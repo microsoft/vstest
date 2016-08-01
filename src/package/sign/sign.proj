@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="SignAssemblies" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <SignType Condition="'$(SignType)' == ''">Test</SignType>
+    <MicrobuildVersion>0.2.0</MicrobuildVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RootDirectory>$(MSBuildThisFileDirectory)..\..\..\</RootDirectory>
+    <BuildConfiguration Condition="'$(BuildConfiguration)' == ''">Release</BuildConfiguration>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net46</TargetFramework>
+    <TargetRuntime Condition="'$(TargetRuntime)' == ''">win7-x64</TargetRuntime>
+    <IncludeLegacyComponents Condition="'$(IncludeLegacyComponents)' == ''">False</IncludeLegacyComponents>
+
+    <PackagesDirectory Condition="'$(PackagesDirectory)' == ''">$(RootDirectory)packages\</PackagesDirectory>
+    <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
+    <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(RootDirectory)artifacts\obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
+  </PropertyGroup>
+
+  <ImportGroup>
+    <Import Project="$(PackagesDirectory)Microbuild.Core\$(MicrobuildVersion)\build\Microbuild.Core.props" />
+    <Import Project="$(PackagesDirectory)Microbuild.Core\$(MicrobuildVersion)\build\Microbuild.Core.targets" />
+  </ImportGroup>
+
+  <Target Name="SignAssemblies">
+    <!-- Sign all files if IncludeLegacyComponents is set to true -->
+    <ItemGroup Condition="'$(IncludeLegacyComponents)' == 'true'">
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Discoverer.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.Resources.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Executor.x64.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.Resources.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.TestEngine.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\CppUnitFramework\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.x64.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.GenericTestAdapter.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.OrderedTestAdapter.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TmiAdapter.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Resource.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
+    </ItemGroup>
+
+    <!-- Sign test platform v2 assemblies -->
+    <ItemGroup>
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.Utilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.Client.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AssembliesToSign>
+        <Authenticode>Microsoft</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </AssembliesToSign>
+    </ItemGroup>
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
+    <SignFiles Files="@(AssembliesToSign)"
+               BinariesDirectory="$(ArtifactsDirectory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+  </Target>
+
+  <Target Name="SignVsix">
+    <PropertyGroup>
+      <VsixOutDir>$(ArtifactsDirectory)..\..\</VsixOutDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <VsixToSign Include="$(VsixOutDir)TestPlatform.vsix">
+        <Authenticode>VsixSHA2</Authenticode>
+      </VsixToSign>
+    </ItemGroup>
+
+    <Message Text="Signing using authenticode certificate '%(VsixToSign.Authenticode)' for @(VsixToSign)"/>
+    <SignFiles Files="@(VsixToSign)"
+               BinariesDirectory="$(VsixOutDir)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+   </Target>
+</Project>

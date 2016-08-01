@@ -1,0 +1,267 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+    using Utilities.Helpers;
+    using Utilities.Helpers.Interfaces;
+
+    /// <summary>
+    /// Provides access to the command-line options.
+    /// </summary>
+    internal class CommandLineOptions
+    {
+        #region Constants/Readonly 
+        
+        /// <summary>
+        /// The default batch size.
+        /// </summary>
+        public const long DefaultBatchSize = 10;
+
+        /// <summary>
+        /// The use vsix extensions key.
+        /// </summary>
+        public const string UseVsixExtensionsKey = "UseVsixExtensions";
+
+        /// <summary>
+        /// The default use vsix extensions value.
+        /// </summary>
+        public const bool DefaultUseVsixExtensionsValue = false;
+        
+        /// <summary>
+        /// The default retrieval timeout for fetching of test results or test cases
+        /// </summary>
+        private readonly TimeSpan DefaultRetrievalTimeout = new TimeSpan(0, 0, 0, 1, 500); 
+        
+        #endregion
+        
+        #region PrivateMembers
+
+        private static CommandLineOptions instance;
+
+        private List<string> sources = new List<string>();
+
+        private Architecture architecture;
+        
+        private FrameworkVersion frameworkVersion;
+
+        #endregion
+
+        /// <summary>
+        /// Gets the instance.
+        /// </summary>
+        internal static CommandLineOptions Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new CommandLineOptions();
+                }
+
+                return instance;
+            }
+        }
+
+        #region Constructor
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        private CommandLineOptions()
+        {
+            this.BatchSize = DefaultBatchSize;
+            this.TestRunStatsEventTimeout = this.DefaultRetrievalTimeout;
+            this.FileHelper = new FileHelper();
+#if TODO
+            UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
+#endif
+        }
+
+#endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Specifies whether parallel execution is on or off.
+        /// </summary>
+        public bool Parallel { get; set; }
+
+        /// <summary>
+        /// Readonly collection of all available test sources
+        /// </summary>
+        public IEnumerable<string> Sources
+        {
+            get
+            {
+                return this.sources.AsReadOnly();
+            }
+        }
+
+        /// <summary>
+        /// Specifies whether dynamic code coverage diagnostic data adapter needs to be configured.
+        /// </summary>
+        public bool EnableCodeCoverage { get; set; }
+
+        /// <summary>
+        /// Specifies whether the Fakes automatic configuration should be disabled.
+        /// </summary>
+        public bool DisableAutoFakes { get; set; }
+
+        /// <summary>
+        /// Specifies whether vsixExtensions is enabled or not. 
+        /// </summary>
+        public bool UseVsixExtensions { get; set; }
+
+        /// <summary>
+        /// Path to the custom test adapters. 
+        /// </summary>
+        public string TestAdapterPath { get; set; }
+
+        /// <summary>
+        /// Port IDE process is listening to
+        /// </summary>
+        public int Port { get; set; }
+
+        /// <summary>
+        /// Configuration the project is built for e.g. Debug/Release
+        /// </summary>
+        public string Configuration { get; set; }
+
+        /// <summary>
+        /// Directory containing the temporary outputs
+        /// </summary>
+        public string BuildBasePath { get; set; }
+
+        /// <summary>
+        /// Directory containing the binaries to run
+        /// </summary>
+        public string Output { get; set; }
+        
+        /// <summary>
+        /// Specifies the frequency of the runStats/discoveredTests event
+        /// </summary>
+        public long BatchSize { get; set; }
+
+        /// <summary>
+        /// Specifies the timeout of the runStats event
+        /// </summary>
+        public TimeSpan TestRunStatsEventTimeout { get; set; }
+
+        /// <summary>
+        /// Test case filter value for run with sources.
+        /// </summary>
+        public string TestCaseFilterValue { get; set; }
+
+        /// <summary>
+        /// Specifies the Target Device
+        /// </summary>
+        public string TargetDevice { get; set; }
+
+        /// <summary>
+        /// Specifies whether the target device has a Windows Phone context or not
+        /// </summary>
+        public bool HasPhoneContext
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(TargetDevice);
+            }
+        }
+        
+        /// <summary>
+        /// Specifies the target platform type for test run.
+        /// </summary>
+        public Architecture TargetArchitecture
+        {
+            get
+            {
+                return this.architecture;
+            }
+            set
+            {
+                this.architecture = value;
+                this.ArchitectureSpecified = true;
+            }
+        }
+
+        /// <summary>
+        /// Specifies if /Platform has been specified on command line or not.
+        /// </summary>
+        internal bool ArchitectureSpecified { get; private set; }
+
+        internal IFileHelper FileHelper { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target .Net Framework version for test run.
+        /// </summary>
+        internal FrameworkVersion TargetFrameworkVersion
+        {
+            get
+            {
+                return this.frameworkVersion;
+            }
+            set
+            {
+                this.frameworkVersion = value;
+                this.FrameworkVersionSpecified = true;
+            }
+        }
+        
+        /// <summary>
+        /// Gets a value indicating whether /Framework has been specified on command line or not.
+        /// </summary>
+        internal bool FrameworkVersionSpecified { get; private set; }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Adds a source file to look for tests in.
+        /// </summary>
+        /// <param name="source">Path to source file to look for tests in.</param>
+        public void AddSource(string source)
+        {
+            if (String.IsNullOrWhiteSpace(source))
+            {
+                throw new CommandLineException(Resources.CannotBeNullOrEmpty);
+            }
+
+            source = source.Trim();
+            if (!FileHelper.Exists(source))
+            {
+                throw new CommandLineException(
+                    string.Format(CultureInfo.CurrentUICulture, Resources.TestSourceFileNotFound, source));
+            }
+
+            if (this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
+            {
+                throw new CommandLineException(
+                    string.Format(CultureInfo.CurrentCulture, Resources.DuplicateSource, source));
+            }
+
+            this.sources.Add(source);
+        }
+
+        #endregion
+
+        #region Internal Methods
+
+        /// <summary>
+        /// Resets the options. Clears the sources.
+        /// </summary>
+        internal void Reset()
+        {
+            instance = null;
+        }
+
+        #endregion
+    }
+}

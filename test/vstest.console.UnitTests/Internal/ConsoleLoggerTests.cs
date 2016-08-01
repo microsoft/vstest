@@ -1,0 +1,303 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
+{
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
+    using System;
+    using System.Collections.Generic;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
+    using System.Threading;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Globalization;
+    using System.Collections.ObjectModel;
+    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+
+    [TestClass]
+    public class ConsoleLoggerTests
+    {
+        private Mock<ITestRunRequest> testRunRequest;
+        private Mock<TestLoggerEvents> events;
+        private Mock<IOutput> mockOutput;
+        private TestLoggerManager testLoggerManager;
+        private ConsoleLogger consoleLogger;
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            RunTestsArgumentProcessorTests.SetupMockExtensions();
+            
+            // Setup Mocks and other dependencies
+            this.Setup();
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            DummyTestLoggerManager.Cleanup();
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowExceptionIfEventsIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                this.consoleLogger.Initialize(null, null);
+            });
+        }
+
+        [TestMethod]
+        public void InitializeShouldNotThrowExceptionIfEventsIsNotNull()
+        {
+            var events = new Mock<TestLoggerEvents>();
+            this.consoleLogger.Initialize(events.Object, null);
+        }
+
+        [TestMethod]
+        public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
+        {
+            // Raise an event on mock object
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                this.testRunRequest.Raise(m => m.TestRunMessage += null, default(TestRunMessageEventArgs));
+            });
+        }
+
+        [TestMethod]
+        public void TestMessageHandlerShouldWriteToConsoleIfTestRunEventsAreRaised()
+        {
+            int count = 0;
+            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
+                (s, o) => { count++; });
+
+            // Raise events on mock object
+            this.testRunRequest.Raise(m => m.TestRunMessage += null, new TestRunMessageEventArgs(TestMessageLevel.Informational, "Informational123"));
+            this.testRunRequest.Raise(m => m.TestRunMessage += null, new TestRunMessageEventArgs(TestMessageLevel.Error, "Error123"));
+            this.testRunRequest.Raise(m => m.TestRunMessage += null, new TestRunMessageEventArgs(TestMessageLevel.Warning, "Warning123"));
+
+            // Added this for synchronization
+            SpinWait.SpinUntil(() => count == 3, 300);
+
+            this.mockOutput.Verify(o => o.WriteLine("Information: Informational123", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("Warning: Warning123", OutputLevel.Warning), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("Error: Error123", OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldThowExceptionIfEventArgsIsNull()
+        {
+            var eventarg = default(TestRunChangedEventArgs);
+
+            // Raise an event on mock object
+            Assert.ThrowsException<NullReferenceException>(() =>
+            {
+                testRunRequest.Raise(m => m.OnRunStatsChange += null, eventarg);
+            });
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldWriteToConsoleIfTestResultEventsAreRaised()
+        {
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultsObject(), null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestResulCompleteHandlerShouldThowExceptionIfEventArgsIsNull()
+        {
+            // Raise an event on mock object
+            Assert.ThrowsException<NullReferenceException>(() =>
+            {
+                this.testRunRequest.Raise(m => m.OnRunCompletion += null, default(TestRunCompleteEventArgs));
+            });
+        }
+
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsPass()
+        {
+            // Raise an event on mock object raised to register test case count
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultObject(TestOutcome.Passed), null);
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.TestRunSummary, 1, 1, 0, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(Resources.TestRunSuccessful, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsFail()
+        {
+            // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
+            var eventArgs = new TestRunChangedEventArgs(null, GetTestResultObject(TestOutcome.Failed), null);
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.TestRunSummary, 1, 0, 1, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(Resources.TestRunFailed, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void PrintTimeHandlerShouldPrintElapsedTimeOnConsole()
+        {
+            // Raise an event on mock object raised to register test case count
+            var eventArgs = new TestRunChangedEventArgs(null, GetTestResultObject(TestOutcome.Passed), null);
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            // Raise events on mock object
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 1, 0, 0)));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 0, 1, 0)));
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 0, 0, 1)));
+
+            // Verify PrintTimeSpan with different formats
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Days), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Hours), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Minutes), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Seconds), OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void DisplayFullInformationShouldWriteErrorMessageAndStackTraceToConsole()
+        {
+            var testresults = this.GetTestResultObject(TestOutcome.Failed);
+            testresults[0].ErrorMessage = "ErrorMessage";
+            testresults[0].ErrorStackTrace = "ErrorStackTrace";
+
+            var eventArgs = new TestRunChangedEventArgs(null, testresults, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}{1}", Resources.TestMessageFormattingPrefix, "ErrorMessage"), OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, "{0}", "ErrorStackTrace"), OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(Resources.ErrorMessageBanner, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(Resources.StacktraceBanner, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void GetTestMessagesShouldWriteMessageAndStackTraceToConsole()
+        {
+            var count = 0;
+            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
+                (s, o) => { count++; });
+
+            var testresults = this.GetTestResultObject(TestOutcome.Failed);
+            testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardOutCategory, "StandardOutCategory"));
+            testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.StandardErrorCategory, "StandardErrorCategory"));
+            testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, "AdditionalInfoCategory"));
+            testresults[0].Messages.Add(new TestResultMessage(TestResultMessage.AdditionalInfoCategory, "AnotherAdditionalInfoCategory"));
+            var eventArgs = new TestRunChangedEventArgs(null, testresults, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            // Added this for synchronization
+            SpinWait.SpinUntil(() => count == 3, 300);
+
+            this.mockOutput.Verify(o => o.WriteLine(Resources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.Write(" StandardOutCategory", OutputLevel.Information), Times.Once());
+
+            this.mockOutput.Verify(o => o.WriteLine(Resources.StdErrMessagesBanner, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.Write(" StandardErrorCategory", OutputLevel.Error), Times.Once());
+
+            this.mockOutput.Verify(o => o.WriteLine(Resources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.Write(" AdditionalInfoCategory AnotherAdditionalInfoCategory", OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void AttachmentInformationShouldBeWrittenToConsoleIfAttachmentsArePresent()
+        {
+            var attachmentSet = new AttachmentSet(new Uri("test://uri"), "myattachmentset");
+
+            var uriDataAttachment = new UriDataAttachment(new Uri("file://server/filename.ext"), "description");
+            attachmentSet.Attachments.Add(uriDataAttachment);
+
+            var uriDataAttachment1 = new UriDataAttachment(new Uri("file://server/filename1.ext"), "description");
+            attachmentSet.Attachments.Add(uriDataAttachment1);
+
+            var attachmentSetList = new List<AttachmentSet>();
+            attachmentSetList.Add(attachmentSet);
+
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
+
+            // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, testRunCompleteEventArgs);
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());
+        }
+
+        /// <summary>
+        /// Setup Mocks and other dependencies
+        /// </summary>
+        private void Setup()
+        {
+            // mock for ITestRunRequest
+            this.testRunRequest = new Mock<ITestRunRequest>();
+            this.events = new Mock<TestLoggerEvents>();
+            this.mockOutput = new Mock<IOutput>();
+
+            this.consoleLogger = new ConsoleLogger(this.mockOutput.Object);
+            this.consoleLogger.Initialize(this.events.Object, null);
+
+            DummyTestLoggerManager.Cleanup();
+            // Create Instance of TestLoggerManager
+            this.testLoggerManager = TestLoggerManager.Instance;
+            //Console.WriteLine(TestLoggerManager.Instance.GetHashCode());
+            this.testLoggerManager.AddLogger(new Uri(ConsoleLogger.ExtensionUri), new Dictionary<string, string>());
+            this.testLoggerManager.EnableLogging();
+
+            // Register TestRunRequest object
+            this.testLoggerManager.RegisterTestRunEvents(this.testRunRequest.Object);
+        }
+
+        private List<ObjectModel.TestResult> GetTestResultsObject()
+        {
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Passed;
+
+            var testresult1 = new ObjectModel.TestResult(testcase);
+            testresult1.Outcome = TestOutcome.Failed;
+
+            var testresult2 = new ObjectModel.TestResult(testcase);
+            testresult2.Outcome = TestOutcome.None;
+
+            var testresult3 = new ObjectModel.TestResult(testcase);
+            testresult3.Outcome = TestOutcome.NotFound;
+
+            var testresult4 = new ObjectModel.TestResult(testcase);
+            testresult4.Outcome = TestOutcome.Skipped;
+
+            var testresultList = new List<ObjectModel.TestResult> { testresult, testresult1, testresult2, testresult3, testresult4 };
+
+            return testresultList;
+        }
+
+        private List<ObjectModel.TestResult> GetTestResultObject(TestOutcome outcome)
+        {
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = outcome;
+            var testresultList = new List<ObjectModel.TestResult> { testresult };
+            return testresultList;
+        }
+    }   
+}

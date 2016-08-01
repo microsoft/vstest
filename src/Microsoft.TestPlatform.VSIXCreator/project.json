@@ -1,0 +1,47 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "copyToOutput": {
+      "include": [
+        "[Content_Types].xml",
+        "extension.vsixmanifest",
+        // Have to drop a time stamped version of testhost config because the build system does not honour the
+        // users config file when building from a dependent exe. It does honor while building from testhost.x86 project though.
+        "testhost.x86.exe.config",
+        "testhost.exe.config"
+      ]
+    }
+  },
+
+  "scripts": {
+    "precompile": "VSIXDelete.cmd",
+    "postcompile": [ "VSIXCreator.cmd" ] 
+	}, 
+	
+  "frameworks": {
+    "net461": {
+      "frameworkAssemblies": {
+        "System.IO.Compression": "4.0.0.0",
+        "System.IO.Compression.FileSystem": "4.0.0.0"
+      }
+    }
+  },
+  "dependencies": {
+    "Microsoft.TestPlatform.Client": "15.0.0-*",
+    "Microsoft.TestPlatform.Common": "15.0.0-*",
+    "Microsoft.TestPlatform.CommunicationUtilities": "15.0.0-*",
+    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
+    "Microsoft.TestPlatform.CrossPlatEngine": "15.0.0-*",
+    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+    "Microsoft.TestPlatform.VsTestConsole.TranslationLayer": "15.0.0-*",
+    "testhost": "15.0.0-*",
+    "testhost.x86": "15.0.0-*",
+    "vstest.console": "15.0.0-*",
+
+    "Microsoft.Internal.TestPlatform.Extensions": {
+      "type": "build",
+      "version":  "15.0.0"
+    }
+  }
+}

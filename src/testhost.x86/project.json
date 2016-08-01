@@ -1,0 +1,38 @@
+﻿{
+  "version": "15.0.0-*",
+
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "delaySign": true,
+    "keyFile": "../../scripts/key.snk",
+    "warningsAsErrors": true,
+    "platform": "x86"
+  },
+
+  "dependencies": {
+    "Microsoft.TestPlatform.CommunicationUtilities": "15.0.0-*",
+    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+    "Microsoft.TestPlatform.CrossPlatEngine": "15.0.0-*"
+  },
+
+  "runtimes": {
+    "win7-x64": { },
+    "win7-x86": { }
+  },
+
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "netstandardapp1.5",
+        "portable-net45+win8",
+        "portable-net45+wp80+win8+wpa81+dnxcore50"
+      ],
+      "dependencies": {
+        "NETStandard.Library": "1.5.0-rc2-24027",
+        "System.ComponentModel.TypeConverter": "4.0.1-rc2-23911"
+      }
+    },
+    "net46": {}
+  }
+}

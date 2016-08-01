@@ -1,0 +1,31 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
+{
+    using System;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Interface defining the parallel execution manager
+    /// </summary>
+    public interface IParallelProxyExecutionManager : IParallelOperationManager, IProxyExecutionManager
+    {
+        /// <summary>
+        /// Handles Partial Run Complete event coming from a specific concurrent proxy exceution manager
+        /// Each concurrent proxy execution manager will signal the parallel execution manager when its complete
+        /// </summary>
+        /// <param name="proxyExecutionManager">Concurrent Execution manager that completed the run</param>
+        /// <param name="testRunCompleteArgs">RunCompleteArgs for the concurrent run</param>
+        /// <param name="lastChunkArgs">LastChunk testresults for the concurrent run</param>
+        /// <param name="runContextAttachments">RunAttachments for the concurrent run</param>
+        /// <param name="executorUris">ExecutorURIs of the adapters involved in executing the tests</param>
+        /// <returns>True if parallel run is complete</returns>
+        bool HandlePartialRunComplete(
+            IProxyExecutionManager proxyExecutionManager,
+            TestRunCompleteEventArgs testRunCompleteArgs,
+            TestRunChangedEventArgs lastChunkArgs,
+            ICollection<AttachmentSet> runContextAttachments,
+            ICollection<string> executorUris);
+    }
+}

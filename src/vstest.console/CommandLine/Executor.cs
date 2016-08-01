@@ -1,0 +1,290 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+// General Flow:
+// Create a command processor for each argument.
+//   If there is no matching command processor for an argument, output error, display help and exit.
+//   If throws during creation, output error and exit.
+// If the help command processor has been requested, execute the help processor and exit.
+// Order the command processors by priority.
+// Allow command processors to validate against other command processors which are present.
+//   If throws during validation, output error and exit.
+// Process each command processor.
+//   If throws during validaton, output error and exit.
+//   If the default (RunTests) command processor has no test containers output an error and exit
+//   If the default (RunTests) command processor has no tests to run output an error and exit
+
+// Commands metadata:
+//  *Command line argument.
+//   Priority.
+//   Help output.
+//   Required
+//   Single or multiple
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using System.Diagnostics.Contracts;
+    using System.Reflection;
+
+    /// <summary>
+    /// Performs the execution based on the arguments provided.
+    /// </summary>
+    internal class Executor
+    {
+        #region Constructor
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public Executor(IOutput output)
+        {
+            this.Output = output;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Instance to use for sending output.
+        /// </summary>
+        private IOutput Output { get; set; }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Performs the execution based on the arguments provided.
+        /// </summary>
+        /// <param name="args">
+        /// Arguments provided to perform execution with.
+        /// </param>
+        /// <returns>
+        /// Exit Codes - Zero (for sucessful command execution), One (for bad command) 
+        /// </returns>
+        internal int Execute(params string[] args)
+        {
+            int exitCode = 0;
+            // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
+            if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
+            {
+                args = args ?? new string[0];
+                exitCode = 1;
+                // Do not add help processor as we will go and try to check for project.json files in current dir
+            }
+
+            PrintSplashScreen();
+
+            // Get the argument processors for the arguments.
+            List<IArgumentProcessor> argumentProcessors;
+            exitCode |= GetArgumentProcessors(args, out argumentProcessors);
+
+            // Verify that the arguments are valid.
+            exitCode |= IdentifyDuplicateArguments(argumentProcessors);
+
+            // Quick exit for syntax error
+            if (exitCode == 1
+                && argumentProcessors.All(
+                    processor => processor.Metadata.Value.CommandName != HelpArgumentProcessor.CommandName))
+            {
+                return exitCode;
+            }
+            
+            // Execute all argument processors
+            foreach(var processor in argumentProcessors)
+            {
+                if(!ExecuteArgumentProcessor(processor, out exitCode))
+                {
+                    break;
+                }
+            }
+
+            // Use the test run result aggregator to update the exit code.
+            exitCode |= (TestRunResultAggregator.Instance.Outcome == TestOutcome.Passed) ? 0 : 1;
+
+            EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", exitCode);
+            return exitCode;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Get the list of argument processors for the arguments.
+        /// </summary>
+        /// <param name="args">Arguments provided to perform execution with.</param>
+        /// <param name="processors">List of argument processors for the arguments.</param>
+        /// <returns>0 if all of the processors were created successfully and 1 otherwise.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1804:RemoveUnusedLocals", MessageId = "processorInstance", Justification = "Done on purpose to force the instances to be created")]
+        private int GetArgumentProcessors(string[] args, out List<IArgumentProcessor> processors)
+        {
+            processors = new List<IArgumentProcessor>();
+
+            int result = 0;
+            var processorFactory = ArgumentProcessorFactory.Create();
+
+            foreach (string arg in args)
+            {
+                var processor = processorFactory.CreateArgumentProcessor(arg);
+
+                if (processor != null)
+                {
+                    processors.Add(processor);
+                }
+                else
+                {
+                    // No known processor was found, report an error and continue
+                    Output.Error(String.Format(CultureInfo.CurrentCulture, Resources.NoArgumentProcessorFound, arg));
+
+                    // Add the help processor
+                    if (result == 0)
+                    {
+                        result = 1;
+                        processors.Add(processorFactory.CreateArgumentProcessor(HelpArgumentProcessor.CommandName));
+                    }
+                }
+            }
+
+            // Add the internal argument processors that should always be executed.
+            // Examples: processors to enable loggers that are statically configured, and to start logging,
+            //           should always be executed.
+            var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
+            processors.AddRange(processorsToAlwaysExecute);
+
+            // Ensure we have an action argument.
+            EnsureActionArgumentIsPresent(processors, processorFactory);
+
+            // Instantiate and initialize the processors in priority order.
+            processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
+            foreach (var processor in processors)
+            {
+                IArgumentExecutor executorInstance;
+                try
+                {
+                    // Ensure the instance is created.  Note that the Lazy not only instantiates
+                    // the argument processor, but also initializes it.
+                    executorInstance = processor.Executor.Value;
+                }
+                catch (CommandLineException e)
+                {
+                    Output.Error(e.Message);
+                    result = 1;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Verify that the arguments are valid.
+        /// </summary>
+        /// <param name="argumentProcessors">Processors to verify against.</param>
+        /// <returns>0 if successful and 1 otherwise.</returns>
+        private int IdentifyDuplicateArguments(IEnumerable<IArgumentProcessor> argumentProcessors)
+        {
+            int result = 0;
+
+            // Used to keep track of commands that are only allowed to show up once.  The first time it is seen
+            // an entry for the command will be added to the dictionary and the value will be set to 1.  If we
+            // see the command again and the value is 1 (meaning this is the second time we have seen the command),
+            // we will output an error and increment the count.  This ensures that the error message will only be
+            // displayed once even if the user does something like /ListDiscoverers /ListDiscoverers /ListDiscoverers.
+            Dictionary<string, int> commandSeenCount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+            // Check each processor.
+            foreach (var processor in argumentProcessors)
+            {
+                if (!processor.Metadata.Value.AllowMultiple)
+                {
+                    int count;
+                    if (!commandSeenCount.TryGetValue(processor.Metadata.Value.CommandName, out count))
+                    {
+                        commandSeenCount.Add(processor.Metadata.Value.CommandName, 1);
+                    }
+                    else if (count == 1)
+                    {
+                        result = 1;
+
+                        // Update the count so we do not print the error out for this argument multiple times.
+                        commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
+                        Output.Error(String.Format(CultureInfo.CurrentCulture, Resources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Ensures that an action argument is present and if one is not, then the default action argument is added.
+        /// </summary>
+        /// <param name="argumentProcessors">The arguments that are being processed.</param>
+        /// <param name="processorFactory">A factory for creating argument processors.</param>
+        private void EnsureActionArgumentIsPresent(List<IArgumentProcessor> argumentProcessors, ArgumentProcessorFactory processorFactory)
+        {
+            Contract.Requires(argumentProcessors != null);
+            Contract.Requires(processorFactory != null);
+
+            // Determine if any of the argument processors are actions. 
+            var isActionIncluded = argumentProcessors.Any((processor) => processor.Metadata.Value.IsAction);
+
+            // If no action arguments have been provided, then add the default action argument.
+            if (!isActionIncluded)
+            {
+                argumentProcessors.Add(processorFactory.CreateDefaultActionArgumentProcessor());
+            }
+        }
+        
+        /// <summary>
+        /// Executes the argument processor
+        /// </summary>
+        /// <param name="processor">Argument processor to execute.</param>
+        /// <returns> true if continue execution, false otherwise.</returns>
+        private bool ExecuteArgumentProcessor(IArgumentProcessor processor, out int exitCode)
+        {
+            exitCode = 0;
+            var continueExecution = true;
+            var result = processor.Executor.Value.Execute();
+
+            Debug.Assert(
+                result >= ArgumentProcessorResult.Success && result <= ArgumentProcessorResult.Abort,
+                "Invalid argument processor result.");
+
+            if (result == ArgumentProcessorResult.Fail)
+            {
+                exitCode = 1;
+            }
+
+            if (result == ArgumentProcessorResult.Abort)
+            {
+                continueExecution = false;
+            }
+            
+            return continueExecution;
+        }
+        
+        /// <summary>
+        /// Displays the Company and Copyright splash title info immediately after launch
+        /// </summary>
+        private void PrintSplashScreen()
+        {
+            var version = typeof(Executor).GetTypeInfo().Assembly.GetName().Version;
+            string commandLineBanner = String.Format(CultureInfo.CurrentUICulture, Resources.MicrosoftCommandLineTitle, version.ToString());
+            Output.WriteLine(commandLineBanner, OutputLevel.Information);
+
+            Output.WriteLine(Resources.CopyrightCommandLineTitle, OutputLevel.Information);
+            Output.WriteLine(string.Empty, OutputLevel.Information);
+        }
+
+        #endregion
+    }
+}

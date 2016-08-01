@@ -1,0 +1,306 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.Contracts;
+    using System.Linq;
+    
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    
+    /// <summary>
+    /// Used to create the appropriate instance of an argument processor.
+    /// </summary>
+    internal class ArgumentProcessorFactory
+    {
+        #region Constants
+
+        /// <summary>
+        /// The command starter.
+        /// </summary>
+        internal const string CommandStarter = "/";
+
+        #endregion
+
+        #region Fields
+
+        /// <summary>
+        /// Available argument processors.
+        /// </summary>
+        private IEnumerable<IArgumentProcessor> argumentProcessors;
+        private Dictionary<string, IArgumentProcessor> commandToProcessorMap;
+        private Dictionary<string, IArgumentProcessor> specialCommandToProcessorMap;
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Initializes the argument processor factory.
+        /// </summary>
+        /// <param name="argumentProcessors">
+        /// The argument Processors.
+        /// </param>
+        /// <remarks>
+        /// This is not public because the static Create method should be used to access the instance.
+        /// </remarks>
+        protected ArgumentProcessorFactory(
+            IEnumerable<IArgumentProcessor> argumentProcessors)
+        {
+            Contract.Requires(argumentProcessors != null);
+            this.argumentProcessors = argumentProcessors;
+        }
+
+        #endregion
+
+        #region Static Methods
+
+        public static IEnumerable<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
+                new HelpArgumentProcessor(),
+                new TestSourceArgumentProcessor(),
+                new ListTestsArgumentProcessor(),
+                new RunTestsArgumentProcessor(),
+                new TestAdapterPathArgumentProcessor(),
+                new OutputArgumentProcessor(),
+                new BuildBasePathArgumentProcessor(),
+                new ConfigurationArgumentProcessor(),
+                new PortArgumentProcessor(),
+                new RunSettingsArgumentProcessor(),
+                new PlatformArgumentProcessor(),
+                new EnableLoggerArgumentProcessor(),
+                new ParallelArgumentProcessor()
+        };
+        
+        /// <summary>
+        /// Creates ArgumentProcessorFactory.
+        /// </summary>
+        /// <returns>ArgumentProcessorFactory.</returns>
+        internal static ArgumentProcessorFactory Create()
+        {
+            // Get the ArgumentProcessorFactory
+            return new ArgumentProcessorFactory(DefaultArgumentProcessors);
+        }
+
+        /// <summary>
+        /// Creates ArgumentProcessorFactory with given list of processors
+        /// </summary>
+        /// <returns>ArgumentProcessorFactory.</returns>
+        internal static ArgumentProcessorFactory Create(IEnumerable<IArgumentProcessor> processorList)
+        {
+            return new ArgumentProcessorFactory(processorList);
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Returns all of the available argument processors.
+        /// </summary>
+        public IEnumerable<IArgumentProcessor> AllArgumentProcessors
+        {
+            get { return argumentProcessors; }
+        }
+
+        /// <summary>
+        /// Gets a mapping between command and Argument Executor.
+        /// </summary>
+        internal Dictionary<string, IArgumentProcessor> CommandToProcessorMap
+        {
+            get
+            {
+                // Build the mapping if it does not already exist.
+                if (this.commandToProcessorMap == null)
+                {
+                    BuildCommandMaps();
+                }
+
+                return this.commandToProcessorMap;
+            }
+        }
+
+        /// <summary>
+        /// Gets a mapping between special commands and their Argument Processors.
+        /// </summary>
+        internal Dictionary<string, IArgumentProcessor> SpecialCommandToProcessorMap
+        {
+            get
+            {
+                // Build the mapping if it does not already exist.
+                if (this.specialCommandToProcessorMap == null)
+                {
+                    BuildCommandMaps();
+                }
+
+                return this.specialCommandToProcessorMap;
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Creates the argument processor associated with the provided command line argument.
+        /// The Lazy that is returned will initialize the underlying argument processor when it is first accessed.
+        /// </summary>
+        /// <param name="argument">Command line argument to create the argument processor for.</param>
+        /// <returns>The argument processor or null if one was not found.</returns>
+        public IArgumentProcessor CreateArgumentProcessor(string argument)
+        {
+            if (String.IsNullOrWhiteSpace(argument))
+            {
+                throw new ArgumentException("Cannot be null or empty", "argument");
+            }
+            Contract.EndContractBlock();
+
+            // Parse the input into its command and argument parts.
+            var pair = new CommandArgumentPair(argument);
+
+            // Find the associated argument processor.
+            IArgumentProcessor argumentProcessor;
+            CommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
+
+            // If an argument processor was not found for the command, see if it is a test source
+            // argument.
+            if (argumentProcessor == null)
+            {
+                argumentProcessor = TryGetTestSourceArgument(argument, ref pair);
+            }
+
+            if (argumentProcessor != null)
+            {
+                argumentProcessor = WrapLazyProcessorToInitializeOnInstantiation(argumentProcessor, pair.Argument);
+            }
+
+            return argumentProcessor;
+        }
+
+        /// <summary>
+        /// Creates the default action argument processor.
+        /// The Lazy that is returned will initialize the underlying argument processor when it is first accessed.
+        /// </summary>
+        /// <returns>The default action argument processor.</returns>
+        public IArgumentProcessor CreateDefaultActionArgumentProcessor()
+        {
+            var argumentProcessor = SpecialCommandToProcessorMap[RunTestsArgumentProcessor.CommandName];
+            return WrapLazyProcessorToInitializeOnInstantiation(argumentProcessor, null);
+        }
+
+        /// <summary>
+        /// Gets the argument processors that are tagged as special and to be always executed.
+        /// The Lazy's that are returned will initialize the underlying argument processor when first accessed.
+        /// </summary>
+        /// <returns>The argument processors that are tagged as special and to be always executed.</returns>
+        public IEnumerable<IArgumentProcessor> GetArgumentProcessorsToAlwaysExecute()
+        {
+            return SpecialCommandToProcessorMap.Values
+                .Where(lazyProcessor => lazyProcessor.Metadata.Value.IsSpecialCommand && lazyProcessor.Metadata.Value.AlwaysExecute);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Checks the provided argument to see if it could be a test source and returns the test source
+        /// argument processor if it could be a test source.
+        /// </summary>
+        /// <param name="command">The command to test to see if it is a test source.</param>
+        /// <returns>The test source argument processor or null if the commnad is not a test source.</returns>
+        private IArgumentProcessor TryGetTestSourceArgument(string argument, ref CommandArgumentPair pair)
+        {
+            Contract.Requires(!String.IsNullOrWhiteSpace(argument));
+            IArgumentProcessor result = null;
+
+            // If the command does not begin with the command starter ("/"), then
+            // we considerer it to be a test source.
+            if (!argument.StartsWith(CommandStarter, StringComparison.OrdinalIgnoreCase))
+            {
+                result = SpecialCommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
+
+                // Update the command pair since the command is actually the argument in the case of
+                // a test source.
+                pair = new CommandArgumentPair(TestSourceArgumentProcessor.CommandName, argument);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Builds the command to processor map and special command to processor map.
+        /// </summary>
+        private void BuildCommandMaps()
+        {
+            this.commandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
+            this.specialCommandToProcessorMap = new Dictionary<string, IArgumentProcessor>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (IArgumentProcessor argumentProcessor in this.argumentProcessors)
+            {
+                // Add the command to the appropriate dictionary.
+                var processorsMap = argumentProcessor.Metadata.Value.IsSpecialCommand
+                                      ? this.specialCommandToProcessorMap
+                                      : this.commandToProcessorMap;
+
+                processorsMap.Add(argumentProcessor.Metadata.Value.CommandName, argumentProcessor);
+                if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
+                {
+                    processorsMap.Add(argumentProcessor.Metadata.Value.ShortCommandName, argumentProcessor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Decorates a lazy argument processor so that the real processor is initialized when the lazy value is obtained.
+        /// </summary>
+        /// <param name="processor">The lazy processor.</param>
+        /// <param name="initArg">The argument with which the real processor should be initialized.</param>
+        /// <returns>The decorated lazy processor.</returns>
+        private static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(
+            IArgumentProcessor processor,
+            string initArg)
+        {
+            var processorExecutor = processor.Executor;
+            var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
+            {
+                IArgumentExecutor instance = null;
+                try
+                {
+                    instance = processorExecutor.Value;
+                }
+                catch (Exception e)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
+                    }
+                    throw;
+                }
+
+                if (instance != null)
+                {
+                    try
+                    {
+                        instance.Initialize(initArg);
+                    }
+                    catch (Exception e)
+                    {
+                        if (EqtTrace.IsErrorEnabled)
+                        {
+                            EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
+                        }
+                        throw;
+                    }
+                }
+
+                return instance;
+            }, System.Threading.LazyThreadSafetyMode.PublicationOnly);
+            processor.Executor = lazyArgumentProcessor;
+
+            return processor;
+        }
+
+#endregion
+    }
+}

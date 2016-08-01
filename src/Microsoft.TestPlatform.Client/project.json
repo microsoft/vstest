@@ -1,0 +1,28 @@
+﻿{
+  "version": "15.0.0-*",
+  "buildOptions": {
+    "outputName": "Microsoft.VisualStudio.TestPlatform.Client",
+    "delaySign": true,
+    "keyFile": "../../scripts/key.snk",
+    "warningsAsErrors": true
+  },
+
+  "dependencies": {
+    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
+    "Microsoft.TestPlatform.CrossPlatEngine": "15.0.0-*"
+  },
+
+  "frameworks": {
+    "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8"
+      ],
+      "dependencies": {
+        "NETStandard.Library": "1.5.0-rc2-24008"
+      }
+    },
+    "net46": { }
+  }
+}

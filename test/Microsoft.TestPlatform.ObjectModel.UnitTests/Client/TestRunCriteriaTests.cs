@@ -1,0 +1,178 @@
+// Copyright (c) Microsoft. All rights reserved.
+
+namespace Microsoft.TestPlatform.ObjectModel.UnitTests
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using VisualStudio.TestPlatform.ObjectModel;
+    using VisualStudio.TestPlatform.ObjectModel.Client;
+
+    [TestClass]
+    public class TestRunCriteriaTests
+    {
+        #region Constructor tests.
+
+        [TestMethod]
+        public void ConstructorForSourcesShouldInitializeAdapterSourceMap()
+        {
+            var sources = new List<string> { "s1.dll", "s2.dll" };
+            var testRunCriteria = new TestRunCriteria(sources, frequencyOfRunStatsChangeEvent: 10);
+
+            Assert.IsNotNull(testRunCriteria.AdapterSourceMap);
+            CollectionAssert.AreEqual(new List<string> { "_none_" }, testRunCriteria.AdapterSourceMap.Keys);
+            CollectionAssert.AreEqual(sources, testRunCriteria.AdapterSourceMap.Values.First().ToList());
+        }
+
+        [TestMethod]
+        public void ConstructorForSourcesWithBaseTestRunCriteriaShouldInitializeAdapterSourceMap()
+        {
+            var sources = new List<string> { "s1.dll", "s2.dll" };
+            var testRunCriteria = new TestRunCriteria(sources, new BaseTestRunCriteria(10));
+
+            Assert.IsNotNull(testRunCriteria.AdapterSourceMap);
+            CollectionAssert.AreEqual(new List<string> { "_none_" }, testRunCriteria.AdapterSourceMap.Keys);
+            CollectionAssert.AreEqual(sources, testRunCriteria.AdapterSourceMap.Values.First().ToList());
+        }
+
+        [TestMethod]
+        public void ConstructorForSourcesWithAdapterSourceMapShouldInitializeSourceMap()
+        {
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
+            var sourceSet1 = new List<string> { "s1.dll", "s2.dll" };
+            var sourceSet2 = new List<string> { "s1.json", "s2.json" };
+            adapterSourceMap.Add("dummyadapter1", sourceSet1);
+            adapterSourceMap.Add("dummyadapter2", sourceSet2);
+
+            var testRunCriteria = new TestRunCriteria(adapterSourceMap, 10, false, null, TimeSpan.MaxValue, null);
+
+            Assert.IsNotNull(testRunCriteria.AdapterSourceMap);
+            CollectionAssert.AreEqual(new List<string> { "dummyadapter1", "dummyadapter2" }, testRunCriteria.AdapterSourceMap.Keys);
+            CollectionAssert.AreEqual(sourceSet1, testRunCriteria.AdapterSourceMap.Values.First().ToList());
+            CollectionAssert.AreEqual(sourceSet2, testRunCriteria.AdapterSourceMap.Values.ToArray()[1].ToList());
+        }
+
+        #endregion
+
+        #region Sources tests.
+
+        [TestMethod]
+        public void SourcesShouldEnumerateThroughAllSourcesInTheAdapterSourceMap()
+        {
+            var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
+            var sourceSet1 = new List<string> { "s1.dll", "s2.dll" };
+            var sourceSet2 = new List<string> { "s1.json", "s2.json" };
+            adapterSourceMap.Add("dummyadapter1", sourceSet1);
+            adapterSourceMap.Add("dummyadapter2", sourceSet2);
+
+            var testRunCriteria = new TestRunCriteria(adapterSourceMap, 10, false, null, TimeSpan.MaxValue, null);
+
+            var expectedSourceSet = new List<string>(sourceSet1);
+            expectedSourceSet.AddRange(sourceSet2);
+            CollectionAssert.AreEqual(expectedSourceSet, testRunCriteria.Sources.ToList());
+        }
+
+        [TestMethod]
+        public void SourcesShouldReturnNullIfAdapterSourceMapIsNull()
+        {
+            var testRunCriteria =
+                new TestRunCriteria(
+                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
+                    frequencyOfRunStatsChangeEvent: 10);
+            
+            Assert.IsNull(testRunCriteria.Sources);
+        }
+
+        #endregion
+
+        #region HasSpecificSources tests
+
+        [TestMethod]
+        public void HasSpecificSourcesReturnsFalseIfSourcesAreNotSpecified()
+        {
+            var testRunCriteria =
+                new TestRunCriteria(
+                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
+                    frequencyOfRunStatsChangeEvent: 10);
+
+            Assert.IsFalse(testRunCriteria.HasSpecificSources);
+        }
+
+        [TestMethod]
+        public void HasSpecificSourcesReturnsTrueIfSourcesAreSpecified()
+        {
+            var sources = new List<string> { "s1.dll", "s2.dll" };
+            var testRunCriteria = new TestRunCriteria(sources, frequencyOfRunStatsChangeEvent: 10);
+
+            Assert.IsTrue(testRunCriteria.HasSpecificSources);
+        }
+
+        #endregion
+
+        #region HasSpecificTests tests
+
+        [TestMethod]
+        public void HasSpecificTestsReturnsTrueIfTestsAreSpecified()
+        {
+            var testRunCriteria =
+                new TestRunCriteria(
+                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
+                    frequencyOfRunStatsChangeEvent: 10);
+
+            Assert.IsTrue(testRunCriteria.HasSpecificTests);
+        }
+
+        [TestMethod]
+        public void HasSpecificTestsReturnsFalseIfSourcesAreSpecified()
+        {
+            var sources = new List<string> { "s1.dll", "s2.dll" };
+            var testRunCriteria = new TestRunCriteria(sources, frequencyOfRunStatsChangeEvent: 10);
+
+            Assert.IsFalse(testRunCriteria.HasSpecificTests);
+        }
+
+        #endregion
+
+        #region TestCaseFilter tests
+
+        [TestMethod]
+        public void TestCaseFilterSetterShouldThrowIftestCriteriaIsBasedOnTests()
+        {
+            var testRunCriteria =
+                new TestRunCriteria(
+                    new List<TestCase> { new TestCase("A.C.M", new Uri("excutor://dummy"), "s.dll") },
+                    frequencyOfRunStatsChangeEvent: 10);
+
+            var isExceptionthrown = false;
+            try
+            {
+                testRunCriteria.TestCaseFilter = "foo";
+            }
+            catch (InvalidOperationException ex)
+            {
+                isExceptionthrown = true;
+                Assert.AreEqual(
+                    "Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.",
+                    ex.Message);
+            }
+
+            Assert.IsTrue(isExceptionthrown);
+        }
+
+        [TestMethod]
+        public void TestCaseFilterSetterShouldSetFilterCriteriaForSources()
+        {
+            var sources = new List<string> { "s1.dll", "s2.dll" };
+            var testRunCriteria = new TestRunCriteria(sources, frequencyOfRunStatsChangeEvent: 10);
+
+            testRunCriteria.TestCaseFilter = "foo";
+
+            Assert.AreEqual("foo", testRunCriteria.TestCaseFilter);
+        }
+
+        #endregion 
+    }
+}
