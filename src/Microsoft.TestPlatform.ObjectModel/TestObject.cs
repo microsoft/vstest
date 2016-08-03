@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved.
+﻿﻿// Copyright (c) Microsoft. All rights reserved.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
@@ -76,7 +76,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public TestObject()
 #endif
         {
-            this.store = new Dictionary<TestProperty, object>();
+            this.store = new Dictionary<TestProperty, object>();            
+            TypeDescriptor.AddAttributes(typeof(Guid), new TypeConverterAttribute(typeof(CustomGuidConverter)));
         }
 
         [OnSerializing]
@@ -101,9 +102,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        #endregion Constructors
+#endregion Constructors
 
-        #region Properties
+#region Properties
 
         /// <summary>
         ///   Returns the TestProperties currently specified in this TestObject.
@@ -233,9 +234,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             PrivateSetPropertyValue(property, objValue);
         }
 
-        #endregion Property Values
+#endregion Property Values
 
-        #region Helpers
+#region Helpers
         /// <summary>
         ///   Return TestProperty's value
         /// </summary>
@@ -355,7 +356,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        #endregion Helpers
+#endregion Helpers
 
         private TraitCollection traits;
 
@@ -371,5 +372,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return this.traits;
             }
         }
-    }
+    } 
 }

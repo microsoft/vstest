@@ -23,7 +23,7 @@
         "System.ComponentModel.TypeConverter": "4.0.1-rc2-23911",
         "System.Diagnostics.Process": "4.1.0-rc2-23704",
         "Microsoft.TestPlatform.CommunicationUtilities": "15.0.0-*",
-        "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+        "Microsoft.TestPlatform.ObjectModel": "15.0.0-*"
       }
     },
     "net46": {
@@ -33,7 +33,7 @@
       },
       "dependencies": {
         "Microsoft.TestPlatform.CommunicationUtilities": "15.0.0-*",
-        "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+        "Microsoft.TestPlatform.ObjectModel": "15.0.0-*"
       }
     }
   }

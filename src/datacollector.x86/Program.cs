@@ -3,9 +3,10 @@
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.x86
 {
     using System;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// The program.
