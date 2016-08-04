@@ -35,7 +35,6 @@
           "version": "1.0.0",
           "type": "platform"
         },
-        "NETStandard.Library": "1.6.0",
         "System.ComponentModel.TypeConverter": "4.1.0",
         "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
       }

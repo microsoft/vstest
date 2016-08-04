@@ -35,7 +35,6 @@
           "version": "1.0.0",
           "type": "platform"
         },
-        "NETStandard.Library": "1.6.0",
         "System.ComponentModel.TypeConverter": "4.1.0",
         "System.Diagnostics.Contracts": "4.0.0",
         "System.Xml.XPath": "4.0.1"
