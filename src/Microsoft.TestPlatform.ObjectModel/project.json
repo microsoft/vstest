@@ -1,7 +1,7 @@
 {
   "version": "15.0.0-*",
   "buildOptions": {
-    //"outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
+    "outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true
