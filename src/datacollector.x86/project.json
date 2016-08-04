@@ -29,10 +29,12 @@
         "portable-net45+wp80+win8+wpa81+dnxcore50"
       ],
       "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0",
+          "type": "platform"
+        },
         "NETStandard.Library": "1.6.0",
-        "Microsoft.DotNet.ProjectModel": "1.0.0-rc2-002702",
-        "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-
+        "Microsoft.DotNet.ProjectModel": "1.0.0-rc2-002702"
       }
     },
     "net46": {}

@@ -1,7 +1,7 @@
 {
   "version": "15.0.0-*",
   "buildOptions": {
-    "outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
+    //"outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true
@@ -28,11 +28,11 @@
       "dependencies": {
         "NETStandard.Library": "1.6.0",
         "System.Runtime.Serialization.Primitives": "4.0.10",
-        "System.Runtime.Extensions": "4.1.0-rc3-23808",
+        "System.Runtime.Extensions": "4.1.0",
         "System.Xml.XPath.XmlDocument": "4.0.1-rc2-24027",
         "System.ComponentModel.EventBasedAsync": "4.0.11-rc2-24018",
-        "System.Runtime.InteropServices": "4.1.0-rc2-24027",
-        "System.IO.FileSystem": "4.0.1-rc3-23808",
+        "System.Runtime.InteropServices": "4.1.0",
+        "System.IO.FileSystem": "4.0.1",
         "System.ComponentModel.TypeConverter": "4.1.0"
       }
     }
