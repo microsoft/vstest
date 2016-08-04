@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
     /// <summary>
-    /// The DataCollectorsSettingsProvider interface.
+    /// Provides settings for data collectors.
     /// </summary>
     public interface IDataCollectorsSettingsProvider : ISettingsProvider
     {
         /// <summary>
-        /// Gets run specific data collection settings.
+        /// Gets data collectors settings.
         /// </summary>
         DataCollectionRunSettings Settings { get; }
     }
