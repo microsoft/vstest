@@ -7,7 +7,10 @@
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
     "compile": [
-      "../datacollector.x86/Program.cs"
+      "../datacollector.x86/Program.cs",
+      "../datacollector.x86/DataCollectionCoordinator.cs",
+      "../datacollector.x86/Interfaces/IDataCollectionManager.cs",
+      "../datacollector.x86/Friends.cs"
     ]
   },
 
@@ -18,8 +21,8 @@
   },
 
   "runtimes": {
-    "win7-x64": { },
-    "win7-x86": { }
+    "win7-x64": {},
+    "win7-x86": {}
   },
 
   "frameworks": {
@@ -31,8 +34,11 @@
         "portable-net45+wp80+win8+wpa81+dnxcore50"
       ],
       "dependencies": {
-        "NETStandard.Library": "1.5.0-rc2-24027",
-        "System.ComponentModel.TypeConverter": "4.0.1-rc2-23911"
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0",
+          "type": "platform"
+        },
+        "System.ComponentModel.TypeConverter": "4.1.0"
       }
     },
     "net46": { }
