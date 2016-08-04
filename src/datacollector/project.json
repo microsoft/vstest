@@ -21,8 +21,8 @@
   },
 
   "runtimes": {
-    "win7-x64": { },
-    "win7-x86": { }
+    "win7-x64": {},
+    "win7-x86": {}
   },
 
   "frameworks": {
@@ -35,7 +35,8 @@
       ],
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "System.ComponentModel.TypeConverter": "4.1.0"
+        "System.ComponentModel.TypeConverter": "4.1.0",
+        "Microsoft.NETCore.Runtime.CoreCLR":  "1.0.2"
       }
     },
     "net46": { }

@@ -30,7 +30,9 @@
       ],
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "Microsoft.DotNet.ProjectModel": "1.0.0-rc2-002702"
+        "Microsoft.DotNet.ProjectModel": "1.0.0-rc2-002702",
+        "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
+
       }
     },
     "net46": {}
