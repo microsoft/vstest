@@ -26,7 +26,7 @@
         "portable-net45+win8"
       ],
       "dependencies": {
-        "NETStandard.Library": "1.5.0-rc2-24008",
+        "NETStandard.Library": "1.6.0",
         "System.Runtime.Serialization.Primitives": "4.0.10",
         "System.Runtime.Extensions": "4.1.0-rc3-23808",
         "System.Xml.XPath.XmlDocument": "4.0.1-rc2-24027",
