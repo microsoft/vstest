@@ -1,22 +1,28 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.TestPlatform.DataCollection.UnitTests.Implementations
+namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
 {
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class CollectorRequestedEnvironmentVariableTests
     {
+        [TestInitialize]
+        public void Init()
+        {
+
+        }
+
         [TestMethod]
         public void AddRequestingDataCollectorShouldAddDataCollectorName()
         {
             var friendlyName = "DataCollectorFriendlyName";
-            var kv = new KeyValuePair<string, string>("key", "value");
+            var kvpair = new KeyValuePair<string, string>("key", "value");
 
-            var collectorRequestedEnvironmentVariable = new CollectorRequestedEnvironmentVariable(kv, friendlyName);
+            var collectorRequestedEnvironmentVariable = new CollectorRequestedEnvironmentVariable(kvpair, friendlyName);
 
             Assert.AreEqual("key", collectorRequestedEnvironmentVariable.Name);
             Assert.AreEqual("value", collectorRequestedEnvironmentVariable.Value);
@@ -29,9 +35,9 @@ namespace Microsoft.TestPlatform.DataCollection.UnitTests.Implementations
         public void FirstDataCollectorThatRequestedShouldReturnTheNameOfFirstRequestingDataCollector()
         {
             var friendlyName = "DataCollectorFriendlyName";
-            var kv = new KeyValuePair<string, string>("key", "value");
+            var kvpair = new KeyValuePair<string, string>("key", "value");
 
-            var collectorRequestedEnvironmentVariable = new CollectorRequestedEnvironmentVariable(kv, friendlyName);
+            var collectorRequestedEnvironmentVariable = new CollectorRequestedEnvironmentVariable(kvpair, friendlyName);
             collectorRequestedEnvironmentVariable.AddRequestingDataCollector("DataCollectorFriendlyName1");
 
             Assert.AreEqual("key", collectorRequestedEnvironmentVariable.Name);

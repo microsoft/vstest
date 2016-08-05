@@ -17,12 +17,12 @@
     "MSTest.TestFramework": "1.0.0-preview",
     "moq.netcore": "4.4.0-beta8",
     "System.Diagnostics.TraceSource": "4.0.0-rc2-24015",
-    "Microsoft.TestPlatform.DataCollection": "15.0.0-*",
+    "Microsoft.TestPlatform.DataCollection.v1": "15.0.0-*",
     "Microsoft.VisualStudio.QualityTools.ExecutionCommon": "1.0.0"
   },
 
   "frameworks": {
-    "net461": { }
+    "net46": { }
   },
 
   "testRunner": "mstest"

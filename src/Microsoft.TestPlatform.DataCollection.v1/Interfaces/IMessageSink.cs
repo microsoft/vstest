@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces
 {
     using System;
 

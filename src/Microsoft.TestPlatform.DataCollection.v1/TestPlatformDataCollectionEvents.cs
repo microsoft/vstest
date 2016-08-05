@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection
+namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
     using Microsoft.VisualStudio.TestTools.Common;
     using Microsoft.VisualStudio.TestTools.DataCollection;
     using Microsoft.VisualStudio.TestTools.Execution;
-
 
     /// <summary>
     /// Class defining execution events that will be registered for by collectors
@@ -50,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
             EqtAssert.ParameterNotNull(userWorkItemFactory, "userWorkItemFactory");
             this.userWorkItemFactory = userWorkItemFactory;
 
-            this.eventArgsToEventInvokerMap = new Dictionary<Type, EventInvoker>(12);
+            this.eventArgsToEventInvokerMap = new Dictionary<Type, EventInvoker>(14);
 
             this.eventArgsToEventInvokerMap[typeof(SessionStartEventArgs)] = this.OnSessionStart;
             this.eventArgsToEventInvokerMap[typeof(SessionEndEventArgs)] = this.OnSessionEnd;

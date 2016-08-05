@@ -1,13 +1,11 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
-
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection
+namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
 {
     using System;
     using System.ComponentModel;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-    using DataCollectionContext = Microsoft.VisualStudio.TestTools.Execution.DataCollectionContext;
+    using Microsoft.VisualStudio.TestTools.Execution;
 
     /// <summary>
     /// Base class for all message used in file transfer.
@@ -25,8 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
         /// </param>
         internal DataCollectorDataMessage(DataCollectionContext context, Uri uri, string friendlyName)
         {
-            ValidateArg.NotNull<DataCollectionContext>(context, "context");
-            ValidateArg.NotNull<Uri>(uri, "uri");
+            ValidateArg.NotNull(context, "context");
+            ValidateArg.NotNull(uri, "uri");
             ValidateArg.NotNullOrEmpty(friendlyName, "friendlyName");
 
             this.DataCollectionContext = context;
@@ -98,18 +96,18 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
         /// Friendly name of the collector initiating the transfer
         /// </param>
         internal FileDataHeaderMessage(
-            DataCollectionContext context,
-            string fileName,
-            string description,
-            bool deleteFile,
-            object userToken,
-            AsyncCompletedEventHandler fileTransferCompletedHandler,
-            Uri collectorUri,
+            DataCollectionContext context, 
+            string fileName, 
+            string description, 
+            bool deleteFile, 
+            object userToken, 
+            AsyncCompletedEventHandler fileTransferCompletedHandler, 
+            Uri collectorUri, 
             string collectorFriendlyName)
             : base(context, collectorUri, collectorFriendlyName)
         {
             ValidateArg.NotNullOrEmpty(fileName, "fileName");
-            ValidateArg.NotNull<string>(description, "description");
+            ValidateArg.NotNull(description, "description");
 
             this.FileName = fileName;
             this.PerformCleanup = deleteFile;

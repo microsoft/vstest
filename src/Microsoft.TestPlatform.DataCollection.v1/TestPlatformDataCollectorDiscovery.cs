@@ -1,26 +1,18 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection.Implementations
+namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.Configuration;
     using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
-    using System.Threading.Tasks;
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-    using DataCollectionEnvironmentContext = Microsoft.VisualStudio.TestTools.Execution.DataCollectionEnvironmentContext;
-    using DataCollector = Microsoft.VisualStudio.TestTools.Execution.DataCollector;
-    using DataCollectorInformation = Microsoft.VisualStudio.TestTools.Execution.DataCollectorInformation;
 
     /// <summary>
     /// Discovers data collectors in a directory.
@@ -34,8 +26,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.Implementations
         /// </summary>
         public const string DataCollectorsDirectoryName = @"PrivateAssemblies\DataCollectors";
 
+        /// <summary>
+        /// The current process location.
+        /// </summary>
         private static readonly string CurrentProcessLocation = Process.GetCurrentProcess().MainModule.FileName;
 
+        /// <summary>
+        /// The is portable.
+        /// </summary>
         private static readonly bool IsPortable = ClientUtilities.CheckIfTestProcessIsRunningInXcopyableMode();
 
         #endregion
@@ -87,17 +85,17 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.Implementations
             // we will fallback to assembly's default language. The default language can be null as well. 
             //
             // TODO: Currently we are doing a partial fix by falling back to neutral language which might not work on jpn OS with german VS.
-            var assemblyUILanguage = GetAssemblyCultureLanguage(assembly);
-            if (assemblyUILanguage != null && !subFolders.Contains(assemblyUILanguage))
+            var assemblyUiLanguage = GetAssemblyCultureLanguage(assembly);
+            if (assemblyUiLanguage != null && !subFolders.Contains(assemblyUiLanguage))
             {
-                subFolders.Add(assemblyUILanguage);
+                subFolders.Add(assemblyUiLanguage);
             }
 
             // To search in current folder
             subFolders.Add(string.Empty);
 
             var configFilePath = string.Empty;
-            int iFolder = 0;
+            var iFolder = 0;
             for (; iFolder < subFolders.Count; iFolder++)
             {
                 configFilePath =
@@ -169,6 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.Implementations
                         {
                             EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Using config specified plugin directory '{0}'.", directoryFromConfig);
                         }
+
                         return directoryFromConfig;
                     }
                     else
@@ -280,13 +279,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.Implementations
         {
             try
             {
-                var directoryFromRegistry = Path.Combine(skuInstallLocation, DataCollectorDiscoveryHelper.DataCollectorsDirectoryName);
+                var directoryFromRegistry = Path.Combine(skuInstallLocation, DataCollectorsDirectoryName);
                 if (Directory.Exists(directoryFromRegistry))
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
                         EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Using plugin directory '{0}' relative to directory location in registry.", directoryFromRegistry);
                     }
+
                     return directoryFromRegistry;
                 }
                 else

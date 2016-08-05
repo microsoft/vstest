@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection
+namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
 {
     using System;
     using System.ComponentModel;
     using System.Diagnostics;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     using DataCollectionSink = Microsoft.VisualStudio.TestTools.Execution.DataCollectionSink;
@@ -29,8 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
         /// </param>
         internal TestPlatformDataCollectionSink(IMessageSink messageSink, DataCollectorInformation dataCollectorInfo)
         {
-            ValidateArg.NotNull<IMessageSink>(messageSink, "messageSink");
-            ValidateArg.NotNull<DataCollectorInformation>(dataCollectorInfo, "dataCollectorInfo");
+            ValidateArg.NotNull(messageSink, "messageSink");
+            ValidateArg.NotNull(dataCollectorInfo, "dataCollectorInfo");
             this.CollectorInfo = dataCollectorInfo;
             this.MessageSink = messageSink;
         }
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
         /// <param name="fileTransferInformation">Information about the file being transferred.</param>
         public override void SendFileAsync(FileTransferInformation fileTransferInformation)
         {
-            ValidateArg.NotNull<FileTransferInformation>(fileTransferInformation, "fileTransferInformation");
+            ValidateArg.NotNull(fileTransferInformation, "fileTransferInformation");
 
             var transferCompletedHandler = this.SendFileCompleted;
 
@@ -87,7 +87,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
 
             this.MessageSink.SendMessage(headerMsg);
         }
-
 
         /// <summary>
         /// Sends a stream asynchronously.

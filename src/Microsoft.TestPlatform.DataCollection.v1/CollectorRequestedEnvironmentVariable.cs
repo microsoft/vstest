@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection
+namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
 {
     using System.Collections.Generic;
     using System.Diagnostics;

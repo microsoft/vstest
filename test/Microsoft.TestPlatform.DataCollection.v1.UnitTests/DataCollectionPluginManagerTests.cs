@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.TestPlatform.DataCollection.UnitTests
+namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
 {
     using System;
     using System.Collections.Generic;
@@ -13,14 +13,14 @@ namespace Microsoft.TestPlatform.DataCollection.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.Execution;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
 
-    using IMessageSink = Microsoft.VisualStudio.TestPlatform.DataCollection.Interfaces.IMessageSink;
+    using IMessageSink = Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces.IMessageSink;
 
     [TestClass]
     public class DataCollectionManagerTests
@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.DataCollection.UnitTests
         private DummyMessageSink mockMessageSink;
         private RunSettings runSettings;
         private string xmlSettings =
-            "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <RunConfiguration>\r\n    <MaxCpuCount>1</MaxCpuCount>\r\n    <ResultsDirectory>.\\TestResults</ResultsDirectory>\r\n    <TargetPlatform>x86</TargetPlatform>\r\n  </RunConfiguration>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Custom DataCollector\" uri=\"datacollector://Company/Product/Version\" assemblyQualifiedName=\"Microsoft.TestPlatform.DataCollection.UnitTests.MockDataCollector, Microsoft.TestPlatform.DataCollection.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\">\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
+            "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <RunConfiguration>\r\n    <MaxCpuCount>1</MaxCpuCount>\r\n    <ResultsDirectory>.\\TestResults</ResultsDirectory>\r\n    <TargetPlatform>x86</TargetPlatform>\r\n  </RunConfiguration>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Custom DataCollector\" uri=\"datacollector://Company/Product/Version\" assemblyQualifiedName=\"Microsoft.TestPlatform.DataCollection.V1.UnitTests.MockDataCollector, Microsoft.TestPlatform.DataCollection.v1.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\">\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
 
         [TestInitialize]
         public void Init()
@@ -53,8 +53,7 @@ namespace Microsoft.TestPlatform.DataCollection.UnitTests
         [TestMethod]
         public void LoadDataCollectorShouldLoadDataCollectorAndReturnEnvironmentVariables()
         {
-            var envVarList = new List<KeyValuePair<string, string>>();
-            envVarList.Add(new KeyValuePair<string, string>("key", "value"));
+            var envVarList = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("key", "value") };
             MockDataCollector.EnvVarList = envVarList;
             this.runSettings.InitializeSettingsProviders(this.xmlSettings);
 
@@ -176,9 +175,7 @@ namespace Microsoft.TestPlatform.DataCollection.UnitTests
         public static bool IsGetTestExecutionEnvironmentVariablesInvoked;
         public static bool GetTestExecutionEnvironmentVariablesThrowException;
         public static bool DisposeShouldThrowException;
-
         public static IEnumerable<KeyValuePair<string, string>> EnvVarList;
-
 
         public override void Initialize(XmlElement configurationElement, DataCollectionEvents events, DataCollectionSink dataSink, DataCollectionLogger logger, DataCollectionEnvironmentContext environmentContext)
         {

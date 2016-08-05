@@ -4,7 +4,6 @@
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true
-    //"copyToOutput": "Microsoft.TestPlatform.DataCollection.Legacy"
   },
 
   "runtimes": {
@@ -22,7 +21,7 @@
   },
 
   "frameworks": {
-    "net461": {
+    "net46": {
     }
   }
 }

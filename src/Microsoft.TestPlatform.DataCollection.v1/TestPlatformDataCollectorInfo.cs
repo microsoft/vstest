@@ -1,14 +1,12 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection
+namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
 {
     using System;
     using System.Collections.Generic;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.Implementations;
-
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.Common;
 
@@ -51,10 +49,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection
             DataCollectorInformation dataCollectorInformation,
             SafeAbortableUserWorkItemFactory userWorkItemFactory)
         {
-            ValidateArg.NotNull<DataCollector>(dataCollector, "dataCollector");
-            ValidateArg.NotNull<IMessageSink>(messageSink, "messageSink");
-            ValidateArg.NotNull<DataCollectorInformation>(dataCollectorInformation, "dataCollectorInformation");
-            ValidateArg.NotNull<SafeAbortableUserWorkItemFactory>(userWorkItemFactory, "userWorkItemFactory");
+            ValidateArg.NotNull(dataCollector, "dataCollector");
+            ValidateArg.NotNull(messageSink, "messageSink");
+            ValidateArg.NotNull(dataCollectorInformation, "dataCollectorInformation");
+            ValidateArg.NotNull(userWorkItemFactory, "userWorkItemFactory");
 
             this.DataCollectorInformation = dataCollectorInformation;
             this.DataCollector = dataCollector;

@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             this.dummyDataCollectionManagerV1 = new DummyDataCollectionManager();
             this.dummyDataCollectionManagerV2 = new DummyDataCollectionManager();
-            this.dataCollectionCoordinator = new DataCollectionCoordinator(new[] { dummyDataCollectionManagerV1, dummyDataCollectionManagerV2 });
+            this.dataCollectionCoordinator = new DataCollectionCoordinator(new[] { this.dummyDataCollectionManagerV1, this.dummyDataCollectionManagerV2 });
         }
 
         [TestMethod]
@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void DisposeShouldDisposeResourcesIfNoDataCollectionManagersAreProvided()
+        public void DisposeShouldDisposeResourcesIfDataCollectionManagersAreNotProvided()
         {
             this.dataCollectionCoordinator = new DataCollectionCoordinator(null);
 
@@ -192,7 +192,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             this.IsLoadCollectorsInvoked = true;
             return this.EnvVariables;
-
         }
 
         public void TestCaseStarted(TestCaseStartEventArgs testCaseStartEventArgs)

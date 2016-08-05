@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.TestPlatform.DataCollection.UnitTests
+namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
 {
     using System;
     using System.Collections.Generic;
@@ -8,8 +8,8 @@ namespace Microsoft.TestPlatform.DataCollection.UnitTests
     using System.Threading.Tasks;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1;
+    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
