@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
         /// <summary>
         /// The is portable.
         /// </summary>
-        private static readonly bool IsPortable = ClientUtilities.CheckIfTestProcessIsRunningInXcopyableMode();
+        private static readonly bool IsPortable = ClientUtilities.IsTestProcessRunningInXcopyableMode();
 
         #endregion
 
@@ -201,12 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             }
 
             // Third option: Look for VS Installation directory from registry key. If found and valid use that.
-            var path = GetInstallLocationFromRegistry(ClientUtilities.GetVSInstallPath());
-
-            if (!string.IsNullOrEmpty(path))
-            {
-                return path;
-            }
+            // todo : write code to get VS Installation Path.
 
             return string.Empty;
         }
