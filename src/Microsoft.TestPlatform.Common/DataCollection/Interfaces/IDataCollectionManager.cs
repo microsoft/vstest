@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+    using TestCaseStartEventArgs = Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.Events.TestCaseStartEventArgs;
 
     /// <summary>
     /// Defines the Data Collection Manager for Data Collectors.
@@ -20,9 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
         /// <summary>
         /// Loads and initializes data collector plugins.
         /// </summary>
-        /// <param name="settingsXml">Run Settings which has DataCollector configuration.</param>
+        /// <param name="runSettings">Run Settings which has DataCollector configuration.</param>
         /// <returns>Environment variables.</returns>
-        Dictionary<string, string> LoadDataCollectors(RunSettings settingsXml);
+        IDictionary<string, string> LoadDataCollectors(RunSettings runSettings);
 
         /// <summary>
         /// Raises TestCaseStart event to all data collectors configured for run.

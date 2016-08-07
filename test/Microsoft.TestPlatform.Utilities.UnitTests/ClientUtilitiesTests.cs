@@ -158,5 +158,33 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             Assert.AreEqual(runSettingsXML, finalSettingsXml);
         }
+
+        [TestMethod]
+        public void IsTestProcessRunningInXcopyableModeShouldReturnFalseIfPortableManifestFileIsNotFound()
+        {
+            var cwd = Directory.GetCurrentDirectory();
+            var dir = Path.Combine(cwd, "xcopyableTest");
+            Directory.CreateDirectory("xcopyableTest");
+
+            Assert.IsFalse(ClientUtilities.IsTestProcessRunningInXcopyableMode(Path.Combine(dir, "dummy.exe")));
+
+            Directory.Delete(dir);
+        }
+
+        [TestMethod]
+        public void IsTestProcessRunningInXcopyableModeShouldReturnTrueIfPortableManifestFileIsFound()
+        {
+            var cwd = Directory.GetCurrentDirectory();
+            var dir = Path.Combine(cwd, "xcopyableTest");
+            Directory.CreateDirectory("xcopyableTest");
+            var filename = Path.Combine(dir, ClientUtilities.PortableVsTestManifestFilename);
+
+            var fileStream = File.Create(Path.Combine(dir, ClientUtilities.PortableVsTestManifestFilename));
+            Assert.IsTrue(ClientUtilities.IsTestProcessRunningInXcopyableMode(Path.Combine(dir, "dummy.exe")));
+
+            fileStream.Dispose();
+            File.Delete(filename);
+            Directory.Delete(dir);
+        }
     }
 }

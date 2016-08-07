@@ -1,17 +1,15 @@
-{
+﻿{
   "version": "15.0.0-*",
 
   "buildOptions": {
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+
+    "copyToOutput": "app.config"
   },
 
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0"
-    },
     "dotnet-test-mstest": {
       "version": "1.0.1-preview",
       "exclude": "compile"
@@ -19,17 +17,12 @@
     "MSTest.TestFramework": "1.0.0-preview",
     "moq.netcore": "4.4.0-beta8",
     "System.Diagnostics.TraceSource": "4.0.0-rc2-24015",
-    "Microsoft.TestPlatform.Common": "15.0.0-*",
-    "System.Runtime": "4.1.0"
+    "Microsoft.TestPlatform.DataCollection.v1": "15.0.0-*",
+    "Microsoft.VisualStudio.QualityTools.ExecutionCommon": "1.0.0"
   },
 
   "frameworks": {
-    "netcoreapp1.0": {
-      "imports": [
-        "dnxcore50",
-        "portable-net45+win8"
-      ]
-    }
+    "net46": { }
   },
 
   "testRunner": "mstest"

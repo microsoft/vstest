@@ -1,0 +1,27 @@
+﻿{
+  "version": "15.0.0-*",
+  "buildOptions": {
+    "delaySign": true,
+    "keyFile": "../../scripts/key.snk",
+    "warningsAsErrors": true
+  },
+
+  "runtimes": {
+    "win7-x64": {},
+    "win7-x86": {}
+  },
+
+  "dependencies": {
+    "datacollector": "15.0.0-*",
+    "datacollector.x86": "15.0.0-*",
+    "Microsoft.TestPlatform.Common": "15.0.0-*",
+    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+    "Microsoft.TestPlatform.Utilities": "15.0.0-*",
+    "Microsoft.VisualStudio.QualityTools.ExecutionCommon": "1.0.0"
+  },
+
+  "frameworks": {
+    "net46": {
+    }
+  }
+}

@@ -36,5 +36,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Default value of the boolean that determines whether or not job queue should be bounded.
         /// </summary>
         public const bool DefaultEnableBoundsOnLoggerEventQueue = true;
+
+        /// <summary>
+        /// Name of the key used in app settings for TestRunnerService.exe to specify location of plugin directory.
+        /// </summary>
+        public const string PluginDirectorySettingsKeyName = "DataCollectorPluginDirectory";
     }
 }

@@ -7,11 +7,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Collections.ObjectModel;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
 
     /// <summary>
     /// Coordinates the Data Collection for V1 and V2 DataCollectors
@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// Constructor with Dependency injection. Used for unit testing.
+        /// Constructor with dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="dataCollectionManagers">Array of IDataCollectionManagers for handling various versions of DataCollectors (Legacy,V2)</param>
         internal DataCollectionCoordinator(IDataCollectionManager[] dataCollectionManagers)
@@ -154,11 +154,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private Dictionary<string, string> LoadDataCollectors(RunSettings runSettings)
         {
             var envVars = new Dictionary<string, string>();
-            var tasks = new List<Task<Dictionary<string, string>>>(this.dataCollectionManagers.Length);
+            var tasks = new List<Task<IDictionary<string, string>>>(this.dataCollectionManagers.Length);
 
             foreach (var dataCollectionManager in this.dataCollectionManagers)
             {
-                tasks.Add(Task<Dictionary<string, string>>.Factory.StartNew(() => dataCollectionManager.LoadDataCollectors(runSettings)));
+                tasks.Add(Task<IDictionary<string, string>>.Factory.StartNew(() => dataCollectionManager.LoadDataCollectors(runSettings)));
             }
 
             Task.WaitAll(tasks.ToArray());

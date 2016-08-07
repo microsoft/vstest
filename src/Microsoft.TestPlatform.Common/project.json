@@ -8,7 +8,8 @@
   },
 
   "dependencies": {
-    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*"
+    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*"
   },
 
   "frameworks": {
@@ -19,7 +20,8 @@
       ],
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "System.Runtime.Loader": "4.0.0-rc2-24027"
+        "System.Runtime.Loader": "4.0.0-rc2-24027", 
+        "System.Threading": "4.0.11"
       }
     },
     "net46": {
