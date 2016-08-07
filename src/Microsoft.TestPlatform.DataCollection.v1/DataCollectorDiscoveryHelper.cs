@@ -95,12 +95,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             subFolders.Add(string.Empty);
 
             var configFilePath = string.Empty;
-            var iFolder = 0;
-            for (; iFolder < subFolders.Count; iFolder++)
+            var folderCounter = 0;
+            for (; folderCounter < subFolders.Count; folderCounter++)
             {
                 configFilePath =
                     Path.Combine(
-                        Path.Combine(assemblyFolder, subFolders[iFolder]),
+                        Path.Combine(assemblyFolder, subFolders[folderCounter]),
                         configFileName);
 
                 if (File.Exists(configFilePath))
@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             }
 
             // We couldn't find a config file for this assembly anywhere. Return null
-            if (iFolder >= subFolders.Count)
+            if (folderCounter >= subFolders.Count)
             {
                 EqtTrace.Warning("DataCollectorDiscovery: No configuration file found for data collector collector assembly {0} in all {1} locations", assembly.FullName, subFolders.Count);
                 return null;
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
                     {
                         if (EqtTrace.IsVerboseEnabled)
                         {
-                            EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Using config specified plugin directory '{0}'.", directoryFromConfig);
+                            EqtTrace.Verbose("DataCollectorDiscoveryHelper.GetDataCollectorPluginDirectory: Using config specified plugin directory '{0}'.", directoryFromConfig);
                         }
 
                         return directoryFromConfig;
@@ -174,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
                     {
                         if (EqtTrace.IsVerboseEnabled)
                         {
-                            EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Config specified plugin directory '{0}' not found. Value ignored.", directoryFromConfig);
+                            EqtTrace.Verbose("DataCollectorDiscoveryHelper.GetDataCollectorPluginDirectory: Config specified plugin directory '{0}' not found. Value ignored.", directoryFromConfig);
                         }
                     }
                 }
@@ -188,15 +188,16 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Using plugin directory '{0}' relative to main module assembly location.", directoryFromProcess);
+                    EqtTrace.Verbose("DataCollectorDiscoveryHelper.GetDataCollectorPluginDirectory: Using plugin directory '{0}' relative to main module assembly location.", directoryFromProcess);
                 }
+
                 return directoryFromProcess;
             }
             else
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Can not find plugin directory realtive to main module assembly location.");
+                    EqtTrace.Verbose("DataCollectorDiscoveryHelper.GetDataCollectorPluginDirectory: Can not find plugin directory realtive to main module assembly location.");
                 }
             }
 
@@ -254,55 +255,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("TestPlatformDataCollectorDiscovery: Error occurred while finding the fallback language for assembly {0}. Error: {1}", assembly.FullName, ex);
+                    EqtTrace.Error("DataCollectorDiscoveryHelper: Error occurred while finding the fallback language for assembly {0}. Error: {1}", assembly.FullName, ex);
                 }
 
                 return null;
             }
-        }
-
-        /// <summary>
-        /// The get install location from registry.
-        /// </summary>
-        /// <param name="skuInstallLocation">
-        /// The sku install location.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        private static string GetInstallLocationFromRegistry(string skuInstallLocation)
-        {
-            try
-            {
-                var directoryFromRegistry = Path.Combine(skuInstallLocation, DataCollectorsDirectoryName);
-                if (Directory.Exists(directoryFromRegistry))
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Using plugin directory '{0}' relative to directory location in registry.", directoryFromRegistry);
-                    }
-
-                    return directoryFromRegistry;
-                }
-                else
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Can not find plugin directory realtive to directory location in registry.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestPlatformDataCollectorDiscovery.GetDataCollectorPluginDirectory: Error finding plugin directory from registry. Error details:{0}.", ex.Message);
-                }
-
-                // ignore the exception.
-            }
-
-            return null;
         }
 
         #endregion

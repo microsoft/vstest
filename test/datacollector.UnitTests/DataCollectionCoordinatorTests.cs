@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using TestCaseStartEventArgs = Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.Events.TestCaseStartEventArgs;
 
     [TestClass]
     public class DataCollectionCoordinatorTests
