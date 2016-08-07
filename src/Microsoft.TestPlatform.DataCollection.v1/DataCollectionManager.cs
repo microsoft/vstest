@@ -11,9 +11,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
     using System.Linq;
     using System.Reflection;
 
+    using Common.DataCollection;
+
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.Common;
@@ -76,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
-        public DataCollectionManager() : this(default(IMessageSink), default(IDataCollectionFileManager))
+        public DataCollectionManager() : this(new MessageSink(), new DataCollectionFileManager())
         {
         }
 
@@ -214,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             }
 
             // todo : make this call at the end of GetColelctionEntries or inside GetData itself.
-            this.dataCollectionFileManager.CloseSession(endEvent.Context.SessionId);
+            this.dataCollectionFileManager.CloseSession(ObjectConversionHelper.ToSessionId(endEvent.Context.SessionId));
 
             return result;
         }
@@ -934,7 +935,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
                 }
             }
 
-            return required;
+            return false;
         }
 
         /// <summary>
@@ -950,7 +951,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
         {
             if (this.IsDataCollectionEnabled)
             {
-                var entries = this.dataCollectionFileManager.GetData(context);
+                var entries = this.dataCollectionFileManager.GetData(ObjectConversionHelper.ToDataCollectionConetxt(context));
                 return new Collection<CollectorDataEntry>(entries);
             }
 

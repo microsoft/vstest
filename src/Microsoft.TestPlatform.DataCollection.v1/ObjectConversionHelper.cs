@@ -71,12 +71,56 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
         /// <param name="testCase">Test case which is complete.</param>
         /// <param name="testOutCome">Outcome of the test case.</param>
         /// <returns>TestTools TestCaseEndEventArgs</returns>
-        internal static TestTools.Execution.TestCaseEndEventArgs ToTestCaseEndEventArgs(DataCollectionEnvironmentContext context, TestCase testCase, TestOutcome testOutCome)
+        internal static TestTools.Execution.TestCaseEndEventArgs ToTestCaseEndEventArgs(DataCollectionEnvironmentContext context, TestCase testCase, ObjectModel.TestOutcome testOutCome)
         {
             var testElement = ToTestElement(testCase);
             var dataCollectionContext = new DataCollectionContext(context.SessionDataCollectionContext.SessionId, testElement.ExecutionId);
             var args = new TestTools.Execution.TestCaseEndEventArgs(dataCollectionContext, testElement, null, ToOutcome(testOutCome));
             return args;
+        }
+
+        /// <summary>
+        /// The to session id.
+        /// </summary>
+        /// <param name="sessionId">
+        /// The session id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="SessionId"/>.
+        /// </returns>
+        internal static ObjectModel.DataCollection.SessionId ToSessionId(TestTools.Common.SessionId sessionId)
+        {
+            return new ObjectModel.DataCollection.SessionId(sessionId.Id);
+        }
+
+        /// <summary>
+        /// The to test exec id.
+        /// </summary>
+        /// <param name="testExecId">
+        /// The test exec id.
+        /// </param>
+        /// <returns>
+        /// The <see cref="TestExecId"/>.
+        /// </returns>
+        internal static ObjectModel.DataCollection.TestExecId ToTestExecId(TestTools.Common.TestExecId testExecId)
+        {
+            if (testExecId == null)
+                return null;
+            return new ObjectModel.DataCollection.TestExecId(testExecId.Id);
+        }
+
+        /// <summary>
+        /// The to data collection context.
+        /// </summary>
+        /// <param name="dataCollectionContext">
+        /// The data collection context.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataCollectionContext"/>.
+        /// </returns>
+        internal static ObjectModel.DataCollection.DataCollectionContext ToDataCollectionConetxt(TestTools.Execution.DataCollectionContext dataCollectionContext)
+        {
+            return new ObjectModel.DataCollection.DataCollectionContext(ToSessionId(dataCollectionContext.SessionId), ToTestExecId(dataCollectionContext.TestExecId));
         }
 
         /// <summary>
@@ -120,6 +164,5 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
                     return TestTools.Common.TestOutcome.NotRunnable;
             }
         }
-
     }
 }

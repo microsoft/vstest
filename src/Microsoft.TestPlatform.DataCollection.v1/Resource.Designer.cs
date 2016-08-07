@@ -141,15 +141,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1 {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to Sending message of Message Type &apos;{0}&apos; is not supported..
-        /// </summary>
-        public static string DataCollectorUnsupportedMessageType {
-            get {
-                return ResourceManager.GetString("DataCollectorUnsupportedMessageType", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///    Looks up a localized string similar to Timed out invoking diagnostic data adapter event handler &apos;{0}&apos;.
         ///
         ///To increase the timeout values for all diagnostic data adapters, see the following link: http://go.microsoft.com/fwlink/?LinkId=169311.

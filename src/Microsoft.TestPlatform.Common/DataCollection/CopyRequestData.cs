@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
 {
     using System;
     using System.IO;
@@ -16,7 +16,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
         /// Specifies whether the object is disposed or not. 
         /// </summary>
         private bool disposed;
-
 
         /// <summary>
         /// Set when this request is processed/completed.
@@ -137,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             {
                 if (disposing)
                 {
-                    this.requestCompleted.Close();
+                    this.requestCompleted.Dispose();
                 }
 
                 this.disposed = true;

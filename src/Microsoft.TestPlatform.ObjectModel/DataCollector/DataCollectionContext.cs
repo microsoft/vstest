@@ -2,14 +2,35 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
+    using System;
+
     /// <summary>
     /// Class representing the context in which data collection occurs.
     /// </summary>
-#if NET451
-    [Serializable] 
+#if NET46
+    [Serializable]
 #endif
     public class DataCollectionContext
     {
+        #region Private Fields
+
+        /// <summary>
+        /// The session id.
+        /// </summary>
+        private readonly SessionId sessionId;
+
+        /// <summary>
+        /// The test exec id.
+        /// </summary>
+        private readonly TestExecId testExecId;
+
+        /// <summary>
+        /// The hash code.
+        /// </summary>
+        private readonly int hashCode;
+
+        #endregion
+
         #region Constructors
 
         // NOTE: These constructors are protected internal to allow 3rd parties to
@@ -30,30 +51,35 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         //       class and pass to us for creating data collection events.
 
         /// <summary>
-        /// Constructs a DataCollectionContext indicating that there is a session,
+        /// Initializes a new instance of the <see cref="DataCollectionContext"/> class indicating that there is a session,
         /// but no executing test, in context.
         /// </summary>
-        /// <param name="sessionId">The session under which the data collection occurs.  Cannot be null.</param>
+        /// <param name="sessionId">
+        /// The session under which the data collection occurs.  Cannot be null.
+        /// </param>
         protected internal DataCollectionContext(SessionId sessionId)
             : this(sessionId, null)
         {
         }
 
         /// <summary>
-        /// Constructs a DataCollectionContext indicating that there is a session and an executing test,
+        /// Initializes a new instance of the <see cref="DataCollectionContext"/> class indicating that there is a session and an executing test,
         /// but no test step, in context.
         /// </summary>
-        /// <param name="sessionId">The session under which the data collection occurs.  Cannot be null.</param>
-        /// <param name="testExecId">The test execution under which the data collection occurs,
-        /// or null if no executing test case is in context</param>
+        /// <param name="sessionId">
+        /// The session under which the data collection occurs.  Cannot be null.
+        /// </param>
+        /// <param name="testExecId">
+        /// The test execution under which the data collection occurs,
+        /// or null if no executing test case is in context
+        /// </param>
         protected internal DataCollectionContext(SessionId sessionId, TestExecId testExecId)
         {
-            //todo
-            //EqtAssert.ParameterNotNull(sessionId, "sessionId");
+            ValidateArg.NotNull(sessionId, "sessionId");
 
             this.sessionId = sessionId;
             this.testExecId = testExecId;
-            this.hashCode = ComputeHashCode();
+            this.hashCode = this.ComputeHashCode();
         }
 
         #endregion
@@ -61,93 +87,128 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Properties
 
         /// <summary>
-        /// Identifies the session under which the data collection occurs.  Will not be null.
+        /// Gets the session under which the data collection occurs.
         /// </summary>
         public SessionId SessionId
         {
             get
             {
-                return sessionId;
+                return this.sessionId;
             }
         }
 
         /// <summary>
-        /// Identifies the test execution under which the data collection occurs,
+        /// Gets the test execution under which the data collection occurs,
         /// or null if no such test exists.
         /// </summary>
         public TestExecId TestExecId
         {
             get
             {
-                return testExecId;
+                return this.testExecId;
             }
         }
 
         /// <summary>
-        /// Returns true if there is an executing test case associated with this context.
+        /// Gets a value indicating whether there is an executing test case associated with this context.
         /// </summary>
         public bool HasTestCase
         {
-            get { return testExecId != null; }
+            get { return this.testExecId != null; }
         }
 
         #endregion
 
         #region Equals and Hashcode
 
+        /// <summary>
+        /// The ==.
+        /// </summary>
+        /// <param name="context1">
+        /// The context 1.
+        /// </param>
+        /// <param name="context2">
+        /// The context 2.
+        /// </param>
+        /// <returns>Value indicating whether the data collection contexts are equal.
+        /// </returns>
         public static bool operator ==(DataCollectionContext context1, DataCollectionContext context2)
         {
             return object.Equals(context1, context2);
         }
 
+        /// <summary>
+        /// The !=.
+        /// </summary>
+        /// <param name="context1">
+        /// The context 1.
+        /// </param>
+        /// <param name="context2">
+        /// The context 2.
+        /// </param>
+        /// <returns>Value indicating whether the data collection contexts are equal.
+        /// </returns>
         public static bool operator !=(DataCollectionContext context1, DataCollectionContext context2)
         {
             return !(context1 == context2);
         }
 
+        /// <summary>
+        /// The equals.
+        /// </summary>
+        /// <param name="obj">
+        /// The object.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public override bool Equals(object obj)
         {
-            DataCollectionContext other = obj as DataCollectionContext;
+            var other = obj as DataCollectionContext;
 
             if (other == null)
             {
                 return false;
             }
 
-            return sessionId.Equals(other.sessionId)
-                && (testExecId == null ? other.testExecId == null : testExecId.Equals(other.testExecId));
+            return this.sessionId.Equals(other.sessionId)
+                && (this.testExecId == null ? other.testExecId == null : this.testExecId.Equals(other.testExecId));
         }
 
+        /// <summary>
+        /// The get hash code.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         public override int GetHashCode()
         {
-            return hashCode;
+            return this.hashCode;
         }
 
         #endregion
 
         #region Private Methods
 
+        /// <summary>
+        /// The compute hash code.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         private int ComputeHashCode()
         {
-            int hashCode = 17;
+            var hashCode = 17;
 
             hashCode = 31 * hashCode + sessionId.GetHashCode();
 
-            if (testExecId != null)
+            if (this.testExecId != null)
             {
-                hashCode = 31 * hashCode + testExecId.GetHashCode();
+                hashCode = 31 * hashCode + this.testExecId.GetHashCode();
             }
 
             return hashCode;
         }
-
-        #endregion
-
-        #region Private Fields
-
-        private readonly SessionId sessionId;
-        private readonly TestExecId testExecId;
-        private readonly int hashCode;
 
         #endregion
     }

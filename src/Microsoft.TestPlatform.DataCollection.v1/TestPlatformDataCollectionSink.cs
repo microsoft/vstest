@@ -6,7 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
     using System.ComponentModel;
     using System.Diagnostics;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     using DataCollectionSink = Microsoft.VisualStudio.TestTools.Execution.DataCollectionSink;
@@ -76,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
             Debug.Assert(System.IO.File.Exists(fileTransferInformation.Path), "DataCollector file '" + fileTransferInformation.Path + "' does not exist!");
 
             var headerMsg = new FileDataHeaderMessage(
-                fileTransferInformation.Context,
+                ObjectConversionHelper.ToDataCollectionConetxt(fileTransferInformation.Context),
                 fileTransferInformation.ClientFileName,
                 fileTransferInformation.Description,
                 fileTransferInformation.DeleteFile,

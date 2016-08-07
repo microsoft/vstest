@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
+
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
 {
     using System;
     using System.ComponentModel;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestTools.Execution;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// Base class for all message used in file transfer.

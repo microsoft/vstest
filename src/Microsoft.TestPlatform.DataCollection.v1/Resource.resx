@@ -144,9 +144,6 @@
   <data name="DataCollectorTypeNotFound" xml:space="preserve">
     <value>Failed to get type for diagnostic data adapter '{0}'. Error: {1}.</value>
   </data>
-  <data name="DataCollectorUnsupportedMessageType" xml:space="preserve">
-    <value>Sending message of Message Type '{0}' is not supported.</value>
-  </data>
   <data name="Execution_DataCollectorEventTimeout" xml:space="preserve">
     <value>Timed out invoking diagnostic data adapter event handler '{0}'.
 

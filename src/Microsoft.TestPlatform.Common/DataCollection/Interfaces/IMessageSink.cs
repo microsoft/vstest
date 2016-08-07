@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>

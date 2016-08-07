@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using SessionId = Microsoft.VisualStudio.TestTools.Common.SessionId;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// Session/Run configuration information for data collection.

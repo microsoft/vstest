@@ -1,25 +1,22 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
+namespace TestPlatform.Common.UnitTests.DataCollection
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using VisualStudio.TestPlatform.Common.DataCollection;
-    using VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
 
     internal class MockDataCollectionFileManager : IDataCollectionFileManager
     {
-        public List<AttachmentSet> Attachments;
-        public const string GetDataExceptionMessaage = "FileManagerExcpetion";
-        public bool GetDataThrowException;
-
-        public MockDataCollectionFileManager()
-        {
-            this.Attachments = new List<AttachmentSet>();
-        }
+        public bool DispatchMessageThrowException = false;
+        public bool IsDispatchMessageInvoked;
+        public DataCollectorDataMessage DataCollectorDataMessage;
 
         public void CloseSession(SessionId id)
         {
@@ -32,7 +29,12 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
 
         public void DispatchMessage(DataCollectorDataMessage collectorDataMessage)
         {
-            throw new NotImplementedException();
+            this.IsDispatchMessageInvoked = true;
+            this.DataCollectorDataMessage = collectorDataMessage;
+            if (this.DispatchMessageThrowException)
+            {
+                throw new Exception();
+            }
         }
 
         public void Dispose()
@@ -42,12 +44,7 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
 
         public List<AttachmentSet> GetData(DataCollectionContext dataCollectionContext)
         {
-            if (this.GetDataThrowException)
-            {
-                throw new Exception(GetDataExceptionMessaage);
-            }
-
-            return this.Attachments;
+            throw new NotImplementedException();
         }
     }
 }

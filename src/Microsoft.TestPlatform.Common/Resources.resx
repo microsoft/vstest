@@ -123,6 +123,9 @@
   <data name="DataCollectorMessageFormat" xml:space="preserve">
     <value>Diagnostic data adapter ('{0}') message: {1}.</value>
   </data>
+  <data name="DataCollectorUnsupportedMessageType" xml:space="preserve">
+    <value>Sending message of Message Type '{0}' is not supported.</value>
+  </data>
   <data name="DuplicateExtensionUri" xml:space="preserve">
     <value>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</value>
   </data>

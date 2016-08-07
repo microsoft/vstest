@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1
     using System.Collections.Generic;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.Common;
 

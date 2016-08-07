@@ -4,9 +4,9 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
@@ -17,14 +17,13 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using TestCaseStartEventArgs = Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.Events.TestCaseStartEventArgs;
-
     using Moq;
 
-    using IMessageSink = Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces.IMessageSink;
-    using System.Globalization;
-    using VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
+    using VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using VisualStudio.TestPlatform.ObjectModel;
+
+    using IMessageSink = Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces.IMessageSink;
+    using TestCaseStartEventArgs = Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.Events.TestCaseStartEventArgs;
 
     [TestClass]
     public class DataCollectionManagerTests
@@ -196,7 +195,7 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
             MockDataCollector2.Events_SessionStartThrowException = true;
 
             this.dataCollectionManager.LoadDataCollectors(this.runSettings);
-            int count = this.dataCollectionManager.RunDataCollectors.Count;
+            var count = this.dataCollectionManager.RunDataCollectors.Count;
 
             var result = this.dataCollectionManager.SessionStarted();
 
@@ -233,13 +232,12 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
             this.dataCollectionManager.LoadDataCollectors(this.runSettings);
             MockDataCollector2.Events_SessionEndThrowException = true;
 
-            int count = this.dataCollectionManager.RunDataCollectors.Count;
+            var count = this.dataCollectionManager.RunDataCollectors.Count;
 
             var result = this.dataCollectionManager.SessionEnded(isCancelled: false);
 
             Assert.AreEqual(count - 1, this.dataCollectionManager.RunDataCollectors.Count);
             Assert.AreEqual(string.Format(CultureInfo.CurrentCulture, Resource.DataCollectorRunError, MockDataCollector2.Events_SessionEndExceptionMessage), this.mockMessageSink.EventMessage);
-
         }
 
         [TestMethod]
@@ -375,7 +373,6 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
 
             Assert.AreEqual(count - 1, this.dataCollectionManager.RunDataCollectors.Count);
             Assert.AreEqual(string.Format(CultureInfo.CurrentCulture, Resource.DataCollectorRunError, MockDataCollector2.Events_TestCaseEndExceptionMessage), this.mockMessageSink.EventMessage);
-
         }
 
         [TestMethod]
@@ -405,7 +402,6 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
         }
 
         #endregion
-
         public static void SetupMockExtensions(string[] extensions, Action callback)
         {
             // Setup mocks.
@@ -419,13 +415,13 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
                     callback.Invoke();
                     return extensions;
                 }
+
                 return new string[] { };
             };
 
             // Setup the testable instance.
             TestPluginCache.Instance = testableTestPluginCache;
         }
-
 
         public static void ResetExtensionsCache()
         {

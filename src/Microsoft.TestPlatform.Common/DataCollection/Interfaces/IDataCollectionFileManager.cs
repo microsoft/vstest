@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces
 {
+    using System;
     using System.Collections.Generic;
 
-    using CollectorDataEntry = Microsoft.VisualStudio.TestPlatform.ObjectModel.AttachmentSet;
-    using DataCollectionContext = Microsoft.VisualStudio.TestTools.Execution.DataCollectionContext;
-    using SessionId = Microsoft.VisualStudio.TestTools.Common.SessionId;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// The DataCollectionFileManager interface.
     /// </summary>
-    internal interface IDataCollectionFileManager
+    internal interface IDataCollectionFileManager : IDisposable
     {
         /// <summary>
         /// The configure session.
@@ -27,13 +27,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces
         /// <summary>
         /// The get data.
         /// </summary>
-        /// <param name="collectionContext">
-        /// The collection context.
+        /// <param name="sessionId">
+        /// The session Id.
         /// </param>
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
-        List<CollectorDataEntry> GetData(DataCollectionContext collectionContext);
+        List<AttachmentSet> GetData(DataCollectionContext sessionId);
 
         /// <summary>
         /// The close session.
@@ -50,10 +50,5 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces
         /// The collector data message.
         /// </param>
         void DispatchMessage(DataCollectorDataMessage collectorDataMessage);
-
-        /// <summary>
-        /// The dispose.
-        /// </summary>
-        void Dispose();
     }
 }

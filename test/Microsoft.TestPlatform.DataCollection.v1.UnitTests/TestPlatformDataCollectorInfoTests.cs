@@ -8,9 +8,8 @@ namespace Microsoft.TestPlatform.DataCollection.V1.UnitTests
     using System.Threading.Tasks;
     using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.DataCollection.V1;
-    using Microsoft.VisualStudio.TestPlatform.DataCollection.V1.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using DataCollectionContext = Microsoft.VisualStudio.TestTools.Execution.DataCollectionContext;
