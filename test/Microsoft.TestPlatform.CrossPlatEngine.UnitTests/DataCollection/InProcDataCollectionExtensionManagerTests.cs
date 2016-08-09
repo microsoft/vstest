@@ -14,6 +14,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
     using Moq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
     [TestClass]
     public class InProcDataCollectionExtensionManagerTests
@@ -33,21 +34,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        public void InProcDataCollectionTestCaseEventHandlerCallingTriggerTestCaseStart()
+        public void TriggerTestCaseStartShouldBeCalledWhenSendTestCaseStartIsCalled()
         {            
             this.testCasesEventsHandler.SendTestCaseStart(null);
             this.mockInProcDataCollectionHelper.Verify(x => x.TriggerTestCaseStart(null), Times.Once);
         }
 
         [TestMethod]
-        public void InProcDataCollectionTestCaseEventHandlerCallingTriggerTestCaseEnd()
+        public void TriggerTestCaseEndShouldBeCalledWhenSendTestCaseEndIsCalled()
         {
             this.testCasesEventsHandler.SendTestCaseEnd(null, TestOutcome.Passed);
             this.mockInProcDataCollectionHelper.Verify(x => x.TriggerTestCaseEnd(null, TestOutcome.Passed), Times.Once);
         }
 
         [TestMethod]
-        public void InProcDataCollectionTestCaseEventHandlerCallingTestCaseEventsFromClients()
+        [TestCategory("InPRocDC")]
+        public void TriggerUpdateTestResultShouldBeCalledWhenSendTestResultIsCalled()
+        {
+            this.testCasesEventsHandler.SendTestResult(null);
+            this.mockInProcDataCollectionHelper.Verify(x => x.TriggerUpdateTestResult(null), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestCaseEventsFromClientsShouldBeCalledWhenTestCaseEventsAreCalled()
         {
             this.testCasesEventsHandler.SendTestCaseStart(null);
             this.testCasesEventsHandler.SendTestCaseEnd(null, TestOutcome.Passed);
