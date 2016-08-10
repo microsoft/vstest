@@ -108,8 +108,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             events.TestResult += this.TestResultHandler;
             events.TestRunComplete += this.TestRunCompleteHandler;
 
-            // ToDo: 
-            // currently we are getting null in testRunDirectory because reading run setting work has to be done
             TrxFileDirectory = testRunDirectory;
 
             this.InitializeInternal();

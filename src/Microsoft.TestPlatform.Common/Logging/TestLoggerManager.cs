@@ -6,11 +6,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using ObjectModel.Utilities;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
+    using Utilities;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources;
 
     /// <summary>
@@ -157,8 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     }
                     else
                     {
-                        // todo Read Output Directory from RunSettings
-                        ((ITestLogger)logger.Value).Initialize(this.loggerEvents, null);
+                        ((ITestLogger)logger.Value).Initialize(this.loggerEvents, GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
                     }
                 }
                 catch (Exception e)
@@ -339,7 +341,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         #endregion
 
-        #region Private Members
+        /// <summary>
+        /// Gets the test results directory.
+        /// </summary>
+        /// <param name="runSettings">Test run settings.</param>
+        /// <returns>Test results directory</returns>
+        private static string GetResultsDirectory(RunSettings runSettings)
+        {
+            string resultsDirectory = null;
+            if (runSettings != null)
+            {
+                try
+                {
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings.SettingsXml);
+                    resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+                }
+                catch (SettingsException se)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
+                    }
+                }
+            }
+
+#if NET46
+            if (string.IsNullOrEmpty(resultsDirectory))
+            {
+                resultsDirectory = Path.Combine(Environment.CurrentDirectory, Constants.ResultsDirectoryName);
+            }
+#endif
+
+            return resultsDirectory;
+        }
+
+#region Private Members
 
         /// <summary>
         /// Populates user supplied and default logger parameters.
@@ -366,7 +402,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
         }
 
-        #region Event Handlers
+#region Event Handlers
 
         /// <summary>
         /// Called when a test run message is received.
@@ -423,8 +459,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             this.loggerEvents.RaiseMessage(e);
         }
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }
