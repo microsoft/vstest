@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         private TestLoggerExtensionManager testLoggerExtensionManager;
         private IDiscoveryRequest discoveryRequest;
-        
+
         #endregion
 
         #region Constructor
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         uri.OriginalString));
             }
         }
-        
+
         /// <summary>
         /// Tries to get uri of the logger corresponding to the friendly name. If no such logger exists return null.
         /// </summary>
@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             loggerUri = null;
             return false;
         }
-        
+
         /// <summary>
         /// Registers to receive events from the provided test run request.
         /// These events will then be broadcast to any registered loggers.
@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.discoveryRequest = discoveryRequest;
             discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
         }
-        
+
         /// <summary>
         /// Unregisters the events from the test run request. 
         /// </summary>
@@ -255,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
             this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
         }
-        
+
         /// <summary>
         /// Unregister the events from the discovery request.
         /// </summary>
@@ -341,6 +341,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         #endregion
 
+        #region Private Members
+
         /// <summary>
         /// Gets the test results directory.
         /// </summary>
@@ -365,17 +367,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 }
             }
 
-#if NET46
             if (string.IsNullOrEmpty(resultsDirectory))
             {
-                resultsDirectory = Path.Combine(Environment.CurrentDirectory, Constants.ResultsDirectoryName);
+                resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), Constants.ResultsDirectoryName);
             }
-#endif
 
             return resultsDirectory;
         }
-
-#region Private Members
 
         /// <summary>
         /// Populates user supplied and default logger parameters.
@@ -402,7 +400,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
         }
 
-#region Event Handlers
+        #region Event Handlers
 
         /// <summary>
         /// Called when a test run message is received.
@@ -459,8 +457,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             this.loggerEvents.RaiseMessage(e);
         }
-#endregion
+        #endregion
 
-#endregion
+        #endregion
     }
 }
