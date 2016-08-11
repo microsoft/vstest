@@ -37,14 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             string resultsDirectory = null;
             if (runConfiguration != null)
             {
-                if (!runConfiguration.ResultsDirectorySet)
-                {
-                    resultsDirectory = null;
-                }
-                else
-                {
-                    resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
-                }
+                 resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
             }
 
             return resultsDirectory;

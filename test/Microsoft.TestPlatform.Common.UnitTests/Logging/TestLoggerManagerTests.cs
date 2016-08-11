@@ -2,6 +2,7 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -52,6 +53,52 @@ namespace TestPlatform.Common.UnitTests.Logging
             string uri;
             TestLoggerManager.Instance.TryGetUriFromFriendlyName("TestLoggerExtension1", out uri);
             Assert.IsNull(uri);
+        }
+
+        [TestMethod]
+        public void GetResultsDirectoryShouldReturnNullIfRunSettingsIsNull()
+        {
+            string result = TestLoggerManager.Instance.GetResultsDirectory(null);
+            Assert.AreEqual(null, result);
+        }
+
+        [TestMethod]
+        public void GetResultsDirectoryIsReadingFromRunsettings()
+        {
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>    
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>      
+        <ResultsDirectory>DummyTestResultsFolder</ResultsDirectory>            
+        <TargetPlatform> x64 </TargetPlatform>    
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+      </RunConfiguration>    
+    </RunSettings> ";
+
+            RunSettings runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runSettingsXml);
+
+            string result = TestLoggerManager.Instance.GetResultsDirectory(runsettings);
+            Assert.AreEqual(string.Compare("DummyTestResultsFolder", result), 0);
+        }
+
+        [TestMethod]
+        public void GetResultsDirectoryShouldReturnDefaultPathIfResultsDirectoryIsNotProvidedInRunSettings()
+        {
+            string runSettingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <RunSettings>    
+      <RunConfiguration>
+        <MaxCpuCount>0</MaxCpuCount>      
+        <TargetPlatform> x64 </TargetPlatform>    
+        <TargetFrameworkVersion> Framework45 </TargetFrameworkVersion>
+      </RunConfiguration>    
+    </RunSettings> ";
+
+            RunSettings runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runSettingsXml);
+
+            string result = TestLoggerManager.Instance.GetResultsDirectory(runsettings);
+            Assert.AreEqual(string.Compare(Constants.DefaultResultsDirectory, result), 0);
         }
 
         [TestMethod]
