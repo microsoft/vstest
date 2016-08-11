@@ -96,7 +96,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set
             {
                 this.resultsDirectory = value;
-                this.ResultsDirectorySet = true;
             }
         }
 
@@ -235,15 +234,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Gets a value indicating whether test adapters paths set.
         /// </summary>
         public bool TestAdaptersPathsSet
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether results directory is set.
-        /// </summary>
-        public bool ResultsDirectorySet
         {
             get;
             private set;
