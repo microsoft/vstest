@@ -37,8 +37,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #region Fields
 
-        private static IOutput output;
-
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
         private int testsPassed = 0;
@@ -62,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <param name="output"></param>
         internal ConsoleLogger(IOutput output)
         {
-            ConsoleLogger.output = output;
+            ConsoleLogger.Output = output;
         }
 
         #endregion
@@ -74,10 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <remarks>Protected so this can be detoured for testing purposes.</remarks>
         protected static IOutput Output
         {
-            get
-            {
-                return output;
-            }
+            get;
+            private set;
         }
         #endregion
         
@@ -95,9 +91,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 throw new ArgumentNullException("events");
             }
 
-            if (output == null)
+            if (ConsoleLogger.Output == null)
             {
-                output = ConsoleOutput.Instance;
+                ConsoleLogger.Output = ConsoleOutput.Instance;
             }
 
             // Register for the events.

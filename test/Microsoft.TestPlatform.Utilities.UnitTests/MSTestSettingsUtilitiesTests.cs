@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                 () =>
                 MSTestSettingsUtilities.Import(
                     "C:\\temp\\r.runsettings",
-                    xmlDocument.ToXPathNavigable(),
+                    GetXPathNavigable(xmlDocument),
                     Architecture.X86,
                     FrameworkVersion.Framework45);
             ExceptionUtilities.ThrowsException<XmlException>(action, "Unexpected settings file specified.");
@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                 () =>
                 MSTestSettingsUtilities.Import(
                     "C:\\temp\\r.testsettings",
-                    xmlDocument.ToXPathNavigable(),
+                    GetXPathNavigable(xmlDocument),
                     Architecture.X86,
                     FrameworkVersion.Framework45);
             ExceptionUtilities.ThrowsException<XmlException>(action, "Could not find 'RunSettings' node.");
@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             xmlDocument.LoadXml(defaultRunSettingsXml);
             var finalxPath = MSTestSettingsUtilities.Import(
                 "C:\\temp\\r.testsettings",
-                xmlDocument.ToXPathNavigable(),
+                GetXPathNavigable(xmlDocument),
                 Architecture.X86,
                 FrameworkVersion.Framework45);
 
@@ -100,7 +100,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             xmlDocument.LoadXml(defaultRunSettingsXml);
             var finalxPath = MSTestSettingsUtilities.Import(
                 "C:\\temp\\r.testsettings",
-                xmlDocument.ToXPathNavigable(),
+                GetXPathNavigable(xmlDocument),
                 Architecture.X86,
                 FrameworkVersion.Framework45);
 
@@ -113,5 +113,14 @@ namespace Microsoft.TestPlatform.Utilities.Tests
         }
 
         #endregion
+
+        private static IXPathNavigable GetXPathNavigable(XmlDocument doc)
+        {
+#if NET46
+            return doc;
+#else
+            return doc.ToXPathNavigable();
+#endif
+        }
     }
 }
