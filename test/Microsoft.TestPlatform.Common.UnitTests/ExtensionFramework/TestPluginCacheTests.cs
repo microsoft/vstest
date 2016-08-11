@@ -134,12 +134,18 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetDefaultResolutionPathsShouldReturnCurrentDirectoryByDefault()
         {
+            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
+            var defaultExtensionsDirectory = Path.Combine(currentDirectory, "Extensions");
+            var expectedDirectories = new List<string> { currentDirectory };
+            if (Directory.Exists(defaultExtensionsDirectory))
+            {
+                expectedDirectories.Add(defaultExtensionsDirectory);
+            }
+
             var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();
 
-            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
-
             Assert.IsNotNull(resolutionPaths);
-            CollectionAssert.AreEqual(new List<string> { currentDirectory }, resolutionPaths.ToList());
+            CollectionAssert.AreEqual(expectedDirectories, resolutionPaths.ToList());
         }
         
         [TestMethod]

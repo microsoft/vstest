@@ -86,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 }
                 return testLoggerManager;
             }
+
             protected set
             {
                 testLoggerManager = value;

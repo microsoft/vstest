@@ -54,8 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void InitializeShouldNotThrowExceptionIfEventsIsNotNull()
         {
-            var events = new Mock<TestLoggerEvents>();
-            this.consoleLogger.Initialize(events.Object, null);
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, null);
         }
 
         [TestMethod]
@@ -71,17 +70,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         [TestMethod]
         public void TestMessageHandlerShouldWriteToConsoleIfTestRunEventsAreRaised()
         {
-            int count = 0;
-            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback<string, OutputLevel>(
-                (s, o) => { count++; });
-
             // Raise events on mock object
             this.testRunRequest.Raise(m => m.TestRunMessage += null, new TestRunMessageEventArgs(TestMessageLevel.Informational, "Informational123"));
             this.testRunRequest.Raise(m => m.TestRunMessage += null, new TestRunMessageEventArgs(TestMessageLevel.Error, "Error123"));
             this.testRunRequest.Raise(m => m.TestRunMessage += null, new TestRunMessageEventArgs(TestMessageLevel.Warning, "Warning123"));
-
-            // Added this for synchronization
-            SpinWait.SpinUntil(() => count == 3, 300);
+            this.FlushLoggerMessages();
 
             this.mockOutput.Verify(o => o.WriteLine("Information: Informational123", OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine("Warning: Warning123", OutputLevel.Warning), Times.Once());
@@ -107,6 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             // Raise an event on mock object
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
@@ -144,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsFail()
         {
             // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
-            var eventArgs = new TestRunChangedEventArgs(null, GetTestResultObject(TestOutcome.Failed), null);
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultObject(TestOutcome.Failed), null);
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise an event on mock object
@@ -158,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         public void PrintTimeHandlerShouldPrintElapsedTimeOnConsole()
         {
             // Raise an event on mock object raised to register test case count
-            var eventArgs = new TestRunChangedEventArgs(null, GetTestResultObject(TestOutcome.Passed), null);
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultObject(TestOutcome.Passed), null);
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
 
             // Raise events on mock object
@@ -185,6 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             // Raise an event on mock object
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}{1}", Resources.TestMessageFormattingPrefix, "ErrorMessage"), OutputLevel.Error), Times.Once());
             this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, "{0}", "ErrorStackTrace"), OutputLevel.Error), Times.Once());
@@ -208,6 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             // Raise an event on mock object
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
 
             // Added this for synchronization
             SpinWait.SpinUntil(() => count == 3, 300);
@@ -226,20 +222,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         public void AttachmentInformationShouldBeWrittenToConsoleIfAttachmentsArePresent()
         {
             var attachmentSet = new AttachmentSet(new Uri("test://uri"), "myattachmentset");
-
             var uriDataAttachment = new UriDataAttachment(new Uri("file://server/filename.ext"), "description");
             attachmentSet.Attachments.Add(uriDataAttachment);
-
             var uriDataAttachment1 = new UriDataAttachment(new Uri("file://server/filename1.ext"), "description");
             attachmentSet.Attachments.Add(uriDataAttachment1);
-
             var attachmentSetList = new List<AttachmentSet>();
             attachmentSetList.Add(attachmentSet);
-
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(attachmentSetList), new TimeSpan(1, 0, 0, 0));
 
             // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
             this.testRunRequest.Raise(m => m.OnRunCompletion += null, testRunCompleteEventArgs);
+
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());
         }
@@ -258,14 +251,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.consoleLogger.Initialize(this.events.Object, null);
 
             DummyTestLoggerManager.Cleanup();
+
             // Create Instance of TestLoggerManager
             this.testLoggerManager = TestLoggerManager.Instance;
-            //Console.WriteLine(TestLoggerManager.Instance.GetHashCode());
             this.testLoggerManager.AddLogger(new Uri(ConsoleLogger.ExtensionUri), new Dictionary<string, string>());
             this.testLoggerManager.EnableLogging();
 
             // Register TestRunRequest object
             this.testLoggerManager.RegisterTestRunEvents(this.testRunRequest.Object);
+        }
+
+        private void FlushLoggerMessages()
+        {
+            // Raise a test run complete message to flush out any pending messages in queue
+            this.testRunRequest.Raise(
+                m => m.OnRunCompletion += null,
+                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: false, error: null, attachmentSets: null, elapsedTime: new TimeSpan(1, 0, 0, 0)));
         }
 
         private List<ObjectModel.TestResult> GetTestResultsObject()

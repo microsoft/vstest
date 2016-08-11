@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
@@ -27,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             this.dummyDataCollectionManagerV1 = new DummyDataCollectionManager();
             this.dummyDataCollectionManagerV2 = new DummyDataCollectionManager();
-            this.dataCollectionCoordinator = new DataCollectionCoordinator(new[] { dummyDataCollectionManagerV1, dummyDataCollectionManagerV2 });
+            this.dataCollectionCoordinator = new DataCollectionCoordinator(new IDataCollectionManager[] { dummyDataCollectionManagerV1, dummyDataCollectionManagerV2 });
         }
 
         [TestMethod]
@@ -35,15 +36,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             var envVars = new Dictionary<string, string>();
             envVars.Add("key", "value");
-            this.dummyDataCollectionManagerV1.envVariables = envVars;
-            this.dummyDataCollectionManagerV2.envVariables = new Dictionary<string, string>();
+            this.dummyDataCollectionManagerV1.EnvVariables = envVars;
+            this.dummyDataCollectionManagerV2.EnvVariables = new Dictionary<string, string>();
 
             var result = this.dataCollectionCoordinator.BeforeTestRunStart(settingsXml: string.Empty, resetDataCollectors: true, isRunStartingNow: true);
 
-            Assert.IsTrue(this.dummyDataCollectionManagerV1.isLoadCollectorsInvoked);
-            Assert.IsTrue(this.dummyDataCollectionManagerV2.isLoadCollectorsInvoked);
-            Assert.IsTrue(this.dummyDataCollectionManagerV1.isSessionStartedInvoked);
-            Assert.IsTrue(this.dummyDataCollectionManagerV2.isSessionStartedInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV1.IsLoadCollectorsInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV2.IsLoadCollectorsInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV1.IsSessionStartedInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV2.IsSessionStartedInvoked);
             Assert.AreEqual(1, result.EnvironmentVariables.Count);
             Assert.AreEqual(envVars.Keys.First(), result.EnvironmentVariables.Keys.First());
             Assert.AreEqual(envVars.Values.First(), result.EnvironmentVariables.Values.First());
@@ -54,15 +55,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             var envVars = new Dictionary<string, string>();
             envVars.Add("key", "value");
-            this.dummyDataCollectionManagerV1.envVariables = envVars;
-            this.dummyDataCollectionManagerV2.envVariables = new Dictionary<string, string>();
+            this.dummyDataCollectionManagerV1.EnvVariables = envVars;
+            this.dummyDataCollectionManagerV2.EnvVariables = new Dictionary<string, string>();
 
             var result = this.dataCollectionCoordinator.BeforeTestRunStart(settingsXml: string.Empty, resetDataCollectors: true, isRunStartingNow: true);
 
             // Verify the two collectors are invoked in parallel
-            Assert.IsTrue(this.dummyDataCollectionManagerV1.ThreadId > 0);
-            Assert.IsTrue(this.dummyDataCollectionManagerV2.ThreadId > 0);
-            Assert.AreNotEqual(this.dummyDataCollectionManagerV1.ThreadId, this.dummyDataCollectionManagerV2.ThreadId);
+            Assert.IsTrue(this.dummyDataCollectionManagerV1.TaskId > 0);
+            Assert.IsTrue(this.dummyDataCollectionManagerV2.TaskId > 0);
+            Assert.AreNotEqual(this.dummyDataCollectionManagerV1.TaskId, this.dummyDataCollectionManagerV2.TaskId);
         }
 
         [TestMethod]
@@ -78,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void BeforeTestRunStartShouldThrowExceptionIfExceptionIsThrownByDataCollectionManager()
         {
-            this.dummyDataCollectionManagerV1.loadDataCollectorsThrowException = true;
+            this.dummyDataCollectionManagerV1.LoadDataCollectorsThrowException = true;
 
             Assert.ThrowsException<AggregateException>(
                 () =>
@@ -95,14 +96,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             attachmentset1.Attachments.Add(new UriDataAttachment(new Uri("DataCollection://Attachment/v11"), "AttachmentV1-Attachment1"));
             attachments1.Add(attachmentset1);
 
-            this.dummyDataCollectionManagerV1.attachments = attachments1;
-            this.dummyDataCollectionManagerV2.attachments = attachments1;
+            this.dummyDataCollectionManagerV1.Attachments = attachments1;
+            this.dummyDataCollectionManagerV2.Attachments = attachments1;
 
             var result = this.dataCollectionCoordinator.AfterTestRunEnd(isCancelled: false);
 
             Assert.IsNotNull(result);
-            Assert.IsTrue(this.dummyDataCollectionManagerV1.isSessionEndedInvoked);
-            Assert.IsTrue(this.dummyDataCollectionManagerV2.isSessionEndedInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV1.IsSessionEndedInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV2.IsSessionEndedInvoked);
             Assert.AreEqual(2, result.Count());
         }
 
@@ -114,15 +115,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             attachmentset1.Attachments.Add(new UriDataAttachment(new Uri("DataCollection://Attachment/v11"), "AttachmentV1-Attachment1"));
             attachments1.Add(attachmentset1);
 
-            this.dummyDataCollectionManagerV1.attachments = attachments1;
-            this.dummyDataCollectionManagerV2.attachments = attachments1;
+            this.dummyDataCollectionManagerV1.Attachments = attachments1;
+            this.dummyDataCollectionManagerV2.Attachments = attachments1;
 
             var result = this.dataCollectionCoordinator.AfterTestRunEnd(isCancelled: false);
 
             // Verify the two collectors are invoked in parallel
-            Assert.IsTrue(this.dummyDataCollectionManagerV1.ThreadId > 0);
-            Assert.IsTrue(this.dummyDataCollectionManagerV2.ThreadId > 0);
-            Assert.AreNotEqual(this.dummyDataCollectionManagerV1.ThreadId, this.dummyDataCollectionManagerV2.ThreadId);
+            Assert.IsTrue(this.dummyDataCollectionManagerV1.TaskId > 0);
+            Assert.IsTrue(this.dummyDataCollectionManagerV2.TaskId > 0);
+            Assert.AreNotEqual(this.dummyDataCollectionManagerV1.TaskId, this.dummyDataCollectionManagerV2.TaskId);
         }
 
         [TestMethod]
@@ -138,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void AfterTestRunEndShouldThrowExceptionIfExceptionIsThrownByDataCollectionManager()
         {
-            this.dummyDataCollectionManagerV1.sessionEndedThrowsException = true;
+            this.dummyDataCollectionManagerV1.SessionEndedThrowsException = true;
 
             Assert.ThrowsException<AggregateException>(
                 () =>
@@ -152,8 +153,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             this.dataCollectionCoordinator.Dispose();
 
-            Assert.IsTrue(this.dummyDataCollectionManagerV1.isDisposedInvoked);
-            Assert.IsTrue(this.dummyDataCollectionManagerV2.isDisposedInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV1.IsDisposedInvoked);
+            Assert.IsTrue(this.dummyDataCollectionManagerV2.IsDisposedInvoked);
         }
 
         [TestMethod]
@@ -167,32 +168,32 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
     internal class DummyDataCollectionManager : IDataCollectionManager
     {
-        public bool isLoadCollectorsInvoked;
-        public bool isSessionStartedInvoked;
-        public bool isSessionEndedInvoked;
-        public Dictionary<string, string> envVariables;
-        public bool loadDataCollectorsThrowException;
-        public Collection<AttachmentSet> attachments;
-        public bool sessionEndedThrowsException;
-        public bool isDisposedInvoked;
-        public int ThreadId;
+        public bool IsLoadCollectorsInvoked;
+        public bool IsSessionStartedInvoked;
+        public bool IsSessionEndedInvoked;
+        public Dictionary<string, string> EnvVariables;
+        public bool LoadDataCollectorsThrowException;
+        public Collection<AttachmentSet> Attachments;
+        public bool SessionEndedThrowsException;
+        public bool IsDisposedInvoked;
+        public int TaskId;
 
         public void Dispose()
         {
-            this.isDisposedInvoked = true;
+            this.IsDisposedInvoked = true;
         }
 
         public Dictionary<string, string> LoadDataCollectors(RunSettings settingsXml)
         {
-            this.ThreadId = Thread.CurrentThread.ManagedThreadId;
+            this.TaskId = Task.CurrentId.Value;
 
-            if (this.loadDataCollectorsThrowException)
+            if (this.LoadDataCollectorsThrowException)
             {
                 throw new Exception("DataCollectionManagerException");
             }
 
-            this.isLoadCollectorsInvoked = true;
-            return this.envVariables;
+            this.IsLoadCollectorsInvoked = true;
+            return this.EnvVariables;
 
         }
 
@@ -203,21 +204,21 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
         public Collection<AttachmentSet> SessionEnded(bool isCancelled)
         {
-            this.ThreadId = Thread.CurrentThread.ManagedThreadId;
+            this.TaskId = Task.CurrentId.Value;
 
-            if (this.sessionEndedThrowsException)
+            if (this.SessionEndedThrowsException)
             {
                 throw new Exception("DataCollectionManagerException");
             }
 
-            this.isSessionEndedInvoked = true;
-            return this.attachments;
+            this.IsSessionEndedInvoked = true;
+            return this.Attachments;
         }
 
         public bool SessionStarted()
         {
-            this.ThreadId = Thread.CurrentThread.ManagedThreadId;
-            this.isSessionStartedInvoked = true;
+            this.TaskId = Task.CurrentId.Value;
+            this.IsSessionStartedInvoked = true;
             return true;
         }
 
