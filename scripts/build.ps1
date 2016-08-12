@@ -6,7 +6,12 @@ Param(
     [Parameter(Mandatory=$false)]
     [ValidateSet("Debug", "Release")]
     [Alias("c")]
-    [System.String] $Configuration = "Debug"
+    [System.String] $Configuration = "Debug",
+
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("win7-x64", "win7-x86")]
+    [Alias("r")]
+    [System.String] $TargetRuntime = "win7-x64"
 )
 
 $ErrorActionPreference = "Stop"
@@ -32,11 +37,11 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Build configuration
 #
-# Folders to build. TODO move to props
 Write-Verbose "Setup build configuration."
-$SourceFolders = @("src", "test")
-$TargetFramework = "net46"
-$TargetRuntime = "win7-x64"
+$TPB_SourceFolders = @("src", "test")
+$TPB_TargetFramework = "net46"
+$TPB_Configuration = $Configuration
+$TPB_TargetRuntime = $TargetRuntime
 
 function Write-Log ([string] $message)
 {
@@ -90,7 +95,7 @@ function Restore-Package
     Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     $dotnetExe = Get-DotNetPath
 
-    foreach ($src in $SourceFolders) {
+    foreach ($src in $TPB_SourceFolders) {
         Write-Log "Restore-Package: Restore for source directory: $src"
         & $dotnetExe restore $src --packages $env:TP_PACKAGES_DIR
     }
@@ -104,11 +109,11 @@ function Invoke-Build
     Write-Log "Invoke-Build: Start build."
     $dotnetExe = Get-DotNetPath
 
-    foreach ($src in $SourceFolders) {
+    foreach ($src in $TPB_SourceFolders) {
         # Invoke build for each project.json since we want a custom output
         # path.
         Write-Log ".. Build: Source directory: $src"
-        #foreach ($fx in $TargetFramework) {
+        #foreach ($fx in $TPB_TargetFramework) {
             #Get-ChildItem -Recurse -Path $src -Include "project.json" | ForEach-Object {
                 #Write-Log ".. .. Build: Source: $_"
                 #$binPath = Join-Path $env:TP_OUT_DIR "$fx\$src\$($_.Directory.Name)\bin"
@@ -118,8 +123,8 @@ function Invoke-Build
                 #Write-Log ".. .. Build: Complete."
             #}
         #}
-        Write-Verbose "$dotnetExe build $src\**\project.json --configuration $Configuration"
-        & $dotnetExe build $_ $src\**\project.json --configuration $Configuration
+        Write-Verbose "$dotnetExe build $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime"
+        & $dotnetExe build $_ $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime
     }
 
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
@@ -133,8 +138,8 @@ function Publish-Package
     $packageDir = Get-PackageDirectory
 
     Write-Log ".. Package: Publish package\project.json"
-    Write-Verbose "$dotnetExe publish src\package\project.json --runtime win7-x64 --framework net46 --no-build --configuration $Configuration --out $packageDir"
-    & $dotnetExe publish src\package\project.json --runtime win7-x64 --framework net46 --no-build --configuration $Configuration --output $packageDir
+    Write-Verbose "$dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --out $packageDir"
+    & $dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --output $packageDir
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -159,7 +164,7 @@ function Create-VsixPackage
 
     # Zip the folder
     # TODO remove vsix creator
-    & src\Microsoft.TestPlatform.VSIXCreator\bin\$Configuration\net461\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$Configuration
+    & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net461\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -179,7 +184,7 @@ function Get-DotNetPath
 
 function Get-PackageDirectory
 {
-    return $(Join-Path $env:TP_OUT_DIR "$Configuration\$TargetFramework\$TargetRuntime")
+    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\$TPB_TargetRuntime")
 }
 
 function Start-Timer
@@ -198,6 +203,9 @@ $timer = Start-Timer
 Write-Log "Build started: args = '$args'"
 Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
+
+Write-Log "Test platform build variables: "
+Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
 Install-DotNetCli
 Restore-Package
