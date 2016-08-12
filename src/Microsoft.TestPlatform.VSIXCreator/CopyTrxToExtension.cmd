@@ -17,4 +17,4 @@ IF EXIST "%TPBINDEBUGPATH%" (
 	IF EXIST "%TPBINDEBUGPATH%\\net461\\win7-x64\\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" ( 
 		MOVE /Y "%TPBINDEBUGPATH%\\net461\\win7-x64\\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" "%TPBINDEBUGPATH%\\net461\\win7-x64\\Extensions" 
 	) 
-) 
+)
