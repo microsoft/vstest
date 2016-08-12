@@ -15,11 +15,13 @@ def branch = GithubBranchName
         
         // Define your build/test strings here
         def buildString = """call build.cmd -c ${configuration}"""
+        def testString = """call test.cmd -c ${configuration}"""
 
         // Create a new job for windows build
         def newJob = job(newJobName) {
             steps {
                 batchFile(buildString)
+                batchFile(testString)
             }
         }
 
