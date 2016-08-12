@@ -4,6 +4,7 @@ import jobs.generation.InternalUtilities;
 
 // Defines a the new of the repo, used elsewhere in the file
 def project = GithubProject
+def branch = GithubBranchName
 
 // Generate the builds for debug and release, commit and PRJob
 [true, false].each { isPR -> // Defines a closure over true and false, value assigned to isPR
@@ -25,7 +26,7 @@ def project = GithubProject
         Utilities.setMachineAffinity(newJob, 'Windows_NT', 'latest-or-auto-internal')
         
         // This call performs remaining common job setup on the newly created job.
-        InternalUtilities.standardJobSetup(newJob, project, isPR, "*/${branchName}")
+        InternalUtilities.standardJobSetup(newJob, project, isPR, "*/${branch}")
 
         if (isPR) {
             Utilities.addGithubPRTriggerForBranch(newJob, branch, "Windows / ${os} ${configuration} Build")
