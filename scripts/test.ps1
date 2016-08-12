@@ -57,6 +57,9 @@ $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("Microsoft.TestPlatform.CoreUtilities.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
+#
+# Capture error state in any step globally to modify return code
+$Script:ScriptFailed = $false
 
 function Write-Log ([string] $message)
 {
@@ -118,6 +121,8 @@ function Invoke-Test
                         Write-Log ".. . Failed tests:"
                         Write-Log ".. .  $($output -match '^Failed')"
 
+                        Set-ScriptFailed
+
                         if ($Script:TPT_FailFast) {
                             Write-Log ".. Stop execution since fail fast is enabled."
                             continue
@@ -164,6 +169,11 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
     return $timer.Elapsed
 }
 
+function Set-ScriptFailed
+{
+    $Script:ScriptFailed = $true
+}
+
 # Execute build
 $timer = Start-Timer
 Write-Log "Build started: args = '$args'"
@@ -177,5 +187,4 @@ Invoke-Test
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 
-# Always exit with 0. We capture vstest.console errors with stderr instead of exit code.
-Exit 0
+if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
