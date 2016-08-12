@@ -176,3 +176,6 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPT_") } | Forma
 Invoke-Test
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+
+# Always exit with 0. We capture vstest.console errors with stderr instead of exit code.
+Exit 0
