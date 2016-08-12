@@ -29,7 +29,7 @@ def branch = GithubBranchName
         InternalUtilities.standardJobSetup(newJob, project, isPR, "*/${branch}")
 
         if (isPR) {
-            Utilities.addGithubPRTriggerForBranch(newJob, branch, "Windows / ${os} ${configuration} Build")
+            Utilities.addGithubPRTriggerForBranch(newJob, branch, "Windows / ${configuration} Build")
         }
         else {
             Utilities.addGithubPushTrigger(newJob)
