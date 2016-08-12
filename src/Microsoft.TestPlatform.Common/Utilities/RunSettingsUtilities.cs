@@ -37,7 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             string resultsDirectory = null;
             if (runConfiguration != null)
             {
-                 resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
+                // It will try to get path from runsettings, if not found then it will return default path.
+                resultsDirectory = Environment.ExpandEnvironmentVariables(runConfiguration.ResultsDirectory);
             }
 
             return resultsDirectory;
