@@ -43,6 +43,9 @@ $TPB_TargetFramework = "net46"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 
+# Capture error state in any step globally to modify return code
+$Script:ScriptFailed = $false
+
 function Write-Log ([string] $message)
 {
     $currentColor = $Host.UI.RawUI.ForegroundColor
@@ -125,6 +128,10 @@ function Invoke-Build
         #}
         Write-Verbose "$dotnetExe build $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime"
         & $dotnetExe build $_ $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime
+
+        if ($lastExitCode -ne 0) {
+            Set-ScriptFailed
+        }
     }
 
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
@@ -140,6 +147,10 @@ function Publish-Package
     Write-Log ".. Package: Publish package\project.json"
     Write-Verbose "$dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --out $packageDir"
     & $dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --output $packageDir
+
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
+    }
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -198,6 +209,11 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
     return $timer.Elapsed
 }
 
+function Set-ScriptFailed
+{
+    $Script:ScriptFailed = $true
+}
+
 # Execute build
 $timer = Start-Timer
 Write-Log "Build started: args = '$args'"
@@ -214,3 +230,5 @@ Publish-Package
 Create-VsixPackage
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+
+if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
