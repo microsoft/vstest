@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Default results directory.
         /// </summary>
-        public static readonly string DefaultResultsDirectory = Path.Combine("%Temp%", ResultsDirectoryName);
+        public static readonly string DefaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), ResultsDirectoryName);
 
         /// <summary>
         /// Default treatment of error from test adapters.
