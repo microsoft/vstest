@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
+using System.Xml.XPath;
+
 namespace Microsoft.TestPlatform.Utilities.Tests
 {
     using System.Xml;
@@ -25,8 +27,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(runSettingsXml);
 
-            CodeCoverageDataAdapterUtilities.UpdateWithCodeCoverageSettingsIfNotConfigured(
-                xmlDocument.ToXPathNavigable());
+            CodeCoverageDataAdapterUtilities.UpdateWithCodeCoverageSettingsIfNotConfigured(GetXPathNavigable(xmlDocument));
 
             var expectedRunSettings =
                 "<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector uri=\"datacollector://microsoft/CodeCoverage/1.0\"></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
@@ -48,12 +49,20 @@ namespace Microsoft.TestPlatform.Utilities.Tests
             var xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(runSettingsXml);
 
-            CodeCoverageDataAdapterUtilities.UpdateWithCodeCoverageSettingsIfNotConfigured(
-                xmlDocument.ToXPathNavigable());
+            CodeCoverageDataAdapterUtilities.UpdateWithCodeCoverageSettingsIfNotConfigured(GetXPathNavigable(xmlDocument));
 
             var expectedRunSettings =
                 "<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector uri=\"datacollector://microsoft/CodeCoverage/2.0\"></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
             Assert.AreEqual(expectedRunSettings, xmlDocument.OuterXml);
+        }
+
+        private static IXPathNavigable GetXPathNavigable(XmlDocument doc)
+        {
+#if NET46
+            return doc;
+#else
+            return doc.ToXPathNavigable();
+#endif
         }
     }
 }

@@ -8,17 +8,11 @@
   },
 
   "dependencies": {
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.0"
-    },
-    "dotnet-test-mstest": {
-      "version": "1.0.1-preview",
+    "MSTest.TestFramework": "1.0.0-preview",
+    "MSTest.TestAdapter": {
+      "version": "1.0.3-preview",
       "exclude": "compile"
     },
-    "MSTest.TestFramework": "1.0.0-preview",
-    "moq.netcore": "4.4.0-beta8",
-    "System.Diagnostics.TraceSource": "4.0.0-rc2-24015",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*"
   },
 
@@ -27,8 +21,25 @@
       "imports": [
         "dnxcore50",
         "portable-net45+win8"
-      ]
-    }
+      ],
+
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0"
+        },
+        "dotnet-test-mstest": {
+          "version": "1.0.1-preview",
+          "exclude": "compile"
+        }
+      }
+    },
+
+    "net46": {
+      "frameworkAssemblies": {
+        "System.Runtime": ""
+      }
+    } 
   },
 
   "testRunner": "mstest"
