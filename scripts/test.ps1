@@ -8,6 +8,11 @@ Param(
     [Alias("c")]
     [System.String] $Configuration = "Debug",
 
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("win7-x64", "win7-x86")]
+    [Alias("r")]
+    [System.String] $TargetRuntime = "win7-x64",
+
     # Only test sources matching the pattern are run.
     # Use End2End to run E2E tests. Or to run any one assembly tests, use the 
     # assembly name. E.g. test -p Microsoft.TestPlatform.CoreUtilities.UnitTests 
@@ -44,12 +49,11 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Test configuration
 #
-# Folders to build. TODO move to props
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFramework = "net46"
-$Script:TPT_TargetRuntime = "win7-x64"
+$Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("Microsoft.TestPlatform.CoreUtilities.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
@@ -92,16 +96,17 @@ function Invoke-Test
                 # Tests are only built for x86 at the moment, though we don't have architecture requirement
                 $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.0.3-preview\build\_common"
                 $testContainerName = $_.Directory.Name
-                $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/$($Script:TPT_TargetFramework)/win7-x86"
+                $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/$($Script:TPT_TargetFramework)/$($Script:TPT_TargetRuntime)"
                 $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
+                $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
 
                 if ($Script:TPT_SkipProjects.Contains($testContainerName)) {
                     Write-Log ".. . $testContainerName is in skipped test list."
                 } elseif (!($testContainerName -match $Script:TPT_Pattern)) {
                     Write-Log ".. . $testContainerName doesn't match test container pattern '$($Script:TPT_Pattern)'. Skipped from run."
                 } else {
-                    Write-Verbose "vstest.console.exe $testContainerPath /testAdapterPath:$testAdapterPath"
-                    $output = & $vstestConsolePath $testContainerPath /testAdapterPath:"$testAdapterPath"
+                    Write-Verbose "vstest.console.exe $testContainerPath /platform:$testArchitecture /testAdapterPath:$testAdapterPath"
+                    $output = & $vstestConsolePath $testContainerPath /platform:$testArchitecture /testAdapterPath:"$testAdapterPath"
 
                     #Write-Verbose "$dotnetExe test $_ --configuration $Configuration"
                     #& $dotnetExe test $_ --configuration $Configuration
