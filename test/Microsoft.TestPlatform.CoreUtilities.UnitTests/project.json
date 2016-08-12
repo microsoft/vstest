@@ -13,8 +13,7 @@
       "version": "1.0.3-preview",
       "exclude": "compile"
     },
-    "moq.netcore": "4.4.0-beta8",
-    "System.Diagnostics.TraceSource": "4.0.0-rc2-24015",
+    "Moq": "4.6.36-*",
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*"
   },
 

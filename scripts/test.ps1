@@ -90,6 +90,7 @@ function Invoke-Test
                 Write-Log ".. Test: Source: $_"
 
                 # Tests are only built for x86 at the moment, though we don't have architecture requirement
+                $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.0.3-preview\build\_common"
                 $testContainerName = $_.Directory.Name
                 $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/$($Script:TPT_TargetFramework)/win7-x86"
                 $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
@@ -99,8 +100,8 @@ function Invoke-Test
                 } elseif (!($testContainerName -match $Script:TPT_Pattern)) {
                     Write-Log ".. . $testContainerName doesn't match test container pattern '$($Script:TPT_Pattern)'. Skipped from run."
                 } else {
-                    Write-Verbose "vstest.console.exe $testContainerPath /testAdapterPath:$testOutputPath"
-                    $output = & $vstestConsolePath $testContainerPath /testAdapterPath:"$testOutputPath"
+                    Write-Verbose "vstest.console.exe $testContainerPath /testAdapterPath:$testAdapterPath"
+                    $output = & $vstestConsolePath $testContainerPath /testAdapterPath:"$testAdapterPath"
 
                     #Write-Verbose "$dotnetExe test $_ --configuration $Configuration"
                     #& $dotnetExe test $_ --configuration $Configuration

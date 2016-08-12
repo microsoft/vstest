@@ -13,7 +13,6 @@
       "version": "1.0.3-preview",
       "exclude": "compile"
     },
-    "System.Diagnostics.TraceSource": "4.0.0-rc2-24015",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*"
   },
 
@@ -32,8 +31,7 @@
         "dotnet-test-mstest": {
           "version": "1.0.1-preview",
           "exclude": "compile"
-        },
-        "moq.netcore": "4.4.0-beta8"
+        }
       }
     },
 

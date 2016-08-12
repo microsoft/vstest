@@ -13,11 +13,10 @@
       "version": "1.0.0-preview",
       "exclude": "compile"
     },
-    "System.Diagnostics.TraceSource": "4.0.0-rc2-24015",
     "Microsoft.TestPlatform.Client": "15.0.0-*",
     "Microsoft.TestPlatform.Extensions.TrxLogger": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
-    "moq.netcore": "4.4.0-beta8"
+    "Moq": "4.6.36-*"
   },
 
   "frameworks": {
