@@ -8,7 +8,6 @@
   },
 
   "dependencies": {
-    
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*"
   },

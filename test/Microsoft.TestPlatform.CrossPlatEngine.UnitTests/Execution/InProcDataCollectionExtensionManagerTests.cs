@@ -4,7 +4,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System;
     using System.Collections.ObjectModel;
     using System.Reflection;
-    using System.Runtime.Loader;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;

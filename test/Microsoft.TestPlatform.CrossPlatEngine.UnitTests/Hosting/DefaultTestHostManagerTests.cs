@@ -49,13 +49,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 };
                 
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-            
-            var expectedProcessPath =
-                Path.Combine(
-                    Path.GetDirectoryName(typeof(DefaultTestHostManagerTests).GetTypeInfo().Assembly.Location),
-                    "testhost.x86.exe");
 
-            Assert.AreEqual(expectedProcessPath, processPath);
+            StringAssert.EndsWith(processPath, "testhost.x86.exe");
             Assert.AreEqual(1, times);
         }
 
@@ -77,12 +72,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
 
-            var expectedProcessPath =
-                Path.Combine(
-                    Path.GetDirectoryName(typeof(DefaultTestHostManagerTests).GetTypeInfo().Assembly.Location),
-                    "testhost.exe");
-
-            Assert.AreEqual(expectedProcessPath, processPath);
+            StringAssert.EndsWith(processPath, "testhost.exe");
             Assert.AreEqual(1, times);
         }
 
