@@ -24,6 +24,8 @@ $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.F
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
+$env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
+$env:NETCORE_DIR = "NetCore"
 
 #
 # Dotnet configuration
@@ -40,6 +42,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 Write-Verbose "Setup build configuration."
 $TPB_SourceFolders = @("src", "test")
 $TPB_TargetFramework = "net46"
+$TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 
@@ -142,15 +145,25 @@ function Publish-Package
     $timer = Start-Timer
     Write-Log "Publish-Package: Started."
     $dotnetExe = Get-DotNetPath
-    $packageDir = Get-PackageDirectory
+    $fullCLRPackageDir = Get-FullCLRPackageDirectory
+    $coreCLRPackageDir = Get-CoreCLRPackageDirectory
 
     Write-Log ".. Package: Publish package\project.json"
-    Write-Verbose "$dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --out $packageDir"
-    & $dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --output $packageDir
+    
+    Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFramework --no-build --configuration $TPB_Configuration --output $fullCLRPackageDir"
+    & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFramework --no-build --configuration $TPB_Configuration --output $fullCLRPackageDir
+    
+    Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
+    & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
     }
+
+    # Copy over the Core CLR built assemblies to the Full CLR package folder.
+    $coreDestDir = Join-Path $fullCLRPackageDir $env:NETCORE_DIR
+    New-Item -ItemType directory -Path $coreDestDir -Force
+    Copy-Item -Recurse $coreCLRPackageDir\* $coreDestDir -Force
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -159,14 +172,16 @@ function Create-VsixPackage
 {
     $timer = Start-Timer
 
+    Write-Log "Create-VsixPackage: Started."
+    $packageDir = Get-FullCLRPackageDirectory
+
     # Copy vsix manifests
-    $packageDir = Get-PackageDirectory
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
         "testhost.x86.exe.config",
         "testhost.exe.config")
     foreach ($file in $vsixManifests) {
-        Copy-Item src\package\$file $packageDir -Force
+        Copy-Item $env:TP_PACKAGE_PROJ_DIR\$file $packageDir -Force
     }
 
     # Copy legacy dependencies
@@ -193,9 +208,14 @@ function Get-DotNetPath
     return $dotnetPath
 }
 
-function Get-PackageDirectory
+function Get-FullCLRPackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\$TPB_TargetRuntime")
+}
+
+function Get-CoreCLRPackageDirectory
+{
+    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore")
 }
 
 function Start-Timer
