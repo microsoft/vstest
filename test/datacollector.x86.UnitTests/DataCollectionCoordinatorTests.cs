@@ -41,6 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             var result = this.dataCollectionCoordinator.BeforeTestRunStart(settingsXml: string.Empty, resetDataCollectors: true, isRunStartingNow: true);
 
+            Assert.IsTrue(1 == 2);
             Assert.IsTrue(this.dummyDataCollectionManagerV1.IsLoadCollectorsInvoked);
             Assert.IsTrue(this.dummyDataCollectionManagerV2.IsLoadCollectorsInvoked);
             Assert.IsTrue(this.dummyDataCollectionManagerV1.IsSessionStartedInvoked);
