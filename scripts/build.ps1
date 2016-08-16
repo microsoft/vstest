@@ -153,8 +153,8 @@ function Publish-Package
     Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFramework --no-build --configuration $TPB_Configuration --output $fullCLRPackageDir"
     & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFramework --no-build --configuration $TPB_Configuration --output $fullCLRPackageDir
     
-    Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
-    & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
+    Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
+    & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
