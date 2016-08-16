@@ -40,6 +40,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 Write-Verbose "Setup build configuration."
 $TPB_SourceFolders = @("src", "test")
 $TPB_TargetFramework = "net46"
+$TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 
@@ -145,9 +146,9 @@ function Publish-Package
     $packageDir = Get-PackageDirectory
 
     Write-Log ".. Package: Publish package\project.json"
-    Write-Verbose "$dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --out $packageDir"
-    & $dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --framework net46 --no-build --configuration $TPB_Configuration --output $packageDir
-
+    Write-Verbose "$dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --no-build --configuration $TPB_Configuration"
+    & $dotnetExe publish src\package\project.json --runtime $TPB_TargetRuntime --no-build --configuration $TPB_Configuration
+    
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
     }
@@ -159,8 +160,18 @@ function Create-VsixPackage
 {
     $timer = Start-Timer
 
-    # Copy vsix manifests
+    Write-Log "Create-VsixPackage: Started."
     $packageDir = Get-PackageDirectory
+
+    #Create the destination folder.
+    New-Item -ItemType directory -Path $packageDir -Force
+
+    # Copy over the net46 assemblies first.
+    $defaultPublishDir = Join-Path $env:TP_ROOT_DIR -ChildPath src\package\bin | Join-Path -ChildPath $TPB_Configuration
+    $net46PublishDir = Join-Path $defaultPublishDir -ChildPath "$TPB_TargetFramework\$TPB_TargetRuntime" | Join-Path -ChildPath "publish"
+    Copy-Item -Recurse $net46PublishDir\* $packageDir -Force
+        
+    # Copy vsix manifests
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
         "testhost.x86.exe.config",
@@ -172,6 +183,12 @@ function Create-VsixPackage
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
+    # Create a NetCore folder and copy over the assemblies built for .net core.
+    $corePublishDir = Join-Path $defaultPublishDir -ChildPath $TPB_TargetFrameworkCore | Join-Path -ChildPath "publish"
+    $coreDestDir = Join-Path $packageDir NetCore
+    New-Item -ItemType directory -Path $coreDestDir -Force
+    Copy-Item -Recurse $corePublishDir\* $coreDestDir -Force
 
     # Zip the folder
     # TODO remove vsix creator
