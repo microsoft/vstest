@@ -16,7 +16,7 @@
 
   "scripts": {
     "precompile": "VSIXDelete.cmd",
-    "postcompile": [ "VSIXCreator.cmd" ] 
+    "postcompile": [ "CopyTrxToExtension.cmd", "VSIXCreator.cmd" ] 
 	}, 
 	
   "frameworks": {
@@ -38,10 +38,10 @@
     "testhost": "15.0.0-*",
     "testhost.x86": "15.0.0-*",
     "vstest.console": "15.0.0-*",
-
     "Microsoft.Internal.TestPlatform.Extensions": {
       "type": "build",
-      "version":  "15.0.0"
-    }
+      "version": "15.0.0"
+    },
+    "Microsoft.TestPlatform.Extensions.TrxLogger": "15.0.0-*"
   }
 }

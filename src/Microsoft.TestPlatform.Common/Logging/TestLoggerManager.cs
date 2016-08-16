@@ -6,11 +6,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources;
 
     /// <summary>
@@ -52,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         private TestLoggerExtensionManager testLoggerExtensionManager;
         private IDiscoveryRequest discoveryRequest;
-        
+
         #endregion
 
         #region Constructor
@@ -158,8 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     }
                     else
                     {
-                        // todo Read Output Directory from RunSettings
-                        ((ITestLogger)logger.Value).Initialize(this.loggerEvents, null);
+                        ((ITestLogger)logger.Value).Initialize(this.loggerEvents, this.GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
                     }
                 }
                 catch (Exception e)
@@ -182,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         uri.OriginalString));
             }
         }
-        
+
         /// <summary>
         /// Tries to get uri of the logger corresponding to the friendly name. If no such logger exists return null.
         /// </summary>
@@ -204,7 +206,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             loggerUri = null;
             return false;
         }
-        
+
         /// <summary>
         /// Registers to receive events from the provided test run request.
         /// These events will then be broadcast to any registered loggers.
@@ -240,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.discoveryRequest = discoveryRequest;
             discoveryRequest.OnDiscoveryMessage += this.DiscoveryMessageHandler;
         }
-        
+
         /// <summary>
         /// Unregisters the events from the test run request. 
         /// </summary>
@@ -254,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             testRunRequest.OnRunCompletion -= this.TestRunCompleteHandler;
             this.runRequest.DataCollectionMessage -= this.DiscoveryMessageHandler;
         }
-        
+
         /// <summary>
         /// Unregister the events from the discovery request.
         /// </summary>
@@ -341,6 +343,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         #endregion
 
         #region Private Members
+
+        /// <summary> 
+        /// Gets the test results directory. 
+        /// </summary> 
+        /// <param name="runSettings">Test run settings.</param> 
+        /// <returns>Test results directory</returns>
+        internal string GetResultsDirectory(RunSettings runSettings)
+        {
+            string resultsDirectory = null;
+            if (runSettings != null)
+            {
+                try
+                {
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings.SettingsXml);
+                    resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+                }
+                catch (SettingsException se)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("TestLoggerManager.GetResultsDirectory: Unable to get the test results directory: Error {0}", se);
+                    }
+                }
+            }
+
+            return resultsDirectory;
+        }
 
         /// <summary>
         /// Populates user supplied and default logger parameters.
