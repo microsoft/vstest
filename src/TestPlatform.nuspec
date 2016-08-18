@@ -13,7 +13,7 @@
     <copyright>Copyright © Microsoft Corporation</copyright>
   </metadata>
   <files>	
-	<file src="net46\win7-64\**\*.*" target="lib\net46\" />
-	<file src="netcoreapp1.0\**\*.*" target="lib\netstandard1.5\" />
+	<file src="net46\win7-64\**\*.*" target="tools\net46\" />
+	<file src="netcoreapp1.0\**\*.*" target="tools\netstandard1.5\" />
   </files>
 </package>
