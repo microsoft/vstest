@@ -24,7 +24,6 @@ $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.F
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
-$env:TP_SRC_DIR = Join-Path $env:TP_ROOT_DIR "src"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 $env:NETCORE_DIR = "NetCore"
 
@@ -203,11 +202,12 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+    $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
 
     # Copy over the nuspecs to the staging directory
     $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec")
     foreach ($file in $nuspecFiles) {
-        Copy-Item $env:TP_SRC_DIR\$file $stagingDir -Force
+        Copy-Item $tpSrcDir\$file $stagingDir -Force
     }
 
     # Call nuget pack on these components.

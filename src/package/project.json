@@ -24,7 +24,11 @@
           "type": "build",
           "version":  "15.0.0"
         },
-        "NuGet.CommandLine": "3.4.3"
+        "NuGet.CommandLine": 
+        {
+          "type": "build", 
+          "version": "3.4.3" 
+        }
       }
     },
     "netcoreapp1.0":{ 
