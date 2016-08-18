@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Microsoft.TestPlatform.TranslationLayer</id>
+    <version>15.0.0</version>
+    <title>Microsoft.TestPlatform.TranslationLayer</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>The entry point to Microsoft Test Platform. This is a csharp layer that can drive the test platform confirming to its protocol</description>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <copyright>Copyright © Microsoft Corporation</copyright>
+  </metadata>
+  <files>	
+	<file src="net46\win7-x64\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net46\" />
+	<file src="netcoreapp1.0\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\netstandard1.5\" />
+  </files>
+</package>

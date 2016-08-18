@@ -24,6 +24,7 @@ $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.F
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
+$env:TP_SRC_DIR = Join-Path $env:TP_ROOT_DIR "src"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 $env:NETCORE_DIR = "NetCore"
 
@@ -35,6 +36,7 @@ Write-Verbose "Setup dotnet configuration."
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
+$env:NUGET_EXE_Version = "3.4.3"
 
 #
 # Build configuration
@@ -192,7 +194,31 @@ function Create-VsixPackage
     # TODO remove vsix creator
     & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net461\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
 
-    Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
+    Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Create-NugetPackages
+{
+    $timer = Start-Timer
+
+    Write-Log "Create-NugetPackages: Started."
+    $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+
+    # Copy over the nuspecs to the staging directory
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec")
+    foreach ($file in $nuspecFiles) {
+        Copy-Item $env:TP_SRC_DIR\$file $stagingDir -Force
+    }
+
+    # Call nuget pack on these components.
+    $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
+
+    foreach ($file in $nuspecFiles) {
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir
+    }
+
+    Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
 #
@@ -248,6 +274,7 @@ Restore-Package
 Invoke-Build
 Publish-Package
 Create-VsixPackage
+Create-NugetPackages
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 
