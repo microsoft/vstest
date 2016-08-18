@@ -19,11 +19,15 @@
       "frameworkAssemblies": {
       },
       "dependencies": {
-        "Microsoft.TestPlatform.VsTestConsole.TranslationLayer": "15.0.0-*",
         "testhost.x86": "15.0.0-*",
         "Microsoft.Internal.TestPlatform.Extensions": {
           "type": "build",
           "version":  "15.0.0"
+        },
+        "NuGet.CommandLine": 
+        {
+          "type": "build", 
+          "version": "3.4.3" 
         }
       }
     },
@@ -50,6 +54,7 @@
     "Microsoft.TestPlatform.CrossPlatEngine": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "vstest.console": "15.0.0-*",
-    "testhost": "15.0.0-*"
+    "testhost": "15.0.0-*",
+    "Microsoft.TestPlatform.VsTestConsole.TranslationLayer": "15.0.0-*"
   }
 }

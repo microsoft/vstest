@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Microsoft.TestPlatform.ObjectModel</id>
+    <version>15.0.0</version>
+    <title>Microsoft.TestPlatform.ObjectModel</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>The Microsoft Test Platform Object Model.</description>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <copyright>Copyright © Microsoft Corporation</copyright>
+  </metadata>
+  <files>	
+	<file src="net46\win7-x64\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net46\" />
+	<file src="netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.5\" />
+  </files>
+</package>
