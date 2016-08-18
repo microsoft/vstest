@@ -14,6 +14,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+#if !NET46
+    using System.Runtime.Loader;
+#endif
 
     /// <summary>
     /// Discovers test extensions in a directory.
@@ -21,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestPluginDiscoverer
     {
         #region Fields
-        
+
 #if WINDOWS_UAP
         private static HashSet<string> platformAssemblies = new HashSet<string>(new string[] {
             "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.UNITTESTFRAMEWORK.DLL",
@@ -53,22 +56,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             bool loadOnlyWellKnownExtensions)
         {
             Debug.Assert(pathToExtensions != null);
-            
+
             var testExtensions = new TestExtensions
-                                     {
-                                         TestDiscoverers =
-                                             new Dictionary<string, TestDiscovererPluginInformation>(
-                                             StringComparer.OrdinalIgnoreCase),
-                                         TestExecutors =
-                                             new Dictionary<string, TestExecutorPluginInformation>(
-                                             StringComparer.OrdinalIgnoreCase),
-                                         TestSettingsProviders =
-                                             new Dictionary <string, TestSettingsProviderPluginInformation>(
-                                             StringComparer.OrdinalIgnoreCase),
-                                         TestLoggers =
-                                             new Dictionary<string, TestLoggerPluginInformation>(
-                                             StringComparer.OrdinalIgnoreCase)
-                                     };
+            {
+                TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>(StringComparer.OrdinalIgnoreCase),
+                TestExecutors = new Dictionary<string, TestExecutorPluginInformation>(StringComparer.OrdinalIgnoreCase),
+                TestSettingsProviders = new Dictionary<string, TestSettingsProviderPluginInformation>(StringComparer.OrdinalIgnoreCase),
+                TestLoggers = new Dictionary<string, TestLoggerPluginInformation>(StringComparer.OrdinalIgnoreCase)
+            };
 
 
 #if !WINDOWS_UAP
@@ -165,8 +160,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 try
                 {
                     var assemblyName = Path.GetFileNameWithoutExtension(file);
+#if NET46
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
-
+#else
+                    assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
+#endif
+                    
                     // Check whether this assembly is known or not. 
                     //if (loadOnlyWellKnownExtensions && assembly != null)
                     //{
