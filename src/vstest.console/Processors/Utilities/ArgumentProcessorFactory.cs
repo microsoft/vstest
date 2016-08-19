@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Available argument processors.
         /// </summary>
-        private IEnumerable<IArgumentProcessor> argumentProcessors;
+        private readonly IEnumerable<IArgumentProcessor> argumentProcessors;
         private Dictionary<string, IArgumentProcessor> commandToProcessorMap;
         private Dictionary<string, IArgumentProcessor> specialCommandToProcessorMap;
 
@@ -45,8 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <remarks>
         /// This is not public because the static Create method should be used to access the instance.
         /// </remarks>
-        protected ArgumentProcessorFactory(
-            IEnumerable<IArgumentProcessor> argumentProcessors)
+        protected ArgumentProcessorFactory(IEnumerable<IArgumentProcessor> argumentProcessors)
         {
             Contract.Requires(argumentProcessors != null);
             this.argumentProcessors = argumentProcessors;
@@ -56,22 +55,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         #region Static Methods
 
-        public static IEnumerable<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
-                new HelpArgumentProcessor(),
-                new TestSourceArgumentProcessor(),
-                new ListTestsArgumentProcessor(),
-                new RunTestsArgumentProcessor(),
-                new TestAdapterPathArgumentProcessor(),
-                new OutputArgumentProcessor(),
-                new BuildBasePathArgumentProcessor(),
-                new ConfigurationArgumentProcessor(),
-                new PortArgumentProcessor(),
-                new RunSettingsArgumentProcessor(),
-                new PlatformArgumentProcessor(),
-                new EnableLoggerArgumentProcessor(),
-                new ParallelArgumentProcessor()
-        };
-        
         /// <summary>
         /// Creates ArgumentProcessorFactory.
         /// </summary>
@@ -80,15 +63,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Get the ArgumentProcessorFactory
             return new ArgumentProcessorFactory(DefaultArgumentProcessors);
-        }
-
-        /// <summary>
-        /// Creates ArgumentProcessorFactory with given list of processors
-        /// </summary>
-        /// <returns>ArgumentProcessorFactory.</returns>
-        internal static ArgumentProcessorFactory Create(IEnumerable<IArgumentProcessor> processorList)
-        {
-            return new ArgumentProcessorFactory(processorList);
         }
 
         #endregion
@@ -203,6 +177,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         #region Private Methods
 
+        private static IEnumerable<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
+                new HelpArgumentProcessor(),
+                new TestSourceArgumentProcessor(),
+                new ListTestsArgumentProcessor(),
+                new RunTestsArgumentProcessor(),
+                new RunSpecificTestsArgumentProcessor(),
+                new TestAdapterPathArgumentProcessor(),
+                new TestCaseFilterArgumentProcessor(),
+                new OutputArgumentProcessor(),
+                new BuildBasePathArgumentProcessor(),
+                new ConfigurationArgumentProcessor(),
+                new PortArgumentProcessor(),
+                new RunSettingsArgumentProcessor(),
+                new PlatformArgumentProcessor(),
+                new EnableLoggerArgumentProcessor(),
+                new ParallelArgumentProcessor()
+        };
+ 
         /// <summary>
         /// Checks the provided argument to see if it could be a test source and returns the test source
         /// argument processor if it could be a test source.
