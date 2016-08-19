@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
     using System.Collections.Generic;
@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using ObjectModel.DataCollector.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 
     /// <summary>
     /// The in process data collection extension manager.
@@ -24,16 +25,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     public class InProcDataCollectionExtensionManager
     {
         private IDictionary<string, object> inProcDataCollectors;
+        private IDataCollectionSink inProcDataCollectionSink;
+        private IDictionary<string, Tuple<string, string>> inProcDataSinkDict;
 
         public InProcDataCollectionExtensionManager()
         {
-            this.inProcDataCollectors = new Dictionary<string,Object>();
+            this.inProcDataCollectors = new Dictionary<string, Object>();
+            this.inProcDataCollectionSink = new InProcDataCollectionSink();
+            this.inProcDataSinkDict = new Dictionary<string, Tuple<string, string>>();
         }
 
         public InProcDataCollectionExtensionManager(string runsettings)
         {
             this.inProcDataCollectors = new Dictionary<string, Object>();
             InProcDataCollectionUtilities.ReadInProcDataCollectionRunSettings(runsettings);
+            this.inProcDataCollectionSink = new InProcDataCollectionSink();
+            this.inProcDataSinkDict = new Dictionary<string, Tuple<string, string>>();
             this.InitializeInProcDataCollectors();
         }
 
@@ -65,9 +72,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         var type =
                             assembly?.GetTypes()
                                 .FirstOrDefault(x => (x.AssemblyQualifiedName.Equals(inProcDc.AssemblyQualifiedName) && interfaceType.GetTypeInfo().IsAssignableFrom(x)));
-                        if (type != null && !this.inProcDataCollectors.ContainsKey(type.AssemblyQualifiedName))//this.inProcDataCollectionTypes.Contains(type)
+                        if (type != null && !this.inProcDataCollectors.ContainsKey(type.AssemblyQualifiedName))
                         {
-                            this.inProcDataCollectors[type.AssemblyQualifiedName] = CreateObjectFromType(type);
+                            var obj = CreateObjectFromType(type);
+                            InvokeInitializeOnInProcDataCollector(obj, this.inProcDataCollectionSink);
+                            this.inProcDataCollectors[type.AssemblyQualifiedName] = obj;
                         }
                     }
                 }
@@ -76,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 EqtTrace.Error("Error occured while Initializing the datacollectors : {0}", ex);
             }
-        }        
+        }
 
         /// <summary>
         /// The trigger session start.
@@ -86,8 +95,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs();
             this.TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
         }
-
-
 
         /// <summary>
         /// The trigger session end.
@@ -113,8 +120,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         public virtual void TriggerTestCaseEnd(TestCase testCase, TestOutcome outcome)
         {
-            var testCaseEndArgs = new TestCaseEndArgs(testCase, outcome);
+            var dataCollectionContext = new DataCollectionContext(testCase);
+            var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, outcome);
             this.TriggerInProcDataCollectionMethods(Constants.TestCaseEndMethodName, testCaseEndArgs);
+        }
+
+        /// <summary>
+        /// Triggers the send test result method
+        /// </summary>
+        /// <param name="testResult"></param>
+        public virtual void TriggerUpdateTestResult(TestResult testResult)
+        {
+            this.SetInProcDataCollectionDataInTestResult(testResult);
         }
 
         /// <summary>
@@ -126,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             Assembly assembly = null;
             try
-            {                
+            {
 #if NET46
                 assembly = Assembly.LoadFrom(codeBase);                
 #else
@@ -154,6 +171,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return obj;
         }
 
+        private static void InvokeInitializeOnInProcDataCollector(object obj, IDataCollectionSink inProcDataCollectionSink)
+        {
+            var initializeMethodInfo = GetMethodInfoFromType(obj.GetType(), "Initialize", new Type[] { typeof(IDataCollectionSink) });
+            initializeMethodInfo.Invoke(obj, new object[] { inProcDataCollectionSink });
+        }
+
         private static MethodInfo GetMethodInfoFromType(Type type, string funcName, Type[] argumentTypes)
         {
             MethodInfo methodInfo = null;
@@ -179,17 +202,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             x => x.AssemblyQualifiedName.Equals(entry.Key))?
                             .Configuration.OuterXml;
                         testSessionStartArgs.Configuration = config;
-                        methodInfo?.Invoke(entry.Value, new[] { testSessionStartArgs });
+                        methodInfo?.Invoke(entry.Value, new object[] { testSessionStartArgs });
                     }
                     else
                     {
-                        methodInfo?.Invoke(entry.Value, new[] { methodArg });
+                        methodInfo?.Invoke(entry.Value, new object[] { methodArg });
                     }
                 }
             }
             catch (Exception ex)
             {
                 EqtTrace.Error("Error occured while Triggering the {0} method : {1}", methodName, ex);
+            }
+        }
+
+        /// <summary>
+        /// Set the data sent via datacollection sink in the testresult property for upstream applications to read.
+        /// And removes the data from the dictionary.
+        /// </summary>
+        /// <param name="testResultArg"></param>
+        private void SetInProcDataCollectionDataInTestResult(TestResult testResult)
+        {
+            //Loops through each datacollector reads the data collection data and sets as TestResult property.
+            foreach (var entry in this.inProcDataCollectors)
+            {
+                var dataCollectionData =
+                    ((InProcDataCollectionSink)this.inProcDataCollectionSink).GetDataCollectionDataSetForTestCase(
+                        testResult.TestCase.Id);
+
+                foreach (var keyValuePair in dataCollectionData)
+                {
+                    var testProperty = TestProperty.Register(id: keyValuePair.Key, label: keyValuePair.Key, category: string.Empty, description: string.Empty, valueType: typeof(string), validateValueCallback: null, attributes: TestPropertyAttributes.None, owner: typeof(TestCase));
+                    testResult.SetPropertyValue(testProperty, keyValuePair.Value);
+                }
             }
         }
     }
@@ -215,6 +260,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// The test case end method name.
         /// </summary>
         public const string TestCaseEndMethodName = "TestCaseEnd";
-
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
     /// <summary>
     /// The test case end args.
     /// </summary>
@@ -10,26 +12,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDa
         /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseEndArgs"/> class.
         /// </summary>
-        /// <param name="testCase">
-        /// The test case.
+        /// <param name="dataCollectionContext">
+        /// The data Collection Context.
         /// </param>
         /// <param name="outcome">
         /// The outcome.
         /// </param>
-        public TestCaseEndArgs(TestCase testCase, TestOutcome outcome)
+        public TestCaseEndArgs(DataCollectionContext dataCollectionContext, TestOutcome outcome)
         {
-            this.TestCase = testCase;
             this.TestOutcome = outcome;
+            this.DataCollectionContext = dataCollectionContext;
         }
-
-        /// <summary>
-        /// Gets the test case.
-        /// </summary>
-        public TestCase TestCase { get; private set; }
 
         /// <summary>
         /// Gets the outcome.
         /// </summary>
         public TestOutcome TestOutcome { get; private set; }
+
+        /// <summary>
+        /// Gets the data collection context.
+        /// </summary>
+        public DataCollectionContext DataCollectionContext { get; private set; }
     }
 }
