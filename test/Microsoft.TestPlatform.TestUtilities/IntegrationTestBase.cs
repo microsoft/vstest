@@ -178,7 +178,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected string GetSampleTestAssembly()
         {
-            return this.testEnvironment.GetTestAsset("SampleUnitTestProject.dll");
+            return this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
         }
 
         protected string GetTestAdapterPath()
