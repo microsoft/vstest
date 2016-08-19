@@ -1,15 +1,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
 {
-    
+
     using System;
+
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 #if !NET46
     using System.Runtime.Loader;
 #endif
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-
-    using TestPlatform.ObjectModel;
-    using TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
     /// The test case events handler.
@@ -18,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
     {
 
         private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
-
         private ITestCaseEventsHandler testCaseEvents;
 
         /// <summary>
@@ -68,6 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// </param>
         public void SendTestResult(TestResult result)
         {
+            this.inProcDataCollectionExtensionManager.TriggerUpdateTestResult(result);
             this.testCaseEvents?.SendTestResult(result);
         }
     }

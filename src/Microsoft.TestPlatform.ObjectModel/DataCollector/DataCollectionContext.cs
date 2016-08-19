@@ -2,6 +2,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
+    using System;
+
     /// <summary>
     /// Class representing the context in which data collection occurs.
     /// </summary>
@@ -30,6 +32,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         //       class and pass to us for creating data collection events.
 
         /// <summary>
+        /// Constructs DataCollection Context for in process data collectors
+        /// </summary>
+        /// <param name="testCase">test case to identify the context</param>
+        public DataCollectionContext(TestCase testCase)
+        {
+            this.TestCase = testCase;
+        }
+
+        /// <summary>
         /// Constructs a DataCollectionContext indicating that there is a session,
         /// but no executing test, in context.
         /// </summary>
@@ -55,10 +66,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             this.testExecId = testExecId;
             this.hashCode = ComputeHashCode();
         }
-
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Gets test case.
+        /// </summary>
+        public TestCase TestCase { get; private set; }
 
         /// <summary>
         /// Identifies the session under which the data collection occurs.  Will not be null.
