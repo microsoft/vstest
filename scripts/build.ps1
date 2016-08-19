@@ -26,6 +26,7 @@ $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
 $env:NETCORE_DIR = "NetCore"
+$env:EXTENSIONS_DIR = "Extensions"
 
 #
 # Dotnet configuration
@@ -159,6 +160,24 @@ function Publish-Package
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
+    }
+
+    # Copy over the logger assemblies to the Extensions folder.
+    $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $env:EXTENSIONS_DIR
+    $coreCLRExtensionsDir = Join-Path $coreCLRPackageDir $env:EXTENSIONS_DIR
+    # Create an extensions directory.
+    New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force
+    New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force
+
+    # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
+    # Ideally we should just be publishing the loggers to the Extensions folder.
+    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
+    foreach($file in $loggers) {
+        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
+
+    #    Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
+    #    Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
     }
 
     # Copy over the Core CLR built assemblies to the Full CLR package folder.
