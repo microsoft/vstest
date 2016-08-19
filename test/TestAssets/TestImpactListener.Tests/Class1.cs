@@ -13,7 +13,7 @@ namespace TestImpactListener.Tests
     /// </summary>
     public class TIListenerTests : InProcDataCollection
     {
-        private string fileName;
+        private readonly string fileName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TIListenerTests"/> class.

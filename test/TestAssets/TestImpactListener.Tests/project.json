@@ -1,6 +1,11 @@
 {
   "version": "1.0.0-*",
 
+  "buildOptions": {
+    "keyFile": "TITestDllKey.snk",
+    "warningsAsErrors": true
+  },
+
   "dependencies": {    
     "MSTest.TestFramework": "1.0.0-preview",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*"
