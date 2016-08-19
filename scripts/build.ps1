@@ -176,8 +176,8 @@ function Publish-Package
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
 
-    #    Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
-    #    Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
+        Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
+        Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
     }
 
     # Copy over the Core CLR built assemblies to the Full CLR package folder.
