@@ -1,46 +1,79 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-namespace TestPlatform.TestUtilities
+namespace Microsoft.TestPlatform.TestUtilities
 {
+    using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
- 
+
     /// <summary>
-    /// The VS test console test base.
+    /// Base class for integration tests.
     /// </summary>
-    public class VsTestConsoleTestBase
+    public class IntegrationTestBase
     {
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
         private string standardTestOutput = string.Empty;
-
         private string standardTestError = string.Empty;
 
+        private readonly IntegrationTestEnvironment testEnvironment;
+
+        private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.0.3-preview\build\_common";
+
+        public IntegrationTestBase()
+        {
+            this.testEnvironment = new IntegrationTestEnvironment();
+        }
+
         /// <summary>
-        /// The invoke VS test.
+        /// Prepare arguments for <c>vstest.console.exe</c>.
         /// </summary>
-        /// <param name="arguments">
-        /// The arguments.
-        /// </param>
+        /// <param name="testAssembly">Name of the test assembly.</param>
+        /// <param name="testAdapterPath">Path to test adapter.</param>
+        /// <param name="runSettings">Text of run settings.</param>
+        /// <returns>Command line arguments string.</returns>
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings)
+        {
+            string arguments;
+            if (string.IsNullOrWhiteSpace(runSettings))
+            {
+                arguments = string.Concat("\"", testAssembly, "\"", " /testadapterpath:\"", testAdapterPath, "\"");
+            }
+            else
+            {
+                arguments = string.Concat(
+                    "\"",
+                    testAssembly,
+                    "\"",
+                    " /testadapterpath:\"",
+                    testAdapterPath,
+                    "\"",
+                    " /settings:\"",
+                    runSettings,
+                    "\"");
+            }
+
+            return arguments;
+        }
+
+        /// <summary>
+        /// Invokes <c>vstest.console</c> with specified arguments.
+        /// </summary>
+        /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
         {
-            ExecutionManager.Execute(arguments, out this.standardTestOutput, out this.standardTestError);
+            Execute(arguments, out this.standardTestOutput, out this.standardTestError);
             this.FormatStandardOutCome();
         }
 
         /// <summary>
-        /// The invoke VS test.
+        /// Invokes <c>vstest.console</c> to execute tests in a test assembly.
         /// </summary>
-        /// <param name="testAssembly">
-        /// The test assembly.
-        /// </param>
-        /// <param name="testAdapterPath">
-        /// The test Adapter Path.
-        /// </param>
-        /// <param name="runSettings">
-        /// The run Settings.
-        /// </param>
+        /// <param name="testAssembly">A test assembly.</param>
+        /// <param name="testAdapterPath">Path to test adapters.</param>
+        /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForExecution(string testAssembly, string testAdapterPath, string runSettings = "")
         {
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings);
@@ -48,17 +81,11 @@ namespace TestPlatform.TestUtilities
         }
 
         /// <summary>
-        /// The invoke VS test for discovery.
+        /// Invokes <c>vstest.console</c> to discover tests in a test assembly. "/listTests" is appended to the arguments.
         /// </summary>
-        /// <param name="testAssembly">
-        /// The test assembly.
-        /// </param>
-        /// <param name="testAdapterPath">
-        /// The test adapter path.
-        /// </param>
-        /// <param name="runSettings">
-        /// The run Settings.
-        /// </param>
+        /// <param name="testAssembly">A test assembly.</param>
+        /// <param name="testAdapterPath">Path to test adapters.</param>
+        /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "")
         {
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings);
@@ -67,11 +94,11 @@ namespace TestPlatform.TestUtilities
         }
         
         /// <summary>
-        /// Validate if the overall Test count and results are matching.
+        /// Validate if the overall test count and results are matching.
         /// </summary>
-        /// <param name="passedTestsCount">passed test count</param>
-        /// <param name="failedTestsCount">failed test count</param>
-        /// <param name="skippedTestsCount">skipped test count</param>
+        /// <param name="passedTestsCount">Passed test count</param>
+        /// <param name="failedTestsCount">Failed test count</param>
+        /// <param name="skippedTestsCount">Skipped test count</param>
         public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
         {
             var summaryStatus = string.Format(
@@ -87,7 +114,7 @@ namespace TestPlatform.TestUtilities
         /// <summary>
         /// Validates if the test results have the specified set of passed tests.
         /// </summary>
-        /// <param name="passedTests">The set of passed tests.</param>
+        /// <param name="passedTests">Set of passed tests.</param>
         /// <remarks>Provide the full test name similar to this format SampleTest.TestCode.TestMethodPass.</remarks>
         public void ValidatePassedTests(params string[] passedTests)
         {
@@ -102,7 +129,7 @@ namespace TestPlatform.TestUtilities
         /// <summary>
         /// Validates if the test results have the specified set of failed tests.
         /// </summary>
-        /// <param name="failedTests">The set of failed tests.</param>
+        /// <param name="failedTests">Set of failed tests.</param>
         /// <remarks>
         /// Provide the full test name similar to this format SampleTest.TestCode.TestMethodFailed.
         /// Also validates whether these tests have stack trace info.
@@ -136,11 +163,9 @@ namespace TestPlatform.TestUtilities
         }
 
         /// <summary>
-        /// The validate discovered tests.
+        /// Validate if the discovered tests list contains provided tests.
         /// </summary>
-        /// <param name="discoveredTestsList">
-        /// The discovered tests list.
-        /// </param>
+        /// <param name="discoveredTestsList">List of tests expected to be discovered.</param>
         public void ValidateDiscoveredTests(params string[] discoveredTestsList)
         {
             foreach (var test in discoveredTestsList)
@@ -151,50 +176,21 @@ namespace TestPlatform.TestUtilities
             }
         }
 
-        /// <summary>
-        /// The prepare arguments.
-        /// </summary>
-        /// <param name="testAssembly">
-        /// The test assembly.
-        /// </param>
-        /// <param name="testAdapterPath">
-        /// The test adapter path.
-        /// </param>
-        /// <param name="runSettings">
-        /// The run settings.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings)
+        protected string GetSampleTestAssembly()
         {
-            string arguments;
-            if (string.IsNullOrWhiteSpace(runSettings))
-            {
-                arguments = string.Concat("\"", testAssembly, "\"", " /testadapterpath:\"", testAdapterPath, "\"");
-            }
-            else
-            {
-                arguments = string.Concat(
-                    "\"",
-                    testAssembly,
-                    "\"",
-                    " /testadapterpath:\"",
-                    testAdapterPath,
-                    "\"",
-                    " /settings:\"",
-                    runSettings,
-                    "\"");
-            }
+            return this.testEnvironment.GetTestAsset("SampleUnitTestProject.dll");
+        }
 
-            return arguments;
+        protected string GetTestAdapterPath()
+        {
+            return this.testEnvironment.GetNugetPackage(TestAdapterRelativePath);
         }
 
         /// <summary>
         /// Gets the test method name from full name.
         /// </summary>
-        /// <param name="testFullName">test case complete name</param>
-        /// <returns>just the test name</returns>
+        /// <param name="testFullName">Fully qualified name of the test.</param>
+        /// <returns>Simple name of the test.</returns>
         private static string GetTestMethodName(string testFullName)
         {
             string testMethodName = string.Empty;
@@ -206,6 +202,33 @@ namespace TestPlatform.TestUtilities
             }
 
             return testMethodName;
+        }
+
+        private static void Execute(string args, out string stdOut, out string stdError)
+        {
+            var testEnvironment = new IntegrationTestEnvironment();
+
+            using (Process vstestconsole = new Process())
+            {
+                Console.WriteLine("IntegrationTestBase.Execute: Starting vstest.console.exe");
+                vstestconsole.StartInfo.FileName = testEnvironment.GetConsoleRunnerPath();
+                vstestconsole.StartInfo.Arguments = args;
+                vstestconsole.StartInfo.UseShellExecute = false;
+                //vstestconsole.StartInfo.WorkingDirectory = testEnvironment.PublishDirectory;
+                vstestconsole.StartInfo.RedirectStandardError = true;
+                vstestconsole.StartInfo.RedirectStandardOutput = true;
+                vstestconsole.StartInfo.CreateNoWindow = true;
+
+                Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
+                Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);
+
+                vstestconsole.Start();
+                stdError = vstestconsole.StandardError.ReadToEnd();
+                stdOut = vstestconsole.StandardOutput.ReadToEnd();
+
+                vstestconsole.WaitForExit();
+                Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
+            }
         }
 
         private void FormatStandardOutCome()
