@@ -25,7 +25,6 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
-$env:NETCORE_DIR = "NetCore"
 
 #
 # Dotnet configuration
@@ -161,8 +160,28 @@ function Publish-Package
         Set-ScriptFailed
     }
 
+    # Copy over the logger assemblies to the Extensions folder.
+    $extensions_Dir = "Extensions"
+    $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
+    $coreCLRExtensionsDir = Join-Path $coreCLRPackageDir $extensions_Dir
+    # Create an extensions directory.
+    New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force
+    New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force
+
+    # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
+    # Ideally we should just be publishing the loggers to the Extensions folder.
+    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
+    foreach($file in $loggers) {
+        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
+
+        Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
+        Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
+    }
+
     # Copy over the Core CLR built assemblies to the Full CLR package folder.
-    $coreDestDir = Join-Path $fullCLRPackageDir $env:NETCORE_DIR
+    $netCore_Dir = "NetCore"
+    $coreDestDir = Join-Path $fullCLRPackageDir $netCore_Dir
     New-Item -ItemType directory -Path $coreDestDir -Force
     Copy-Item -Recurse $coreCLRPackageDir\* $coreDestDir -Force
 
@@ -205,7 +224,7 @@ function Create-NugetPackages
     $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.nuspec")
     foreach ($file in $nuspecFiles) {
         Copy-Item $tpSrcDir\$file $stagingDir -Force
     }
