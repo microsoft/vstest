@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         public IntegrationTestEnvironment()
         {
             // These environment variables are set in scripts/test.ps1 or scripts/test.sh.
-            this.testPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT");
+            this.testPlatformRootDirectory = Environment.GetEnvironmentVariable("TP_ROOT_DIR");
             this.TargetFramework = Environment.GetEnvironmentVariable("TPT_TargetFramework");
             this.TargetRuntime = Environment.GetEnvironmentVariable("TPT_TargetRuntime");
 
