@@ -23,6 +23,11 @@ namespace TestImpactListener.Tests
             this.fileName = Path.Combine(Path.GetTempPath(), "inproctest.txt");
         }
 
+        public void Initialize(IDataCollectionSink dataCollectionSink)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// The test session start.
         /// </summary>
@@ -58,8 +63,8 @@ namespace TestImpactListener.Tests
         /// </param>
         public void TestCaseEnd(TestCaseEndArgs testCaseEndArgs)
         {
-            Console.WriteLine("TestCase Name:{0}, TestCase ID:{1}, OutCome:{2}", testCaseEndArgs.TestCase.DisplayName, testCaseEndArgs.TestCase.Id, testCaseEndArgs.TestOutcome);            
-            File.AppendAllText(this.fileName, "TestCaseEnd : " + testCaseEndArgs.TestCase.DisplayName + "\r\n");
+            Console.WriteLine("TestCase Name:{0}, TestCase ID:{1}, OutCome:{2}", testCaseEndArgs.DataCollectionContext.TestCase.DisplayName, testCaseEndArgs.DataCollectionContext.TestCase.Id, testCaseEndArgs.TestOutcome);            
+            File.AppendAllText(this.fileName, "TestCaseEnd : " + testCaseEndArgs.DataCollectionContext.TestCase.DisplayName + "\r\n");
         }
 
         /// <summary>
