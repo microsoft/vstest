@@ -14,6 +14,6 @@
   </metadata>
   <files>	
 	<file src="net46\win7-x64\**\*.*" target="tools\net46\" />
-	<file src="netcoreapp1.0\**\*.*" target="tools\netstandard1.5\" />
+	<file src="netcoreapp1.0\**\*.*" target="tools\netcoreapp1.0\" />
   </files>
 </package>

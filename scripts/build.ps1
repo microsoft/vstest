@@ -25,8 +25,6 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
-$env:NETCORE_DIR = "NetCore"
-$env:EXTENSIONS_DIR = "Extensions"
 
 #
 # Dotnet configuration
@@ -163,8 +161,9 @@ function Publish-Package
     }
 
     # Copy over the logger assemblies to the Extensions folder.
-    $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $env:EXTENSIONS_DIR
-    $coreCLRExtensionsDir = Join-Path $coreCLRPackageDir $env:EXTENSIONS_DIR
+    $extensions_Dir = "Extensions"
+    $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
+    $coreCLRExtensionsDir = Join-Path $coreCLRPackageDir $extensions_Dir
     # Create an extensions directory.
     New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force
     New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force
@@ -181,7 +180,8 @@ function Publish-Package
     }
 
     # Copy over the Core CLR built assemblies to the Full CLR package folder.
-    $coreDestDir = Join-Path $fullCLRPackageDir $env:NETCORE_DIR
+    $netCore_Dir = "NetCore"
+    $coreDestDir = Join-Path $fullCLRPackageDir $netCore_Dir
     New-Item -ItemType directory -Path $coreDestDir -Force
     Copy-Item -Recurse $coreCLRPackageDir\* $coreDestDir -Force
 
