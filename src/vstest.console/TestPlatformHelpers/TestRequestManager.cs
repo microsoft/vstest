@@ -112,7 +112,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         public bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar)
         {
             bool success = false;
-            var adapterSourceMap = JsonUtilities.GetTestRunnerAndAssemblyInfo(discoveryPayload.Sources);
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, this.commandLineOptions.BatchSize, TimeSpan.MaxValue, discoveryPayload.RunSettings);
@@ -166,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             TestRunCriteria runCriteria = null;
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Count() > 0)
             {
-                var adapterSourceMap = JsonUtilities.GetTestRunnerAndAssemblyInfo(testRunRequestPayload.Sources);
+                var adapterSourceMap = AdapterSourceMapUtilities.GetTestRunnerAndAssemblyInfo(testRunRequestPayload.Sources);
 
                 runCriteria = new TestRunCriteria(adapterSourceMap,
                         commandLineOptions.BatchSize,
