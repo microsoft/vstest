@@ -165,9 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             TestRunCriteria runCriteria = null;
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Count() > 0)
             {
-                var adapterSourceMap = AdapterSourceMapUtilities.GetTestRunnerAndAssemblyInfo(testRunRequestPayload.Sources);
-
-                runCriteria = new TestRunCriteria(adapterSourceMap,
+                runCriteria = new TestRunCriteria(testRunRequestPayload.Sources,
                         commandLineOptions.BatchSize,
                         testRunRequestPayload.KeepAlive,
                         testRunRequestPayload.RunSettings,
