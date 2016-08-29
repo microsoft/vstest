@@ -25,6 +25,9 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
+$env:TP_TESTHOST_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\testhost"
+$env:TP_VSTESTCONSOLE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\vstest.console"
+$env:TP_DATACOLLECTOR_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\datacollector"
 
 #
 # Dotnet configuration
@@ -155,6 +158,19 @@ function Publish-Package
     
     Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
     & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
+	
+	# Publish testhost, vstest.console and datacollector exclusively because *.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
+	Write-Log ".. Package: Publish src\vstest.console\project.json"
+	Write-Verbose "$dotnetExe publish $env:TP_VSTESTCONSOLE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
+	& $dotnetExe publish $env:TP_VSTESTCONSOLE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
+	
+	Write-Log ".. Package: Publish src\testhost\project.json"
+	Write-Verbose "$dotnetExe publish $env:TP_TESTHOST_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
+	& $dotnetExe publish $env:TP_TESTHOST_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
+	
+	Write-Log ".. Package: Publish src\datacollector\project.json"
+	Write-Verbose "$dotnetExe publish $env:TP_DATACOLLECTOR_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
+	& $dotnetExe publish $env:TP_DATACOLLECTOR_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
