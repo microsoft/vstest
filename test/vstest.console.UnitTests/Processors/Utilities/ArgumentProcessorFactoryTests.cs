@@ -3,9 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
     using System.Reflection;
 
@@ -20,12 +18,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             var specialCommands = GetArgumentProcessors(specialCommandFilter: true)
                                     .Select(a => a.Metadata.Value.CommandName)
-                                    .ToImmutableSortedSet();
+                                    .ToList();
             var factory = ArgumentProcessorFactory.Create();
 
             CollectionAssert.AreEquivalent(
                 specialCommands,
-                factory.SpecialCommandToProcessorMap.Keys.ToImmutableSortedSet());
+                factory.SpecialCommandToProcessorMap.Keys.ToList());
         }
 
         [TestMethod]
@@ -40,8 +38,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
 
             // Expect command processors to contain both long and short commands.
             CollectionAssert.AreEquivalent(
-                commands.Concat(shortCommands).ToImmutableSortedSet(),
-                factory.CommandToProcessorMap.Keys.ToImmutableSortedSet());
+                commands.Concat(shortCommands).ToList(),
+                factory.CommandToProcessorMap.Keys.ToList());
         }
 
         private static IEnumerable<IArgumentProcessor> GetArgumentProcessors(bool specialCommandFilter)
