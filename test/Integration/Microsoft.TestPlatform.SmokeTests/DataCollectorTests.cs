@@ -10,10 +10,10 @@ namespace Microsoft.TestPlatform.SmokeTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class TestImpactTests : IntegrationTestBase
+    public class DataCollectorTests : IntegrationTestBase
     {
         [TestMethod]
-        public void RunAllWithTestImpactSettings()
+        public void RunAllWithInProcDataCollectorSettings()
         {
             var runSettings = this.GetInProcDataCollectionRunsettingsFile();
 
@@ -41,11 +41,11 @@ namespace Microsoft.TestPlatform.SmokeTests
         {
             var runSettings = Path.Combine(Path.GetDirectoryName(this.GetSampleTestAssembly()), "runsettingstest.runsettings");
             var testEnvironment = new IntegrationTestEnvironment();
-            var inprocasm = testEnvironment.GetTestAsset("TestImpactListener.Tests.dll");
+            var inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll");
             var fileContents = @"<RunSettings>
 	                                <InProcDataCollectionRunSettings>
 		                                <InProcDataCollectors>
-			                                <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='TestImpactListener.Tests.TIListenerTests, TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
+			                                <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
 				                                <Configuration>
 					                                <Port>4312</Port>
 				                                </Configuration>
