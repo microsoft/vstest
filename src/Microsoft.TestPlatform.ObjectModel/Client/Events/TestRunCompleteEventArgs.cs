@@ -8,10 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Newtonsoft.Json;
 
     /// <summary>
     /// Event arguments used when a test run has completed.
     /// </summary>
+    [DataContract]
     public class TestRunCompleteEventArgs : EventArgs
     {
         /// <summary>
@@ -36,32 +38,39 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets the statistics on the state of the test run.
         /// </summary>
+        [DataMember]
+        [JsonConverter(typeof(TestRunStatisticsConverter))]
         public ITestRunStatistics TestRunStatistics { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the test run is canceled or not. 
         /// </summary>
+        [DataMember]
         public bool IsCanceled { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the test run is aborted. 
         /// </summary>
+        [DataMember]
         public bool IsAborted { get; private set; }
 
         /// <summary>
         /// Gets the error encountered during the execution of the test run. Null if there is no error.
         /// </summary>
+        [DataMember]
         public Exception Error { get; private set; }
-
+        
         /// <summary>
         /// Gets the attachment sets associated with the test run. 
         /// </summary>
+        [DataMember]
         public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
         /// <summary>
         /// Gets the time elapsed in just running the tests.
         /// Value is set to TimeSpan.Zero incase of any error.
         /// </summary>
+        [DataMember]
         public TimeSpan ElapsedTimeInRunningTests { get; private set; }
-    }
+    }    
 }

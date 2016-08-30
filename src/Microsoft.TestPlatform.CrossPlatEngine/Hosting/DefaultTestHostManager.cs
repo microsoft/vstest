@@ -24,8 +24,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private const string X86TestHostProcessName = "testhost.x86.exe";
         private const string DotnetProcessName = "dotnet.exe";
         private const string DotnetProcessNameXPlat = "dotnet";
-
+        private const string NetCoreDirectoryName = "NetCore";
+        
         private Architecture architecture;
+        private Framework framework;
         private ITestHostLauncher customTestHostLauncher;
 
         private Process testHostProcess;
@@ -39,8 +41,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         ///  <param name="architecture">
         /// The architecture.
         /// </param>
-        public DefaultTestHostManager(Architecture architecture)
-            : this(architecture, new ProcessHelper())
+        public DefaultTestHostManager(Architecture architecture, Framework framework)
+            : this(architecture, framework, new ProcessHelper())
         {
         }
 
@@ -49,9 +51,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         /// <param name="architecture"> The architecture. </param>
         /// <param name="processHelper"> The process helper. </param>
-        internal DefaultTestHostManager(Architecture architecture, IProcessHelper processHelper)
+        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper)
         {
             this.architecture = architecture;
+            this.framework = framework;
             this.processHelper = processHelper;
             this.testHostProcess = null;
         }
@@ -127,7 +130,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+                if (framework.Name.ToLower().Contains("netstandard") || framework.Name.ToLower().Contains("netcoreapp"))
+                {
+                    testhostProcessPath = DotnetProcessName;
+                    var testhostAssemblyPath = Path.Combine(Path.GetDirectoryName(currentProcessFileName), NetCoreDirectoryName, testHostProcessName.Replace("exe", "dll"));
+                    commandLineArguments.Insert(0, testhostAssemblyPath);
+                }
+                else
+                {
+                    testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+                } 
                 // For IDEs and other scenario - Current directory should be the working directory - not the vstest.console.exe location
                 // For VS - this becomes the solution directory for example
                 // "TestResults" directory will be created at "current directory" of test host

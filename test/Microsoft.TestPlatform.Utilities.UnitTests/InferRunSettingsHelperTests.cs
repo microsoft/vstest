@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RandomSettings></RandomSettings>";
             var navigator = this.GetNavigator(settings);
 
-            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, FrameworkVersion.Framework45, "temp");
+            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
             ExceptionUtilities.ThrowsException<XmlException>(
                 action,
@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings><RunConfiguration><TargetPlatform>foo</TargetPlatform></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, FrameworkVersion.Framework45, "temp");
+            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
             ExceptionUtilities.ThrowsException<XmlException>(
                 action,
@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>foo</TargetFrameworkVersion></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, FrameworkVersion.Framework45, "temp");
+            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
             ExceptionUtilities.ThrowsException<XmlException>(
                 action,
@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
@@ -76,11 +76,11 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
-            StringAssert.Contains(xml, "<TargetFrameworkVersion>Framework45</TargetFrameworkVersion>");
+            StringAssert.Contains(xml, "<TargetFrameworkVersion>.NETFramework,Version=v4.6</TargetFrameworkVersion>");
         }
 
         [TestMethod]
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
@@ -102,7 +102,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings><RunConfiguration><TargetPlatform>X86</TargetPlatform></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
@@ -115,7 +115,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>Framework40</TargetFrameworkVersion></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
@@ -128,7 +128,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings><RunConfiguration><ResultsDirectory>someplace</ResultsDirectory></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
@@ -141,7 +141,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings><RunConfiguration><TargetPlatform>X86</TargetPlatform><TargetFrameworkVersion>Framework40</TargetFrameworkVersion><ResultsDirectory>someplace</ResultsDirectory></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
@@ -156,12 +156,12 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
 
             StringAssert.Contains(xml, "<TargetPlatform>X64</TargetPlatform>");
-            StringAssert.Contains(xml, "<TargetFrameworkVersion>Framework45</TargetFrameworkVersion>");
+            StringAssert.Contains(xml, "<TargetFrameworkVersion>.NETFramework,Version=v4.6</TargetFrameworkVersion>");
             StringAssert.Contains(xml, "<ResultsDirectory>temp</ResultsDirectory>");
         }
 
@@ -171,10 +171,10 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, FrameworkVersion.Framework45, "temp");
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
-            var expectedRunSettings = "<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>temp</ResultsDirectory>\r\n    <TargetPlatform>X64</TargetPlatform>\r\n    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>";
+            var expectedRunSettings = "<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>temp</ResultsDirectory>\r\n    <TargetPlatform>X64</TargetPlatform>\r\n    <TargetFrameworkVersion>.NETFramework,Version=v4.6</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>";
 
             Assert.AreEqual(expectedRunSettings, xml);
         }
@@ -185,7 +185,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var settings = @"<RunSettings></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.ARM, FrameworkVersion.Framework45, "temp");
+            Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.ARM, Framework.DefaultFramework, "temp");
 
             ExceptionUtilities.ThrowsException<SettingsException>(
                 action,

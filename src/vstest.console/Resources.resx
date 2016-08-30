@@ -380,13 +380,14 @@
   <data name="FrameworkArgumentHelp" xml:space="preserve">
     <value>/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are Framework35, Framework40 and Framework45</value>
+      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+Other supported values are Framework35, Framework40 and Framework45</value>
   </data>
   <data name="FrameworkVersionRequired" xml:space="preserve">
-    <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:Framework40</value>
+    <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</value>
   </data>
   <data name="InvalidFrameworkVersion" xml:space="preserve">
-    <value>Invalid .Net Framework version:{0}. Supported .Net Framework versions are Framework35, Framework40 and Framework45.</value>
+    <value>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</value>
   </data>
   <data name="AppContainerTestPrerequisiteFail" xml:space="preserve">
     <value>Could not start test run for unit tests for Windows Store app: {0}.</value>

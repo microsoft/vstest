@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-
+    
     /// <summary>
     /// JsonDataSerializes serializes and deserializes data using Json format
     /// </summary>
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public T DeserializePayload<T>(Message message)
         {
             T retValue = default(T);
-
+            
             // TODO: Currently we use json serializer auto only for non-testmessage types
             // CHECK: Can't we just use auto for everything
             if (MessageType.TestMessage.Equals(message.MessageType))
@@ -42,9 +42,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             else
             {
-                retValue = message.Payload.ToObject<T>(
+                 retValue = message.Payload.ToObject<T>(
                     JsonSerializer.Create(
-                        new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }));
+                        new JsonSerializerSettings {
+                            TypeNameHandling = TypeNameHandling.None }));
             }
 
             return retValue;
@@ -69,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 serializedPayload = JToken.FromObject(payload, 
                     JsonSerializer.Create(
-                                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto }));
+                                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None }));
             }
 
             return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });

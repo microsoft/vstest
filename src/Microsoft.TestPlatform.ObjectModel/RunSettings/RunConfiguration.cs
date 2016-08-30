@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// .Net framework which rocksteady should use for discovery/execution
         /// </summary>
-        private FrameworkVersion framework;
+        private Framework framework;
 
         /// <summary>
         /// Directory in which rocksteady/adapter should keep their run specific data. 
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             // set defaults for target platform, framework version type and results directory.
             this.platform = Constants.DefaultPlatform;
-            this.framework = Constants.DefaultFramework;
+            this.framework = Framework.DefaultFramework;
             this.resultsDirectory = Constants.DefaultResultsDirectory;
             this.SolutionDirectory = null;
             this.TreatTestAdapterErrorsAsWarnings = Constants.DefaultTreatTestAdapterErrorsAsWarnings;
@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
         /// </summary>
-        public FrameworkVersion TargetFrameworkVersion
+        public Framework TargetFrameworkVersion
         {
             get
             {
@@ -391,13 +391,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                         case "TargetFrameworkVersion":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                            FrameworkVersion frameworkType;
+                            Framework frameworkType;
                             value = reader.ReadElementContentAsString();
                             try
                             {
-                                frameworkType = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), value, true);
-                                if (frameworkType != FrameworkVersion.Framework35 && frameworkType != FrameworkVersion.Framework40 &&
-                                    frameworkType != FrameworkVersion.Framework45)
+                                frameworkType = Framework.FromString(value);
+
+                                if (frameworkType == null)
                                 {
                                     throw new SettingsException(
                                         string.Format(

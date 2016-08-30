@@ -85,25 +85,28 @@ using System.Security.Permissions;
             ValidateArg.NotNull(valueType, "valueType");
 
             // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db. Fixed bug #754475
-            if (!(valueType.GetTypeInfo().IsValueType
-                  ||
-                valueType.Equals(typeof(String))
-                   ||
-                valueType.Equals(typeof(Uri))
-                   ||
-                valueType.Equals(typeof(string[]))
-                   ||
-                valueType.Equals(typeof(KeyValuePair<string, string>[])))
-                )
+            if (valueType.Equals(typeof(KeyValuePair<string, string>[])))
+            {
+                this._strValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
+            }
+            else if (valueType.Equals(typeof(String)) || valueType.Equals(typeof(Uri)) || valueType.Equals(typeof(string[]))
+                 || (valueType.AssemblyQualifiedName.Contains("System.Private")))
+            {
+                this._strValueType = valueType.FullName;
+            }
+            else if(valueType.GetTypeInfo().IsValueType)
+            {
+                this._strValueType = valueType.AssemblyQualifiedName;
+            }
+            else
             {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.UnexpectedTypeOfProperty, valueType, id));
             }
-
+            
             this._id = id;
             this._label = label;
             this._category = category;
             this._description = description;
-            this._strValueType = valueType.AssemblyQualifiedName;
             this.validateValueCallback = validateValueCallback;
             this._attributes = attributes;
             this.valueType = valueType;
@@ -352,7 +355,9 @@ using System.Security.Permissions;
                 if (s_properties.TryGetValue(id, out propertyTypePair))
                 {
                     // verify the data valueType is valid
-                    if (propertyTypePair.Key._strValueType == valueType.AssemblyQualifiedName)
+                    if (propertyTypePair.Key._strValueType == valueType.AssemblyQualifiedName
+                        || propertyTypePair.Key._strValueType == valueType.FullName
+                        || propertyTypePair.Key.valueType == valueType)
                     {
                         // add the owner to set of owners for this GraphProperty object
                         propertyTypePair.Value.Add(owner);

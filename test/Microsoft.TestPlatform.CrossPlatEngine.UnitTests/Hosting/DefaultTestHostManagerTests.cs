@@ -35,7 +35,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X86, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper);
             
             // Setup mocks.
             var processPath = string.Empty;
@@ -57,7 +57,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void ConstructorShouldSetX64ProcessForX64Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             // Setup mocks.
             var processPath = string.Empty;
@@ -79,7 +79,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithOneArgument()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             // Setup mocks.
             var cliargs = string.Empty;
@@ -104,7 +104,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithMultipleArguments()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             // Setup mocks.
             var cliargs = string.Empty;
@@ -129,7 +129,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithCurrentWorkingDirectory()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             // Setup mocks.
             var pwd = string.Empty;
@@ -153,7 +153,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper); ;
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper); ;
 
             // Setup mocks.
             this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
@@ -169,7 +169,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldLaunchDotnetExeIfRunningUnderDotnetCLIContext()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             string processPath = null;
 
@@ -190,7 +190,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfRunningUnderDotnetCLIContext()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             string arguments = null;
 
@@ -215,7 +215,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldSetWorkingDirectoryToDotnetExeDirectoryIfRunningUnderDotnetCLIContext()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             string workingDirectory = null;
 
@@ -236,7 +236,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void PropertiesShouldReturnEmptyDictionary()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
             Assert.AreEqual(0, this.testHostManager.Properties.Count);
         }
@@ -244,7 +244,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldUseCustomHostIfSet()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
 
