@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Sends the test result
         /// </summary>
         /// <param name="result"> The result. </param>
-        void SendTestResult(TestResult result);
+        /// <returns>True, if result can be flushed</returns>
+        bool SendTestResult(TestResult result);
     }
 }

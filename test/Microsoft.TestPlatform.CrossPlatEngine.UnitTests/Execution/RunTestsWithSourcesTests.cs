@@ -66,7 +66,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -90,7 +89,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -113,7 +111,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -140,7 +137,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -169,7 +165,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -192,20 +187,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         private class TestableRunTestsWithSources : RunTestsWithSources
         {
-            public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap,
-                ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext,
-                ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+            public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, 
+                TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
                 : base(
-                    adapterSourceMap, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler,
+                    adapterSourceMap, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler)
             {
             }
 
-            internal TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap,
-                ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext,
+            internal TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, 
+                TestExecutionContext testExecutionContext,
                 ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
                 : base(
-                    adapterSourceMap, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler,
+                    adapterSourceMap, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler, executorUriVsSourceList)
             {
             }

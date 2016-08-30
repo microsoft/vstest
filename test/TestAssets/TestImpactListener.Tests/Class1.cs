@@ -25,7 +25,7 @@ namespace TestImpactListener.Tests
 
         public void Initialize(IDataCollectionSink dataCollectionSink)
         {
-            throw new NotImplementedException();
+           // Do Nothing
         }
 
         /// <summary>

@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     /// <summary>
     /// Maintains a cache of last 'n' test results and maintains stats for the complete run.
     /// </summary>
-    internal class TestRunCache : ITestRunCache, IDisposable
+    internal class TestRunCache : ITestRunCache
     {
         #region Private members 
 
