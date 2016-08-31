@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-namespace TestImpactListener.Tests
+namespace SimpleDataCollector
 {
     using System;
     using System.IO;
@@ -11,14 +11,14 @@ namespace TestImpactListener.Tests
     /// <summary>
     /// The ti listener tests.
     /// </summary>
-    public class TIListenerTests : InProcDataCollection
+    public class SimpleDataCollector : InProcDataCollection
     {
         private readonly string fileName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TIListenerTests"/> class.
+        /// Initializes a new instance of the <see cref="SimpleDataCollector"/> class.
         /// </summary>
-        public TIListenerTests()
+        public SimpleDataCollector()
         {
             this.fileName = Path.Combine(Path.GetTempPath(), "inproctest.txt");
         }
