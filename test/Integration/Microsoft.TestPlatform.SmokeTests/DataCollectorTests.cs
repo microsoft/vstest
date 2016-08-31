@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.SmokeTests
     public class DataCollectorTests : IntegrationTestBase
     {
         [TestMethod]
+        [Ignore]
         public void RunAllWithInProcDataCollectorSettings()
         {
             var runSettings = this.GetInProcDataCollectionRunsettingsFile();
