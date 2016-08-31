@@ -81,6 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testRunCache = new TestRunCache(testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
             this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache);
 
+            // Verify if datacollection is enabled and wrap the testcasehandler around to get the events 
             if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
             {
                 this.testCaseEventsHandler = new TestCaseEventsHandler(inProcDataCollectionExtensionManager, this.testCaseEventsHandler);
@@ -159,6 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                 try
                 {
+                    // Call Session-Start event on in-proc datacollectors
                     this.inProcDataCollectionExtensionManager?.TriggerTestSessionStart();
 
                     elapsedTime = this.RunTestsInternal();
@@ -182,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
                 finally
                 {
-                    // Trigger Session End
+                    // Trigger Session End on in-proc datacollectors
                     inProcDataCollectionExtensionManager?.TriggerTestSessionEnd();
 
                     try
