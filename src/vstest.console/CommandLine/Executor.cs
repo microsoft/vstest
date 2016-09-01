@@ -32,20 +32,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System.Diagnostics.Contracts;
     using System.Reflection;
+    using CoreUtilities.Tracing;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
     /// </summary>
     internal class Executor
     {
+        private TestPlatformEventSource testPlatformEventSource;
+
         #region Constructor
 
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public Executor(IOutput output)
+        public Executor(IOutput output, TestPlatformEventSource testPlatformEventSource)
         {
             this.Output = output;
+            this.testPlatformEventSource = testPlatformEventSource;
         }
 
         #endregion
@@ -72,6 +76,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </returns>
         internal int Execute(params string[] args)
         {
+            this.testPlatformEventSource?.VsTestConsole();
+            
             int exitCode = 0;
             // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
             if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
@@ -95,6 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 && argumentProcessors.All(
                     processor => processor.Metadata.Value.CommandName != HelpArgumentProcessor.CommandName))
             {
+                this.testPlatformEventSource?.VsTestConsoleEnd();
                 return exitCode;
             }
             
@@ -111,6 +118,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             exitCode |= (TestRunResultAggregator.Instance.Outcome == TestOutcome.Passed) ? 0 : 1;
 
             EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", exitCode);
+            
+            this.testPlatformEventSource?.VsTestConsoleEnd();
+
             return exitCode;
         }
 

@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
     using System;
@@ -23,14 +25,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     internal class DiscovererEnumerator
     {
         private DiscoveryResultCache discoveryResultCache;
+        private TestPlatformEventSource testPlatformEventSource;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
-        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache)
+        /// <param name="testPlatformEventSource1"></param>
+        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache, TestPlatformEventSource testPlatformEventSource)
         {
             this.discoveryResultCache = discoveryResultCache;
+            this.testPlatformEventSource = testPlatformEventSource;
         }
 
         /// <summary>
@@ -75,6 +80,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
 
+
+            this.testPlatformEventSource?.Discovery();
             foreach (var discoverer in discovererToSourcesMap.Keys)
             {
                 Type discovererType = null;
@@ -126,6 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     logger.SendMessage(TestMessageLevel.Error, message);
                     EqtTrace.Error(e);
                 }
+                this.testPlatformEventSource?.DiscoveryEnd();
             }
         }
 

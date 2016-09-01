@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using CoreUtilities.Tracing;
 
     /// <summary>
     /// The program.
@@ -72,6 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private static void Run(string[] args)
         {
+            TestPlatformEventSource.Instance.TestHost();
             var portNumber = GetPortNumber(args);
 
             var requestHandler = new TestRequestHandler();
@@ -91,6 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 requestHandler.Close();
                 throw new TimeoutException();
             }
+
+            TestPlatformEventSource.Instance.TestHostEnd();
         }
     }
 }

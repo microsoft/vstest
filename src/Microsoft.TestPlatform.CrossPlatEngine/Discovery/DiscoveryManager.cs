@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
     using System;
@@ -24,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     public class DiscoveryManager : IDiscoveryManager
     {
         private TestSessionMessageLogger sessionMessageLogger;
+        private TestPlatformEventSource testPlatformEventSource;
 
         private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
 
@@ -34,6 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         {
             this.sessionMessageLogger = TestSessionMessageLogger.Instance;
             this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
+            this.testPlatformEventSource = TestPlatformEventSource.Instance;            
         }
 
         /// <summary>
@@ -42,11 +46,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
         public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
         {
+            this.testPlatformEventSource?.AdapterSearch();
             // Start using these additional extensions
             TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
 
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
+            this.testPlatformEventSource?.AdapterSearchEnd();
         }
 
         /// <summary>
@@ -64,6 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             try
             {
                 EqtTrace.Info("TestDiscoveryManager.DoDiscovery: Background test discovery started.");
+                
 
                 this.testDiscoveryEventsHandler = eventHandler;
                 
@@ -82,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    new DiscovererEnumerator(discoveryResultCache).LoadTests(
+                    new DiscovererEnumerator(discoveryResultCache, TestPlatformEventSource.Instance).LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
                         this.sessionMessageLogger);
@@ -107,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     EqtTrace.Warning(
                         "DiscoveryManager: Could not pass the discovery complete message as the callback is null.");
                 }
-                
+                                
                 EqtTrace.Verbose("TestDiscoveryManager.DiscoveryComplete: Called DiscoveryComplete callback.");
 
                 this.testDiscoveryEventsHandler = null;
