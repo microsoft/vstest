@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using CoreUtilities.Tracing;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -26,6 +27,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private CommandLineOptions commandLineOptions;
 
         private TestLoggerManager testLoggerManager;
+
+        private TestPlatformEventSource testPlatformEventSource;
 
         private TestRunResultAggregator testRunResultAggregator;
 
@@ -46,20 +49,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         public TestRequestManager() :
             this(CommandLineOptions.Instance,
             TestPlatformFactory.GetTestPlatform(),
-            TestLoggerManager.Instance,
-            TestRunResultAggregator.Instance)
+            TestLoggerManager.Instance,            
+            TestRunResultAggregator.Instance, 
+            TestPlatformEventSource.Instance)
         {
         }
 
-        internal TestRequestManager(CommandLineOptions commandLineOptions,
-            ITestPlatform testPlatform,
-            TestLoggerManager testLoggerManager,
-            TestRunResultAggregator testRunResultAggregator)
+        //internal TestRequestManager(CommandLineOptions commandLineOptions,
+        //    ITestPlatform testPlatform,
+        //    TestLoggerManager testLoggerManager,
+        //    TestPlatformEventSource testPlatformEventSource,
+        //    TestRunResultAggregator testRunResultAggregator)
+        //{
+        //    this.testPlatform = testPlatform;
+        //    this.commandLineOptions = commandLineOptions;
+        //    this.testLoggerManager = testLoggerManager;
+        //    this.testRunResultAggregator = testRunResultAggregator;
+        //    this.testPlatformEventSource = testPlatformEventSource;
+
+        //    // Always enable logging for discovery or run requests
+        //    this.testLoggerManager.EnableLogging();
+
+        //    // TODO: Is this required for design mode
+        //    // Add console logger as a listener to logger events.
+        //    var consoleLogger = new ConsoleLogger();
+        //    consoleLogger.Initialize(this.testLoggerManager.LoggerEvents, null);
+        //}
+
+        internal TestRequestManager(CommandLineOptions commandLineOptions, ITestPlatform testPlatform, TestLoggerManager testLoggerManager, TestRunResultAggregator testRunResultAggregator, TestPlatformEventSource testPlatformEventSource)
         {
             this.testPlatform = testPlatform;
             this.commandLineOptions = commandLineOptions;
             this.testLoggerManager = testLoggerManager;
             this.testRunResultAggregator = testRunResultAggregator;
+            this.testPlatformEventSource = testPlatformEventSource;
 
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
@@ -122,8 +145,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
                     discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
 
+                    //this.testPlatformEventSource?.Discovery();
+
                     discoveryRequest.DiscoverAsync();
                     discoveryRequest.WaitForCompletion();
+
+                    //this.testPlatformEventSource?.DiscoveryEnd();
 
                     success = true;
                 }
@@ -211,10 +238,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     testRunResultAggregator.RegisterTestRunEvents(currentTestRunRequest);
                     testRunEventsRegistrar?.RegisterTestRunEvents(currentTestRunRequest);
 
+                    //this.testPlatformEventSource?.Execution();
+
                     currentTestRunRequest.ExecuteAsync();
 
                     // Wait for the run completion event
                     currentTestRunRequest.WaitForCompletion();
+
+                    //this.testPlatformEventSource?.ExecutionEnd();
                 }
                 catch (Exception ex)
                 {
