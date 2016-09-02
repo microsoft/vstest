@@ -26,10 +26,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private Dictionary<string, IEnumerable<string>> adapterSourceMap;
 
         private Dictionary<Tuple<Uri,string>, IEnumerable<string>> executorUriVsSourceList;
-        private TestPlatformEventSource testPlatformEventSource;
 
         public RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
-            : this(adapterSourceMap, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null, TestPlatformEventSource.Instance)
+            : this(adapterSourceMap, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
         {
         }
 
@@ -44,12 +43,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testRunEventsHandler"></param>
         /// <param name="executorUriVsSourceList"></param>
         /// <param name="testPlatformEventSource1"></param>
-        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList, TestPlatformEventSource testPlatformEventSource)
-            : base(testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
+        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
+            : base(testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
         {
             this.adapterSourceMap = adapterSourceMap;
             this.executorUriVsSourceList = executorUriVsSourceList;
-            this.testPlatformEventSource = testPlatformEventSource;
         }
 
         protected override void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests)
@@ -92,9 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle)
         {
-            this.testPlatformEventSource?.Execution();
             executor?.Value.RunTests(this.executorUriVsSourceList[executorUriExtensionTuple], runContext, frameworkHandle);
-            this.testPlatformEventSource?.ExecutionEnd();
         }
 
         /// <summary>
