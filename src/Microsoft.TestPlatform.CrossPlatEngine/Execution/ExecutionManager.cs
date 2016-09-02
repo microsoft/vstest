@@ -42,11 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
         public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
         {
-            this.testPlatformEventSource.AdapterSearch();
+            this.testPlatformEventSource?.AdapterSearchStart();
             // Start using these additional extensions
             TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
             this.LoadExtensions();
-            this.testPlatformEventSource.AdapterSearchEnd();
+            this.testPlatformEventSource?.AdapterSearchStop();
         }
 
         /// <summary>

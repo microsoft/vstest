@@ -145,12 +145,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
                     discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
 
-                    //this.testPlatformEventSource?.Discovery();
+                    this.testPlatformEventSource?.DiscoveryRequestStart();
 
                     discoveryRequest.DiscoverAsync();
                     discoveryRequest.WaitForCompletion();
 
-                    //this.testPlatformEventSource?.DiscoveryEnd();
+                    this.testPlatformEventSource?.DiscoveryRequestStop();
 
                     success = true;
                 }
@@ -238,14 +238,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     testRunResultAggregator.RegisterTestRunEvents(currentTestRunRequest);
                     testRunEventsRegistrar?.RegisterTestRunEvents(currentTestRunRequest);
 
-                    //this.testPlatformEventSource?.Execution();
+                    this.testPlatformEventSource?.ExecutionRequestStart();
 
                     currentTestRunRequest.ExecuteAsync();
 
                     // Wait for the run completion event
                     currentTestRunRequest.WaitForCompletion();
 
-                    //this.testPlatformEventSource?.ExecutionEnd();
+                    this.testPlatformEventSource?.ExecutionRequestStop();
                 }
                 catch (Exception ex)
                 {

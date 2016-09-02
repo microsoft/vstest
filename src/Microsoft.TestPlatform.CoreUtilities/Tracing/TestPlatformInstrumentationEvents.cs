@@ -10,28 +10,104 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
     /// </summary>
     public class TestPlatformInstrumentationEvents
     {
-        public const Int32 Discovery = 0x1;
-        public const Int32 DiscoveryEnd = 0x2;
-        public const EventTask DiscoveryTask = (EventTask)0x3;
+        /// <summary>
+        /// The discovery start event id.
+        /// </summary>
+        public const int DiscoveryStartEventId = 0x1;
 
-        public const Int32 Execution = 0x4;
-        public const Int32 ExecutionEnd = 0x5;
-        public const EventTask ExecutionTask = (EventTask)0x6;
+        /// <summary>
+        /// The discovery stop event id.
+        /// </summary>
+        public const int DiscoveryStopEventId = 0x2;
 
-        public const Int32 Adapter = 0x7;
-        public const Int32 AdapterEnd = 0x8;
-        public const EventTask AdapterTask = (EventTask)0x9;
+        /// <summary>
+        /// The execution start event id.
+        /// </summary>
+        public const int ExecutionStartEventId = 0x4;
 
-        public const Int32 VsTestConsole = 0x10;
-        public const Int32 VsTestConsoleEnd = 0x11;
-        public const EventTask VsTestConsoleTask = (EventTask)0x12;
+        /// <summary>
+        /// The execution stop event id.
+        /// </summary>
+        public const int ExecutionStopEventId = 0x5;
 
-        public const Int32 TestHost = 0x13;
-        public const Int32 TestHostEnd = 0x14;
-        public const EventTask TestHostTask = (EventTask)0x15;
+        /// <summary>
+        /// The adapter execution start event id.
+        /// </summary>
+        public const int AdapterExecutionStartEventId = 0x7;
 
-        public const Int32 AdapterSearch = 0x16;
-        public const Int32 AdapterSearchEnd = 0x17;
-        public const EventTask AdapterSearchTask = (EventTask)0x18;
+        /// <summary>
+        /// The adapter execution stop event id.
+        /// </summary>
+        public const int AdapterExecutionStopEventId = 0x8;
+
+        /// <summary>
+        /// The vs test console start event id.
+        /// </summary>
+        public const int VsTestConsoleStartEventId = 0x10;
+
+        /// <summary>
+        /// The vs test console stop event id.
+        /// </summary>
+        public const int VsTestConsoleStopEventId = 0x11;
+
+        /// <summary>
+        /// The test host start event id.
+        /// </summary>
+        public const int TestHostStartEventId = 0x13;
+
+        /// <summary>
+        /// The test host stop event id.
+        /// </summary>
+        public const int TestHostStopEventId = 0x14;
+
+        /// <summary>
+        /// The adapter search start event id.
+        /// </summary>
+        public const int AdapterSearchStartEventId = 0x16;
+
+        /// <summary>
+        /// The adapter search stop event id.
+        /// </summary>
+        public const int AdapterSearchStopEventId = 0x17;
+
+        /// <summary>
+        /// The discovery request start event id.
+        /// </summary>
+        public const int DiscoveryRequestStartEventId = 0x19;
+
+        /// <summary>
+        /// The discovery request stop event id.
+        /// </summary>
+        public const int DiscoveryRequestStopEventId = 0x20;
+
+        /// <summary>
+        /// The execution request start event id.
+        /// </summary>
+        public const int ExecutionRequestStartEventId = 0x21;
+
+        /// <summary>
+        /// The execution request stop event id.
+        /// </summary>
+        public const int ExecutionRequestStopEventId = 0x22;
+
+        /// <summary>
+        /// The data collection start event id.
+        /// </summary>
+        public const int DataCollectionStartEventId = 0x25;
+
+        /// <summary>
+        /// The data collection stop event id.
+        /// </summary>
+        public const int DataCollectionStopEventId = 0x26;
+
+        /// <summary>
+        /// The adapter discovery start event id.
+        /// </summary>
+        public const int AdapterDiscoveryStartEventId = 0x27;
+
+        /// <summary>
+        /// The adapter discovery stop event id.
+        /// </summary>
+        public const int AdapterDiscoveryStopEventId = 0x28;
     }
 }

@@ -46,10 +46,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="logger"> The logger. </param>
         internal void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, IMessageLogger logger)
         {
+            this.testPlatformEventSource?.DiscoveryStart();
             foreach (var kvp in testExtensionSourceMap)
             {
                 this.LoadTestsFromAnExtension(kvp.Key, kvp.Value, settings, logger);
             }
+            this.testPlatformEventSource?.DiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests);
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
 
 
-            this.testPlatformEventSource?.Discovery();
+            
             foreach (var discoverer in discovererToSourcesMap.Keys)
             {
                 Type discovererType = null;
@@ -113,7 +115,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                             discoverer.Value.GetType().FullName);
                     }
 
+                    var beforeTotoalDiscoveredTests = this.discoveryResultCache.TotalDiscoveredTests;
+
+                    this.testPlatformEventSource?.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
                     discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
+                    this.testPlatformEventSource?.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - beforeTotoalDiscoveredTests);
 
                     if (EqtTrace.IsVerboseEnabled)
                     {
@@ -133,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     logger.SendMessage(TestMessageLevel.Error, message);
                     EqtTrace.Error(e);
                 }
-                this.testPlatformEventSource?.DiscoveryEnd();
+                
             }
         }
 

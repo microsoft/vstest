@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
 {
     using System.Diagnostics.Tracing;
+
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
     /// <summary>
@@ -11,78 +11,210 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
     [EventSource(Name = "TestPlatform")]
     public class TestPlatformEventSource : EventSource, ITestPlatformEventSource
     {
-        public static TestPlatformEventSource Instance => new TestPlatformEventSource();
+        /// <summary>
+        /// The instance of TestPlatformEventSource.
+        /// </summary>
+        public static TestPlatformEventSource Instance = new TestPlatformEventSource();
 
-        [Event(TestPlatformInstrumentationEvents.VsTestConsole, Opcode = EventOpcode.Start, Task = TestPlatformInstrumentationEvents.VsTestConsoleTask, Message = "VsTestConsole Started")]
-        public void VsTestConsole()
+        /// <summary>
+        /// The vs test console start.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.VsTestConsoleStartEventId)]
+        public void VsTestConsoleStart()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.VsTestConsole);
+            this.WriteEvent(TestPlatformInstrumentationEvents.VsTestConsoleStartEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.VsTestConsoleEnd, Opcode = EventOpcode.Stop, Task = TestPlatformInstrumentationEvents.VsTestConsoleTask, Message = "VsTestConsole Ended")]
-        public void VsTestConsoleEnd()
+        /// <summary>
+        /// The vs test console stop.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.VsTestConsoleStopEventId)]
+        public void VsTestConsoleStop()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.VsTestConsoleEnd);
+            this.WriteEvent(TestPlatformInstrumentationEvents.VsTestConsoleStopEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.TestHost, Opcode = EventOpcode.Start, Task = TestPlatformInstrumentationEvents.TestHostTask, Message = "TestHost Started")]
-        public void TestHost()
+        /// <summary>
+        /// The discovery request start.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.DiscoveryRequestStartEventId)]
+        public void DiscoveryRequestStart()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.TestHost);
+            this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryRequestStartEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.TestHostEnd, Opcode = EventOpcode.Stop, Task = TestPlatformInstrumentationEvents.TestHostTask, Message = "TestHost Stopped")]
-        public void TestHostEnd()
+        /// <summary>
+        /// The discovery request stop.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.DiscoveryRequestStopEventId)]
+        public void DiscoveryRequestStop()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.TestHostEnd);
+            this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryRequestStopEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.AdapterSearch, Opcode = EventOpcode.Start, Task = TestPlatformInstrumentationEvents.AdapterSearchTask, Message = "AdapterSearch Started")]
-        public void AdapterSearch()
+        /// <summary>
+        /// The execution request start.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.ExecutionRequestStartEventId)]
+        public void ExecutionRequestStart()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.AdapterSearch);
+            this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionRequestStartEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.AdapterSearchEnd, Opcode = EventOpcode.Stop, Task = TestPlatformInstrumentationEvents.AdapterSearchTask, Message = "AdapterSearch Ended")]
-        public void AdapterSearchEnd()
+        /// <summary>
+        /// The execution request stop.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.ExecutionRequestStopEventId)]
+        public void ExecutionRequestStop()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.AdapterSearchEnd);
+            this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionRequestStopEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.Adapter, Opcode = EventOpcode.Start, Task = TestPlatformInstrumentationEvents.AdapterTask, Message = "Adapter Started")]
-        public void Adapter()
+        /// <summary>
+        /// The test host start.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.TestHostStartEventId)]
+        public void TestHostStart()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.Adapter);
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestHostStartEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.AdapterEnd, Opcode = EventOpcode.Stop, Task = TestPlatformInstrumentationEvents.AdapterTask, Message = "Adapter Ended")]
-        public void AdapterEnd()
+        /// <summary>
+        /// The test host stop.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.TestHostStopEventId)]
+        public void TestHostStop()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.AdapterEnd);
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestHostStopEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.Discovery, Opcode = EventOpcode.Start, Task = TestPlatformInstrumentationEvents.DiscoveryTask, Message = "Discovery started")]
-        public void Discovery()
+        /// <summary>
+        /// The adapter search start.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.AdapterSearchStartEventId)]
+        public void AdapterSearchStart()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.Discovery);
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSearchStartEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.DiscoveryEnd, Opcode = EventOpcode.Stop, Task = TestPlatformInstrumentationEvents.DiscoveryTask, Message = "Discovery Ended")]
-        public void DiscoveryEnd()
+        /// <summary>
+        /// The adapter search stop.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.AdapterSearchStopEventId)]
+        public void AdapterSearchStop()
         {
-            WriteEvent(TestPlatformInstrumentationEvents.DiscoveryEnd);
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSearchStopEventId);
         }
 
-        [Event(TestPlatformInstrumentationEvents.Execution, Opcode = EventOpcode.Start, Task = TestPlatformInstrumentationEvents.ExecutionTask, Message = "Execution Started")]
-        public void Execution()
+        /// <summary>
+        /// The adapter execution start.
+        /// </summary>
+        /// <param name="executorUri">
+        /// The executor uri.
+        /// </param>
+        [Event(TestPlatformInstrumentationEvents.AdapterExecutionStartEventId)]
+        public void AdapterExecutionStart(string executorUri)
         {
-            WriteEvent(TestPlatformInstrumentationEvents.Execution);
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterExecutionStartEventId, executorUri);
         }
 
-        [Event(TestPlatformInstrumentationEvents.ExecutionEnd, Opcode = EventOpcode.Stop, Task = TestPlatformInstrumentationEvents.ExecutionTask, Message = "Execution ended")]
-        public void ExecutionEnd()
+        /// <summary>
+        /// The adapter execution stop.
+        /// </summary>
+        /// <param name="numberOfTests">
+        /// The number of tests.
+        /// </param>
+        [Event(TestPlatformInstrumentationEvents.AdapterExecutionStopEventId)]
+        public void AdapterExecutionStop(long numberOfTests)
         {
-            WriteEvent(TestPlatformInstrumentationEvents.ExecutionEnd);
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterExecutionStopEventId, numberOfTests);
+        }
+
+        /// <summary>
+        /// The adapter discovery start.
+        /// </summary>
+        /// <param name="executorUri">
+        /// The executor uri.
+        /// </param>
+        [Event(TestPlatformInstrumentationEvents.AdapterDiscoveryStartEventId)]
+        public void AdapterDiscoveryStart(string executorUri)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterDiscoveryStartEventId, executorUri);
+        }
+
+        /// <summary>
+        /// The adapter discovery stop.
+        /// </summary>
+        /// <param name="numberOfTests">
+        /// The number of tests.
+        /// </param>
+        [Event(TestPlatformInstrumentationEvents.AdapterDiscoveryStopEventId)]
+        public void AdapterDiscoveryStop(long numberOfTests)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.AdapterDiscoveryStopEventId, numberOfTests);
+        }
+
+        /// <summary>
+        /// The discovery start.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.DiscoveryStartEventId)]
+        public void DiscoveryStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryStartEventId);
+        }
+
+        /// <summary>
+        /// The discovery stop.
+        /// </summary>
+        /// <param name="numberOfTests">
+        /// The number of tests.
+        /// </param>
+        [Event(TestPlatformInstrumentationEvents.DiscoveryStopEventId)]
+        public void DiscoveryStop(long numberOfTests)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryStopEventId, numberOfTests);
+        }
+
+        /// <summary>
+        /// The execution start.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.ExecutionStartEventId)]
+        public void ExecutionStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionStartEventId);
+        }
+
+        /// <summary>
+        /// The execution stop.
+        /// </summary>
+        /// <param name="numberOfTests">
+        /// The number of tests.
+        /// </param>
+        [Event(TestPlatformInstrumentationEvents.ExecutionStopEventId)]
+        public void ExecutionStop(long numberOfTests)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionStopEventId, numberOfTests);
+        }
+
+        /// <summary>
+        /// The data collection start.
+        /// </summary>
+        /// <param name="dataCollectorUri">
+        /// The data collector uri.
+        /// </param>
+        [Event(TestPlatformInstrumentationEvents.DataCollectionStartEventId)]
+        public void DataCollectionStart(string dataCollectorUri)
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.DataCollectionStartEventId, dataCollectorUri);
+        }
+
+        /// <summary>
+        /// The data collection stop.
+        /// </summary>
+        [Event(TestPlatformInstrumentationEvents.DataCollectionStopEventId)]
+        public void DataCollectionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.DataCollectionStopEventId);
         }
     }
 }

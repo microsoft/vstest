@@ -46,13 +46,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
         public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
         {
-            this.testPlatformEventSource?.AdapterSearch();
+            this.testPlatformEventSource?.AdapterSearchStart();
             // Start using these additional extensions
             TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
 
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
-            this.testPlatformEventSource?.AdapterSearchEnd();
+            this.testPlatformEventSource?.AdapterSearchStop();
         }
 
         /// <summary>

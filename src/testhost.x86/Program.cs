@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private static void Run(string[] args)
         {
-            TestPlatformEventSource.Instance.TestHost();
+            TestPlatformEventSource.Instance.TestHostStart();
             var portNumber = GetPortNumber(args);
 
             var requestHandler = new TestRequestHandler();
@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 throw new TimeoutException();
             }
 
-            TestPlatformEventSource.Instance.TestHostEnd();
+            TestPlatformEventSource.Instance.TestHostStop();
         }
     }
 }

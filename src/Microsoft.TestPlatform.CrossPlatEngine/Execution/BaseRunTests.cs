@@ -23,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
     /// <summary>
     /// The base run tests.
@@ -50,6 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private FrameworkHandle frameworkHandle;
 
         private ICollection<string> executorUrisThatRanTests;
+        private TestPlatformEventSource testPlatformEventSource;
 
         #endregion
 
@@ -63,7 +65,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testExecutionContext"> The test execution context. </param>
         /// <param name="testCaseEventsHandler"> The test case events handler. </param>
         /// <param name="testRunEventsHandler"> The test run events handler. </param>
-        public BaseRunTests(ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+        /// <param name="testPlatformEventSource"></param>
+        public BaseRunTests(ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, TestPlatformEventSource testPlatformEventSource)
         {
             this.testRunCache = testRunCache;
             this.runSettings = runSettings;
@@ -72,6 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testRunEventsHandler = testRunEventsHandler;
 
             this.isCancellationRequested = false;
+            this.testPlatformEventSource = testPlatformEventSource;
             this.SetContext();
         }
 
@@ -234,13 +238,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
+            this.testPlatformEventSource?.ExecutionStart();
             var exceptionsHitDuringRunTests = this.RunTestInternalWithExecutors(
                 executorUriExtensionMap,
                 totalTests);
 
             stopwatch.Stop();
-
+            this.testPlatformEventSource?.ExecutionStop(totalTests);
             this.BeforeRaisingTestRunComplete(exceptionsHitDuringRunTests);
 
             // Send the test run complete event.
@@ -279,9 +283,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         {
                             break;
                         }
+                        var beforeTotlaExecutedTests = this.testRunCache.TotalExecutedTests;
+                        this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
                         this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
+
+                        this.testPlatformEventSource?.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - beforeTotlaExecutedTests);
 
                         // Identify whether the executor did run any tests at all  
                         if (this.testRunCache.TotalExecutedTests > totalTests)
