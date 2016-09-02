@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
-    /// Argument Executor for the "/BuildBasePath" command line argument.
+    /// Argument Executor for the "--BuildBasePath|/BuildBasePath" command line argument.
     /// </summary>
     internal class BuildBasePathArgumentProcessor : IArgumentProcessor
     {
