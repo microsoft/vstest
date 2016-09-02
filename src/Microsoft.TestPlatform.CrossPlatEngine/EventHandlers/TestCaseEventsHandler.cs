@@ -27,9 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <param name="inProcDCExtMgr">
         /// The in proc tidc helper.
         /// </param>
-        public TestCaseEventsHandler(InProcDataCollectionExtensionManager inProcDCExtMgr, ITestCaseEventsHandler testCaseEvents)
+        public TestCaseEventsHandler(InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager, ITestCaseEventsHandler testCaseEvents)
         {
-            this.inProcDataCollectionExtensionManager = inProcDCExtMgr;
+            this.inProcDataCollectionExtensionManager = inProcDataCollectionExtensionManager;
             this.testCaseEvents = testCaseEvents;
         }
 
@@ -66,10 +66,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <param name="result">
         /// The result.
         /// </param>
-        public void SendTestResult(TestResult result)
+        public bool SendTestResult(TestResult result)
         {
-            this.inProcDataCollectionExtensionManager.TriggerUpdateTestResult(result);
+            var flushResult = this.inProcDataCollectionExtensionManager.TriggerUpdateTestResult(result);
             this.testCaseEvents?.SendTestResult(result);
+            return flushResult;
         }
     }
 }

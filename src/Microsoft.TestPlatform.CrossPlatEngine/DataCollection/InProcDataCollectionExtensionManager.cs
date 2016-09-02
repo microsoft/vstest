@@ -4,87 +4,97 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
-#if !NET46
-    using System.Runtime.Loader;
-#endif
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using ObjectModel.DataCollector.InProcDataCollector;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
     /// <summary>
     /// The in process data collection extension manager.
     /// </summary>
-    public class InProcDataCollectionExtensionManager
+    internal class InProcDataCollectionExtensionManager
     {
-        private IDictionary<string, object> inProcDataCollectors;
+        protected IDictionary<string, IInProcDataCollector> inProcDataCollectors;
         private IDataCollectionSink inProcDataCollectionSink;
-        private IDictionary<string, Tuple<string, string>> inProcDataSinkDict;
 
-        public InProcDataCollectionExtensionManager()
+        private IDictionary<Guid, List<TestResult>> testResultDictionary;
+        private HashSet<Guid> testCaseEndStatusMap;
+        private ITestRunCache testRunCache;
+
+        /// <summary>
+        /// Loaded in-proc datacollectors collection
+        /// </summary>
+        private IEnumerable<DataCollectorSettings> inProcDataCollectorSettingsCollection;
+
+        private object testCaseEndStatusSyncObject = new object();
+
+        public InProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache)
         {
-            this.inProcDataCollectors = new Dictionary<string, Object>();
+            this.testRunCache = testRunCache;
+
+            this.inProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
-            this.inProcDataSinkDict = new Dictionary<string, Tuple<string, string>>();
+            this.testResultDictionary = new Dictionary<Guid, List<TestResult>>();
+            this.testCaseEndStatusMap = new HashSet<Guid>();
+
+            // Initialize InProcDataCollectors
+            this.InitializeInProcDataCollectors(runSettings);
         }
 
-        public InProcDataCollectionExtensionManager(string runsettings)
-        {
-            this.inProcDataCollectors = new Dictionary<string, Object>();
-            InProcDataCollectionUtilities.ReadInProcDataCollectionRunSettings(runsettings);
-            this.inProcDataCollectionSink = new InProcDataCollectionSink();
-            this.inProcDataSinkDict = new Dictionary<string, Tuple<string, string>>();
-            this.InitializeInProcDataCollectors();
-        }
-
-        public bool IsInProcDataCollectionEnabled
-        {
-            get
-            {
-                return InProcDataCollectionUtilities.InProcDataCollectionEnabled;
-            }
-        }
-
-        public Collection<DataCollectorSettings> InProcDataCollectorSettingsCollection { get; private set; }
+        public bool IsInProcDataCollectionEnabled { get; private set; }
 
         /// <summary>
         /// Loads all the inproc data collector dlls
         /// </summary>       
-        public void InitializeInProcDataCollectors()
+        private void InitializeInProcDataCollectors(string runSettings)
         {
             try
             {
-                if (this.IsInProcDataCollectionEnabled)
-                {
-                    this.InProcDataCollectorSettingsCollection = InProcDataCollectionUtilities.GetInProcDataCollectorSettings();
+                // Check if runsettings contains in-proc datacollector element
+                var inProcDataCollectionRunSettings = XmlRunSettingsUtilities.GetInProcDataCollectionRunSettings(runSettings);
+                var inProcDataCollectionSettingsPresentInRunSettings = inProcDataCollectionRunSettings?.IsCollectionEnabled ?? false;
 
-                    var interfaceType = typeof(InProcDataCollection);
-                    foreach (var inProcDc in this.InProcDataCollectorSettingsCollection)
+                // Verify if it has any valid in-proc datacollectors or just a dummy element
+                inProcDataCollectionSettingsPresentInRunSettings = inProcDataCollectionSettingsPresentInRunSettings &&
+                    inProcDataCollectionRunSettings.DataCollectorSettingsList.Any();
+
+                // Initialize if we have atleast one
+                if (inProcDataCollectionSettingsPresentInRunSettings)
+                {
+                    this.inProcDataCollectorSettingsCollection = inProcDataCollectionRunSettings.DataCollectorSettingsList;
+
+                    var interfaceTypeInfo = typeof(InProcDataCollection).GetTypeInfo();
+                    foreach (var inProcDc in this.inProcDataCollectorSettingsCollection)
                     {
-                        var assembly = this.LoadInProcDataCollectorExtension(inProcDc.CodeBase);
-                        var type =
-                            assembly?.GetTypes()
-                                .FirstOrDefault(x => (x.AssemblyQualifiedName.Equals(inProcDc.AssemblyQualifiedName) && interfaceType.GetTypeInfo().IsAssignableFrom(x)));
-                        if (type != null && !this.inProcDataCollectors.ContainsKey(type.AssemblyQualifiedName))
-                        {
-                            var obj = CreateObjectFromType(type);
-                            InvokeInitializeOnInProcDataCollector(obj, this.inProcDataCollectionSink);
-                            this.inProcDataCollectors[type.AssemblyQualifiedName] = obj;
-                        }
+                        var inProcDataCollector = this.CreateDataCollector(inProcDc, interfaceTypeInfo);
+                        this.inProcDataCollectors[inProcDataCollector.AssemblyQualifiedName] = inProcDataCollector;
                     }
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Error occured while Initializing the datacollectors : {0}", ex);
+                EqtTrace.Error("InProcDataCollectionExtensionManager: Error occured while Initializing the datacollectors : {0}", ex);
             }
+            finally
+            {
+                this.IsInProcDataCollectionEnabled = this.inProcDataCollectors.Any();
+            }
+        }
+
+        protected virtual IInProcDataCollector CreateDataCollector(DataCollectorSettings dataCollectorSettings, TypeInfo interfaceTypeInfo)
+        {
+            var inProcDataCollector = new InProcDataCollector(dataCollectorSettings.CodeBase, dataCollectorSettings.AssemblyQualifiedName,
+                interfaceTypeInfo, dataCollectorSettings.Configuration.OuterXml);
+
+            inProcDataCollector.LoadDataCollector(inProcDataCollectionSink);
+
+            return inProcDataCollector;
         }
 
         /// <summary>
@@ -92,6 +102,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public virtual void TriggerTestSessionStart()
         {
+            this.testCaseEndStatusMap.Clear();
+            this.testResultDictionary.Clear();
+
             TestSessionStartArgs testSessionStartArgs = new TestSessionStartArgs();
             this.TriggerInProcDataCollectionMethods(Constants.TestSessionStartMethodName, testSessionStartArgs);
         }
@@ -110,9 +123,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public virtual void TriggerTestCaseStart(TestCase testCase)
         {
+            lock (testCaseEndStatusSyncObject)
+            {
+                this.testCaseEndStatusMap.Remove(testCase.Id);
+            }
+
             var testCaseStartArgs = new TestCaseStartArgs(testCase);
             this.TriggerInProcDataCollectionMethods(Constants.TestCaseStartMethodName, testCaseStartArgs);
-
         }
 
         /// <summary>
@@ -120,99 +137,107 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public virtual void TriggerTestCaseEnd(TestCase testCase, TestOutcome outcome)
         {
-            var dataCollectionContext = new DataCollectionContext(testCase);
-            var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, outcome);
-            this.TriggerInProcDataCollectionMethods(Constants.TestCaseEndMethodName, testCaseEndArgs);
+            bool isTestCaseEndAlreadySent = false;
+            lock (testCaseEndStatusSyncObject)
+            {
+                isTestCaseEndAlreadySent = this.testCaseEndStatusMap.Contains(testCase.Id);
+                if (!isTestCaseEndAlreadySent)
+                {
+                    this.testCaseEndStatusMap.Add(testCase.Id);
+                }
+
+                // Do not support multiple - testcasends for a single test case start
+                // TestCaseEnd must always be preceded by testcasestart for a given test case id
+                if (!isTestCaseEndAlreadySent)
+                {
+                    var dataCollectionContext = new DataCollectionContext(testCase);
+                    var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, outcome);
+
+                    // Call all in-proc datacollectors - TestCaseEnd event
+                    this.TriggerInProcDataCollectionMethods(Constants.TestCaseEndMethodName, testCaseEndArgs);
+
+                    // If dictionary contains results for this test case, update them with in-proc data and flush them
+                    if (testResultDictionary.ContainsKey(testCase.Id))
+                    {
+                        foreach (var testResult in testResultDictionary[testCase.Id])
+                        {
+                            this.SetInProcDataCollectionDataInTestResult(testResult);
+
+                            // TestResult updated with in-proc data, just flush
+                            this.testRunCache.OnNewTestResult(testResult);
+                        }
+
+                        this.testResultDictionary.Remove(testCase.Id);
+                    }
+                }
+            }
         }
 
         /// <summary>
         /// Triggers the send test result method
         /// </summary>
         /// <param name="testResult"></param>
-        public virtual void TriggerUpdateTestResult(TestResult testResult)
+        /// <returns>True, if result can be flushed. False, otherwise</returns>
+        public virtual bool TriggerUpdateTestResult(TestResult testResult)
         {
-            this.SetInProcDataCollectionDataInTestResult(testResult);
+            bool allowTestResultFlush = true;
+            var testCaseId = testResult.TestCase.Id;
+
+            lock (testCaseEndStatusSyncObject)
+            {
+                if (this.testCaseEndStatusMap.Contains(testCaseId))
+                {
+                    // Just set the cached in-proc data if already exists
+                    this.SetInProcDataCollectionDataInTestResult(testResult);
+                }
+                else
+                {
+                    // No TestCaseEnd received yet
+                    // We need to wait for testcaseend before flushing
+                    allowTestResultFlush = false;
+
+                    // Cache results so we can flush later with in proc data
+                    if (testResultDictionary.ContainsKey(testCaseId))
+                    {
+                        testResultDictionary[testCaseId].Add(testResult);
+                    }
+                    else
+                    {
+                        testResultDictionary.Add(testCaseId, new List<TestResult>() { testResult });
+                    }
+                }
+            }
+            return allowTestResultFlush;
         }
 
         /// <summary>
-        /// Loads the assembly into the default context based on the codebase path
+        /// Flush any test results that are cached in dictionary
         /// </summary>
-        /// <param name="codeBase"></param>
-        /// <returns></returns>
-        private Assembly LoadInProcDataCollectorExtension(string codeBase)
+        public void FlushLastChunkResults()
         {
-            Assembly assembly = null;
-            try
+            // Can happen if we cached test results expecting a test case end event for them
+            // If test case end events never come, we have to flush all of them 
+            foreach(var results in this.testResultDictionary.Values)
             {
-#if NET46
-                assembly = Assembly.LoadFrom(codeBase);                
-#else
-                assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(codeBase);
-#endif
-
+                foreach(var result in results)
+                {
+                    this.testRunCache.OnNewTestResult(result);
+                }
             }
-            catch (Exception ex)
-            {
-                EqtTrace.Error(
-                    "Error occured while loading the InProcDataCollector : {0} , Exception Details : {1}", codeBase, ex);
-            }
-
-            return assembly;
-        }
-
-        private static object CreateObjectFromType(Type type)
-        {
-            object obj = null;
-
-            var typeInfo = type.GetTypeInfo();
-            var constructorInfo = typeInfo?.GetConstructor(Type.EmptyTypes);
-            obj = constructorInfo?.Invoke(new object[] { });
-
-            return obj;
-        }
-
-        private static void InvokeInitializeOnInProcDataCollector(object obj, IDataCollectionSink inProcDataCollectionSink)
-        {
-            var initializeMethodInfo = GetMethodInfoFromType(obj.GetType(), "Initialize", new Type[] { typeof(IDataCollectionSink) });
-            initializeMethodInfo.Invoke(obj, new object[] { inProcDataCollectionSink });
-        }
-
-        private static MethodInfo GetMethodInfoFromType(Type type, string funcName, Type[] argumentTypes)
-        {
-            MethodInfo methodInfo = null;
-
-            var typeInfo = type.GetTypeInfo();
-            methodInfo = typeInfo?.GetMethod(funcName, argumentTypes);
-            return methodInfo;
         }
 
         private void TriggerInProcDataCollectionMethods(string methodName, InProcDataCollectionArgs methodArg)
         {
             try
             {
-                foreach (var entry in this.inProcDataCollectors)
+                foreach (var inProcDc in this.inProcDataCollectors.Values)
                 {
-                    var methodInfo = GetMethodInfoFromType(entry.Value.GetType(), methodName, new[] { methodArg.GetType() });
-
-                    if (methodName.Equals(Constants.TestSessionStartMethodName))
-                    {
-                        var testSessionStartArgs = (TestSessionStartArgs)methodArg;
-                        var config =
-                        this.InProcDataCollectorSettingsCollection.FirstOrDefault(
-                            x => x.AssemblyQualifiedName.Equals(entry.Key))?
-                            .Configuration.OuterXml;
-                        testSessionStartArgs.Configuration = config;
-                        methodInfo?.Invoke(entry.Value, new object[] { testSessionStartArgs });
-                    }
-                    else
-                    {
-                        methodInfo?.Invoke(entry.Value, new object[] { methodArg });
-                    }
+                    inProcDc.TriggerInProcDataCollectionMethod(methodName, methodArg);
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("Error occured while Triggering the {0} method : {1}", methodName, ex);
+                EqtTrace.Error("InProcDataCollectionExtensionManager: Error occured while Triggering the {0} method : {1}", methodName, ex);
             }
         }
 
