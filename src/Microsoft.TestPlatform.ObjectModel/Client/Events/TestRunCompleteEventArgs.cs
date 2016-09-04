@@ -39,7 +39,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Gets the statistics on the state of the test run.
         /// </summary>
         [DataMember]
-        [JsonConverter(typeof(TestRunStatisticsConverter))]
         public ITestRunStatistics TestRunStatistics { get; private set; }
 
         /// <summary>

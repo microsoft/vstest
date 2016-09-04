@@ -66,7 +66,7 @@ using System.Security.Permissions;
         public TestPropertyAttributes _attributes;
 #endif
 
-        private ValidateValueCallback validateValueCallback;
+        private readonly ValidateValueCallback validateValueCallback;
 
         #endregion Fields
 
@@ -85,16 +85,15 @@ using System.Security.Permissions;
             ValidateArg.NotNull(valueType, "valueType");
 
             // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db. Fixed bug #754475
-            if (valueType.Equals(typeof(KeyValuePair<string, string>[])))
+            if (valueType == typeof(KeyValuePair<string, string>[]))
             {
                 this._strValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
             }
-            else if (valueType.Equals(typeof(String)) || valueType.Equals(typeof(Uri)) || valueType.Equals(typeof(string[]))
-                 || (valueType.AssemblyQualifiedName.Contains("System.Private")))
+            else if (valueType == typeof(string) || valueType == typeof(Uri) || valueType == typeof(string[]) || valueType.AssemblyQualifiedName.Contains("System.Private"))
             {
                 this._strValueType = valueType.FullName;
             }
-            else if(valueType.GetTypeInfo().IsValueType)
+            else if (valueType.GetTypeInfo().IsValueType)
             {
                 this._strValueType = valueType.AssemblyQualifiedName;
             }

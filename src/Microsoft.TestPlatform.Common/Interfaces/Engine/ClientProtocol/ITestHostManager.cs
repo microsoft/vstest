@@ -15,8 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Sets a custom launcher
         /// </summary>
-        /// <param name="customTestHostLauncher">Custom launcher to set</param>
-        void SetCustomLauncher(ITestHostLauncher customTestHostLauncher);
+        /// <param name="customLauncher">Custom launcher to set</param>
+        void SetCustomLauncher(ITestHostLauncher customLauncher);
 
         /// <summary>
         /// Launches the test host for discovery/execution.

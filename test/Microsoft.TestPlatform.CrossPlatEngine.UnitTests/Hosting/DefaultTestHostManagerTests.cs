@@ -11,8 +11,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using Moq;
 
     [TestClass]
@@ -196,10 +197,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             // Setup mocks.
             this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                arguments = args;
-                return Process.GetCurrentProcess();
-            };
+                {
+                    arguments = args;
+                    return Process.GetCurrentProcess();
+                };
             this.mockProcessHelper.CurrentProcessName = "c:\\temp\\dotnet.exe";
 
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());

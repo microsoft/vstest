@@ -4,9 +4,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Newtonsoft.Json;
     using System.Runtime.Serialization;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// The test run changed event args that provides the test results available.
@@ -37,7 +37,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Gets the test run statistics.
         /// </summary>
         [DataMember]
-        [JsonConverter(typeof(TestRunStatisticsConverter))]
         public ITestRunStatistics TestRunStatistics { get; private set; }
 
         /// <summary>

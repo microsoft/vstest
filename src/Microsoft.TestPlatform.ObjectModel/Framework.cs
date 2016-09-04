@@ -9,40 +9,43 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class Framework
     {
-        /// <summary>
-        /// Default .Net target framework
-        /// </summary>
-        public static Framework DefaultFramework = FromString(".NETFramework,Version=v4.6");
+        private static readonly Framework Default = Framework.FromString(".NETFramework,Version=v4.6");
 
         private Framework()
         {
         }
-        
+
         /// <summary>
-        /// FullName of the framework
+        /// Default .Net target framework.
+        /// </summary>
+        public static Framework DefaultFramework => Framework.Default;
+
+        /// <summary>
+        /// Gets the FullName of framework.
         /// </summary>
         public string Name { get; private set; }
 
         /// <summary>
-        /// Version of the framework
+        /// Gets the framework version.
         /// </summary>
         public string Version { get; private set; }
 
         /// <summary>
         /// Returns a valid framework else returns null
         /// </summary>
-        /// <param name="frameworkString"></param>
-        /// <returns></returns>
+        /// <param name="frameworkString">Framework name</param>
+        /// <returns>A framework object</returns>
         public static Framework FromString(string frameworkString)
         {
             FrameworkName frameworkName;
             try
             {
+                // FrameworkName already trims the input identifier.
                 frameworkName = new FrameworkName(frameworkString);
             }
             catch
             {
-                switch(frameworkString)
+                switch (frameworkString.Trim())
                 {
                     case "Framework35":
                         frameworkName = new FrameworkName(".NETFramework,Version=v3.5");
@@ -57,16 +60,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         return null;
                 }
             }
+
             return new Framework() { Name = frameworkName.FullName, Version = frameworkName.Version.ToString() };
         }
         
         /// <summary>
-        /// Returns the Name which is the fullname of the framework.
+        /// Returns full name of the framework.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>String presentation of the object.</returns>
         public override string ToString()
         {
-            return Name;
+            return this.Name;
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -15,7 +16,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     {
         private static JsonDataSerializer instance;
 
-        private JsonDataSerializer() { }
+        private static JsonSerializer serializer;
+
+        private JsonDataSerializer()
+        {
+            serializer = JsonSerializer.Create(
+                            new JsonSerializerSettings
+                                {
+                                    ContractResolver = new TestPlatformContractResolver(),
+                                    TypeNameHandling = TypeNameHandling.None
+                                });
+        }
 
         public static JsonDataSerializer Instance
         {
@@ -42,10 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             else
             {
-                 retValue = message.Payload.ToObject<T>(
-                    JsonSerializer.Create(
-                        new JsonSerializerSettings {
-                            TypeNameHandling = TypeNameHandling.None }));
+                retValue = message.Payload.ToObject<T>(serializer);
             }
 
             return retValue;
@@ -68,9 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             else
             {
-                serializedPayload = JToken.FromObject(payload, 
-                    JsonSerializer.Create(
-                                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None }));
+                serializedPayload = JToken.FromObject(payload, serializer);
             }
 
             return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });

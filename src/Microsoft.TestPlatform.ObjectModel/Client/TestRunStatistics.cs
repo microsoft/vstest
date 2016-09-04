@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     using Newtonsoft.Json;
-    using System;
 
     /// <summary>
     /// Defines the test run stats header
@@ -67,28 +66,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
                 return 0;
             }
-        }
-    }
-
-    /// <summary>
-    /// Json converter for converting ITestRunStatistics to TestRunStatistics
-    /// </summary>
-    public class TestRunStatisticsConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType.Equals(typeof(TestRunStatistics));
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            return serializer.Deserialize<TestRunStatistics>(reader);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            //use the default serialization - it works fine
-            serializer.Serialize(writer, value);
         }
     }
 }

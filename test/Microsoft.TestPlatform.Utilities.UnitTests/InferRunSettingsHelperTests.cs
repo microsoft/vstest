@@ -119,7 +119,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             var xml = navigator.OuterXml;
 
-            StringAssert.Contains(xml, "<TargetFrameworkVersion>Framework40</TargetFrameworkVersion>");
+            StringAssert.Contains(xml, "<TargetFrameworkVersion>.NETFramework,Version=v4.0</TargetFrameworkVersion>");
         }
 
         [TestMethod]
