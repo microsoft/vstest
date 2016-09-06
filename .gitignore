@@ -106,3 +106,4 @@ Tools
 
 *.nupkg
 *.zip
+/test
