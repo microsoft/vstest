@@ -249,12 +249,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
                 {
-                    string ShortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
-                    processorsMap.Add(ShortCommandName, argumentProcessor);
+                    string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
+                    processorsMap.Add(shortCommandName, argumentProcessor);
 
                     // Add xplat short name for the command name
-                    ShortCommandName = ShortCommandName.Replace('/', '-');
-                    processorsMap.Add(ShortCommandName, argumentProcessor);
+                    shortCommandName = shortCommandName.Replace('/', '-');
+                    processorsMap.Add(shortCommandName, argumentProcessor);
                 }
             }
         }
