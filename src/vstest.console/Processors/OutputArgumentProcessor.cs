@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
-    /// Argument Executor for the "/Output" command line argument.
+    /// Argument Executor for the "-o|--Output|/o|/Output" command line argument.
     /// </summary>
     internal class OutputArgumentProcessor : IArgumentProcessor
     {

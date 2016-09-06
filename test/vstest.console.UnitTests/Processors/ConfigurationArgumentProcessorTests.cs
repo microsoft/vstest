@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ConfigurationArgumentProcessorCapabilities capabilities = new ConfigurationArgumentProcessorCapabilities();
             Assert.AreEqual("/Configuration", capabilities.CommandName);
-            Assert.AreEqual("/Configuration:<Configuration>\n     The configuration the project is built for i.e. Debug/Release", capabilities.HelpContentResourceName);
+            Assert.AreEqual("-c|--Configuration|/c|/Configuration:<Configuration>\n     The configuration the project is built for i.e. Debug/Release", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ConfigurationArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

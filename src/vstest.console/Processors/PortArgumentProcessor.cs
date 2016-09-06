@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 
     /// <summary>
-    /// Argument Executor for the "/Port" command line argument.
+    /// Argument Executor for the "--Port|/Port" command line argument.
     /// </summary>
     internal class PortArgumentProcessor : IArgumentProcessor
     {

@@ -8,9 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
-    
+
     /// <summary>
-    /// Argument Executor for the "/Configuration" command line argument.
+    /// Argument Executor for the "-c|--Configuration|/c|/Configuration" command line argument.
     /// </summary>
     internal class ConfigurationArgumentProcessor : IArgumentProcessor
     {

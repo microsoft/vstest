@@ -21,6 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         internal const string CommandStarter = "/";
 
+        /// <summary>
+        /// The xplat command starter.
+        /// </summary>
+        internal const string XplatCommandStarter = "-";
+
         #endregion
 
         #region Fields
@@ -206,9 +211,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Requires(!String.IsNullOrWhiteSpace(argument));
             IArgumentProcessor result = null;
 
-            // If the command does not begin with the command starter ("/"), then
+            // If the command does not begin with the command starter ("/" or "-"), then
             // we considerer it to be a test source.
-            if (!argument.StartsWith(CommandStarter, StringComparison.OrdinalIgnoreCase))
+            if (!argument.StartsWith(CommandStarter, StringComparison.OrdinalIgnoreCase) && !argument.StartsWith(XplatCommandStarter, StringComparison.OrdinalIgnoreCase))
             {
                 result = SpecialCommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
 
@@ -235,10 +240,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                                       ? this.specialCommandToProcessorMap
                                       : this.commandToProcessorMap;
 
-                processorsMap.Add(argumentProcessor.Metadata.Value.CommandName, argumentProcessor);
+                string commandName = argumentProcessor.Metadata.Value.CommandName;
+                processorsMap.Add(commandName, argumentProcessor);
+
+                // Add xplat name for the command name
+                commandName = string.Concat("--", commandName.Remove(0, 1));
+                processorsMap.Add(commandName, argumentProcessor);
+
                 if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
                 {
-                    processorsMap.Add(argumentProcessor.Metadata.Value.ShortCommandName, argumentProcessor);
+                    string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
+                    processorsMap.Add(shortCommandName, argumentProcessor);
+
+                    // Add xplat short name for the command name
+                    shortCommandName = shortCommandName.Replace('/', '-');
+                    processorsMap.Add(shortCommandName, argumentProcessor);
                 }
             }
         }

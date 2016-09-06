@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     /// <summary>
     /// An argument processor that allows the user to enable a specific logger
-    /// from the command line using the /Logger command line switch.
+    /// from the command line using the --Logger|/Logger command line switch.
     /// </summary>
     internal class EnableLoggerArgumentProcessor : IArgumentProcessor
     {
