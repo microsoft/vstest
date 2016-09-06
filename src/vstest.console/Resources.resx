@@ -593,4 +593,11 @@ Specifies that the tests be executed in parallel. By default up to all available
   <data name="DiscoveryFailed" xml:space="preserve">
     <value>Discovery failed for given sources. Exception : {0}</value>
   </data>
+  <data name="ParentProcessIdArgumentHelp" xml:space="preserve">
+    <value>/ParentProcessId:&lt;ParentProcessId&gt;
+     Process Id of the Parent Process responsible for launching current process.</value>
+  </data>
+  <data name="InvalidParentProcessIdArgument" xml:space="preserve">
+    <value>The /ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</value>
+  </data>
 </root>

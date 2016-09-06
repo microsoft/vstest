@@ -110,6 +110,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// PortArgumentProcessor Help
         /// </summary>
+        ParentProcessIdArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// PortArgumentProcessor Help
+        /// </summary>
         PortArgumentProcessorHelpPriority,
 
         /// <summary>

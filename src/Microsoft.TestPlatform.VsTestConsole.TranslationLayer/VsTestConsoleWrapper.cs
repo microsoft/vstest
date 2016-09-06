@@ -10,6 +10,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using System.Diagnostics;
 
     /// <summary>
     /// Vstest.console.exe Wrapper
@@ -28,6 +29,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private const string PORT_ARGUMENT = "/port:{0}";
 
+        private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
         #endregion
 
         #region Constructor
@@ -56,8 +58,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             if (port > 0)
             {
                 // Start Vstest.console.exe
-                string args = string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, port);
-                this.vstestConsoleProcessManager.StartProcess(new string[1] { args });
+                string parentProcessIdArgs = string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, Process.GetCurrentProcess().Id);
+                string portArgs = string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, port);
+                this.vstestConsoleProcessManager.StartProcess(new string[2] { parentProcessIdArgs, portArgs });
             }
             else
             {
