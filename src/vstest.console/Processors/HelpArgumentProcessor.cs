@@ -128,12 +128,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             OutputSection(Resources.HelpDescriptionText);
             OutputSection(Resources.HelpArgumentsText);
 
-            // Output the help description for RunTestsArgumentProcessor
             var argumentProcessorFactory = ArgumentProcessorFactory.Create();
             List<IArgumentProcessor> processors = new List<IArgumentProcessor>();
             processors.AddRange(argumentProcessorFactory.AllArgumentProcessors);
             processors.Sort((p1, p2) => Comparer<HelpContentPriority>.Default.Compare(p1.Metadata.Value.HelpPriority, p2.Metadata.Value.HelpPriority));
 
+            // Output the help description for RunTestsArgumentProcessor
             IArgumentProcessor runTestsArgumentProcessor = processors.Find(p1 => p1.GetType() == typeof(RunTestsArgumentProcessor));
             processors.Remove(runTestsArgumentProcessor);
             var helpDescription = LookupHelpDescription(runTestsArgumentProcessor);
