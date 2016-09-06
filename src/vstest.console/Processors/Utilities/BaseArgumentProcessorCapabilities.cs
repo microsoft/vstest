@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public abstract string CommandName { get; }
 
         /// <summary>
-        /// Gets the command name.
+        /// Gets the short command name.
         /// </summary>
         public virtual string ShortCommandName => null;
 

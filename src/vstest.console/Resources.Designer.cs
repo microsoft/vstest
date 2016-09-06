@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /BuildBasePath:&lt;BuildBasePath&gt;
+        ///    Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
         ///     The directory containing the temporary outputs..
         /// </summary>
         public static string BuildBasePathArgumentHelp {
@@ -250,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Configuration:&lt;Configuration&gt;
+        ///    Looks up a localized string similar to -c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
         ///     The configuration the project is built for i.e. Debug/Release.
         /// </summary>
         public static string ConfigurationArgumentHelp {
@@ -361,7 +361,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to  /logger:&lt;Logger Uri/FriendlyName&gt;
+        ///    Looks up a localized string similar to  --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
         ///      Visual Studio Test Results File (TRX) use  /logger:trx.
         ///      To publish test results to Team Foundation Server, use TfsPublisher as shown below
@@ -369,8 +369,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         ///                Collection=&lt;team project collection url&gt;;
         ///                BuildName=&lt;build name&gt;;
         ///                TeamProject=&lt;team project name&gt;
-        ///                [;Platform=&lt;Defaults to &quot;Any CPU&quot;&gt;]
-        ///      [rest of string was truncated]&quot;;.
+        ///                [;Platform=&lt;Defaults to &quot;Any CPU&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         public static string EnableLoggersArgumentHelp {
             get {
@@ -467,12 +466,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /?
+        ///    Looks up a localized string similar to -?|--Help|/?|/Help
         ///      Display this usage message..
         /// </summary>
         public static string HelpArgumentHelp {
             get {
                 return ResourceManager.GetString("HelpArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Arguments:.
+        /// </summary>
+        public static string HelpArgumentsText {
+            get {
+                return ResourceManager.GetString("HelpArgumentsText", resourceCulture);
             }
         }
         
@@ -495,7 +503,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to Usage: vstest.console.exe [TestFileNames] [Options].
+        ///    Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options].
         /// </summary>
         public static string HelpUsageText {
             get {
@@ -682,7 +690,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /ListTests:&lt;File Name&gt;
+        ///    Looks up a localized string similar to -lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
         ///      Lists discovered tests from the given test container..
         /// </summary>
         public static string ListTestsHelp {
@@ -836,7 +844,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Output:&lt;Output&gt;
+        ///    Looks up a localized string similar to -o|--Output|/o|/Output:&lt;Output&gt;
         ///     The directory containing the binaries to run..
         /// </summary>
         public static string OutputArgumentHelp {
@@ -855,7 +863,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Parallel
+        ///    Looks up a localized string similar to --Parallel|/Parallel
         ///Specifies that the tests be executed in parallel. By default up to all available cores on the machine may be used. The number of cores to use may be configured using a settings file..
         /// </summary>
         public static string ParallelArgumentProcessorHelp {
@@ -902,7 +910,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Platform:&lt;Platform type&gt;
+        ///    Looks up a localized string similar to --Platform|/Platform:&lt;Platform type&gt;
         ///      Target platform architecture to be used for test execution. 
         ///      Valid values are x86, x64 and ARM..
         /// </summary>
@@ -922,7 +930,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Port:&lt;Port&gt;
+        ///    Looks up a localized string similar to --Port|/Port:&lt;Port&gt;
         ///     The Port for socket connection and receiving the event messages..
         /// </summary>
         public static string PortArgumentHelp {
@@ -941,7 +949,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Settings:&lt;Settings File&gt;
+        ///    Looks up a localized string similar to --Settings|/Settings:&lt;Settings File&gt;
         ///      Settings to use when running tests..
         /// </summary>
         public static string RunSettingsArgumentHelp {
@@ -978,7 +986,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Tests:&lt;Test Names&gt;
+        ///    Looks up a localized string similar to --Tests|/Tests:&lt;Test Names&gt;
         ///      Run tests with names that match the provided values. To provide multiple
         ///      values, separate them by commas.
         ///      Examples: /Tests:TestMethod1
@@ -1221,7 +1229,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /TestAdapterPath
+        ///    Looks up a localized string similar to --TestAdapterPath|/TestAdapterPath
         ///      This makes vstest.console.exe process use custom test adapters
         ///      from a given path (if any) in the test run. 
         ///      Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.
@@ -1242,7 +1250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to  /TestCaseFilter:&lt;Expression&gt;
+        ///    Looks up a localized string similar to  --TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
         ///      Run tests that match the given expression.
         ///      &lt;Expression&gt; is of the format &lt;property&gt;Operator&lt;value&gt;[|&amp;&lt;Expression&gt;]
         ///         where Operator is one of =, != or ~  (Operator ~ has &apos;contains&apos;
@@ -1250,7 +1258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         ///         Parenthesis () can be used to group sub-expressions.
         ///      Examples: /TestCaseFilter:&quot;Priority=1&quot;
         ///                /TestCaseFilter:&quot;(FullyQualifiedName~Nightly
-        ///                              [rest of string was truncated]&quot;;.
+        ///             [rest of string was truncated]&quot;;.
         /// </summary>
         public static string TestCaseFilterArgumentHelp {
             get {

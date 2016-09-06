@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics;
 
     /// <summary>
-    /// Argument Processor for the "/Port" command line argument.
+    /// Argument Processor for the "--Port|/Port" command line argument.
     /// </summary>
     internal class PortArgumentProcessor : IArgumentProcessor
     {
