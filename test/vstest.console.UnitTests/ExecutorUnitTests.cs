@@ -10,10 +10,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using Utilities;
     using System.Linq;
     using System.Reflection;
+    using CoreUtilities.Tracing;
+
+    using Moq;
 
     [TestClass]
     public class ExecutorUnitTests
     {
+        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+
+        [TestInitialize]
+        public void TestInit()
+        {
+            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
+        }
+
         /// <summary>
         /// Executor should Print splash screen first
         /// </summary>
@@ -21,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         public void ExecutorPrintsSplashScreenTest()
         {
             var mockOutput = new MockOutput();
-            var exitCode = new Executor(mockOutput).Execute("/?");
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("/?");
 
             Assert.AreEqual(0, exitCode, "Exit code must be One for bad arguments");
 
@@ -41,9 +52,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         /// </summary>
         [TestMethod]
         public void ExecutorEmptyArgsCallRunTestsProcessor()
-        {
+        {            
             var mockOutput = new MockOutput();
-            var exitCode = new Executor(mockOutput).Execute(null);
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
 
             // Since no projectjsons exist in current folder it should fail
             Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");

@@ -23,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using CoreUtilities.Tracing;
 
     /// <summary>
     /// Tests for RunTestsArgumentProcessor
@@ -33,9 +34,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         MockFileHelper mockFileHelper;
         string dummyTestFilePath = "DummyTest.dll";
 
+        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+
         public RunTestsArgumentProcessorTests()
         {
             this.mockFileHelper = new MockFileHelper();
+            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
             this.mockFileHelper.ExistsInvoker = (path) =>
             {
                 if (string.Equals(path, this.dummyTestFilePath))
@@ -90,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, TestPlatformEventSource.Instance);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
           
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
            
@@ -110,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             
             this.ResetAndAddSourceToCommandLineOptions();
             
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, TestPlatformEventSource.Instance);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
@@ -128,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             
             this.ResetAndAddSourceToCommandLineOptions();
             
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, TestPlatformEventSource.Instance);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
@@ -146,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             
             this.ResetAndAddSourceToCommandLineOptions();
             
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, TestPlatformEventSource.Instance);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
             ArgumentProcessorResult argumentProcessorResult = executor.Execute();
@@ -164,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             
             this.ResetAndAddSourceToCommandLineOptions();
             
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, TestPlatformEventSource.Instance);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
             Assert.ThrowsException<Exception>(() => executor.Execute());
@@ -188,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             
             this.ResetAndAddSourceToCommandLineOptions();
             
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, TestPlatformEventSource.Instance);
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
             var result = executor.Execute();

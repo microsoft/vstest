@@ -24,6 +24,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.Reflection;
     //using Microsoft.Extensions.PlatformAbstractions;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -34,8 +35,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         private TestableBaseRunTests runTestsInstance;
 
+        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+
         private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
         private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
+
 
         [TestInitialize]
         public void TestInit()
@@ -51,12 +55,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 testCaseFilter: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
+            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
+
             this.runTestsInstance = new TestableBaseRunTests(
                 testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object);
+                this.mockTestRunEventsHandler.Object,
+                this.mockTestPlatformEventSource.Object);
         }
 
         #region Constructor tests
@@ -500,8 +507,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 string runSettings,
                 TestExecutionContext testExecutionContext,
                 ITestCaseEventsHandler testCaseEventsHandler,
-                ITestRunEventsHandler testRunEventsHandler)
-                : base(testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
+                ITestRunEventsHandler testRunEventsHandler,
+                TestPlatformEventSource testPlatformEventSource)
+                : base(testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
             {
             }
 
