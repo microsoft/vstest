@@ -47,9 +47,14 @@
                     {
                         var testProperty = property["Key"].ToObject<TestProperty>();
 
-                        // On deserialization, the value for each TestProperty is always a string. It is up
-                        // to the consumer to deserialize it further as appropriate.
-                        var propertyData = property["Value"].ToString(Formatting.None).Trim('"');
+                        // Let the null values be passed in as null data
+                        object propertyData = null;
+                        if (property["Value"].Type != JTokenType.Null)
+                        {
+                            // On deserialization, the value for each TestProperty is always a string. It is up
+                            // to the consumer to deserialize it further as appropriate.
+                            propertyData = property["Value"].ToString(Formatting.None).Trim('"');
+                        }
 
                         propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData));
                     }

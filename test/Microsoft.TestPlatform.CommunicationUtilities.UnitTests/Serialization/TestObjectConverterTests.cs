@@ -69,6 +69,18 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual(29, test.GetPropertyValue(properties[1]));
         }
 
+        [TestMethod]
+        public void TestObjectShouldDeserializeNullValueForProperty()
+        {
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":null}]}";
+
+            var test = Deserialize<TestableTestObject>(json);
+
+            var properties = test.Properties.ToArray();
+            Assert.AreEqual(1, properties.Length);
+            Assert.IsTrue(string.IsNullOrEmpty(test.GetPropertyValue(properties[0]).ToString()));
+        }
+
         private static string Serialize<T>(T data)
         {
             return JsonConvert.SerializeObject(data, serializerSettings);
