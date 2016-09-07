@@ -42,8 +42,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
             }
-            else if (valueType == typeof(string) || valueType == typeof(Uri) || valueType == typeof(string[]) || valueType.AssemblyQualifiedName.Contains("System.Private"))
+            else if (valueType == typeof(string)
+                || valueType == typeof(Uri)
+                || valueType == typeof(string[])
+                || valueType.AssemblyQualifiedName.Contains("System.Private")
+                || valueType.AssemblyQualifiedName.Contains("mscorlib"))
             {
+                // This comparison is an ugly hack to ensure assembly information is not embedded in data.
                 // Use type.FullName instead of type.AssemblyQualifiedName since the internal assemblies
                 // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
                 // is not available on the desktop.
