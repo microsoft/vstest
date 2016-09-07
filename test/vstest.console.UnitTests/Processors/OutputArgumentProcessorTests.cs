@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             OutputArgumentProcessorCapabilities capabilities = new OutputArgumentProcessorCapabilities();
             Assert.AreEqual("/Output", capabilities.CommandName);
-            Assert.AreEqual("/Output:<Output>\n     The directory containing the binaries to run.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("-o|--Output|/o|/Output:<Output>\n     The directory containing the binaries to run.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.OutputArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

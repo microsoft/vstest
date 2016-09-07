@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Diagnostics;
 
     /// <summary>
     /// The design mode client.
@@ -88,12 +89,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             }
         }
 
-        /// <summary>
-        /// End the connection
-        /// </summary>
-        public void Dispose()
+        public void HandleParentProcessExit()
         {
-            this.communicationManager?.StopClient();
+            // Dispose off the communications to end the session
+            // this should end the "ProcessRequests" loop with an exception
+            this.Dispose();
         }
 
         /// <summary>
@@ -103,86 +103,97 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private void ProcessRequests(ITestRequestManager testRequestManager)
         {
             var isSessionEnd = false;
-            // Todo : Add exception handling here. Do we want some way of notifying the caller if for some reason deserialization throws exception.
+
             do
             {
-                var message = this.communicationManager.ReceiveMessage();
-                switch (message.MessageType)
+                try
                 {
-                    case MessageType.VersionCheck:
-                        {
-                            // At this point, we cannot add stuff to object model like "ProtocolVersionMessage"
-                            // as that cannot be acessed from testwindow which still uses TP-V1
-                            // we are sending a version number as an integer for now
-                            // TODO: Find a better way without breaking TW which using TP-V1
-                            var payload = 1;
-                            this.communicationManager.SendMessage(MessageType.VersionCheck, payload);
-                            break;
-                        }
+                    var message = this.communicationManager.ReceiveMessage();
 
-                    case MessageType.ExtensionsInitialize:
-                        {
-                            var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
-                            testRequestManager.InitializeExtensions(extensionPaths);
-                            break;
-                        }
+                    EqtTrace.Info("DesignModeClient: Processing Message of message type: {0}", message.MessageType);
+                    switch (message.MessageType)
+                    {
+                        case MessageType.VersionCheck:
+                            {
+                                // At this point, we cannot add stuff to object model like "ProtocolVersionMessage"
+                                // as that cannot be acessed from testwindow which still uses TP-V1
+                                // we are sending a version number as an integer for now
+                                // TODO: Find a better way without breaking TW which using TP-V1
+                                var payload = 1;
+                                this.communicationManager.SendMessage(MessageType.VersionCheck, payload);
+                                break;
+                            }
 
-                    case MessageType.StartDiscovery:
-                        {
-                            var discoveryPayload = message.Payload.ToObject<DiscoveryRequestPayload>();
-                            testRequestManager.DiscoverTests(discoveryPayload, new DesignModeTestEventsRegistrar(this));
-                            break;
-                        }
+                        case MessageType.ExtensionsInitialize:
+                            {
+                                var extensionPaths = this.communicationManager.DeserializePayload<IEnumerable<string>>(message);
+                                testRequestManager.InitializeExtensions(extensionPaths);
+                                break;
+                            }
 
-                    case MessageType.GetTestRunnerProcessStartInfoForRunAll:
-                    case MessageType.GetTestRunnerProcessStartInfoForRunSelected:
-                        {
-                            var testRunPayload =
-                                this.communicationManager.DeserializePayload<TestRunRequestPayload>(
-                                    message);
-                            this.StartTestRun(testRunPayload, testRequestManager, skipTestHostLaunch: true);
-                            break;
-                        }
+                        case MessageType.StartDiscovery:
+                            {
+                                var discoveryPayload = message.Payload.ToObject<DiscoveryRequestPayload>();
+                                testRequestManager.DiscoverTests(discoveryPayload, new DesignModeTestEventsRegistrar(this));
+                                break;
+                            }
 
-                    case MessageType.TestRunAllSourcesWithDefaultHost:
-                    case MessageType.TestRunSelectedTestCasesDefaultHost:
-                        {
-                            var testRunPayload =
-                                this.communicationManager.DeserializePayload<TestRunRequestPayload>(
-                                    message);
-                            this.StartTestRun(testRunPayload, testRequestManager, skipTestHostLaunch: false);
-                            break;
-                        }
+                        case MessageType.GetTestRunnerProcessStartInfoForRunAll:
+                        case MessageType.GetTestRunnerProcessStartInfoForRunSelected:
+                            {
+                                var testRunPayload =
+                                    this.communicationManager.DeserializePayload<TestRunRequestPayload>(
+                                        message);
+                                this.StartTestRun(testRunPayload, testRequestManager, skipTestHostLaunch: true);
+                                break;
+                            }
 
-                    case MessageType.CancelTestRun:
-                        {
-                            testRequestManager.CancelTestRun();
-                            break;
-                        }
+                        case MessageType.TestRunAllSourcesWithDefaultHost:
+                        case MessageType.TestRunSelectedTestCasesDefaultHost:
+                            {
+                                var testRunPayload =
+                                    this.communicationManager.DeserializePayload<TestRunRequestPayload>(
+                                        message);
+                                this.StartTestRun(testRunPayload, testRequestManager, skipTestHostLaunch: false);
+                                break;
+                            }
 
-                    case MessageType.AbortTestRun:
-                        {
-                            testRequestManager.AbortTestRun();
-                            break;
-                        }
-                    case MessageType.CustomTestHostLaunchCallback:
-                        {
-                            this.onAckMessageReceived?.Invoke(message);
-                            break;
-                        }
-                    case MessageType.SessionEnd:
-                        {
-                            EqtTrace.Info("Session End message received from server. Closing the connection.");
-                            isSessionEnd = true;
-                            this.Dispose();
-                            break;
-                        }
+                        case MessageType.CancelTestRun:
+                            {
+                                testRequestManager.CancelTestRun();
+                                break;
+                            }
 
-                    default:
-                        {
-                            EqtTrace.Info("Invalid Message types");
-                            break;
-                        }
+                        case MessageType.AbortTestRun:
+                            {
+                                testRequestManager.AbortTestRun();
+                                break;
+                            }
+                        case MessageType.CustomTestHostLaunchCallback:
+                            {
+                                this.onAckMessageReceived?.Invoke(message);
+                                break;
+                            }
+                        case MessageType.SessionEnd:
+                            {
+                                EqtTrace.Info("DesignModeClient: Session End message received from server. Closing the connection.");
+                                isSessionEnd = true;
+                                this.Dispose();
+                                break;
+                            }
+
+                        default:
+                            {
+                                EqtTrace.Info("DesignModeClient: Invalid Message received: {0}", message);
+                                break;
+                            }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    EqtTrace.Error("DesignModeClient: Error processing request: {0}", ex);
+                    isSessionEnd = true;
+                    this.Dispose();
                 }
             }
             while (!isSessionEnd);
@@ -234,5 +245,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this));
             });
         }
+
+        #region IDisposable Support
+
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    this.communicationManager?.StopClient();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+        }
+
+        #endregion
     }
 }

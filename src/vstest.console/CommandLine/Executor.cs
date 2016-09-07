@@ -208,7 +208,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // see the command again and the value is 1 (meaning this is the second time we have seen the command),
             // we will output an error and increment the count.  This ensures that the error message will only be
             // displayed once even if the user does something like /ListDiscoverers /ListDiscoverers /ListDiscoverers.
-            Dictionary<string, int> commandSeenCount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var commandSeenCount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             // Check each processor.
             foreach (var processor in argumentProcessors)

@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     // <summary>
-    //     Argument Executor for the "/?" Help command line argument.
+    //     Argument Executor for the "-?|--Help|/?|/Help" Help command line argument.
     // </summary>
     internal class HelpArgumentProcessor : IArgumentProcessor
     {
@@ -19,7 +19,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// The name of the command line argument that the HelpArgumentExecutor handles.
         /// </summary>
-        public const string CommandName = "/?";
+        public const string CommandName = "/Help";
+
+        /// <summary>
+        /// The short name of the command line argument that the HelpArgumentExecutor handles.
+        /// </summary>
+        public const string ShortCommandName = "/?";
+
 
         #endregion
 
@@ -72,6 +78,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         public override string CommandName => HelpArgumentProcessor.CommandName;
 
+        public override string ShortCommandName => HelpArgumentProcessor.ShortCommandName;
+
         public override string HelpContentResourceName => Resources.HelpArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.HelpArgumentProcessorHelpPriority;
@@ -118,16 +126,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Output the stock ouput text
             OutputSection(Resources.HelpUsageText);
             OutputSection(Resources.HelpDescriptionText);
-            OutputSection(Resources.HelpOptionsText);
+            OutputSection(Resources.HelpArgumentsText);
 
-            // Output the help description for each available argument processor
             var argumentProcessorFactory = ArgumentProcessorFactory.Create();
             List<IArgumentProcessor> processors = new List<IArgumentProcessor>();
             processors.AddRange(argumentProcessorFactory.AllArgumentProcessors);
             processors.Sort((p1, p2) => Comparer<HelpContentPriority>.Default.Compare(p1.Metadata.Value.HelpPriority, p2.Metadata.Value.HelpPriority));
+
+            // Output the help description for RunTestsArgumentProcessor
+            IArgumentProcessor runTestsArgumentProcessor = processors.Find(p1 => p1.GetType() == typeof(RunTestsArgumentProcessor));
+            processors.Remove(runTestsArgumentProcessor);
+            var helpDescription = LookupHelpDescription(runTestsArgumentProcessor);
+            if (helpDescription != null)
+            {
+                OutputSection(helpDescription);
+            }
+
+            // Output the help description for each available argument processor
+            OutputSection(Resources.HelpOptionsText);
             foreach (var argumentProcessor in processors)
             {
-                var helpDescription = LookupHelpDescription(argumentProcessor);
+                helpDescription = LookupHelpDescription(argumentProcessor);
                 if (helpDescription != null)
                 {
                     OutputSection(helpDescription);

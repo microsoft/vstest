@@ -55,5 +55,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
         {
             this.TestStartedList.Add(testCase);
         }
+
+        public void Dispose()
+        {
+        }
     }
 }

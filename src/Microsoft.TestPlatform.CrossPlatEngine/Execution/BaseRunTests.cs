@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.IO;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -22,8 +22,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
 
     /// <summary>
     /// The base run tests.
@@ -35,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private string runSettings;
         private TestExecutionContext testExecutionContext;
         private ITestRunEventsHandler testRunEventsHandler;
+        private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
         private ITestRunCache testRunCache;
 
         /// <summary>
@@ -68,7 +70,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testPlatformEventSource"></param>
         public BaseRunTests(ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, TestPlatformEventSource testPlatformEventSource)
         {
-            this.testRunCache = testRunCache;
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;
             this.testCaseEventsHandler = testCaseEventsHandler;
@@ -81,6 +82,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private void SetContext()
         {
+            this.testRunCache = new TestRunCache(testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
+            this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache);
+
+            // Verify if datacollection is enabled and wrap the testcasehandler around to get the events 
+            if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
+            {
+                this.testCaseEventsHandler = new TestCaseEventsHandler(inProcDataCollectionExtensionManager, this.testCaseEventsHandler);
+            }
+            else
+            {
+                // No need to call any methods on this, if inproc-datacollection is not enabled
+                inProcDataCollectionExtensionManager = null;
+            }
+
             this.runContext = new RunContext();
             this.runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(this.runSettings);
             this.runContext.KeepAlive = this.testExecutionContext.KeepAlive;
@@ -136,50 +151,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         #endregion
 
         #region Public methods
-        
+
         public void RunTests()
         {
-            try
+            using (testRunCache)
             {
-                this.RunTestsInternal();
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestExecutionManager.RunTests: Failed to run the tests. Reason: {0}.", ex);
-                }
+                TimeSpan elapsedTime = TimeSpan.Zero;
 
-                var runCompletionError = new Exception(ex.Message, ex.InnerException);
+                Exception exception = null;
+                bool isAborted = false;
+                bool shutdownAfterRun = false;
 
                 try
                 {
-                    this.RaiseTestRunComplete(runCompletionError, this.isCancellationRequested, true, false, TimeSpan.Zero);
+                    // Call Session-Start event on in-proc datacollectors
+                    this.inProcDataCollectionExtensionManager?.TriggerTestSessionStart();
+
+                    elapsedTime = this.RunTestsInternal();
+
+                    // Flush any results cached by in-proc manager
+                    inProcDataCollectionExtensionManager?.FlushLastChunkResults();
+
+                    // Check the adapter setting for shutting down this process after run
+                    shutdownAfterRun = this.frameworkHandle.EnableShutdownAfterTestRun;
                 }
-                catch (Exception ex2)
+                catch (Exception ex)
                 {
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("TestExecutionManager.RunTests: Failed to raise runCompletion error. Reason: {0}.", ex2);
+                        EqtTrace.Error("BaseRunTests.RunTests: Failed to run the tests. Reason: {0}.", ex);
                     }
 
-                    // Todo: aajohn this does not crash the process currently because of the job queue.
-                    // Let the process crash
-                    throw;
-                }
+                    exception = new Exception(ex.Message, ex.InnerException);
 
-                // No need to crash the process if the exception is a IO exception. bugfix #575875
-                if (ex is FileNotFoundException
-                    || ex is ArgumentException)
+                    isAborted = true;
+                }
+                finally
                 {
-                    return;
-                }
+                    // Trigger Session End on in-proc datacollectors
+                    inProcDataCollectionExtensionManager?.TriggerTestSessionEnd();
 
-                // Let the process crash.
-                throw;
+                    try
+                    {
+                        // Send the test run complete event.
+                        this.RaiseTestRunComplete(exception, this.isCancellationRequested, isAborted, shutdownAfterRun, elapsedTime);
+                    }
+                    catch (Exception ex2)
+                    {
+                        if (EqtTrace.IsErrorEnabled)
+                        {
+                            EqtTrace.Error("BaseRunTests.RunTests: Failed to raise runCompletion error. Reason: {0}.", ex2);
+                        }
+
+                        // TODO: aajohn this does not crash the process currently because of the job queue.
+                        // Let the process crash
+                        throw;
+                    }
+                }
             }
 
-            EqtTrace.Verbose("TestExecutionManager.RunTests: Run is complete.");
+            EqtTrace.Verbose("BaseRunTests.RunTests: Run is complete.");
         }
 
         internal void Abort()
@@ -227,7 +258,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         #region Private methods
 
-        private void RunTestsInternal()
+        private TimeSpan RunTestsInternal()
         {
             long totalTests = 0;
 
@@ -246,9 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             stopwatch.Stop();
             this.testPlatformEventSource?.ExecutionStop(totalTests);
             this.BeforeRaisingTestRunComplete(exceptionsHitDuringRunTests);
-
-            // Send the test run complete event.
-            this.RaiseTestRunComplete(null, this.isCancellationRequested, false, this.frameworkHandle.EnableShutdownAfterTestRun, stopwatch.Elapsed);
+            return stopwatch.Elapsed;
         }
 
         [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "This methods must call all possible executors and not fail on crash in any executor.")]
@@ -271,7 +300,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose(
-                                "TestExecutionManager.RunTests: Running tests for {0}",
+                                "BaseRunTests.RunTestInternalWithExecutors: Running tests for {0}",
                                 executor.Metadata.ExtensionUri);
                         }
 
@@ -301,7 +330,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose(
-                                "TestExecutionManager.RunTests: Completed running tests for {0}",
+                                "TestExecutionManager.RunTestInternalWithExecutors: Completed running tests for {0}",
                                 executor.Metadata.ExtensionUri);
                         }
                     }
@@ -312,7 +341,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         if (EqtTrace.IsErrorEnabled)
                         {
                             EqtTrace.Error(
-                                "TestExecutionManager.RunTests: An exception occurred while invoking executor {0}. {1}.",
+                                "TestExecutionManager.RunTestInternalWithExecutors: An exception occurred while invoking executor {0}. {1}.",
                                 executorUriExtensionTuple.Item1,
                                 e);
                         }
@@ -363,7 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             catch (Exception ex)
             {
                 EqtTrace.Error(
-                    "TestExecutorExtensionManager: Get Executor Extensions: Exception occured while loading extensions {0}",
+                    "BaseRunTests: GetExecutorExtensionManager: Exception occured while loading extensions {0}",
                     ex);
 
                 return null;
@@ -393,12 +422,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             bool adapterHintToShutdownAfterRun,
             TimeSpan elapsedTime)
         {
-            var runStats = this.testRunCache != null
-                                        ? this.testRunCache.TestRunStatistics
-                                        : new TestRunStatistics(new Dictionary<TestOutcome, long>());
-            var lastChunk = this.testRunCache != null
-                                                    ? this.testRunCache.GetLastChunk()
-                                                    : new List<TestResult>();
+            var runStats = this.testRunCache?.TestRunStatistics ?? new TestRunStatistics(new Dictionary<TestOutcome, long>());
+            var lastChunk = this.testRunCache?.GetLastChunk() ?? new List<TestResult>();
+
             if (this.testRunEventsHandler != null)
             {
                 Collection<AttachmentSet> attachments = this.frameworkHandle?.Attachments;
@@ -421,6 +447,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             else
             {
                 EqtTrace.Warning("Could not pass run completion as the callback is null. Aborted :{0}", aborted);
+            }
+        }
+
+        private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTests)
+        {
+            if (this.testRunEventsHandler != null)
+            {
+                var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
+                this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
+            }
+            else
+            {
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("BaseRunTests.OnCacheHit: Unable to send TestRunStatsChange Event as TestRunEventsHandler is NULL");
+                }
             }
         }
 

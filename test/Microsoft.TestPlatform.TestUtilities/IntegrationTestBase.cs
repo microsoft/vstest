@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns>Command line arguments string.</returns>
         public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings)
         {
-            string arguments;
+            string arguments = " /platform:x64 ";
             if (string.IsNullOrWhiteSpace(runSettings))
             {
                 arguments = string.Concat("\"", testAssembly, "\"", " /testadapterpath:\"", testAdapterPath, "\"");
@@ -226,7 +226,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 stdError = vstestconsole.StandardError.ReadToEnd();
                 stdOut = vstestconsole.StandardOutput.ReadToEnd();
 
-                vstestconsole.WaitForExit();
+                vstestconsole.WaitForExit(5 * 60 * 1000);
                 Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
             }
         }

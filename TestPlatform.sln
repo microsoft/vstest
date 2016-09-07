@@ -91,7 +91,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.TestPlatform.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestAssets", "TestAssets", "{50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestImpactListener.Tests", "test\TestAssets\TestImpactListener.Tests\TestImpactListener.Tests.xproj", "{D7F7A9F5-5646-44E7-990C-500844E9272E}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleDataCollector", "test\TestAssets\SimpleDataCollector\SimpleDataCollector.xproj", "{D7F7A9F5-5646-44E7-990C-500844E9272E}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleTestProject", "test\TestAssets\SimpleTestProject\SimpleTestProject.xproj", "{0CC51637-B665-47B0-A093-042D31785928}"
 EndProject

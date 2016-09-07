@@ -4,13 +4,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System.Collections.Generic;
 
-    using ObjectModel;
-    using ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using System;
 
     /// <summary>
     /// The cache for test execution information.
     /// </summary>
-    internal interface ITestRunCache
+    internal interface ITestRunCache : IDisposable
     {
         #region Properties
 
