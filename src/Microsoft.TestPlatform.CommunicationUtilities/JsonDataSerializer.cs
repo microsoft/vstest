@@ -8,7 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    
+    using Newtonsoft.Json.Serialization;
+
     /// <summary>
     /// JsonDataSerializes serializes and deserializes data using Json format
     /// </summary>
@@ -20,9 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private JsonDataSerializer()
         {
+            ITraceWriter traceWriter = new MemoryTraceWriter();
             serializer = JsonSerializer.Create(
                             new JsonSerializerSettings
                                 {
+                                    TraceWriter = traceWriter,
                                     ContractResolver = new TestPlatformContractResolver(),
                                     TypeNameHandling = TypeNameHandling.None
                                 });

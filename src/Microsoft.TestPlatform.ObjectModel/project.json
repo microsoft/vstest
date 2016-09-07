@@ -1,13 +1,12 @@
 {
   "version": "15.0.0-*",
   "buildOptions": {
-    "outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
+    //"outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true
   },
   "dependencies": {
-    "Newtonsoft.Json": "7.0.1",
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*"
   },
   "frameworks": {
@@ -33,7 +32,9 @@
         "System.ComponentModel.EventBasedAsync": "4.0.11-rc2-24018",
         "System.Runtime.InteropServices": "4.1.0",
         "System.IO.FileSystem": "4.0.1",
-        "System.ComponentModel.TypeConverter": "4.1.0"
+        "System.ComponentModel.TypeConverter": "4.1.0",
+        "System.Security.Cryptography.Algorithms": "4.2.0",
+        "System.Runtime.Serialization.Json":  "4.0.0"
       }
     }
   }

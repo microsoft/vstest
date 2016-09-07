@@ -7,8 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Runtime.Serialization;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Newtonsoft.Json;
 
     /// <summary>
     /// Event arguments used when a test run has completed.

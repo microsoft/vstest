@@ -4,26 +4,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
+    using Common.UnitTests.ExtensionFramework;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
 
     using TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
-    using Moq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using System.Collections.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System.IO;
-    using Common.UnitTests.ExtensionFramework;
-    using System.Reflection;
-    //using Microsoft.Extensions.PlatformAbstractions;
-    using System.Linq;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -42,13 +43,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             this.testableTestRunCache = new TestableTestRunCache();
             this.testExecutionContext = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: null);
+                          frequencyOfRunStatsChangeEvent: 100,
+                          runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                          inIsolation: false,
+                          keepAlive: false,
+                          isDataCollectionEnabled: false,
+                          areTestCaseLevelEventsRequired: false,
+                          hasTestRun: false,
+                          isDebug: false,
+                          testCaseFilter: string.Empty);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             this.runTestsInstance = new TestableBaseRunTests(

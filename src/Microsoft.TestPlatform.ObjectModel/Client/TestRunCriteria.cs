@@ -5,109 +5,178 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Text;
     using System.Linq;
+    using System.Runtime.Serialization;
+    using System.Text;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using Newtonsoft.Json;
 
     /// <summary>
     /// Defines the testRun criterion
     /// </summary>
     public class TestRunCriteria : BaseTestRunCriteria, ITestRunConfiguration
     {
-        #region Constructors that take list of source strings
+        private string testCaseFilter;
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>          
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
+        /// <param name="sources">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
         public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent)
-            :this(sources, frequencyOfRunStatsChangeEvent, true)
+            : this(sources, frequencyOfRunStatsChangeEvent, true)
         {
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-        /// <param name="keepAlive">Whether the execution process should be kept alive after the run is finished or not.</param>
+        /// <param name="sources">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether the execution process should be kept alive after the run is finished or not.
+        /// </param>
         public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent, bool keepAlive)
             : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, string.Empty)
         {
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-        /// <param name="keepAlive">Whether the execution process should be kept alive after the run is finished or not.</param>
-        /// <param name="testSettings">Settings used for this run.</param>
+        /// <param name="sources">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether the execution process should be kept alive after the run is finished or not.
+        /// </param>
+        /// <param name="testSettings">
+        /// Settings used for this run.
+        /// </param>
         public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings)
             : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, TimeSpan.MaxValue)
         {
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-        /// <param name="testRunSettings">List of TestRunSettings for all providers as applicable for current run.</param>
-        /// <param name="keepAlive">Whether the execution process should be kept alive after the run is finished or not.</param>
-        /// <param name="runStatsChangeEventTimeout">Timeout that triggers sending results regardless of cache size.</param>
+        /// <param name="sources">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether the execution process should be kept alive after the run is finished or not.
+        /// </param>
+        /// <param name="testSettings">
+        /// The test Settings.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout that triggers sending results regardless of cache size.
+        /// </param>
         public TestRunCriteria(IEnumerable<string> sources, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout)
             : this(sources, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, null)
         {
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// Create the TestRunCriteria for a test run
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>        
-        /// <param name="baseTestRunCriteria">The BaseTestRunCriteria</param>
+        /// <param name="sources">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="baseTestRunCriteria">
+        /// The BaseTestRunCriteria
+        /// </param>
         public TestRunCriteria(IEnumerable<string> sources, BaseTestRunCriteria baseTestRunCriteria)
             : base(baseTestRunCriteria)
         {
-            ValidateArg.NotNullOrEmpty(sources, "sources");
+            var testSources = sources as IList<string> ?? sources.ToArray();
+            ValidateArg.NotNullOrEmpty(testSources, "sources");
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, sources);
+            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-		/// <param name="testSettings">Settings used for this run.</param>
-        /// <param name="keepAlive">Whether the execution process should be kept alive after the run is finished or not.</param>
-        /// <param name="runStatsChangeEventTimeout">Timeout that triggers sending results regardless of cache size.</param>
-        /// <param name="testHostLauncher">Test host launcher. If null then default will be used.</param>
-        public TestRunCriteria(IEnumerable<string> sources, 
-               long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, 
-               TimeSpan runStatsChangeEventTimeout, ITestHostLauncher testHostLauncher)
-            : base (frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
+        /// <param name="sources">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether the execution process should be kept alive after the run is finished or not.
+        /// </param>
+        /// <param name="testSettings">
+        /// Settings used for this run.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout that triggers sending results regardless of cache size.
+        /// </param>
+        /// <param name="testHostLauncher">
+        /// Test host launcher. If null then default will be used.
+        /// </param>
+        public TestRunCriteria(
+            IEnumerable<string> sources,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout,
+            ITestHostLauncher testHostLauncher)
+            : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
-            ValidateArg.NotNullOrEmpty(sources, "sources");
+            var testSources = sources as IList<string> ?? sources.ToList();
+            ValidateArg.NotNullOrEmpty(testSources, "sources");
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
-            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, sources);
+            this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, testSources);
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-		/// <param name="testSettings">Settings used for this run.</param>
-        /// <param name="keepAlive">Whether the execution process should be kept alive after the run is finished or not.</param>
-        /// <param name="runStatsChangeEventTimeout">Timeout that triggers sending results regardless of cache size.</param>
-        /// <param name="testHostLauncher">Test host launcher. If null then default will be used.</param>
-        public TestRunCriteria(Dictionary<string, IEnumerable<string>> adapterSourceMap, long frequencyOfRunStatsChangeEvent, bool keepAlive, 
-            string testSettings, TimeSpan runStatsChangeEventTimeout, ITestHostLauncher testHostLauncher)
+        /// <param name="adapterSourceMap">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether the execution process should be kept alive after the run is finished or not.
+        /// </param>
+        /// <param name="testSettings">
+        /// Settings used for this run.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout that triggers sending results regardless of cache size.
+        /// </param>
+        /// <param name="testHostLauncher">
+        /// Test host launcher. If null then default will be used.
+        /// </param>
+        public TestRunCriteria(
+            Dictionary<string, IEnumerable<string>> adapterSourceMap,
+            long frequencyOfRunStatsChangeEvent,
+            bool keepAlive,
+            string testSettings,
+            TimeSpan runStatsChangeEventTimeout,
+            ITestHostLauncher testHostLauncher)
             : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
             ValidateArg.NotNullOrEmpty(adapterSourceMap, "adapterSourceMap");
@@ -115,92 +184,132 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.AdapterSourceMap = adapterSourceMap;
         }
 
-        #endregion
-
-        #region Constructors that take list of test cases
-
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="tests">Tests which should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
+        /// <param name="tests">
+        /// Tests which should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
         public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent)
-            :this(tests, frequencyOfRunStatsChangeEvent, false)
+            : this(tests, frequencyOfRunStatsChangeEvent, false)
         {
         }
-        
+
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="tests">Tests which should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-        /// <param name="keepAlive">Whether or not to keep the test executor process alive after run completion</param>
+        /// <param name="tests">
+        /// Tests which should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether or not to keep the test executor process alive after run completion
+        /// </param>
         public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive)
             : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, string.Empty)
         {
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="tests">Tests which should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-        /// <param name="keepAlive">Whether or not to keep the test executor process alive after run completion</param>
-        /// <param name="testSettings">Settings used for this run.</param>
+        /// <param name="tests">
+        /// Tests which should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether or not to keep the test executor process alive after run completion
+        /// </param>
+        /// <param name="testSettings">
+        /// Settings used for this run.
+        /// </param>
         public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings)
             : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, TimeSpan.MaxValue)
         {
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="tests">Tests which should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-        /// <param name="keepAlive">Whether or not to keep the test executor process alive after run completion</param>
-        /// <param name="testSettings">Settings used for this run.</param>
-        /// <param name="runStatsChangeEventTimeout">Timeout that triggers sending results regardless of cache size.</param>
+        /// <param name="tests">
+        /// Tests which should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether or not to keep the test executor process alive after run completion
+        /// </param>
+        /// <param name="testSettings">
+        /// Settings used for this run.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout that triggers sending results regardless of cache size.
+        /// </param>
         public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout)
             : this(tests, frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, null)
         {
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="tests">Tests which should be executed</param>        
-        /// <param name="baseTestRunCriteria">The BaseTestRunCriteria</param>
+        /// <param name="tests">
+        /// Tests which should be executed
+        /// </param>
+        /// <param name="baseTestRunCriteria">
+        /// The BaseTestRunCriteria
+        /// </param>
         public TestRunCriteria(IEnumerable<TestCase> tests, BaseTestRunCriteria baseTestRunCriteria)
             : base(baseTestRunCriteria)
         {
-            ValidateArg.NotNullOrEmpty(tests, "tests");
-            this.Tests = tests;
+            var testCases = tests as IList<TestCase> ?? tests.ToList();
+            ValidateArg.NotNullOrEmpty(testCases, "tests");
+
+            this.Tests = testCases;
         }
 
         /// <summary>
-        /// Create the TestRunCriteria for a test run
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
         /// </summary>
-        /// <param name="sources">Sources which contains tests that should be executed</param>        
-        /// <param name="frequencyOfRunStatsChangeEvent">Frequency of run stats event</param>
-        /// <param name="keepAlive">Whether or not to keep the test executor process alive after run completion</param>
-        /// <param name="testSettings">Settings used for this run.</param>
-        /// <param name="runStatsChangeEventTimeout">Timeout that triggers sending results regardless of cache size.</param>
-        /// <param name="testHostLauncher">Test host launcher. If null then default will be used.</param>
+        /// <param name="tests">
+        /// Sources which contains tests that should be executed
+        /// </param>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of run stats event
+        /// </param>
+        /// <param name="keepAlive">
+        /// Whether or not to keep the test executor process alive after run completion
+        /// </param>
+        /// <param name="testSettings">
+        /// Settings used for this run.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout that triggers sending results regardless of cache size.
+        /// </param>
+        /// <param name="testHostLauncher">
+        /// Test host launcher. If null then default will be used.
+        /// </param>
         public TestRunCriteria(IEnumerable<TestCase> tests, long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout, ITestHostLauncher testHostLauncher)
             : base(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, testHostLauncher)
         {
-            ValidateArg.NotNullOrEmpty(tests, "tests");
+            var testCases = tests as IList<TestCase> ?? tests.ToList();
+            ValidateArg.NotNullOrEmpty(testCases, "tests");
 
-            this.Tests = tests;
+            this.Tests = testCases;
         }
 
-        #endregion
-        
-
         /// <summary>
-        /// Test Containers (e.g. DLL/EXE/artifacts to scan)
+        /// Gets the test Containers (e.g. DLL/EXE/artifacts to scan).
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         public IEnumerable<string> Sources
         {
             get
@@ -211,26 +320,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// The test adapter and source map which would look like below:
+        /// Gets the test adapter and source map which would look like below:
+        /// <code>
         /// { C:\temp\testAdapter1.dll : [ source1.dll, source2.dll ], C:\temp\testadapter2.dll : [ source3.dll, source2.dll ]
+        /// </code>
         /// </summary>
-        public Dictionary<string, IEnumerable<string>> AdapterSourceMap
-        {
-            get; private set;
-        }
+        [DataMember]
+        public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
 
         /// <summary>
-        /// Tests that need to executed in this test run. 
-        /// 
+        /// Gets the tests that need to executed in this test run. 
         /// This will be null if test run is created with specific test containers
         /// </summary>
+        [DataMember]
         public IEnumerable<TestCase> Tests { get; private set; }
 
-        private string testCaseFilter;
-
         /// <summary>
-        /// Criteria for filtering test cases. This is only for with sources.
+        /// Gets or sets the criteria for filtering test cases.
         /// </summary>
+        /// <remarks>This is only for with sources.</remarks>
+        [DataMember]
         public string TestCaseFilter
         {
             get
@@ -250,39 +359,52 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Returns whether run criteria is based on specific tests 
+        /// Gets a value indicating whether run criteria is based on specific tests.
         /// </summary>
         public bool HasSpecificTests
         {
-            get { return Tests != null; }
+            get { return this.Tests != null; }
         }
 
         /// <summary>
-        /// Returns whether run criteria is based on specific sources 
+        /// Gets a value indicating whether run criteria is based on specific sources.
         /// </summary>
+        [DataMember]
         public bool HasSpecificSources
         {
-            get { return Sources != null; }
+            get { return this.Sources != null; }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "TestRunCriteria:"));
-            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   KeepAlive={0},FrequencyOfRunStatsChangeEvent={1},RunStatsChangeEventTimeout={2},TestCaseFilter={3},TestExecutorLauncher={4}", 
-                                            KeepAlive, FrequencyOfRunStatsChangeEvent, RunStatsChangeEventTimeout, TestCaseFilter, TestHostLauncher));
-            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   Settingsxml={0}", TestRunSettings));
+            sb.AppendLine(string.Format(
+                    CultureInfo.CurrentCulture,
+                    "   KeepAlive={0},FrequencyOfRunStatsChangeEvent={1},RunStatsChangeEventTimeout={2},TestCaseFilter={3},TestExecutorLauncher={4}",
+                    this.KeepAlive,
+                    this.FrequencyOfRunStatsChangeEvent,
+                    this.RunStatsChangeEventTimeout,
+                    this.TestCaseFilter,
+                    this.TestHostLauncher));
+            sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   Settingsxml={0}", this.TestRunSettings));
 
             return sb.ToString();
         }
     }
-
 
     /// <summary>
     /// Defines the base testRun criterion
     /// </summary>
     public class BaseTestRunCriteria
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
+        /// </summary>
+        /// <param name="runCriteria">
+        /// Run criteria to clone.
+        /// </param>
         public BaseTestRunCriteria(BaseTestRunCriteria runCriteria)
         {
             ValidateArg.NotNull(runCriteria, "runCriteria");
@@ -294,31 +416,97 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.TestHostLauncher = runCriteria.TestHostLauncher;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
+        /// </summary>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of <c>TestRunChangedEvent</c>.
+        /// </param>
         public BaseTestRunCriteria(long frequencyOfRunStatsChangeEvent)
             : this(frequencyOfRunStatsChangeEvent, true)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
+        /// </summary>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of <c>TestRunChangedEvent</c>.
+        /// </param>
+        /// <param name="keepAlive">
+        /// Specify if the test host process should be stay alive after run.
+        /// </param>
         public BaseTestRunCriteria(long frequencyOfRunStatsChangeEvent, bool keepAlive)
             : this(frequencyOfRunStatsChangeEvent, keepAlive, string.Empty)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
+        /// </summary>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of <c>TestRunChangedEvent</c>.
+        /// </param>
+        /// <param name="keepAlive">
+        /// Specify if the test host process should be stay alive after run.
+        /// </param>
+        /// <param name="testSettings">
+        /// Test run settings.
+        /// </param>
         public BaseTestRunCriteria(long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings)
             : this(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, TimeSpan.MaxValue)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
+        /// </summary>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of <c>TestRunChangedEvent</c>.
+        /// </param>
+        /// <param name="keepAlive">
+        /// Specify if the test host process should be stay alive after run.
+        /// </param>
+        /// <param name="testSettings">
+        /// Test run settings.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout for a <c>TestRunChangedEvent</c>.
+        /// </param>
         public BaseTestRunCriteria(long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout)
             : this(frequencyOfRunStatsChangeEvent, keepAlive, testSettings, runStatsChangeEventTimeout, null)
         {
         }
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseTestRunCriteria"/> class.
+        /// </summary>
+        /// <param name="frequencyOfRunStatsChangeEvent">
+        /// Frequency of <c>TestRunChangedEvent</c>.
+        /// </param>
+        /// <param name="keepAlive">
+        /// Specify if the test host process should be stay alive after run.
+        /// </param>
+        /// <param name="testSettings">
+        /// Test run settings.
+        /// </param>
+        /// <param name="runStatsChangeEventTimeout">
+        /// Timeout for a <c>TestRunChangedEvent</c>.
+        /// </param>
+        /// <param name="testHostLauncher">
+        /// Test host launcher.
+        /// </param>
         public BaseTestRunCriteria(long frequencyOfRunStatsChangeEvent, bool keepAlive, string testSettings, TimeSpan runStatsChangeEventTimeout, ITestHostLauncher testHostLauncher)
         {
-            if (frequencyOfRunStatsChangeEvent <= 0) throw new ArgumentOutOfRangeException("frequencyOfRunStatsChangeEvent", Resources.NotificationFrequencyIsNotPositive);
-            if (runStatsChangeEventTimeout <= TimeSpan.MinValue) throw new ArgumentOutOfRangeException("runStatsChangeEventTimeout", Resources.NotificationTimeoutIsZero);
+            if (frequencyOfRunStatsChangeEvent <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(frequencyOfRunStatsChangeEvent), Resources.NotificationFrequencyIsNotPositive);
+            }
+
+            if (runStatsChangeEventTimeout <= TimeSpan.MinValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(runStatsChangeEventTimeout), Resources.NotificationTimeoutIsZero);
+            }
 
             this.FrequencyOfRunStatsChangeEvent = frequencyOfRunStatsChangeEvent;
             this.KeepAlive = keepAlive;
@@ -328,22 +516,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Whether or not to keep the test executor process alive after run completion.
+        /// Gets a value indicating whether the test executor process should remain alive after run completion.
         /// </summary>
+        [DataMember]
         public bool KeepAlive { get; private set; }
 
         /// <summary>
-        /// Settings used for this run.
+        /// Gets the settings used for this run.
         /// </summary>
+        [DataMember]
         public string TestRunSettings { get; private set; }
 
         /// <summary>
-        /// Custom launcher for test executor.
+        /// Gets the custom launcher for test executor.
         /// </summary>
+        [DataMember]
         public ITestHostLauncher TestHostLauncher { get; private set; }
 
         /// <summary>
-        /// Defines the frequency of run stats test event. 
+        /// Gets the frequency of run stats test event. 
         /// </summary>
         /// <remarks>
         /// Run stats change event will be raised after completion of these number of tests. 
@@ -351,12 +542,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// paused during the listener invocation. So if the event handler, you try to query the 
         /// next set of results, you may get more than 'FrequencyOfRunStatsChangeEvent'.
         /// </remarks>        
+        [DataMember]
         public long FrequencyOfRunStatsChangeEvent { get; private set; }
 
         /// <summary>
-        /// Timeout that triggers sending results regardless of cache size.
+        /// Gets the timeout that triggers sending results regardless of cache size.
         /// </summary>
+        [DataMember]
         public TimeSpan RunStatsChangeEventTimeout { get; private set; }
     }
-
 }

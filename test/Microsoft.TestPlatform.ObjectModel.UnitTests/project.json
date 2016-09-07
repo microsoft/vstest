@@ -13,7 +13,8 @@
       "version": "1.0.3-preview",
       "exclude": "compile"
     },
-    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*"
+    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+    "Newtonsoft.Json": "7.0.1" 
   },
 
   "frameworks": {

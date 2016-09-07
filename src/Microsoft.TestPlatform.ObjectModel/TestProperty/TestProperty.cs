@@ -5,76 +5,29 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Runtime.Serialization;
     using System.Reflection;
-    using Newtonsoft.Json;
-#if NET46
-using System.Security.Permissions;
-#endif
+    using System.Runtime.Serialization;
 
     public delegate bool ValidateValueCallback(object value);
 
     [DataContract]
     public class TestProperty : IEquatable<TestProperty>
-#if NET46
-    ,IObjectReference
-#endif
     {
         #region Fields
 
-        [DataMember]
-#if FullCLR
-        private string _id;
-#else
-        public string _id;
-#endif
-
-        [DataMember]
-#if FullCLR
-        private string _label;
-#else
-        public string _label;
-#endif
-
-        [DataMember]
-#if FullCLR
-        private string _description;
-#else
-        public string _description;
-#endif
-
-        [DataMember]
-#if FullCLR
-        private string _category;
-#else
-        public string _category;
-#endif
-
         private Type valueType;
-
-        [DataMember]
-#if FullCLR
-        private string _strValueType;
-#else
-        public string _strValueType;
-#endif
-
-        [DataMember]
-#if FullCLR
-        private TestPropertyAttributes _attributes;
-#else
-        public TestPropertyAttributes _attributes;
-#endif
-
-        private readonly ValidateValueCallback validateValueCallback;
 
         #endregion Fields
 
         #region Constructors
 
-        // Constructor used only while json deserialization 
-        [JsonConstructor]
-        private TestProperty() { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestProperty"/> class.
+        /// </summary>
+        private TestProperty()
+        {
+            // Default constructor for Serialization.
+        }
 
         private TestProperty(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes)
         {
@@ -87,27 +40,33 @@ using System.Security.Permissions;
             // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db. Fixed bug #754475
             if (valueType == typeof(KeyValuePair<string, string>[]))
             {
-                this._strValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
+                this.ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
             }
             else if (valueType == typeof(string) || valueType == typeof(Uri) || valueType == typeof(string[]) || valueType.AssemblyQualifiedName.Contains("System.Private"))
             {
-                this._strValueType = valueType.FullName;
+                // Use type.FullName instead of type.AssemblyQualifiedName since the internal assemblies
+                // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
+                // is not available on the desktop.
+                // Note that this doesn't handle generic types. Such types will fail during serialization.
+                this.ValueType = valueType.FullName;
             }
             else if (valueType.GetTypeInfo().IsValueType)
             {
-                this._strValueType = valueType.AssemblyQualifiedName;
+                // In case of custom types, let the assembly qualified name be available to help
+                // deserialization on the client.
+                this.ValueType = valueType.AssemblyQualifiedName;
             }
             else
             {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.UnexpectedTypeOfProperty, valueType, id));
             }
             
-            this._id = id;
-            this._label = label;
-            this._category = category;
-            this._description = description;
-            this.validateValueCallback = validateValueCallback;
-            this._attributes = attributes;
+            this.Id = id;
+            this.Label = label;
+            this.Category = category;
+            this.Description = description;
+            this.ValidateValueCallback = validateValueCallback;
+            this.Attributes = attributes;
             this.valueType = valueType;
         }
 
@@ -115,68 +74,79 @@ using System.Security.Permissions;
 
         #region Properties
 
-        public string Id
-        {
-            get { return this._id; }
-            set { this._id = value; }
-        }
+        /// <summary>
+        /// Gets or sets the Id for the property.
+        /// </summary>
+        [DataMember]
+        public string Id { get; set; }
 
-        public string Label
-        {
-            get { return this._label; }
-            set { this._label = value; }
-        }
+        /// <summary>
+        /// Gets or sets a label for the property.
+        /// </summary>
+        [DataMember]
+        public string Label { get; set; }
 
-        public string Category
-        {
-            get { return this._category; }
-            set { this._category = value; }
-        }
+        /// <summary>
+        /// Gets or sets a category for the property.
+        /// </summary>
+        [DataMember]
+        public string Category { get; set; }
 
-        public string Description
-        {
-            get { return this._description; }
-            set { this._description = value; }
-        }
+        /// <summary>
+        /// Gets or sets a description for the property.
+        /// </summary>
+        [DataMember]
+        public string Description { get; set; }
 
+        /// <summary>
+        /// Gets the callback for validation of property value.
+        /// </summary>
         /// <remarks>This property is not required at the client side.</remarks>
-        public ValidateValueCallback ValidateValueCallback
-        {
-            get { return this.validateValueCallback; }
-        }
+        [IgnoreDataMember]
+        public ValidateValueCallback ValidateValueCallback { get; }
 
-        public TestPropertyAttributes Attributes
-        {
-            get { return this._attributes; }
-            set { this._attributes = value; }
-        }
+        /// <summary>
+        /// Gets or sets the attributes for this property.
+        /// </summary>
+        [DataMember]
+        public TestPropertyAttributes Attributes { get; set; }
+
+        /// <summary>
+        /// Gets or sets a string representation of the type for value.
+        /// </summary>
+        [DataMember]
+        public string ValueType { get; set; }
 
         #endregion Properties
 
         #region IEquatable
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return this._id.GetHashCode();
+            return this.Id.GetHashCode();
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            return Equals(obj as TestProperty);
+            return base.Equals(obj as TestProperty);
         }
 
+        /// <inheritdoc/>
         public bool Equals(TestProperty other)
         {
-            return (other != null) && (this._id == other._id);
+            return (other != null) && (this.Id == other.Id);
         }
 
         #endregion IEquatable
 
         #region Methods
 
+        /// <inheritdoc/>
         public override string ToString()
         {
-            return this._id;
+            return this.Id;
         }
 
         /// <summary>
@@ -187,9 +157,12 @@ using System.Security.Permissions;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This could take a bit time, is not simple enough to be a property.")]
         public Type GetValueType()
         {
-            if (valueType == null)
-                valueType = GetType(_strValueType);
-            return valueType;
+            if (this.valueType == null)
+            {
+                this.valueType = this.GetType(this.ValueType);
+            }
+
+            return this.valueType;
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Use this in the body in debug mode")]
@@ -225,9 +198,9 @@ using System.Security.Permissions;
                 {
                     type = typeof(System.DateTimeOffset);
                 }
-                // For LineNumber property - Int is required
                 else if (type == null && typeName.StartsWith("System.Int16"))
                 {
+                    // For LineNumber property - Int is required
                     type = typeof(System.Int16);
                 }
                 else if (type == null && typeName.StartsWith("System.Int32"))
@@ -251,9 +224,9 @@ using System.Security.Permissions;
 
                 if (type == null)
                 {
-                    System.Diagnostics.Debug.Fail("The test property type " + typeName + " of property " + this._id + "is not supported.");
+                    System.Diagnostics.Debug.Fail("The test property type " + typeName + " of property " + this.id + "is not supported.");
 #else
-                System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + this._id + "is not supported.");
+                System.Diagnostics.Debug.WriteLine("The test property type " + typeName + " of property " + this.Id + "is not supported.");
 #endif
 #if FullCLR
                 }
@@ -354,8 +327,8 @@ using System.Security.Permissions;
                 if (s_properties.TryGetValue(id, out propertyTypePair))
                 {
                     // verify the data valueType is valid
-                    if (propertyTypePair.Key._strValueType == valueType.AssemblyQualifiedName
-                        || propertyTypePair.Key._strValueType == valueType.FullName
+                    if (propertyTypePair.Key.ValueType == valueType.AssemblyQualifiedName
+                        || propertyTypePair.Key.ValueType == valueType.FullName
                         || propertyTypePair.Key.valueType == valueType)
                     {
                         // add the owner to set of owners for this GraphProperty object
@@ -370,7 +343,7 @@ using System.Security.Permissions;
                             Resources.Exception_RegisteredTestPropertyHasDifferentValueType,
                             id,
                             valueType.ToString(),
-                            propertyTypePair.Key._strValueType);
+                            propertyTypePair.Key.ValueType);
 
                         throw new InvalidOperationException(message);
                     }
@@ -408,23 +381,19 @@ using System.Security.Permissions;
 
         #endregion Static Methods
 
-#if FullCLR
-        [SecurityPermission(
-            SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-#endif
         public object GetRealObject(StreamingContext context)
         {
-            var registeredProperty = TestProperty.Find(this._id);
+            var registeredProperty = TestProperty.Find(this.Id);
             if (registeredProperty == null)
             {
                 registeredProperty = TestProperty.Register(
-                    this._id,
-                    this._label,
-                    this._category,
-                    this._description,
+                    this.Id,
+                    this.Label,
+                    this.Category,
+                    this.Description,
                     this.GetValueType(),
-                    this.validateValueCallback,
-                    this._attributes,
+                    this.ValidateValueCallback,
+                    this.Attributes,
                     typeof(TestObject));
             }
 
