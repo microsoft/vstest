@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual("The /Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.", ex.Message);
+                Assert.AreEqual("The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.", ex.Message);
             }
         }
 
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual("The /Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.", ex.Message);
+                Assert.AreEqual("The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.", ex.Message);
             }
         }
 

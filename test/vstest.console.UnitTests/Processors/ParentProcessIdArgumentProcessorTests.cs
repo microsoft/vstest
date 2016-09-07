@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ParentProcessIdArgumentProcessorCapabilities();
             Assert.AreEqual("/ParentProcessId", capabilities.CommandName);
-            Assert.AreEqual("/ParentProcessId:<ParentProcessId>\n     Process Id of the Parent Process responsible for launching current process.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--ParentProcessId|/ParentProcessId:<ParentProcessId>\n     Process Id of the Parent Process responsible for launching current process.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ParentProcessIdArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual("The /ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.", ex.Message);
+                Assert.AreEqual("The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.", ex.Message);
             }
         }
 
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual("The /ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.", ex.Message);
+                Assert.AreEqual("The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.", ex.Message);
             }
         }
 

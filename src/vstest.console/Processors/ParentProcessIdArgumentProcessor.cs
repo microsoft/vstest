@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
 
     /// <summary>
-    /// Argument Processor for the "/ParentProcessId" command line argument.
+    /// Argument Processor for the "--ParentProcessId|/ParentProcessId" command line argument.
     /// </summary>
     internal class ParentProcessIdArgumentProcessor : IArgumentProcessor
     {
