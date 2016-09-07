@@ -2,29 +2,21 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using System;
     using System.Diagnostics.Contracts;
-    using System.Globalization;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     /// <summary>
-    /// Argument Executor for the "-c|--Configuration|/c|/Configuration" command line argument.
+    /// Argument Processor for the "--ParentProcessId|/ParentProcessId" command line argument.
     /// </summary>
-    internal class ConfigurationArgumentProcessor : IArgumentProcessor
+    internal class ParentProcessIdArgumentProcessor : IArgumentProcessor
     {
         #region Constants
 
         /// <summary>
-        /// The name of the command line argument that the ConfigurationArgumentExecutor handles.
+        /// The name of the command line argument that the ParentProcessIdArgumentExecutor handles.
         /// </summary>
-        public const string CommandName = "/Configuration";
-
-        /// <summary>
-        /// The short name of the command line argument that the ConfigurationArgumentExecutor handles.
-        /// </summary>
-        public const string ShortCommandName = "/c";
+        public const string CommandName = "/ParentProcessId";
 
         #endregion
 
@@ -41,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ConfigurationArgumentProcessorCapabilities());
+                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ParentProcessIdArgumentProcessorCapabilities());
                 }
 
                 return this.metadata;
@@ -57,7 +49,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new ConfigurationArgumentExecutor(CommandLineOptions.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() =>
+                    new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance));
                 }
 
                 return this.executor;
@@ -70,31 +63,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
     }
 
-    internal class ConfigurationArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+    internal class ParentProcessIdArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
-        public override string CommandName => ConfigurationArgumentProcessor.CommandName;
-
-        public override string ShortCommandName => ConfigurationArgumentProcessor.ShortCommandName;
+        public override string CommandName => ParentProcessIdArgumentProcessor.CommandName;
 
         public override bool AllowMultiple => false;
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.ParentProcessId;
 
-        public override string HelpContentResourceName => Resources.ConfigurationArgumentHelp;
+        public override string HelpContentResourceName => Resources.ParentProcessIdArgumentHelp;
 
-        public override HelpContentPriority HelpPriority => HelpContentPriority.ConfigurationArgumentProcessorHelpPriority;
+        public override HelpContentPriority HelpPriority => HelpContentPriority.ParentProcessIdArgumentProcessorHelpPriority;
     }
 
     /// <summary>
-    /// Argument Executor for the "/Configuration" command line argument.
+    /// Argument Executor for the "/ParentProcessId" command line argument.
     /// </summary>
-    internal class ConfigurationArgumentExecutor : IArgumentExecutor
+    internal class ParentProcessIdArgumentExecutor : IArgumentExecutor
     {
         #region Fields
-
-        private string[] ValidConfigs = { "Debug", "Release" };
 
         /// <summary>
         /// Used for getting sources.
@@ -111,14 +100,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="options">
         /// The options.
         /// </param>
-        public ConfigurationArgumentExecutor(CommandLineOptions options)
+        public ParentProcessIdArgumentExecutor(CommandLineOptions options)
         {
             Contract.Requires(options != null);
             this.commandLineOptions = options;
         }
-        #endregion
 
-        #region IArgumentExecutor
+        #endregion
 
         /// <summary>
         /// Initializes with the argument that was provided with the command.
@@ -126,23 +114,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            if (string.IsNullOrWhiteSpace(argument) || !ValidConfigs.Contains(argument))
+            int parentProcessId;
+            if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out parentProcessId))
             {
-                //We might want to check for Debug/Release
-                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, Resources.InvalidConfiguration));
+                throw new CommandLineException(Resources.InvalidParentProcessIdArgument);
             }
 
-            this.commandLineOptions.Configuration = argument;
+            this.commandLineOptions.ParentProcessId = parentProcessId;
         }
 
         /// <summary>
-        /// The configuration is already set, return success.
+        /// ParentProcessId is already set, return success.
         /// </summary>
         /// <returns> The <see cref="ArgumentProcessorResult"/> Success </returns>
         public ArgumentProcessorResult Execute()
         {
+            // Nothing to do here, the work was done in initialization.
             return ArgumentProcessorResult.Success;
         }
-        #endregion
     }
 }

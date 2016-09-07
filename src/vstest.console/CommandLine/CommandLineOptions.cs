@@ -125,6 +125,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public string TestAdapterPath { get; set; }
 
         /// <summary>
+        /// Process Id of the process which launched vstest runner
+        /// </summary>
+        public int ParentProcessId { get; set; }
+
+        /// <summary>
         /// Port IDE process is listening to
         /// </summary>
         public int Port { get; set; }

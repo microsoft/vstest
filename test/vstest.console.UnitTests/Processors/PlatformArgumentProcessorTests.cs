@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new PlatformArgumentProcessorCapabilities();
             Assert.AreEqual("/Platform", capabilities.CommandName);
-            Assert.AreEqual("/Platform:<Platform type>\n      Target platform architecture to be used for test execution. \n      Valid values are x86, x64 and ARM.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Platform|/Platform:<Platform type>\n      Target platform architecture to be used for test execution. \n      Valid values are x86, x64 and ARM.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.PlatformArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
