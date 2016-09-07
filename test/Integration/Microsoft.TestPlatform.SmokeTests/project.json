@@ -14,10 +14,12 @@
       "version": "1.0.3-preview",
       "exclude": "compile"
     },
-    "StyleCop.Analyzers": {
-      "version": "1.0.0",
-      "type": "build"
-    },
+	 
+    "StyleCop.Analyzers": { 
+      "version": "1.0.0", 
+      "type": "build" 
+    }, 
+
     "Microsoft.TestPlatform.TestUtilities": "15.0.0-*"
   },
 

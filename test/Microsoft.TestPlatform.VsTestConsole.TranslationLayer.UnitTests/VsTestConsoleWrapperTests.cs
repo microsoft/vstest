@@ -34,21 +34,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void StartSessionShouldStartVsTestConsole()
+        public void StartSessionShouldStartVsTestConsoleWithCorrectArguments()
         {
             var inputPort = 123;
+            int expectedParentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            string actualParentProcessIdString = "";
+            string actualPortString = "";
             this.mockSender.SetupPort(inputPort);
 
             var startProcessCalled = false;
             this.mockProcessManager.VerifyArgs = (args) =>
             {
                 startProcessCalled = true;
-                Assert.IsTrue(args.Length > 0 && args[0].Contains(inputPort + ""), "Wrong Port fed to process manager");
+                actualParentProcessIdString = args.Length > 0 ? args[0] : "";
+                actualPortString = args.Length > 1 ? args[1] : "";
             };
 
             this.consoleWrapper.StartSession();
 
+            int actualPort = int.Parse(actualPortString.Split(':')[1]);
+            int actualParentProcessId = int.Parse(actualParentProcessIdString.Split(':')[1]);
             Assert.IsTrue(startProcessCalled, "Start Process must be called");
+            Assert.AreEqual(expectedParentProcessId, actualParentProcessId, "Incorrect Parent Process Id fed to process args");
+            Assert.AreEqual(inputPort, actualPort, "Incorrect Port number fed to process args");
         }
 
 

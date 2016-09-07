@@ -220,5 +220,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             communicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
             communicationManager.Verify(cm => cm.StopClient(), Times.Once);
         }
+
+        [TestMethod]
+        public void DesignModeClientShouldStopCommunicationOnParentProcessExit()
+        {
+            var designModeHandler = new Mock<ITestRequestManager>();
+            var communicationManager = new Mock<ICommunicationManager>();
+            var testDesignModeClient = new DesignModeClient(communicationManager.Object, JsonDataSerializer.Instance);
+
+            testDesignModeClient.HandleParentProcessExit();
+
+            communicationManager.Verify(cm => cm.StopClient(), Times.Once);
+        }
     }
 }

@@ -193,6 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new OutputArgumentProcessor(),
                 new BuildBasePathArgumentProcessor(),
                 new ConfigurationArgumentProcessor(),
+                new ParentProcessIdArgumentProcessor(),
                 new PortArgumentProcessor(),
                 new RunSettingsArgumentProcessor(),
                 new PlatformArgumentProcessor(),
