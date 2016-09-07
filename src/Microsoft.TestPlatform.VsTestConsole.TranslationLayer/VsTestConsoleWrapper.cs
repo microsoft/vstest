@@ -10,6 +10,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using System.Diagnostics;
 
     /// <summary>
     /// Vstest.console.exe Wrapper
@@ -26,7 +27,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private const int ConnectionTimeout = 30 * 1000;
 
+        /// <summary>
+        /// Port number for communicating with Vstest CLI
+        /// </summary>
         private const string PORT_ARGUMENT = "/port:{0}";
+
+        /// <summary>
+        /// Process Id of the Current Process which is launching Vstest CLI
+        /// Helps Vstest CLI in auto-exit if current process dies without notifying it
+        /// </summary>
+        private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
 
         #endregion
 
@@ -55,9 +65,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (port > 0)
             {
-                // Start Vstest.console.exe
-                string args = string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, port);
-                this.vstestConsoleProcessManager.StartProcess(new string[1] { args });
+                // Start Vstest.console.exe with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
+                string parentProcessIdArgs = string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, Process.GetCurrentProcess().Id);
+                string portArgs = string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, port);
+                this.vstestConsoleProcessManager.StartProcess(new string[2] { parentProcessIdArgs, portArgs });
             }
             else
             {

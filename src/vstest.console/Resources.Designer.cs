@@ -587,6 +587,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process..
+        /// </summary>
+        public static string InvalidParentProcessIdArgument {
+            get {
+                return ResourceManager.GetString("InvalidParentProcessIdArgument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Invalid platform type:{0}. Valid platform types are x86, x64 and Arm..
         /// </summary>
         public static string InvalidPlatformType {
@@ -596,7 +605,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The /Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages..
+        ///    Looks up a localized string similar to The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages..
         /// </summary>
         public static string InvalidPortArgument {
             get {
@@ -860,6 +869,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         public static string ParallelArgumentProcessorHelp {
             get {
                 return ResourceManager.GetString("ParallelArgumentProcessorHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to --ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
+        ///     Process Id of the Parent Process responsible for launching current process..
+        /// </summary>
+        public static string ParentProcessIdArgumentHelp {
+            get {
+                return ResourceManager.GetString("ParentProcessIdArgumentHelp", resourceCulture);
             }
         }
         

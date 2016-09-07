@@ -9,9 +9,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
+    using System.Diagnostics;
 
     /// <summary>
-    /// Argument Executor for the "--Port|/Port" command line argument.
+    /// Argument Processor for the "--Port|/Port" command line argument.
     /// </summary>
     internal class PortArgumentProcessor : IArgumentProcessor
     {
@@ -102,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes Design mode when called
         /// </summary>
-        private Func<IDesignModeClient> designModeInitializer;
+        private Func<int, IDesignModeClient> designModeInitializer;
 
         /// <summary>
         /// IDesignModeClient
@@ -127,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// For Unit testing only
         /// </summary>
-        internal PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager, Func<IDesignModeClient> designModeInitializer)
+        internal PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager, Func<int, IDesignModeClient> designModeInitializer)
         {
             Contract.Requires(options != null);
             this.commandLineOptions = options;
@@ -152,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.commandLineOptions.Port = portNumber;
-            this.designModeClient = this.designModeInitializer?.Invoke();
+            this.designModeClient = this.designModeInitializer?.Invoke(this.commandLineOptions.ParentProcessId);
         }
 
         /// <summary>
@@ -175,8 +176,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         #endregion
 
-        private static IDesignModeClient InitializeDesignMode()
+        private static IDesignModeClient InitializeDesignMode(int parentProcessId)
         {
+            if (parentProcessId > 0)
+            {
+                var process = Process.GetProcessById(parentProcessId);
+                if (process != null && !process.HasExited)
+                {
+                    process.EnableRaisingEvents = true;
+                    process.Exited += (sender, e) => DesignModeClient.Instance?.HandleParentProcessExit();
+                }
+            }
+
             DesignModeClient.Initialize();
             return DesignModeClient.Instance;
         }
