@@ -14,7 +14,7 @@
       "exclude": "compile"
     },
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
-    "Newtonsoft.Json": "7.0.1" 
+    "Newtonsoft.Json": "9.0.1" 
   },
 
   "frameworks": {
@@ -30,7 +30,7 @@
           "version": "1.0.0"
         },
         "dotnet-test-mstest": {
-          "version": "1.0.1-preview",
+          "version": "1.1.1-preview",
           "exclude": "compile"
         }
       }

@@ -2,6 +2,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
 
@@ -9,6 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// Class that holds Trait. 
     /// A traits is Name, Value pair.
     /// </summary>
+#if NET46
+    [Serializable]
+#endif
     [DataContract]
     public class Trait
     {

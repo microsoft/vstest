@@ -1,7 +1,7 @@
 {
   "version": "15.0.0-*",
   "buildOptions": {
-    //"outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
+    "outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true
@@ -34,7 +34,7 @@
         "System.IO.FileSystem": "4.0.1",
         "System.ComponentModel.TypeConverter": "4.1.0",
         "System.Security.Cryptography.Algorithms": "4.2.0",
-        "System.Runtime.Serialization.Json":  "4.0.0"
+        "System.Runtime.Serialization.Json": "4.0.0"
       }
     }
   }
