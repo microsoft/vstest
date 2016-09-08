@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
@@ -18,6 +19,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     public sealed class TestRequestSender : ITestRequestSender
     {
         private ICommunicationManager communicationManager;
+
+        private bool isConnectionBroken=false;
 
         private IDataSerializer dataSerializer;
 
@@ -126,6 +129,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void EndSession()
         {
+            // don't try to communicate if connection is broken
+            if (isConnectionBroken)
+            {
+                EqtTrace.Error("Connection has been broken: not sending SessionEnd message");
+                return;
+            }
             this.communicationManager.SendMessage(MessageType.SessionEnd);
         }
 
@@ -163,14 +172,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isTestRunComplete)
             {
-                var rawMessage = this.communicationManager.ReceiveRawMessage();
-
-                // Send raw message first to unblock handlers waiting to send message to IDEs
-                testRunEventsHandler.HandleRawMessage(rawMessage);
-
-                var message = this.dataSerializer.DeserializeMessage(rawMessage);
+                
                 try
                 {
+                    var rawMessage = this.communicationManager.ReceiveRawMessage();
+
+                    // Send raw message first to unblock handlers waiting to send message to IDEs
+                    testRunEventsHandler.HandleRawMessage(rawMessage);
+
+                    var message = this.dataSerializer.DeserializeMessage(rawMessage);
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
                         var testRunChangedArgs = dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
@@ -201,14 +211,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, processId);
                     }
                 }
+                catch(System.IO.IOException exception)
+                {
+                    EqtTrace.Error("Server: TestExecution: Receive raw message failed with {0}", exception);
+
+                    // to avoid furthur communication with remote host
+                    isConnectionBroken = true;
+
+                    OnTestRunAbort(testRunEventsHandler, exception, Resources.ConnectionClosed);
+                    isTestRunComplete = true;
+                }
                 catch (Exception exception)
                 {
                     EqtTrace.Error("Server: TestExecution: Message Deserialization failed with {0}", exception);
-                    // notify of a test run complete and bail out.
-                    testRunEventsHandler.HandleTestRunComplete(null, null, null, null);
+                    OnTestRunAbort(testRunEventsHandler, exception, exception.Message);
                     isTestRunComplete = true;
                 }
             }
+        }
+
+        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, string logMessage)
+        {
+            // log console message to user
+            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestRun + " " +logMessage);
+
+            // notify of a test run complete and bail out.
+            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+            testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+
         }
         
         /// <summary>
