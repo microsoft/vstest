@@ -5,8 +5,6 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -18,6 +16,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using System.IO;
 
     [TestClass]
     public class TestRequestSenderTests
@@ -44,7 +43,6 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.Verify(mc => mc.HostServer(), Times.Once);
             this.mockCommunicationManager.Verify(mc => mc.AcceptClientAsync(), Times.Once);
-
             Assert.AreEqual(port, 123, "Correct port must be returned.");
         }
 
@@ -375,6 +373,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var payload = new TestRunCompletePayload() { ExecutorUris = null, LastRunTests = null, RunAttachments = null, TestRunCompleteArgs = null };
 
             this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
+            
             this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestRunCompletePayload>(message)).Returns(payload);
 
@@ -394,6 +393,27 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void StartTestRunShouldCallHandleTestRunCompleteAndHandleLogMessageOnConnectionBreak()
+        {
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+            var runCriteria = new TestRunCriteriaWithSources(null, null, null);
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Throws(new IOException());
+            var waitHandle = new AutoResetEvent(false);
+            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+                null, null, null)).Callback
+                (() => waitHandle.Set());
+
+            this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
+            waitHandle.WaitOne();
+            this.testRequestSender.EndSession();
+
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.ConnectionClosed), Times.Once);
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
+            mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.SessionEnd), Times.Never);
+
+        }
+
+        [TestMethod]
         public void EndSessionShouldSendCorrectEventMessage()
         {
             this.testRequestSender.EndSession();
@@ -408,5 +428,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.CancelTestRun), Times.Once);
         }
+
+        
     }
 }
