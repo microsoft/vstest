@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testCaseEventsHandler"> The test case events handler. </param>
         /// <param name="testRunEventsHandler"> The test run events handler. </param>
         /// <param name="testPlatformEventSource"></param>
-        public BaseRunTests(ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, TestPlatformEventSource testPlatformEventSource)
+        public BaseRunTests(string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, TestPlatformEventSource testPlatformEventSource)
         {
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;

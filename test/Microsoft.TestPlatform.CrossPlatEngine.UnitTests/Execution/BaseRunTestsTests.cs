@@ -535,7 +535,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 ITestCaseEventsHandler testCaseEventsHandler,
                 ITestRunEventsHandler testRunEventsHandler,
                 TestPlatformEventSource testPlatformEventSource)
-                : base(testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
+                : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
             {
             }
 

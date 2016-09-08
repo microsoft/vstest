@@ -42,8 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
         /// <param name="executorUriVsSourceList"></param>        
-        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
-            : base(testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
+        internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
+            : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
         {
             this.adapterSourceMap = adapterSourceMap;
             this.executorUriVsSourceList = executorUriVsSourceList;
