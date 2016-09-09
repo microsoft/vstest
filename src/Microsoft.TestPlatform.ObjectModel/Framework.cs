@@ -56,6 +56,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     case "Framework45":
                         frameworkName = new FrameworkName(".NETFramework,Version=v4.5");
                         break;
+                    case "FrameworkCore10":
+                        frameworkName = new FrameworkName(".NETCoreApp,Version=1.0");
+                        break;
                     default:
                         return null;
                 }

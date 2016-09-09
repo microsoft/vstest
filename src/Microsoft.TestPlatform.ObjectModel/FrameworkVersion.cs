@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         None,
         Framework35,
         Framework40,
-        Framework45
+        Framework45,
+        FrameworkCore10
     }
 }

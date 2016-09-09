@@ -64,7 +64,14 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestCaseObjectShouldContainAllPropertiesOnDeserialization()
         {
-            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},{\"Key\":{\"Id\":\"TestCase.CodeFilePath\",\"Label\":\"File Path\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"/user/src/testFile.cs\"},{\"Key\":{\"Id\":\"TestCase.DisplayName\",\"Label\":\"Name\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"00000000-0000-0000-0000-000000000000\"},{\"Key\":{\"Id\":\"TestCase.LineNumber\",\"Label\":\"Line Number\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Int32\"},\"Value\":999},{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"Priority\",\"Value\":\"0\"},{\"Key\":\"Category\",\"Value\":\"unit\"}]}]}";
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.CodeFilePath\",\"Label\":\"File Path\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"/user/src/testFile.cs\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.DisplayName\",\"Label\":\"Name\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestCase\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"00000000-0000-0000-0000-000000000000\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.LineNumber\",\"Label\":\"Line Number\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Int32\"},\"Value\":999},"
+                + "{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"Priority\",\"Value\":\"0\"},{\"Key\":\"Category\",\"Value\":\"unit\"}]}]}";
             var test = Deserialize<TestCase>(json);
 
             Assert.AreEqual(testCase.CodeFilePath, test.CodeFilePath);
@@ -74,6 +81,62 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual(testCase.LineNumber, test.LineNumber);
             Assert.AreEqual(testCase.Source, test.Source);
             Assert.AreEqual(testCase.Traits.First().Name, test.Traits.First().Name);
+        }
+
+        [TestMethod]
+        public void TestCaseObjectShouldSerializeWindowsPathWithEscaping()
+        {
+            var test = new TestCase("a.b", new Uri("uri://x"), @"C:\Test\TestAssembly.dll");
+
+            var json = Serialize(test);
+
+            // Use raw deserialization to validate basic properties
+            dynamic data = JObject.Parse(json);
+            dynamic properties = data["Properties"];
+            Assert.AreEqual(@"TestCase.Source", properties[2]["Key"]["Id"].Value);
+            Assert.AreEqual(@"C:\Test\TestAssembly.dll", properties[2]["Value"].Value);
+        }
+
+        [TestMethod]
+        public void TestCaseObjectShouldDeserializeEscapedWindowsPath()
+        {
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"a.b\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"uri://x\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"C:\\\\Test\\\\TestAssembly.dll\"}]}";
+
+            var test = Deserialize<TestCase>(json);
+
+            Assert.AreEqual(@"C:\Test\TestAssembly.dll", test.Source);
+        }
+
+        [TestMethod]
+        public void TestCaseObjectShouldSerializeTraitsWithSpecialCharacters()
+        {
+            var test = new TestCase("a.b", new Uri("uri://x"), @"/tmp/a.b.dll");
+            test.Traits.Add("t", @"SDJDDHW>,:&^%//\\\\");
+
+            var json = Serialize(test);
+
+            // Use raw deserialization to validate basic properties
+            dynamic data = JObject.Parse(json);
+            dynamic properties = data["Properties"];
+            Assert.AreEqual(@"TestObject.Traits", properties[3]["Key"]["Id"].Value);
+            Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[3]["Value"].ToString(Formatting.None));
+        }
+
+        [TestMethod]
+        public void TestCaseObjectShouldDeserializeTraitsWithSpecialCharacters()
+        {
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"a.b\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"uri://x\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"/tmp/a.b.dll\"},"
+                + "{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]}]}";
+
+            var test = Deserialize<TestCase>(json);
+
+            var traits = test.Traits.ToArray();
+            Assert.AreEqual(1, traits.Length);
+            Assert.AreEqual(@"SDJDDHW>,:&^%//\\\\", traits[0].Value);
         }
 
         private static string Serialize<T>(T data)

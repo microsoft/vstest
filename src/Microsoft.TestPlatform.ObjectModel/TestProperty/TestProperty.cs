@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.UnexpectedTypeOfProperty, valueType, id));
             }
-            
+
             this.Id = id;
             this.Label = label;
             this.Category = category;

@@ -48,12 +48,21 @@
                         var testProperty = property["Key"].ToObject<TestProperty>();
 
                         // Let the null values be passed in as null data
+                        var token = property["Value"];
                         object propertyData = null;
-                        if (property["Value"].Type != JTokenType.Null)
+                        if (token.Type != JTokenType.Null)
                         {
-                            // On deserialization, the value for each TestProperty is always a string. It is up
-                            // to the consumer to deserialize it further as appropriate.
-                            propertyData = property["Value"].ToString(Formatting.None).Trim('"');
+                            // If the property is already a string. No need to convert again.
+                            if (token.Type == JTokenType.String)
+                            {
+                                propertyData = token.ToObject(typeof(string));
+                            }
+                            else
+                            {
+                                // On deserialization, the value for each TestProperty is always a string. It is up
+                                // to the consumer to deserialize it further as appropriate.
+                                propertyData = token.ToString(Formatting.None).Trim('"');
+                            }
                         }
 
                         propertyList.Add(new KeyValuePair<TestProperty, object>(testProperty, propertyData));

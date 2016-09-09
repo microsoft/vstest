@@ -57,6 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.store = new Dictionary<TestProperty, object>();            
             TypeDescriptor.AddAttributes(typeof(Guid), new TypeConverterAttribute(typeof(CustomGuidConverter)));
             TypeDescriptor.AddAttributes(typeof(KeyValuePair<string, string>[]), new TypeConverterAttribute(typeof(CustomKeyValueConverter)));
+            TypeDescriptor.AddAttributes(typeof(string[]), new TypeConverterAttribute(typeof(CustomStringArrayConverter)));
         }
 
         [OnSerializing]
