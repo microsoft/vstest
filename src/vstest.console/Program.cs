@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <returns>0 if everything was successful and 1 otherwise.</returns>
         public static int Main(string[] args)
         {
-            return new Executor(ConsoleOutput.Instance, TestPlatformEventSource.Instance).Execute(args);
+            return new Executor(ConsoleOutput.Instance).Execute(args);
         }
     }
 }

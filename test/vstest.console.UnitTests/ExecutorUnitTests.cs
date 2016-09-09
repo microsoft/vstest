@@ -13,16 +13,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using CoreUtilities.Tracing;
 
     using Moq;
+    using CoreUtilities.Tracing.Interfaces;
 
     [TestClass]
     public class ExecutorUnitTests
     {
-        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         [TestInitialize]
         public void TestInit()
         {
-            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
         }
 
         /// <summary>
@@ -67,6 +68,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             //Assert.IsTrue(mockOutput.Messages.First().Message.Contains(
             //    Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.MicrosoftCommandLineTitle.Substring(0, 20)),
             //    "First Printed message must be Microsoft Copyright");
+        }
+
+        [TestMethod]
+        public void ExecuteShouldInstrumentVsTestConsoleStart()
+        {
+            var mockOutput = new MockOutput();
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(It.IsAny<string[]>());
+
+            this.mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStart(), Times.Once);
+        }
+
+        [TestMethod]
+        public void ExecuteShouldInstrumentVsTestConsoleStop()
+        {
+            var mockOutput = new MockOutput();
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(It.IsAny<string[]>());
+
+            this.mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStop(), Times.Once);
         }
 
 

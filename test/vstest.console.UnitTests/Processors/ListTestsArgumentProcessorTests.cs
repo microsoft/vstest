@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using TestPlatformHelpers;
     using Common.Logging;    // <summary>
     using CoreUtilities.Tracing;
+    using CoreUtilities.Tracing.Interfaces;
 
     // Tests for ListTestsArgumentProcessor
     // </summary>
@@ -28,12 +29,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         MockFileHelper mockFileHelper;
         string dummyTestFilePath = "DummyTest.dll";
 
-        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         public ListTestsArgumentProcessorTests()
         {
             this.mockFileHelper = new MockFileHelper();
-            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.mockFileHelper.ExistsInvoker = (path) =>
             {
                 if (string.Equals(path, this.dummyTestFilePath))
@@ -212,22 +213,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorExecuteShouldOutputDiscoveredTestsAndReturnSuccess()
         {
-            var mockTestPlatform = new Mock<ITestPlatform>();
+            
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             var mockConsoleOutput = new Mock<IOutput>();
 
-            List<TestCase> list = new List<TestCase>();
-            list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
-            list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
-            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
-            
-            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
-            
-
-            this.ResetAndAddSourceToCommandLineOptions();
-
-            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
-            new ListTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager, mockConsoleOutput.Object).Execute();
+            this.RunListTestArgumentProcessorExecuteWithMockSetup(mockDiscoveryRequest, mockConsoleOutput);
 
             // Assert
             mockDiscoveryRequest.Verify(dr => dr.DiscoverAsync(), Times.Once);
@@ -236,7 +226,45 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             mockConsoleOutput.Verify((IOutput co) => co.WriteLine("    Test2", OutputLevel.Information));
         }
 
+        [TestMethod]
+        public void ListTestArgumentProcessorExecuteShouldInstrumentDiscoveryRequestStart()
+        {
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            var mockConsoleOutput = new Mock<IOutput>();
+
+            this.RunListTestArgumentProcessorExecuteWithMockSetup(mockDiscoveryRequest, mockConsoleOutput);
+
+            this.mockTestPlatformEventSource.Verify(x => x.DiscoveryRequestStart(), Times.Once);
+        }
+
+        [TestMethod]
+        public void ListTestArgumentProcessorExecuteShouldInstrumentDiscoveryRequestStop()
+        {
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            var mockConsoleOutput = new Mock<IOutput>();
+
+            this.RunListTestArgumentProcessorExecuteWithMockSetup(mockDiscoveryRequest, mockConsoleOutput);
+
+            this.mockTestPlatformEventSource.Verify(x => x.DiscoveryRequestStop(), Times.Once);
+        }
         #endregion
+
+        private void RunListTestArgumentProcessorExecuteWithMockSetup(Mock<IDiscoveryRequest> mockDiscoveryRequest, Mock<IOutput> mockConsoleOutput)
+        {
+            var mockTestPlatform = new Mock<ITestPlatform>();
+            List<TestCase> list = new List<TestCase>();
+            list.Add(new TestCase("Test1", new Uri("http://FooTestUri1"), "Source1"));
+            list.Add(new TestCase("Test2", new Uri("http://FooTestUri2"), "Source2"));
+            mockDiscoveryRequest.Setup(dr => dr.DiscoverAsync()).Raises(dr => dr.OnDiscoveredTests += null, new DiscoveredTestsEventArgs(list));
+
+            mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>())).Returns(mockDiscoveryRequest.Object);
+
+
+            this.ResetAndAddSourceToCommandLineOptions();
+
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
+            new ListTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager, mockConsoleOutput.Object).Execute();
+        }
 
         private void ResetAndAddSourceToCommandLineOptions()
         {

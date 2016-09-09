@@ -19,18 +19,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
     [TestClass]
     public class DiscovererEnumeratorTests
     {
         private DiscovererEnumerator discovererEnumerator;
-        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
         private DiscoveryResultCache discoveryResultCache;
 
         [TestInitialize]
         public void TestInit()
         {
-            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.discoveryResultCache = new DiscoveryResultCache(1000, TimeSpan.FromHours(1), (tests) => { });
             this.discovererEnumerator = new DiscovererEnumerator(this.discoveryResultCache, this.mockTestPlatformEventSource.Object);
 
@@ -253,25 +254,66 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         {
             try
             {
-                TestPluginCacheTests.SetupMockExtensions(
-                    new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
-                    () => { });
-
-                var sources = new List<string>
-                                  {
-                                      typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
-                                  };
-
-                var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
-                extensionSourceMap.Add("_none_", sources);
-
-                var settings = new Mock<IRunSettings>().Object;
-                var logger = new Mock<IMessageLogger>().Object;
-
-                this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+                this.InvokeLoadTestWithMockSetup();
 
                 Assert.IsTrue(DllTestDiscoverer.IsDiscoverTestCalled);
                 Assert.AreEqual(1, this.discoveryResultCache.Tests.Count);
+            }
+            finally
+            {
+                this.ResetDiscoverers();
+            }
+        }
+
+        [TestMethod]
+        public void LoadTestShouldInstrumentDiscoveryStart()
+        {
+            try
+            {
+                this.InvokeLoadTestWithMockSetup();
+                this.mockTestPlatformEventSource.Verify(x => x.DiscoveryStart(), Times.Once);
+            }
+            finally
+            {
+             this.ResetDiscoverers();   
+            }            
+        }
+
+        [TestMethod]
+        public void LoadTestShouldInstrumentDiscoveryStop()
+        {
+            try
+            {
+                this.InvokeLoadTestWithMockSetup();
+                this.mockTestPlatformEventSource.Verify(x => x.DiscoveryStop(It.IsAny<long>()), Times.Once);
+            }
+            finally
+            {
+                this.ResetDiscoverers();
+            }
+        }
+
+        [TestMethod]
+        public void LoadTestShouldInstrumentAdapterDiscoveryStart()
+        {
+            try
+            {
+                this.InvokeLoadTestWithMockSetup();
+                this.mockTestPlatformEventSource.Verify(x => x.AdapterDiscoveryStart(It.IsAny<string>()), Times.AtLeastOnce);
+            }
+            finally
+            {
+                this.ResetDiscoverers();
+            }
+        }
+
+        [TestMethod]
+        public void LoadTestShouldInstrumentAdapterDiscoveryStop()
+        {
+            try
+            {
+                this.InvokeLoadTestWithMockSetup();
+                this.mockTestPlatformEventSource.Verify(x => x.AdapterDiscoveryStop(It.IsAny<long>()), Times.AtLeastOnce);
             }
             finally
             {
@@ -334,6 +376,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             JsonTestDiscoverer.Reset();
             NotImplementedTestDiscoverer.Reset();
         }
+
+        private void InvokeLoadTestWithMockSetup()
+        {
+            TestPluginCacheTests.SetupMockExtensions(
+                    new string[] { typeof(DiscovererEnumeratorTests).GetTypeInfo().Assembly.Location },
+                    () => { });
+
+            var sources = new List<string>
+                                  {
+                                      typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
+                                  };
+
+            var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
+            extensionSourceMap.Add("_none_", sources);
+
+            var settings = new Mock<IRunSettings>().Object;
+            var logger = new Mock<IMessageLogger>().Object;
+
+            this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
+        }
+
 
         #region implementation
 

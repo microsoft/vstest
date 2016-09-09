@@ -2,13 +2,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
 {
-    using System;
-    using System.Diagnostics.Tracing;
-
     /// <summary>
     /// TestPlatform Event Ids and tasks constants
     /// </summary>
-    public class TestPlatformInstrumentationEvents
+    internal class TestPlatformInstrumentationEvents
     {
         /// <summary>
         /// The discovery start event id.

@@ -32,26 +32,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System.Diagnostics.Contracts;
     using System.Reflection;
-    using CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
     /// </summary>
     internal class Executor
     {
-        private TestPlatformEventSource testPlatformEventSource;
+        private ITestPlatformEventSource testPlatformEventSource;
 
         #region Constructor
 
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public Executor(IOutput output, TestPlatformEventSource testPlatformEventSource)
+        public Executor(IOutput output): this(output, TestPlatformEventSource.Instance)
+        {            
+        }
+
+        internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource)
         {
             this.Output = output;
             this.testPlatformEventSource = testPlatformEventSource;
         }
-
         #endregion
 
         #region Properties
@@ -76,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </returns>
         internal int Execute(params string[] args)
         {
-            this.testPlatformEventSource?.VsTestConsoleStart();
+            this.testPlatformEventSource.VsTestConsoleStart();
             
             int exitCode = 0;
             // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
@@ -101,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 && argumentProcessors.All(
                     processor => processor.Metadata.Value.CommandName != HelpArgumentProcessor.CommandName))
             {
-                this.testPlatformEventSource?.VsTestConsoleStop();
+                this.testPlatformEventSource.VsTestConsoleStop();
                 return exitCode;
             }
             
@@ -119,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", exitCode);
             
-            this.testPlatformEventSource?.VsTestConsoleStop();
+            this.testPlatformEventSource.VsTestConsoleStop();
 
             return exitCode;
         }

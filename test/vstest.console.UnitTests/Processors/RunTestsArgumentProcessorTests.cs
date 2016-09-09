@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     using Moq;
     using CoreUtilities.Tracing;
+    using CoreUtilities.Tracing.Interfaces;
 
     /// <summary>
     /// Tests for RunTestsArgumentProcessor
@@ -34,12 +35,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         MockFileHelper mockFileHelper;
         string dummyTestFilePath = "DummyTest.dll";
 
-        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         public RunTestsArgumentProcessorTests()
         {
             this.mockFileHelper = new MockFileHelper();
-            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.mockFileHelper.ExistsInvoker = (path) =>
             {
                 if (string.Equals(path, this.dummyTestFilePath))
@@ -177,8 +178,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorExecuteShouldForListOfTestsReturnSuccess()
         {
-            var mockTestPlatform = new Mock<ITestPlatform>();
             var mockTestRunRequest = new Mock<ITestRunRequest>();
+            
+            var result = this.RunRunArgumentProcessorExecuteWithMockSetup(mockTestRunRequest.Object);
+            
+            mockTestRunRequest.Verify(tr => tr.ExecuteAsync(), Times.Once);
+            Assert.AreEqual(ArgumentProcessorResult.Success, result);
+        }
+
+        [TestMethod]
+        public void TestRunRequestManagerShouldInstrumentExecutionRequestStart()
+        {
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+
+            var result = this.RunRunArgumentProcessorExecuteWithMockSetup(mockTestRunRequest.Object);
+
+            this.mockTestPlatformEventSource.Verify(x => x.ExecutionRequestStart(), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestRunRequestManagerShouldInstrumentExecutionRequestStop()
+        {
+            var mockTestRunRequest = new Mock<ITestRunRequest>();
+
+            var result = this.RunRunArgumentProcessorExecuteWithMockSetup(mockTestRunRequest.Object);
+
+            this.mockTestPlatformEventSource.Verify(x => x.ExecutionRequestStop(), Times.Once);
+        }
+
+        #endregion
+
+        private ArgumentProcessorResult RunRunArgumentProcessorExecuteWithMockSetup(ITestRunRequest testRunRequest)
+        {
+            var mockTestPlatform = new Mock<ITestPlatform>();            
             var mockConsoleOutput = new Mock<IOutput>();
 
             List<TestCase> list = new List<TestCase>();
@@ -188,20 +220,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var args = new TestRunCompleteEventArgs(mockTestRunStats.Object, false, false, null, null, new TimeSpan());
 
-            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            
+            mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Returns(testRunRequest);
+
             this.ResetAndAddSourceToCommandLineOptions();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
-            var result = executor.Execute();
-            // Assert
-            mockTestRunRequest.Verify(tr => tr.ExecuteAsync(), Times.Once);
-            Assert.AreEqual(ArgumentProcessorResult.Success, result);
+            return executor.Execute();
         }
-
-        #endregion
 
         private void ResetAndAddSourceToCommandLineOptions()
         {

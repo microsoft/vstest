@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
     using System;
@@ -18,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
     /// <summary>
     /// Enumerates through all the discoverers.
@@ -25,14 +25,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     internal class DiscovererEnumerator
     {
         private DiscoveryResultCache discoveryResultCache;
-        private TestPlatformEventSource testPlatformEventSource;
+        private ITestPlatformEventSource testPlatformEventSource;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
         /// <param name="testPlatformEventSource1"></param>
-        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache, TestPlatformEventSource testPlatformEventSource)
+        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache):this(discoveryResultCache, TestPlatformEventSource.Instance)
+        {            
+        }
+
+        internal DiscovererEnumerator(
+            DiscoveryResultCache discoveryResultCache,
+            ITestPlatformEventSource testPlatformEventSource)
         {
             this.discoveryResultCache = discoveryResultCache;
             this.testPlatformEventSource = testPlatformEventSource;
@@ -46,12 +52,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="logger"> The logger. </param>
         internal void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, IMessageLogger logger)
         {
-            this.testPlatformEventSource?.DiscoveryStart();
+            this.testPlatformEventSource.DiscoveryStart();
             foreach (var kvp in testExtensionSourceMap)
             {
                 this.LoadTestsFromAnExtension(kvp.Key, kvp.Value, settings, logger);
             }
-            this.testPlatformEventSource?.DiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests);
+            this.testPlatformEventSource.DiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests);
         }
 
         /// <summary>
@@ -115,11 +121,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                             discoverer.Value.GetType().FullName);
                     }
 
-                    var beforeTotoalDiscoveredTests = this.discoveryResultCache.TotalDiscoveredTests;
+                    var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
 
-                    this.testPlatformEventSource?.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
+                    this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
                     discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
-                    this.testPlatformEventSource?.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - beforeTotoalDiscoveredTests);
+                    this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
 
                     if (EqtTrace.IsVerboseEnabled)
                     {
@@ -224,7 +230,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             return result;
         }
-
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",

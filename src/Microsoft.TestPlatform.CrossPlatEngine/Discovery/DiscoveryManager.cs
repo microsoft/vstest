@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 {
     using System;
@@ -20,24 +18,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the test host process.
     /// </summary>
     public class DiscoveryManager : IDiscoveryManager
     {
         private TestSessionMessageLogger sessionMessageLogger;
-        private TestPlatformEventSource testPlatformEventSource;
+        private ITestPlatformEventSource testPlatformEventSource;
 
         private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
-        public DiscoveryManager()
+        public DiscoveryManager() : this(TestPlatformEventSource.Instance)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
+        /// </summary>
+        /// <param name="testPlatformEventSource">
+        /// The test platform event source.
+        /// </param>
+        protected DiscoveryManager(ITestPlatformEventSource testPlatformEventSource)
         {
             this.sessionMessageLogger = TestSessionMessageLogger.Instance;
             this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
-            this.testPlatformEventSource = TestPlatformEventSource.Instance;            
+            this.testPlatformEventSource = testPlatformEventSource;
         }
 
         /// <summary>
@@ -46,13 +57,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
         public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
         {
-            this.testPlatformEventSource?.AdapterSearchStart();
+            this.testPlatformEventSource.AdapterSearchStart();
+
             // Start using these additional extensions
             TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
 
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
-            this.testPlatformEventSource?.AdapterSearchStop();
+            this.testPlatformEventSource.AdapterSearchStop();
         }
 
         /// <summary>
@@ -89,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    new DiscovererEnumerator(discoveryResultCache, TestPlatformEventSource.Instance).LoadTests(
+                    new DiscovererEnumerator(discoveryResultCache).LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
                         this.sessionMessageLogger);

@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     using Moq;
     using CoreUtilities.Tracing;
+    using CoreUtilities.Tracing.Interfaces;
 
     [TestClass]
     public class RunSpecificTestsArgumentProcessorTests
@@ -24,12 +25,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         MockFileHelper mockFileHelper;
         string dummyTestFilePath = "DummyTest.dll";
 
-        private Mock<TestPlatformEventSource> mockTestPlatformEventSource;
+        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         public RunSpecificTestsArgumentProcessorTests()
         {
             this.mockFileHelper = new MockFileHelper();
-            this.mockTestPlatformEventSource = new Mock<TestPlatformEventSource>();
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.mockFileHelper.ExistsInvoker = (path) =>
             {
                 return string.Equals(path, this.dummyTestFilePath);
