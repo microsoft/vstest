@@ -240,7 +240,7 @@ function Create-NugetPackages
     $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec")
     foreach ($file in $nuspecFiles) {
         Copy-Item $tpSrcDir\$file $stagingDir -Force
     }

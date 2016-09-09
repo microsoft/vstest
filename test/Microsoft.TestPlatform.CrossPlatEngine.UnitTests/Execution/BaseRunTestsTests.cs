@@ -12,6 +12,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -24,16 +25,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
     using Moq;
 
-    using TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations;
-
     [TestClass]
     public class BaseRunTestsTests
     {
-        private TestableTestRunCache testableTestRunCache;
         private TestExecutionContext testExecutionContext;
         private Mock<ITestRunEventsHandler> mockTestRunEventsHandler;
 
         private TestableBaseRunTests runTestsInstance;
+
+        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
         private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
@@ -41,7 +41,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestInitialize]
         public void TestInit()
         {
-            this.testableTestRunCache = new TestableTestRunCache();
             this.testExecutionContext = new TestExecutionContext(
                           frequencyOfRunStatsChangeEvent: 100,
                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
@@ -54,11 +53,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                           testCaseFilter: string.Empty);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
+
             this.runTestsInstance = new TestableBaseRunTests(
                 null,
                 testExecutionContext,
                 null,
-                this.mockTestRunEventsHandler.Object);
+                this.mockTestRunEventsHandler.Object,
+                this.mockTestPlatformEventSource.Object);
         }
 
         #region Constructor tests
@@ -258,6 +260,45 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             Assert.IsNotNull(receivedExecutor);
             Assert.AreEqual(BaseRunTestsExecutorUri, receivedExecutor.Metadata.ExtensionUri);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldInstrumentExecutionStart()
+        {
+            this.runTestsInstance.RunTests();
+                    
+            this.mockTestPlatformEventSource.Verify(x => x.ExecutionStart(), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldInstrumentExecutionStop()
+        {
+
+            this.SetupExecutorUriMock();
+
+            this.runTestsInstance.RunTests();     
+                   
+            this.mockTestPlatformEventSource.Verify(x => x.ExecutionStop(It.IsAny<long>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldInstrumentAdapterExecutionStart()
+        {
+            this.SetupExecutorUriMock();
+
+            this.runTestsInstance.RunTests();
+
+            this.mockTestPlatformEventSource.Verify(x => x.AdapterExecutionStart(It.IsAny<string>()), Times.AtLeastOnce);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldInstrumentAdapterExecutionStop()
+        {
+            this.SetupExecutorUriMock();
+
+            this.runTestsInstance.RunTests();
+
+            this.mockTestPlatformEventSource.Verify(x => x.AdapterExecutionStop(It.IsAny<long>()), Times.AtLeastOnce);
         }
 
         [TestMethod]
@@ -521,6 +562,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         #endregion
 
+        #region Private Methods
+
+        private void SetupExecutorUriMock()
+        {
+            var executorUriExtensionMap = new List<Tuple<Uri, string>>
+            {
+                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants.UnspecifiedAdapterPath)
+            };
+            LazyExtension<ITestExecutor, ITestExecutorCapabilities> receivedExecutor = null;
+
+            // Setup mocks.
+            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
+            this.runTestsInstance.InvokeExecutorCallback =
+                (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
+                {
+                    receivedExecutor = executor;
+                };
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location },
+                () => { });
+        }
+        #endregion
+
         #region Testable Implementation
 
         private class TestableBaseRunTests : BaseRunTests
@@ -529,8 +593,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 string runSettings,
                 TestExecutionContext testExecutionContext,
                 ITestCaseEventsHandler testCaseEventsHandler,
-                ITestRunEventsHandler testRunEventsHandler)
-                : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
+                ITestRunEventsHandler testRunEventsHandler,
+                ITestPlatformEventSource testPlatformEventSource)
+                : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
             {
             }
 

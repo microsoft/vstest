@@ -14,6 +14,54 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
     public class ArgumentProcessorFactoryTests
     {
         [TestMethod]
+        public void CreateArgumentProcessorIsTreatingNonArgumentAsSource()
+        {
+            string argument = "--NonArgumet:Dummy";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(TestSourceArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorIsTreatingNonArgumentAsSourceEvenItIsStratingFromForwardSlash()
+        {
+            string argument = "/foo/foo.dll";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(TestSourceArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorShouldReturnPlatformArgumentProcessorWhenArgumentIsPlatform()
+        {
+            string argument = "/Platform:x64";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(PlatformArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorShouldReturnPlatformArgumentProcessorWhenArgumentIsPlatformInXplat()
+        {
+            string argument = "--Platform:x64";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(PlatformArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
         public void BuildCommadMapsForProcessorWithIsSpecialCommandSetAddsProcessorToSpecialMap()
         {
             var specialCommands = GetArgumentProcessors(specialCommandFilter: true)
