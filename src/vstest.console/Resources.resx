@@ -378,15 +378,15 @@
     <value>Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning.</value>
   </data>
   <data name="FrameworkArgumentHelp" xml:space="preserve">
-    <value>/Framework:&lt;Framework Version&gt;
+    <value>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are Framework35, Framework40 and Framework45</value>
+      Valid values are Framework35, Framework40, Framework45 and FrameworkCore10.</value>
   </data>
   <data name="FrameworkVersionRequired" xml:space="preserve">
     <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:Framework40</value>
   </data>
   <data name="InvalidFrameworkVersion" xml:space="preserve">
-    <value>Invalid .Net Framework version:{0}. Supported .Net Framework versions are Framework35, Framework40 and Framework45.</value>
+    <value>Invalid .Net Framework version:{0}. Supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</value>
   </data>
   <data name="AppContainerTestPrerequisiteFail" xml:space="preserve">
     <value>Could not start test run for unit tests for Windows Store app: {0}.</value>
@@ -489,7 +489,9 @@
   </data>
   <data name="ParallelArgumentProcessorHelp" xml:space="preserve">
     <value>--Parallel|/Parallel
-Specifies that the tests be executed in parallel. By default up to all available cores on the machine may be used. The number of cores to use may be configured using a settings file.</value>
+      Specifies that the tests be executed in parallel. By default up
+      to all available cores on the machine may be used.
+      The number of cores to use may be configured using a settings file.</value>
   </data>
   <data name="InvalidParallelCommand" xml:space="preserve">
     <value>Argument {0} is not expected in the 'Parallel' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again.</value>
@@ -499,7 +501,7 @@ Specifies that the tests be executed in parallel. By default up to all available
   </data>
   <data name="PortArgumentHelp" xml:space="preserve">
     <value>--Port|/Port:&lt;Port&gt;
-     The Port for socket connection and receiving the event messages.</value>
+      The Port for socket connection and receiving the event messages.</value>
   </data>
   <data name="InvalidPortArgument" xml:space="preserve">
     <value>The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.</value>
@@ -512,18 +514,18 @@ Specifies that the tests be executed in parallel. By default up to all available
   </data>
   <data name="BuildBasePathArgumentHelp" xml:space="preserve">
     <value>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
-     The directory containing the temporary outputs.</value>
+      The directory containing the temporary outputs.</value>
   </data>
   <data name="ConfigurationArgumentHelp" xml:space="preserve">
     <value>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
-     The configuration the project is built for i.e. Debug/Release</value>
+      The configuration the project is built for i.e. Debug/Release</value>
   </data>
   <data name="InvalidConfiguration" xml:space="preserve">
     <value>The given configuration is invalid.</value>
   </data>
   <data name="OutputArgumentHelp" xml:space="preserve">
     <value>-o|--Output|/o|/Output:&lt;Output&gt;
-     The directory containing the binaries to run.</value>
+      The directory containing the binaries to run.</value>
   </data>
   <data name="BuildBasePathNotFound" xml:space="preserve">
     <value>The BuildBasePath was not found, provide a valid path and try again.</value>
@@ -595,7 +597,7 @@ Specifies that the tests be executed in parallel. By default up to all available
   </data>
   <data name="ParentProcessIdArgumentHelp" xml:space="preserve">
     <value>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
-     Process Id of the Parent Process responsible for launching current process.</value>
+      Process Id of the Parent Process responsible for launching current process.</value>
   </data>
   <data name="InvalidParentProcessIdArgument" xml:space="preserve">
     <value>The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</value>
