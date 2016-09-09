@@ -7,11 +7,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
@@ -20,7 +22,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     {
         private ITestRunEventsHandler testRunEventsHandler;
 
+        private ITestPlatformEventSource testPlatformEventSource;
+
         private BaseRunTests activeTestRun;
+
+        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource):this()
+        {
+            this.testPlatformEventSource = testPlatformEventSource;
+        }
+
+        public ExecutionManager()
+        {
+            this.testPlatformEventSource = TestPlatformEventSource.Instance;
+        }
 
         #region IExecutionManager Implementation
 
@@ -30,9 +44,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
         public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
         {
+            this.testPlatformEventSource.AdapterSearchStart();
             // Start using these additional extensions
             TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
             this.LoadExtensions();
+            this.testPlatformEventSource.AdapterSearchStop();
         }
 
         /// <summary>

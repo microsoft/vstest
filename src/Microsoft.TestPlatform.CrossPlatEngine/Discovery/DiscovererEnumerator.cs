@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
     /// <summary>
     /// Enumerates through all the discoverers.
@@ -23,14 +25,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     internal class DiscovererEnumerator
     {
         private DiscoveryResultCache discoveryResultCache;
+        private ITestPlatformEventSource testPlatformEventSource;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscovererEnumerator"/> class.
         /// </summary>
         /// <param name="discoveryResultCache"> The discovery result cache. </param>
-        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache)
+        /// <param name="testPlatformEventSource1"></param>
+        public DiscovererEnumerator(DiscoveryResultCache discoveryResultCache):this(discoveryResultCache, TestPlatformEventSource.Instance)
+        {            
+        }
+
+        internal DiscovererEnumerator(
+            DiscoveryResultCache discoveryResultCache,
+            ITestPlatformEventSource testPlatformEventSource)
         {
             this.discoveryResultCache = discoveryResultCache;
+            this.testPlatformEventSource = testPlatformEventSource;
         }
 
         /// <summary>
@@ -41,10 +52,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="logger"> The logger. </param>
         internal void LoadTests(IDictionary<string, IEnumerable<string>> testExtensionSourceMap, IRunSettings settings, IMessageLogger logger)
         {
+            this.testPlatformEventSource.DiscoveryStart();
             foreach (var kvp in testExtensionSourceMap)
             {
                 this.LoadTestsFromAnExtension(kvp.Key, kvp.Value, settings, logger);
             }
+            this.testPlatformEventSource.DiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests);
         }
 
         /// <summary>
@@ -75,6 +88,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             var discoverySink = new TestCaseDiscoverySink(this.discoveryResultCache);
 
+
+            
             foreach (var discoverer in discovererToSourcesMap.Keys)
             {
                 Type discovererType = null;
@@ -106,7 +121,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                             discoverer.Value.GetType().FullName);
                     }
 
+                    var currentTotalTests = this.discoveryResultCache.TotalDiscoveredTests;
+
+                    this.testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);                    
                     discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
+                    this.testPlatformEventSource.AdapterDiscoveryStop(this.discoveryResultCache.TotalDiscoveredTests - currentTotalTests);
 
                     if (EqtTrace.IsVerboseEnabled)
                     {
@@ -126,6 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     logger.SendMessage(TestMessageLevel.Error, message);
                     EqtTrace.Error(e);
                 }
+                
             }
         }
 
@@ -210,7 +230,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             return result;
         }
-
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",

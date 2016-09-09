@@ -10,10 +10,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using Utilities;
     using System.Linq;
     using System.Reflection;
+    using CoreUtilities.Tracing;
+
+    using Moq;
+    using CoreUtilities.Tracing.Interfaces;
 
     [TestClass]
     public class ExecutorUnitTests
     {
+        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
+
+        [TestInitialize]
+        public void TestInit()
+        {
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
+        }
+
         /// <summary>
         /// Executor should Print splash screen first
         /// </summary>
@@ -21,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         public void ExecutorPrintsSplashScreenTest()
         {
             var mockOutput = new MockOutput();
-            var exitCode = new Executor(mockOutput).Execute("/?");
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("/?");
 
             Assert.AreEqual(0, exitCode, "Exit code must be One for bad arguments");
 
@@ -41,9 +53,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         /// </summary>
         [TestMethod]
         public void ExecutorEmptyArgsCallRunTestsProcessor()
-        {
+        {            
             var mockOutput = new MockOutput();
-            var exitCode = new Executor(mockOutput).Execute(null);
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
 
             // Since no projectjsons exist in current folder it should fail
             Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
@@ -56,6 +68,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             //Assert.IsTrue(mockOutput.Messages.First().Message.Contains(
             //    Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.MicrosoftCommandLineTitle.Substring(0, 20)),
             //    "First Printed message must be Microsoft Copyright");
+        }
+
+        [TestMethod]
+        public void ExecuteShouldInstrumentVsTestConsoleStart()
+        {
+            var mockOutput = new MockOutput();
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(It.IsAny<string[]>());
+
+            this.mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStart(), Times.Once);
+        }
+
+        [TestMethod]
+        public void ExecuteShouldInstrumentVsTestConsoleStop()
+        {
+            var mockOutput = new MockOutput();
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(It.IsAny<string[]>());
+
+            this.mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStop(), Times.Once);
         }
 
 

@@ -2,6 +2,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
+    using CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>

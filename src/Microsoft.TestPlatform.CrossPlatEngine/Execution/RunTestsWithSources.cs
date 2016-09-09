@@ -11,14 +11,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using ObjectModel.Logging;
     using ObjectModel.Client;
+
     internal class RunTestsWithSources : BaseRunTests
     {
         private Dictionary<string, IEnumerable<string>> adapterSourceMap;
@@ -39,9 +41,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testExecutionContext"></param>
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
-        /// <param name="executorUriVsSourceList"></param>
+        /// <param name="executorUriVsSourceList"></param>        
         internal RunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
-            : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler)
+            : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
         {
             this.adapterSourceMap = adapterSourceMap;
             this.executorUriVsSourceList = executorUriVsSourceList;
