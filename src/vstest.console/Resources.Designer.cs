@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         
         /// <summary>
         ///    Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
-        ///     The directory containing the temporary outputs..
+        ///      The directory containing the temporary outputs..
         /// </summary>
         public static string BuildBasePathArgumentHelp {
             get {
@@ -251,7 +251,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         
         /// <summary>
         ///    Looks up a localized string similar to -c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
-        ///     The configuration the project is built for i.e. Debug/Release.
+        ///      The configuration the project is built for i.e. Debug/Release.
         /// </summary>
         public static string ConfigurationArgumentHelp {
             get {
@@ -446,10 +446,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to /Framework:&lt;Framework Version&gt;
+        ///    Looks up a localized string similar to --Framework|/Framework:&lt;Framework Version&gt;
         ///      Target .Net Framework version to be used for test execution. 
         ///      Valid values are &quot;.NETFramework,Version=v4.6&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
-        ///Other supported values are Framework35, Framework40 and Framework45.
+        ///      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.
         /// </summary>
         public static string FrameworkArgumentHelp {
             get {
@@ -846,7 +846,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         
         /// <summary>
         ///    Looks up a localized string similar to -o|--Output|/o|/Output:&lt;Output&gt;
-        ///     The directory containing the binaries to run..
+        ///      The directory containing the binaries to run..
         /// </summary>
         public static string OutputArgumentHelp {
             get {
@@ -865,7 +865,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         
         /// <summary>
         ///    Looks up a localized string similar to --Parallel|/Parallel
-        ///Specifies that the tests be executed in parallel. By default up to all available cores on the machine may be used. The number of cores to use may be configured using a settings file..
+        ///      Specifies that the tests be executed in parallel. By default up
+        ///      to all available cores on the machine may be used.
+        ///      The number of cores to use may be configured using a settings file..
         /// </summary>
         public static string ParallelArgumentProcessorHelp {
             get {
@@ -875,7 +877,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         
         /// <summary>
         ///    Looks up a localized string similar to --ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
-        ///     Process Id of the Parent Process responsible for launching current process..
+        ///      Process Id of the Parent Process responsible for launching current process..
         /// </summary>
         public static string ParentProcessIdArgumentHelp {
             get {
@@ -932,7 +934,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         
         /// <summary>
         ///    Looks up a localized string similar to --Port|/Port:&lt;Port&gt;
-        ///     The Port for socket connection and receiving the event messages..
+        ///      The Port for socket connection and receiving the event messages..
         /// </summary>
         public static string PortArgumentHelp {
             get {
