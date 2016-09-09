@@ -5,7 +5,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
     using System;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -26,12 +26,6 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
                                                    LineNumber = 999,
                                                    Traits = { new Trait("Priority", "0"), new Trait("Category", "unit") }
                                                };
-
-        private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-                                                                       {
-                                                                           ContractResolver = new TestPlatformContractResolver(),
-                                                                           TypeNameHandling = TypeNameHandling.None
-                                                                       };
 
         [TestMethod]
         public void TestCaseJsonShouldContainAllPropertiesOnSerialization()
@@ -141,12 +135,12 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
 
         private static string Serialize<T>(T data)
         {
-            return JsonConvert.SerializeObject(data, serializerSettings);
+            return JsonDataSerializer.Instance.Serialize(data);
         }
 
         private static T Deserialize<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json, serializerSettings);
+            return JsonDataSerializer.Instance.Deserialize<T>(json);
         }
     }
 }

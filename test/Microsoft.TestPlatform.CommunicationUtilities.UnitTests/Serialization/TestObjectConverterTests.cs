@@ -3,27 +3,16 @@
 namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
 {
     using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Globalization;
     using System.Linq;
     using System.Runtime.Serialization;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Newtonsoft.Json;
 
     [TestClass]
     public class TestObjectConverterTests
     {
-        private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-                                                                       {
-                                                                           ContractResolver = new TestPlatformContractResolver(),
-                                                                           TypeNameHandling = TypeNameHandling.None
-                                                                       };
-
         [TestMethod]
         public void TestObjectJsonShouldContainOnlyProperties()
         {
@@ -74,6 +63,20 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         }
 
         [TestMethod]
+        public void TestObjectShouldSerializeDateTimeOffsetForProperty()
+        {
+            var test = new TestableTestObject();
+            var testProperty1 = TestProperty.Register("12", "label1", typeof(DateTimeOffset), typeof(TestableTestObject));
+            var testPropertyData1 = DateTimeOffset.MaxValue;
+            test.SetPropertyValue(testProperty1, testPropertyData1);
+
+            var json = Serialize(test);
+
+            var expectedJson = "{\"Properties\":[{\"Key\":{\"Id\":\"12\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
+            Assert.AreEqual(expectedJson, json);
+        }
+
+        [TestMethod]
         public void TestObjectShouldDeserializeCustomProperties()
         {
             var json = "{\"Properties\":[{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Guid\"},\"Value\":\"02048dfd-3da7-475d-a011-8dd1121855ec\"},{\"Key\":{\"Id\":\"2\",\"Label\":\"label2\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Int32\"},\"Value\":29}]}";
@@ -103,21 +106,33 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         {
             var json = "{\"Properties\":[{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String[]\"},\"Value\":[\"val1\", \"val2\"]}]}";
 
-            var test = Deserialize<TestCase>(json);
+            var test = Deserialize<TestableTestObject>(json);
 
             var properties = test.Properties.ToArray();
             Assert.AreEqual(1, properties.Length);
             CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(properties[0]));
         }
 
+        [TestMethod]
+        public void TestObjectShouldDeserializeDatetimeOffset()
+        {
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"11\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
+
+            var test = Deserialize<TestableTestObject>(json);
+
+            var properties = test.Properties.ToArray();
+            Assert.AreEqual(1, properties.Length);
+            Assert.AreEqual(DateTimeOffset.MaxValue, test.GetPropertyValue(properties[0]));
+        }
+
         private static string Serialize<T>(T data)
         {
-            return JsonConvert.SerializeObject(data, serializerSettings);
+            return JsonDataSerializer.Instance.Serialize(data);
         }
 
         private static T Deserialize<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json, serializerSettings);
+            return JsonDataSerializer.Instance.Deserialize<T>(json);
         }
     }
 

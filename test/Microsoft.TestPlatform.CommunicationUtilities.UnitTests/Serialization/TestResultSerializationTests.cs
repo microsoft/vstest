@@ -3,13 +3,11 @@
 namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
 {
     using System;
-    using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
@@ -35,12 +33,6 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
                                                        EndTime = DateTimeOffset.MaxValue
                                                    };
 
-        private static JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-                                                                       {
-                                                                           ContractResolver = new TestPlatformContractResolver(),
-                                                                           TypeNameHandling = TypeNameHandling.None
-                                                                       };
-
         [TestMethod]
         public void TestResultJsonShouldContainAllPropertiesOnSerialization()
         {
@@ -64,7 +56,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
 
             // By default json.net converts DateTimes to current time zone
             Assert.AreEqual("TestResult.StartTime", properties[6]["Key"]["Id"].Value);
-            Assert.AreEqual(DateTimeOffset.MinValue, ((DateTimeOffset)properties[6]["Value"].Value).ToUniversalTime());
+            Assert.AreEqual(DateTimeOffset.MinValue.Year, ((DateTimeOffset)properties[6]["Value"].Value).Year);
             Assert.AreEqual("TestResult.EndTime", properties[7]["Key"]["Id"].Value);
             Assert.AreEqual(DateTimeOffset.MaxValue.Year, ((DateTimeOffset)properties[7]["Value"].Value).Year);
         }
@@ -83,7 +75,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual(testResult.ComputerName, test.ComputerName);
             Assert.AreEqual(testResult.DisplayName, test.DisplayName);
             Assert.AreEqual(testResult.Duration, test.Duration);
-            Assert.AreEqual(testResult.EndTime.Year, test.EndTime.Year);
+            Assert.AreEqual(testResult.EndTime, test.EndTime);
             Assert.AreEqual(testResult.ErrorMessage, test.ErrorMessage);
             Assert.AreEqual(testResult.ErrorStackTrace, test.ErrorStackTrace);
             Assert.AreEqual(testResult.Outcome, test.Outcome);
@@ -116,13 +108,12 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
 
         private static string Serialize<T>(T data)
         {
-            return JsonConvert.SerializeObject(data, serializerSettings);
+            return JsonDataSerializer.Instance.Serialize(data);
         }
 
         private static T Deserialize<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json, serializerSettings);
+            return JsonDataSerializer.Instance.Deserialize<T>(json);
         }
-        
     }
 }
