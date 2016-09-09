@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Test Run was aborted because.
+        ///    Looks up a localized string similar to The active Test Run was aborted because {0}.
         /// </summary>
         public static string AbortedTestRun {
             get {

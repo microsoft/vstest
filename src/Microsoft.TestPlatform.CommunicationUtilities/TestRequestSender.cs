@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     {
         private ICommunicationManager communicationManager;
 
-        private bool isConnectionBroken=false;
+        private bool sendMessagesToRemoteHost = true;
 
         private IDataSerializer dataSerializer;
 
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void EndSession()
         {
             // don't try to communicate if connection is broken
-            if (isConnectionBroken)
+            if (!sendMessagesToRemoteHost)
             {
                 EqtTrace.Error("Connection has been broken: not sending SessionEnd message");
                 return;
@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Error("Server: TestExecution: Receive raw message failed with {0}", exception);
 
                     // to avoid furthur communication with remote host
-                    isConnectionBroken = true;
+                    sendMessagesToRemoteHost = false;
 
                     OnTestRunAbort(testRunEventsHandler, exception, Resources.ConnectionClosed);
                     isTestRunComplete = true;
@@ -230,15 +230,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
         }
 
-        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, string logMessage)
+        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, string reason)
         {
             // log console message to user
-            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestRun + " " +logMessage);
+            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, string.Format(Resources.AbortedTestRun, reason));
 
             // notify of a test run complete and bail out.
             var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
             testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
-
         }
         
         /// <summary>
