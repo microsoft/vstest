@@ -244,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
             if (runCompleteArgs == null)
             {
-                throw new ArgumentNullException("HandleTestRunComplete received runCompleteArgs argument as null");
+                throw new ArgumentNullException(nameof(runCompleteArgs));
             }
             bool isAborted = runCompleteArgs.IsAborted;
             bool isCanceled = runCompleteArgs.IsCanceled;

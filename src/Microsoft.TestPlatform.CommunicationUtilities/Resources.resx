@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AbortedTestRun" xml:space="preserve">
-    <value>The active Test Run was aborted because</value>
+    <value>The active Test Run was aborted because {0}</value>
   </data>
   <data name="ConnectionClosed" xml:space="preserve">
     <value>An existing connection was forcibly closed by the remote host.</value>
