@@ -6,11 +6,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     [TestClass]
     public class FrameworkHandleTests
@@ -18,14 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void EnableShutdownAfterTestRunShoudBeFalseByDefault()
         {
-            var tec = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: string.Empty);
+            var tec = GetTestExecutionContext();
             var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null);
 
             Assert.IsFalse(frameworkHandle.EnableShutdownAfterTestRun);
@@ -34,14 +28,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void EnableShutdownAfterTestRunShoudBeSetAppropriately()
         {
-            var tec = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: string.Empty);
+            var tec = GetTestExecutionContext();
             var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null);
 
             frameworkHandle.EnableShutdownAfterTestRun = true;
@@ -52,14 +39,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void LaunchProcessWithDebuggerAttachedShouldThrowIfObjectIsDisposed()
         {
-            var tec = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: string.Empty);
+            var tec = GetTestExecutionContext();
             var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null);
             frameworkHandle.Dispose();
 
@@ -70,14 +50,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         // [TestMethod]
         public void LaunchProcessWithDebuggerAttachedShouldThrowIfNotInDebugContext()
         {
-            var tec = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: string.Empty);
+            var tec = GetTestExecutionContext();
             var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null);
 
             var isExceptionThrown = false;
@@ -97,24 +70,35 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void LaunchProcessWithDebuggerAttachedShouldCallRunEventsHandler()
         {
-            var tec = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: true,
-                testCaseFilter: string.Empty);
-
+            var tec = GetTestExecutionContext();
+            tec.IsDebug = true;
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
-            var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }),
-                tec, mockTestRunEventsHandler.Object);
+            var frameworkHandle = new FrameworkHandle(
+                                      null,
+                                      new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }),
+                                      tec,
+                                      mockTestRunEventsHandler.Object);
 
             frameworkHandle.LaunchProcessWithDebuggerAttached(null, null, null, null);
 
             mockTestRunEventsHandler.Verify(mt =>
                 mt.LaunchProcessWithDebuggerAttached(It.IsAny<TestProcessStartInfo>()), Times.Once);
+        }
+
+        private static TestExecutionContext GetTestExecutionContext()
+        {
+            var tec = new TestExecutionContext(
+                          frequencyOfRunStatsChangeEvent: 100,
+                          runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                          inIsolation: false,
+                          keepAlive: false,
+                          isDataCollectionEnabled: false,
+                          areTestCaseLevelEventsRequired: false,
+                          hasTestRun: false,
+                          isDebug: false,
+                          testCaseFilter: string.Empty);
+            return tec;
         }
     }
 }

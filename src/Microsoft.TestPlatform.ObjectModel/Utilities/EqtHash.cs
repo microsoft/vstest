@@ -26,6 +26,9 @@ using System.Security.Cryptography;
             Debug.Assert(data != null);
 #if NET46
             using (HashAlgorithm provider = new SHA1CryptoServiceProvider())
+#else
+            using (var provider = System.Security.Cryptography.SHA1.Create())
+#endif
             {
                 byte[] hash = provider.ComputeHash(System.Text.Encoding.Unicode.GetBytes(data));
 
@@ -37,11 +40,6 @@ using System.Security.Cryptography;
 
                 return new Guid(toGuid);
             }
-
-#else
-            // Not used for CoreSystem
-            throw new NotImplementedException();
-#endif
         }
     }
 }

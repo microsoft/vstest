@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Stats on the test run state

@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         private void ConvertToRawMessageAndSend(string messageType, object payload)
         {
-            var rawMessage = this.dataSerializer.SerializeObject(messageType, payload);
+            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             this.actualRunEventsHandler.HandleRawMessage(rawMessage);
         }
     }

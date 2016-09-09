@@ -5,68 +5,68 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
-    using Newtonsoft.Json;
+    using System.Runtime.Serialization;
 
     /// <summary>
-    /// Defines the discovery criterion
+    /// Defines the discovery criterion.
     /// </summary>
+    [DataContract]
     public class DiscoveryCriteria
     {
         /// <summary>
-        /// Criteria used for test discovery
+        /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class.
         /// </summary>
-        /// <param name="sources">Sources from which the tests should be discovered</param>
-        /// <param name="frequencyOfDiscoveredTestsEvent">Frequency of discovered test event</param>
-        /// <param name="runSettings">Run Settings for the discovery.</param>
+        /// <remarks>This constructor doesn't perform any parameter validation, it is meant to be used for serialization."/></remarks>
+        public DiscoveryCriteria()
+        {
+            // Parameterless constructor is used for Serialization.
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class.
+        /// </summary>
+        /// <param name="sources">
+        /// Sources from which the tests should be discovered.
+        /// </param>
+        /// <param name="frequencyOfDiscoveredTestsEvent">
+        /// Frequency of discovered test event. This is used for batching discovered tests.
+        /// </param>
+        /// <param name="testSettings">
+        /// Test configuration provided by user.
+        /// </param>
         public DiscoveryCriteria(IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, string testSettings)
             : this(sources, frequencyOfDiscoveredTestsEvent, TimeSpan.MaxValue, testSettings)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class.
+        /// Initializes a new instance of the <see cref="DiscoveryCriteria"/> class. 
         /// </summary>
-        /// <param name="sources"> The sources. </param>
-        /// <param name="frequencyOfDiscoveredTestsEvent"> The frequency of discovered tests event. </param>
-        /// <param name="discoveredTestEventTimeout"> The discovered test event timeout. </param>
-        /// <param name="runSettings"> The run settings. </param>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// </exception>
-        [JsonConstructor]
-        public DiscoveryCriteria(Dictionary<string, IEnumerable<string>> adapterSourceMap, long frequencyOfDiscoveredTestsEvent, TimeSpan discoveredTestEventTimeout, string runSettings)
-        {
-            ValidateArg.NotNullOrEmpty(adapterSourceMap, "adapterSourceMap");
-            if (frequencyOfDiscoveredTestsEvent <= 0) throw new ArgumentOutOfRangeException("frequencyOfDiscoveredTestsEvent", Resources.NotificationFrequencyIsNotPositive);
-            if (discoveredTestEventTimeout <= TimeSpan.MinValue) throw new ArgumentOutOfRangeException("discoveredTestEventTimeout", Resources.NotificationTimeoutIsZero);
-
-            this.AdapterSourceMap = adapterSourceMap;
-            this.FrequencyOfDiscoveredTestsEvent = frequencyOfDiscoveredTestsEvent;
-            this.DiscoveredTestEventTimeout = discoveredTestEventTimeout;
-
-            this.RunSettings = runSettings;
-        }
-
-        /// <summary>
-        /// Criteria used for test discovery
-        /// </summary>
-        /// <param name="sources">Sources from which the tests should be discovered</param>
-        /// <param name="frequencyOfDiscoveredTestsEvent">Frequency of discovered test event</param>
-        /// <param name="discoveredTestEventTimeout">Timeout that triggers the discovered test event regardless of cache size.</param>
-        /// <param name="runSettings">Run Settings for the discovery.</param>
+        /// <param name="sources">
+        /// Sources from which the tests should be discovered
+        /// </param>
+        /// <param name="frequencyOfDiscoveredTestsEvent">
+        /// Frequency of discovered test event. This is used for batching discovered tests.
+        /// </param>
+        /// <param name="discoveredTestEventTimeout">
+        /// Timeout that triggers the discovered test event regardless of cache size.
+        /// </param>
+        /// <param name="runSettings">
+        /// Run Settings for the discovery.
+        /// </param>
         public DiscoveryCriteria(IEnumerable<string> sources, long frequencyOfDiscoveredTestsEvent, TimeSpan discoveredTestEventTimeout, string runSettings)
         {
             ValidateArg.NotNullOrEmpty(sources, "sources");
             if (frequencyOfDiscoveredTestsEvent <= 0)
             {
                 throw new ArgumentOutOfRangeException(
-                    "frequencyOfDiscoveredTestsEvent",
+                    nameof(frequencyOfDiscoveredTestsEvent),
                     Resources.NotificationFrequencyIsNotPositive);
             }
 
             if (discoveredTestEventTimeout <= TimeSpan.MinValue)
             {
-                throw new ArgumentOutOfRangeException("discoveredTestEventTimeout", Resources.NotificationTimeoutIsZero);
+                throw new ArgumentOutOfRangeException(nameof(discoveredTestEventTimeout), Resources.NotificationTimeoutIsZero);
             }
 
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
@@ -78,9 +78,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Test Containers (e.g. DLL/EXE/artifacts to scan)
+        /// Gets the test Containers (e.g. DLL/EXE/artifacts to scan)
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         public IEnumerable<string> Sources
         {
             get
@@ -91,16 +91,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
         
         /// <summary>
-        /// The test adapter and source map which would look like below:
+        /// Gets the test adapter and source map which would look like below:
+        /// <code>
         /// { C:\temp\testAdapter1.dll : [ source1.dll, source2.dll ], C:\temp\testadapter2.dll : [ source3.dll, source2.dll ]
+        /// </code>
         /// </summary>
-        public Dictionary<string, IEnumerable<string>> AdapterSourceMap
-        {
-            get; private set;
-        }
+        [DataMember]
+        public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
 
         /// <summary>
-        /// Defines the frequency of discovered test event. 
+        /// Gets the frequency of discovered test event. 
         /// </summary>
         /// <remarks>
         /// Discovered test event will be raised after discovering these number of tests. 
@@ -108,16 +108,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// paused during the listener invocation. So if the event handler, you try to query the 
         /// next set of tests, you may get more than 'FrequencyOfDiscoveredTestsEvent'.
         /// </remarks>        
+        [DataMember]
         public long FrequencyOfDiscoveredTestsEvent { get; private set; }
 
         /// <summary>
-        /// Timeout that triggers the discovered test event regardless of cache size.
+        /// Gets the timeout that triggers the discovered test event regardless of cache size.
         /// </summary>
+        [DataMember]
         public TimeSpan DiscoveredTestEventTimeout { get; private set; }
 
         /// <summary>
-        /// Settings used for the discovery request. 
+        /// Gets the test settings used for the discovery request. 
         /// </summary>
+        [DataMember]
         public string RunSettings { get; private set; }
     }
 }

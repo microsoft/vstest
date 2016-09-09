@@ -3,44 +3,49 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Runtime.Serialization;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Utilities;
-    using Newtonsoft.Json;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
     /// Stores information about a test case.
     /// </summary>
     [DataContract]
-    [KnownType(typeof(string[]))]
-    [KnownType(typeof(KeyValuePair<string, string>[]))]
-    [KnownType(typeof(TestOutcome))]
     public sealed class TestCase : TestObject
     {
-
 #if TODO
         /// <summary>
         /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties. 
         /// Note that this data is available only for in-Proc execution, and may not be available for OutProc executors
         /// </summary>
         private Object m_localExtensionData;
-
 #endif
-        private Guid m_defaultId = Guid.Empty;
+        private Guid defaultId = Guid.Empty;
 
         #region Constructor
 
-        [JsonConstructor]
-        private TestCase() { }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCase"/> class.
+        /// </summary>
+        /// <remarks>This constructor doesn't perform any parameter validation, it is meant to be used for serialization."/></remarks>
+        public TestCase()
+        {
+            // Default constructor for Serialization.
+        }
 
         /// <summary>
-        /// Initializes with the name of the test case.
+        /// Initializes a new instance of the <see cref="TestCase"/> class. 
         /// </summary>
-        /// <param name="fullyQualifiedName">Fully qualified name of the test case.</param>
-        /// <param name="executorUri">The Uri of the executor to use for running this test.</param>
-        /// <param name="source">Test container source from which the test is discovered.</param>
+        /// <param name="fullyQualifiedName">
+        /// Fully qualified name of the test case.
+        /// </param>
+        /// <param name="executorUri">
+        /// The Uri of the executor to use for running this test.
+        /// </param>
+        /// <param name="source">
+        /// Test container source from which the test is discovered.
+        /// </param>
         public TestCase(string fullyQualifiedName, Uri executorUri, string source)
         {
             ValidateArg.NotNullOrEmpty(fullyQualifiedName, "fullyQualifiedName");
@@ -69,102 +74,146 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #endif
 
         /// <summary>
-        /// Id of the test case.
+        /// Gets or sets the id of the test case.
         /// </summary>
+        [IgnoreDataMember]
         public Guid Id
         {
             get
             {
-                var id = GetPropertyValue<Guid>(TestCaseProperties.Id, Guid.Empty);
+                var id = this.GetPropertyValue<Guid>(TestCaseProperties.Id, Guid.Empty);
                 if (id == Guid.Empty)
                 {
                     // user has not specified his own Id during ctor! We will cache Id if its empty
-                    if (m_defaultId == Guid.Empty)
+                    if (this.defaultId == Guid.Empty)
                     {
-                        m_defaultId = this.GetTestId();
+                        this.defaultId = this.GetTestId();
                     }
 
-                    return m_defaultId;
+                    return this.defaultId;
                 }
 
                 return id;
             }
+
             set
             {
-                SetPropertyValue(TestCaseProperties.Id, value);
+                this.SetPropertyValue(TestCaseProperties.Id, value);
             }
         }
 
         /// <summary>
-        /// Name of the test case.
+        /// Gets or sets the fully qualified name of the test case.
         /// </summary>
-        [DataMember]
+        [IgnoreDataMember]
         public string FullyQualifiedName
         {
-            get { return GetPropertyValue(TestCaseProperties.FullyQualifiedName, string.Empty); }
+            get
+            {
+                return this.GetPropertyValue(TestCaseProperties.FullyQualifiedName, string.Empty);
+            }
+
             set
             {
-                SetPropertyValue(TestCaseProperties.FullyQualifiedName, value);
+                this.SetPropertyValue(TestCaseProperties.FullyQualifiedName, value);
 
                 // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
-                m_defaultId = Guid.Empty;
+                this.defaultId = Guid.Empty;
             }
         }
 
         /// <summary>
-        /// Display name of the test case.
+        /// Gets or sets the display name of the test case.
         /// </summary>
-        [DataMember]
+        [IgnoreDataMember]
         public string DisplayName
         {
-            get { return GetPropertyValue(TestCaseProperties.DisplayName, FullyQualifiedName); }
-            set { SetPropertyValue(TestCaseProperties.DisplayName, value); }
-        }
-
-        /// <summary>
-        /// The Uri of the Executor to use for running this test.
-        /// </summary>
-        [DataMember]
-        public Uri ExecutorUri
-        {
-            get { return GetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, null); }
-            set { SetPropertyValue(TestCaseProperties.ExecutorUri, value); }
-        }
-
-        /// <summary>
-        /// Test container source from which the test is discovered
-        /// </summary>
-        [DataMember]
-        public string Source
-        {
-            get { return GetPropertyValue<string>(TestCaseProperties.Source, null); }
-            private set
+            get
             {
-                SetPropertyValue(TestCaseProperties.Source, value);
+                return this.GetPropertyValue(TestCaseProperties.DisplayName, this.FullyQualifiedName);
+            }
 
-                // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
-                m_defaultId = Guid.Empty;
+            set
+            {
+                this.SetPropertyValue(TestCaseProperties.DisplayName, value);
             }
         }
 
         /// <summary>
-        /// File path of the test
+        /// Gets or sets the Uri of the Executor to use for running this test.
         /// </summary>
-        [DataMember]
-        public string CodeFilePath
+        [IgnoreDataMember]
+        public Uri ExecutorUri
         {
-            get { return GetPropertyValue<string>(TestCaseProperties.CodeFilePath, null); }
-            set { SetPropertyValue(TestCaseProperties.CodeFilePath, value); }
+            get
+            {
+                return this.GetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, null);
+            }
+
+            set
+            {
+                this.SetPropertyValue(TestCaseProperties.ExecutorUri, value);
+            }
         }
 
         /// <summary>
-        /// Line number of the test
+        /// Gets the test container source from which the test is discovered.
         /// </summary>
-        [DataMember]
+        [IgnoreDataMember]
+        public string Source
+        {
+            get
+            {
+                return this.GetPropertyValue<string>(TestCaseProperties.Source, null);
+            }
+
+            private set
+            {
+                this.SetPropertyValue(TestCaseProperties.Source, value);
+
+                // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
+                this.defaultId = Guid.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the source code file path of the test.
+        /// </summary>
+        [IgnoreDataMember]
+        public string CodeFilePath
+        {
+            get
+            {
+                return this.GetPropertyValue<string>(TestCaseProperties.CodeFilePath, null);
+            }
+
+            set
+            {
+                this.SetPropertyValue(TestCaseProperties.CodeFilePath, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the line number of the test.
+        /// </summary>
+        [IgnoreDataMember]
         public int LineNumber
         {
-            get { return GetPropertyValue(TestCaseProperties.LineNumber, -1); }
-            set { SetPropertyValue(TestCaseProperties.LineNumber, value); }
+            get
+            {
+                return this.GetPropertyValue(TestCaseProperties.LineNumber, -1);
+            }
+
+            set
+            {
+                this.SetPropertyValue(TestCaseProperties.LineNumber, value);
+            }
+        }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return this.FullyQualifiedName;
         }
 
         #endregion
@@ -177,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>Guid test id</returns>
         private Guid GetTestId()
         {
-            //To generate id hash "ExecutorUri + source + Name";
+            // To generate id hash "ExecutorUri + source + Name";
 
             // HACK: if source is a file name then just use the filename for the identifier since the 
             // file might have moved between discovery and execution (in appx mode for example)
@@ -189,18 +238,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 source = Path.GetFileName(source);
             }
 
-            string testcaseFullName = ExecutorUri.ToString() + source + FullyQualifiedName;
+            string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;
             return EqtHash.GuidFromString(testcaseFullName);
         }
-        #endregion
 
-        /// <summary>
-        /// Override to help during debugging
-        /// </summary>
-        public override string ToString()
-        {
-            return this.FullyQualifiedName;
-        }
+        #endregion
     }
 
     /// <summary>
@@ -247,7 +289,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private static bool ValidateName(object value)
         {
-            return !(string.IsNullOrWhiteSpace((string)value));
+            return !string.IsNullOrWhiteSpace((string)value);
         }
 
         private static bool ValidateDisplay(object value)

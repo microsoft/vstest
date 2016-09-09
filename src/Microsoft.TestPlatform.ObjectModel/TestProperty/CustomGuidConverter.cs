@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft. All rights reserved.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
@@ -11,13 +11,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     internal class CustomGuidConverter : GuidConverter
     {
-       ///<inheritdoc/>       
+        /// <inheritdoc/>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            if(destinationType == typeof(Guid))
+            if (destinationType == typeof(Guid))
             {
                 return new Guid(value.ToString());
             }
+
             return base.ConvertTo(context, culture, value, destinationType);
         }
     }

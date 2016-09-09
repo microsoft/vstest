@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                 architecture = commandLineOptions.TargetArchitecture;
             }
 
-            var framework = Constants.DefaultFramework;
+            var framework = Framework.DefaultFramework;
 
             if (commandLineOptions != null && commandLineOptions.FrameworkVersionSpecified)
             {

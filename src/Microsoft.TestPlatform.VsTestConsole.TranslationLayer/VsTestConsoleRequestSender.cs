@@ -2,18 +2,19 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using System.Threading.Tasks;
-    using System.Threading;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
-    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
@@ -229,6 +230,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private void ListenAndReportTestCases(ITestDiscoveryEventsHandler eventHandler)
         {
             var isDiscoveryComplete = false;
+
             // Cycle through the messages that the vstest.console sends. 
             // Currently each of the operations are not separate tasks since they should not each take much time. 
             // This is just a notification.
@@ -256,10 +258,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     EqtTrace.Error("VsTestConsoleRequestSender: TestDiscovery: Message Deserialization failed with {0}", ex);
-                    // notify of a discovery complete and bail out.
+
+                    // Notify of a discovery complete and bail out.
                     eventHandler.HandleDiscoveryComplete(0, null, false);
                     isDiscoveryComplete = true;
                 }

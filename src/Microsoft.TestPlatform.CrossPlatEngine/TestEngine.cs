@@ -94,10 +94,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// <param name="architecture">The architecture we want the test host manager for.</param>
         /// <returns>An instance of the test host manager.</returns>
-        public ITestHostManager GetDefaultTestHostManager(Architecture architecture)
+        public ITestHostManager GetDefaultTestHostManager(Architecture architecture, Framework framework)
         {
             // This is expected to be called once every run so returning a new instance every time.
-            return new DefaultTestHostManager(architecture);
+            return new DefaultTestHostManager(architecture, framework);
         }
 
         #endregion

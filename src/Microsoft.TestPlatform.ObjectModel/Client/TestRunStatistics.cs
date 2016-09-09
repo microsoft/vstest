@@ -7,14 +7,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    using Newtonsoft.Json;
-
     /// <summary>
     /// Defines the test run stats header
     /// </summary>
     [DataContract]
     public class TestRunStatistics : ITestRunStatistics
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestRunStatistics"/> class.
+        /// </summary>
+        /// <remarks>This constructor doesn't perform any parameter validation, it is meant to be used for serialization."/></remarks>
+        public TestRunStatistics()
+        {
+            // Default constructor for Serialization.
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunStatistics"/> class.
         /// </summary>
@@ -30,7 +37,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="executedTests"> The executed tests. </param>
         /// <param name="stats"> The stats. </param>
         /// <remarks> This constructor is only needed to reconstruct the object during deserialization.</remarks>
-        [JsonConstructor]
         public TestRunStatistics(long executedTests, IDictionary<TestOutcome, long> stats)
         {
             this.ExecutedTests = executedTests;

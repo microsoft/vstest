@@ -37,13 +37,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             this.testableTestRunCache = new TestableTestRunCache();
             this.testExecutionContext = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: null);
+                                frequencyOfRunStatsChangeEvent: 100,
+                                runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                inIsolation: false,
+                                keepAlive: false,
+                                isDataCollectionEnabled: false,
+                                areTestCaseLevelEventsRequired: false,
+                                hasTestRun: false,
+                                isDebug: false,
+                                testCaseFilter: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         }
 

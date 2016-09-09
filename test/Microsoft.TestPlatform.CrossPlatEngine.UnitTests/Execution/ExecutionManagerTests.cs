@@ -88,15 +88,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             adapterSourceMap.Add(assemblyLocation, new List<string> { assemblyLocation });
-            
+
             var testExecutionContext = new TestExecutionContext(
-                1,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: null);
+                                           frequencyOfRunStatsChangeEvent: 1,
+                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                           inIsolation: false,
+                                           keepAlive: false,
+                                           isDataCollectionEnabled: false,
+                                           areTestCaseLevelEventsRequired: false,
+                                           hasTestRun: false,
+                                           isDebug: false,
+                                           testCaseFilter: null);
 
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
@@ -137,13 +139,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             };
 
             var testExecutionContext = new TestExecutionContext(
-                1,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: null);
+                                           frequencyOfRunStatsChangeEvent: 1,
+                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                           inIsolation: false,
+                                           keepAlive: false,
+                                           isDataCollectionEnabled: false,
+                                           areTestCaseLevelEventsRequired: false,
+                                           hasTestRun: false,
+                                           isDebug: false,
+                                           testCaseFilter: null);
 
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 

@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #endregion
 
         #region Static Methods
-
+        
         /// <summary>
         /// Creates ArgumentProcessorFactory.
         /// </summary>
@@ -200,6 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new PortArgumentProcessor(),
                 new RunSettingsArgumentProcessor(),
                 new PlatformArgumentProcessor(),
+                new FrameworkArgumentProcessor(),
                 new EnableLoggerArgumentProcessor(),
                 new ParallelArgumentProcessor()
         };

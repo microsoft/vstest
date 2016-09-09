@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Class that holds Trait. 
@@ -12,10 +13,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #if NET46
     [Serializable]
 #endif
+    [DataContract]
     public class Trait
     {
-        public string Name { get; private set; }
-        public string Value { get; private set; }
+        [DataMember(Name = "Key")]
+        public string Name { get; set; }
+
+        [DataMember(Name = "Value")]
+        public string Value { get; set; }
 
         internal Trait(KeyValuePair<string, string> data)
             : this(data.Key, data.Value)

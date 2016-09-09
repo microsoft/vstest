@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
         private Architecture architecture;
         
-        private FrameworkVersion frameworkVersion;
+        private Framework frameworkVersion;
 
         #endregion
 
@@ -204,9 +204,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         internal IFileHelper FileHelper { get; set; }
 
         /// <summary>
-        /// Gets or sets the target .Net Framework version for test run.
+        /// Gets or sets the target Framework version for test run.
         /// </summary>
-        internal FrameworkVersion TargetFrameworkVersion
+        internal Framework TargetFrameworkVersion
         {
             get
             {

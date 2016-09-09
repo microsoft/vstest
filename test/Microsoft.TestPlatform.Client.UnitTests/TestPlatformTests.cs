@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateDiscoveryRequestShouldCreateDiscoveryRequestWithGivenCriteriaAndReturnIt()
         {
-            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86)).Returns(hostManager.Object);
+            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(hostManager.Object);
             discoveryManager.Setup(dm => dm.Initialize(It.IsAny<ITestHostManager>())).Verifiable();
             testEngine.Setup(te => te.GetDiscoveryManager()).Returns(discoveryManager.Object);
             testEngine.Setup(te => te.GetExtensionManager()).Returns(extensionManager.Object);
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateTestRunRequestShouldCreateTestRunRequestWithSpecifiedCriteria()
         {
-            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86)).Returns(hostManager.Object);
+            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(hostManager.Object);
             executionManager.Setup(dm => dm.Initialize(It.IsAny<ITestHostManager>())).Verifiable();
             testEngine.Setup(te => te.GetExecutionManager(It.IsAny<TestRunCriteria>())).Returns(executionManager.Object);
             testEngine.Setup(te => te.GetExtensionManager()).Returns(extensionManager.Object);
@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void CreateTestRunRequestShouldSetCustomHostLauncherOnEngineDefaultLauncherIfSpecified()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
-            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86)).Returns(hostManager.Object);
+            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(hostManager.Object);
             executionManager.Setup(dm => dm.Initialize(It.IsAny<ITestHostManager>())).Verifiable();
 
             testEngine.Setup(te => te.GetExecutionManager(It.IsAny<TestRunCriteria>())).Returns(executionManager.Object);

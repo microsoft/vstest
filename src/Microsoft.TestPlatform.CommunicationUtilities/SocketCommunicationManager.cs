@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
         public void SendMessage(string messageType)
         {
-            var serializedObject = this.dataSerializer.SerializeObject(messageType);
+            var serializedObject = this.dataSerializer.SerializeMessage(messageType);
             WriteAndFlushToChannel(serializedObject);
         }
 
@@ -198,7 +198,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="payload">payload to be sent</param>
         public void SendMessage(string messageType, object payload)
         {
-            var rawMessage = this.dataSerializer.SerializeObject(messageType, payload);
+            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             WriteAndFlushToChannel(rawMessage);
         }
 

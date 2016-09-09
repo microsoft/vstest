@@ -5,10 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Globalization;
     using System.Linq;
-    using System.Runtime.Serialization;
 
     /// <summary>
     /// Class that holds collection of traits
@@ -16,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #if NET46
     [Serializable]
 #endif
-    public class TraitCollection: IEnumerable<Trait>
+    public class TraitCollection : IEnumerable<Trait>
     {
         internal const string TraitPropertyId = "TestObject.Traits";
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
@@ -38,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #if NET46
         [NonSerialized]
 #endif
-        private TestObject testObject;
+        private readonly TestObject testObject;
 
         internal TraitCollection(TestObject testObject)
         {
@@ -87,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 yield break;
             }
 
-            var traits = this.testObject.GetPropertyValue<KeyValuePair<string, string>[]>(TraitsProperty, Enumerable.Empty<KeyValuePair<string, string>>().ToArray());
+            var traits = this.testObject.GetPropertyValue(TraitsProperty, Enumerable.Empty<KeyValuePair<string, string>>().ToArray());
 
             foreach (var trait in traits)
             {
