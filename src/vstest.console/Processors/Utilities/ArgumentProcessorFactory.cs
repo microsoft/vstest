@@ -6,9 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    
+
     /// <summary>
     /// Used to create the appropriate instance of an argument processor.
     /// </summary>
@@ -141,11 +141,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             IArgumentProcessor argumentProcessor;
             CommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
 
-            // If an argument processor was not found for the command, see if it is a test source
-            // argument.
+            // If an argument processor was not found for the command, then consider it as a test source argument.
             if (argumentProcessor == null)
             {
-                argumentProcessor = TryGetTestSourceArgument(argument, ref pair);
+                // Update the command pair since the command is actually the argument in the case of
+                // a test source.
+                pair = new CommandArgumentPair(TestSourceArgumentProcessor.CommandName, argument);
+
+                argumentProcessor = SpecialCommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
             }
 
             if (argumentProcessor != null)
@@ -200,31 +203,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new EnableLoggerArgumentProcessor(),
                 new ParallelArgumentProcessor()
         };
- 
-        /// <summary>
-        /// Checks the provided argument to see if it could be a test source and returns the test source
-        /// argument processor if it could be a test source.
-        /// </summary>
-        /// <param name="command">The command to test to see if it is a test source.</param>
-        /// <returns>The test source argument processor or null if the commnad is not a test source.</returns>
-        private IArgumentProcessor TryGetTestSourceArgument(string argument, ref CommandArgumentPair pair)
-        {
-            Contract.Requires(!String.IsNullOrWhiteSpace(argument));
-            IArgumentProcessor result = null;
-
-            // If the command does not begin with the command starter ("/" or "-"), then
-            // we considerer it to be a test source.
-            if (!argument.StartsWith(CommandStarter, StringComparison.OrdinalIgnoreCase) && !argument.StartsWith(XplatCommandStarter, StringComparison.OrdinalIgnoreCase))
-            {
-                result = SpecialCommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
-
-                // Update the command pair since the command is actually the argument in the case of
-                // a test source.
-                pair = new CommandArgumentPair(TestSourceArgumentProcessor.CommandName, argument);
-            }
-
-            return result;
-        }
 
         /// <summary>
         /// Builds the command to processor map and special command to processor map.
@@ -310,6 +288,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return processor;
         }
 
-#endregion
+        #endregion
     }
 }
