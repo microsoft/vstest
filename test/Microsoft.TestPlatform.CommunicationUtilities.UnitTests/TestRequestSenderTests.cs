@@ -4,8 +4,6 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -17,6 +15,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using System.IO;
 
     [TestClass]
     public class TestRequestSenderTests
@@ -43,7 +42,6 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.Verify(mc => mc.HostServer(), Times.Once);
             this.mockCommunicationManager.Verify(mc => mc.AcceptClientAsync(), Times.Once);
-
             Assert.AreEqual(port, 123, "Correct port must be returned.");
         }
 
@@ -90,6 +88,12 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.ExecutionInitialize, paths), Times.Once);
         }
 
+        private void SetupReceiveRawMessageAndDeserializeMessage(string rawMessage, Message message)
+        {
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
+            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+        }
+
         [TestMethod]
         public void DiscoverTestsShouldCallHandleDiscoveredTestsOnTestCaseEvent()
         {
@@ -102,8 +106,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var rawMessage = "OnDiscoveredTests";
             var message = new Message() { MessageType = MessageType.TestCasesFound, Payload = null };
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<IEnumerable<TestCase>>(message)).Returns(testCases);
 
             var completePayload = new DiscoveryCompletePayload()
@@ -140,8 +143,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var messagePayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Error, Message = rawMessage };
             var message = new Message() { MessageType = MessageType.TestMessage, Payload = null };
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestMessagePayload>(message)).Returns(messagePayload);
 
 
@@ -184,8 +186,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             };
             var message = new Message() { MessageType = MessageType.DiscoveryComplete, Payload = null };
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(message)).Returns(completePayload);
 
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
@@ -206,8 +207,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var rawMessage = "OnTestRunStatsChange";
             var message = new Message() { MessageType = MessageType.TestRunStatsChange, Payload = null };
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestRunChangedEventArgs>(message)).Returns(testRunChangedArgs);
 
 
@@ -254,8 +254,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var rawMessage = "OnTestRunStatsChange";
             var message = new Message() { MessageType = MessageType.TestRunStatsChange, Payload = null };
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestRunChangedEventArgs>(message)).Returns(testRunChangedArgs);
 
 
@@ -292,8 +291,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var message = new Message() { MessageType = MessageType.TestMessage, Payload = null };
             var payload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Error, Message = rawMessage };
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestMessagePayload>(message)).Returns(payload);
 
             var completePayload = new TestRunCompletePayload()
@@ -327,8 +325,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var message = new Message() { MessageType = MessageType.LaunchAdapterProcessWithDebuggerAttached, Payload = null };
             var payload = new TestProcessStartInfo();
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestProcessStartInfo>(message)).Returns(payload);
 
             var completePayload = new TestRunCompletePayload()
@@ -373,8 +370,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             var message = new Message() { MessageType = MessageType.ExecutionComplete, Payload = null };
             var payload = new TestRunCompletePayload() { ExecutorUris = null, LastRunTests = null, RunAttachments = null, TestRunCompleteArgs = null };
 
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Returns(rawMessage);
-            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(rawMessage)).Returns(message);
+            SetupReceiveRawMessageAndDeserializeMessage(rawMessage, message);
             this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestRunCompletePayload>(message)).Returns(payload);
 
             var waitHandle = new AutoResetEvent(false);
@@ -393,6 +389,27 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void StartTestRunShouldCallHandleTestRunCompleteAndHandleLogMessageOnConnectionBreak()
+        {
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+            var runCriteria = new TestRunCriteriaWithSources(null, null, null);
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Throws(new IOException());
+            var waitHandle = new AutoResetEvent(false);
+            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+                null, null, null)).Callback
+                (() => waitHandle.Set());
+
+            this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
+            waitHandle.WaitOne();
+            this.testRequestSender.EndSession();
+
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.AbortedTestRun, Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.ConnectionClosed)), Times.Once);
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
+            mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.SessionEnd), Times.Never);
+
+        }
+
+        [TestMethod]
         public void EndSessionShouldSendCorrectEventMessage()
         {
             this.testRequestSender.EndSession();
@@ -406,6 +423,6 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.SendTestRunCancel();
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.CancelTestRun), Times.Once);
-        }
+        }        
     }
 }

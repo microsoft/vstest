@@ -242,6 +242,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// </summary>
         public void HandleTestRunComplete(TestRunCompleteEventArgs runCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
+            if (runCompleteArgs == null)
+            {
+                throw new ArgumentNullException(nameof(runCompleteArgs));
+            }
             bool isAborted = runCompleteArgs.IsAborted;
             bool isCanceled = runCompleteArgs.IsCanceled;
 
@@ -263,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                 try
                 {
-                    if (runRequestTimeTracker != null) runRequestTimeTracker.Stop();
+                    runRequestTimeTracker.Stop();
 
                     if (lastChunkArgs != null)
                     {
