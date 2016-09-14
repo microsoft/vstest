@@ -111,9 +111,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>ProcessStartInfo of the test host</returns>
         public virtual TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
-            string testhostProcessPath, processWorkingDirectory;
+            string testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
+            string testHostDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
+            string testhostProcessPath;
 
             // If we are running in the dotnet.exe context we do not want to launch testhost.exe but dotnet.exe with the testhost assembly. 
             // Since dotnet.exe is already built for multiple platforms this would avoid building testhost.exe also in multiple platforms.
@@ -122,10 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 testhostProcessPath = currentProcessFileName;
                 var testhostAssemblyPath = Path.Combine(
-                    currentWorkingDirectory,
+                    testHostDirectory,
                     testHostProcessName.Replace("exe", "dll"));
                 commandLineArguments.Insert(0, "\"" + testhostAssemblyPath + "\"");
-                processWorkingDirectory = Path.GetDirectoryName(currentProcessFileName);
             }
             else
             {
@@ -142,16 +141,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
                 else
                 {
-                    testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+                    testhostProcessPath = Path.Combine(testHostDirectory, testHostProcessName);
                 }
- 
-                // For IDEs and other scenario - Current directory should be the working directory - not the vstest.console.exe location
-                // For VS - this becomes the solution directory for example
-                // "TestResults" directory will be created at "current directory" of test host
-                processWorkingDirectory = Directory.GetCurrentDirectory();
             }
 
-            var argumentsString = string.Join(" ", commandLineArguments);
+            // For IDEs and other scenario - Current directory should be the working directory - not the vstest.console.exe location
+            // For VS - this becomes the solution directory for example
+            // "TestResults" directory will be created at "current directory" of test host
+            string processWorkingDirectory = Directory.GetCurrentDirectory();
+
+            string argumentsString = string.Join(" ", commandLineArguments);
             return new TestProcessStartInfo { FileName = testhostProcessPath, Arguments = argumentsString, EnvironmentVariables = environmentVariables, WorkingDirectory = processWorkingDirectory };
         }
 
