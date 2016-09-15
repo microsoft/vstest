@@ -5,6 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -18,6 +19,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     [TestClass]
     public class DotnetTestHostManagerTests
     {
+        private const string DefaultDotnetPath = "c:\\tmp\\dotnet.exe";
+
+        private const string DefaultTestHostPath = "c:\\tmp\\testhost.dll";
+
         private readonly Mock<ITestHostLauncher> mockTestHostLauncher;
 
         private readonly TestableDotnetTestHostManager dotnetHostManager;
@@ -37,17 +42,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                                          this.mockFileHelper.Object);
 
             // Setup a dummy current process for tests
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("c:\\tmp\\dotnet.exe");
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
         }
 
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldInvokeDotnetCommandline()
         {
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("c:\\tmp\\dotnet.exe");
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, null);
 
-            Assert.AreEqual("c:\\tmp\\dotnet.exe", startInfo.FileName);
+            Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
         }
 
         [TestMethod]
@@ -136,9 +141,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, null);
 
             // Path.GetDirectoryName returns platform specific path separator char
-            StringAssert.Contains(startInfo.Arguments, Path.Combine(Path.GetDirectoryName("/tmp/dotnet"), "testhost.dll"));
+            StringAssert.Contains(startInfo.Arguments, this.GetTesthostPath());
         }
- 
+
         [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithNullEnvironmentVariablesOrArgs()
         {
@@ -147,17 +152,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var processId = this.dotnetHostManager.LaunchTestHost(null, null);
 
             Assert.AreEqual(111, processId);
-            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(string.Empty))), Times.Once);
         }
 
         [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithArguments()
         {
             var args = new List<string> { "arg1", "arg2" };
+            var expectedArgs = "exec " + this.GetTesthostPath() + " arg1 arg2";
 
             this.dotnetHostManager.LaunchTestHost(null, args);
 
-            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(string.Join(" ", args)))), Times.Once);
+            this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);
         }
 
         [TestMethod]
@@ -171,27 +176,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithCurrentWorkingDirectory()
-        {
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldReturnTestHostProcessId()
-        {
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldLaunchDotnetExeIfRunningUnderDotnetCLIContext()
-        {
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfRunningUnderDotnetCLIContext()
-        {
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldSetWorkingDirectoryToDotnetExeDirectoryIfRunningUnderDotnetCLIContext()
+        public void LaunchTestHostShouldLaunchProcessWithWorkingDirectorySetToTestAssembly()
         {
         }
 
@@ -200,9 +185,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
         }
 
-        [TestMethod]
-        public void PropertiesShouldReturnEmptyDictionary()
+        private string GetTesthostPath()
         {
+            // testhost.dll will be picked up from the same path as vstest.console.dll. In the test, we are setting up
+            // the path to current assembly location.
+            var testhostPath = Path.Combine(
+                Path.GetDirectoryName(this.GetType().GetTypeInfo().Assembly.Location),
+                "testhost.dll");
+            return testhostPath;
         }
     }
 

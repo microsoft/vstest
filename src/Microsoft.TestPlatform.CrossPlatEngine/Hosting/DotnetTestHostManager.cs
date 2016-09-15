@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Text;
+    using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -37,7 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
         /// <param name="testHostLauncher">A test host launcher instance.</param>
-        /// <param name="processHelper"></param>
+        /// <param name="processHelper">Process helper instance.</param>
+        /// <param name="fileHelper">File helper instance.</param>
         internal DotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper)
         {
             this.testHostLauncher = testHostLauncher;
@@ -54,9 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public int LaunchTestHost(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            var args = commandLineArguments ?? new List<string>();
-            var variables = environmentVariables ?? new Dictionary<string, string>();
-            var startInfo = new TestProcessStartInfo { Arguments = string.Join(" ", args), EnvironmentVariables = variables };
+            var startInfo = this.GetTestHostProcessStartInfo(environmentVariables, commandLineArguments);
 
             return this.testHostLauncher.LaunchTestHost(startInfo);
         }
@@ -69,11 +68,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var startInfo = new TestProcessStartInfo { FileName = "dotnet" };
             var testHostExecutable = Path.Combine("NetCore", "testhost.dll");
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+            var testRunnerDirectory = Path.GetDirectoryName(currentProcessPath);
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
                 startInfo.FileName = currentProcessPath;
                 testHostExecutable = "testhost.dll";
+                testRunnerDirectory = Path.GetDirectoryName(typeof(DotnetTestHostManager).GetTypeInfo().Assembly.Location);
             }
 
             // Use the deps.json for test source
@@ -85,15 +86,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             // Probe for runtimeconfig and deps file for the test source
             var args = "exec";
-            string sourcePath = "test";
+            var sourcePath = "test.dll";
+            var sourceFile = Path.GetFileNameWithoutExtension(sourcePath);
+            var sourceDirectory = Path.GetDirectoryName(sourcePath);
 
-            var runtimeConfigPath = string.Concat(sourcePath, ".runtimeconfig.json");
+            var runtimeConfigPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.json"));
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
                 args += " --runtimeconfig " + runtimeConfigPath;
             }
 
-            var depsFilePath = string.Concat(sourcePath, ".deps.json");
+            var depsFilePath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".deps.json"));
             if (this.fileHelper.Exists(depsFilePath))
             {
                 args += " --depsfile " + depsFilePath;
@@ -103,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             //args += "--additionalprobingpath xxx"
 
             // Add the testhost path and other arguments
-            var testHostPath = Path.Combine(Path.GetDirectoryName(currentProcessPath), testHostExecutable);
+            var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
             args += " " + testHostPath;
             if (commandLineArguments != null && commandLineArguments.Count > 0)
             {
@@ -111,6 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             startInfo.Arguments = args;
+            startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
 
             return startInfo;
         }
