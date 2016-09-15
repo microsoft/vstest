@@ -20,7 +20,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     public class DefaultTestHostManagerTests
     {
         private DefaultTestHostManager testHostManager;
-        
+
         /// <summary>
         /// The mock process helper.
         /// </summary>
@@ -37,7 +37,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
             this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper);
-            
+
             // Setup mocks.
             var processPath = string.Empty;
             var times = 0;
@@ -48,7 +48,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                     processPath = path;
                     return Process.GetCurrentProcess();
                 };
-                
+
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
 
             StringAssert.EndsWith(processPath, "testhost.x86.exe");
@@ -70,7 +70,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 processPath = path;
                 return Process.GetCurrentProcess();
             };
-            
+
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
 
             StringAssert.EndsWith(processPath, "testhost.exe");
@@ -146,7 +146,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
 
             var workingDirectory = Directory.GetCurrentDirectory();
-            
+
             Assert.AreEqual(workingDirectory, pwd);
             Assert.AreEqual(1, times);
         }
@@ -189,9 +189,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfRunningUnderDotnetCLIContext()
+        public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfRunningUnderDotnetCLIContextInX86()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper);
 
             string arguments = null;
 
@@ -205,33 +205,141 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
 
-            var testhostAssemblyPath =
-                Path.Combine(
-                    Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location),
-                    "testhost.dll");
+            var testhostAssemblyPath =Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location),"testhost.dll");
 
             StringAssert.Contains(arguments, testhostAssemblyPath);
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldSetWorkingDirectoryToDotnetExeDirectoryIfRunningUnderDotnetCLIContext()
+        public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfRunningUnderDotnetCLIContextInX64()
         {
             this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
 
-            string workingDirectory = null;
+            string arguments = null;
 
             // Setup mocks.
             this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
             {
-                workingDirectory = wd;
+                arguments = args;
                 return Process.GetCurrentProcess();
             };
-            var currentProcessPath = "c:\\temp\\dotnet.exe";
-            this.mockProcessHelper.CurrentProcessName = currentProcessPath;
+            this.mockProcessHelper.CurrentProcessName = "c:\\temp\\dotnet.exe";
 
             this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
 
-            Assert.AreEqual(Path.GetDirectoryName(currentProcessPath), workingDirectory);
+            var testhostAssemblyPath = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "testhost.dll");
+
+            StringAssert.Contains(arguments, testhostAssemblyPath);
+        }
+
+        [TestMethod]
+        public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfFrameworkIsNETCoreApp()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.FromString(".NETCoreApp,Version=1.0"), this.mockProcessHelper);
+
+            string arguments = null;
+
+            // Setup mocks.
+            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
+            {
+                arguments = args;
+                return Process.GetCurrentProcess();
+            };
+            this.mockProcessHelper.CurrentProcessName = "c:\\temp\\vstest.console.exe";
+
+            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
+
+            var testhostAssemblyPath = Path.Combine(Path.GetDirectoryName("c:\\temp\\vstest.console.exe"), "NetCore", "testhost.dll");
+
+            StringAssert.Contains(arguments, testhostAssemblyPath);
+        }
+
+        [TestMethod]
+        public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfFrameworkIsNETStandard()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.FromString(".NETStandard,Version=1.0"), this.mockProcessHelper);
+
+            string arguments = null;
+
+            // Setup mocks.
+            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
+            {
+                arguments = args;
+                return Process.GetCurrentProcess();
+            };
+            this.mockProcessHelper.CurrentProcessName = "c:\\temp\\vstest.console.exe";
+
+            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
+
+            var testhostAssemblyPath = Path.Combine(Path.GetDirectoryName("c:\\temp\\vstest.console.exe"), "NetCore", "testhost.dll");
+
+            StringAssert.Contains(arguments, testhostAssemblyPath);
+        }
+
+        [TestMethod]
+        public void LaunchTestHostShouldPassTestHostX86ExeInFileNameIfRunningUnderFullDotnetCLIContextInX86()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper);
+
+            string filename = null;
+
+            // Setup mocks.
+            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
+            {
+                filename = path;
+                return Process.GetCurrentProcess();
+            };
+            this.mockProcessHelper.CurrentProcessName = "c:\\temp\\vstest.console.exe";
+
+            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
+
+            var testhostAssemblyPath = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "testhost.x86.exe");
+
+            StringAssert.Contains(filename, testhostAssemblyPath);
+        }
+
+        [TestMethod]
+        public void LaunchTestHostShouldPassTestHostExeInFileNameIfRunningUnderFullDotnetCLIContextInX64()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
+
+            string filename = null;
+
+            // Setup mocks.
+            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
+            {
+                filename = path;
+                return Process.GetCurrentProcess();
+            };
+            this.mockProcessHelper.CurrentProcessName = "c:\\temp\\vstest.console.exe";
+
+            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
+
+            var testhostAssemblyPath = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "testhost.exe");
+
+            StringAssert.Contains(filename, testhostAssemblyPath);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldSetWorkingDirectoryAsParentProcess()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
+
+            TestProcessStartInfo testProcessStartInfo = this.testHostManager.GetTestHostProcessStartInfo(null, new List<string>());
+
+            Assert.AreEqual(Directory.GetCurrentDirectory(), testProcessStartInfo.WorkingDirectory);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldSetWorkingDirectoryAsParentProcessIfRunningUnderDotnetCLIContext()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
+
+            this.mockProcessHelper.CurrentProcessName = "dotnet.exe";
+
+            TestProcessStartInfo testProcessStartInfo = this.testHostManager.GetTestHostProcessStartInfo(null, new List<string>());
+
+            Assert.AreEqual(Directory.GetCurrentDirectory(), testProcessStartInfo.WorkingDirectory);
         }
 
         [TestMethod]
@@ -275,7 +383,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 this.CurrentProcessName = "testhost.exe";
             }
 
-            public Func<string,string,string,Process> LaunchProcessInvoker { get; set; }
+            public Func<string, string, string, Process> LaunchProcessInvoker { get; set; }
 
             public string CurrentProcessName { get; set; }
 
