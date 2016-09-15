@@ -180,7 +180,9 @@ function Create-VsixPackage
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
         "testhost.x86.exe.config",
-        "testhost.exe.config")
+        "testhost.exe.config",
+        "TestPlatform.ObjectModel.manifest",
+        "TestPlatform.ObjectModel.x86.manifest")
     foreach ($file in $vsixManifests) {
         Copy-Item $env:TP_PACKAGE_PROJ_DIR\$file $packageDir -Force
     }
