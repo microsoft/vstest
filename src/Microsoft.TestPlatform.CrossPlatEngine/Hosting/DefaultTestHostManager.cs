@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>ProcessStartInfo of the test host</returns>
         public virtual TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            string testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
+            string testHostProcessName = X64TestHostProcessName;
             string testHostDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
             string testhostProcessPath;
 
@@ -141,6 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
                 else
                 {
+                    testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
                     testhostProcessPath = Path.Combine(testHostDirectory, testHostProcessName);
                 }
             }

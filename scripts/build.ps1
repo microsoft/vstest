@@ -148,10 +148,8 @@ function Publish-Package
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
 	$testHostProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost"
-	$testHostX86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost.x86"
 	$vstestConsoleProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\vstest.console"
 	$dataCollectorProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector"
-	$dataCollectorX86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86"
 
     Write-Log ".. Package: Publish package\project.json"
     
@@ -161,7 +159,7 @@ function Publish-Package
     Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
     & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
 	
-	# Publish testhost, testhost.x86, vstest.console and datacollector, datacollector.x86 exclusively because *.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
+	# Publish testhost, vstest.console and datacollector exclusively because *.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
 	Write-Log ".. Package: Publish src\vstest.console\project.json"
 	Write-Verbose "$dotnetExe publish $vstestConsoleProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
 	& $dotnetExe publish $vstestConsoleProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
@@ -170,18 +168,10 @@ function Publish-Package
 	Write-Verbose "$dotnetExe publish $testHostProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
 	& $dotnetExe publish $testHostProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
 	
-	Write-Log ".. Package: Publish src\testhost.x86\project.json"
-	Write-Verbose "$dotnetExe publish $testHostX86ProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
-	& $dotnetExe publish $testHostX86ProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
-	
 	Write-Log ".. Package: Publish src\datacollector\project.json"
 	Write-Verbose "$dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
 	& $dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
 	
-	Write-Log ".. Package: Publish src\datacollector.x86\project.json"
-	Write-Verbose "$dotnetExe publish $dataCollectorX86ProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
-	& $dotnetExe publish $dataCollectorX86ProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
-
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
     }

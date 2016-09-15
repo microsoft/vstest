@@ -13,25 +13,27 @@
       ]
     }
   },
-    
+
   "frameworks": {
     "net46": {
       "frameworkAssemblies": {
       },
       "dependencies": {
+        "testhost": "15.0.0-*",
+        "datacollector": "15.0.0-*",
         "testhost.x86": "15.0.0-*",
+        "datacollector.x86": "15.0.0-*",
         "Microsoft.Internal.TestPlatform.Extensions": {
           "type": "build",
-          "version":  "15.0.0"
+          "version": "15.0.0"
         },
-        "NuGet.CommandLine": 
-        {
-          "type": "build", 
-          "version": "3.4.3" 
+        "NuGet.CommandLine": {
+          "type": "build",
+          "version": "3.4.3"
         }
       }
     },
-    "netcoreapp1.0":{ 
+    "netcoreapp1.0": {
       "imports": [
         "dnxcore50",
         "netstandardapp1.0",
@@ -54,10 +56,6 @@
     "Microsoft.TestPlatform.CrossPlatEngine": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "vstest.console": "15.0.0-*",
-    "testhost": "15.0.0-*",
-    "testhost.x86": "15.0.0-*",
-    "datacollector": "15.0.0-*",
-    "datacollector.x86": "15.0.0-*",
     "Microsoft.TestPlatform.VsTestConsole.TranslationLayer": "15.0.0-*",
     "Microsoft.TestPlatform.Extensions.TrxLogger": "15.0.0-*"
   }
