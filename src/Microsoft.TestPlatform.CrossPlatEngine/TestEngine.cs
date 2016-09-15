@@ -93,10 +93,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// Retrieves the default test host manager for this engine.
         /// </summary>
         /// <param name="architecture">The architecture we want the test host manager for.</param>
+        /// <param name="framework">Framework for the test session.</param>
         /// <returns>An instance of the test host manager.</returns>
         public ITestHostManager GetDefaultTestHostManager(Architecture architecture, Framework framework)
         {
             // This is expected to be called once every run so returning a new instance every time.
+            if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return new DotnetTestHostManager();
+            }
+
             return new DefaultTestHostManager(architecture, framework);
         }
 

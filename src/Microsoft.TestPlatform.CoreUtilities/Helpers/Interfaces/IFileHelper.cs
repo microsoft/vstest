@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
     /// <summary>
     /// The FileHelper interface.
     /// </summary>
-    internal interface IFileHelper
+    public interface IFileHelper
     {
         /// <summary>
         /// Exists utility to check if file exists

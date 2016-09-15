@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
     using System;
@@ -25,12 +26,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private const string DotnetProcessNameXPlat = "dotnet";
         private const string NetCoreDirectoryName = "NetCore";
         
-        private Architecture architecture;
-        private Framework framework;
+        private readonly Architecture architecture;
+        private readonly Framework framework;
         private ITestHostLauncher customTestHostLauncher;
 
         private Process testHostProcess;
-        private IProcessHelper processHelper;
+        private readonly IProcessHelper processHelper;
 
         private EventHandler registeredExitHandler;
 

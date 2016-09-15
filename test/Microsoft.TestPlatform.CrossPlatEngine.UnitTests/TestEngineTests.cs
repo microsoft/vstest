@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -15,7 +16,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     [TestClass]
     public class TestEngineTests
     {
-        private ITestEngine testEngine;
+        private readonly ITestEngine testEngine;
 
         public TestEngineTests()
         {
@@ -92,6 +93,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             var instance1 = this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework);
             var instance2 = this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework);
             Assert.AreNotEqual(instance1, instance2);
+        }
+
+        [TestMethod]
+        public void GetDefaultTestHostManagerReturnsDotnetCoreHostManagerIfFrameworkIsNetCore()
+        {
+            var testHostManager = this.testEngine.GetDefaultTestHostManager(
+                Architecture.X64,
+                Framework.FromString(".NETCoreApp,Version=v1.0"));
+
+            Assert.AreEqual(typeof(DotnetTestHostManager), testHostManager.GetType());
         }
     }
 }
