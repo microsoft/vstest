@@ -171,7 +171,7 @@ function Publish-Package
 	Write-Log ".. Package: Publish src\datacollector\project.json"
 	Write-Verbose "$dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
 	& $dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
-	
+
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
     }

@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>ProcessStartInfo of the test host</returns>
         public virtual TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            string testHostProcessName = X64TestHostProcessName;
+            var testHostProcessName = X64TestHostProcessName;
             string testHostDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
             string testhostProcessPath;
 
