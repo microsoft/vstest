@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -262,28 +263,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             List<TestCase> receivedTestCases = null;
             var testCaseList = new List<TestCase>() { testCase };
-            var testsFound = new Message()
-            {
-                MessageType = MessageType.TestCasesFound,
-                Payload = JToken.FromObject(testCaseList, JsonSerializer.Create(
-                                                  new JsonSerializerSettings
-                                                  {
-                                                      TypeNameHandling =
-                                                              TypeNameHandling.Auto
-                                                  }))
-            };
+            var testsFound = CreateMessage(MessageType.TestCasesFound, testCaseList);
 
             var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false };
-            var discoveryComplete = new Message()
-            {
-                MessageType = MessageType.DiscoveryComplete,
-                Payload = JToken.FromObject(payload, JsonSerializer.Create(
-                                                  new JsonSerializerSettings
-                                                  {
-                                                      TypeNameHandling =
-                                                              TypeNameHandling.Auto
-                                                  }))
-            };
+            var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsFound);
             mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
@@ -320,16 +303,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCaseList = new List<TestCase>() { testCase };
 
             var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = testCaseList, IsAborted = false };
-            var discoveryComplete = new Message()
-            {
-                MessageType = MessageType.DiscoveryComplete,
-                Payload = JToken.FromObject(payload, JsonSerializer.Create(
-                                                  new JsonSerializerSettings
-                                                  {
-                                                      TypeNameHandling =
-                                                              TypeNameHandling.Auto
-                                                  }))
-            };
+            var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(discoveryComplete);
             mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
@@ -360,25 +334,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             var testCaseList = new List<TestCase>() { testCase };
-            var testsFound = new Message()
-            {
-                MessageType = MessageType.TestCasesFound,
-                Payload = JToken.FromObject(testCaseList)
-            };
+            var testsFound = CreateMessage(MessageType.TestCasesFound, testCaseList);
 
             var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false };
-            var discoveryComplete = new Message()
-            {
-                MessageType = MessageType.DiscoveryComplete,
-                Payload = JToken.FromObject(payload)
-            };
+            var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
-            var message = new Message()
-            {
-                MessageType = MessageType.TestMessage,
-                Payload = JToken.FromObject(mpayload)
-            };
+            var message = CreateMessage(MessageType.TestMessage, mpayload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsFound);
             mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
@@ -415,11 +377,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 TestRunCompleteArgs = dummyCompleteArgs
             };
 
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(payload)
-            };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
 
             this.requestSender.StartTestRun(new List<string>() { "1.dll" }, null, mockHandler.Object);
@@ -447,33 +405,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testsChangedArgs = new TestRunChangedEventArgs(null, 
                 new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
 
-            var testsPayload = new Message()
-            {
-                MessageType = MessageType.TestRunStatsChange,
-                Payload = JToken.FromObject(testsChangedArgs)
-            };
+            var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
             var payload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = dummyLastRunArgs,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
+                              {
+                                  ExecutorUris = null,
+                                  LastRunTests = dummyLastRunArgs,
+                                  RunAttachments = null,
+                                  TestRunCompleteArgs = dummyCompleteArgs
+                              };
 
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(payload)
-            };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
 
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
-            var message = new Message()
-            {
-                MessageType = MessageType.TestMessage,
-                Payload = JToken.FromObject(mpayload)
-            };
-
+            var message = CreateMessage(MessageType.TestMessage, mpayload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsPayload);
 
@@ -512,41 +457,26 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
-            var testsChangedArgs = new TestRunChangedEventArgs(null,
-                new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
-
-            var testsPayload = new Message()
-            {
-                MessageType = MessageType.TestRunStatsChange,
-                Payload = JToken.FromObject(testsChangedArgs)
-            };
+            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
+            var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
             var payload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = dummyLastRunArgs,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
-
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(payload)
-            };
+                              {
+                                  ExecutorUris = null,
+                                  LastRunTests = dummyLastRunArgs,
+                                  RunAttachments = null,
+                                  TestRunCompleteArgs = dummyCompleteArgs
+                              };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
 
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
-            var message = new Message()
-            {
-                MessageType = MessageType.TestMessage,
-                Payload = JToken.FromObject(mpayload)
-            };
+            var message = CreateMessage(MessageType.TestMessage, mpayload);
 
             var runprocessInfoPayload = new Message()
-            {
-                MessageType = MessageType.CustomTestHostLaunch,
-                Payload = JToken.FromObject(new TestProcessStartInfo())
-            };
+                                            {
+                                                MessageType = MessageType.CustomTestHostLaunch,
+                                                Payload = JToken.FromObject(new TestProcessStartInfo())
+                                            };
 
 
             mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
@@ -583,23 +513,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.InitializeCommunication();
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
-
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var payload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = dummyLastRunArgs,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
-
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(payload)
-            };
+                              {
+                                  ExecutorUris = null,
+                                  LastRunTests = dummyLastRunArgs,
+                                  RunAttachments = null,
+                                  TestRunCompleteArgs = dummyCompleteArgs
+                              };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
 
             this.requestSender.StartTestRun(new List<TestCase>(), null, mockHandler.Object);
@@ -626,36 +550,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
-            var testsChangedArgs = new TestRunChangedEventArgs(null,
-                new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
-
-            var testsPayload = new Message()
-            {
-                MessageType = MessageType.TestRunStatsChange,
-                Payload = JToken.FromObject(testsChangedArgs)
-            };
+            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
+            var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
             var payload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = dummyLastRunArgs,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
-
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(payload)
-            };
+                              {
+                                  ExecutorUris = null,
+                                  LastRunTests = dummyLastRunArgs,
+                                  RunAttachments = null,
+                                  TestRunCompleteArgs = dummyCompleteArgs
+                              };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
 
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
-            var message = new Message()
-            {
-                MessageType = MessageType.TestMessage,
-                Payload = JToken.FromObject(mpayload)
-            };
-
+            var message = CreateMessage(MessageType.TestMessage, mpayload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsPayload);
 
@@ -699,28 +607,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             TestRunChangedEventArgs receivedChangeEventArgs = null;
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult> { testResult }, null);
-            
-            var payload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = dummyLastRunArgs,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
 
-            var runComplete = new Message()
-                                  {
-                                      MessageType = MessageType.ExecutionComplete,
-                                      Payload =
-                                          JToken.FromObject(
-                                              payload,
-                                              JsonSerializer.Create(
-                                                  new JsonSerializerSettings
-                                                      {
-                                                          TypeNameHandling =
-                                                              TypeNameHandling.Auto
-                                                      }))
-                                  };
+            var payload = new TestRunCompletePayload()
+                              {
+                                  ExecutorUris = null,
+                                  LastRunTests = dummyLastRunArgs,
+                                  RunAttachments = null,
+                                  TestRunCompleteArgs = dummyCompleteArgs
+                              };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
 
@@ -773,40 +668,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 null,
                 new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult },
                 null);
-
-            var testsRunStatsPayload = new Message()
-            {
-                MessageType = MessageType.TestRunStatsChange,
-                Payload = JToken.FromObject(
-                                              testsChangedArgs,
-                                              JsonSerializer.Create(
-                                                  new JsonSerializerSettings
-                                                  {
-                                                      TypeNameHandling =
-                                                              TypeNameHandling.Auto
-                                                  }))
-            };
+            var testsRunStatsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
             var testRunCompletepayload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = dummyLastRunArgs,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
-
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(
-                                              testRunCompletepayload,
-                                              JsonSerializer.Create(
-                                                  new JsonSerializerSettings
-                                                  {
-                                                      TypeNameHandling =
-                                                              TypeNameHandling.Auto
-                                                  }))
-            };
+                                             {
+                                                 ExecutorUris = null,
+                                                 LastRunTests = dummyLastRunArgs,
+                                                 RunAttachments = null,
+                                                 TestRunCompleteArgs = dummyCompleteArgs
+                                             };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, testRunCompletepayload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsRunStatsPayload);
 
@@ -822,7 +693,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRun(testCaseList, null, mockHandler.Object);
 
             Assert.IsNotNull(receivedChangeEventArgs);
-            Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Count() > 0);
+            Assert.IsTrue(receivedChangeEventArgs.NewTestResults.Any());
 
             // Verify that the traits are passed through properly.
             var traits = receivedChangeEventArgs.NewTestResults.ToArray()[0].TestCase.Traits;
@@ -847,42 +718,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
-            var testsChangedArgs = new TestRunChangedEventArgs(null,
-                new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
+            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
 
-            var testsPayload = new Message()
-            {
-                MessageType = MessageType.TestRunStatsChange,
-                Payload = JToken.FromObject(testsChangedArgs)
-            };
+            var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
             var payload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = dummyLastRunArgs,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
+                              {
+                                  ExecutorUris = null,
+                                  LastRunTests = dummyLastRunArgs,
+                                  RunAttachments = null,
+                                  TestRunCompleteArgs = dummyCompleteArgs
+                              };
 
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(payload)
-            };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
 
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
-            var message = new Message()
-            {
-                MessageType = MessageType.TestMessage,
-                Payload = JToken.FromObject(mpayload)
-            };
-
-
-            var runprocessInfoPayload = new Message()
-            {
-                MessageType = MessageType.CustomTestHostLaunch,
-                Payload = JToken.FromObject(new TestProcessStartInfo())
-            };
+            var message = CreateMessage(MessageType.TestMessage, mpayload);
+            var runprocessInfoPayload = CreateMessage(MessageType.CustomTestHostLaunch, new TestProcessStartInfo());
 
             mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
                 (testRunChangedArgs) =>
@@ -917,38 +769,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var mockLauncher = new Mock<ITestHostLauncher>();
             var mockHandler = new Mock<ITestRunEventsHandler>();
-
             IEnumerable<string> sources = new List<string> { "1.dll" };
-
             var p1 = new TestProcessStartInfo() { FileName = "X" };
             var p2 = new TestProcessStartInfo() { FileName = "Y" };
-
-            var message1 = new Message()
-            {
-                MessageType = MessageType.CustomTestHostLaunch,
-                Payload = JToken.FromObject(p1)
-            };
-
-            var message2 = new Message()
-            {
-                MessageType = MessageType.CustomTestHostLaunch,
-                Payload = JToken.FromObject(p2)
-            };
-
+            var message1 = CreateMessage(MessageType.CustomTestHostLaunch, p1);
+            var message2 = CreateMessage(MessageType.CustomTestHostLaunch, p2);
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
-
             var completepayload = new TestRunCompletePayload()
-            {
-                ExecutorUris = null,
-                LastRunTests = null,
-                RunAttachments = null,
-                TestRunCompleteArgs = dummyCompleteArgs
-            };
-            var runComplete = new Message()
-            {
-                MessageType = MessageType.ExecutionComplete,
-                Payload = JToken.FromObject(completepayload)
-            };
+                                      {
+                                          ExecutorUris = null,
+                                          LastRunTests = null,
+                                          RunAttachments = null,
+                                          TestRunCompleteArgs = dummyCompleteArgs
+                                      };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, completepayload);
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message1);
             mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
@@ -973,6 +807,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         #region private methods
         
+        private static Message CreateMessage<T>(string messageType, T payload)
+        {
+            var message = new Message()
+            {
+                MessageType = messageType,
+                Payload = JToken.FromObject(
+                    payload,
+                    JsonSerializer.Create(
+                        new JsonSerializerSettings
+                        {
+                            ContractResolver = new TestPlatformContractResolver(),
+                            TypeNameHandling = TypeNameHandling.None
+                        }))
+            };
+            return message;
+        }
+
         private void InitializeCommunication()
         {
             var dummyPortInput = 123;

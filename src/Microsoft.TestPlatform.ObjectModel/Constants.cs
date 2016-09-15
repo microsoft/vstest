@@ -64,8 +64,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM ? Architecture.ARM : Architecture.X86;
         
-        public const FrameworkVersion DefaultFramework = FrameworkVersion.Framework45;
-        
         /// <summary>
         /// Default option for parallel execution
         /// </summary>

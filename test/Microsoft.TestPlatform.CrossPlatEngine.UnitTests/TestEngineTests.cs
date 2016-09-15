@@ -83,14 +83,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANonNullInstance()
         {
-            Assert.IsNotNull(this.testEngine.GetDefaultTestHostManager(Architecture.X86));
+            Assert.IsNotNull(this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework));
         }
 
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANewInstanceEverytime()
         {
-            var instance1 = this.testEngine.GetDefaultTestHostManager(Architecture.X86);
-            var instance2 = this.testEngine.GetDefaultTestHostManager(Architecture.X86);
+            var instance1 = this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework);
+            var instance2 = this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework);
             Assert.AreNotEqual(instance1, instance2);
         }
     }

@@ -37,13 +37,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             this.testableTestRunCache = new TestableTestRunCache();
             this.testExecutionContext = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: null);
+                                frequencyOfRunStatsChangeEvent: 100,
+                                runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                inIsolation: false,
+                                keepAlive: false,
+                                isDataCollectionEnabled: false,
+                                areTestCaseLevelEventsRequired: false,
+                                hasTestRun: false,
+                                isDebug: false,
+                                testCaseFilter: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         }
 
@@ -58,7 +60,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithTests(
                 tests,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -86,7 +87,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithTests(
                 tests,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -119,7 +119,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithTests(
                 tests,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -142,17 +141,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private class TestableRunTestsWithTests : RunTestsWithTests
         {
             public TestableRunTestsWithTests(IEnumerable<TestCase> testCases,
-                ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext,
+                string runSettings, TestExecutionContext testExecutionContext,
                 ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
                 : base(
-                    testCases, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler,
+                    testCases, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler)
             {
             }
 
-            internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
+            internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
                 : base(
-                    testCases, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler,
+                    testCases, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler, executorUriVsTestList)
             {
             }

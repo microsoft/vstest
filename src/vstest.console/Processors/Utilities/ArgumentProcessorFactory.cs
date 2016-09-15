@@ -6,9 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
-    
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    
+
     /// <summary>
     /// Used to create the appropriate instance of an argument processor.
     /// </summary>
@@ -21,6 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         internal const string CommandStarter = "/";
 
+        /// <summary>
+        /// The xplat command starter.
+        /// </summary>
+        internal const string XplatCommandStarter = "-";
+
         #endregion
 
         #region Fields
@@ -28,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Available argument processors.
         /// </summary>
-        private IEnumerable<IArgumentProcessor> argumentProcessors;
+        private readonly IEnumerable<IArgumentProcessor> argumentProcessors;
         private Dictionary<string, IArgumentProcessor> commandToProcessorMap;
         private Dictionary<string, IArgumentProcessor> specialCommandToProcessorMap;
 
@@ -45,8 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <remarks>
         /// This is not public because the static Create method should be used to access the instance.
         /// </remarks>
-        protected ArgumentProcessorFactory(
-            IEnumerable<IArgumentProcessor> argumentProcessors)
+        protected ArgumentProcessorFactory(IEnumerable<IArgumentProcessor> argumentProcessors)
         {
             Contract.Requires(argumentProcessors != null);
             this.argumentProcessors = argumentProcessors;
@@ -55,22 +59,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #endregion
 
         #region Static Methods
-
-        public static IEnumerable<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
-                new HelpArgumentProcessor(),
-                new TestSourceArgumentProcessor(),
-                new ListTestsArgumentProcessor(),
-                new RunTestsArgumentProcessor(),
-                new TestAdapterPathArgumentProcessor(),
-                new OutputArgumentProcessor(),
-                new BuildBasePathArgumentProcessor(),
-                new ConfigurationArgumentProcessor(),
-                new PortArgumentProcessor(),
-                new RunSettingsArgumentProcessor(),
-                new PlatformArgumentProcessor(),
-                new EnableLoggerArgumentProcessor(),
-                new ParallelArgumentProcessor()
-        };
         
         /// <summary>
         /// Creates ArgumentProcessorFactory.
@@ -80,15 +68,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             // Get the ArgumentProcessorFactory
             return new ArgumentProcessorFactory(DefaultArgumentProcessors);
-        }
-
-        /// <summary>
-        /// Creates ArgumentProcessorFactory with given list of processors
-        /// </summary>
-        /// <returns>ArgumentProcessorFactory.</returns>
-        internal static ArgumentProcessorFactory Create(IEnumerable<IArgumentProcessor> processorList)
-        {
-            return new ArgumentProcessorFactory(processorList);
         }
 
         #endregion
@@ -162,11 +141,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             IArgumentProcessor argumentProcessor;
             CommandToProcessorMap.TryGetValue(pair.Command, out argumentProcessor);
 
-            // If an argument processor was not found for the command, see if it is a test source
-            // argument.
+            // If an argument processor was not found for the command, then consider it as a test source argument.
             if (argumentProcessor == null)
             {
-                argumentProcessor = TryGetTestSourceArgument(argument, ref pair);
+                // Update the command pair since the command is actually the argument in the case of
+                // a test source.
+                pair = new CommandArgumentPair(TestSourceArgumentProcessor.CommandName, argument);
+
+                argumentProcessor = SpecialCommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
             }
 
             if (argumentProcessor != null)
@@ -203,30 +185,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         #region Private Methods
 
-        /// <summary>
-        /// Checks the provided argument to see if it could be a test source and returns the test source
-        /// argument processor if it could be a test source.
-        /// </summary>
-        /// <param name="command">The command to test to see if it is a test source.</param>
-        /// <returns>The test source argument processor or null if the commnad is not a test source.</returns>
-        private IArgumentProcessor TryGetTestSourceArgument(string argument, ref CommandArgumentPair pair)
-        {
-            Contract.Requires(!String.IsNullOrWhiteSpace(argument));
-            IArgumentProcessor result = null;
-
-            // If the command does not begin with the command starter ("/"), then
-            // we considerer it to be a test source.
-            if (!argument.StartsWith(CommandStarter, StringComparison.OrdinalIgnoreCase))
-            {
-                result = SpecialCommandToProcessorMap[TestSourceArgumentProcessor.CommandName];
-
-                // Update the command pair since the command is actually the argument in the case of
-                // a test source.
-                pair = new CommandArgumentPair(TestSourceArgumentProcessor.CommandName, argument);
-            }
-
-            return result;
-        }
+        private static IEnumerable<IArgumentProcessor> DefaultArgumentProcessors => new List<IArgumentProcessor> {
+                new HelpArgumentProcessor(),
+                new TestSourceArgumentProcessor(),
+                new ListTestsArgumentProcessor(),
+                new RunTestsArgumentProcessor(),
+                new RunSpecificTestsArgumentProcessor(),
+                new TestAdapterPathArgumentProcessor(),
+                new TestCaseFilterArgumentProcessor(),
+                new OutputArgumentProcessor(),
+                new BuildBasePathArgumentProcessor(),
+                new ConfigurationArgumentProcessor(),
+                new ParentProcessIdArgumentProcessor(),
+                new PortArgumentProcessor(),
+                new RunSettingsArgumentProcessor(),
+                new PlatformArgumentProcessor(),
+                new FrameworkArgumentProcessor(),
+                new EnableLoggerArgumentProcessor(),
+                new ParallelArgumentProcessor()
+        };
 
         /// <summary>
         /// Builds the command to processor map and special command to processor map.
@@ -243,10 +220,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                                       ? this.specialCommandToProcessorMap
                                       : this.commandToProcessorMap;
 
-                processorsMap.Add(argumentProcessor.Metadata.Value.CommandName, argumentProcessor);
+                string commandName = argumentProcessor.Metadata.Value.CommandName;
+                processorsMap.Add(commandName, argumentProcessor);
+
+                // Add xplat name for the command name
+                commandName = string.Concat("--", commandName.Remove(0, 1));
+                processorsMap.Add(commandName, argumentProcessor);
+
                 if (!string.IsNullOrEmpty(argumentProcessor.Metadata.Value.ShortCommandName))
                 {
-                    processorsMap.Add(argumentProcessor.Metadata.Value.ShortCommandName, argumentProcessor);
+                    string shortCommandName = argumentProcessor.Metadata.Value.ShortCommandName;
+                    processorsMap.Add(shortCommandName, argumentProcessor);
+
+                    // Add xplat short name for the command name
+                    shortCommandName = shortCommandName.Replace('/', '-');
+                    processorsMap.Add(shortCommandName, argumentProcessor);
                 }
             }
         }
@@ -301,6 +289,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return processor;
         }
 
-#endregion
+        #endregion
     }
 }

@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 
     /// <summary>
-    /// Argument Executor for the "/ListTests" command line argument.
+    /// Argument Executor for the "-lt|--ListTests|/lt|/ListTests" command line argument.
     /// </summary>
     internal class ListTestsArgumentProcessor : IArgumentProcessor
     {

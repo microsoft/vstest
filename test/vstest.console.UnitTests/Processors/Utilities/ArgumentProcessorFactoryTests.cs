@@ -4,6 +4,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
     using TestPlatform.CommandLine.Processors;
     using TestTools.UnitTesting;
 
@@ -11,46 +14,123 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
     public class ArgumentProcessorFactoryTests
     {
         [TestMethod]
-        public void BuildCommadMapsForProcessorWithValidShortCommandNameAddsShortCommandNameToMap()
+        public void CreateArgumentProcessorIsTreatingNonArgumentAsSource()
         {
-            var configProcessor = new ConfigurationArgumentProcessor();
-            IEnumerable<IArgumentProcessor> processors = new List<IArgumentProcessor>()
-            {
-                //Adding Processor which has a Short Command Name
-               configProcessor
-            };
-            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(processors);
+            string argument = "--NonArgumet:Dummy";
 
-            Assert.IsTrue(factory.CommandToProcessorMap.ContainsKey("/c"));
-            Assert.IsTrue(factory.CommandToProcessorMap.ContainsKey("/Configuration"));
-            Assert.IsTrue(factory.CommandToProcessorMap.ContainsValue(configProcessor));
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(TestSourceArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorIsTreatingNonArgumentAsSourceEvenItIsStratingFromForwardSlash()
+        {
+            string argument = "/foo/foo.dll";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(TestSourceArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorShouldReturnPlatformArgumentProcessorWhenArgumentIsPlatform()
+        {
+            string argument = "/Platform:x64";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(PlatformArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorShouldReturnPlatformArgumentProcessorWhenArgumentIsPlatformInXplat()
+        {
+            string argument = "--Platform:x64";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(argument);
+
+            Assert.AreEqual(typeof(PlatformArgumentProcessor), result.GetType());
         }
 
         [TestMethod]
         public void BuildCommadMapsForProcessorWithIsSpecialCommandSetAddsProcessorToSpecialMap()
         {
-            var sourceProcessor = new TestSourceArgumentProcessor();
-            IEnumerable<IArgumentProcessor> processors = new List<IArgumentProcessor>(){sourceProcessor};
-            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(processors);
+            var specialCommands = GetArgumentProcessors(specialCommandFilter: true)
+                                    .Select(a => a.Metadata.Value.CommandName)
+                                    .ToList();
 
-            Assert.IsTrue(factory.SpecialCommandToProcessorMap.ContainsKey("TestSource"));
-            Assert.IsTrue(factory.SpecialCommandToProcessorMap.ContainsValue(sourceProcessor));
+            List<string> xplatspecialCommands = new List<string>();
+
+            // for each command add there xplat version
+            foreach (string name in specialCommands)
+            {
+                xplatspecialCommands.Add(string.Concat("--", name.Remove(0, 1)));
+            }
+            var factory = ArgumentProcessorFactory.Create();
+
+            CollectionAssert.AreEquivalent(
+                specialCommands.Concat(xplatspecialCommands).ToList(),
+                factory.SpecialCommandToProcessorMap.Keys.ToList());
         }
 
         [TestMethod]
         public void BuildCommadMapsForMultipleProcessorAddsProcessorToAppropriateMaps()
         {
-            var configProcessor = new ConfigurationArgumentProcessor();
-            var sourceProcessor = new TestSourceArgumentProcessor();
-            IEnumerable<IArgumentProcessor> processors = new List<IArgumentProcessor>() { sourceProcessor, configProcessor };
-            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create(processors);
+            var commandProcessors = GetArgumentProcessors(specialCommandFilter: false);
+            var commands = commandProcessors.Select(a => a.Metadata.Value.CommandName);
+            List<string> xplatCommandName = new List<string>();
 
-            Assert.IsTrue(factory.SpecialCommandToProcessorMap.ContainsKey("TestSource"));
-            Assert.IsTrue(factory.SpecialCommandToProcessorMap.ContainsValue(sourceProcessor));
-            Assert.IsTrue(factory.CommandToProcessorMap.ContainsKey("/c"));
-            Assert.IsTrue(factory.CommandToProcessorMap.ContainsKey("/Configuration"));
-            Assert.IsTrue(factory.CommandToProcessorMap.ContainsValue(configProcessor));
+            // for each command add there xplat version
+            foreach (string name in commands)
+            {
+                xplatCommandName.Add(string.Concat("--", name.Remove(0, 1)));
+            }
+
+            var shortCommands = commandProcessors.Where(a => !string.IsNullOrEmpty(a.Metadata.Value.ShortCommandName))
+                                    .Select(a => a.Metadata.Value.ShortCommandName);
+
+            List<string> xplatShortCommandName = new List<string>();
+
+            // for each short command add there xplat version
+            foreach (string name in shortCommands)
+            {
+                xplatShortCommandName.Add(name.Replace('/', '-'));
+            }
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            // Expect command processors to contain both long and short commands.
+            CollectionAssert.AreEquivalent(
+                commands.Concat(xplatCommandName).Concat(shortCommands).Concat(xplatShortCommandName).ToList(),
+                factory.CommandToProcessorMap.Keys.ToList());
+        }
+
+        private static IEnumerable<IArgumentProcessor> GetArgumentProcessors(bool specialCommandFilter)
+        {
+            var allProcessors = typeof(ArgumentProcessorFactory).GetTypeInfo()
+                                    .Assembly.GetTypes()
+                                    .Where(t => !t.Name.Equals("IArgumentProcessor") && typeof(IArgumentProcessor).IsAssignableFrom(t));
+
+            foreach (var processor in allProcessors)
+            {
+                var instance = Activator.CreateInstance(processor) as IArgumentProcessor;
+                Assert.IsNotNull(instance, "Unable to instantiate processor: {0}", processor);
+
+                var specialProcessor = instance.Metadata.Value.IsSpecialCommand;
+                if ((specialCommandFilter && specialProcessor) || (!specialCommandFilter && !specialProcessor))
+                {
+                    yield return instance;
+                }
+            }
         }
     }
 }
-

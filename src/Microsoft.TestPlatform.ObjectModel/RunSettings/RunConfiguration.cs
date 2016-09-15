@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// .Net framework which rocksteady should use for discovery/execution
         /// </summary>
-        private FrameworkVersion framework;
+        private Framework framework;
 
         /// <summary>
         /// Directory in which rocksteady/adapter should keep their run specific data. 
@@ -51,16 +51,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #region Constructor
 
         /// <summary>
-        /// Initializes with the name of the test case.
+        /// Initializes a new instance of the <see cref="RunConfiguration"/> class. 
         /// </summary>
-        /// <param name="name">The name of the test case.</param>
-        /// <param name="executorUri">The Uri of the executor to use for running this test.</param>
-        public RunConfiguration()
-            : base(Constants.RunConfigurationSettingsName)
+        public RunConfiguration() : base(Constants.RunConfigurationSettingsName)
         {
-            // set defaults for target platform, framework version type and results directory.
+            // Set defaults for target platform, framework version type and results directory.
             this.platform = Constants.DefaultPlatform;
-            this.framework = Constants.DefaultFramework;
+            this.framework = Framework.DefaultFramework;
             this.resultsDirectory = Constants.DefaultResultsDirectory;
             this.SolutionDirectory = null;
             this.TreatTestAdapterErrorsAsWarnings = Constants.DefaultTreatTestAdapterErrorsAsWarnings;
@@ -117,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Disable App domain creation. 
+        /// Gets or sets a value indicating whether app domain creation should be disabled.
         /// </summary>
         public bool DisableAppDomain
         {
@@ -125,6 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 return this.disableAppDomain;
             }
+
             set
             {
                 this.disableAppDomain = value;
@@ -133,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets or sets the Target platform this run is targeting. Possible values are x86|x64|arm|anycpu
+        /// Gets or sets the Target platform this run is targeting. Possible values are <c>x86|x64|arm|anycpu</c>.
         /// </summary>
         public Architecture TargetPlatform
         {
@@ -141,6 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 return this.platform;
             }
+
             set
             {
                 this.platform = value;
@@ -151,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
         /// </summary>
-        public FrameworkVersion TargetFrameworkVersion
+        public Framework TargetFrameworkVersion
         {
             get
             {
@@ -166,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets or sets the paths at which rocksteady should look for test adapters
+        /// Gets or sets the paths used for test adapters lookup in test platform.
         /// </summary>
         public string TestAdaptersPaths
         {
@@ -205,7 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets a value indicating whether max cpu count set.
+        /// Gets a value indicating whether maximum parallelization count is set.
         /// </summary>
         public bool MaxCpuCountSet
         {
@@ -256,6 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #endregion
         
+        /// <inheritdoc/>
         public override XmlElement ToXml()
         {
             XmlDocument doc = new XmlDocument();
@@ -391,13 +391,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                         case "TargetFrameworkVersion":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                            FrameworkVersion frameworkType;
+                            Framework frameworkType;
                             value = reader.ReadElementContentAsString();
                             try
                             {
-                                frameworkType = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), value, true);
-                                if (frameworkType != FrameworkVersion.Framework35 && frameworkType != FrameworkVersion.Framework40 &&
-                                    frameworkType != FrameworkVersion.Framework45)
+                                frameworkType = Framework.FromString(value);
+
+                                if (frameworkType == null)
                                 {
                                     throw new SettingsException(
                                         string.Format(

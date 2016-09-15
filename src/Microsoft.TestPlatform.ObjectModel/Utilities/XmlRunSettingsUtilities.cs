@@ -6,10 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Runtime.InteropServices;
     using System.Security;
     using System.Xml;
     using System.Xml.XPath;
-    
+
     /// <summary>
     /// Utilities for the run settings XML.
     /// </summary>
@@ -29,31 +30,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// Gets the assembly qualified name of the data collector type
         /// </summary>
         private const string DataCollectorAssemblyQualifiedName = "Microsoft.VisualStudio.TraceCollector.UnitTestIsolationDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-        
+
         /// <summary>
-        /// Gets the os architecture.
+        /// Gets the os architecture of the machine where this application is running
         /// </summary>
-        public static Architecture OSArchitecture
+        public static ObjectModel.Architecture OSArchitecture
         {
             [SecuritySafeCritical]
             get
             {
-                string processorArch = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
-                string processorArch6432 = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432");
-                if (string.Equals(processorArch, "amd64", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(processorArch, "ia64", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(processorArch6432, "amd64", StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(processorArch6432, "ia64", StringComparison.OrdinalIgnoreCase))
-                {
-                    return Architecture.X64;
-                }
+                var  arch = RuntimeInformation.OSArchitecture;
 
-                if (string.Equals(processorArch, "x86", StringComparison.OrdinalIgnoreCase))
+                switch (arch)
                 {
-                    return Architecture.X86;
+                    case Architecture.X64:
+                        return ObjectModel.Architecture.X64;
+                    case Architecture.X86:
+                        return ObjectModel.Architecture.X86;
+                    default:
+                        return ObjectModel.Architecture.ARM;
                 }
-
-                return Architecture.ARM;
             }
         }
 

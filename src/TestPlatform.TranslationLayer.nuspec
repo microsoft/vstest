@@ -11,9 +11,23 @@
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <copyright>Copyright © Microsoft Corporation</copyright>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="7.0.1"/>
+    </dependencies>
   </metadata>
-  <files>	
-	<file src="net46\win7-x64\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net46\" />
-	<file src="netcoreapp1.0\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\netstandard1.5\" />
+  <files>
+    <file src="net46\win7-x64\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net46\" />
+    <file src="net46\win7-x64\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\net46\" />
+    <file src="net46\win7-x64\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net46\" />
+    <file src="net46\win7-x64\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net46\" />
+    <file src="net46\win7-x64\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\net46\" />
+    <file src="net46\win7-x64\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net46\" />
+
+    <file src="netcoreapp1.0\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\netstandard1.5\" />
+    <file src="netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netstandard1.5\" />
+    <file src="netcoreapp1.0\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.5\" />
+    <file src="netcoreapp1.0\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\netstandard1.5\" />
+    <file src="netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netstandard1.5\" />
+    <file src="netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.5\" />
   </files>
 </package>

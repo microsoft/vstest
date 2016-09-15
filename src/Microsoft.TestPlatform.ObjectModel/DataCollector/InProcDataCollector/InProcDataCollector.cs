@@ -12,6 +12,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector
     public interface InProcDataCollection
     {
         /// <summary>
+        /// Initializes the In Process DataCollection with the DataCollectionSink
+        /// </summary>
+        /// <param name="dataCollectionSink">data collection sink object</param>
+        void Initialize(IDataCollectionSink dataCollectionSink);
+
+        /// <summary>
         /// Called when test session starts
         /// </summary>
         /// <param name="testSessionStartArgs">

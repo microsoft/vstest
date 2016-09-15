@@ -4,22 +4,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-    using ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
     /// </summary>
@@ -27,7 +22,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     {
         private ITestRunEventsHandler testRunEventsHandler;
 
+        private ITestPlatformEventSource testPlatformEventSource;
+
         private BaseRunTests activeTestRun;
+
+        protected ExecutionManager(ITestPlatformEventSource testPlatformEventSource):this()
+        {
+            this.testPlatformEventSource = testPlatformEventSource;
+        }
+
+        public ExecutionManager()
+        {
+            this.testPlatformEventSource = TestPlatformEventSource.Instance;
+        }
 
         #region IExecutionManager Implementation
 
@@ -37,9 +44,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
         public void Initialize(IEnumerable<string> pathToAdditionalExtensions)
         {
+            this.testPlatformEventSource.AdapterSearchStart();
             // Start using these additional extensions
             TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
             this.LoadExtensions();
+            this.testPlatformEventSource.AdapterSearchStop();
         }
 
         /// <summary>
@@ -48,43 +57,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="adapterSourceMap"> The adapter Source Map.  </param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
-        /// <param name="testCaseEvents"> EventHandler for handling test cases level events from Engine. </param>
+        /// <param name="testCaseEventsHandler"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine.  </param>
-        public void StartTestRun(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, ITestRunEventsHandler runEventsHandler)
+        public void StartTestRun(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext,
+            ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler runEventsHandler)
         {
             this.testRunEventsHandler = runEventsHandler;
-            var testCaseEventsHandler = testCaseEvents;
-            var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings);
-
             try
             {
-                if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
-                {
-                    testCaseEventsHandler = new TestCaseEventsHandler(inProcDataCollectionExtensionManager, testCaseEvents);
-                    inProcDataCollectionExtensionManager.TriggerTestSessionStart();
-                }
+                activeTestRun = new RunTestsWithSources(
+                     adapterSourceMap,
+                     runSettings,
+                     testExecutionContext,
+                     testCaseEventsHandler,
+                     runEventsHandler);
 
-                using (var testRunCache = new TestRunCache(
-                    testExecutionContext.FrequencyOfRunStatsChangeEvent,
-                    testExecutionContext.RunStatsChangeEventTimeout,
-                    this.OnCacheHit))
-                {
-                    activeTestRun = new RunTestsWithSources(
-                         adapterSourceMap,
-                         testRunCache,
-                         runSettings,
-                         testExecutionContext,
-                         testCaseEventsHandler,
-                         runEventsHandler);
-                    activeTestRun.RunTests();
-                }
+                activeTestRun.RunTests();
             }
             finally
             {
-                if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
-                {
-                    inProcDataCollectionExtensionManager.TriggerTestSessionEnd();
-                }
                 activeTestRun = null;
             }
         }
@@ -95,38 +86,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="tests"> The test list. </param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
-        /// <param name="testCaseEvents"> EventHandler for handling test cases level events from Engine. </param>
+        /// <param name="testCaseEventsHandler"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine. </param>
-        public void StartTestRun(IEnumerable<TestCase> tests, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, ITestRunEventsHandler runEventsHandler)
+        public void StartTestRun(IEnumerable<TestCase> tests, string runSettings, TestExecutionContext testExecutionContext, 
+            ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler runEventsHandler)
         {
             this.testRunEventsHandler = runEventsHandler;
-            var testCaseEventsHandler = testCaseEvents;
-            var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings);
 
             try
             {
-                if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
-                {
-                    testCaseEventsHandler = new TestCaseEventsHandler(inProcDataCollectionExtensionManager, testCaseEvents);
-                    inProcDataCollectionExtensionManager.TriggerTestSessionStart();
-                }
+                activeTestRun = new RunTestsWithTests(tests,
+                    runSettings,
+                    testExecutionContext,
+                    testCaseEventsHandler,
+                    runEventsHandler);
 
-                using (var testRunCache = new TestRunCache(
-                    testExecutionContext.FrequencyOfRunStatsChangeEvent,
-                    testExecutionContext.RunStatsChangeEventTimeout,
-                    this.OnCacheHit))
-                {
-                    var runTestsWithTests = new RunTestsWithTests(tests, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler, runEventsHandler);
-                    activeTestRun = runTestsWithTests;
-                    runTestsWithTests.RunTests();
-                }
+                activeTestRun.RunTests();
             }
             finally
             {
-                if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
-                {
-                    inProcDataCollectionExtensionManager.TriggerTestSessionEnd();
-                }
                 activeTestRun = null;
             }
         }
@@ -167,22 +145,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         #endregion
 
         #region private methods
-        
-        private void OnCacheHit(TestRunStatistics testRunStats, ICollection<TestResult> results, ICollection<TestCase> inProgressTests)
-        {
-            if (this.testRunEventsHandler != null)
-            {
-                var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
-                this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
-            }
-            else
-            {
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("Could not pass the message for changes in test run statistics as the callback is null.");
-                }
-            }
-        }
 
         private void LoadExtensions()
         {

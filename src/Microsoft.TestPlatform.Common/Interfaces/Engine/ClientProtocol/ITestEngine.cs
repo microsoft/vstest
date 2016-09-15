@@ -33,6 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="architecture">Architecture of the test run</param>
         /// <returns>Launcher for the test host process</returns>
-        ITestHostManager GetDefaultTestHostManager(Architecture architecture);
+        ITestHostManager GetDefaultTestHostManager(Architecture architecture, Framework framework);
     }
 }

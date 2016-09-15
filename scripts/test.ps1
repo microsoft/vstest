@@ -108,9 +108,12 @@ function Invoke-Test
                 } elseif (!($testContainerName -match $Script:TPT_Pattern)) {
                     Write-Log ".. . $testContainerName doesn't match test container pattern '$($Script:TPT_Pattern)'. Skipped from run."
                 } else {
+                    Set-TestEnvironment
+
                     Write-Verbose "vstest.console.exe $testContainerPath /platform:$testArchitecture /testAdapterPath:$testAdapterPath"
                     $output = & $vstestConsolePath $testContainerPath /platform:$testArchitecture /testAdapterPath:"$testAdapterPath"
 
+                    Reset-TestEnvironment
                     #Write-Verbose "$dotnetExe test $_ --configuration $Configuration"
                     #& $dotnetExe test $_ --configuration $Configuration
 
@@ -128,6 +131,7 @@ function Invoke-Test
                             continue
                         }
                     }
+
                 }
 
                 Write-Log ".. Test: Complete."
@@ -172,6 +176,18 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
 function Set-ScriptFailed
 {
     $Script:ScriptFailed = $true
+}
+
+function Set-TestEnvironment
+{
+    $env:TPT_TargetFramework = $Script:TPT_TargetFramework
+    $env:TPT_TargetRuntime = $Script:TPT_TargetRuntime
+}
+
+function Reset-TestEnvironment
+{
+    $env:TPT_TargetFramework = $null
+    $env:TPT_TargetRuntime = $null
 }
 
 # Execute build

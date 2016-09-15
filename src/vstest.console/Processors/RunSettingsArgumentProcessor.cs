@@ -168,10 +168,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 FrameworkVersion frameworkVersion = FrameworkVersion.Framework45;
 
-                if (this.commandLineOptions.FrameworkVersionSpecified && this.commandLineOptions.TargetFrameworkVersion != FrameworkVersion.Framework45)
+                if (this.commandLineOptions.FrameworkVersionSpecified && this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework)
                 {
                     IOutput output = ConsoleOutput.Instance;
-                    output.Warning(Resources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), FrameworkVersion.Framework45.ToString());
+                    output.Warning(Resources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
                 }
 
                 var architecture = this.commandLineOptions.ArchitectureSpecified

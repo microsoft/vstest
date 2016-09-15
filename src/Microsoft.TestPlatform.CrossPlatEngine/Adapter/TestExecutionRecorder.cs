@@ -67,11 +67,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// test result to the framework when the test(s) is canceled. </exception>  
         public void RecordResult(TestResult testResult)
         {
-            this.testRunCache.OnNewTestResult(testResult);
-
+            var flushResult = true;
+            // For test result, we cannot flush to cache unless the result is updated with datacollection data
             if (this.testCaseEventsHandler != null)
             {
-                this.testCaseEventsHandler.SendTestResult(testResult);
+                flushResult = this.testCaseEventsHandler.SendTestResult(testResult);
+            }
+
+            if (flushResult)
+            {
+                this.testRunCache.OnNewTestResult(testResult);
             }
         }
 

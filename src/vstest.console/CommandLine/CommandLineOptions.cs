@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
         private Architecture architecture;
         
-        private FrameworkVersion frameworkVersion;
+        private Framework frameworkVersion;
 
         #endregion
 
@@ -123,6 +123,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// Path to the custom test adapters. 
         /// </summary>
         public string TestAdapterPath { get; set; }
+
+        /// <summary>
+        /// Process Id of the process which launched vstest runner
+        /// </summary>
+        public int ParentProcessId { get; set; }
 
         /// <summary>
         /// Port IDE process is listening to
@@ -199,9 +204,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         internal IFileHelper FileHelper { get; set; }
 
         /// <summary>
-        /// Gets or sets the target .Net Framework version for test run.
+        /// Gets or sets the target Framework version for test run.
         /// </summary>
-        internal FrameworkVersion TargetFrameworkVersion
+        internal Framework TargetFrameworkVersion
         {
             get
             {

@@ -131,7 +131,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var lastChunk = new TestRunChangedEventArgs(null, null, null);
             var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
 
-            this.mockDataSerializer.Setup(mds => mds.SerializeObject(MessageType.TestRunStatsChange, lastChunk))
+            this.mockDataSerializer.Setup(mds => mds.SerializePayload(MessageType.TestRunStatsChange, lastChunk))
                 .Returns(payload);
 
             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
@@ -157,7 +157,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
                     this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
 
-            this.mockDataSerializer.Setup(mds => mds.SerializeObject(MessageType.ExecutionComplete)).Returns(payload);
+            this.mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.ExecutionComplete)).Returns(payload);
 
             this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 

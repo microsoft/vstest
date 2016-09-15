@@ -32,22 +32,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System.Diagnostics.Contracts;
     using System.Reflection;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
     /// </summary>
     internal class Executor
     {
+        private ITestPlatformEventSource testPlatformEventSource;
+
         #region Constructor
 
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public Executor(IOutput output)
-        {
-            this.Output = output;
+        public Executor(IOutput output): this(output, TestPlatformEventSource.Instance)
+        {            
         }
 
+        internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource)
+        {
+            this.Output = output;
+            this.testPlatformEventSource = testPlatformEventSource;
+        }
         #endregion
 
         #region Properties
@@ -72,6 +80,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </returns>
         internal int Execute(params string[] args)
         {
+            this.testPlatformEventSource.VsTestConsoleStart();
+            
             int exitCode = 0;
             // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
             if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
@@ -95,6 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 && argumentProcessors.All(
                     processor => processor.Metadata.Value.CommandName != HelpArgumentProcessor.CommandName))
             {
+                this.testPlatformEventSource.VsTestConsoleStop();
                 return exitCode;
             }
             
@@ -111,6 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             exitCode |= (TestRunResultAggregator.Instance.Outcome == TestOutcome.Passed) ? 0 : 1;
 
             EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", exitCode);
+            
+            this.testPlatformEventSource.VsTestConsoleStop();
+
             return exitCode;
         }
 
@@ -198,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // see the command again and the value is 1 (meaning this is the second time we have seen the command),
             // we will output an error and increment the count.  This ensures that the error message will only be
             // displayed once even if the user does something like /ListDiscoverers /ListDiscoverers /ListDiscoverers.
-            Dictionary<string, int> commandSeenCount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var commandSeenCount = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
             // Check each processor.
             foreach (var processor in argumentProcessors)

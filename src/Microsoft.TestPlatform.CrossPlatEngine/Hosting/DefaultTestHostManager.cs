@@ -1,5 +1,4 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
     using System;
@@ -24,8 +23,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private const string X86TestHostProcessName = "testhost.x86.exe";
         private const string DotnetProcessName = "dotnet.exe";
         private const string DotnetProcessNameXPlat = "dotnet";
-
+        private const string NetCoreDirectoryName = "NetCore";
+        
         private Architecture architecture;
+        private Framework framework;
         private ITestHostLauncher customTestHostLauncher;
 
         private Process testHostProcess;
@@ -34,24 +35,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private EventHandler registeredExitHandler;
 
         /// <summary>
-        /// The constructor.
+        /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
-        ///  <param name="architecture">
-        /// The architecture.
-        /// </param>
-        public DefaultTestHostManager(Architecture architecture)
-            : this(architecture, new ProcessHelper())
+        /// <param name="architecture">Platform architecture of the host process.</param>
+        /// <param name="framework">Runtime framework for the host process.</param>
+        public DefaultTestHostManager(Architecture architecture, Framework framework)
+            : this(architecture, framework, new ProcessHelper())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultTestHostProcessManager"/> class.
+        /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
-        /// <param name="architecture"> The architecture. </param>
-        /// <param name="processHelper"> The process helper. </param>
-        internal DefaultTestHostManager(Architecture architecture, IProcessHelper processHelper)
+        /// <param name="architecture">Platform architecture of the host process.</param>
+        /// <param name="framework">Runtime framework for the host process.</param>
+        /// <param name="processHelper">Process helper instance.</param>
+        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper)
         {
             this.architecture = architecture;
+            this.framework = framework;
             this.processHelper = processHelper;
             this.testHostProcess = null;
         }
@@ -68,12 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <summary>
-        /// Sets a custom launcher
+        /// Sets a custom launcher.
         /// </summary>
-        /// <param name="customTestHostLauncher">Custom launcher to set</param>
-        public void SetCustomLauncher(ITestHostLauncher customTestHostLauncher)
+        /// <param name="customLauncher">Custom launcher to set</param>
+        public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
-            this.customTestHostLauncher = customTestHostLauncher;
+            this.customTestHostLauncher = customLauncher;
         }
 
         /// <summary>
@@ -84,8 +86,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
         public virtual int LaunchTestHost(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            DeregisterForExitNotification();
-            var testHostProcessInfo = GetTestHostProcessStartInfo(environmentVariables, commandLineArguments);
+            this.DeregisterForExitNotification();
+            var testHostProcessInfo = this.GetTestHostProcessStartInfo(environmentVariables, commandLineArguments);
             EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostProcessInfo.FileName, testHostProcessInfo.Arguments);
 
             if (this.customTestHostLauncher == null)
@@ -104,14 +106,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Gives the ProcessStartInfo for the test host process
         /// </summary>
-        /// <param name="environmentVariables"></param>
-        /// <param name="commandLineArguments"></param>
+        /// <param name="environmentVariables">Set of environment variables.</param>
+        /// <param name="commandLineArguments">Arguments for the test host process.</param>
         /// <returns>ProcessStartInfo of the test host</returns>
         public virtual TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            var testHostProcessName = (architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
-            string testhostProcessPath, processWorkingDirectory = null;
+            var testHostProcessName = X64TestHostProcessName;
+            string testHostDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
+            string testhostProcessPath;
 
             // If we are running in the dotnet.exe context we do not want to launch testhost.exe but dotnet.exe with the testhost assembly. 
             // Since dotnet.exe is already built for multiple platforms this would avoid building testhost.exe also in multiple platforms.
@@ -120,20 +122,36 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 testhostProcessPath = currentProcessFileName;
                 var testhostAssemblyPath = Path.Combine(
-                    currentWorkingDirectory,
+                    testHostDirectory,
                     testHostProcessName.Replace("exe", "dll"));
-                commandLineArguments.Insert(0, testhostAssemblyPath);
-                processWorkingDirectory = Path.GetDirectoryName(currentProcessFileName);
+                commandLineArguments.Insert(0, "\"" + testhostAssemblyPath + "\"");
             }
             else
             {
-                testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
-                // For IDEs and other scenario - Current directory should be the working directory - not the vstest.console.exe location
-                // For VS - this becomes the solution directory for example
-                // "TestResults" directory will be created at "current directory" of test host
-                processWorkingDirectory = Directory.GetCurrentDirectory();
+                // Running on Windows with vstest.console.exe for desktop (or VS IDE). Spawn the dotnet.exe
+                // on path with testhost bundled with vstest.console.
+                if (this.framework.Name.ToLower().Contains("netstandard") || this.framework.Name.ToLower().Contains("netcoreapp"))
+                {
+                    testhostProcessPath = DotnetProcessName;
+                    var testhostAssemblyPath = Path.Combine(
+                        Path.GetDirectoryName(currentProcessFileName),
+                        NetCoreDirectoryName,
+                        testHostProcessName.Replace("exe", "dll"));
+                    commandLineArguments.Insert(0, "\"" + testhostAssemblyPath + "\"");
+                }
+                else
+                {
+                    testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
+                    testhostProcessPath = Path.Combine(testHostDirectory, testHostProcessName);
+                }
             }
-            var argumentsString = string.Join(" ", commandLineArguments);
+
+            // For IDEs and other scenario - Current directory should be the working directory - not the vstest.console.exe location
+            // For VS - this becomes the solution directory for example
+            // "TestResults" directory will be created at "current directory" of test host
+            string processWorkingDirectory = Directory.GetCurrentDirectory();
+
+            string argumentsString = string.Join(" ", commandLineArguments);
             return new TestProcessStartInfo { FileName = testhostProcessPath, Arguments = argumentsString, EnvironmentVariables = environmentVariables, WorkingDirectory = processWorkingDirectory };
         }
 
@@ -145,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         {
             if (this.testHostProcess != null && abortCallback != null)
             {
-                this.registeredExitHandler = new EventHandler((sender, args) => abortCallback());
+                this.registeredExitHandler = (sender, args) => abortCallback();
                 this.testHostProcess.Exited += this.registeredExitHandler;
             }
         }
@@ -155,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         public virtual void DeregisterForExitNotification()
         {
-            if(this.testHostProcess != null && this.registeredExitHandler != null)
+            if (this.testHostProcess != null && this.registeredExitHandler != null)
             {
                 this.testHostProcess.Exited -= this.registeredExitHandler;
             }

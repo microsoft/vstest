@@ -10,8 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Reflection;
     using System.Runtime.Serialization;
 
-    using Newtonsoft.Json;
-
     /// <summary>
     ///  Base class for test related classes.
     /// </summary>
@@ -24,27 +22,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The store for all the properties registered.
         /// </summary>
-        /// <remarks>
-        /// Not sending custom properties over because of serialization issues. 
-        /// Custom TypeConverters for TestProperty does not work in Core currently. 
-        /// This is not immediately needed for dotnet-test integration. Need to revisit.
-        /// </remarks>
-        [DataMember]
-        [JsonIgnore]
-#if FullCLR
-        private Dictionary<TestProperty, object> store;
-#else
-        public Dictionary<TestProperty, object> store;
-#endif
-        
+        private readonly Dictionary<TestProperty, object> store;
+
         /// <summary>
-        /// Property used for Json (de)serialization of store dictionary
-        /// Notes: Set the ObjectCreationHandling to Replace so that JSON does not use the "store" value as the value to set
-        /// Notes: JSON will use "Auto" setting which does not replace the value from the payload message if "get" returns values
-        /// Notes: "Replace" setting will always replace the property value from payload message
+        /// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
+        /// by default doesn't provide the required object representation. <c>List of KeyValuePair</c> on the
+        /// other hand provides a clean Key, Value entries for <c>TestProperty</c> and it's value.
         /// </summary>
-        [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Replace)]
-        public List<KeyValuePair<TestProperty, object>> StorekvpList
+        [DataMember(Name = "Properties")]
+        private List<KeyValuePair<TestProperty, object>> StoreKeyValuePairs
         {
             get
             {
@@ -53,15 +39,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                if (this.store == null)
+                // Receive the <TestProperty, String> key value pairs from deserialized entity.
+                // Store each property and value in the property data store.
+                foreach (var property in value)
                 {
-                    this.store = new Dictionary<TestProperty, object>();
-                }
-
-                foreach (var kvp in value.Where(kvp => !this.store.Keys.Contains(kvp.Key)))
-                {
-                    TestProperty.Register(kvp.Key.Id, kvp.Key.Label, kvp.Key.GetValueType(), typeof(TestObject));
-                    this.SetPropertyValue(kvp.Key, kvp.Value);
+                    TestProperty.Register(
+                        property.Key.Id,
+                        property.Key.Label,
+                        property.Key.Category,
+                        property.Key.Description,
+                        property.Key.GetValueType(),
+                        null,
+                        property.Key.Attributes,
+                        typeof(TestObject));
+                    this.SetPropertyValue(property.Key, property.Value, CultureInfo.InvariantCulture);
                 }
             }
         }
@@ -70,14 +61,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Constructors
 
-#if FullCLR
         protected TestObject()
-#else
-        public TestObject()
-#endif
         {
             this.store = new Dictionary<TestProperty, object>();            
             TypeDescriptor.AddAttributes(typeof(Guid), new TypeConverterAttribute(typeof(CustomGuidConverter)));
+            TypeDescriptor.AddAttributes(typeof(KeyValuePair<string, string>[]), new TypeConverterAttribute(typeof(CustomKeyValueConverter)));
+            TypeDescriptor.AddAttributes(typeof(string[]), new TypeConverterAttribute(typeof(CustomStringArrayConverter)));
         }
 
         [OnSerializing]
@@ -102,12 +91,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-#endregion Constructors
+        #endregion Constructors
 
-#region Properties
+        #region Properties
 
         /// <summary>
-        ///   Returns the TestProperties currently specified in this TestObject.
+        /// Returns the TestProperties currently specified in this TestObject.
         /// </summary>
         public IEnumerable<TestProperty> Properties
         {
@@ -131,11 +120,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 defaultValue = Activator.CreateInstance(valueType);
             }
 
-            return PrivateGetPropertyValue(property, defaultValue);
+            return this.PrivateGetPropertyValue(property, defaultValue);
         }
 
         /// <summary>
-        ///   Returns property value of the specify TestProperty
+        /// Returns property value of the specify TestProperty
         /// </summary>
         /// <typeparam name="T">Property value type</typeparam>
         /// <param name="property">TestObject's TestProperty</param>
@@ -143,39 +132,39 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>property value</returns>
         public T GetPropertyValue<T>(TestProperty property, T defaultValue)
         {
-            return GetPropertyValue<T>(property, defaultValue, CultureInfo.InvariantCulture);
+            return this.GetPropertyValue<T>(property, defaultValue, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
-        ///   Set TestProperty's value
+        /// Set TestProperty's value
         /// </summary>
         /// <typeparam name="T">Property value type</typeparam>
         /// <param name="property">TestObject's TestProperty</param>
         /// <param name="value">value to be set</param>
         public void SetPropertyValue<T>(TestProperty property, T value)
         {
-            SetPropertyValue<T>(property, value, CultureInfo.InvariantCulture);
+            this.SetPropertyValue<T>(property, value, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
-        ///   Set TestProperty's value
+        /// Set TestProperty's value
         /// </summary>
         /// <typeparam name="T">Property value type</typeparam>
         /// <param name="property">TestObject's TestProperty</param>
         /// <param name="value">value to be set</param>
         public void SetPropertyValue<T>(TestProperty property, LazyPropertyValue<T> value)
         {
-            SetPropertyValue<T>(property, value, CultureInfo.InvariantCulture);
+            this.SetPropertyValue<T>(property, value, CultureInfo.InvariantCulture);
         }
 
         /// <summary>
-        ///   Set TestProperty's value
+        /// Set TestProperty's value
         /// </summary>
         /// <param name="property">TestObject's TestProperty</param>
         /// <param name="value">value to be set</param>
         public void SetPropertyValue(TestProperty property, object value)
         {
-            PrivateSetPropertyValue(property, value);
+            this.PrivateSetPropertyValue(property, value);
         }
 
         /// <summary>
@@ -195,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
 
         /// <summary>
-        ///   Returns TestProperty's value 
+        /// Returns TestProperty's value 
         /// </summary>
         /// <returns>property's value. default value is returned if the property is not present</returns>
         public T GetPropertyValue<T>(TestProperty property, T defaultValue, CultureInfo culture)
@@ -203,13 +192,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");
 
-            object objValue = PrivateGetPropertyValue(property, defaultValue);
+            object objValue = this.PrivateGetPropertyValue(property, defaultValue);
 
             return ConvertPropertyTo<T>(property, culture, objValue);
         }
 
         /// <summary>
-        ///   Set TestProperty's value to the specified value T.
+        /// Set TestProperty's value to the specified value T.
         /// </summary>
         public void SetPropertyValue<T>(TestProperty property, T value, CultureInfo culture)
         {
@@ -218,11 +207,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            PrivateSetPropertyValue(property, objValue);
+            this.PrivateSetPropertyValue(property, objValue);
         }
 
         /// <summary>
-        ///   Set TestProperty's value to the specified value T.
+        /// Set TestProperty's value to the specified value T.
         /// </summary>
         public void SetPropertyValue<T>(TestProperty property, LazyPropertyValue<T> value, CultureInfo culture)
         {
@@ -231,14 +220,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            PrivateSetPropertyValue(property, objValue);
+            this.PrivateSetPropertyValue(property, objValue);
         }
 
-#endregion Property Values
+        #endregion Property Values
 
-#region Helpers
+        #region Helpers
+
         /// <summary>
-        ///   Return TestProperty's value
+        /// Return TestProperty's value
         /// </summary>
         /// <returns></returns>
         private object PrivateGetPropertyValue(TestProperty property, object defaultValue)
@@ -255,7 +245,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        ///   Set TestProperty's value
+        /// Set TestProperty's value
         /// </summary>
         private void PrivateSetPropertyValue(TestProperty property, object value)
         {
@@ -272,7 +262,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        ///    Convert passed in value from TestProperty's specified value type.
+        /// Convert passed in value from TestProperty's specified value type.
         /// </summary>
         /// <returns>Converted object</returns>
         private static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
@@ -309,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        ///   Convert passed in value into the specified type when property is registered.
+        /// Convert passed in value into the specified type when property is registered.
         /// </summary>
         /// <returns>Converted object</returns>
         private static T ConvertPropertyTo<T>(TestProperty property, CultureInfo culture, object value)
@@ -356,7 +346,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-#endregion Helpers
+        #endregion Helpers
 
         private TraitCollection traits;
 

@@ -4,11 +4,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    
+
     /// <summary>
     /// The test run changed event args that provides the test results available.
     /// </summary>
+    [DataContract]
     public class TestRunChangedEventArgs : EventArgs
     {
         /// <summary>
@@ -27,16 +30,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets the new test results.
         /// </summary>
+        [DataMember]
         public IEnumerable<TestResult> NewTestResults { get; private set; }
 
         /// <summary>
         /// Gets the test run statistics.
         /// </summary>
+        [DataMember]
         public ITestRunStatistics TestRunStatistics { get; private set; }
 
         /// <summary>
         /// Gets the active tests.
         /// </summary>
+        [DataMember]
         public IEnumerable<TestCase> ActiveTests { get; private set; }
     }
 }

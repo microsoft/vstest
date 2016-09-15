@@ -9,7 +9,6 @@
   },
 
   "dependencies": {
-    "Microsoft.DotNet.ProjectModel": "1.0.0-rc2-002702",
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "Microsoft.TestPlatform.Client": "15.0.0-*",

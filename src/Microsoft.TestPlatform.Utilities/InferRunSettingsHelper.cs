@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="architecture"> The architecture. </param>
         /// <param name="framework"> The framework. </param>
         /// <param name="resultsDirectory"> The results directory. </param>
-        public static void UpdateRunSettingsWithUserProvidedSwitches(XPathNavigator runSettingsNavigator, Architecture architecture, FrameworkVersion framework, string resultsDirectory)
+        public static void UpdateRunSettingsWithUserProvidedSwitches(XPathNavigator runSettingsNavigator, Architecture architecture, Framework framework, string resultsDirectory)
         {
             ValidateRunConfiguration(runSettingsNavigator);
 
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (!string.IsNullOrEmpty(nodeXml))
             {
-                framework = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), nodeXml, true);
+                framework = Framework.FromString(nodeXml);
                 shouldUpdateFramework = false;
             }
 
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private static void UpdateRunConfiguration(
             XPathNavigator navigator,
             Architecture effectivePlatform,
-            FrameworkVersion effectiveFramework,
+            Framework effectiveFramework,
             string resultsDirectory)
         {
             var resultsDirectoryNavigator = navigator.SelectSingleNode(ResultsDirectoryNodePath);

@@ -1,15 +1,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
 {
-    
+
     using System;
+
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 #if !NET46
     using System.Runtime.Loader;
 #endif
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-
-    using TestPlatform.ObjectModel;
-    using TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
     /// The test case events handler.
@@ -18,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
     {
 
         private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
-
         private ITestCaseEventsHandler testCaseEvents;
 
         /// <summary>
@@ -27,9 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <param name="inProcDCExtMgr">
         /// The in proc tidc helper.
         /// </param>
-        public TestCaseEventsHandler(InProcDataCollectionExtensionManager inProcDCExtMgr, ITestCaseEventsHandler testCaseEvents)
+        public TestCaseEventsHandler(InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager, ITestCaseEventsHandler testCaseEvents)
         {
-            this.inProcDataCollectionExtensionManager = inProcDCExtMgr;
+            this.inProcDataCollectionExtensionManager = inProcDataCollectionExtensionManager;
             this.testCaseEvents = testCaseEvents;
         }
 
@@ -66,9 +66,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <param name="result">
         /// The result.
         /// </param>
-        public void SendTestResult(TestResult result)
+        public bool SendTestResult(TestResult result)
         {
+            var flushResult = this.inProcDataCollectionExtensionManager.TriggerUpdateTestResult(result);
             this.testCaseEvents?.SendTestResult(result);
+            return flushResult;
         }
     }
 }

@@ -4,23 +4,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 {
     using System;
     using System.Collections.Generic;
-
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
-    using TestableImplementations;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using System.Linq;
     using System.Reflection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
+    using TestableImplementations;
 
     [TestClass]
     public class RunTestsWithSourcesTests
@@ -38,13 +40,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             this.testableTestRunCache = new TestableTestRunCache();
             this.testExecutionContext = new TestExecutionContext(
-                100,
-                TimeSpan.MaxValue,
-                inIsolation: false,
-                keepAlive: false,
-                areTestCaseLevelEventsRequired: false,
-                isDebug: false,
-                testCaseFilter: null);
+                                            frequencyOfRunStatsChangeEvent: 100,
+                                            runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                            inIsolation: false,
+                                            keepAlive: false,
+                                            isDataCollectionEnabled: false,
+                                            areTestCaseLevelEventsRequired: false,
+                                            hasTestRun: false,
+                                            isDebug: false,
+                                            testCaseFilter: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
         }
 
@@ -66,7 +70,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -90,7 +93,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -113,7 +115,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -140,7 +141,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -169,7 +169,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance = new TestableRunTestsWithSources(
                 adapterSourceMap,
-                testableTestRunCache,
                 null,
                 testExecutionContext,
                 null,
@@ -192,20 +191,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
         private class TestableRunTestsWithSources : RunTestsWithSources
         {
-            public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap,
-                ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext,
-                ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+            public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, 
+                TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
                 : base(
-                    adapterSourceMap, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler,
+                    adapterSourceMap, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler)
             {
             }
 
-            internal TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap,
-                ITestRunCache testRunCache, string runSettings, TestExecutionContext testExecutionContext,
+            internal TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, 
+                TestExecutionContext testExecutionContext,
                 ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
                 : base(
-                    adapterSourceMap, testRunCache, runSettings, testExecutionContext, testCaseEventsHandler,
+                    adapterSourceMap, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler, executorUriVsSourceList)
             {
             }

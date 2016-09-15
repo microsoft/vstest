@@ -12,17 +12,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         #region Constructor
 
         /// <summary>
-        /// Initializes with the test result for the event.
+        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class. 
         /// </summary>
-        /// <param name="result">Test Result for the event.</param>
+        /// <param name="result">
+        /// Test Result for the event.
+        /// </param>
         public TestResultEventArgs(TestResult result)
         {
             if (result == null)
             {
-                throw new ArgumentNullException("result");
+                throw new ArgumentNullException(nameof(result));
             }
-            
-            Result = result;
+
+            this.Result = result;
         }
 
         #endregion
@@ -30,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
         #region Properties
 
         /// <summary>
-        /// Test Result.
+        /// Gets the Test Result.
         /// </summary>
         public TestResult Result { get; private set; }
 

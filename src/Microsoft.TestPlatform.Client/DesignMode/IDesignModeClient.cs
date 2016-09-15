@@ -28,5 +28,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// </summary>
         /// <param name="defaultTestHostStartInfo">Default TestHost Start Info</param>
         int LaunchCustomHost(TestProcessStartInfo defaultTestHostStartInfo);
+
+        /// <summary>
+        /// Handles parent process exit
+        /// </summary>
+        void HandleParentProcessExit();
     }
 }

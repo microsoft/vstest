@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Microsoft.TestPlatform.CLI</id>
+    <version>15.0.0</version>
+    <title>Microsoft.TestPlatform.CLI</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>The cross platform Microsoft Test Platform.</description>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
+    <copyright>Copyright © Microsoft Corporation</copyright>
+    <contentFiles>
+      <files include="**/*.*" copyToOutput="true" flatten="false" buildAction="None" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="netcoreapp1.0\**\*.*" target="contentFiles\any\any\" />
+  </files>
+</package>
