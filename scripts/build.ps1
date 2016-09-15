@@ -191,6 +191,10 @@ function Create-VsixPackage
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
+    # Copy COM Components and their manifests over
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+
     # Zip the folder
     # TODO remove vsix creator
     & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net461\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration

@@ -44,6 +44,10 @@
       "type": "build",
       "version": "15.0.0"
     },
+    "Microsoft.Internal.Dia": {
+      "type": "build",
+      "version": "14.0.0"
+    },
     "Microsoft.TestPlatform.Extensions.TrxLogger": "15.0.0-*"
   }
 }
