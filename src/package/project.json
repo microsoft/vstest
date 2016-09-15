@@ -55,6 +55,9 @@
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "vstest.console": "15.0.0-*",
     "testhost": "15.0.0-*",
+    "testhost.x86": "15.0.0-*",
+    "datacollector": "15.0.0-*",
+    "datacollector.x86": "15.0.0-*",
     "Microsoft.TestPlatform.VsTestConsole.TranslationLayer": "15.0.0-*",
     "Microsoft.TestPlatform.Extensions.TrxLogger": "15.0.0-*"
   }

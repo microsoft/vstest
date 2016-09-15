@@ -7,13 +7,15 @@
     "warningsAsErrors": true
   },
   "dependencies": {
-    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*"
+    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
+    "System.Runtime.InteropServices.RuntimeInformation": "4.0.0"
   },
   "frameworks": {
     "net46": {
       "frameworkAssemblies": {
         "System.Xml": "",
-        "System.Runtime.Serialization": ""
+        "System.Runtime.Serialization": "",
+        "System.Runtime": ""
       },
       "dependencies": {
         "Microsoft.Internal.Dia.Interop": "14.0.0"
