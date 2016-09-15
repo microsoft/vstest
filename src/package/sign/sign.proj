@@ -36,6 +36,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.GenericTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.OrderedTestAdapter.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TmiAdapter.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
@@ -59,6 +60,24 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
+    </ItemGroup>
+
+    <!-- Sign NetCore Assemblies -->
+    <ItemGroup>
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\DataCollector.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.Utilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.VisualStudio.TestPlatform.Client.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\testhost.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\vstest.console.dll" />
+
+      <!-- NetCoreExtensions -->
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
     </ItemGroup>
 
     <ItemGroup>

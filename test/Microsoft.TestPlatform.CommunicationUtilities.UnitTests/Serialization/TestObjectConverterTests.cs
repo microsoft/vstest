@@ -79,7 +79,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestObjectShouldDeserializeCustomProperties()
         {
-            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Guid\"},\"Value\":\"02048dfd-3da7-475d-a011-8dd1121855ec\"},{\"Key\":{\"Id\":\"2\",\"Label\":\"label2\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Int32\"},\"Value\":29}]}";
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"13\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Guid\"},\"Value\":\"02048dfd-3da7-475d-a011-8dd1121855ec\"},{\"Key\":{\"Id\":\"2\",\"Label\":\"label2\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Int32\"},\"Value\":29}]}";
 
             var test = Deserialize<TestableTestObject>(json);
 
@@ -92,7 +92,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestObjectShouldDeserializeNullValueForProperty()
         {
-            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":null}]}";
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"14\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":null}]}";
 
             var test = Deserialize<TestableTestObject>(json);
 
@@ -104,7 +104,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestObjectShouldDeserializeStringArrayValueForProperty()
         {
-            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"1\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String[]\"},\"Value\":[\"val1\", \"val2\"]}]}";
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"15\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String[]\"},\"Value\":[\"val1\", \"val2\"]}]}";
 
             var test = Deserialize<TestableTestObject>(json);
 
@@ -116,13 +116,31 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestObjectShouldDeserializeDatetimeOffset()
         {
-            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"11\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"16\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
 
             var test = Deserialize<TestableTestObject>(json);
 
             var properties = test.Properties.ToArray();
             Assert.AreEqual(1, properties.Length);
             Assert.AreEqual(DateTimeOffset.MaxValue, test.GetPropertyValue(properties[0]));
+        }
+
+        [TestMethod]
+        public void TestObjectShouldAddPropertyToTestPropertyStoreOnDeserialize()
+        {
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"17\",\"Label\":\"label1\",\"Category\":\"c\",\"Description\":\"d\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"DummyValue\"}]}";
+
+            var test = Deserialize<TestableTestObject>(json);
+
+            var property = TestProperty.Find("17");
+            Assert.IsNotNull(property);
+            Assert.AreEqual("17", property.Id);
+            Assert.AreEqual("label1", property.Label);
+            Assert.AreEqual("c", property.Category);
+            Assert.AreEqual("d", property.Description);
+            Assert.AreEqual(typeof(string), property.GetValueType());
+            Assert.AreEqual(TestPropertyAttributes.None, property.Attributes);
+            Assert.AreEqual("DummyValue", test.GetPropertyValue(property));
         }
 
         private static string Serialize<T>(T data)

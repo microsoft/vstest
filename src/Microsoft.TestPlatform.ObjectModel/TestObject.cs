@@ -43,6 +43,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // Store each property and value in the property data store.
                 foreach (var property in value)
                 {
+                    TestProperty.Register(
+                        property.Key.Id,
+                        property.Key.Label,
+                        property.Key.Category,
+                        property.Key.Description,
+                        property.Key.GetValueType(),
+                        null,
+                        property.Key.Attributes,
+                        typeof(TestObject));
                     this.SetPropertyValue(property.Key, property.Value, CultureInfo.InvariantCulture);
                 }
             }
