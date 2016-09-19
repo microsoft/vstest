@@ -393,7 +393,8 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var runCriteria = new TestRunCriteriaWithSources(null, null, null);
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Throws(new IOException());
+            var exception = new IOException();
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Throws(exception);
             var waitHandle = new AutoResetEvent(false);
             mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 null, null, null)).Callback
@@ -405,6 +406,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
 
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.AbortedTestRun, Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.ConnectionClosed)), Times.Once);
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
+            mockHandler.Verify(mh => mh.HandleRawMessage(It.IsAny<string>()), Times.AtLeastOnce);
             mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.SessionEnd), Times.Never);
 
         }
