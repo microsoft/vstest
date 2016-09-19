@@ -93,13 +93,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var runtimeConfigPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.json"));
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
-                args += " --runtimeconfig " + runtimeConfigPath;
+                args += " --runtimeconfig \"" + runtimeConfigPath + "\"";
             }
 
             var depsFilePath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".deps.json"));
             if (this.fileHelper.Exists(depsFilePath))
             {
-                args += " --depsfile " + depsFilePath;
+                args += " --depsfile \"" + depsFilePath + "\"";
             }
 
             // Create a additional probing path args with Nuget.Client
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // Add the testhost path and other arguments
             var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
-            args += " " + testHostPath;
+            args += " \"" + testHostPath + "\"";
             if (commandLineArguments != null && commandLineArguments.Count > 0)
             {
                 args += " " + string.Join(" ", commandLineArguments);
@@ -115,6 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
+            startInfo.WorkingDirectory = sourceDirectory;
 
             return startInfo;
         }

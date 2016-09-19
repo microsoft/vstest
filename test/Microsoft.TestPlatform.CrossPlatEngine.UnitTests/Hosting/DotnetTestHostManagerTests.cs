@@ -90,7 +90,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, null);
             
-            StringAssert.Contains(startInfo.Arguments, "--runtimeconfig test.runtimeconfig.json");
+            StringAssert.Contains(startInfo.Arguments, "--runtimeconfig \"test.runtimeconfig.json\"");
         }
 
         [TestMethod]
@@ -100,7 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, null);
             
-            Assert.IsFalse(startInfo.Arguments.Contains("--runtimeconfig test.runtimeconfig.json"));
+            Assert.IsFalse(startInfo.Arguments.Contains("--runtimeconfig \"test.runtimeconfig.json\""));
         }
 
         [TestMethod]
@@ -110,7 +110,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, null);
             
-            StringAssert.Contains(startInfo.Arguments, "--depsfile test.deps.json");
+            StringAssert.Contains(startInfo.Arguments, "--depsfile \"test.deps.json\"");
         }
 
         [TestMethod]
@@ -120,7 +120,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, null);
             
-            Assert.IsFalse(startInfo.Arguments.Contains("--depsfile test.deps.json"));
+            Assert.IsFalse(startInfo.Arguments.Contains("--depsfile \"test.deps.json\""));
         }
 
         [TestMethod]
@@ -158,7 +158,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void LaunchTestHostShouldLaunchProcessWithArguments()
         {
             var args = new List<string> { "arg1", "arg2" };
-            var expectedArgs = "exec " + this.GetTesthostPath() + " arg1 arg2";
+            var expectedArgs = "exec \"" + this.GetTesthostPath() + "\" arg1 arg2";
 
             this.dotnetHostManager.LaunchTestHost(null, args);
 
