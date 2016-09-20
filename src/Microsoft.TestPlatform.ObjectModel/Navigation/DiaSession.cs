@@ -9,6 +9,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Runtime.InteropServices;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Reflection;
 
     using Dia;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
@@ -22,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private IDiaDataSource source;
         private IDiaSession session;
         private bool isDisposed;
+        private RegistryFreeActivationContext activationContext;
 
         /// <summary>
         /// Holds type symbols avaiable in the source.
@@ -35,6 +38,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private Dictionary<string, Dictionary<string, IDiaSymbol>> methodSymbols = new Dictionary<string, Dictionary<string, IDiaSymbol>>();
 
+        /// <summary>
+        /// Manifest files for Reg Free Com. This is essentially put in place for the msdia dependency.
+        /// </summary>
+        private const string ManifestFileNameX86 = "TestPlatform.ObjectModel.x86.manifest";
+        private const string ManifestFileNameX64 = "TestPlatform.ObjectModel.manifest";
+
         public DiaSession(string binaryPath) : this(binaryPath, null)
         {
         }
@@ -42,9 +51,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public DiaSession(string binaryPath, string searchPath)
         {
             ValidateArg.NotNullOrEmpty(binaryPath, "binaryPath");
-
             try
             {
+                this.activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom());
+                this.activationContext.ActivateContext();
+
                 this.source = new DiaSource();
                 this.source.loadDataForExe(binaryPath, searchPath, null);
                 this.source.openSession(out this.session);
@@ -124,6 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (disposing)
                 {
+                    this.activationContext?.Dispose();
                     foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in methodSymbols.Values)
                     {
                         foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
@@ -148,6 +160,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 isDisposed = true;
             }
+        }
+
+        /// <summary>
+        /// Gets the appropraite manifest file for reg free COM. This is dependent on the architecture of the current running process.
+        /// </summary>
+        /// <returns></returns>
+        private string GetManifestFileForRegFreeCom()
+        {
+            var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var manifestFieName = string.Empty;
+            if (IntPtr.Size == 4)
+            {
+                manifestFieName = ManifestFileNameX86;
+            }
+            else if (IntPtr.Size == 8)
+            {
+                manifestFieName = ManifestFileNameX64;
+            }
+            var manifestFile = Path.Combine(currentDirectory, manifestFieName);
+
+            if (!File.Exists(manifestFile))
+            {
+                throw new TestPlatformException(string.Format("Could not find the manifest file {0} for Registry free Com registration.", manifestFile));
+            }
+
+            return manifestFile;
         }
 
         private static void ReleaseComObject<T>(ref T obj)
