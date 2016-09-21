@@ -393,8 +393,12 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var runCriteria = new TestRunCriteriaWithSources(null, null, null);
-            var exception = new IOException();
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Throws(exception);
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessage()).Throws(new IOException());
+            string testCompleteRawMessage =
+                "{\"MessageType\":\"TestExecution.Completed\",\"Payload\":{\"TestRunCompleteArgs\":{\"TestRunStatistics\":null,\"IsCanceled\":false,\"IsAborted\":true,\"Error\":{\"ClassName\":\"System.IO.IOException\",\"Message\":\"Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host.\",\"Data\":null,\"InnerException\":null},\"AttachmentSets\":null,\"ElapsedTimeInRunningTests\":\"00:00:00\"},\"LastRunTests\":null,\"RunAttachments\":null,\"ExecutorUris\":null}}";
+            this.mockDataSerializer.Setup(
+                    md => md.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()))
+                .Returns(testCompleteRawMessage);
             var waitHandle = new AutoResetEvent(false);
             mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 null, null, null)).Callback
@@ -406,7 +410,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
 
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.AbortedTestRun, Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.ConnectionClosed)), Times.Once);
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
-            mockHandler.Verify(mh => mh.HandleRawMessage(It.IsAny<string>()), Times.AtLeastOnce);
+            mockHandler.Verify(mh => mh.HandleRawMessage(testCompleteRawMessage), Times.Once);
             mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.SessionEnd), Times.Never);
 
         }
