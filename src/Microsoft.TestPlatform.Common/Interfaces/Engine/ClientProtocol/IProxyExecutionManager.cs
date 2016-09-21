@@ -10,10 +10,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface IProxyExecutionManager : IProxyOperationManager
     {
         /// <summary>
-        /// Starts the test run
+        /// Starts the test run.
         /// </summary>
         /// <param name="testRunCriteria">The settings/options for the test run.</param>
         /// <param name="eventHandler">EventHandler for handling execution events from Engine.</param>
+        /// <returns>The process id of the runner executing tests.</returns>
         int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler);
 
         /// <summary>

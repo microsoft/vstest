@@ -53,15 +53,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public int LaunchTestHost(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+        public int LaunchTestHost(TestProcessStartInfo testHostStartInfo)
         {
-            var startInfo = this.GetTestHostProcessStartInfo(environmentVariables, commandLineArguments);
-
-            return this.testHostLauncher.LaunchTestHost(startInfo);
+            return this.testHostLauncher.LaunchTestHost(testHostStartInfo);
         }
 
         /// <inheritdoc/>
-        public TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+        public TestProcessStartInfo GetTestHostProcessStartInfo(
+            IDictionary<string, string> environmentVariables,
+            TestRunnerConnectionInfo connectionInfo)
         {
             // This host manager can create process start info for dotnet core targets only.
             // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
@@ -107,11 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // Add the testhost path and other arguments
             var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
-            args += " \"" + testHostPath + "\"";
-            if (commandLineArguments != null && commandLineArguments.Count > 0)
-            {
-                args += " " + string.Join(" ", commandLineArguments);
-            }
+            args += " \"" + testHostPath + "\" --port " + connectionInfo.Port;
 
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();

@@ -2,16 +2,23 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using System;
     using System.Collections.Generic;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Interface for HostManager which manages test host processes for test engine.
     /// </summary>
     public interface ITestHostManager
     {
+        /// <summary>
+        /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
+        /// is launched in a separate host process.
+        /// </summary>
+        bool SourceSpecific { get; }
+
         /// <summary>
         /// Sets a custom launcher
         /// </summary>
@@ -21,18 +28,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Launches the test host for discovery/execution.
         /// </summary>
-        /// <param name="environmentVariables">Environment variables for the process.</param>
-        /// <param name="commandLineArguments">The command line arguments to pass to the process.</param>
+        /// <param name="testHostStartInfo">Start parameters for the test host.</param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-        int LaunchTestHost(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments);
+        int LaunchTestHost(TestProcessStartInfo testHostStartInfo);
 
         /// <summary>
-        /// Gives the ProcessStartInfo for the test host process
+        /// Gets the start parameters for the test host.
         /// </summary>
-        /// <param name="environmentVariables"></param>
-        /// <param name="commandLineArguments"></param>
-        /// <returns>ProcessStartInfo of the test host</returns>
-        TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments);
+        /// <param name="environmentVariables">Set of environment variables for the test host process.</param>
+        /// <param name="connectionInfo">Set of connection parameters for the test host process to communicate with test runner.</param>
+        /// <returns>ProcessStartInfo of the test host.</returns>
+        TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo);
         
         /// <summary>
         /// Register for the exit event.
@@ -44,5 +50,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Deregister for the exit event.
         /// </summary>
         void DeregisterForExitNotification();
+    }
+
+    /// <summary>
+    /// Connection information for a test host to communicate with test runner.
+    /// </summary>
+    public struct TestRunnerConnectionInfo
+    {
+        /// <summary>
+        /// Gets or sets the port opened by test runner for host communication.
+        /// </summary>
+        public int Port
+        {
+            get;
+            set;
+        }
     }
 }

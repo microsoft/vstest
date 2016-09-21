@@ -14,17 +14,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager
     {
+        private ITestHostManager testHostManager;
+
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
         public ProxyDiscoveryManager()
-            : base()
         {
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="requestSender">
@@ -39,6 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         internal ProxyDiscoveryManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
+            this.testHostManager = testHostManager;
         }
 
         #endregion
@@ -51,19 +54,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">
         /// The manager for the test host.
         /// </param>
-        /// <param name="testRunSettings">
-        /// The test Run Settings.
-        /// </param>
         public override void Initialize(ITestHostManager testHostManager)
         {
-            base.Initialize(testHostManager);
-
             // Only send this if needed.
             if (TestPluginCache.Instance.PathToAdditionalExtensions != null
                 && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
             {
-                // Ensure that the client is conected.
-                this.EnsureInitialized();
+                base.Initialize(testHostManager);
 
                 this.RequestSender.InitializeDiscovery(
                     TestPluginCache.Instance.PathToAdditionalExtensions,
@@ -78,8 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
         {
-            // Ensure that initialize is called.
-            this.EnsureInitialized();
+            base.Initialize(this.testHostManager);
 
             this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
 

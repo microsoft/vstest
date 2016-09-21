@@ -90,7 +90,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(null, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(null, It.IsAny<IList<string>>()), Times.AtMostOnce);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
         }
 
         [TestMethod]
@@ -103,7 +103,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(null, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(null, It.IsAny<IList<string>>()), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
         }
 
         [TestMethod]
@@ -116,7 +116,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.ThrowsException<TestPlatformException>(
                 () => this.testDiscoveryManager.DiscoverTests(null, null));
         }
-
 
         [TestMethod]
         public void DiscoverTestsShouldInitiateServerDiscoveryLoop()

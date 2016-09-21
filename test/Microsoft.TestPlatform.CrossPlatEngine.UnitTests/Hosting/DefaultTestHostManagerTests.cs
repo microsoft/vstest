@@ -12,6 +12,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -25,271 +26,95 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         /// The mock process helper.
         /// </summary>
         /// <remarks>Doing this only because mocks currently does not support internalVisibleTo on signed assemblies yet for .Net Core.</remarks>
-        private MockProcessHelper mockProcessHelper;
+        private Mock<IProcessHelper> mockProcessHelper;
 
-        [TestInitialize]
-        public void TestInit()
+        private TestProcessStartInfo startInfo;
+
+        public DefaultTestHostManagerTests()
         {
-            this.mockProcessHelper = new MockProcessHelper();
+            this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object);
+            this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(null, default(TestRunnerConnectionInfo));
         }
 
         [TestMethod]
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper);
-            
-            // Setup mocks.
-            var processPath = string.Empty;
-            var times = 0;
+            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper.Object);
 
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-                {
-                    times++;
-                    processPath = path;
-                    return Process.GetCurrentProcess();
-                };
-                
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
+            var info = this.testHostManager.GetTestHostProcessStartInfo(null, default(TestRunnerConnectionInfo));
 
-            StringAssert.EndsWith(processPath, "testhost.x86.exe");
-            Assert.AreEqual(1, times);
+            StringAssert.EndsWith(info.FileName, "testhost.x86.exe");
         }
 
         [TestMethod]
         public void ConstructorShouldSetX64ProcessForX64Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
-
-            // Setup mocks.
-            var processPath = string.Empty;
-            var times = 0;
-
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                times++;
-                processPath = path;
-                return Process.GetCurrentProcess();
-            };
-            
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-
-            StringAssert.EndsWith(processPath, "testhost.exe");
-            Assert.AreEqual(1, times);
+            StringAssert.EndsWith(this.startInfo.FileName, "testhost.exe");
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithOneArgument()
+        public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
 
-            // Setup mocks.
-            var cliargs = string.Empty;
-            var times = 0;
+            var info = this.testHostManager.GetTestHostProcessStartInfo(null, connectionInfo);
 
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                times++;
-                cliargs = args;
-                return Process.GetCurrentProcess();
-            };
-
-            var arguments = new List<string> { "-p" };
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), arguments);
-
-            var commandLineArgumentsString = string.Join(" ", arguments);
-
-            Assert.AreEqual(commandLineArgumentsString, cliargs);
-            Assert.AreEqual(1, times);
+            Assert.AreEqual(" --port 123", info.Arguments);
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithMultipleArguments()
+        public void GetTestHostProcessStartInfoShouldIncludeEmptyEnvironmentVariables()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
-
-            // Setup mocks.
-            var cliargs = string.Empty;
-            var times = 0;
-
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                times++;
-                cliargs = args;
-                return Process.GetCurrentProcess();
-            };
-
-            var arguments = new List<string> { "-p", "23453" };
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), arguments);
-
-            var commandLineArgumentsString = string.Join(" ", arguments);
-
-            Assert.AreEqual(commandLineArgumentsString, cliargs);
-            Assert.AreEqual(1, times);
+            Assert.AreEqual(0, this.startInfo.EnvironmentVariables.Count);
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithCurrentWorkingDirectory()
+        public void GetTestHostProcessStartInfoShouldIncludeEnvironmentVariables()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
+            var environmentVariables = new Dictionary<string, string> { { "k1", "v1" } };
 
-            // Setup mocks.
-            var pwd = string.Empty;
-            var times = 0;
+            var info = this.testHostManager.GetTestHostProcessStartInfo(environmentVariables, default(TestRunnerConnectionInfo));
 
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                times++;
-                pwd = wd;
-                return Process.GetCurrentProcess();
-            };
+            Assert.AreEqual(environmentVariables, info.EnvironmentVariables);
+        }
 
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-
-            var workingDirectory = Directory.GetCurrentDirectory();
-            
-            Assert.AreEqual(workingDirectory, pwd);
-            Assert.AreEqual(1, times);
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeCurrentWorkingDirectory()
+        {
+            Assert.AreEqual(Directory.GetCurrentDirectory(), this.startInfo.WorkingDirectory);
         }
 
         [TestMethod]
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper); ;
+            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(Process.GetCurrentProcess());
 
-            // Setup mocks.
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                return Process.GetCurrentProcess();
-            };
+            var processId = this.testHostManager.LaunchTestHost(this.startInfo);
 
-            var processID = this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-
-            Assert.AreEqual(Process.GetCurrentProcess().Id, processID);
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldLaunchDotnetExeIfRunningUnderDotnetCLIContext()
-        {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
-
-            string processPath = null;
-
-            // Setup mocks.
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                processPath = path;
-                return Process.GetCurrentProcess();
-            };
-            var currentProcessPath = "c:\\temp\\dotnet.exe";
-            this.mockProcessHelper.CurrentProcessName = currentProcessPath;
-
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-
-            Assert.AreEqual(currentProcessPath, processPath);
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldPassTestHostAssemblyInArgumentsIfRunningUnderDotnetCLIContext()
-        {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
-
-            string arguments = null;
-
-            // Setup mocks.
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-                {
-                    arguments = args;
-                    return Process.GetCurrentProcess();
-                };
-            this.mockProcessHelper.CurrentProcessName = "c:\\temp\\dotnet.exe";
-
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-
-            var testhostAssemblyPath =
-                Path.Combine(
-                    Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location),
-                    "testhost.dll");
-
-            StringAssert.Contains(arguments, testhostAssemblyPath);
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldSetWorkingDirectoryToDotnetExeDirectoryIfRunningUnderDotnetCLIContext()
-        {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
-
-            string workingDirectory = null;
-
-            // Setup mocks.
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                workingDirectory = wd;
-                return Process.GetCurrentProcess();
-            };
-            var currentProcessPath = "c:\\temp\\dotnet.exe";
-            this.mockProcessHelper.CurrentProcessName = currentProcessPath;
-
-            this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-
-            Assert.AreEqual(Path.GetDirectoryName(currentProcessPath), workingDirectory);
+            Assert.AreEqual(Process.GetCurrentProcess().Id, processId);
         }
 
         [TestMethod]
         public void PropertiesShouldReturnEmptyDictionary()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
-
             Assert.AreEqual(0, this.testHostManager.Properties.Count);
         }
 
         [TestMethod]
         public void LaunchTestHostShouldUseCustomHostIfSet()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper);
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
             this.testHostManager.SetCustomLauncher(mockCustomLauncher.Object);
+            var currentProcess = Process.GetCurrentProcess();
+            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
 
-            var isProcessHelperCalled = false;
-            var processToReturn = Process.GetCurrentProcess();
-            // Setup mocks.
-            this.mockProcessHelper.LaunchProcessInvoker = (path, args, wd) =>
-            {
-                isProcessHelperCalled = true;
-                return processToReturn;
-            };
+            var pid = this.testHostManager.LaunchTestHost(this.startInfo);
 
-            mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(processToReturn.Id);
-
-            var processID = this.testHostManager.LaunchTestHost(new Dictionary<string, string>(), new List<string>());
-
-            Assert.IsFalse(isProcessHelperCalled, "ProcessHelper must not be called if custom launcher is set.");
-            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once, "Custom launcher must be called if set.");
+            mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            Assert.AreEqual(currentProcess.Id, pid);
         }
-
-        #region implementations
-
-        private class MockProcessHelper : IProcessHelper
-        {
-            public MockProcessHelper()
-            {
-                this.CurrentProcessName = "testhost.exe";
-            }
-
-            public Func<string,string,string,Process> LaunchProcessInvoker { get; set; }
-
-            public string CurrentProcessName { get; set; }
-
-            public string GetCurrentProcessFileName()
-            {
-                return this.CurrentProcessName;
-            }
-
-            public Process LaunchProcess(string processPath, string arguments, string workingDirectory)
-            {
-                return this.LaunchProcessInvoker?.Invoke(processPath, arguments, workingDirectory);
-            }
-        }
-
-        #endregion
     }
 }

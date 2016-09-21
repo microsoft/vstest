@@ -3,13 +3,14 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using System.Collections;
-    using System.Linq;
 
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
@@ -75,6 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     {
                         testCasesBySource.Add(test.Source, new List<TestCase>());
                     }
+
                     testCasesBySource[test.Source].Add(test);
                 }
 
@@ -197,6 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         EqtTrace.Warning("ParallelTestRunnerServiceClient: Exception while invoking an action on DiscoveryManager: {0}", ex);
                     }
                 }
+
                 lastParallelRunCleanUpTask = null;
             }
 
@@ -211,8 +214,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 var concurrentManager = concurrentManagerInstances[i];
 
-                var parallelEventsHandler = new ParallelRunEventsHandler(concurrentManager, runEventsHandler,
-                    this, runDataAggregator);
+                var parallelEventsHandler = new ParallelRunEventsHandler(
+                                                concurrentManager,
+                                                runEventsHandler,
+                                                this,
+                                                runDataAggregator);
                 concurrentManagerHandlerMap.Add(concurrentManager, parallelEventsHandler);
 
                 Task.Run(() => StartTestRunOnConcurrentManager(concurrentManager));

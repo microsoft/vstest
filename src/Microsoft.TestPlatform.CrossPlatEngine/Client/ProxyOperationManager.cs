@@ -22,19 +22,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private bool isInitialized;
 
-        private int connectionTimeout;
-        
-        #region Constructors.
+        private readonly int connectionTimeout;
+
+        private bool disposed;
+
+        #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
+        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
         /// </summary>
-        public ProxyOperationManager()
-            : this(new TestRequestSender(), null, Constants.ClientConnectionTimeout)
+        public ProxyOperationManager() : this(new TestRequestSender(), null, Constants.ClientConnectionTimeout)
         {
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="requestSender">Request Sender instance.</param>
@@ -65,17 +67,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Ensure that the engine is ready for test operations.
         /// Usually includes starting up the test host process.
         /// </summary>
-        /// <param name="testHostManager">Manager for launching and maintaining the test host process</param>
+        /// <param name="testHostManager">
+        /// Manager for the test host process
+        /// </param>
         public virtual void Initialize(ITestHostManager testHostManager)
         {
-            this.testHostManager = testHostManager;
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().Name);
+            }
 
-            var portNumber = this.RequestSender.InitializeCommunication();
+            if (!this.isInitialized)
+            {
+                this.testHostManager = testHostManager;
 
-            // TODO: Fix the environment variables usage
-            this.testHostManager.LaunchTestHost(null, this.GetCommandLineArguments(portNumber));
+                var portNumber = this.RequestSender.InitializeCommunication();
 
-            this.isInitialized = true;
+                // TODO: Fix the environment variables usage
+                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(
+                    null,
+                    new TestRunnerConnectionInfo { Port = portNumber });
+                this.testHostManager.LaunchTestHost(testHostStartInfo);
+
+                // Get the test process start info
+                // Launch the test process
+                // Listen to terminate events, and close the channel accordingly
+                //
+
+                this.isInitialized = true;
+            }
+
+            // Wait for a timeout for the client to connect.
+            if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
+            {
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngine.Resources.InitializationFailed));
+            }
         }
 
         /// <summary>
@@ -83,38 +109,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public virtual void Dispose()
         {
-            // Do Nothing.
+            this.isInitialized = false;
+            this.disposed = true;
         }
 
         /// <summary>
-        /// Aborts the test discovery.
+        /// Aborts the test operation.
         /// </summary>
         public virtual void Abort()
         {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region protected methods
-
-        /// <summary>
-        /// The ensure initialized.
-        /// </summary>
-        protected void EnsureInitialized()
-        {
-            if (!this.isInitialized)
+            if (this.disposed)
             {
-                this.Initialize(this.testHostManager);
-            }
-
-            // Wait for a timeout for the client to connect.
-            var isHandlerConnected = this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
-
-            if (!isHandlerConnected)
-            {
-                throw new TestPlatformException(
-                    string.Format(CultureInfo.CurrentUICulture, CrossPlatEngine.Resources.InitializationFailed));
+                throw new ObjectDisposedException(this.GetType().Name);
             }
         }
 
@@ -129,11 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns> The commandLine arguments as a list. </returns>
         private IList<string> GetCommandLineArguments(int portNumber)
         {
-            var commandlineArguments = new List<string>();
-
-            commandlineArguments.Add(Constants.PortOption);
-            commandlineArguments.Add(portNumber.ToString());
-
+            var commandlineArguments = new List<string> { Constants.PortOption, portNumber.ToString() };
             return commandlineArguments;
         }
         

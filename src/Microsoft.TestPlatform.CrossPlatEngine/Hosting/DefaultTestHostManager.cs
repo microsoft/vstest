@@ -82,39 +82,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Launches the test host for discovery/execution.
         /// </summary>
-        /// <param name="environmentVariables">Environment variables for the process.</param>
-        /// <param name="commandLineArguments">The command line arguments to pass to the process.</param>
+        /// <param name="testHostStartInfo"></param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-        public virtual int LaunchTestHost(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+        public int LaunchTestHost(TestProcessStartInfo testHostStartInfo)
         {
             this.DeregisterForExitNotification();
-            var testHostProcessInfo = this.GetTestHostProcessStartInfo(environmentVariables, commandLineArguments);
-            EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostProcessInfo.FileName, testHostProcessInfo.Arguments);
+            EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
             if (this.customTestHostLauncher == null)
             {
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostProcessInfo.FileName, testHostProcessInfo.Arguments, testHostProcessInfo.WorkingDirectory);
+                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory);
             }
             else
             {
-                int processId = this.customTestHostLauncher.LaunchTestHost(testHostProcessInfo);
+                int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
                 this.testHostProcess = Process.GetProcessById(processId);
             }
 
             return this.testHostProcess.Id;
         }
 
-        /// <summary>
-        /// Gives the ProcessStartInfo for the test host process
-        /// </summary>
-        /// <param name="environmentVariables">Set of environment variables.</param>
-        /// <param name="commandLineArguments">Arguments for the test host process.</param>
-        /// <returns>ProcessStartInfo of the test host</returns>
-        public virtual TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+        /// <inheritdoc/>
+        public virtual TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
         {
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
             string testhostProcessPath, processWorkingDirectory;
+            var argumentsString = " --port " + connectionInfo.Port;
 
             // If we are running in the dotnet.exe context we do not want to launch testhost.exe but dotnet.exe with the testhost assembly. 
             // Since dotnet.exe is already built for multiple platforms this would avoid building testhost.exe also in multiple platforms.
@@ -125,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 var testhostAssemblyPath = Path.Combine(
                     currentWorkingDirectory,
                     testHostProcessName.Replace("exe", "dll"));
-                commandLineArguments.Insert(0, "\"" + testhostAssemblyPath + "\"");
+                argumentsString = "\"" + testhostAssemblyPath + "\"" + argumentsString;
                 processWorkingDirectory = Path.GetDirectoryName(currentProcessFileName);
             }
             else
@@ -139,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         Path.GetDirectoryName(currentProcessFileName),
                         NetCoreDirectoryName,
                         testHostProcessName.Replace("exe", "dll"));
-                    commandLineArguments.Insert(0, "\"" + testhostAssemblyPath + "\"");
+                    argumentsString = "\"" + testhostAssemblyPath + "\"" + argumentsString;
                 }
                 else
                 {
@@ -152,8 +146,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 processWorkingDirectory = Directory.GetCurrentDirectory();
             }
 
-            var argumentsString = string.Join(" ", commandLineArguments);
-            return new TestProcessStartInfo { FileName = testhostProcessPath, Arguments = argumentsString, EnvironmentVariables = environmentVariables, WorkingDirectory = processWorkingDirectory };
+            return new TestProcessStartInfo
+                       {
+                           FileName = testhostProcessPath,
+                           Arguments = argumentsString,
+                           EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
+                           WorkingDirectory = processWorkingDirectory
+                       };
         }
 
         /// <summary>

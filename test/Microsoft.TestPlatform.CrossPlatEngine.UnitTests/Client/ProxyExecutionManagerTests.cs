@@ -95,7 +95,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(null, It.IsAny<IList<string>>()), Times.AtMostOnce);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
         }
 
         [TestMethod]
@@ -109,7 +109,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(null, It.IsAny<IList<string>>()), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
         }
 
         [TestMethod]

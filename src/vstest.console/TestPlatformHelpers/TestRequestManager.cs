@@ -1,22 +1,22 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         private ITestRunRequest currentTestRunRequest;
 
-        private EventWaitHandle runRequestCreatedEventHandle = new AutoResetEvent(false);
+        private readonly EventWaitHandle runRequestCreatedEventHandle = new AutoResetEvent(false);
 
         #region Constructor
 
@@ -83,6 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 {
                     testRequestManagerInstance = new TestRequestManager();
                 }
+
                 return testRequestManagerInstance;
             }
         }
@@ -90,12 +91,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         #region ITestRequestManager
 
         /// <summary>
-        /// Initializes the extensions while probing additional paths
+        /// Initializes the extensions while probing additional paths.
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to Additional extensions</param>
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
-            testPlatform.Initialize(pathToAdditionalExtensions, false, true);
+            this.testPlatform.Initialize(pathToAdditionalExtensions, false, true);
         }
 
         /// <summary>
@@ -107,10 +108,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
-        /// Discover Tests given a list of sources, runsettings
+        /// Discover Tests given a list of sources, run settings.
         /// </summary>
         /// <param name="discoveryPayload">Discovery payload</param>
-        /// <param name="discoveredTestEvent">EventHandler for discovered tests</param>
+        /// <param name="discoveryEventsRegistrar">EventHandler for discovered tests</param>
         /// <returns>True, if successful</returns>
         public bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar)
         {
@@ -122,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 try
                 {
-                    testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
+                    this.testLoggerManager?.RegisterDiscoveryEvents(discoveryRequest);
                     discoveryEventsRegistrar?.RegisterDiscoveryEvents(discoveryRequest);
 
                     this.testPlatformEventSource.DiscoveryRequestStart();
@@ -152,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
                 finally
                 {
-                    testLoggerManager?.UnregisterDiscoveryEvents(discoveryRequest);
+                    this.testLoggerManager?.UnregisterDiscoveryEvents(discoveryRequest);
                     discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
                 }
             }
@@ -161,36 +162,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         /// <summary>
-        /// Run Tests with given a set of testcases
+        /// Run Tests with given a set of test cases.
         /// </summary>
         /// <param name="testRunRequestPayload">TestRun request Payload</param>
         /// <param name="testHostLauncher">TestHost Launcher for the run</param>
         /// <param name="testRunEventsRegistrar">event registrar for run events</param>
-        /// <returns>True, if sucessful</returns>
+        /// <returns>True, if successful</returns>
         public bool RunTests(TestRunRequestPayload testRunRequestPayload, ITestHostLauncher testHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
             TestRunCriteria runCriteria = null;
-            if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Count() > 0)
+            if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
-                runCriteria = new TestRunCriteria(testRunRequestPayload.Sources,
-                        commandLineOptions.BatchSize,
-                        testRunRequestPayload.KeepAlive,
-                        testRunRequestPayload.RunSettings,
-                        commandLineOptions.TestRunStatsEventTimeout,
-                        testHostLauncher);
-                runCriteria.TestCaseFilter = commandLineOptions.TestCaseFilterValue;
+                runCriteria = new TestRunCriteria(
+                                  testRunRequestPayload.Sources,
+                                  this.commandLineOptions.BatchSize,
+                                  testRunRequestPayload.KeepAlive,
+                                  testRunRequestPayload.RunSettings,
+                                  this.commandLineOptions.TestRunStatsEventTimeout,
+                                  testHostLauncher);
+                runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
             }
             else
             {
-                runCriteria = new TestRunCriteria(testRunRequestPayload.TestCases, commandLineOptions.BatchSize, testRunRequestPayload.KeepAlive,
-                    testRunRequestPayload.RunSettings, commandLineOptions.TestRunStatsEventTimeout, testHostLauncher);
+                runCriteria = new TestRunCriteria(
+                                  testRunRequestPayload.TestCases,
+                                  this.commandLineOptions.BatchSize,
+                                  testRunRequestPayload.KeepAlive,
+                                  testRunRequestPayload.RunSettings,
+                                  this.commandLineOptions.TestRunStatsEventTimeout,
+                                  testHostLauncher);
             }
 
-            return RunTests(runCriteria, testRunEventsRegistrar);
+            return this.RunTests(runCriteria, testRunEventsRegistrar);
         }
 
         /// <summary>
-        /// Cancel the test run
+        /// Cancel the test run.
         /// </summary>
         public void CancelTestRun()
         {
@@ -198,6 +205,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             this.currentTestRunRequest?.CancelAsync();
         }
 
+        /// <summary>
+        /// Aborts the test run.
+        /// </summary>
         public void AbortTestRun()
         {
             this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
@@ -209,21 +219,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
             bool success = true;
-            using (this.currentTestRunRequest = testPlatform.CreateTestRunRequest(testRunCriteria))
+            using (this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria))
             {
                 this.runRequestCreatedEventHandle.Set();
                 try
                 {
-                    testLoggerManager.RegisterTestRunEvents(currentTestRunRequest);
-                    testRunResultAggregator.RegisterTestRunEvents(currentTestRunRequest);
-                    testRunEventsRegistrar?.RegisterTestRunEvents(currentTestRunRequest);
+                    this.testLoggerManager.RegisterTestRunEvents(this.currentTestRunRequest);
+                    this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
+                    testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
 
                     this.testPlatformEventSource.ExecutionRequestStart();
 
-                    currentTestRunRequest.ExecuteAsync();
+                    this.currentTestRunRequest.ExecuteAsync();
 
                     // Wait for the run completion event
-                    currentTestRunRequest.WaitForCompletion();
+                    this.currentTestRunRequest.WaitForCompletion();
 
                     this.testPlatformEventSource.ExecutionRequestStop();
                 }
@@ -233,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         ex is SettingsException ||
                         ex is InvalidOperationException)
                     {
-                        LoggerUtilities.RaiseTestRunError(testLoggerManager, testRunResultAggregator, ex);
+                        LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
                         success = false;
                     }
                     else
@@ -243,11 +253,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
                 finally
                 {
-                    testLoggerManager.UnregisterTestRunEvents(currentTestRunRequest);
-                    testRunResultAggregator.UnregisterTestRunEvents(currentTestRunRequest);
-                    testRunEventsRegistrar?.UnregisterTestRunEvents(currentTestRunRequest);
+                    this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
+                    this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
+                    testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
                 }
             }
+
             this.currentTestRunRequest = null;
 
             return success;

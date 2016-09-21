@@ -2,12 +2,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
     /// Abstract class having common parallel manager implementation
@@ -35,6 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel)
         {
             this.CreateNewConcurrentManager = createNewManager;         
+
             // Update Parallel Level
             UpdateParallelLevel(parallelLevel);
         }

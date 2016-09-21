@@ -16,17 +16,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager
     {
+        private ITestHostManager testHostManager;
+
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// </summary>
         public ProxyExecutionManager()
-            : base()
         {
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="requestSender">Request Sender instance</param>
@@ -35,6 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         internal ProxyExecutionManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
+            this.testHostManager = testHostManager;
         }
 
         #endregion
@@ -47,14 +50,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">Manager for the test host.</param>
         public override void Initialize(ITestHostManager testHostManager)
         {
-            base.Initialize(testHostManager);
-
             // Only send this if needed.
             if (TestPluginCache.Instance.PathToAdditionalExtensions != null
                 && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
             {
-                // Ensure that the client is conected.
-                this.EnsureInitialized();
+                base.Initialize(testHostManager);
 
                 this.RequestSender.InitializeExecution(
                     TestPluginCache.Instance.PathToAdditionalExtensions,
@@ -70,8 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns> The process id of the runner executing tests. </returns>
         public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
-            // Ensure that initialize is called.
-            this.EnsureInitialized();
+            base.Initialize(this.testHostManager);
+
             var executionContext = new TestExecutionContext(
                 testRunCriteria.FrequencyOfRunStatsChangeEvent,
                 testRunCriteria.RunStatsChangeEventTimeout,
@@ -121,6 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.SendTestRunAbort();
         }
 
+        /// <inheritdoc cref="System.IDisposable.Dispose"/>
         public override void Dispose()
         {
             this.RequestSender?.EndSession();
