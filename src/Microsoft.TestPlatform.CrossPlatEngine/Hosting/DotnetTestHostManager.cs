@@ -46,6 +46,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.fileHelper = fileHelper;
         }
 
+        /// <summary>
+        /// Gets a value indicating if the test host can be shared for multiple sources.
+        /// </summary>
+        /// <remarks>
+        /// Dependency resolution for .net core projects are pivoted by the test project. Hence each test
+        /// project must be launched in a separate test host process.
+        /// </remarks>
+        public bool Shared => false;
+
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
@@ -107,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // Add the testhost path and other arguments
             var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
-            args += " \"" + testHostPath + "\" --port " + connectionInfo.Port;
+            args += " \"" + testHostPath + "\" " + CrossPlatEngine.Constants.PortOption + " " + connectionInfo.Port;
 
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();

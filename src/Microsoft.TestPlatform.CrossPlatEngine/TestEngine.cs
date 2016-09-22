@@ -44,13 +44,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
         /// </summary>
-        /// <param name="testRunCriteria">
-        /// The test Run Criteria.
-        /// </param>
+        /// <param name="testHostManager">Test host manager.</param>
+        /// <param name="testRunCriteria">Test run criterion.</param>
         /// <returns>
         /// ITestExecutionManager object that can do execution
         /// </returns>
-        public IProxyExecutionManager GetExecutionManager(TestRunCriteria testRunCriteria)
+        public IProxyExecutionManager GetExecutionManager(ITestHostManager testHostManager, TestRunCriteria testRunCriteria)
         {
             int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(testRunCriteria);
 
@@ -58,8 +57,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             var architecture = runconfiguration.TargetPlatform;
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            // Initialize ProxyExecutionManager with data collection if data collectors are specififed in run settings.
-            Func<IProxyExecutionManager> proxyExecutionManagerCreator = () => isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings)) : new ProxyExecutionManager();
+            // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
+            Func<IProxyExecutionManager> proxyExecutionManagerCreator =
+                () =>
+                    isDataCollectorEnabled
+                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings))
+                        : new ProxyExecutionManager(testHostManager);
 
             if (parallelLevel > 1)
             {

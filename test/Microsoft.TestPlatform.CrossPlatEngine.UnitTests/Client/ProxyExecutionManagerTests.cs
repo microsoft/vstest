@@ -30,17 +30,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<ITestRequestSender> mockRequestSender;
 
+        private Mock<TestRunCriteria> mockTestRunCriteria;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
-        private int testableClientConnectionTimeout = 400;
+        private int clientConnectionTimeout = 400;
 
-        [TestInitialize]
-        public void TestInit()
+        public ProxyExecutionManagerTests()
         {
             this.mockTestHostManager = new Mock<ITestHostManager>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.testableClientConnectionTimeout);
+            this.mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
+            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.clientConnectionTimeout);
+
+            // Default to shared test host
+            this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
         }
 
         [TestMethod]
@@ -49,7 +54,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Make sure TestPlugincache is refreshed.
             TestPluginCache.Instance = null;
 
-            this.testExecutionManager.Initialize(this.mockTestHostManager.Object);
+            this.testExecutionManager.Initialize();
 
             this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
         }
@@ -68,7 +73,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
-                this.testExecutionManager.Initialize(this.mockTestHostManager.Object);
+                this.testExecutionManager.Initialize();
 
                 // Also verify that we have waited for client connection.
                 this.mockRequestSender.Verify(s => s.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
@@ -83,53 +88,65 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void InitializeShouldNotInitializeExtensionsIfTestHostIsNotShared()
+        {
+            // Make sure TestPlugincache is refreshed.
+            TestPluginCache.Instance = null;
+            this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
+
+            this.testExecutionManager.Initialize();
+
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+        }
+
+        [TestMethod]
         public void StartTestRunShouldNotIntializeIfDoneSoAlready()
         {
-            this.testExecutionManager.Initialize(this.mockTestHostManager.Object);
-
-            // Setup mocks.
+            this.testExecutionManager.Initialize();
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
 
-            // Act.
-            this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, null);
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
             this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
         }
 
         [TestMethod]
-        public void StartTestRunShouldIntializeIfNotInitializedAlready()
+        public void StartTestRunShouldInitializeIfNotInitializedAlready()
         {
-            // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
 
-            // Act.
-            this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, null);
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
             this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
         }
 
         [TestMethod]
-        public void StartTestRunShouldThrowExceptionIfClientConnectionTimeout()
+        public void StartTestRunShouldInitializeExtensionsIfTestHostIsNotShared()
         {
-            // Setup mocks.
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            TestPluginCache.Instance = null;
+            TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "x.dll" });
+            this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
-            // Act.
-            Assert.ThrowsException<TestPlatformException>(
-                () => this.testExecutionManager.StartTestRun(null, null));
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
+
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Once);
         }
 
+        [TestMethod]
+        public void StartTestRunShouldThrowExceptionIfClientConnectionTimeout()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+
+            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.StartTestRun(null, null));
+        }
 
         [TestMethod]
         public void StartTestRunShouldInitiateTestRunForSourcesThroughTheServer()
         {
             TestRunCriteriaWithSources testRunCriteriaPassed = null;
-
-            // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithSources>(), null))
                 .Callback(
@@ -137,36 +154,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                         {
                             testRunCriteriaPassed = criteria;
                         });
-            var mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
 
-            // Act.
-            this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, null);
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
-            // Assert.
             Assert.IsNotNull(testRunCriteriaPassed);
-            CollectionAssert.AreEqual(
-                mockTestRunCriteria.Object.AdapterSourceMap.Keys,
-                testRunCriteriaPassed.AdapterSourceMap.Keys);
-            CollectionAssert.AreEqual(
-                mockTestRunCriteria.Object.AdapterSourceMap.Values,
-                testRunCriteriaPassed.AdapterSourceMap.Values);
-            Assert.AreEqual(
-                mockTestRunCriteria.Object.FrequencyOfRunStatsChangeEvent,
-                testRunCriteriaPassed.TestExecutionContext.FrequencyOfRunStatsChangeEvent);
-            Assert.AreEqual(
-                mockTestRunCriteria.Object.RunStatsChangeEventTimeout,
-                testRunCriteriaPassed.TestExecutionContext.RunStatsChangeEventTimeout);
-            Assert.AreEqual(
-                mockTestRunCriteria.Object.TestRunSettings,
-                testRunCriteriaPassed.RunSettings);
+            CollectionAssert.AreEqual(this.mockTestRunCriteria.Object.AdapterSourceMap.Keys, testRunCriteriaPassed.AdapterSourceMap.Keys);
+            CollectionAssert.AreEqual(this.mockTestRunCriteria.Object.AdapterSourceMap.Values, testRunCriteriaPassed.AdapterSourceMap.Values);
+            Assert.AreEqual(this.mockTestRunCriteria.Object.FrequencyOfRunStatsChangeEvent, testRunCriteriaPassed.TestExecutionContext.FrequencyOfRunStatsChangeEvent);
+            Assert.AreEqual(this.mockTestRunCriteria.Object.RunStatsChangeEventTimeout, testRunCriteriaPassed.TestExecutionContext.RunStatsChangeEventTimeout);
+            Assert.AreEqual(this.mockTestRunCriteria.Object.TestRunSettings, testRunCriteriaPassed.RunSettings);
         }
 
         [TestMethod]
         public void StartTestRunShouldInitiateTestRunForTestsThroughTheServer()
         {
             TestRunCriteriaWithTests testRunCriteriaPassed = null;
-
-            // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(s => s.StartTestRun(It.IsAny<TestRunCriteriaWithTests>(), null))
                 .Callback(
@@ -174,25 +176,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     {
                         testRunCriteriaPassed = criteria;
                     });
-            var mockTestRunCriteria =
-                new Mock<TestRunCriteria>(
-                    new List<TestCase> { new TestCase("A.C.M", new System.Uri("executor://dummy"), "source.dll") },
-                    10);
+            var runCriteria = new Mock<TestRunCriteria>(
+                                            new List<TestCase> { new TestCase("A.C.M", new System.Uri("executor://dummy"), "source.dll") },
+                                            10);
 
-            // Act.
-            this.testExecutionManager.StartTestRun(mockTestRunCriteria.Object, null);
+            this.testExecutionManager.StartTestRun(runCriteria.Object, null);
 
-            // Assert.
             Assert.IsNotNull(testRunCriteriaPassed);
-            CollectionAssert.AreEqual(mockTestRunCriteria.Object.Tests.ToList(), testRunCriteriaPassed.Tests.ToList());
+            CollectionAssert.AreEqual(runCriteria.Object.Tests.ToList(), testRunCriteriaPassed.Tests.ToList());
             Assert.AreEqual(
-                mockTestRunCriteria.Object.FrequencyOfRunStatsChangeEvent,
+                runCriteria.Object.FrequencyOfRunStatsChangeEvent,
                 testRunCriteriaPassed.TestExecutionContext.FrequencyOfRunStatsChangeEvent);
             Assert.AreEqual(
-                mockTestRunCriteria.Object.RunStatsChangeEventTimeout,
+                runCriteria.Object.RunStatsChangeEventTimeout,
                 testRunCriteriaPassed.TestExecutionContext.RunStatsChangeEventTimeout);
             Assert.AreEqual(
-                mockTestRunCriteria.Object.TestRunSettings,
+                runCriteria.Object.TestRunSettings,
                 testRunCriteriaPassed.RunSettings);
         }
 

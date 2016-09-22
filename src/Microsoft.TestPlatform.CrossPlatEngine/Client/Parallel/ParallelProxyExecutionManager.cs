@@ -57,9 +57,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         #region IProxyExecutionManager
 
-        public void Initialize(ITestHostManager testHostManager)
+        public void Initialize()
         {
-            DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(testHostManager), doActionsInParallel: true);
+            DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(), doActionsInParallel: true);
         }
 
         public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)

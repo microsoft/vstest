@@ -83,8 +83,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var executionManager = this.TestEngine.GetExecutionManager(testRunCriteria);
-            executionManager.Initialize(testHostManager);
+            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria);
+            executionManager.Initialize();
 
             return new TestRunRequest(testRunCriteria, executionManager);
         }

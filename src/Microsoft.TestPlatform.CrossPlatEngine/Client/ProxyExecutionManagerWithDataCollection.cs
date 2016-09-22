@@ -16,12 +16,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
+        /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
         /// </summary>
+        /// <param name="testHostManager">
+        /// Test host manager for this operation.
+        /// </param>
         /// <param name="proxyDataCollectionManager">
         /// The proxy Data Collection Manager.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(IProxyDataCollectionManager proxyDataCollectionManager) : base()
+        public ProxyExecutionManagerWithDataCollection(ITestHostManager testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
@@ -46,10 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
         /// </summary>
-        /// <param name="testHostManager">
-        /// The test Host Manager.
-        /// </param>
-        public override void Initialize(ITestHostManager testHostManager)
+        public override void Initialize()
         {
             DataCollectionParameters dataCollectionParameters = null;
             try
@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // todo : pass dataCollectionParameters.EnvironmentVariables while initializaing testhostprocess.
-            base.Initialize(testHostManager);
+            base.Initialize();
         }
 
         /// <summary>

@@ -54,13 +54,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">
         /// The manager for the test host.
         /// </param>
-        public override void Initialize(ITestHostManager testHostManager)
+        public void Initialize(ITestHostManager testHostManager)
         {
             // Only send this if needed.
             if (TestPluginCache.Instance.PathToAdditionalExtensions != null
                 && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
             {
-                base.Initialize(testHostManager);
+                base.SetupChannel(testHostManager);
 
                 this.RequestSender.InitializeDiscovery(
                     TestPluginCache.Instance.PathToAdditionalExtensions,
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
         {
-            base.Initialize(this.testHostManager);
+            base.SetupChannel(this.testHostManager);
 
             this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
 

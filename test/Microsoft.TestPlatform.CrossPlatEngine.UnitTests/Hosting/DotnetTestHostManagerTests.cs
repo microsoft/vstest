@@ -159,7 +159,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
 
-            var startInfo = this.GetDefaultStartInfo();
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, connectionInfo);
 
             StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port);
         }
@@ -215,6 +215,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldUseCustomHostIfSet()
         {
+        }
+
+        [TestMethod]
+        public void DotnetTestHostManagedShouldNotBeShared()
+        {
+            Assert.IsFalse(this.dotnetHostManager.Shared);
         }
 
         private string GetTesthostPath()

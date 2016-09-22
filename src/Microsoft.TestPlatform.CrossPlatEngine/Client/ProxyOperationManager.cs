@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
     /// </summary>
-    public class ProxyOperationManager : IProxyOperationManager
+    public class ProxyOperationManager : IDisposable
     {
         private ITestHostManager testHostManager;
 
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">
         /// Manager for the test host process
         /// </param>
-        public virtual void Initialize(ITestHostManager testHostManager)
+        public void SetupChannel(ITestHostManager testHostManager)
         {
             if (this.disposed)
             {

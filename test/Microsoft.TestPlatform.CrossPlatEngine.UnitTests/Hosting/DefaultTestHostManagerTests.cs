@@ -104,6 +104,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void DefaultTestHostManagerShouldBeShared()
+        {
+            Assert.IsTrue(this.testHostManager.Shared);
+        }
+
+        [TestMethod]
         public void LaunchTestHostShouldUseCustomHostIfSet()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();

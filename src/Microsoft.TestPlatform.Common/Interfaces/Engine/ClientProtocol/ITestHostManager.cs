@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
         /// is launched in a separate host process.
         /// </summary>
-        bool SourceSpecific { get; }
+        bool Shared { get; }
 
         /// <summary>
         /// Sets a custom launcher

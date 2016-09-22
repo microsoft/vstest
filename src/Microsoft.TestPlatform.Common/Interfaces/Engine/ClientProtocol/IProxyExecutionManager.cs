@@ -7,8 +7,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the client.
     /// </summary>
-    public interface IProxyExecutionManager : IProxyOperationManager
+    public interface IProxyExecutionManager
     {
+        /// <summary>
+        /// Initializes test execution. Create the test host, setup channel and initialize extensions.
+        /// </summary>
+        void Initialize();
+
         /// <summary>
         /// Starts the test run.
         /// </summary>
@@ -22,5 +27,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// TODO: what's the difference between abort and cancel
         /// </summary>
         void Cancel();
+
+        /// <summary>
+        /// Aborts the test operation.
+        /// </summary>
+        void Abort();
+
+        /// <summary>
+        /// Dispose the test operation.
+        /// </summary>
+        void Dispose();
     }
 }

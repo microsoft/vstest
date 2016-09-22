@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
+    using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
+
     /// <summary>
     /// The default test host launcher for the engine.
     /// This works for Desktop local scenarios
@@ -58,6 +60,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.processHelper = processHelper;
             this.testHostProcess = null;
         }
+
+        /// <inheritdoc/>
+        public bool Shared => true;
 
         /// <summary>
         /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
@@ -108,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
             string testhostProcessPath, processWorkingDirectory;
-            var argumentsString = " --port " + connectionInfo.Port;
+            var argumentsString = " " + Constants.PortOption + " " + connectionInfo.Port;
 
             // If we are running in the dotnet.exe context we do not want to launch testhost.exe but dotnet.exe with the testhost assembly. 
             // Since dotnet.exe is already built for multiple platforms this would avoid building testhost.exe also in multiple platforms.
