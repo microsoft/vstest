@@ -42,9 +42,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private string testAdaptersPaths;
 
         /// <summary>
-        /// Inidication to adapters to disable app domain.
+        /// Indication to adapters to disable app domain.
         /// </summary>
         private bool disableAppDomain;
+
+        /// <summary>
+        /// Indication to adapters to disable parallelization.
+        /// </summary>
+        private bool disableParallelization;
 
         #endregion
 
@@ -65,6 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.testAdaptersPaths = null;
             this.maxCpuCount = Constants.DefaultCpuCount;
             this.disableAppDomain = false;
+            this.disableParallelization = false;
         }
 
         #endregion
@@ -127,6 +133,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.disableAppDomain = value;
                 this.DisableAppDomainSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
+        /// </summary>
+        public bool DisableParallelization
+        {
+            get
+            {
+                return this.disableParallelization;
+            }
+
+            set
+            {
+                this.disableParallelization = value;
+                this.DisableParallelizationSet = true;
             }
         }
 
@@ -221,6 +244,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             private set;
         }
 
+
+        /// <summary>
+        /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
+        /// </summary>
+        public bool DisableParallelizationSet
+        {
+            get;
+            private set;
+        }
+
         /// <summary>
         /// Gets a value indicating whether target framework set.
         /// </summary>
@@ -277,6 +310,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement disableAppDomain = doc.CreateElement("DisableAppDomain");
             disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
             root.AppendChild(disableAppDomain);
+
+            XmlElement disableParallelization = doc.CreateElement("DisableParallelization");
+            disableParallelization.InnerXml = this.DisableParallelization.ToString();
+            root.AppendChild(disableParallelization);
 
             XmlElement targetFrameworkVersion = doc.CreateElement("TargetFrameworkVersion");
             targetFrameworkVersion.InnerXml = this.TargetFrameworkVersion.ToString();
@@ -352,14 +389,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "DisableAppDomain":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
 
-                            string appContainerCheck = reader.ReadElementContentAsString();
+                            string disableAppDomainValueString = reader.ReadElementContentAsString();
                             bool disableAppDomainCheck;
-                            if (!bool.TryParse(appContainerCheck, out disableAppDomainCheck))
+                            if (!bool.TryParse(disableAppDomainValueString, out disableAppDomainCheck))
                             {
                                 throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, appContainerCheck, elementName));
+                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableAppDomainValueString, elementName));
                             }
                             runConfiguration.DisableAppDomain = disableAppDomainCheck;
+                            break;
+
+                        case "DisableParallelization":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string disableParallelizationValueString = reader.ReadElementContentAsString();
+                            bool disableParallelizationCheck;
+                            if (!bool.TryParse(disableParallelizationValueString, out disableParallelizationCheck))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableParallelizationValueString, elementName));
+                            }
+                            runConfiguration.DisableParallelization = disableParallelizationCheck;
                             break;
 
                         case "TargetPlatform":
