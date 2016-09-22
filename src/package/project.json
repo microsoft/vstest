@@ -9,29 +9,37 @@
         // Have to drop a time stamped version of testhost config because the build system does not honour the
         // users config file when building from a dependent exe. It does honor while building from testhost.x86 project though.
         "testhost.x86.exe.config",
-        "testhost.exe.config"
+        "testhost.exe.config",
+        "TestPlatform.ObjectModel.manifest",
+        "TestPlatform.ObjectModel.x86.manifest"
       ]
     }
   },
-    
+
   "frameworks": {
     "net46": {
       "frameworkAssemblies": {
       },
       "dependencies": {
+        "testhost": "15.0.0-*",
+        "datacollector": "15.0.0-*",
         "testhost.x86": "15.0.0-*",
+        "datacollector.x86": "15.0.0-*",
         "Microsoft.Internal.TestPlatform.Extensions": {
           "type": "build",
-          "version":  "15.0.0"
+          "version": "15.0.0"
         },
-        "NuGet.CommandLine": 
-        {
-          "type": "build", 
-          "version": "3.4.3" 
+        "Microsoft.Internal.Dia": {
+          "type": "build",
+          "version": "14.0.0"
+        },
+        "NuGet.CommandLine": {
+          "type": "build",
+          "version": "3.4.3"
         }
       }
     },
-    "netcoreapp1.0":{ 
+    "netcoreapp1.0": {
       "imports": [
         "dnxcore50",
         "netstandardapp1.0",
@@ -54,7 +62,6 @@
     "Microsoft.TestPlatform.CrossPlatEngine": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "vstest.console": "15.0.0-*",
-    "testhost": "15.0.0-*",
     "Microsoft.TestPlatform.VsTestConsole.TranslationLayer": "15.0.0-*",
     "Microsoft.TestPlatform.Extensions.TrxLogger": "15.0.0-*"
   }

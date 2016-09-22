@@ -215,7 +215,9 @@ function Create-VsixPackage
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
         "testhost.x86.exe.config",
-        "testhost.exe.config")
+        "testhost.exe.config",
+        "TestPlatform.ObjectModel.manifest",
+        "TestPlatform.ObjectModel.x86.manifest")
     foreach ($file in $vsixManifests) {
         Copy-Item $env:TP_PACKAGE_PROJ_DIR\$file $packageDir -Force
     }
@@ -223,6 +225,10 @@ function Create-VsixPackage
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
+    # Copy COM Components and their manifests over
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
     # Zip the folder
     # TODO remove vsix creator
