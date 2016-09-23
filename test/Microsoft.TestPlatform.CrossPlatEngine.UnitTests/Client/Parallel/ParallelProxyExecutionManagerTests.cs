@@ -36,13 +36,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 };
 
             this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
-            this.proxyParallelExecutionManager.Initialize(null);
+            this.proxyParallelExecutionManager.Initialize();
 
             Assert.AreEqual(3, createdMockManagers.Count, "Number of Concurrent Managers created should be 3");
 
             foreach (var manager in createdMockManagers)
             {
-                manager.Verify(m => m.Initialize(null), Times.Once);
+                manager.Verify(m => m.Initialize(), Times.Once);
             }
         }
 

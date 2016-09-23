@@ -16,33 +16,33 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
     [TestClass]
     public class TestPlatformTests
     {
-        private Mock<ITestEngine> testEngine;
-        private Mock<IProxyDiscoveryManager> discoveryManager;
-        private Mock<ITestExtensionManager> extensionManager;
-        private Mock<ITestHostManager> hostManager;
-        private Mock<IProxyExecutionManager> executionManager;
+        private readonly Mock<ITestEngine> testEngine;
+        private readonly Mock<IProxyDiscoveryManager> discoveryManager;
+        private readonly Mock<ITestExtensionManager> extensionManager;
+        private readonly Mock<ITestHostManager> hostManager;
+        private readonly Mock<IProxyExecutionManager> executionManager;
 
-        [TestInitialize]
-        public void Initialize()
+        public TestPlatformTests()
         {
-            testEngine = new Mock<ITestEngine>();
-            discoveryManager = new Mock<IProxyDiscoveryManager>();
-            extensionManager = new Mock<ITestExtensionManager>();
-            executionManager = new Mock<IProxyExecutionManager>();
-            hostManager = new Mock<ITestHostManager>();
+            this.testEngine = new Mock<ITestEngine>();
+            this.discoveryManager = new Mock<IProxyDiscoveryManager>();
+            this.extensionManager = new Mock<ITestExtensionManager>();
+            this.executionManager = new Mock<IProxyExecutionManager>();
+            this.hostManager = new Mock<ITestHostManager>();
         }
 
         [TestMethod]
         public void CreateDiscoveryRequestShouldCreateDiscoveryRequestWithGivenCriteriaAndReturnIt()
         {
-            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(hostManager.Object);
-            discoveryManager.Setup(dm => dm.Initialize(It.IsAny<ITestHostManager>())).Verifiable();
-            testEngine.Setup(te => te.GetDiscoveryManager()).Returns(discoveryManager.Object);
-            testEngine.Setup(te => te.GetExtensionManager()).Returns(extensionManager.Object);
-            var tp = new TestableTestPlatform(testEngine.Object);
-
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(this.hostManager.Object);
+            this.discoveryManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.testEngine.Setup(te => te.GetDiscoveryManager(this.hostManager.Object)).Returns(this.discoveryManager.Object);
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object);
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
+
             var discoveryRequest = tp.CreateDiscoveryRequest(discoveryCriteria);
+
             Assert.AreEqual(discoveryCriteria, discoveryRequest.DiscoveryCriteria);
         }
 
@@ -50,33 +50,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void CreateDiscoveryRequestThrowsIfDiscoveryCriteriaIsNull()
         {
             TestPlatform tp = new TestPlatform();
+
             Assert.ThrowsException<ArgumentNullException>(() => tp.CreateDiscoveryRequest(null));
         }
 
         [TestMethod]
         public void UpdateExtensionsShouldUpdateTheEngineWithAdditionalExtensions()
         {
-            testEngine.Setup(te => te.GetExtensionManager()).Returns(extensionManager.Object);
-            var tp = new TestableTestPlatform(testEngine.Object);
-
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object);
             var additionalExtensions = new List<string> { "e1.dll", "e2.dll" };
 
             tp.UpdateExtensions(additionalExtensions, loadOnlyWellKnownExtensions: true);
 
-            extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
         }
 
         [TestMethod]
         public void CreateTestRunRequestShouldCreateTestRunRequestWithSpecifiedCriteria()
         {
-            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(hostManager.Object);
-            executionManager.Setup(dm => dm.Initialize(It.IsAny<ITestHostManager>())).Verifiable();
-            testEngine.Setup(te => te.GetExecutionManager(It.IsAny<TestRunCriteria>())).Returns(executionManager.Object);
-            testEngine.Setup(te => te.GetExtensionManager()).Returns(extensionManager.Object);
-            var tp = new TestableTestPlatform(testEngine.Object);
-
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(this.hostManager.Object);
+            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
+
             var testRunRequest = tp.CreateTestRunRequest(testRunCriteria);
+
             var actualTestRunRequest = testRunRequest as TestRunRequest;
             Assert.AreEqual(testRunCriteria, actualTestRunRequest.TestRunCriteria);
         }
@@ -85,25 +86,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void CreateTestRunRequestShouldSetCustomHostLauncherOnEngineDefaultLauncherIfSpecified()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
-            testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(hostManager.Object);
-            executionManager.Setup(dm => dm.Initialize(It.IsAny<ITestHostManager>())).Verifiable();
-
-            testEngine.Setup(te => te.GetExecutionManager(It.IsAny<TestRunCriteria>())).Returns(executionManager.Object);
-            testEngine.Setup(te => te.GetExtensionManager()).Returns(extensionManager.Object);
-            var tp = new TestableTestPlatform(testEngine.Object);
-
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(ObjectModel.Architecture.X86, ObjectModel.Framework.DefaultFramework)).Returns(this.hostManager.Object);
+            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
-            var testRunRequest = tp.CreateTestRunRequest(testRunCriteria);
-            var actualTestRunRequest = testRunRequest as TestRunRequest;
 
+            var testRunRequest = tp.CreateTestRunRequest(testRunCriteria);
+
+            var actualTestRunRequest = testRunRequest as TestRunRequest;
             Assert.AreEqual(testRunCriteria, actualTestRunRequest.TestRunCriteria);
-            hostManager.Verify(hl => hl.SetCustomLauncher(mockCustomLauncher.Object), Times.Once);
+            this.hostManager.Verify(hl => hl.SetCustomLauncher(mockCustomLauncher.Object), Times.Once);
         }
 
         [TestMethod]
         public void CreateTestRunRequestThrowsIfTestRunCriteriaIsNull()
         {
             var tp = new TestPlatform();
+
             Assert.ThrowsException<ArgumentNullException>(() => tp.CreateTestRunRequest(null));
         }
 

@@ -2,19 +2,34 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
-    using System;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
     /// </summary>
-    public interface IProxyDiscoveryManager : IProxyOperationManager
+    public interface IProxyDiscoveryManager
     {
+        /// <summary>
+        /// Initializes test discovery. Create the test host, setup channel and initialize extensions.
+        /// </summary>
+        void Initialize();
+
         /// <summary>
         /// Discovers tests
         /// </summary>
         /// <param name="discoveryCriteria">Settings, parameters for the discovery request</param>
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler);
+
+        /// <summary>
+        /// Aborts the test operation.
+        /// </summary>
+        void Abort();
+
+        /// <summary>
+        /// Closes the current test operation.
+        /// Send a EndSession message to close the test host and channel gracefully.
+        /// </summary>
+        void Close();
     }
 }

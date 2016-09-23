@@ -21,7 +21,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <summary>
         /// Gets the current process file path.
         /// </summary>
-        /// <returns> The current process file path. </returns>
+        /// <returns>The current process file path.</returns>
         string GetCurrentProcessFileName();
+
+        /// <summary>
+        /// Gets the location of test engine.
+        /// </summary>
+        /// <returns>Location of test engine.</returns>
+        string GetTestEngineDirectory();
     }
 }

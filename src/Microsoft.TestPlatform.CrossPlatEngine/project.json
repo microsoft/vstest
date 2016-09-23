@@ -21,7 +21,7 @@
       ],
       "dependencies": {
         "NETStandard.Library": "1.6.0",
-        "System.Diagnostics.Process": "4.1.0-rc2-23704",
+        "System.Diagnostics.Process": "4.1.0",
         "System.Threading": "4.0.11"
       }
     },

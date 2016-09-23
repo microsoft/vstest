@@ -2,13 +2,13 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using System;
     using System.Collections.Generic;
+    using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,60 +17,109 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ProxyOperationManagerTests
     {
-        private TestableProxyOperationManager testOperationManager;
+        private readonly ProxyOperationManager testOperationManager;
 
-        private Mock<ITestHostManager> mockTestHostManager;
+        private readonly Mock<ITestHostManager> mockTestHostManager;
 
-        private Mock<ITestRequestSender> mockRequestSender;
+        private readonly Mock<ITestRequestSender> mockRequestSender;
 
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
-        private int testableClientConnectionTimeout = 400;
+        private int connectionTimeout = 400;
 
-        [TestInitialize]
-        public void TestInit()
+        public ProxyOperationManagerTests()
         {
             this.mockTestHostManager = new Mock<ITestHostManager>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
-            this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.testableClientConnectionTimeout);
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
+            this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
         }
 
         [TestMethod]
-        public void InitializeShouldLaunchTestHost()
+        public void SetupChannelShouldLaunchTestHost()
         {
-            this.testOperationManager.Initialize(this.mockTestHostManager.Object);
+            var expectedStartInfo = new TestProcessStartInfo();
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+            this.mockTestHostManager.Setup(
+                    th => th.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, It.IsAny<TestRunnerConnectionInfo>()))
+                .Returns(expectedStartInfo);
 
-            // construct the command line arguments.
-            var commandLineArguments = new List<string> { "--port", "0" };
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(null, commandLineArguments), Times.Once);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo)), Times.Once);
         }
 
         [TestMethod]
-        public void InitializeShouldSetupServerForCommunication()
+        public void SetupChannelShouldSetupServerForCommunication()
         {
-            this.testOperationManager.Initialize(this.mockTestHostManager.Object);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
         }
 
-        #region Testable Implementation
+        [TestMethod]
+        public void SetupChannelShouldNotInitializeIfConnectionIsAlreadyInitialized()
+        {
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldWaitForTestHostConnection()
+        {
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Once);
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldWaitForTestHostConnectionEvenIfConnectionIsInitialized()
+        {
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Exactly(2));
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldThrowIfWaitForTestHostConnectionTimesOut()
+        {
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(false);
+
+            Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(Enumerable.Empty<string>()));
+        }
+
+        [TestMethod]
+        public void CloseShouldEndSession()
+        {
+            this.testOperationManager.Close();
+
+            this.mockRequestSender.Verify(rs => rs.EndSession(), Times.Once);
+        }
+
+        [TestMethod]
+        public void CloseShouldResetChannelInitialization()
+        {
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.testOperationManager.Close();
+
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            this.mockTestHostManager.Verify(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
+        }
 
         private class TestableProxyOperationManager : ProxyOperationManager
         {
-            public TestableProxyOperationManager()
-                : base()
-            {
-            }
-
-            internal TestableProxyOperationManager(
+            public TestableProxyOperationManager(
                 ITestRequestSender requestSender,
-                int clientConnectionTimeout)
-                : base(requestSender, null, clientConnectionTimeout)
+                ITestHostManager testHostManager,
+                int clientConnectionTimeout) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
             }
         }
-
-        #endregion
     }
 }

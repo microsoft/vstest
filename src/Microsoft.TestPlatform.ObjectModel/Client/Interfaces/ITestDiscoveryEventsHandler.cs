@@ -12,6 +12,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Dispatch DiscoveryComplete event to listeners.
         /// </summary>
+        /// <param name="totalTests">Total number of tests discovered.</param>
+        /// <param name="lastChunk">Last set of test cases discovered.</param>
+        /// <param name="isAborted">True if the discovery operation is aborted.</param>
         void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted);
 
 

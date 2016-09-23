@@ -99,6 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isDiscoveryComplete)
             {
+                //TODO Handle communication failures
                 var rawMessage = this.communicationManager.ReceiveRawMessage();
 
                 // Send raw message first to unblock handlers waiting to send message to IDEs
@@ -135,6 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Error("Connection has been broken: not sending SessionEnd message");
                 return;
             }
+
             this.communicationManager.SendMessage(MessageType.SessionEnd);
         }
 
@@ -167,12 +169,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private void ListenAndReportTestResults(ITestRunEventsHandler testRunEventsHandler)
         {
             var isTestRunComplete = false;
-
             // Cycle through the messages that the testhost sends. 
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isTestRunComplete)
             {
-                
                 try
                 {
                     var rawMessage = this.communicationManager.ReceiveRawMessage();
@@ -232,11 +232,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, string reason)
         {
-            // log console message to user
-            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, string.Format(Resources.AbortedTestRun, reason));
+            // log console message to vstest console
+            var errorMessage = string.Format(Resources.AbortedTestRun, reason);
+            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, errorMessage);
+
+            //log console message to vstest console wrapper
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = string.Format(Resources.AbortedTestRun, reason) };
+            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+            testRunEventsHandler.HandleRawMessage(rawMessage);
+
+            // notify test run abort to vstest console wrapper
+            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+            var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
+            rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
+            testRunEventsHandler.HandleRawMessage(rawMessage);
 
             // notify of a test run complete and bail out.
-            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
             testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
         }
         

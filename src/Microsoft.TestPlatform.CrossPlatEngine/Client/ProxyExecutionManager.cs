@@ -2,31 +2,39 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+
+    using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
 
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
     /// </summary>
     internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager
     {
+        private readonly ITestHostManager testHostManager;
+
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// </summary>
-        public ProxyExecutionManager()
-            : base()
+        /// <param name="testHostManager">Test host manager for this proxy.</param>
+        public ProxyExecutionManager(ITestHostManager testHostManager) : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
         {
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="requestSender">Request Sender instance</param>
@@ -35,6 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         internal ProxyExecutionManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
+            this.testHostManager = testHostManager;
         }
 
         #endregion
@@ -44,21 +53,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
         /// </summary>
-        /// <param name="testHostManager">Manager for the test host.</param>
-        public override void Initialize(ITestHostManager testHostManager)
+        public virtual void Initialize()
         {
-            base.Initialize(testHostManager);
-
-            // Only send this if needed.
-            if (TestPluginCache.Instance.PathToAdditionalExtensions != null
-                && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
+            if (this.testHostManager.Shared)
             {
-                // Ensure that the client is conected.
-                this.EnsureInitialized();
-
-                this.RequestSender.InitializeExecution(
-                    TestPluginCache.Instance.PathToAdditionalExtensions,
-                    TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+                // Shared test hosts don't require test source information to launch. Start them early
+                // to allow fail fast.
+                EqtTrace.Verbose("ProxyExecutionManager: Test host is shared. SetupChannel it early.");
+                this.InitializeExtensions(Enumerable.Empty<string>());
             }
         }
 
@@ -70,8 +72,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns> The process id of the runner executing tests. </returns>
         public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
-            // Ensure that initialize is called.
-            this.EnsureInitialized();
+            if (!this.testHostManager.Shared)
+            {
+                // Non shared test host requires test source information to launch. Provide the sources
+                // information and create the channel.
+                EqtTrace.Verbose("ProxyExecutionManager: Test host is non shared. Lazy initialize.");
+                var testSources = testRunCriteria.Sources;
+
+                // If the test execution is with a test filter, group them by sources
+                if (testRunCriteria.HasSpecificTests)
+                {
+                    testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                }
+
+                this.InitializeExtensions(testSources);
+            }
+
+            this.SetupChannel(testRunCriteria.Sources);
+
             var executionContext = new TestExecutionContext(
                 testRunCriteria.FrequencyOfRunStatsChangeEvent,
                 testRunCriteria.RunStatsChangeEventTimeout,
@@ -116,17 +134,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Aborts the test run.
         /// </summary>
-        public override void Abort()
+        public void Abort()
         {
             this.RequestSender.SendTestRunAbort();
         }
 
-        public override void Dispose()
-        {
-            this.RequestSender?.EndSession();
-            base.Dispose();
-        }
-
         #endregion
+
+        private void InitializeExtensions(IEnumerable<string> sources)
+        {
+            // Only send this if needed.
+            if (TestPluginCache.Instance.PathToAdditionalExtensions != null
+                && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
+            {
+                this.SetupChannel(sources);
+
+                this.RequestSender.InitializeExecution(
+                    TestPluginCache.Instance.PathToAdditionalExtensions,
+                    TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+            }
+        }
     }
 }

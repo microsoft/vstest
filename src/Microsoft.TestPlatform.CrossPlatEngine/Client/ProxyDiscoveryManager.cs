@@ -2,9 +2,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -14,17 +17,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager
     {
+        private readonly ITestHostManager testHostManager;
+
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
-        public ProxyDiscoveryManager()
-            : base()
+        /// <param name="testHostManager">Test host manager instance.</param>
+        public ProxyDiscoveryManager(ITestHostManager testHostManager)
+            : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
         {
+            this.testHostManager = testHostManager;
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="requestSender">
@@ -36,9 +44,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="clientConnectionTimeout">
         /// The client Connection Timeout
         /// </param>
-        internal ProxyDiscoveryManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
+        internal ProxyDiscoveryManager(
+            ITestRequestSender requestSender,
+            ITestHostManager testHostManager,
+            int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
+            this.testHostManager = testHostManager;
         }
 
         #endregion
@@ -48,26 +60,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Ensure that the discovery component of engine is ready for discovery usually by loading extensions.
         /// </summary>
-        /// <param name="testHostManager">
-        /// The manager for the test host.
-        /// </param>
-        /// <param name="testRunSettings">
-        /// The test Run Settings.
-        /// </param>
-        public override void Initialize(ITestHostManager testHostManager)
+        public void Initialize()
         {
-            base.Initialize(testHostManager);
-
-            // Only send this if needed.
-            if (TestPluginCache.Instance.PathToAdditionalExtensions != null
-                && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
+            if (this.testHostManager.Shared)
             {
-                // Ensure that the client is conected.
-                this.EnsureInitialized();
-
-                this.RequestSender.InitializeDiscovery(
-                    TestPluginCache.Instance.PathToAdditionalExtensions,
-                    TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+                // If the test host manager supports sharing the test host across sources, we can
+                // initialize it early and assign sources later.
+                this.InitializeExtensions(Enumerable.Empty<string>());
             }
         }
 
@@ -78,14 +77,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
         {
-            // Ensure that initialize is called.
-            this.EnsureInitialized();
+            if (!this.testHostManager.Shared)
+            {
+                // If the test host doesn't support sharing across sources, we must initialize it
+                // with sources.
+                this.InitializeExtensions(discoveryCriteria.Sources);
+            }
 
+            this.SetupChannel(discoveryCriteria.Sources);
             this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
+        }
 
-            this.RequestSender.EndSession();
+        /// <inheritdoc/>
+        public void Abort()
+        {
+            // This is no-op for the moment. There is no discovery abort message?
+        }
+
+        /// <inheritdoc/>
+        public override void Close()
+        {
+            base.Close();
         }
 
         #endregion
+
+        private void InitializeExtensions(IEnumerable<string> sources)
+        {
+            // Only send this if needed.
+            if (TestPluginCache.Instance.PathToAdditionalExtensions != null
+                && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
+            {
+                this.SetupChannel(sources);
+
+                this.RequestSender.InitializeDiscovery(
+                    TestPluginCache.Instance.PathToAdditionalExtensions,
+                    TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+            }
+        }
     }
 }

@@ -35,22 +35,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
+        /// <param name="testHostManager"></param>
         /// <returns>ITestDiscoveryManager object that can do discovery</returns>
-        public IProxyDiscoveryManager GetDiscoveryManager()
+        public IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager)
         {
-            return this.proxyDiscoveryManager ?? (this.proxyDiscoveryManager = new ProxyDiscoveryManager());
+            return this.proxyDiscoveryManager ?? (this.proxyDiscoveryManager = new ProxyDiscoveryManager(testHostManager));
         }
 
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
         /// </summary>
-        /// <param name="testRunCriteria">
-        /// The test Run Criteria.
-        /// </param>
+        /// <param name="testHostManager">Test host manager.</param>
+        /// <param name="testRunCriteria">Test run criterion.</param>
         /// <returns>
         /// ITestExecutionManager object that can do execution
         /// </returns>
-        public IProxyExecutionManager GetExecutionManager(TestRunCriteria testRunCriteria)
+        public IProxyExecutionManager GetExecutionManager(ITestHostManager testHostManager, TestRunCriteria testRunCriteria)
         {
             int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(testRunCriteria);
 
@@ -58,8 +58,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             var architecture = runconfiguration.TargetPlatform;
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            // Initialize ProxyExecutionManager with data collection if data collectors are specififed in run settings.
-            Func<IProxyExecutionManager> proxyExecutionManagerCreator = () => isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings)) : new ProxyExecutionManager();
+            // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
+            Func<IProxyExecutionManager> proxyExecutionManagerCreator =
+                () =>
+                    isDataCollectorEnabled
+                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings))
+                        : new ProxyExecutionManager(testHostManager);
 
             if (parallelLevel > 1)
             {
@@ -93,10 +97,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// Retrieves the default test host manager for this engine.
         /// </summary>
         /// <param name="architecture">The architecture we want the test host manager for.</param>
+        /// <param name="framework">Framework for the test session.</param>
         /// <returns>An instance of the test host manager.</returns>
         public ITestHostManager GetDefaultTestHostManager(Architecture architecture, Framework framework)
         {
             // This is expected to be called once every run so returning a new instance every time.
+            if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return new DotnetTestHostManager();
+            }
+
             return new DefaultTestHostManager(architecture, framework);
         }
 
