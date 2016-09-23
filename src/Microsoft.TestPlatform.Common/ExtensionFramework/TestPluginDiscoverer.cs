@@ -160,11 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 try
                 {
                     var assemblyName = Path.GetFileNameWithoutExtension(file);
-#if NET46
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
-#else
-                    assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(file);
-#endif
                     
                     // Check whether this assembly is known or not. 
                     //if (loadOnlyWellKnownExtensions && assembly != null)

@@ -16,36 +16,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
     /// </summary>
-    public class ProxyOperationManager : IProxyOperationManager
+    public abstract class ProxyOperationManager
     {
-        private ITestHostManager testHostManager;
+        private readonly ITestHostManager testHostManager;
 
-        private bool isInitialized;
+        private bool initialized;
 
-        private int connectionTimeout;
-        
-        #region Constructors.
+        private readonly int connectionTimeout;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
-        /// </summary>
-        public ProxyOperationManager()
-            : this(new TestRequestSender(), null, Constants.ClientConnectionTimeout)
-        {
-        }
+        #region Constructors
 
         /// <summary>
-        /// Constructor with Dependency injection. Used for unit testing.
+        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
         /// </summary>
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        internal ProxyOperationManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
+        protected ProxyOperationManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
-            this.isInitialized = false;
+            this.initialized = false;
         }
 
         #endregion
@@ -65,56 +57,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Ensure that the engine is ready for test operations.
         /// Usually includes starting up the test host process.
         /// </summary>
-        /// <param name="testHostManager">Manager for launching and maintaining the test host process</param>
-        public virtual void Initialize(ITestHostManager testHostManager)
+        /// <param name="sources">List of test sources.</param>
+        public virtual void SetupChannel(IEnumerable<string> sources)
         {
-            this.testHostManager = testHostManager;
-
-            var portNumber = this.RequestSender.InitializeCommunication();
-
-            // TODO: Fix the environment variables usage
-            this.testHostManager.LaunchTestHost(null, this.GetCommandLineArguments(portNumber));
-
-            this.isInitialized = true;
-        }
-
-        /// <summary>
-        /// Dispose for this instance.
-        /// </summary>
-        public virtual void Dispose()
-        {
-            // Do Nothing.
-        }
-
-        /// <summary>
-        /// Aborts the test discovery.
-        /// </summary>
-        public virtual void Abort()
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region protected methods
-
-        /// <summary>
-        /// The ensure initialized.
-        /// </summary>
-        protected void EnsureInitialized()
-        {
-            if (!this.isInitialized)
+            if (!this.initialized)
             {
-                this.Initialize(this.testHostManager);
+                var portNumber = this.RequestSender.InitializeCommunication();
+
+                // Get the test process start info
+                // TODO: Fix the environment variables usage
+                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(
+                    sources,
+                    null,
+                    new TestRunnerConnectionInfo { Port = portNumber });
+
+                // TODO: monitor test host exit and clean up
+                this.testHostManager.LaunchTestHost(testHostStartInfo);
+
+                this.initialized = true;
             }
 
             // Wait for a timeout for the client to connect.
-            var isHandlerConnected = this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
-
-            if (!isHandlerConnected)
+            if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
             {
-                throw new TestPlatformException(
-                    string.Format(CultureInfo.CurrentUICulture, CrossPlatEngine.Resources.InitializationFailed));
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngine.Resources.InitializationFailed));
+            }
+        }
+
+        /// <summary>
+        /// Closes the channel, terminate test host process.
+        /// </summary>
+        public virtual void Close()
+        {
+            // TODO dispose the testhost process
+            try
+            {
+                this.RequestSender.EndSession();
+            }
+            finally
+            {
+                this.initialized = false;
             }
         }
 
@@ -129,11 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns> The commandLine arguments as a list. </returns>
         private IList<string> GetCommandLineArguments(int portNumber)
         {
-            var commandlineArguments = new List<string>();
-
-            commandlineArguments.Add(Constants.PortOption);
-            commandlineArguments.Add(portNumber.ToString());
-
+            var commandlineArguments = new List<string> { Constants.PortOption, portNumber.ToString() };
             return commandlineArguments;
         }
         

@@ -9,10 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
     /// The discovery request.
@@ -22,8 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryRequest"/> class.
         /// </summary>
-        ///  <param name="criteria"> The criteria. </param>
-        /// <param name="discoveryManager"> The discovery manager. </param>
+        /// <param name="criteria">Discovery criterion.</param>
+        /// <param name="discoveryManager">Discovery manager instance.</param>
         internal DiscoveryRequest(DiscoveryCriteria criteria, IProxyDiscoveryManager discoveryManager)
         {
             this.DiscoveryCriteria = criteria;
@@ -42,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     throw new ObjectDisposedException("DiscoveryRequest");
                 }
@@ -80,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     throw new ObjectDisposedException("DiscoveryRequest");
                 }
@@ -95,6 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     {
                         EqtTrace.Info("DiscoveryRequest.Abort: No operation to abort.");
                     }
+
                     return;
                 }
             }
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 EqtTrace.Verbose("DiscoveryRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
             }
 
-            if (this.bDisposed)
+            if (this.disposed)
             {
                 throw new ObjectDisposedException("DiscoveryRequest");
             }
@@ -169,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// </summary>
         internal bool DiscoveryInProgress
         {
-            get { return discoveryInProgress; }
+            get { return this.discoveryInProgress; }
         }
 
         /// <summary>
@@ -179,47 +179,48 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
         #region ITestDiscoveryEventsHandler Methods
 
-        /// <summary>
-        /// Dispatch DiscoveryComplete event to listeners.
-        /// </summary>
+        /// <inheritdoc/>
         public void HandleDiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Starting. Aborted:{0}, TotalTests:{1}", isAborted, totalTests);
             }
+
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
                         EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Ignoring as the object is disposed.");
                     }
+
                     return;
                 }
-                //If discovery event is already raised, ignore current one.
+
+                // If discovery event is already raised, ignore current one.
                 if (this.discoveryCompleted.WaitOne(0))
                 {
                     if (EqtTrace.IsVerboseEnabled)
                     {
                         EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete:Ignoring duplicate DiscoveryComplete. Aborted:{0}, TotalTests:{1}", isAborted, totalTests);
                     }
+
                     return;
                 }
 
                 try
                 {
                     // Raise onDiscoveredTests event if there are some tests in the last chunk. 
-                    //
                     // (We dont want to send the tests in the discovery complete event so that programming on top of 
-                    //  RS client is easier i.e. user does not have to listen on discovery complete event.)
+                    // RS client is easier i.e. user does not have to listen on discovery complete event.)
                     if (lastChunk != null && lastChunk.Count() > 0)
                     {
-                        OnDiscoveredTests.SafeInvoke(this, new DiscoveredTestsEventArgs(lastChunk), "DiscoveryRequest.DiscoveryComplete");
+                        this.OnDiscoveredTests.SafeInvoke(this, new DiscoveredTestsEventArgs(lastChunk), "DiscoveryRequest.DiscoveryComplete");
                     }
 
-                    OnDiscoveryComplete.SafeInvoke(this, new DiscoveryCompleteEventArgs(totalTests, isAborted), "DiscoveryRequest.DiscoveryComplete");
+                    this.OnDiscoveryComplete.SafeInvoke(this, new DiscoveryCompleteEventArgs(totalTests, isAborted), "DiscoveryRequest.DiscoveryComplete");
                 }
                 finally
                 {
@@ -241,6 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                             EqtTrace.Warning("DiscoveryRequest.DiscoveryComplete: Discovery complete event was null.");
                         }
                     }
+
                     this.discoveryInProgress = false;
                 }
             }
@@ -251,11 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
             }
         }
 
-        /// <summary>
-        /// Dispatch DiscoveredTest event to listeners.
-        /// </summary>
-        /// <param name="discoveryManager">Instance of IDiscoveryManager that discovered  tests.</param>
-        /// <param name="discoveredTestCases">Discovered  test cases.</param>
+        /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
             if (EqtTrace.IsVerboseEnabled)
@@ -265,17 +263,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
                         EqtTrace.Warning("DiscoveryRequest.SendDiscoveredTests: Ignoring as the object is disposed.");
                     }
+
                     return;
                 }
 
-                OnDiscoveredTests.SafeInvoke(this, new DiscoveredTestsEventArgs(discoveredTestCases), "DiscoveryRequest.OnDiscoveredTests");
+                this.OnDiscoveredTests.SafeInvoke(this, new DiscoveredTestsEventArgs(discoveredTestCases), "DiscoveryRequest.OnDiscoveredTests");
             }
+
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("DiscoveryRequest.SendDiscoveredTests: Completed.");
@@ -285,8 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Dispatch TestRunMessage event to listeners.
         /// </summary>
-        /// <param name="discoveryManager">Instnace of IDiscoveryManager that discovered tests</param>
-        /// <param name="level">Ouput level of the message being sent.</param>
+        /// <param name="level">Output level of the message being sent.</param>
         /// <param name="message">Actual contents of the message</param>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
@@ -297,16 +296,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
                         EqtTrace.Warning("DiscoveryRequest.SendDiscoveryMessage: Ignoring as the object is disposed.");
                     }
+
                     return;
                 }
 
-                OnDiscoveryMessage.SafeInvoke(this, new TestRunMessageEventArgs(level, message), "DiscoveryRequest.OnTestMessageRecieved");
+                this.OnDiscoveryMessage.SafeInvoke(this, new TestRunMessageEventArgs(level, message), "DiscoveryRequest.OnTestMessageRecieved");
             }
 
             if (EqtTrace.IsInfoEnabled)
@@ -318,7 +318,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Handle Raw message directly from the host
         /// </summary>
-        /// <param name="rawMessage"></param>
+        /// <param name="rawMessage">Raw message.</param>
         public void HandleRawMessage(string rawMessage)
         {
             this.OnRawMessageReceived?.Invoke(this, rawMessage);
@@ -328,20 +328,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
         #region IDisposable implementation
 
-        // Summary:
-        //     Performs application-defined tasks associated with freeing, releasing, or
-        //     resetting unmanaged resources.
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or
+        /// resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
 
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>
-        /// Dispose the discovery request.
-        /// </summary>
-        /// <param name="disposing"></param>
         private void Dispose(bool disposing)
         {
             if (EqtTrace.IsVerboseEnabled)
@@ -351,7 +348,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
             lock (this.syncObject)
             {
-                if (!this.bDisposed)
+                if (!this.disposed)
                 {
                     if (disposing)
                     {
@@ -363,7 +360,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
 
                     // Indicate that object has been disposed
                     this.discoveryCompleted = null;
-                    this.bDisposed = true;
+                    this.disposed = true;
                 }
             }
 
@@ -380,7 +377,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// If this request has been disposed.
         /// </summary>
-        private bool bDisposed = false;
+        private bool disposed = false;
 
         /// <summary>
         /// It get set when current discovery request is completed.
@@ -390,7 +387,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <summary>
         /// Sync object for various operations
         /// </summary>
-        private Object syncObject = new Object();
+        private object syncObject = new Object();
 
         /// <summary>
         /// Whether or not the test discovery is in progress.

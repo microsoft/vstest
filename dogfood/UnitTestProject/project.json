@@ -11,6 +11,7 @@
         "dnxcore50",
         "portable-net45+win8"
       ],
+
       "dependencies": {
         "Microsoft.NETCore.App": {
           "type": "platform",
@@ -18,10 +19,11 @@
         }
       }
     },
+
     "net46": {
-        "frameworkAssemblies": {
-            "System.Runtime": ""
-        }
+      "frameworkAssemblies": {
+        "System.Runtime": ""
+      }
     }
   }
 }

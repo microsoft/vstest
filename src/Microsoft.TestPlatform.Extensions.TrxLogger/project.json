@@ -21,7 +21,7 @@
       "dependencies": {
         "NETStandard.Library": "1.6.0",
         "System.Collections.NonGeneric": "4.0.1",
-        "System.Security.Principal.Windows": "4.0.0-rc2-24027",
+        "System.Security.Principal.Windows": "4.0.0",
         "System.Collections.Specialized": "4.0.1"
       }
     },

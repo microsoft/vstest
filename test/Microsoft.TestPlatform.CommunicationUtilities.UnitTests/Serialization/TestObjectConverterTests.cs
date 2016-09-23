@@ -143,6 +143,19 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual("DummyValue", test.GetPropertyValue(property));
         }
 
+        [TestMethod]
+        public void TestObjectSetPropertyValueShouldNotConvertIfValueMatchesPropertyDataType()
+        {
+            var property = TestProperty.Register("98", "p1", typeof(bool), typeof(TestObject));
+            var testobj = new TestableTestObject();
+
+            // This should not throw even if the runtime type of boolean where as specified
+            // type is object
+            testobj.SetPropertyValue<object>(property, false);
+
+            Assert.AreEqual(false, testobj.GetPropertyValue(property));
+        }
+
         private static string Serialize<T>(T data)
         {
             return JsonDataSerializer.Instance.Serialize(data);

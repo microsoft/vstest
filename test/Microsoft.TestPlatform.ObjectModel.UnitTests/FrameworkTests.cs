@@ -18,5 +18,21 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(".NETFramework,Version=v3.5", fx.Name);
             Assert.AreEqual("3.5", fx.Version);
         }
+
+        [TestMethod]
+        public void DefaultFrameworkShouldBeNet46OnDesktop()
+        {
+#if NET46
+            Assert.AreEqual(".NETFramework,Version=v4.6", Framework.DefaultFramework.Name);
+#endif
+        }
+
+        [TestMethod]
+        public void DefaultFrameworkShouldBeNetCoreApp10OnNonDesktop()
+        {
+#if !NET46
+            Assert.AreEqual(".NETCoreApp,Version=v1.0", Framework.DefaultFramework.Name);
+#endif
+        }
     }
 }

@@ -5,6 +5,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System;
     using System.Threading;
 
+    /// <summary>
+    /// Represents any request to discover or run tests.
+    /// </summary>
     public interface IRequest : IDisposable
     {
         /// <summary>
@@ -17,13 +20,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Waits for the request to complete
         /// </summary>
-        /// <param name="timeout">Timeout</param>
+        /// <param name="timeout">Time out</param>
         /// <returns>True if the request timeouts</returns>
         bool WaitForCompletion(int timeout);
     }
 
+    /// <summary>
+    /// Extensions for <see cref="IRequest"/>.
+    /// </summary>
     public static class RequestExtensions
     {
+        /// <summary>
+        /// Waits for the request to complete.
+        /// </summary>
+        /// <param name="request">Request to wait on.</param>
         public static void WaitForCompletion(this IRequest request)
         {
             request.WaitForCompletion(Timeout.Infinite);

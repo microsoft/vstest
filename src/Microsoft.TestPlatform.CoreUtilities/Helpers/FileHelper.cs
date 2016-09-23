@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
     /// <summary>
     /// The file helper.
     /// </summary>
-    internal class FileHelper : IFileHelper
+    public class FileHelper : IFileHelper
     {
         /// <summary>
         /// Exists utility to check if file exists
