@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 {
     using System;
     using System.Diagnostics;
+    using System.IO;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -62,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <inheritdoc/>
         public string GetTestEngineDirectory()
         {
-            return typeof(ProcessHelper).GetTypeInfo().Assembly.Location;
+            return Path.GetDirectoryName(typeof(ProcessHelper).GetTypeInfo().Assembly.Location);
         }
     }
 }

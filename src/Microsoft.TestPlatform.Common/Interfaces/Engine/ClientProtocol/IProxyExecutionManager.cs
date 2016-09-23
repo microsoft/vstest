@@ -23,13 +23,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler);
 
         /// <summary>
-        /// Cancels the test run
-        /// TODO: what's the difference between abort and cancel
+        /// Cancels the test run. On the test host, this will send a message to adapters.
         /// </summary>
         void Cancel();
 
         /// <summary>
-        /// Aborts the test operation.
+        /// Aborts the test operation. This will forcefully terminate the test host.
         /// </summary>
         void Abort();
 
