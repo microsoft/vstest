@@ -95,6 +95,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleDataCollector", "test
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleTestProject", "test\TestAssets\SimpleTestProject\SimpleTestProject.xproj", "{0CC51637-B665-47B0-A093-042D31785928}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance", "{44DABCFB-7AA0-4682-B7F7-067E0ABA1D14}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.TestPlatform.PerformanceTests", "test\Performance\Microsoft.TestPlatform.PerformanceTests\Microsoft.TestPlatform.PerformanceTests.xproj", "{12D59CED-9916-4C3F-AF82-12E019757FD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -233,6 +237,10 @@ Global
 		{0CC51637-B665-47B0-A093-042D31785928}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CC51637-B665-47B0-A093-042D31785928}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CC51637-B665-47B0-A093-042D31785928}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12D59CED-9916-4C3F-AF82-12E019757FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12D59CED-9916-4C3F-AF82-12E019757FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12D59CED-9916-4C3F-AF82-12E019757FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12D59CED-9916-4C3F-AF82-12E019757FD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,5 +283,7 @@ Global
 		{50D7D355-08F6-4DFD-AEAA-9BCE41C94C18} = {463031A2-7F16-4E38-9944-1F5161D04933}
 		{D7F7A9F5-5646-44E7-990C-500844E9272E} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
 		{0CC51637-B665-47B0-A093-042D31785928} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
+		{44DABCFB-7AA0-4682-B7F7-067E0ABA1D14} = {463031A2-7F16-4E38-9944-1F5161D04933}
+		{12D59CED-9916-4C3F-AF82-12E019757FD2} = {44DABCFB-7AA0-4682-B7F7-067E0ABA1D14}
 	EndGlobalSection
 EndGlobal
