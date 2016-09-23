@@ -244,6 +244,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     }
 
                     this.discoveryInProgress = false;
+
+                    // Close the discovery session
+                    this.DiscoveryManager?.Close();
                 }
             }
 

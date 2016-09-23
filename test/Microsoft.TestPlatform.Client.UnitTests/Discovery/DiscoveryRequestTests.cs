@@ -3,6 +3,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Client.Discovery;
 
@@ -10,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 
     using Moq;
 
+    using ObjectModel;
     using ObjectModel.Client;
     using ObjectModel.Engine;
 
@@ -98,6 +100,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         {
             this.discoveryRequest.Dispose();
             Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.WaitForCompletion());
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldCloseDiscoveryManager()
+        {
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler;
+
+            eventsHandler.HandleDiscoveryComplete(1, Enumerable.Empty<TestCase>(), false);
+
+            this.discoveryManager.Verify(dm => dm.Close(), Times.Once);
         }
     }
 }
