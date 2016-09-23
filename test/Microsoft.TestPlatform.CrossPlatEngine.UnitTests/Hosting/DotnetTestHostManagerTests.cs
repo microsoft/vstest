@@ -97,14 +97,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual("dotnet", startInfo.FileName);
+            Assert.AreEqual("dotnet.exe", startInfo.FileName);
         }
 
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldInvokeDotnetExec()
         {
             var startInfo = this.GetDefaultStartInfo();
-            
+
             StringAssert.StartsWith(startInfo.Arguments, "exec");
         }
 
@@ -114,7 +114,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.json")).Returns(true);
 
             var startInfo = this.GetDefaultStartInfo();
-            
+
             StringAssert.Contains(startInfo.Arguments, "--runtimeconfig \"test.runtimeconfig.json\"");
         }
 
@@ -124,7 +124,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockFileHelper.Setup(fh => fh.Exists("test.runtimeconfig.json")).Returns(false);
 
             var startInfo = this.GetDefaultStartInfo();
-            
+
             Assert.IsFalse(startInfo.Arguments.Contains("--runtimeconfig \"test.runtimeconfig.json\""));
         }
 
@@ -134,7 +134,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(true);
 
             var startInfo = this.GetDefaultStartInfo();
-            
+
             StringAssert.Contains(startInfo.Arguments, "--depsfile \"test.deps.json\"");
         }
 
@@ -144,7 +144,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockFileHelper.Setup(fh => fh.Exists("test.deps.json")).Returns(false);
 
             var startInfo = this.GetDefaultStartInfo();
-            
+
             Assert.IsFalse(startInfo.Arguments.Contains("--depsfile \"test.deps.json\""));
         }
 
@@ -230,6 +230,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             Assert.IsFalse(this.dotnetHostManager.Shared);
         }
 
+        [TestMethod]
+        public void GetTestHostProcessStartInfoOnWindowsForValidPathReturnsFullPathOfDotnetHost()
+        {
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("testhost.exe");
+            
+            this.mockFileHelper.Setup(fh => fh.Exists(DefaultDotnetPath)).Returns(true);
+            var startInfo = this.GetDefaultStartInfo();
+            
+            Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoOnWindowsForInValidPathReturnsDotnet()
+        {
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("testhost.exe");
+            
+            this.dotnetHostManager.envVarPathString = @"d:\hello;c:\foo";
+            this.mockFileHelper.Setup(fh => fh.Exists(DefaultDotnetPath)).Returns(false);
+            var startInfo = this.GetDefaultStartInfo();
+            
+            Assert.AreEqual("dotnet.exe", startInfo.FileName);
+        }
+        
         private string GetTesthostPath(string engineDirectory)
         {
             // testhost.dll will be picked up from the same path as vstest.console.dll. In the test, we are setting up
@@ -251,10 +274,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     {
         public TestableDotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper)
             : base(testHostLauncher, processHelper, fileHelper)
-        {
-        }
-    }
+        { }
 
+        internal string envVarPathString = @"d:\hello;c:\tmp\; c:\foo";
+        
+        internal override string EnvVarPathString { get { return envVarPathString; } }
+    }
+    
     [TestClass]
     public class DefaultTestHostLauncherTests
     {

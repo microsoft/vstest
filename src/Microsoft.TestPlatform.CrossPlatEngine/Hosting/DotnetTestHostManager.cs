@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -24,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private readonly IProcessHelper processHelper;
 
         private readonly IFileHelper fileHelper;
-
+        
         private ITestHostLauncher testHostLauncher;
 
         /// <summary>
@@ -55,6 +56,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// project must be launched in a separate test host process.
         /// </remarks>
         public bool Shared => false;
+        
+        /// <summary>
+        /// Returns the separated PATH string
+        /// Made virtual for testing
+        /// </summary>
+        internal virtual string EnvVarPathString => Environment.GetEnvironmentVariable("PATH");
 
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -77,6 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // This host manager can create process start info for dotnet core targets only.
             // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
             var startInfo = new TestProcessStartInfo { FileName = "dotnet" };
+
             var testHostExecutable = Path.Combine("NetCore", "testhost.dll");
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
             var testRunnerDirectory = Path.GetDirectoryName(currentProcessPath);
@@ -86,6 +94,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 startInfo.FileName = currentProcessPath;
                 testHostExecutable = "testhost.dll";
                 testRunnerDirectory = this.processHelper.GetTestEngineDirectory();
+            }
+            else
+            {
+                startInfo.FileName = GetDotnetHostFullPath();
             }
 
             // .NET core host manager is not a shared host. It will expect a single test source to be provided.
@@ -128,6 +140,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             startInfo.WorkingDirectory = sourceDirectory;
 
             return startInfo;
+        }
+
+        private string GetDotnetHostFullPath()
+        {
+            // Use semicolon(;) as path separator for windows
+            // colon(:) for Linux and OSX
+            var isWindowsOS = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            char separator = isWindowsOS ? ';' : ':';
+            var dotnetExeName = isWindowsOS ? "dotnet.exe" : "dotnet";
+            
+            foreach (string path in EnvVarPathString.Split(separator))
+            {
+                string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
+                if (fileHelper.Exists(exeFullPath))
+                {
+                    return exeFullPath;
+                }
+            }
+
+            EqtTrace.Error("Unable to find path for dotnet host");
+            return dotnetExeName;
         }
 
         /// <inheritdoc/>
