@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             BuildBasePathArgumentProcessorCapabilities capabilities = new BuildBasePathArgumentProcessorCapabilities();
             Assert.AreEqual("/BuildBasePath", capabilities.CommandName);
-            Assert.AreEqual("--BuildBasePath|/BuildBasePath:<BuildBasePath>\n     The directory containing the temporary outputs.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--BuildBasePath|/BuildBasePath:<BuildBasePath>\n      The directory containing the temporary outputs.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.BuildBasePathArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
