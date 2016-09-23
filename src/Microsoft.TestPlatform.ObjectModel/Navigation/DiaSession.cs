@@ -24,7 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private IDiaDataSource source;
         private IDiaSession session;
         private bool isDisposed;
-        private RegistryFreeActivationContext activationContext;
 
         /// <summary>
         /// Holds type symbols avaiable in the source.
@@ -51,10 +50,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public DiaSession(string binaryPath, string searchPath)
         {
             ValidateArg.NotNullOrEmpty(binaryPath, "binaryPath");
+            RegistryFreeActivationContext activationContext = null;
             try
             {
-                this.activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom());
-                this.activationContext.ActivateContext();
+                activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom());
+                activationContext.ActivateContext();
 
                 this.source = new DiaSource();
                 this.source.loadDataForExe(binaryPath, searchPath, null);
@@ -65,6 +65,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 Dispose();
                 throw;
+            }
+            finally
+            {
+                // Deactivating the context here itself since a dispose can happen
+                // on a different thread and deactivating context from a different thread would throw an SEH exception.
+                // The DIA dll would have been loaded by now. So the activation context is not needed post this point anyway.
+                try
+                {
+                    activationContext?.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    // This should never get hit ideally but putting it in for safety.
+                    // Log but do not throw. We do not want the adapters to be throwing exceptions/warnings about this. 
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error(ex);
+                    }
+                }
             }
         }
 
@@ -135,7 +154,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (disposing)
                 {
-                    this.activationContext?.Dispose();
                     foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in methodSymbols.Values)
                     {
                         foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
