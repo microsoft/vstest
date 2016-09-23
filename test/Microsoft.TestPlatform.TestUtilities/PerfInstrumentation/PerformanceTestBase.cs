@@ -1,0 +1,134 @@
+﻿// Copyright (c) Microsoft. All rights reserved.
+
+namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
+{
+    using System.Collections;
+    using System.Collections.Generic;
+
+    using Microsoft.TestPlatform.TestUtilities;    
+
+    /// <summary>
+    /// The performance test base.
+    /// </summary>
+    public class PerformanceTestBase : IntegrationTestBase
+    {
+        private PerfAnalyzer perfAnalyzer;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PerformanceTestBase"/> class.
+        /// </summary>
+        public PerformanceTestBase()
+            : base()
+        {
+            this.perfAnalyzer = new PerfAnalyzer();
+        }
+
+        /// <summary>
+        /// The run execution performance tests.
+        /// </summary>
+        /// <param name="testAsset">
+        /// The test asset.
+        /// </param>
+        /// <param name="testAdapterPath">
+        /// The test adapter path.
+        /// </param>
+        /// <param name="runSettings">
+        /// The run settings.
+        /// </param>
+        public void RunExecutionPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
+        {
+            // Start session and listen
+#if NET46
+            this.perfAnalyzer.EnableProvider();
+#endif
+            // Run Test
+            this.InvokeVsTestForExecution(testAsset, testAdapterPath, runSettings);
+            
+            // Stop Listening
+#if NET46
+            this.perfAnalyzer.DisableProvider();
+#endif
+        }
+
+        /// <summary>
+        /// The run discovery performance tests.
+        /// </summary>
+        /// <param name="testAsset">
+        /// The test asset.
+        /// </param>
+        /// <param name="testAdapterPath">
+        /// The test adapter path.
+        /// </param>
+        /// <param name="runSettings">
+        /// The run settings.
+        /// </param>
+        public void RunDiscoveryPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
+        {
+            // Start session and listen
+#if NET46
+            this.perfAnalyzer.EnableProvider();
+#endif
+            // Run Test
+            this.InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings);
+
+            // Stop Listening
+#if NET46
+            this.perfAnalyzer.DisableProvider();
+#endif
+        }
+
+        /// <summary>
+        /// The analyze perf data.
+        /// </summary>
+        public void AnalyzePerfData()
+        {
+            this.perfAnalyzer.AnalyzeEventsData();
+        }
+
+        /// <summary>
+        /// The get execution time.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="double"/>.
+        /// </returns>
+        public double GetExecutionTime()
+        {
+            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.ExecutionTask);
+        }
+
+        public double GetDiscoveryTime()
+        {
+            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.DiscoveryTask);
+        }
+
+        public double GetVsTestTime()
+        {
+            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.VsTestConsoleTask);
+        }
+
+        public double GetTestHostTime()
+        {
+            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.TestHostTask);
+        }
+
+        public double GetAdapterSearchTime()
+        {
+            return this.perfAnalyzer.GetElapsedTimeByTaskName(Constants.AdapterSearchTask);
+        }
+
+        public IDictionary<string,string> GetDiscoveryData()
+        {
+            return this.perfAnalyzer.GetEventDataByTaskName(Constants.AdapterDiscoveryTask);
+        }
+
+        public IDictionary<string, string> GetExecutionData()
+        {
+            return this.perfAnalyzer.GetEventDataByTaskName(Constants.AdapterExecutionTask);
+        }
+
+        public double GetAdapterExecutionTime(string executorUri)
+        {
+            return this.perfAnalyzer.GetAdapterExecutionTime(executorUri);
+        }
+    }
+}
