@@ -38,6 +38,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
 
+        private IEnumerable<string> pathToAdditionalExtensions;
+
         #endregion
 
         #region Constructor
@@ -95,6 +97,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.EnsureInitialized();
             this.requestSender.InitializeExtensions(pathToAdditionalExtensions);
+            this.pathToAdditionalExtensions = pathToAdditionalExtensions;
         }
 
         /// <inheritdoc/>
@@ -163,11 +166,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void EnsureInitialized()
         {
+
+            if (!vstestConsoleProcessManager.IsProcessInitialized())
+            {
+                this.StartSession();
+                this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
+                this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+            }
             if (!this.sessionStarted && this.requestSender != null)
             {
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
             }
-
+            
             if (!this.sessionStarted)
             {
                 throw new TransationLayerException("Error connecting to Vstest Command Line");

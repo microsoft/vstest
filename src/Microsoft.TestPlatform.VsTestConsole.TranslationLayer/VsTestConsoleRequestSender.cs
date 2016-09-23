@@ -1,5 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
@@ -104,8 +106,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="eventHandler"></param>
         public void DiscoverTests(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler eventHandler)
         {
-            this.communicationManager.SendMessage(MessageType.StartDiscovery, new DiscoveryRequestPayload() { Sources = sources, RunSettings = runSettings });
-            this.ListenAndReportTestCases(eventHandler);
+            try
+            {
+                this.communicationManager.SendMessage(MessageType.StartDiscovery,
+                    new DiscoveryRequestPayload() {Sources = sources, RunSettings = runSettings});
+                this.ListenAndReportTestCases(eventHandler);
+            }
+            catch (Exception exception)
+            {
+                AbortDiscoveryOperation(eventHandler, exception);
+            }
         }
 
         /// <summary>
@@ -116,9 +126,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="runEventsHandler">EventHandler for test run events</param>
         public void StartTestRun(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler)
         {
-            this.communicationManager.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, 
-                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings });
-            ListenAndReportTestResults(runEventsHandler, null);
+            try
+            {
+                this.communicationManager.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost,
+                    new TestRunRequestPayload() {Sources = sources.ToList(), RunSettings = runSettings});
+                ListenAndReportTestResults(runEventsHandler, null);
+            }
+            catch (Exception exception)
+            {
+                AbortRunOperation(runEventsHandler, exception);
+            }
         }
 
         /// <summary>
@@ -129,9 +146,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="runEventsHandler">EventHandler for test run events</param>
         public void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler)
         {
-            this.communicationManager.SendMessage(MessageType.TestRunSelectedTestCasesDefaultHost,
-                new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings });
-            ListenAndReportTestResults(runEventsHandler, null);
+            try
+            {
+                this.communicationManager.SendMessage(MessageType.TestRunSelectedTestCasesDefaultHost,
+                    new TestRunRequestPayload() {TestCases = testCases.ToList(), RunSettings = runSettings});
+                ListenAndReportTestResults(runEventsHandler, null);
+            }
+            catch (Exception exception)
+            {
+                AbortRunOperation(runEventsHandler, exception);
+            }
         }
 
         /// <summary>
@@ -143,9 +167,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public void StartTestRunWithCustomHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler, 
             ITestHostLauncher customHostLauncher)
         {
-            this.communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll,
-                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings, DebuggingEnabled = customHostLauncher.IsDebug });
-            ListenAndReportTestResults(runEventsHandler, customHostLauncher);
+            try
+            {
+                this.communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll,
+                    new TestRunRequestPayload()
+                    {
+                        Sources = sources.ToList(),
+                        RunSettings = runSettings,
+                        DebuggingEnabled = customHostLauncher.IsDebug
+                    });
+                ListenAndReportTestResults(runEventsHandler, customHostLauncher);
+            }
+            catch (Exception exception)
+            {
+                AbortRunOperation(runEventsHandler, exception);
+            }
         }
 
         /// <summary>
@@ -157,9 +193,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
-            this.communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-                new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings, DebuggingEnabled = customHostLauncher.IsDebug });
-            ListenAndReportTestResults(runEventsHandler, customHostLauncher);
+            try
+            {
+                this.communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunSelected,
+                    new TestRunRequestPayload()
+                    {
+                        TestCases = testCases.ToList(),
+                        RunSettings = runSettings,
+                        DebuggingEnabled = customHostLauncher.IsDebug
+                    });
+                ListenAndReportTestResults(runEventsHandler, customHostLauncher);
+            }
+            catch (Exception exception)
+            {
+                AbortRunOperation(runEventsHandler, exception);
+            }
         }
 
 
@@ -262,8 +310,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     EqtTrace.Error("VsTestConsoleRequestSender: TestDiscovery: Message Deserialization failed with {0}", ex);
 
-                    // Notify of a discovery complete and bail out.
-                    eventHandler.HandleDiscoveryComplete(0, null, false);
+                    AbortDiscoveryOperation(eventHandler, ex);
                     isDiscoveryComplete = true;
                 }
             }
@@ -314,10 +361,24 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 {
                     EqtTrace.Error("VsTestConsoleRequestSender: TestExecution: Error Processing Request from DesignModeClient: {0}", exception);
                     // notify of a test run complete and bail out.
-                    eventHandler.HandleTestRunComplete(new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.MinValue), null, null, null);
+                    AbortRunOperation(eventHandler, exception);
                     isTestRunComplete = true;
                 }
             }
+        }
+
+        private void AbortRunOperation(ITestRunEventsHandler eventHandler, Exception exception)
+        {
+            eventHandler.HandleLogMessage(TestMessageLevel.Error, string.Format(Resource.AbortedTestsRun, exception?.Message));
+            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+            eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
+
+        }
+
+        private void AbortDiscoveryOperation(ITestDiscoveryEventsHandler eventHandler, Exception exception)
+        {
+            eventHandler.HandleLogMessage(TestMessageLevel.Error, string.Format(Resource.AbortedTestsDiscovery, exception?.Message));
+            eventHandler.HandleDiscoveryComplete(-1, null, true);
         }
     }
 }
