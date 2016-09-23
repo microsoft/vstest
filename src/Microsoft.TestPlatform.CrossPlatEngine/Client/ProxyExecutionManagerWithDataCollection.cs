@@ -4,13 +4,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    /// <summary>
+
+    /// <summary>
     /// The proxy execution manager with data collection.
     /// </summary>
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
@@ -116,17 +118,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return base.StartTestRun(testRunCriteria, currentEventHandler);
         }
 
-        /// <summary>
-        /// Cancels the test run.
-        /// </summary>
+        /// <inheritdoc/>
         public override void Cancel()
         {
             base.Cancel();
         }
 
-        public override void Dispose()
+        /// <inheritdoc/>
+        public override void Close()
         {
-            base.Dispose();
+            base.Close();
         }
     }
 
@@ -140,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public DataCollectionRunEventsHandler()
         {
-            this.ExceptionMessages = new List<string>();
+            this.ExceptionMessages = new List<string>();
         }
 
         /// <summary>
@@ -156,11 +157,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </param>
         /// <param name="message">
         /// The message.
-        /// </param>        public void HandleLogMessage(TestMessageLevel level, string message)
+        /// </param>
+        public void HandleLogMessage(TestMessageLevel level, string message)
         {
             this.ExceptionMessages.Add(message);
         }
-        /// <summary>
+
+        /// <summary>
         /// The handle raw message.
         /// </summary>
         /// <param name="rawMessage">

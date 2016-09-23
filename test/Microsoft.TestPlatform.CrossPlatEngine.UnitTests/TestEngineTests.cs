@@ -31,23 +31,39 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnANonNullInstance()
         {
-            Assert.IsNotNull(this.testEngine.GetDiscoveryManager());
+            Assert.IsNotNull(this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object));
         }
 
+        [TestMethod]
+        public void GetDiscoveryManagerShouldReturnCachedInstance()
+        {
+            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object);
+
+            Assert.AreSame(discoveryManager, this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object));
+        }
 
         [TestMethod]
         public void GetExecutionManagerShouldReturnANonNullInstance()
         {
-            var testRunCriteria = new TestRunCriteria(new List<string>() { "1.dll" }, 100);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
+        }
+
+        [TestMethod]
+        public void GetExecutionManagerShouldReturnCachedInstance()
+        {
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100);
+            var executionManager = this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria);
+
+            Assert.AreSame(executionManager, this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
         }
 
         [TestMethod]
         public void GetExecutionManagerShouldReturnDefaultExecutionManagerIfParallelDisabled()
         {
             string settingXml = @"<RunSettings><RunConfiguration></RunConfiguration ></RunSettings>";
-            var testRunCriteria = new TestRunCriteria(new List<string>() { "1.dll" }, 100, false, settingXml);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
             Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria), typeof(ProxyExecutionManager));
@@ -57,7 +73,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void GetExecutionManagerWithSingleSourceShouldReturnDefaultExecutionManagerEvenIfParallelEnabled()
         {
             string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration ></RunSettings>";
-            var testRunCriteria = new TestRunCriteria(new List<string>() { "1.dll" }, 100, false, settingXml);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
             Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria), typeof(ProxyExecutionManager));
@@ -67,7 +83,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void GetExecutionManagerShouldReturnParallelExecutionManagerIfParallelEnabled()
         {
             string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration></RunSettings>";
-            var testRunCriteria = new TestRunCriteria(new List<string>() { "1.dll", "2.dll" }, 100, false, settingXml);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
             Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria), typeof(ParallelProxyExecutionManager));
@@ -77,7 +93,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void GetExcecutionManagerShouldReturnExectuionManagerWithDataCollectionIfDataCollectionIsEnabled()
         {
             var settingXml = @"<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=""Code Coverage"" uri=""datacollector://Microsoft/CodeCoverage/2.0"" assemblyQualifiedName=""Microsoft.VisualStudio.Coverage.DynamicCoverageDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a""></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
-            var testRunCriteria = new TestRunCriteria(new List<string>() { "1.dll" }, 100, false, settingXml);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
             var result = this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria);
 
             Assert.IsNotNull(result);

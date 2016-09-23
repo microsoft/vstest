@@ -2,11 +2,10 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Reflection;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -21,14 +20,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     public class DefaultTestHostManagerTests
     {
         private DefaultTestHostManager testHostManager;
-        
-        /// <summary>
-        /// The mock process helper.
-        /// </summary>
-        /// <remarks>Doing this only because mocks currently does not support internalVisibleTo on signed assemblies yet for .Net Core.</remarks>
-        private Mock<IProcessHelper> mockProcessHelper;
-
-        private TestProcessStartInfo startInfo;
+        private readonly Mock<IProcessHelper> mockProcessHelper;
+        private readonly TestProcessStartInfo startInfo;
 
         public DefaultTestHostManagerTests()
         {
@@ -36,7 +29,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
 
             this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object);
-            this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(null, default(TestRunnerConnectionInfo));
+            this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
 
         [TestMethod]
@@ -44,7 +37,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper.Object);
 
-            var info = this.testHostManager.GetTestHostProcessStartInfo(null, default(TestRunnerConnectionInfo));
+            var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
             StringAssert.EndsWith(info.FileName, "testhost.x86.exe");
         }
@@ -60,7 +53,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
 
-            var info = this.testHostManager.GetTestHostProcessStartInfo(null, connectionInfo);
+            var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, connectionInfo);
 
             Assert.AreEqual(" --port 123", info.Arguments);
         }
@@ -76,7 +69,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             var environmentVariables = new Dictionary<string, string> { { "k1", "v1" } };
 
-            var info = this.testHostManager.GetTestHostProcessStartInfo(environmentVariables, default(TestRunnerConnectionInfo));
+            var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), environmentVariables, default(TestRunnerConnectionInfo));
 
             Assert.AreEqual(environmentVariables, info.EnvironmentVariables);
         }

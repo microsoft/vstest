@@ -12,8 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Initializes test discovery. Create the test host, setup channel and initialize extensions.
         /// </summary>
-        /// <param name="testHostManager">Test host manager for this operation.</param>
-        void Initialize(ITestHostManager testHostManager);
+        void Initialize();
 
         /// <summary>
         /// Discovers tests
@@ -26,5 +25,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Aborts the test operation.
         /// </summary>
         void Abort();
+
+        /// <summary>
+        /// Closes the current test operation.
+        /// Send a EndSession message to close the test host and channel gracefully.
+        /// </summary>
+        void Close();
     }
 }

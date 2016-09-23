@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -108,48 +109,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public virtual TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+        public virtual TestProcessStartInfo GetTestHostProcessStartInfo(
+            IEnumerable<string> sources,
+            IDictionary<string, string> environmentVariables,
+            TestRunnerConnectionInfo connectionInfo)
         {
+            // Default test host manager supports shared test sources
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
-            string testhostProcessPath, processWorkingDirectory;
             var argumentsString = " " + Constants.PortOption + " " + connectionInfo.Port;
 
-            // If we are running in the dotnet.exe context we do not want to launch testhost.exe but dotnet.exe with the testhost assembly. 
-            // Since dotnet.exe is already built for multiple platforms this would avoid building testhost.exe also in multiple platforms.
-            var currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
-            if (currentProcessFileName.EndsWith(DotnetProcessName) || currentProcessFileName.EndsWith(DotnetProcessNameXPlat))
-            {
-                testhostProcessPath = currentProcessFileName;
-                var testhostAssemblyPath = Path.Combine(
-                    currentWorkingDirectory,
-                    testHostProcessName.Replace("exe", "dll"));
-                argumentsString = "\"" + testhostAssemblyPath + "\"" + argumentsString;
-                processWorkingDirectory = Path.GetDirectoryName(currentProcessFileName);
-            }
-            else
-            {
-                // Running on Windows with vstest.console.exe for desktop (or VS IDE). Spawn the dotnet.exe
-                // on path with testhost bundled with vstest.console.
-                if (this.framework.Name.ToLower().Contains("netstandard") || this.framework.Name.ToLower().Contains("netcoreapp"))
-                {
-                    testhostProcessPath = DotnetProcessName;
-                    var testhostAssemblyPath = Path.Combine(
-                        Path.GetDirectoryName(currentProcessFileName),
-                        NetCoreDirectoryName,
-                        testHostProcessName.Replace("exe", "dll"));
-                    argumentsString = "\"" + testhostAssemblyPath + "\"" + argumentsString;
-                }
-                else
-                {
-                    testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
-                }
- 
-                // For IDEs and other scenario - Current directory should be the working directory - not the vstest.console.exe location
-                // For VS - this becomes the solution directory for example
-                // "TestResults" directory will be created at "current directory" of test host
-                processWorkingDirectory = Directory.GetCurrentDirectory();
-            }
+            var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+
+            // For IDEs and other scenario, current directory should be the
+            // working directory (not the vstest.console.exe location).
+            // For VS - this becomes the solution directory for example
+            // "TestResults" directory will be created at "current directory" of test host
+            var processWorkingDirectory = Directory.GetCurrentDirectory();
 
             return new TestProcessStartInfo
                        {

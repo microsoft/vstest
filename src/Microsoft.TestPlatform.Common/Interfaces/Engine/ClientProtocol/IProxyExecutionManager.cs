@@ -34,8 +34,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         void Abort();
 
         /// <summary>
-        /// Dispose the test operation.
+        /// Closes the current test operation by sending a end session message.
+        /// Terminates the test host.
         /// </summary>
-        void Dispose();
+        void Close();
     }
 }

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -20,11 +21,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// </summary>
     public class DotnetTestHostManager : ITestHostManager
     {
-        private ITestHostLauncher testHostLauncher;
-
         private readonly IProcessHelper processHelper;
 
         private readonly IFileHelper fileHelper;
+
+        private ITestHostLauncher testHostLauncher;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -58,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
-            throw new NotImplementedException();
+            this.testHostLauncher = customLauncher;
         }
 
         /// <inheritdoc/>
@@ -68,7 +69,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public TestProcessStartInfo GetTestHostProcessStartInfo(
+        public virtual TestProcessStartInfo GetTestHostProcessStartInfo(
+            IEnumerable<string> sources,
             IDictionary<string, string> environmentVariables,
             TestRunnerConnectionInfo connectionInfo)
         {
@@ -83,28 +85,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 startInfo.FileName = currentProcessPath;
                 testHostExecutable = "testhost.dll";
-                testRunnerDirectory = Path.GetDirectoryName(typeof(DotnetTestHostManager).GetTypeInfo().Assembly.Location);
+                testRunnerDirectory = this.processHelper.GetTestEngineDirectory();
             }
 
-            // Use the deps.json for test source
-            // "D:\dd\gh\Microsoft\vstest\tools\dotnet\dotnet.exe" exec
-            // --runtimeconfig G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.runtimeconfig.json
-            // --depsfile G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.deps.json
-            // --additionalprobingpath C:\Users\armahapa\.nuget\packages\ 
-            // C:\Users\armahapa\.nuget\packages\dotnet-test-xunit\2.2.0-preview2-build1029\lib\netcoreapp1.0\dotnet-test-xunit.dll
-            // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
-            // Probe for runtimeconfig and deps file for the test source
+            // .NET core host manager is not a shared host. It will expect a single test source to be provided.
             var args = "exec";
-            var sourcePath = "test.dll";
+            var sourcePath = sources.Single();
             var sourceFile = Path.GetFileNameWithoutExtension(sourcePath);
             var sourceDirectory = Path.GetDirectoryName(sourcePath);
 
+            // Probe for runtimeconfig and deps file for the test source
             var runtimeConfigPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.json"));
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
                 args += " --runtimeconfig \"" + runtimeConfigPath + "\"";
             }
 
+            // Use the deps.json for test source
             var depsFilePath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".deps.json"));
             if (this.fileHelper.Exists(depsFilePath))
             {
@@ -112,12 +109,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             // Create a additional probing path args with Nuget.Client
-            //args += "--additionalprobingpath xxx"
+            // args += "--additionalprobingpath xxx"
+            // TODO this may be required in ASP.net, requires validation
 
             // Add the testhost path and other arguments
             var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
             args += " \"" + testHostPath + "\" " + CrossPlatEngine.Constants.PortOption + " " + connectionInfo.Port;
 
+            // Sample command line for the spawned test host
+            // "D:\dd\gh\Microsoft\vstest\tools\dotnet\dotnet.exe" exec
+            // --runtimeconfig G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.runtimeconfig.json
+            // --depsfile G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.deps.json
+            // --additionalprobingpath C:\Users\armahapa\.nuget\packages\ 
+            // G:\packages\testhost.dll
+            // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
             startInfo.WorkingDirectory = sourceDirectory;

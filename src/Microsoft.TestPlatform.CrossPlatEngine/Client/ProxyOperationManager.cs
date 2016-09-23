@@ -16,38 +16,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
     /// </summary>
-    public class ProxyOperationManager : IDisposable
+    public abstract class ProxyOperationManager
     {
-        private ITestHostManager testHostManager;
+        private readonly ITestHostManager testHostManager;
 
-        private bool isInitialized;
+        private bool initialized;
 
         private readonly int connectionTimeout;
-
-        private bool disposed;
 
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
         /// </summary>
-        public ProxyOperationManager() : this(new TestRequestSender(), null, Constants.ClientConnectionTimeout)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyOperationManager"/> class. 
-        /// Constructor with Dependency injection. Used for unit testing.
-        /// </summary>
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        internal ProxyOperationManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
+        protected ProxyOperationManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
-            this.isInitialized = false;
+            this.initialized = false;
         }
 
         #endregion
@@ -67,34 +57,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Ensure that the engine is ready for test operations.
         /// Usually includes starting up the test host process.
         /// </summary>
-        /// <param name="testHostManager">
-        /// Manager for the test host process
-        /// </param>
-        public void SetupChannel(ITestHostManager testHostManager)
+        /// <param name="sources">List of test sources.</param>
+        public virtual void SetupChannel(IEnumerable<string> sources)
         {
-            if (this.disposed)
+            if (!this.initialized)
             {
-                throw new ObjectDisposedException(this.GetType().Name);
-            }
-
-            if (!this.isInitialized)
-            {
-                this.testHostManager = testHostManager;
-
                 var portNumber = this.RequestSender.InitializeCommunication();
 
+                // Get the test process start info
                 // TODO: Fix the environment variables usage
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(
+                    sources,
                     null,
                     new TestRunnerConnectionInfo { Port = portNumber });
+
+                // TODO: monitor test host exit and clean up
                 this.testHostManager.LaunchTestHost(testHostStartInfo);
 
-                // Get the test process start info
-                // Launch the test process
-                // Listen to terminate events, and close the channel accordingly
-                //
-
-                this.isInitialized = true;
+                this.initialized = true;
             }
 
             // Wait for a timeout for the client to connect.
@@ -105,22 +85,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Dispose for this instance.
+        /// Closes the channel, terminate test host process.
         /// </summary>
-        public virtual void Dispose()
+        public virtual void Close()
         {
-            this.isInitialized = false;
-            this.disposed = true;
-        }
-
-        /// <summary>
-        /// Aborts the test operation.
-        /// </summary>
-        public virtual void Abort()
-        {
-            if (this.disposed)
+            // TODO dispose the testhost process
+            try
             {
-                throw new ObjectDisposedException(this.GetType().Name);
+                this.RequestSender.EndSession();
+            }
+            finally
+            {
+                this.initialized = false;
             }
         }
 

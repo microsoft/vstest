@@ -35,10 +35,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Gets the start parameters for the test host.
         /// </summary>
+        /// <param name="sources">Test source paths.</param>
         /// <param name="environmentVariables">Set of environment variables for the test host process.</param>
         /// <param name="connectionInfo">Set of connection parameters for the test host process to communicate with test runner.</param>
         /// <returns>ProcessStartInfo of the test host.</returns>
-        TestProcessStartInfo GetTestHostProcessStartInfo(IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo);
+        TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo);
         
         /// <summary>
         /// Register for the exit event.

@@ -140,7 +140,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.StartTestRun(null, null));
+            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null));
         }
 
         [TestMethod]
@@ -196,18 +196,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void DisposeShouldSignalServerSessionEnd()
+        public void CloseShouldSignalServerSessionEnd()
         {
-            this.testExecutionManager.Dispose();
+            this.testExecutionManager.Close();
 
             this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
         }
 
         [TestMethod]
-        public void DisposeShouldSignalServerSessionEndEachTime()
+        public void CloseShouldSignalServerSessionEndEachTime()
         {
-            this.testExecutionManager.Dispose();
-            this.testExecutionManager.Dispose();
+            this.testExecutionManager.Close();
+            this.testExecutionManager.Close();
 
             this.mockRequestSender.Verify(s => s.EndSession(), Times.Exactly(2));
         }

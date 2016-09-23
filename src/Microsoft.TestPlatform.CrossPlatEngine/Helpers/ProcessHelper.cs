@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 {
     using System;
     using System.Diagnostics;
+    using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -56,6 +57,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         public string GetCurrentProcessFileName()
         {
             return Process.GetCurrentProcess().MainModule.FileName;
+        }
+
+        /// <inheritdoc/>
+        public string GetTestEngineDirectory()
+        {
+            return typeof(ProcessHelper).GetTypeInfo().Assembly.Location;
         }
     }
 }

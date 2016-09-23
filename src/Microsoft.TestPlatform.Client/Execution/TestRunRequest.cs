@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     throw new ObjectDisposedException("testRunRequest");
                 }
@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         {
           EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
             
-            if (this.bDisposed)
+            if (this.disposed)
             {
                 throw new ObjectDisposedException("testRunRequest");
             }
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     throw new ObjectDisposedException("testRunRequest");
                 }
@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             lock (this.syncObject)
             {
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     throw new ObjectDisposedException("testRunRequest");
                 }
@@ -262,7 +262,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             lock (this.syncObject)
             {
                 // If this object is disposed, dont do anything
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.TestRunComplete: Ignoring as the object is disposed.");
                     return;
@@ -317,7 +317,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     this.runCompletionEvent.Set();
 
                     // Disposing off the resources held by the execution manager so that the test host process can shut down.
-                    this.ExecutionManager?.Dispose();
+                    this.ExecutionManager?.Close();
                 }
 
                 EqtTrace.Info("TestRunRequest:TestRunComplete: Completed.");
@@ -348,7 +348,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 lock (this.syncObject)
                 {
                     // If this object is disposed, dont do anything
-                    if (this.bDisposed)
+                    if (this.disposed)
                     {
                         EqtTrace.Warning("TestRunRequest.SendTestRunStatsChange: Ignoring as the object is disposed.");
                         return;
@@ -374,7 +374,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             lock (this.syncObject)
             {
                 // If this object is disposed, dont do anything
-                if (this.bDisposed)
+                if (this.disposed)
                 {
                     EqtTrace.Warning("TestRunRequest.SendTestRunMessage: Ignoring as the object is disposed.");
                     return;
@@ -423,7 +423,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             lock (this.syncObject)
             {
-                if (!this.bDisposed)
+                if (!this.disposed)
                 {
                     if (disposing)
                     {
@@ -432,7 +432,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Indicate that object has been disposed
                     this.runCompletionEvent = null;
-                    this.bDisposed = true;
+                    this.disposed = true;
                 }
             }
 
@@ -447,7 +447,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// <summary>
         /// Specifies whether the run is disposed or not
         /// </summary>
-        private bool bDisposed;
+        private bool disposed;
 
         /// <summary>
         /// Sync object for various operations

@@ -2,6 +2,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
+    using System.Collections.Generic;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -59,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Shared test hosts don't require test source information to launch. Start them early
                 // to allow fail fast.
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is shared. SetupChannel it early.");
-                this.InitializeExtensions(this.testHostManager);
+                this.InitializeExtensions(Enumerable.Empty<string>());
             }
         }
 
@@ -73,12 +74,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (!this.testHostManager.Shared)
             {
-                // Non shared test host requires test source information to launch. SetupChannel them now.
+                // Non shared test host requires test source information to launch. Provide the sources
+                // information and create the channel.
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is non shared. Lazy initialize.");
-                this.InitializeExtensions(this.testHostManager);
+                var testSources = testRunCriteria.Sources;
+
+                // If the test execution is with a test filter, group them by sources
+                if (testRunCriteria.HasSpecificTests)
+                {
+                    testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                }
+
+                this.InitializeExtensions(testSources);
             }
 
-            this.SetupChannel(this.testHostManager);
+            this.SetupChannel(testRunCriteria.Sources);
 
             var executionContext = new TestExecutionContext(
                 testRunCriteria.FrequencyOfRunStatsChangeEvent,
@@ -124,27 +134,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Aborts the test run.
         /// </summary>
-        public override void Abort()
+        public void Abort()
         {
             this.RequestSender.SendTestRunAbort();
         }
 
-        /// <inheritdoc cref="System.IDisposable.Dispose"/>
-        public override void Dispose()
-        {
-            this.RequestSender?.EndSession();
-            base.Dispose();
-        }
-
         #endregion
 
-        private void InitializeExtensions(ITestHostManager testHostManager)
+        private void InitializeExtensions(IEnumerable<string> sources)
         {
             // Only send this if needed.
             if (TestPluginCache.Instance.PathToAdditionalExtensions != null
                 && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
             {
-                this.SetupChannel(testHostManager);
+                this.SetupChannel(sources);
 
                 this.RequestSender.InitializeExecution(
                     TestPluginCache.Instance.PathToAdditionalExtensions,

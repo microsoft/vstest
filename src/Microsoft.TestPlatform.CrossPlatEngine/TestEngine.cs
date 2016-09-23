@@ -35,10 +35,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
+        /// <param name="testHostManager"></param>
         /// <returns>ITestDiscoveryManager object that can do discovery</returns>
-        public IProxyDiscoveryManager GetDiscoveryManager()
+        public IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager)
         {
-            return this.proxyDiscoveryManager ?? (this.proxyDiscoveryManager = new ProxyDiscoveryManager());
+            return this.proxyDiscoveryManager ?? (this.proxyDiscoveryManager = new ProxyDiscoveryManager(testHostManager));
         }
 
         /// <summary>

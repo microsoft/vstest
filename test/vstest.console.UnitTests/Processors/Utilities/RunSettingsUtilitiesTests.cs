@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
     public class RunSettingsUtilitiesTests
     {
         private const string DefaultRunSettingsTemplate =
-            "<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>%ResultsDirectory%</ResultsDirectory>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n    <TargetFrameworkVersion>.NETFramework,Version=v4.6</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>";
+            "<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>%ResultsDirectory%</ResultsDirectory>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n    <TargetFrameworkVersion>%DefaultFramework%</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>";
 
         [TestCleanup]
         public void TestCleanup()
@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             var defaultRunSettings = this.GetDefaultRunSettings();
             
             //Replace with the framework specified.
-            var expectedSettings = defaultRunSettings.Replace("Version=v4.6", "Version=v3.5");
+            var expectedSettings = defaultRunSettings.Replace(Framework.DefaultFramework.Name, ".NETFramework,Version=v3.5");
             Assert.AreEqual(expectedSettings, runSettings);
         }
 
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         private string GetDefaultRunSettings()
         {
             var defaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), "TestResults");
-            return DefaultRunSettingsTemplate.Replace("%ResultsDirectory%", defaultResultsDirectory);
+            return DefaultRunSettingsTemplate.Replace("%ResultsDirectory%", defaultResultsDirectory).Replace("%DefaultFramework%", Framework.DefaultFramework.Name);
         }
 
         private class TestableRunSettingsProvider : IRunSettingsProvider

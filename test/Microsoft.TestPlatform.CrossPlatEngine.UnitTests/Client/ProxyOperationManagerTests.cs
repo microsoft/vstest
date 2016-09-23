@@ -3,6 +3,8 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -15,11 +17,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ProxyOperationManagerTests
     {
-        private ProxyOperationManager testOperationManager;
+        private readonly ProxyOperationManager testOperationManager;
 
-        private Mock<ITestHostManager> mockTestHostManager;
+        private readonly Mock<ITestHostManager> mockTestHostManager;
 
-        private Mock<ITestRequestSender> mockRequestSender;
+        private readonly Mock<ITestRequestSender> mockRequestSender;
 
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
@@ -31,7 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestHostManager>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
-            this.testOperationManager = new ProxyOperationManager(this.mockRequestSender.Object, null, this.connectionTimeout);
+            this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
         }
 
         [TestMethod]
@@ -40,10 +42,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var expectedStartInfo = new TestProcessStartInfo();
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
             this.mockTestHostManager.Setup(
-                    th => th.GetTestHostProcessStartInfo(null, It.IsAny<TestRunnerConnectionInfo>()))
+                    th => th.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, It.IsAny<TestRunnerConnectionInfo>()))
                 .Returns(expectedStartInfo);
 
-            this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo)), Times.Once);
         }
@@ -51,7 +53,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelShouldSetupServerForCommunication()
         {
-            this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
         }
@@ -59,27 +61,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelShouldNotInitializeIfConnectionIsAlreadyInitialized()
         {
-            this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
-            this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
         }
 
         [TestMethod]
-        public void SetupChannelShouldThrowIfObjectIsDisposed()
-        {
-            using (this.testOperationManager)
-            {
-                this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
-            }
-
-            Assert.ThrowsException<ObjectDisposedException>(() => this.testOperationManager.SetupChannel(this.mockTestHostManager.Object));
-        }
-
-        [TestMethod]
         public void SetupChannelShouldWaitForTestHostConnection()
         {
-            this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Once);
         }
@@ -87,8 +78,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelShouldWaitForTestHostConnectionEvenIfConnectionIsInitialized()
         {
-            this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
-            this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Exactly(2));
         }
@@ -98,18 +89,37 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(false);
 
-            Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(this.mockTestHostManager.Object));
+            Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(Enumerable.Empty<string>()));
         }
 
         [TestMethod]
-        public void AbortShouldThrowIfObjectIsDisposed()
+        public void CloseShouldEndSession()
         {
-            using (this.testOperationManager)
-            {
-                this.testOperationManager.SetupChannel(this.mockTestHostManager.Object);
-            }
+            this.testOperationManager.Close();
 
-            Assert.ThrowsException<ObjectDisposedException>(() => this.testOperationManager.SetupChannel(this.mockTestHostManager.Object));
+            this.mockRequestSender.Verify(rs => rs.EndSession(), Times.Once);
+        }
+
+        [TestMethod]
+        public void CloseShouldResetChannelInitialization()
+        {
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.testOperationManager.Close();
+
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            this.mockTestHostManager.Verify(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
+        }
+
+        private class TestableProxyOperationManager : ProxyOperationManager
+        {
+            public TestableProxyOperationManager(
+                ITestRequestSender requestSender,
+                ITestHostManager testHostManager,
+                int clientConnectionTimeout) : base(requestSender, testHostManager, clientConnectionTimeout)
+            {
+            }
         }
     }
 }

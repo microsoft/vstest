@@ -2,10 +2,13 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
+    using System.Security.Cryptography;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -22,8 +25,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     {
         private const string DefaultDotnetPath = "c:\\tmp\\dotnet.exe";
 
-        private const string DefaultTestHostPath = "c:\\tmp\\testhost.dll";
-
         private readonly Mock<ITestHostLauncher> mockTestHostLauncher;
 
         private readonly TestableDotnetTestHostManager dotnetHostManager;
@@ -33,6 +34,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         private readonly Mock<IFileHelper> mockFileHelper;
 
         private readonly TestRunnerConnectionInfo defaultConnectionInfo;
+
+        private readonly string[] testSource = { "test.dll" };
 
         public DotnetTestHostManagerTests()
         {
@@ -47,6 +50,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             // Setup a dummy current process for tests
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
+            this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldThrowIfSourceIsNull()
+        {
+            Action action = () => this.dotnetHostManager.GetTestHostProcessStartInfo(null, null, this.defaultConnectionInfo);
+
+            Assert.ThrowsException<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldThrowIfMultipleSourcesAreProvided()
+        {
+            var sources = new[] { "test1.dll", "test2.dll" };
+            Action action = () => this.dotnetHostManager.GetTestHostProcessStartInfo(sources, null, this.defaultConnectionInfo);
+
+            Assert.ThrowsException<InvalidOperationException>(action);
         }
 
         [TestMethod]
@@ -57,12 +78,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = this.GetDefaultStartInfo();
 
             Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
-        }
-
-        private TestProcessStartInfo GetDefaultStartInfo()
-        {
-            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, this.defaultConnectionInfo);
-            return startInfo;
         }
 
         [TestMethod]
@@ -147,11 +162,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldProvidePathToTestHostForNetCoreTarget()
         {
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("/tmp/dotnet");
+            this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns("/tmp/vstest");
 
             var startInfo = this.GetDefaultStartInfo();
 
             // Path.GetDirectoryName returns platform specific path separator char
-            StringAssert.Contains(startInfo.Arguments, this.GetTesthostPath());
+            StringAssert.Contains(startInfo.Arguments, this.GetTesthostPath("/tmp/vstest"));
         }
 
         [TestMethod]
@@ -159,7 +175,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
 
-            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(null, connectionInfo);
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
             StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port);
         }
@@ -169,7 +185,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             var environmentVariables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
 
-            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(environmentVariables, this.defaultConnectionInfo);
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, environmentVariables, this.defaultConnectionInfo);
 
             Assert.AreEqual(environmentVariables, startInfo.EnvironmentVariables);
         }
@@ -188,8 +204,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithConnectionInfo()
         {
+            this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns("/tmp/vstest");
             var startInfo = this.GetDefaultStartInfo();
-            var expectedArgs = "exec \"" + this.GetTesthostPath() + "\" --port 0";
+            var expectedArgs = "exec \"" + this.GetTesthostPath("/tmp/vstest") + "\" --port 0";
 
             this.dotnetHostManager.LaunchTestHost(startInfo);
 
@@ -208,29 +225,25 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithWorkingDirectorySetToTestAssembly()
-        {
-        }
-
-        [TestMethod]
-        public void LaunchTestHostShouldUseCustomHostIfSet()
-        {
-        }
-
-        [TestMethod]
         public void DotnetTestHostManagedShouldNotBeShared()
         {
             Assert.IsFalse(this.dotnetHostManager.Shared);
         }
 
-        private string GetTesthostPath()
+        private string GetTesthostPath(string engineDirectory)
         {
             // testhost.dll will be picked up from the same path as vstest.console.dll. In the test, we are setting up
             // the path to current assembly location.
-            var testhostPath = Path.Combine(
-                Path.GetDirectoryName(this.GetType().GetTypeInfo().Assembly.Location),
-                "testhost.dll");
-            return testhostPath;
+            return Path.Combine(engineDirectory, "testhost.dll");
+        }
+
+        private TestProcessStartInfo GetDefaultStartInfo()
+        {
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(
+                this.testSource,
+                null,
+                this.defaultConnectionInfo);
+            return startInfo;
         }
     }
 
