@@ -36,7 +36,7 @@
 
     "Microsoft.Internal.TestPlatform.Extensions": {
       "type": "build",
-      "version": "15.0.0"
+      "version": "15.0.25723-preview"
     }
   }
 }
