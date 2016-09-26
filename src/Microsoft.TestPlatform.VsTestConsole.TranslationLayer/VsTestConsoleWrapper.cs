@@ -2,14 +2,15 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Diagnostics;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using System.Diagnostics;
 
     /// <summary>
     /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
@@ -64,6 +65,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.requestSender = requestSender;
             this.vstestConsoleProcessManager = processManager;
+            this.vstestConsoleProcessManager.ProcessExited += ProcessManagerOnProcessExited;
             this.sessionStarted = false;
         }
 
@@ -182,6 +184,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 throw new TransationLayerException("Error connecting to Vstest Command Line");
             }
+        }
+
+        private void ProcessManagerOnProcessExited(object sender, EventArgs eventArgs)
+        {
+            this.requestSender?.AbortTestRun();
         }
     }
 }

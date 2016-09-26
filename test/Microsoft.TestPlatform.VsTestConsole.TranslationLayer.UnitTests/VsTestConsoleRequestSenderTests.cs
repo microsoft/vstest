@@ -1,5 +1,8 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
+using System.IO;
+using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
     using System;
@@ -355,8 +358,48 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Once, "TestMessage event must be called");
         }
 
+        [TestMethod]
+        public void DiscoverTestsShouldAbortOnException()
+        {
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var sources = new List<string> {"1.dll"};
+            var payload = new DiscoveryRequestPayload {Sources = sources, RunSettings = null};
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, payload)).Throws(new IOException());
+
+            this.requestSender.DiscoverTests(sources, null, mockHandler.Object);
+
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
+        }
+        [TestMethod]
+        public void DiscoverTestsShouldAbortOnAbortTestRunCall()
+        {
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var sources = new List<string> { "1.dll" };
+            var payload = new DiscoveryRequestPayload { Sources = sources, RunSettings = null };
+            var manualEvent = new ManualResetEvent(false);
+
+            var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+            var testCaseList = new List<TestCase>() { testCase };
+            var testsFound = CreateMessage(MessageType.TestCasesFound, testCaseList);
+
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Callback(() =>
+            {
+                this.requestSender.AbortTestRun();
+                Thread.Sleep(30 * 1000);
+            }).Returns(testsFound);
+
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(-1, null, true)).Callback(() => manualEvent.Set());
+
+            this.requestSender.DiscoverTests(sources, null, mockHandler.Object);
+
+            manualEvent.WaitOne();
+            mockHandler.Verify( mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
         #endregion
-        
+
         #region RunTests
 
         [TestMethod]
@@ -802,11 +845,55 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
         }
+        
+        [TestMethod]
+        public void StartTestRunShouldAbortOnException()
+        {
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+            var sources = new List<string> { "1.dll" };
+            var payload = new TestRunRequestPayload { Sources = sources, RunSettings = null };
+            var exception = new IOException();
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload)).Throws(exception);
+
+            this.requestSender.StartTestRun(sources, null, mockHandler.Object);
+
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once, "Test Run Complete must be called");
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
+        }
+
+        [TestMethod]
+        public void StartTunTestsShouldAbortOnAbortTestRunCall()
+        {
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+            var manualEvent = new ManualResetEvent(false);
+            var sources = new List<string> { "1.dll" };
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
+            var payload = new TestRunCompletePayload()
+            {
+                ExecutorUris = null,
+                LastRunTests = dummyLastRunArgs,
+                RunAttachments = null,
+                TestRunCompleteArgs = dummyCompleteArgs
+            };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Callback(() =>
+            {
+                this.requestSender.AbortTestRun();
+                Thread.Sleep(30 * 1000);
+            }).Returns(runComplete);
+            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(() => manualEvent.Set());
+
+            this.requestSender.StartTestRun(sources, null, mockHandler.Object);
+
+            manualEvent.WaitOne();
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
 
         #endregion
 
         #region private methods
-        
+
         private static Message CreateMessage<T>(string messageType, T payload)
         {
             var message = new Message()

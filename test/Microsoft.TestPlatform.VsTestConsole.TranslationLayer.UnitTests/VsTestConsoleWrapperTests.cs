@@ -25,6 +25,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private MockProcessManager mockProcessManager;
 
+        
+
         [TestInitialize]
         public void TestInit()
         {
@@ -67,6 +69,57 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockSender.SetupPort(inputPort);
 
             Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.StartSession());
+        }
+
+        [TestMethod]
+        public void StartSessionShouldCallWhenProcessNotInitialized()
+        {
+            Mock<IProcessManager> mockProcessManager  = new Mock<IProcessManager>();
+            Mock<ITranslationLayerRequestSender> mockRequestSender = new Mock<ITranslationLayerRequestSender>();
+            this.consoleWrapper = new VsTestConsoleWrapper(mockRequestSender.Object, mockProcessManager.Object);
+
+            mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(false);
+            mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+            
+            // to call private method EnsureInitialize call InitializeExtensions
+            this.consoleWrapper.InitializeExtensions(new []{"path/to/adapter"});
+            
+            mockProcessManager.Verify(pm => pm.StartProcess(It.IsAny<string[]>()));
+        }
+
+        [TestMethod]
+        public void PathToExtensionsShouldCacheOnInitializeExtension()
+        {
+            Mock<IProcessManager> mockProcessManager = new Mock<IProcessManager>();
+            Mock<ITranslationLayerRequestSender> mockRequestSender = new Mock<ITranslationLayerRequestSender>();
+            this.consoleWrapper = new VsTestConsoleWrapper(mockRequestSender.Object, mockProcessManager.Object);
+
+            var pathToExtensions = new[] {"path/to/adapter"};
+            mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(true);
+            mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            this.consoleWrapper.InitializeExtensions(pathToExtensions);
+
+            mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(false);
+            mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+
+            this.consoleWrapper.InitializeExtensions(pathToExtensions);
+
+            mockRequestSender.Verify( rs => rs.InitializeExtensions(pathToExtensions), Times.Exactly(3));
+
+        }
+
+        [TestMethod]
+        public void AbortTestRunShouldCallOnProcessExit()
+        {
+            Mock<IProcessManager> mockProcessManager = new Mock<IProcessManager>();
+            Mock<ITranslationLayerRequestSender> mockRequestSender = new Mock<ITranslationLayerRequestSender>();
+            this.consoleWrapper = new VsTestConsoleWrapper(mockRequestSender.Object, mockProcessManager.Object);
+            
+            mockProcessManager.Raise( pm => pm.ProcessExited += null, EventArgs.Empty);
+            
+            mockRequestSender.Verify(rs => rs.AbortTestRun(), Times.Once);
         }
 
         [TestMethod]
@@ -386,6 +439,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         private class MockProcessManager : IProcessManager
         {
             public Action<string[]> VerifyArgs;
+            public event EventHandler ProcessExited;
 
             public bool IsProcessInitialized()
             {
@@ -394,6 +448,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             public void ShutdownProcess()
             {
+                ProcessExited?.Invoke(this, null);
 
             }
 

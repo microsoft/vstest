@@ -23,6 +23,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private Process process;
 
+        public event EventHandler ProcessExited;
+
         #region Constructor
 
         public VsTestConsoleProcessManager(string vstestConsolePath)
@@ -87,6 +89,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             lock (syncObject)
             {
                 vstestConsoleCrashed = true;
+                this.ProcessExited?.Invoke(sender, e);
             }
         }
     }
