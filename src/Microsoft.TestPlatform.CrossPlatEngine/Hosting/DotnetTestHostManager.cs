@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns></returns>
         private string GetDotnetHostFullPath()
         {
-            char separator = ':'; 
+            char separator = ';'; 
             var dotnetExeName = "dotnet.exe";
 
             // Use semicolon(;) as path separator for windows

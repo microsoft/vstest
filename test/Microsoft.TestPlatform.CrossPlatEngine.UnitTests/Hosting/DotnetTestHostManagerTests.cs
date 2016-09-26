@@ -237,7 +237,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             // To validate the else part, set current process to exe other than dotnet
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
 
-            char separator = ':';
+            char separator = ';';
             var dotnetExeName = "dotnet.exe";
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
