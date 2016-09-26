@@ -19,6 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using System.Runtime.InteropServices;
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -233,24 +234,36 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoOnWindowsForValidPathReturnsFullPathOfDotnetHost()
         {
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("testhost.exe");
-            
-            this.mockFileHelper.Setup(fh => fh.Exists(DefaultDotnetPath)).Returns(true);
+            // To validate the else part, set current process to exe other than dotnet
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+
+            char separator = ':';
+            var dotnetExeName = "dotnet.exe";
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                separator = ':';
+                dotnetExeName = "dotnet";
+            }
+
+            var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
+            var acceptablePath = Path.Combine(paths[0], dotnetExeName);
+
+            this.mockFileHelper.Setup(fh => fh.Exists(acceptablePath)).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
             
-            Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
+            Assert.AreEqual(acceptablePath, startInfo.FileName);
         }
 
         [TestMethod]
         public void GetTestHostProcessStartInfoOnWindowsForInValidPathReturnsDotnet()
         {
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("testhost.exe");
-            
-            this.dotnetHostManager.envVarPathString = @"d:\hello;c:\foo";
-            this.mockFileHelper.Setup(fh => fh.Exists(DefaultDotnetPath)).Returns(false);
+            // To validate the else part, set current process to exe other than dotnet
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+            var dotnetExeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
+
             var startInfo = this.GetDefaultStartInfo();
-            
-            Assert.AreEqual("dotnet.exe", startInfo.FileName);
+
+            Assert.AreEqual(dotnetExeName, startInfo.FileName);
         }
         
         private string GetTesthostPath(string engineDirectory)
@@ -275,10 +288,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public TestableDotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper)
             : base(testHostLauncher, processHelper, fileHelper)
         { }
-
-        internal string envVarPathString = @"d:\hello;c:\tmp\; c:\foo";
-        
-        internal override string EnvVarPathString { get { return envVarPathString; } }
     }
     
     [TestClass]

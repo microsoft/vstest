@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private readonly IProcessHelper processHelper;
 
         private readonly IFileHelper fileHelper;
-        
+
         private ITestHostLauncher testHostLauncher;
 
         /// <summary>
@@ -56,12 +56,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// project must be launched in a separate test host process.
         /// </remarks>
         public bool Shared => false;
-        
-        /// <summary>
-        /// Returns the separated PATH string
-        /// Made virtual for testing
-        /// </summary>
-        internal virtual string EnvVarPathString => Environment.GetEnvironmentVariable("PATH");
 
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -142,15 +136,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return startInfo;
         }
 
+        /// <summary>
+        /// Get full path for the dotnet host
+        /// </summary>
+        /// <returns></returns>
         private string GetDotnetHostFullPath()
         {
+            char separator = ':'; 
+            var dotnetExeName = "dotnet.exe";
+
             // Use semicolon(;) as path separator for windows
             // colon(:) for Linux and OSX
-            var isWindowsOS = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            char separator = isWindowsOS ? ';' : ':';
-            var dotnetExeName = isWindowsOS ? "dotnet.exe" : "dotnet";
-            
-            foreach (string path in EnvVarPathString.Split(separator))
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                separator = ':';
+                dotnetExeName = "dotnet";
+            }
+
+            var pathString = Environment.GetEnvironmentVariable("PATH");
+            foreach (string path in pathString.Split(separator))
             {
                 string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
                 if (fileHelper.Exists(exeFullPath))
