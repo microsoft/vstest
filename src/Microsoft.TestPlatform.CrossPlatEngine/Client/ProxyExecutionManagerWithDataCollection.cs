@@ -4,24 +4,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    /// <summary>
+
+    /// <summary>
     /// The proxy execution manager with data collection.
     /// </summary>
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
+        /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
         /// </summary>
+        /// <param name="testHostManager">
+        /// Test host manager for this operation.
+        /// </param>
         /// <param name="proxyDataCollectionManager">
         /// The proxy Data Collection Manager.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(IProxyDataCollectionManager proxyDataCollectionManager) : base()
+        public ProxyExecutionManagerWithDataCollection(ITestHostManager testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
@@ -46,10 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Ensure that the Execution component of engine is ready for execution usually by loading extensions.
         /// </summary>
-        /// <param name="testHostManager">
-        /// The test Host Manager.
-        /// </param>
-        public override void Initialize(ITestHostManager testHostManager)
+        public override void Initialize()
         {
             DataCollectionParameters dataCollectionParameters = null;
             try
@@ -87,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // todo : pass dataCollectionParameters.EnvironmentVariables while initializaing testhostprocess.
-            base.Initialize(testHostManager);
+            base.Initialize();
         }
 
         /// <summary>
@@ -116,17 +118,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return base.StartTestRun(testRunCriteria, currentEventHandler);
         }
 
-        /// <summary>
-        /// Cancels the test run.
-        /// </summary>
+        /// <inheritdoc/>
         public override void Cancel()
         {
             base.Cancel();
         }
 
-        public override void Dispose()
+        /// <inheritdoc/>
+        public override void Close()
         {
-            base.Dispose();
+            base.Close();
         }
     }
 
@@ -140,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public DataCollectionRunEventsHandler()
         {
-            this.ExceptionMessages = new List<string>();
+            this.ExceptionMessages = new List<string>();
         }
 
         /// <summary>
@@ -156,11 +157,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </param>
         /// <param name="message">
         /// The message.
-        /// </param>        public void HandleLogMessage(TestMessageLevel level, string message)
+        /// </param>
+        public void HandleLogMessage(TestMessageLevel level, string message)
         {
             this.ExceptionMessages.Add(message);
         }
-        /// <summary>
+
+        /// <summary>
         /// The handle raw message.
         /// </summary>
         /// <param name="rawMessage">

@@ -3,6 +3,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -31,12 +33,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         /// </summary>
         private int testableClientConnectionTimeout = 400;
 
-        [TestInitialize]
-        public void TestInit()
+        private DiscoveryCriteria discoveryCriteria;
+
+        public ProxyDiscoveryManagerTests()
         {
             this.mockTestHostManager = new Mock<ITestHostManager>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
-            this.testDiscoveryManager = new ProxyDiscoveryManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.testableClientConnectionTimeout);
+            this.testDiscoveryManager = new ProxyDiscoveryManager(
+                                            this.mockRequestSender.Object,
+                                            this.mockTestHostManager.Object,
+                                            this.testableClientConnectionTimeout);
+            this.discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
+
+            // Default setup test host manager as shared (desktop)
+            this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
         }
 
         [TestMethod]
@@ -45,7 +55,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             // Make sure TestPlugincache is refreshed.
             TestPluginCache.Instance = null;
 
-            this.testDiscoveryManager.Initialize(this.mockTestHostManager.Object);
+            this.testDiscoveryManager.Initialize();
 
             this.mockRequestSender.Verify(s => s.InitializeDiscovery(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
         }
@@ -64,7 +74,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
-                this.testDiscoveryManager.Initialize(this.mockTestHostManager.Object);
+                this.testDiscoveryManager.Initialize();
 
                 // Also verify that we have waited for client connection.
                 this.mockRequestSender.Verify(s => s.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
@@ -81,16 +91,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldNotIntializeIfDoneSoAlready()
         {
-            this.testDiscoveryManager.Initialize(this.mockTestHostManager.Object);
+            this.testDiscoveryManager.Initialize();
 
             // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(null, null);
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(null, It.IsAny<IList<string>>()), Times.AtMostOnce);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
         }
 
         [TestMethod]
@@ -100,10 +110,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(null, null);
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(null, It.IsAny<IList<string>>()), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
         }
 
         [TestMethod]
@@ -114,9 +124,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Act.
             Assert.ThrowsException<TestPlatformException>(
-                () => this.testDiscoveryManager.DiscoverTests(null, null));
+                () => this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null));
         }
-
 
         [TestMethod]
         public void DiscoverTestsShouldInitiateServerDiscoveryLoop()
@@ -125,31 +134,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
             // Act.
-            this.testDiscoveryManager.DiscoverTests(null, null);
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             // Assert.
-            this.mockRequestSender.Verify(s => s.DiscoverTests(null, null), Times.Once);
-        }
-
-        [TestMethod]
-        public void DiscoverTestsShouldEndSessionWithTheServer()
-        {
-            // Setup mocks.
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
-            // Act.
-            this.testDiscoveryManager.DiscoverTests(null, null);
-
-            // Assert.
-            this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
-        }
-
-        private void SignalEvent(ManualResetEvent manualResetEvent)
-        {
-            // Wait for the 100 ms.
-            Task.Delay(200).Wait();
-
-            manualResetEvent.Set();
+            this.mockRequestSender.Verify(s => s.DiscoverTests(It.IsAny<DiscoveryCriteria>(), null), Times.Once);
         }
     }
 }

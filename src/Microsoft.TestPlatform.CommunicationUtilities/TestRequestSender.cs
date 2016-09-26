@@ -136,6 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 EqtTrace.Error("Connection has been broken: not sending SessionEnd message");
                 return;
             }
+
             this.communicationManager.SendMessage(MessageType.SessionEnd);
         }
 
@@ -172,7 +173,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isTestRunComplete)
             {
-                
                 try
                 {
                     var rawMessage = this.communicationManager.ReceiveRawMessage();

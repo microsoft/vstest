@@ -89,6 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 return instance ?? (instance = new TestPluginCache());
             }
+
             internal set
             {
                 instance = value;

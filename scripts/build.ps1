@@ -246,7 +246,9 @@ function Create-NugetPackages
     $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec")
+    # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
+    $skipAnalysis = @("TestPlatform.CLI.nuspec")
     foreach ($file in $nuspecFiles) {
         Copy-Item $tpSrcDir\$file $stagingDir -Force
     }
@@ -255,8 +257,13 @@ function Create-NugetPackages
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
 
     foreach ($file in $nuspecFiles) {
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir
+        $additionalArgs = ""
+        if ($skipAnalysis -contains $file) {
+            $additionalArgs = "-NoPackageAnalysis"
+        }
+
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"

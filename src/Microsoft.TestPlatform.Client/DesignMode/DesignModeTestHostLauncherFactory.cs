@@ -4,10 +4,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Factory for providing the design mode test host launchers
@@ -21,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         public static ITestHostLauncher GetCustomHostLauncherForTestRun(IDesignModeClient designModeClient, TestRunRequestPayload testRunRequestPayload)
         {
             ITestHostLauncher testHostLauncher = null;
-            if(!testRunRequestPayload.DebuggingEnabled)
+            if (!testRunRequestPayload.DebuggingEnabled)
             {
                 testHostLauncher = defaultLauncher = defaultLauncher ?? new DesignModeTestHostLauncher(designModeClient);
             }

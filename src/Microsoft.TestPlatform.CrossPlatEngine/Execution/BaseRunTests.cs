@@ -275,7 +275,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 totalTests);
 
             stopwatch.Stop();
-            this.testPlatformEventSource.ExecutionStop(totalTests);
+            this.testPlatformEventSource.ExecutionStop(this.testRunCache.TotalExecutedTests);
             this.BeforeRaisingTestRunComplete(exceptionsHitDuringRunTests);
             return stopwatch.Elapsed;
         }

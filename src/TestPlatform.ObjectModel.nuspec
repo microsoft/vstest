@@ -11,6 +11,26 @@
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <copyright>Copyright © Microsoft Corporation</copyright>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6">
+      </group>
+      <group targetFramework=".NETStandard1.5">
+        <dependency id="NETStandard.Library" version="[1.6.0, )" />
+        <dependency id="System.Runtime.Serialization.Primitives" version="[4.1.1, )" />
+        <dependency id="System.Runtime.Extensions" version="[4.1.0, )" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="[4.0.1, )" />
+        <dependency id="System.ComponentModel.EventBasedAsync" version="[4.0.11, )" />
+        <dependency id="System.Runtime.InteropServices" version="[4.1.0, )" />
+        <dependency id="System.IO.FileSystem" version="[4.0.1, )" />
+        <dependency id="System.ComponentModel.TypeConverter" version="[4.1.0, )" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="[4.2.0, )" />
+        <dependency id="System.Runtime.Serialization.Json" version="[4.0.2, )" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Xml" targetFramework=".NETFramework4.6" />
+      <frameworkAssembly assemblyName="System.Runtime.Serialization" targetFramework=".NETFramework4.6" />
+    </frameworkAssemblies>
   </metadata>
   <files>	
     <file src="net46\win7-x64\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net46\" />

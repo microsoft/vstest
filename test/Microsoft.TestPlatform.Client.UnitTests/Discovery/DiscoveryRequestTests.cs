@@ -1,15 +1,20 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
 {
-    using Client.Discovery;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
-    using ObjectModel.Client;
-    using ObjectModel.Engine;
     using System;
     using System.Collections.Generic;
-    
+    using System.Linq;
+
+    using Client.Discovery;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
+    using ObjectModel;
+    using ObjectModel.Client;
+    using ObjectModel.Engine;
+
     [TestClass]
     public class DiscoveryRequestTests
     {
@@ -17,85 +22,94 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
         Mock<IProxyDiscoveryManager> discoveryManager;
         DiscoveryCriteria discoveryCriteria;
 
-        [TestInitialize]
-        public void TestInit()
+        public DiscoveryRequestTests()
         {
-            discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
-            discoveryManager = new Mock<IProxyDiscoveryManager>();
-            discoveryRequest = new DiscoveryRequest(discoveryCriteria, discoveryManager.Object);
+            this.discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
+            this.discoveryManager = new Mock<IProxyDiscoveryManager>();
+            this.discoveryRequest = new DiscoveryRequest(this.discoveryCriteria, this.discoveryManager.Object);
         }
         
         [TestMethod]
         public void ConstructorSetsDiscoveryCriteriaAndDiscoveryManager()
         {
-            Assert.AreEqual(discoveryCriteria, discoveryRequest.DiscoveryCriteria);
-            Assert.AreEqual(discoveryManager.Object, (discoveryRequest as DiscoveryRequest).DiscoveryManager);
+            Assert.AreEqual(this.discoveryCriteria, this.discoveryRequest.DiscoveryCriteria);
+            Assert.AreEqual(this.discoveryManager.Object, (this.discoveryRequest as DiscoveryRequest).DiscoveryManager);
         }
 
         [TestMethod]
         public void DiscoveryAsycIfDiscoveryRequestIsDisposedThrowsObjectDisposedException()
         {
-            discoveryRequest.Dispose();
+            this.discoveryRequest.Dispose();
             
-            Assert.ThrowsException<ObjectDisposedException>(() => discoveryRequest.DiscoverAsync());
+            Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.DiscoverAsync());
         }
 
         [TestMethod]
         public void DiscoverAsyncSetsDiscoveryInProgressAndCallManagerToDiscoverTests()
         {
-            discoveryRequest.DiscoverAsync();
+            this.discoveryRequest.DiscoverAsync();
 
-            Assert.IsTrue((discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
-            discoveryManager.Verify(dm => dm.DiscoverTests(discoveryCriteria, discoveryRequest as DiscoveryRequest), Times.Once);
+            Assert.IsTrue((this.discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
+            this.discoveryManager.Verify(dm => dm.DiscoverTests(this.discoveryCriteria, this.discoveryRequest as DiscoveryRequest), Times.Once);
         }
 
         [TestMethod]
         public void DiscoveryAsyncIfDiscoverTestsThrowsExceptionSetsDiscoveryInProgressToFalseAndThrowsThatException()
         {
-            discoveryManager.Setup(dm => dm.DiscoverTests(discoveryCriteria, discoveryRequest as DiscoveryRequest)).Throws(new Exception("DummyException"));
+            this.discoveryManager.Setup(dm => dm.DiscoverTests(this.discoveryCriteria, this.discoveryRequest as DiscoveryRequest)).Throws(new Exception("DummyException"));
             try
             {
-                discoveryRequest.DiscoverAsync();
+                this.discoveryRequest.DiscoverAsync();
             }
             catch (Exception ex)
             {
                 Assert.IsTrue(ex is Exception);
                 Assert.AreEqual("DummyException", ex.Message);
-                Assert.IsFalse((discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
+                Assert.IsFalse((this.discoveryRequest as DiscoveryRequest).DiscoveryInProgress);
             }
         }
 
         [TestMethod]
         public void AbortIfDiscoveryRequestDisposedShouldThrowObjectDisposedException()
         {
-            discoveryRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => discoveryRequest.Abort());
+            this.discoveryRequest.Dispose();
+            Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.Abort());
         }
 
         [TestMethod]
         public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort()
         {
             // Just to set the IsDiscoveryInProgress flag
-            discoveryRequest.DiscoverAsync();
+            this.discoveryRequest.DiscoverAsync();
 
-            discoveryRequest.Abort();
-            discoveryManager.Verify(dm => dm.Abort(), Times.Once);
+            this.discoveryRequest.Abort();
+            this.discoveryManager.Verify(dm => dm.Abort(), Times.Once);
         }
 
 
         [TestMethod]
         public void AbortIfDiscoveryIsNotInProgressShouldNotCallDiscoveryManagerAbort()
         {
-            //DiscoveryAsyn has not been called, discoveryInProgress should be false
-            discoveryRequest.Abort();
-            discoveryManager.Verify(dm => dm.Abort(), Times.Never);
+            // DiscoveryAsyn has not been called, discoveryInProgress should be false
+            this.discoveryRequest.Abort();
+            this.discoveryManager.Verify(dm => dm.Abort(), Times.Never);
         }
 
         [TestMethod]
         public void WaitForCompletionIfDiscoveryRequestDisposedShouldThrowObjectDisposedException()
         {
-            discoveryRequest.Dispose();
-            Assert.ThrowsException<ObjectDisposedException>(() => discoveryRequest.WaitForCompletion());
+            this.discoveryRequest.Dispose();
+            Assert.ThrowsException<ObjectDisposedException>(() => this.discoveryRequest.WaitForCompletion());
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldCloseDiscoveryManager()
+        {
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler;
+
+            eventsHandler.HandleDiscoveryComplete(1, Enumerable.Empty<TestCase>(), false);
+
+            this.discoveryManager.Verify(dm => dm.Close(), Times.Once);
         }
     }
 }

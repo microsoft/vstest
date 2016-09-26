@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             var xml = navigator.OuterXml;
 
-            StringAssert.Contains(xml, "<TargetFrameworkVersion>.NETFramework,Version=v4.6</TargetFrameworkVersion>");
+            StringAssert.Contains(xml, $"<TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion>");
         }
 
         [TestMethod]
@@ -161,7 +161,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             var xml = navigator.OuterXml;
 
             StringAssert.Contains(xml, "<TargetPlatform>X64</TargetPlatform>");
-            StringAssert.Contains(xml, "<TargetFrameworkVersion>.NETFramework,Version=v4.6</TargetFrameworkVersion>");
+            StringAssert.Contains(xml, $"<TargetFrameworkVersion>{Framework.DefaultFramework.Name}</TargetFrameworkVersion>");
             StringAssert.Contains(xml, "<ResultsDirectory>temp</ResultsDirectory>");
         }
 
@@ -174,7 +174,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
 
             var xml = navigator.OuterXml;
-            var expectedRunSettings = "<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>temp</ResultsDirectory>\r\n    <TargetPlatform>X64</TargetPlatform>\r\n    <TargetFrameworkVersion>.NETFramework,Version=v4.6</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>";
+            var expectedRunSettings = string.Format("<RunSettings>\r\n  <RunConfiguration>\r\n    <ResultsDirectory>temp</ResultsDirectory>\r\n    <TargetPlatform>X64</TargetPlatform>\r\n    <TargetFrameworkVersion>{0}</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n</RunSettings>", Framework.DefaultFramework.Name);
 
             Assert.AreEqual(expectedRunSettings, xml);
         }
