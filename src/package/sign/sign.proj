@@ -75,6 +75,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\testhost.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\vstest.console.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.Build.dll" />
 
       <!-- NetCoreExtensions -->
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />

@@ -1,0 +1,31 @@
+﻿{
+  "version": "15.0.0-*",
+  "buildOptions": {
+    "outputName": "Microsoft.TestPlatform.Build",
+    "delaySign": true,
+    "keyFile": "../../scripts/key.snk",
+    "warningsAsErrors": true,
+    "copyToOutput": {
+      "include": [
+        "Microsoft.TestPlatform.targets"
+      ]
+    }
+  },
+
+  "dependencies": {
+    "Microsoft.Build.Framework": "14.3.0",
+    "Microsoft.Build.Utilities.Core": "14.3.0",
+    "System.AppContext": "4.1.0"
+  },
+
+  "frameworks": {
+    "netstandard1.3": {
+      "imports": [
+        "dnxcore50",
+        "portable-net45+win8",
+        "portable-net45+wp80+win8+wpa81+dnxcore50"
+      ]
+    },
+    "net46":  {} 
+  }
+}
