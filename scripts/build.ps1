@@ -11,7 +11,11 @@ Param(
     [Parameter(Mandatory=$false)]
     [ValidateSet("win7-x64", "win7-x86")]
     [Alias("r")]
-    [System.String] $TargetRuntime = "win7-x64"
+    [System.String] $TargetRuntime = "win7-x64",
+
+    [Parameter(Mandatory=$false)]
+    [Alias("v")]
+    [System.String] $Version = "dev"
 )
 
 $ErrorActionPreference = "Stop"
@@ -45,6 +49,7 @@ $TPB_TargetFramework = "net46"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
+$TPB_Version = $Version
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -77,7 +82,7 @@ function Install-DotNetCli
     $dotnetInstallRemoteScript = "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1"
     $dotnetInstallScript = Join-Path $env:TP_TOOLS_DIR "dotnet-install.ps1"
     if (-not (Test-Path $env:TP_TOOLS_DIR)) {
-        New-Item $env:TP_TOOLS_DIR -Type Directory
+        New-Item $env:TP_TOOLS_DIR -Type Directory | Out-Null
     }
 
     (New-Object System.Net.WebClient).DownloadFile($dotnetInstallRemoteScript, $dotnetInstallScript)
@@ -129,8 +134,8 @@ function Invoke-Build
                 #Write-Log ".. .. Build: Complete."
             #}
         #}
-        Write-Verbose "$dotnetExe build $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime"
-        & $dotnetExe build $_ $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime
+        Write-Verbose "$dotnetExe build $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_Version"
+        & $dotnetExe build $_ $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_Version
 
         if ($lastExitCode -ne 0) {
             Set-ScriptFailed
@@ -150,7 +155,6 @@ function Publish-Package
     $testHostProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost"
     $vstestConsoleProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\vstest.console"
     $dataCollectorProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector"
-    $buildTasksProjectsDirectory = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Build"
 
     Write-Log ".. Package: Publish package\project.json"
     
@@ -173,8 +177,10 @@ function Publish-Package
     Write-Verbose "$dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
     & $dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
 
-    Write-Log ".. Package: Publish src\Microsoft.TestPlatform.Build\project.json"
-    Copy-Item "$buildTasksProjectsDirectory\bin\$TPB_Configuration\netstandard1.3\*.*" $coreCLRPackageDir
+    # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
+    Copy-PackageItems "Microsoft.TestPlatform.Build"
+    #Copy-PackageItems "Microsoft.TestPlatform.ObjectModel"
+    #Copy-PackageItems "TestHost"
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
@@ -185,8 +191,8 @@ function Publish-Package
     $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
     $coreCLRExtensionsDir = Join-Path $coreCLRPackageDir $extensions_Dir
     # Create an extensions directory.
-    New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force
-    New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force
+    New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force | Out-Null
+    New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force | Out-Null
 
     # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
     # Ideally we should just be publishing the loggers to the Extensions folder.
@@ -202,7 +208,7 @@ function Publish-Package
     # Copy over the Core CLR built assemblies to the Full CLR package folder.
     $netCore_Dir = "NetCore"
     $coreDestDir = Join-Path $fullCLRPackageDir $netCore_Dir
-    New-Item -ItemType directory -Path $coreDestDir -Force
+    New-Item -ItemType directory -Path $coreDestDir -Force | Out-Null
     Copy-Item -Recurse $coreCLRPackageDir\* $coreDestDir -Force
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
@@ -271,6 +277,21 @@ function Create-NugetPackages
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Copy-PackageItems($packageName)
+{
+    # Packages published separately are copied into their own artifacts directory
+    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net46\* is copied
+    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net46
+    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration", "*.*")
+    $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
+    Write-Log "Copy-PackageItems: Package: $packageName"
+    Write-Verbose "Create $publishDirectory"
+    New-Item -ItemType directory -Path $publishDirectory -Force | Out-Null
+
+    Write-Verbose "Copy binaries for package '$packageName' from '$binariesDirectory' to '$publishDirectory'"
+    Copy-Item -Path $binariesDirectory -Destination $publishDirectory -Recurse -Force
 }
 
 #

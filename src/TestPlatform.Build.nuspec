@@ -13,7 +13,7 @@
     <copyright>Copyright © Microsoft Corporation</copyright>
   </metadata>
   <files>
-    <file src="net46\win7-x64\NetCore\Microsoft.TestPlatform.Build.dll" target="lib\netstandard1.3\" />
-    <file src="net46\win7-x64\NetCore\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.Build.dll" target="lib\netstandard1.3\" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
   </files>
 </package>
