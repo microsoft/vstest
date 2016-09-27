@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
         static TestObject()
         {
-            // Do TypeConverter registration only once to avoid multiple registrations
+            // Do TypeConverter registrations in static constructor only to avoid multiple registrations
             // If we register too much, deserialization of large number of testobjects will cause StackOverflow exception
             TypeDescriptor.AddAttributes(typeof(Guid), new TypeConverterAttribute(typeof(CustomGuidConverter)));
             TypeDescriptor.AddAttributes(typeof(KeyValuePair<string, string>[]), new TypeConverterAttribute(typeof(CustomKeyValueConverter)));
