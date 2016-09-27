@@ -51,12 +51,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         }
 
         [TestMethod]
-        public void GetExecutionManagerShouldReturnCachedInstance()
+        public void GetExecutionManagerShouldReturnNewInstance()
         {
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100);
             var executionManager = this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria);
 
-            Assert.AreSame(executionManager, this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
+            Assert.AreNotSame(executionManager, this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
         }
 
         [TestMethod]

@@ -24,9 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         #region Private Fields
 
         private IProxyDiscoveryManager proxyDiscoveryManager;
-        private IProxyExecutionManager proxyExecutionManager;
         private ITestExtensionManager testExtensionManager;
-        private IParallelProxyExecutionManager parallelProxyExecutionManager;
 
         #endregion
 
@@ -67,20 +65,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (parallelLevel > 1)
             {
-                if (parallelProxyExecutionManager == null)
-                {
-                    parallelProxyExecutionManager = new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel);
-                }
-                else
-                {
-                    parallelProxyExecutionManager.UpdateParallelLevel(parallelLevel);
-                }
-
-                return parallelProxyExecutionManager;
+                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel);
             }
             else
             {
-                return this.proxyExecutionManager ?? (this.proxyExecutionManager = proxyExecutionManagerCreator());
+                return proxyExecutionManagerCreator();
             }
         }
 
