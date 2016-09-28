@@ -68,6 +68,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
 
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\DataCollector.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CommunicationUtilities.dll" />
