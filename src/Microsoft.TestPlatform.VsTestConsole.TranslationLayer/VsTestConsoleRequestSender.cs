@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
@@ -18,6 +16,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
@@ -118,7 +117,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 AbortDiscoveryOperation(eventHandler, exception);
-                throw;
             }
         }
 
@@ -140,7 +138,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 AbortRunOperation(runEventsHandler, exception);
-                throw;
             }
         }
 
@@ -241,7 +238,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         public void AbortTestRun()
         {
-            //set signal to unblock discovery or run operation's ListenAndReportTestResults from reading stream
+            //Set signal to unblock discovery or run operation's ListenAndReportTestResults from reading stream
             operationAborted?.Set();
         }
 
@@ -309,43 +306,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             while (!isDiscoveryComplete)
                 try
                 {
-                    // reader should not wait indefinate when vstestconsole exit
-                    var messageReceivedEvent = new ManualResetEvent(false);
-                    Message message = null;
-                    var cancellationTokenSource = new CancellationTokenSource();
-                    var cancellationToken = cancellationTokenSource.Token;
-
-                    Task.Factory.StartNew(() =>
-                    {
-                        try
-                        {
-                            message = communicationManager.ReceiveMessage();
-                            messageReceivedEvent.Set();
-                        }
-                        catch (Exception exception)
-                        {
-                            AbortDiscoveryOperation(eventHandler, exception);
-                        }
-                    }, cancellationToken);
-
-                    WaitHandle[] waitHandles = { messageReceivedEvent, operationAborted };
-                    var index = WaitHandle.WaitAny(waitHandles);
-
-                    if (index == 1) //singnal from abort
-                    {
-                        cancellationTokenSource.Cancel();
-                        throw new Exception("Process exited or socket failure");
-                    }
+                    var message = ReceiveMessageWithListeningToAbortTestRun(exception => this.AbortDiscoveryOperation(eventHandler, exception));
+                    
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
-                        var testCases = dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
+                        var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
 
                         eventHandler.HandleDiscoveredTests(testCases);
                     }
                     else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                     {
                         var discoveryCompletePayload =
-                            dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                            this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
                         eventHandler.HandleDiscoveryComplete(discoveryCompletePayload.TotalTests,
                             discoveryCompletePayload.LastDiscoveredTests, discoveryCompletePayload.IsAborted);
@@ -353,15 +325,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
-                        var testMessagePayload = dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
                         eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
                     }
                 }
                 catch (Exception ex)
                 {
-                    EqtTrace.Error(
-                        "VsTestConsoleRequestSender: TestDiscovery: Message Deserialization failed with {0}", ex);
-                    AbortDiscoveryOperation(eventHandler, ex);
+                    EqtTrace.Error("VsTestConsoleRequestSender: TestDiscovery: Message Deserialization failed with {0}", ex);
+                    this.AbortDiscoveryOperation(eventHandler, ex);
                     isDiscoveryComplete = true;
                 }
         }
@@ -375,42 +346,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             while (!isTestRunComplete)
                 try
                 {
-                    // reader should not wait indefinate when vstestconsole exit
-                    var messageReceivedEvent = new ManualResetEvent(false);
-                    Message message = null;
-                    var cancellationTokenSource = new CancellationTokenSource();
-                    var cancellationToken = cancellationTokenSource.Token;
-
-                    Task.Factory.StartNew(() =>
-                    {
-                        try
-                        {
-                            message = communicationManager.ReceiveMessage();
-                            messageReceivedEvent.Set();
-                        }
-                        catch (Exception exception)
-                        {
-                            AbortRunOperation(eventHandler, exception);
-                        }
-                    }, cancellationToken);
-
-                    WaitHandle[] waitHandles = { messageReceivedEvent, operationAborted };
-                    var index = WaitHandle.WaitAny(waitHandles);
-
-                    if (index == 1) //singnal from abort
-                    {
-                        cancellationTokenSource.Cancel();
-                        throw new Exception("Process exited or socket failure");
-                    }
+                    var message = ReceiveMessageWithListeningToAbortTestRun(exception => this.AbortRunOperation(eventHandler, exception));
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
-                        var testRunChangedArgs = dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
+                        var testRunChangedArgs = this.dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
                         eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
                     }
                     else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
                     {
-                        var testRunCompletePayload = dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                        var testRunCompletePayload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
                         eventHandler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
@@ -421,28 +366,59 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
-                        var testMessagePayload = dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
                         eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        var testProcessStartInfo = dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
+                        var testProcessStartInfo = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
 
                         var processId = customHostLauncher != null
                             ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
                             : -1;
-                        communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, processId);
+                        this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, processId);
                     }
                 }
                 catch (Exception exception)
                 {
-                    EqtTrace.Error(
-                        "VsTestConsoleRequestSender: TestExecution: Error Processing Request from DesignModeClient: {0}",
-                        exception);
+                    EqtTrace.Error("VsTestConsoleRequestSender: TestExecution:"+
+                        " Error Processing Request from DesignModeClient: {0}",exception);
                     // notify of a test run complete and bail out.
-                    AbortRunOperation(eventHandler, exception);
+                    this.AbortRunOperation(eventHandler, exception);
                     isTestRunComplete = true;
                 }
+        }
+
+        private Message ReceiveMessageWithListeningToAbortTestRun(Action<Exception> abortOperation)
+        {
+            // Reader should not wait indefinately when vstestconsole exit
+            var messageReceivedEvent = new ManualResetEvent(false);
+            Message message = null;
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    message = communicationManager.ReceiveMessage();
+                    messageReceivedEvent.Set();
+                }
+                catch (Exception exception)
+                {
+                    abortOperation(exception);
+                }
+            }, cancellationToken);
+
+            WaitHandle[] waitHandles = {messageReceivedEvent, operationAborted};
+            var index = WaitHandle.WaitAny(waitHandles);
+
+            if (index == 1) //Signal from abort
+            {
+                cancellationTokenSource.Cancel();
+                throw new Exception("Process exited or socket failure");
+            }
+            return message;
         }
 
         private void AbortRunOperation(ITestRunEventsHandler eventHandler, Exception exception)

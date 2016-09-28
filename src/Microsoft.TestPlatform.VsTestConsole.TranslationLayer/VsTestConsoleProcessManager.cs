@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool vstestConsoleStarted = false;
 
-        private bool vstestConsoleCrashed = false;
+        private bool vstestConsoleExited = false;
 
         private Process process;
 
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             lock (syncObject)
             {
-                return this.vstestConsoleStarted && !vstestConsoleCrashed &&
+                return this.vstestConsoleStarted && !vstestConsoleExited &&
                        this.process != null;
             }
         }
@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             lock (syncObject)
             {
-                vstestConsoleCrashed = false;
+                vstestConsoleExited = false;
                 vstestConsoleStarted = true;
             }
         }
@@ -81,6 +81,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             if (IsProcessInitialized())
             {
                 this.process.Kill();
+                this.process.Dispose();
             }
         }
 
@@ -88,7 +89,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             lock (syncObject)
             {
-                vstestConsoleCrashed = true;
+                vstestConsoleExited = true;
                 this.ProcessExited?.Invoke(sender, e);
             }
         }

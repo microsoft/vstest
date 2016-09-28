@@ -25,8 +25,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private MockProcessManager mockProcessManager;
 
-        
-
         [TestInitialize]
         public void TestInit()
         {
@@ -107,7 +105,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.consoleWrapper.InitializeExtensions(pathToExtensions);
 
             mockRequestSender.Verify( rs => rs.InitializeExtensions(pathToExtensions), Times.Exactly(3));
-
         }
 
         [TestMethod]

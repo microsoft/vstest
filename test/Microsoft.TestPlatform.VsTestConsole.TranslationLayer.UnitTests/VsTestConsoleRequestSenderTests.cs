@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System.IO;
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -21,6 +19,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
 
     using Moq;
 
@@ -387,7 +386,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Callback(() =>
             {
                 this.requestSender.AbortTestRun();
-                Thread.Sleep(30 * 1000);
             }).Returns(testsFound);
 
             mockHandler.Setup(mh => mh.HandleDiscoveryComplete(-1, null, true)).Callback(() => manualEvent.Set());
