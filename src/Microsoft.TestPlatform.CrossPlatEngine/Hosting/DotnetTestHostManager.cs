@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -77,6 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // This host manager can create process start info for dotnet core targets only.
             // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
             var startInfo = new TestProcessStartInfo { FileName = "dotnet" };
+
             var testHostExecutable = Path.Combine("NetCore", "testhost.dll");
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
             var testRunnerDirectory = Path.GetDirectoryName(currentProcessPath);
@@ -86,6 +88,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 startInfo.FileName = currentProcessPath;
                 testHostExecutable = "testhost.dll";
                 testRunnerDirectory = this.processHelper.GetTestEngineDirectory();
+            }
+            else
+            {
+                startInfo.FileName = GetDotnetHostFullPath();
             }
 
             // .NET core host manager is not a shared host. It will expect a single test source to be provided.
@@ -128,6 +134,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             startInfo.WorkingDirectory = sourceDirectory;
 
             return startInfo;
+        }
+
+        /// <summary>
+        /// Get full path for the dotnet host
+        /// </summary>
+        /// <returns></returns>
+        private string GetDotnetHostFullPath()
+        {
+            char separator = ';'; 
+            var dotnetExeName = "dotnet.exe";
+
+            // Use semicolon(;) as path separator for windows
+            // colon(:) for Linux and OSX
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                separator = ':';
+                dotnetExeName = "dotnet";
+            }
+
+            var pathString = Environment.GetEnvironmentVariable("PATH");
+            foreach (string path in pathString.Split(separator))
+            {
+                string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
+                if (fileHelper.Exists(exeFullPath))
+                {
+                    return exeFullPath;
+                }
+            }
+
+            EqtTrace.Error("Unable to find path for dotnet host");
+            return dotnetExeName;
         }
 
         /// <inheritdoc/>
