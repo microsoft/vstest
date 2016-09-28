@@ -65,6 +65,8 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
 
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\DataCollector.dll" />

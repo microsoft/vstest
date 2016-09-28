@@ -45,7 +45,13 @@ function Verify-Signature
                     Write-Log "Valid: $($_.FullName)"
                 }
                 else {
-                    Write-FailLog "Incorrect certificate. File: $($_.FullName). Certificate: $($signature.SignerCertificate.Thumbprint)."
+                    # For legacy components, sign certificate is always "prod" signature. Skip such binaries.
+                    if ($signature.SignerCertificate.Thumbprint -eq "98ED99A67886D020C564923B7DF25E9AC019DF26") {
+                        Write-Log "Valid (Prod Signed): $($_.FullName)."
+                    }
+                    else {
+                        Write-FailLog "Incorrect certificate. File: $($_.FullName). Certificate: $($signature.SignerCertificate.Thumbprint)."
+                    }
                 }
             }
             else {
