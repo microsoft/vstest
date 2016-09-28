@@ -13,35 +13,59 @@ namespace Microsoft.TestPlatform.Build.Tasks
         private const string vsTestAppName = "vstest.console.dll";
         private readonly List<string> allArgs = new List<string>();
 
+        private bool traceEnabled;
+
         public VSTestForwardingApp(IEnumerable<string> argsToForward)
         {
             this.allArgs.Add("exec");
-            this.allArgs.Add(this.GetVSTestExePath());
+            this.allArgs.Add(GetVSTestExePath());
             this.allArgs.AddRange(argsToForward);
+
+            var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_TRACE_BUILD");
+            this.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
         }
 
         public int Execute()
         {
             var processInfo = new ProcessStartInfo
+                                  {
+                                      FileName = hostExe,
+                                      // ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(allArgs),
+                                      Arguments = string.Join(" ", this.allArgs),
+                                      UseShellExecute = false,
+                                      CreateNoWindow = true,
+                                      RedirectStandardError = true,
+                                      RedirectStandardOutput = true
+                                  };
+
+            this.Trace("VSTest: Starting vstest.console...");
+            this.Trace("VSTest: Arguments: " + processInfo.Arguments);
+
+            using (var process = new Process { StartInfo = processInfo })
             {
-                FileName = hostExe,
-                Arguments = string.Join(" ", this.allArgs), // ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(allArgs),
-                UseShellExecute = false
-            };
+                process.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
 
-            var process = new Process { StartInfo = processInfo };
+                process.Start();
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
 
-            process.Start();
-            process.WaitForExit();
-
-            return process.ExitCode;
+                process.WaitForExit();
+                this.Trace("VSTest: Exit code: " + process.ExitCode);
+                return process.ExitCode;
+            }
         }
 
-        private string GetVSTestExePath()
+        private static string GetVSTestExePath()
         {
             return Path.Combine(AppContext.BaseDirectory, vsTestAppName);
         }
+
+        private void Trace(string message)
+        {
+            if (this.traceEnabled)
+            {
+                Console.WriteLine(message);
+            }
+        }
     }
-
-
 }

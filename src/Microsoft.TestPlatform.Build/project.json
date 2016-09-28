@@ -15,7 +15,8 @@
   "dependencies": {
     "Microsoft.Build.Framework": "14.3.0",
     "Microsoft.Build.Utilities.Core": "14.3.0",
-    "System.AppContext": "4.1.0"
+    "System.AppContext": "4.1.0",
+    "System.Console": "4.0.0" 
   },
 
   "frameworks": {

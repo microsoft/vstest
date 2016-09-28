@@ -4,6 +4,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System.Collections.Generic;
 
+    using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
     public class VSTestTask : Task
@@ -76,12 +77,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
         public override bool Execute()
         {
             var vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
-
             vsTestForwardingApp.Execute();
             return true;
         }
 
-        private string AddDoubleQoutes(string x)
+        private string AddDoubleQuotes(string x)
         {
             return "\"" + x + "\"";
         }
@@ -90,9 +90,10 @@ namespace Microsoft.TestPlatform.Build.Tasks
         {
             var allArgs = new List<string>();
 
+            // TODO log arguments in task
             if (!string.IsNullOrEmpty(this.VSTestSetting))
             {
-                allArgs.Add("--settings:" + this.AddDoubleQoutes(this.VSTestSetting));
+                allArgs.Add("--settings:" + this.AddDoubleQuotes(this.VSTestSetting));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTests))
@@ -102,7 +103,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestTestAdapterPath))
             {
-                allArgs.Add("--testAdapterPath:" + this.AddDoubleQoutes(this.VSTestTestAdapterPath));
+                allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(this.VSTestTestAdapterPath));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestPlatform))
@@ -112,12 +113,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
-                allArgs.Add("--framework:" + this.AddDoubleQoutes(this.VSTestFramework));
+                allArgs.Add("--framework:" + this.AddDoubleQuotes(this.VSTestFramework));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
             {
-                allArgs.Add("--testCaseFilter:" + this.AddDoubleQoutes(this.VSTestTestCaseFilter));
+                allArgs.Add("--testCaseFilter:" + this.AddDoubleQuotes(this.VSTestTestCaseFilter));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestLogger))
@@ -132,7 +133,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestListTests))
             {
-                allArgs.Add("--listTests:" + this.VSTestListTests);
+                allArgs.Add("--listTests");
             }
 
             if (!string.IsNullOrEmpty(this.VSTestParentProcessId))
@@ -143,6 +144,15 @@ namespace Microsoft.TestPlatform.Build.Tasks
             if (!string.IsNullOrEmpty(this.VSTestPort))
             {
                 allArgs.Add("--port:" + this.VSTestPort);
+            }
+
+            if (string.IsNullOrEmpty(this.TestFileFullPath))
+            {
+                this.Log.LogError("Test file path cannot be empty or null.");
+            }
+            else
+            {
+                allArgs.Add(this.AddDoubleQuotes(this.TestFileFullPath));
             }
 
             return allArgs;
