@@ -6,7 +6,11 @@ Param(
     [Parameter(Mandatory=$false)]
     [ValidateSet("Debug", "Release")]
     [Alias("c")]
-    [System.String] $Configuration = "Debug"
+    [System.String] $Configuration = "Debug",
+
+    [Parameter(Mandatory=$true)]
+    [Alias("cert")]
+    [System.String] $Certificate
 )
 
 $ErrorActionPreference = "Continue"
@@ -23,7 +27,7 @@ $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 #
 # Authenticode signature details
 Write-Verbose "Setup build configuration."
-$TPB_SignCertificate = "98ED99A67886D020C564923B7DF25E9AC019DF26"
+$TPB_SignCertificate = $Certificate
 $TPB_Configuration = $Configuration
 $TPB_AssembliesPattern = @("*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe", "Microsoft.TestPlatform.Build.dll")
 
