@@ -9,7 +9,7 @@ Param(
     [System.String] $Configuration = "Debug"
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 #
 # Variables
@@ -66,13 +66,10 @@ function Write-Log ([string] $message)
 
 function Write-FailLog ([string] $message)
 {
-    $currentColor = $Host.UI.RawUI.ForegroundColor
-    $Host.UI.RawUI.ForegroundColor = "Red"
     if ($message)
     {
-        Write-Output "... $message"
+        Write-Error "... $message"
     }
-    $Host.UI.RawUI.ForegroundColor = $currentColor
 }
 
 Verify-Signature
