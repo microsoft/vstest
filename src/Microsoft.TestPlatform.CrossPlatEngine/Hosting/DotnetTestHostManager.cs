@@ -17,6 +17,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System.Runtime.InteropServices;
 
+    using Microsoft.Extensions.DependencyModel;
+
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
     /// </summary>
@@ -134,6 +136,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             startInfo.WorkingDirectory = Directory.GetCurrentDirectory();
 
             return startInfo;
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+        {
+            var sourceFile = sources.Single();
+            var depsFile = Path.ChangeExtension(sourceFile, ".deps.json");
+
+            if (this.fileHelper.Exists(depsFile))
+            {
+                using (var stream = this.fileHelper.GetStream(depsFile, FileMode.Open))
+                using (var reader = new DependencyContextJsonReader())
+                {
+                    foreach (var lib in reader.Read(stream).CompileLibraries)
+                    {
+                        foreach (var assembly in lib.Assemblies)
+                        {
+                            if (assembly.EndsWith("TestAdapter.dll", StringComparison.OrdinalIgnoreCase))
+                            {
+                                yield return assembly;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <inheritdoc/>

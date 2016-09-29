@@ -133,6 +133,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                        };
         }
 
+        /// <inheritdoc/>
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+        {
+            // Default test host manager doesn't provide custom acquisition or discovery of
+            // test platform extensions.
+            return Enumerable.Empty<string>();
+        }
+
         /// <summary>
         /// Register for the exit event.
         /// </summary>

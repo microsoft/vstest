@@ -8,7 +8,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -24,13 +23,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ProxyExecutionManagerTests
     {
-        private ProxyExecutionManager testExecutionManager;
+        private readonly ProxyExecutionManager testExecutionManager;
 
-        private Mock<ITestHostManager> mockTestHostManager;
+        private readonly Mock<ITestHostManager> mockTestHostManager;
 
-        private Mock<ITestRequestSender> mockRequestSender;
+        private readonly Mock<ITestRequestSender> mockRequestSender;
 
-        private Mock<TestRunCriteria> mockTestRunCriteria;
+        private readonly Mock<TestRunCriteria> mockTestRunCriteria;
 
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
@@ -97,6 +96,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.Initialize();
 
             this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void InitializeShouldQueryTestHostManagerForExtensions()
+        {
+            TestPluginCache.Instance = null;
+            try
+            {
+                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "e1.dll" });
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
+
+                this.testExecutionManager.Initialize();
+
+                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "e1.dll" }, true), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
         }
 
         [TestMethod]

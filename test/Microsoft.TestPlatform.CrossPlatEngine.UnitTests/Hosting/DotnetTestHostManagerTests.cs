@@ -6,6 +6,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -17,6 +18,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
     using Moq;
     using System.Runtime.InteropServices;
+    using System.Text;
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -272,7 +274,36 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             Assert.AreEqual(Directory.GetCurrentDirectory(), startInfo.WorkingDirectory);
         }
-        
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnEmptySetIfDepsFileDoesNotExist()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource);
+
+            Assert.AreEqual(0, extensions.Count());
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnLibariesFromDepsFile()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.GetStream(It.IsAny<string>(), FileMode.Open)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(GetDepsJsonWithAdapters())));
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource);
+
+            CollectionAssert.AreEqual(new[] { "lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll" }, extensions.ToArray());
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnEmptySetIfDepsFileDoesNotContainAdapters()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.GetStream(It.IsAny<string>(), FileMode.Open)).Returns(new MemoryStream(Encoding.UTF8.GetBytes(GetDepsJsonWithoutAdapters())));
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource);
+
+            Assert.AreEqual(0, extensions.Count());
+        }
+
         private string GetTesthostPath(string engineDirectory)
         {
             // testhost.dll will be picked up from the same path as vstest.console.dll. In the test, we are setting up
@@ -287,6 +318,122 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 null,
                 this.defaultConnectionInfo);
             return startInfo;
+        }
+        
+        private static string GetDepsJsonWithAdapters()
+        {
+            return @"{
+  ""runtimeTarget"": {
+    ""name"": "".NETCoreApp,Version=v1.0"",
+    ""signature"": ""dfbd9da59ce8f74f37ec2fcab3d503ffcce2c75e""
+  },
+  ""compilationOptions"": {},
+  ""targets"": {
+    "".NETCoreApp,Version=v1.0"": {
+      ""netcore-test/1.0.0"": {
+        ""dependencies"": {
+          ""MSTest.TestAdapter"": ""1.1.2-preview"",
+          ""MSTest.TestFramework"": ""1.0.4-preview""
+        },
+        ""runtime"": {
+          ""netcore-test.dll"": {}
+        },
+        ""compile"": {
+          ""netcore-test.dll"": {}
+        }
+      },
+      ""mstest.testadapter/1.1.2-preview"": {
+        ""runtime"": {
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll"": {},
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll"": {},
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll"": {}
+        },
+        ""compile"": {
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll"": {},
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll"": {},
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll"": {}
+        }
+      },
+      ""mstest.testframework/1.0.4-preview"": {
+        ""runtime"": {
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.dll"": {}
+        },
+        ""compile"": {
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.dll"": {}
+        }
+      }
+    }
+  },
+  ""libraries"": {
+    ""netcore-test/1.0.0"": {
+      ""type"": ""project"",
+      ""serviceable"": false,
+      ""sha512"": """"
+    },
+     ""mstest.testadapter/1.1.2-preview"": {
+      ""type"": ""package"",
+      ""serviceable"": true,
+      ""sha512"": ""sha512-cCYGrK3c/mmsrxGKKiBNNulcHThYjPSV4xynjqX2UvsA609U0ie+I2SgiiZTVK/ovoqu5n1PsGmdnNh3wVmwng=="",
+      ""path"": ""mstest.testadapter/1.1.2-preview"",
+      ""hashPath"": ""mstest.testadapter.1.1.2-preview.nupkg.sha512""
+    },
+    ""mstest.testframework/1.0.4-preview"": {
+      ""type"": ""package"",
+      ""serviceable"": true,
+      ""sha512"": ""sha512-bmcFU3dPmDoNKOWuu6+ygx/BKA5ZAtELb/NhNxpJhrjEAdj04Q9zjURhEKgOZ5ebFm6qNOAC2zbiw3efySFFig=="",
+      ""path"": ""mstest.testframework/1.0.4-preview"",
+      ""hashPath"": ""mstest.testframework.1.0.4-preview.nupkg.sha512""
+    }
+  }
+}";
+        }
+
+        private static string GetDepsJsonWithoutAdapters()
+        {
+            return @"{
+  ""runtimeTarget"": {
+    ""name"": "".NETCoreApp,Version=v1.0"",
+    ""signature"": ""dfbd9da59ce8f74f37ec2fcab3d503ffcce2c75e""
+  },
+  ""compilationOptions"": {},
+  ""targets"": {
+    "".NETCoreApp,Version=v1.0"": {
+      ""netcore-test/1.0.0"": {
+        ""dependencies"": {
+          ""MSTest.TestFramework"": ""1.0.4-preview""
+        },
+        ""runtime"": {
+          ""netcore-test.dll"": {}
+        },
+        ""compile"": {
+          ""netcore-test.dll"": {}
+        }
+      },
+      ""mstest.testframework/1.0.4-preview"": {
+        ""runtime"": {
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.dll"": {}
+        },
+        ""compile"": {
+          ""lib/netcoreapp1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.dll"": {}
+        }
+      }
+    }
+  },
+  ""libraries"": {
+    ""netcore-test/1.0.0"": {
+      ""type"": ""project"",
+      ""serviceable"": false,
+      ""sha512"": """"
+    },
+    ""mstest.testframework/1.0.4-preview"": {
+      ""type"": ""package"",
+      ""serviceable"": true,
+      ""sha512"": ""sha512-bmcFU3dPmDoNKOWuu6+ygx/BKA5ZAtELb/NhNxpJhrjEAdj04Q9zjURhEKgOZ5ebFm6qNOAC2zbiw3efySFFig=="",
+      ""path"": ""mstest.testframework/1.0.4-preview"",
+      ""hashPath"": ""mstest.testframework.1.0.4-preview.nupkg.sha512""
+    }
+  }
+}";
         }
     }
 

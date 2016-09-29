@@ -20,5 +20,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return File.Exists(path);
         }
+
+        /// <inheritdoc/>
+        public Stream GetStream(string filePath, FileMode mode)
+        {
+            return new FileStream(filePath, mode);
+        }
     }
 }

@@ -3,9 +3,6 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -33,7 +30,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         /// </summary>
         private int testableClientConnectionTimeout = 400;
 
-        private DiscoveryCriteria discoveryCriteria;
+        private readonly DiscoveryCriteria discoveryCriteria;
 
         public ProxyDiscoveryManagerTests()
         {
@@ -81,6 +78,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.mockRequestSender.Verify(
                     s => s.InitializeDiscovery(extensions, true),
                     Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
+        }
+
+        [TestMethod]
+        public void InitializeShouldQueryTestHostManagerForExtensions()
+        {
+            TestPluginCache.Instance = null;
+            try
+            {
+                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "e1.dll" });
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
+
+                this.testDiscoveryManager.Initialize();
+
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "e1.dll" }, true), Times.Once);
             }
             finally
             {
