@@ -188,7 +188,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void ProcessManagerOnProcessExited(object sender, EventArgs eventArgs)
         {
-            this.requestSender?.AbortTestRun();
+            this.requestSender?.OnProcessExited();
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
             
-            // to call private method EnsureInitialize call InitializeExtensions
+            // To call private method EnsureInitialize call InitializeExtensions
             this.consoleWrapper.InitializeExtensions(new []{"path/to/adapter"});
             
             mockProcessManager.Verify(pm => pm.StartProcess(It.IsAny<string[]>()));
@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void AbortTestRunShouldCallOnProcessExit()
+        public void ProcessExitedEventShouldSetOnProcessExit()
         {
             Mock<IProcessManager> mockProcessManager = new Mock<IProcessManager>();
             Mock<ITranslationLayerRequestSender> mockRequestSender = new Mock<ITranslationLayerRequestSender>();
@@ -116,7 +116,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             
             mockProcessManager.Raise( pm => pm.ProcessExited += null, EventArgs.Empty);
             
-            mockRequestSender.Verify(rs => rs.AbortTestRun(), Times.Once);
+            mockRequestSender.Verify(rs => rs.OnProcessExited(), Times.Once);
         }
 
         [TestMethod]
@@ -427,6 +427,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             }
 
             public void AbortTestRun()
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnProcessExited()
             {
                 throw new NotImplementedException();
             }

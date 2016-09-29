@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Tests Discovery was aborted because {0}.
+        ///    Looks up a localized string similar to The active Tests Discovery was aborted..
         /// </summary>
         public static string AbortedTestsDiscovery {
             get {
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Tests Run was aborted because {0}.
+        ///    Looks up a localized string similar to The active Tests Run was aborted..
         /// </summary>
         public static string AbortedTestsRun {
             get {

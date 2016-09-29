@@ -358,12 +358,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldAbortOnException()
+        public void DiscoverTestsShouldAbortOnExceptionInSendMessage()
         {
             var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
             var sources = new List<string> {"1.dll"};
             var payload = new DiscoveryRequestPayload {Sources = sources, RunSettings = null};
-
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, payload)).Throws(new IOException());
 
             this.requestSender.DiscoverTests(sources, null, mockHandler.Object);
@@ -372,7 +371,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
         }
         [TestMethod]
-        public void DiscoverTestsShouldAbortOnAbortTestRunCall()
+        public void DiscoverTestsShouldAbortWhenProcessExited()
         {
             var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
             var sources = new List<string> { "1.dll" };
@@ -385,7 +384,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Callback(() =>
             {
-                this.requestSender.AbortTestRun();
+                this.requestSender.OnProcessExited();
             }).Returns(testsFound);
 
             mockHandler.Setup(mh => mh.HandleDiscoveryComplete(-1, null, true)).Callback(() => manualEvent.Set());
@@ -845,7 +844,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
         
         [TestMethod]
-        public void StartTestRunShouldAbortOnException()
+        public void StartTestRunShouldAbortOnExceptionInSendMessage()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var sources = new List<string> { "1.dll" };
@@ -860,7 +859,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         }
 
         [TestMethod]
-        public void StartTunTestsShouldAbortOnAbortTestRunCall()
+        public void StartTunTestsShouldAbortOnProcessExited()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var manualEvent = new ManualResetEvent(false);
@@ -877,8 +876,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Callback(() =>
             {
-                this.requestSender.AbortTestRun();
-                Thread.Sleep(30 * 1000);
+                this.requestSender.OnProcessExited();
             }).Returns(runComplete);
             mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(() => manualEvent.Set());
 

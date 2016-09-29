@@ -42,6 +42,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Discovers the tests
         /// </summary>
         /// <param name="sources">Sources for discovering tests</param>
+        /// <param name="runSettings">Run settings for discovering tests</param>
         /// <param name="discoveryEventsHandler">EventHandler for discovery events</param>
         void DiscoverTests(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler discoveryEventsHandler);
 
@@ -93,5 +94,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Abort the test run
         /// </summary>
         void AbortTestRun();
+
+        /// <summary>
+        /// on process exit unblocks communication waiting calls
+        /// </summary>
+        void OnProcessExited();
     }
 }
