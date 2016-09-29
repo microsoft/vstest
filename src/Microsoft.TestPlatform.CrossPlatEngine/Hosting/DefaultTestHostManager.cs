@@ -118,6 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
             var argumentsString = " " + Constants.PortOption + " " + connectionInfo.Port;
+            argumentsString += " " + Constants.ParentProcessIdOption + " " + processHelper.GetCurrentProcessId();
 
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 

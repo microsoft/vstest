@@ -29,5 +29,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// </summary>
         /// <returns>Location of test engine.</returns>
         string GetTestEngineDirectory();
+
+        /// <summary>
+        /// Gets the pid of test engine.
+        /// </summary>
+        /// <returns>pid of test engine.</returns>
+
+        int GetCurrentProcessId();
     }
 }

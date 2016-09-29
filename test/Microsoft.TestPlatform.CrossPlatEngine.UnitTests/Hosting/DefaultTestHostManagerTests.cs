@@ -51,11 +51,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
+            var portNum = 123;
+            var parentProcessId = 101;
+            var connectionInfo = new TestRunnerConnectionInfo {Port = portNum};
+            mockProcessHelper.Setup(ph => ph.GetCurrentProcessId()).Returns(parentProcessId);
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, connectionInfo);
 
-            Assert.AreEqual(" --port 123", info.Arguments);
+            Assert.AreEqual(string.Format(" {0} {1} {2} {3}",
+                    Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants.PortOption,
+                    portNum,
+                    Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants.ParentProcessIdOption,
+                    parentProcessId)
+                , info.Arguments);
         }
 
         [TestMethod]

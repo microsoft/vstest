@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
+    using System.Diagnostics;
 
     using CrossPlatEngine;
 
@@ -10,6 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+
 
     /// <summary>
     /// The program.
@@ -87,13 +90,42 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             return port;
         }
 
+        private static int GetParentProcessId(string[] args)
+        {
+            var parentProcessId = -1;
+
+            for (var i = 0; i < args.Length; i++)
+            {
+                if (string.Equals("--parentprocessid", args[i], StringComparison.OrdinalIgnoreCase))
+                {
+                    if (i < args.Length - 1)
+                    {
+                        int.TryParse(args[i + 1], out parentProcessId);
+                    }
+
+                    break;
+                }
+            }
+
+            if (parentProcessId < 0)
+            {
+                throw new ArgumentException("Incorrect/No Parent Process id");
+            }
+
+            return parentProcessId;
+        }
+
+
         private static void Run(string[] args)
         {
             TestPlatformEventSource.Instance.TestHostStart();
             var portNumber = GetPortNumber(args);
-
+            
             var requestHandler = new TestRequestHandler();
             requestHandler.InitializeCommunication(portNumber);
+
+            var parentProcessId = GetParentProcessId(args);
+            OnParentProcessExit(parentProcessId, requestHandler);
 
             // setup the factory.
             var managerFactory = new TestHostManagerFactory();
@@ -111,6 +143,19 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 
             TestPlatformEventSource.Instance.TestHostStop();
+        }
+
+        private static void OnParentProcessExit(int parentProcessId, ITestRequestHandler requestHandler)
+        {
+            EqtTrace.Info("TestHost: exits itself because parent process exited");
+            Process process = Process.GetProcessById(parentProcessId);
+            process.EnableRaisingEvents = true;
+            process.Exited += (sender, args) => {
+                requestHandler?.Close();
+                TestPlatformEventSource.Instance.TestHostStop();
+                process.Dispose();
+                Environment.Exit(0);
+            };
         }
     }
 }

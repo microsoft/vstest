@@ -175,10 +175,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
+            var parentProcessId = 101;
+
+            mockProcessHelper.Setup(ph => ph.GetCurrentProcessId()).Returns(parentProcessId);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
             StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port);
+
+            StringAssert.Contains(startInfo.Arguments, string.Format("{0} {1}",  Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants.ParentProcessIdOption, parentProcessId));
+
         }
 
         [TestMethod]
