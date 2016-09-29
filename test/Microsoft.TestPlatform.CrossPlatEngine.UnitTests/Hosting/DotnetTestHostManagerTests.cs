@@ -6,9 +6,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Security.Cryptography;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -255,7 +252,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoOnWindowsForInValidPathReturnsDotnet()
+        public void GetTestHostProcessStartInfoOnWindowsForInvalidPathReturnsDotnet()
         {
             // To validate the else part, set current process to exe other than dotnet
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
@@ -264,6 +261,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = this.GetDefaultStartInfo();
 
             Assert.AreEqual(dotnetExeName, startInfo.FileName);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeCurrentDirectoryAsWorkingDirectory()
+        {
+            // Absolute path to the source directory
+            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
+            Assert.AreEqual(Directory.GetCurrentDirectory(), startInfo.WorkingDirectory);
         }
         
         private string GetTesthostPath(string engineDirectory)

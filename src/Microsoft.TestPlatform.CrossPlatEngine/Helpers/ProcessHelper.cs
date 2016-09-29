@@ -28,6 +28,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             var process = new Process();
             try
             {
+#if DEBUG
+                // Enable stdout/stderr redirection for debug builds for diagnostics.
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+#endif
+
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
                 process.StartInfo.WorkingDirectory = workingDirectory;

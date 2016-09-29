@@ -25,9 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
-        private const string DotnetProcessName = "dotnet.exe";
-        private const string DotnetProcessNameXPlat = "dotnet";
-        private const string NetCoreDirectoryName = "NetCore";
         
         private readonly Architecture architecture;
         private readonly Framework framework;
