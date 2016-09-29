@@ -3,6 +3,7 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -66,9 +67,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             try
             {
-                var extensions = new string[] { "e1.dll", "e2.dll" };
-
-                // Setup Mocks.
+                var extensions = new[] { "c:\\e1.dll", "c:\\e2.dll" };
                 TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
@@ -104,13 +103,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance = null;
             try
             {
-                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "e1.dll" });
+                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.dll" });
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
                 this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
 
                 this.testExecutionManager.Initialize();
 
-                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "e1.dll" }, true), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }, true), Times.Once);
             }
             finally
             {

@@ -12,20 +12,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using CoreUtilities.Tracing;
-    using CoreUtilities.Tracing.Interfaces;
-
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Tests for RunTestsArgumentProcessor
@@ -242,7 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public static void SetupMockExtensions(string[] extensions, Action callback)
         {
             // Setup mocks.
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = true;
 
             testableTestPluginCache.FilesInDirectory = (path, pattern) =>
@@ -289,11 +285,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     public class TestableTestPluginCache : TestPluginCache
     {
-        public TestableTestPluginCache(IPathUtilities pathUtilities)
-            : base(pathUtilities)
-        {
-        }
-
         internal Func<string, string, string[]> FilesInDirectory
         {
             get;
