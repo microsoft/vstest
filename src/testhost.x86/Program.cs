@@ -24,6 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = 5 * 1000;
 
+        private static const string PortLongname = "--port";
+
+        private static const string PortShortname = "-p";
+
+        private static const string ParentProcessIdLongname = "--parentprocessid";
+
+        private static const string ParentProcessIdShortname = "-i";
+
         /// <summary>
         /// The main.
         /// </summary>
@@ -61,70 +69,56 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         }
 
         /// <summary>
-        /// Get port number from command line arguments
+        /// To parse int argument value.
         /// </summary>
-        /// <param name="args">command line arguments</param>
-        /// <returns>port number</returns>
-        private static int GetPortNumber(string[] args)
+        /// <param name="args">
+        /// Array of all arguments Ex: { "--port", "12312", "--parentprocessid", "2312" }
+        /// </param>
+        /// <param name="fullname">
+        /// The fullname for required argument. Ex: "--port"
+        /// </param>
+        /// <param name="shortname">
+        /// The shortname for required argument. Ex: "-p"
+        /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
+        /// <exception cref="ArgumentException">
+        /// </exception>
+        private static int GetIntArg(string[] args, string fullname, string shortname)
         {
-            var port = -1;
+            var val = -1;
 
             for (var i = 0; i < args.Length; i++)
             {
-                if (string.Equals("--port", args[i], StringComparison.OrdinalIgnoreCase) || string.Equals("-p", args[i], StringComparison.OrdinalIgnoreCase))
+                bool isFullname = fullname != null && string.Equals(fullname, args[i], StringComparison.OrdinalIgnoreCase);
+                bool isShortname = shortname != null && string.Equals(shortname, args[i], StringComparison.OrdinalIgnoreCase);
+                if (isFullname || isShortname)
                 {
                     if (i < args.Length - 1)
                     {
-                        int.TryParse(args[i + 1], out port);
+                        int.TryParse(args[i + 1], out val);
                     }
 
                     break;
                 }
             }
 
-            if (port < 0)
+            if (val < 0)
             {
-                throw new ArgumentException("Incorrect/No Port number");
+                throw new ArgumentException($"Incorrect/No number for: {fullname}/{shortname}");
             }
 
-            return port;
+            return val;
         }
-
-        private static int GetParentProcessId(string[] args)
-        {
-            var parentProcessId = -1;
-
-            for (var i = 0; i < args.Length; i++)
-            {
-                if (string.Equals("--parentprocessid", args[i], StringComparison.OrdinalIgnoreCase))
-                {
-                    if (i < args.Length - 1)
-                    {
-                        int.TryParse(args[i + 1], out parentProcessId);
-                    }
-
-                    break;
-                }
-            }
-
-            if (parentProcessId < 0)
-            {
-                throw new ArgumentException("Incorrect/No Parent Process id");
-            }
-
-            return parentProcessId;
-        }
-
 
         private static void Run(string[] args)
         {
             TestPlatformEventSource.Instance.TestHostStart();
-            var portNumber = GetPortNumber(args);
-            
+            var portNumber = GetIntArg(args, PortLongname, PortShortname);
             var requestHandler = new TestRequestHandler();
             requestHandler.InitializeCommunication(portNumber);
-
-            var parentProcessId = GetParentProcessId(args);
+            var parentProcessId = GetIntArg(args, ParentProcessIdLongname, ParentProcessIdShortname);
             OnParentProcessExit(parentProcessId, requestHandler);
 
             // setup the factory.
@@ -150,12 +144,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             EqtTrace.Info("TestHost: exits itself because parent process exited");
             Process process = Process.GetProcessById(parentProcessId);
             process.EnableRaisingEvents = true;
-            process.Exited += (sender, args) => {
-                requestHandler?.Close();
-                TestPlatformEventSource.Instance.TestHostStop();
-                process.Dispose();
-                Environment.Exit(0);
-            };
+            process.Exited += (sender, args) =>
+                {
+                    requestHandler?.Close();
+                    TestPlatformEventSource.Instance.TestHostStop();
+                    process.Dispose();
+                    Environment.Exit(0);
+                };
         }
     }
 }

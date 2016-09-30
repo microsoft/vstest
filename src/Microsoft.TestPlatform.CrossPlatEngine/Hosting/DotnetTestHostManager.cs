@@ -1,5 +1,4 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
     using System;
@@ -7,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.InteropServices;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using System.Runtime.InteropServices;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -91,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                startInfo.FileName = GetDotnetHostFullPath();
+                startInfo.FileName = this.GetDotnetHostFullPath();
             }
 
             // .NET core host manager is not a shared host. It will expect a single test source to be provided.
@@ -120,8 +119,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // Add the testhost path and other arguments
             var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
-            args += " \"" + testHostPath + "\" " + CrossPlatEngine.Constants.PortOption + " " + connectionInfo.Port;
-            args += " " + CrossPlatEngine.Constants.ParentProcessIdOption + " " + processHelper.GetCurrentProcessId();
+            args += " \"" + testHostPath + "\" " + CrossPlatEngine.Constants.PortOption + " " + connectionInfo.Port + 
+                " " + CrossPlatEngine.Constants.ParentProcessIdOption + " " + this.processHelper.GetCurrentProcessId();
 
             // Sample command line for the spawned test host
             // "D:\dd\gh\Microsoft\vstest\tools\dotnet\dotnet.exe" exec
@@ -158,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             foreach (string path in pathString.Split(separator))
             {
                 string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
-                if (fileHelper.Exists(exeFullPath))
+                if (this.fileHelper.Exists(exeFullPath))
                 {
                     return exeFullPath;
                 }

@@ -1,5 +1,4 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 {
     using System;
@@ -8,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.InteropServices;
     using System.Security.Cryptography;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -19,7 +19,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using System.Runtime.InteropServices;
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -176,15 +175,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
             var parentProcessId = 101;
-
-            mockProcessHelper.Setup(ph => ph.GetCurrentProcessId()).Returns(parentProcessId);
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessId()).Returns(parentProcessId);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
             StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port);
-
             StringAssert.Contains(startInfo.Arguments, string.Format("{0} {1}",  Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants.ParentProcessIdOption, parentProcessId));
-
         }
 
         [TestMethod]
@@ -213,7 +209,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns("/tmp/vstest");
             var startInfo = this.GetDefaultStartInfo();
-            var expectedArgs = "exec \"" + this.GetTesthostPath("/tmp/vstest") + "\" --port 0";
+            var expectedArgs = "exec \"" + this.GetTesthostPath("/tmp/vstest") + "\" --port 0 --parentprocessid 0";
 
             this.dotnetHostManager.LaunchTestHost(startInfo);
 

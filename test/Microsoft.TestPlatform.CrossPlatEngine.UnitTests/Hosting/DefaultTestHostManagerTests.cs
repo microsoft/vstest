@@ -55,7 +55,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var parentProcessId = 101;
             var connectionInfo = new TestRunnerConnectionInfo {Port = portNum};
             mockProcessHelper.Setup(ph => ph.GetCurrentProcessId()).Returns(parentProcessId);
-
             var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, connectionInfo);
 
             Assert.AreEqual(string.Format(" {0} {1} {2} {3}",
