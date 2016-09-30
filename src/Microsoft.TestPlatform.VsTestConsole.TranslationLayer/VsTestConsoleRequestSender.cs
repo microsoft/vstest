@@ -1,5 +1,4 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
@@ -67,7 +66,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 Task.Run(() =>
                 {
                     this.communicationManager.WaitForClientConnection(Timeout.Infinite);
-                    handShakeSuccessful = HandShakeWithVsTestConsole();
+                    this.handShakeSuccessful = this.HandShakeWithVsTestConsole();
                     this.handShakeComplete.Set();
                 });
             }
@@ -88,7 +87,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
             var waitSucess = this.handShakeComplete.WaitOne(clientConnectionTimeout);
-            return waitSucess && handShakeSuccessful;
+            return waitSucess && this.handShakeSuccessful;
         }
 
         /// <summary>
@@ -110,9 +109,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.StartDiscovery,
-                    new DiscoveryRequestPayload() {Sources = sources, RunSettings = runSettings});
-                processExitedResetEvent.Reset();
+                this.communicationManager.SendMessage(
+                    MessageType.StartDiscovery,
+                    new DiscoveryRequestPayload() { Sources = sources, RunSettings = runSettings });
+                this.processExitedResetEvent.Reset();
                 this.ListenAndReportTestCases(eventHandler);
             }
             catch (Exception exception)
@@ -133,14 +133,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost,
-                    new TestRunRequestPayload() {Sources = sources.ToList(), RunSettings = runSettings});
-                processExitedResetEvent.Reset();
-                ListenAndReportTestResults(runEventsHandler, null);
+                this.communicationManager.SendMessage(
+                    MessageType.TestRunAllSourcesWithDefaultHost,
+                    new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings });
+                this.processExitedResetEvent.Reset();
+                this.ListenAndReportTestResults(runEventsHandler, null);
             }
             catch (Exception exception)
             {
-                AbortRunOperation(runEventsHandler, exception);
+                this.AbortRunOperation(runEventsHandler, exception);
             }
         }
 
@@ -154,14 +155,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.TestRunSelectedTestCasesDefaultHost,
-                    new TestRunRequestPayload() {TestCases = testCases.ToList(), RunSettings = runSettings});
-                processExitedResetEvent.Reset();
-                ListenAndReportTestResults(runEventsHandler, null);
+                this.communicationManager.SendMessage(
+                    MessageType.TestRunSelectedTestCasesDefaultHost,
+                    new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings });
+                this.processExitedResetEvent.Reset();
+                this.ListenAndReportTestResults(runEventsHandler, null);
             }
             catch (Exception exception)
             {
-                AbortRunOperation(runEventsHandler, exception);
+                this.AbortRunOperation(runEventsHandler, exception);
             }
         }
 
@@ -176,19 +178,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll,
+                this.communicationManager.SendMessage(
+                    MessageType.GetTestRunnerProcessStartInfoForRunAll,
                     new TestRunRequestPayload()
-                    {
+                        {
                         Sources = sources.ToList(),
                         RunSettings = runSettings,
                         DebuggingEnabled = customHostLauncher.IsDebug
                     });
-                processExitedResetEvent.Reset();
-                ListenAndReportTestResults(runEventsHandler, customHostLauncher);
+                this.processExitedResetEvent.Reset();
+                this.ListenAndReportTestResults(runEventsHandler, customHostLauncher);
             }
             catch (Exception exception)
             {
-                AbortRunOperation(runEventsHandler, exception);
+                this.AbortRunOperation(runEventsHandler, exception);
             }
         }
 
@@ -198,24 +201,28 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="testCases">TestCases to run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
-        public void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler,
+        public void StartTestRunWithCustomHost(
+            IEnumerable<TestCase> testCases,
+            string runSettings,
+            ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunSelected,
+                this.communicationManager.SendMessage(
+                    MessageType.GetTestRunnerProcessStartInfoForRunSelected,
                     new TestRunRequestPayload()
-                    {
+                        {
                         TestCases = testCases.ToList(),
                         RunSettings = runSettings,
                         DebuggingEnabled = customHostLauncher.IsDebug
                     });
-                processExitedResetEvent.Reset();
-                ListenAndReportTestResults(runEventsHandler, customHostLauncher);
+                this.processExitedResetEvent.Reset();
+                this.ListenAndReportTestResults(runEventsHandler, customHostLauncher);
             }
             catch (Exception exception)
             {
-                AbortRunOperation(runEventsHandler, exception);
+                this.AbortRunOperation(runEventsHandler, exception);
             }
         }
 
@@ -238,7 +245,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         public void OnProcessExited()
         {
-            processExitedResetEvent?.Set();
+            this.processExitedResetEvent?.Set();
         }
 
         public void Close()
@@ -285,6 +292,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 EqtTrace.Error("VsTestConsoleRequestSender: SessionConnected Message Expected but different message received: Received MessageType: {0}", message.MessageType);
             }
+
             return success;
         }
 
@@ -297,7 +305,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // This is just a notification.
             while (!isDiscoveryComplete)
             {
-                var message = ReceiveMessageWithListeningToOnProcessExit();
+                var message = this.ReceiveMessageWithListeningToOnProcessExit();
 
                 if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                 {
@@ -310,8 +318,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     var discoveryCompletePayload =
                         this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
 
-                    eventHandler.HandleDiscoveryComplete(discoveryCompletePayload.TotalTests,
-                        discoveryCompletePayload.LastDiscoveredTests, discoveryCompletePayload.IsAborted);
+                    eventHandler.HandleDiscoveryComplete(
+                        discoveryCompletePayload.TotalTests,
+                        discoveryCompletePayload.LastDiscoveredTests,
+                        discoveryCompletePayload.IsAborted);
                     isDiscoveryComplete = true;
                 }
                 else if (string.Equals(MessageType.TestMessage, message.MessageType))
@@ -330,8 +340,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isTestRunComplete)
             { 
-                
-                var message = ReceiveMessageWithListeningToOnProcessExit();
+                var message = this.ReceiveMessageWithListeningToOnProcessExit();
 
                 if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                 {
@@ -380,7 +389,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 try
                 {
-                    message = communicationManager.ReceiveMessage();
+                    message = this.communicationManager.ReceiveMessage();
                     EqtTrace.Info("received message: {0}", message);
                 }
                 catch (Exception exception)
@@ -393,11 +402,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 }
             }, cancellationToken);
 
-            WaitHandle[] waitHandles = {messageReceivedEvent, processExitedResetEvent};
+            WaitHandle[] waitHandles = { messageReceivedEvent, this.processExitedResetEvent };
             var index = WaitHandle.WaitAny(waitHandles);
 
-            if (index == 1) //Signal from process exit
+            if (index == 1)
             {
+                // Signal from process exit
                 cancellationTokenSource.Cancel();
                 throw new TransationLayerException("Process exited abnormally.");
             }
@@ -406,6 +416,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 throw new TransationLayerException("Failed to receive message.", receiveMessageException);
             }
+
             return message;
         }
 

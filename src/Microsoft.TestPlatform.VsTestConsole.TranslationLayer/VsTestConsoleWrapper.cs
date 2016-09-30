@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.requestSender = requestSender;
             this.vstestConsoleProcessManager = processManager;
-            this.vstestConsoleProcessManager.ProcessExited += ProcessManagerOnProcessExited;
+            this.vstestConsoleProcessManager.ProcessExited += this.ProcessManagerOnProcessExited;
             this.sessionStarted = false;
         }
 
@@ -169,7 +169,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private void EnsureInitialized()
         {
 
-            if (!vstestConsoleProcessManager.IsProcessInitialized())
+            if (!this.vstestConsoleProcessManager.IsProcessInitialized())
             {
                 this.StartSession();
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
