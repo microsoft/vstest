@@ -24,13 +24,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = 5 * 1000;
 
-        private static const string PortLongname = "--port";
+        private const string PortLongname = "--port";
 
-        private static const string PortShortname = "-p";
+        private const string PortShortname = "-p";
 
-        private static const string ParentProcessIdLongname = "--parentprocessid";
+        private const string ParentProcessIdLongname = "--parentprocessid";
 
-        private static const string ParentProcessIdShortname = "-i";
+        private const string ParentProcessIdShortname = "-i";
 
         /// <summary>
         /// The main.
