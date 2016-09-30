@@ -141,26 +141,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
         {
-            var sourceFile = sources.Single();
-            var depsFile = Path.ChangeExtension(sourceFile, ".deps.json");
+            var sourceDirectory = Path.GetDirectoryName(sources.Single());
 
-            if (this.fileHelper.Exists(depsFile))
+            if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.Exists(sourceDirectory))
             {
-                using (var stream = this.fileHelper.GetStream(depsFile, FileMode.Open))
-                using (var reader = new DependencyContextJsonReader())
-                {
-                    foreach (var lib in reader.Read(stream).CompileLibraries)
-                    {
-                        foreach (var assembly in lib.Assemblies)
-                        {
-                            if (assembly.EndsWith("TestAdapter.dll", StringComparison.OrdinalIgnoreCase))
-                            {
-                                yield return assembly;
-                            }
-                        }
-                    }
-                }
+                return this.fileHelper.EnumerateFiles(sourceDirectory, "*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
             }
+
+            return Enumerable.Empty<string>();
         }
 
         /// <inheritdoc/>

@@ -2,6 +2,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
+    using System.Collections.Generic;
     using System.IO;
 
     /// <summary>
@@ -23,5 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="mode"><see cref="FileMode"/> for file operations.</param>
         /// <returns>A <see cref="Stream"/> that supports read/write on the file.</returns>
         Stream GetStream(string filePath, FileMode mode);
+
+        /// <summary>
+        /// Enumerates files in a directory.
+        /// </summary>
+        /// <param name="directory">Parent directory to search.</param>
+        /// <param name="pattern">Search pattern.</param>
+        /// <param name="searchOption"><see cref="SearchOption"/> for directory.</param>
+        /// <returns>List of files matching the pattern.</returns>
+        IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption);
     }
 }

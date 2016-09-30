@@ -2,6 +2,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -25,6 +27,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         public Stream GetStream(string filePath, FileMode mode)
         {
             return new FileStream(filePath, mode);
+        }
+
+        /// <inheritdoc/>
+        IEnumerable<string> IFileHelper.EnumerateFiles(string directory, string pattern, SearchOption searchOption)
+        {
+            return Directory.EnumerateFiles(directory, pattern, searchOption);
         }
     }
 }
