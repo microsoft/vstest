@@ -14,8 +14,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// Exists utility to check if file exists
         /// </summary>
         /// <param name="path"> The path of file. </param>
-        /// <returns> True if file exists <see cref="bool"/>. </returns>
+        /// <returns>True if file exists <see cref="bool"/>.</returns>
         bool Exists(string path);
+
+        /// <summary>
+        /// Exists utility to check if directory exists
+        /// </summary>
+        /// <param name="path"> The path of file. </param>
+        /// <returns>True if directory exists <see cref="bool"/>.</returns>
+        bool DirectoryExists(string path);
 
         /// <summary>
         /// Gets a stream for the file.
