@@ -25,9 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
-        private const string DotnetProcessName = "dotnet.exe";
-        private const string DotnetProcessNameXPlat = "dotnet";
-        private const string NetCoreDirectoryName = "NetCore";
         
         private readonly Architecture architecture;
         private readonly Framework framework;
@@ -134,6 +131,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                            EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
                            WorkingDirectory = processWorkingDirectory
                        };
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+        {
+            // Default test host manager doesn't provide custom acquisition or discovery of
+            // test platform extensions.
+            return Enumerable.Empty<string>();
         }
 
         /// <summary>

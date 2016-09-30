@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Implementations;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -19,28 +18,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using CoreUtilities.Tracing;
     using CoreUtilities.Tracing.Interfaces;
 
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
     [TestClass]
     public class RunSpecificTestsArgumentProcessorTests
     {
-        MockFileHelper mockFileHelper;
-        string dummyTestFilePath = "DummyTest.dll";
+        private readonly Mock<IFileHelper> mockFileHelper;
+        private string dummyTestFilePath = "DummyTest.dll";
 
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         public RunSpecificTestsArgumentProcessorTests()
         {
-            this.mockFileHelper = new MockFileHelper();
+            this.mockFileHelper = new Mock<IFileHelper>();
+            this.mockFileHelper.Setup(fh => fh.Exists(this.dummyTestFilePath)).Returns(true);
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
-            this.mockFileHelper.ExistsInvoker = (path) =>
-            {
-                return string.Equals(path, this.dummyTestFilePath);
-            };
         }
 
         [TestMethod]
         public void GetMetadataShouldReturnRunSpecificTestsArgumentProcessorCapabilities()
         {
             RunSpecificTestsArgumentProcessor processor = new RunSpecificTestsArgumentProcessor();
+
             Assert.IsTrue(processor.Metadata.Value is RunSpecificTestsArgumentProcessorCapabilities);
         }
 
@@ -48,6 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void GetExecutorShouldReturnRunSpecificTestsArgumentProcessorCapabilities()
         {
             RunSpecificTestsArgumentProcessor processor = new RunSpecificTestsArgumentProcessor();
+
             Assert.IsTrue(processor.Executor.Value is RunSpecificTestsArgumentExecutor);
         }
 
@@ -268,7 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.TestCaseFilterValue = null;
 
-            CommandLineOptions.Instance.FileHelper = this.mockFileHelper;
+            CommandLineOptions.Instance.FileHelper = this.mockFileHelper.Object;
 
             CommandLineOptions.Instance.AddSource(this.dummyTestFilePath);
         }

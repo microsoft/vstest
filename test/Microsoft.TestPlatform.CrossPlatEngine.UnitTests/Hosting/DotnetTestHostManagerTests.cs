@@ -7,8 +7,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Security.Cryptography;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -20,6 +18,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
     using Moq;
     using System.Runtime.InteropServices;
+    using System.Text;
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -255,7 +254,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoOnWindowsForInValidPathReturnsDotnet()
+        public void GetTestHostProcessStartInfoOnWindowsForInvalidPathReturnsDotnet()
         {
             // To validate the else part, set current process to exe other than dotnet
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
@@ -265,7 +264,47 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             Assert.AreEqual(dotnetExeName, startInfo.FileName);
         }
-        
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeCurrentDirectoryAsWorkingDirectory()
+        {
+            // Absolute path to the source directory
+            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
+            Assert.AreEqual(Directory.GetCurrentDirectory(), startInfo.WorkingDirectory);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryDoesNotExist()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" });
+
+            Assert.AreEqual(0, extensions.Count());
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnLibariesFromSourceDirectory()
+        {
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.TestAdapter.dll" });
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" });
+
+            CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryIsEmpty()
+        {
+            // Parent directory is empty since the input source is file "test.dll"
+            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.dll" });
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource);
+
+            Assert.AreEqual(0, extensions.Count());
+        }
+
         private string GetTesthostPath(string engineDirectory)
         {
             // testhost.dll will be picked up from the same path as vstest.console.dll. In the test, we are setting up

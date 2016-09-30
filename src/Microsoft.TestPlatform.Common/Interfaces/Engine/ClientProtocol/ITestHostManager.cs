@@ -40,7 +40,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <param name="connectionInfo">Set of connection parameters for the test host process to communicate with test runner.</param>
         /// <returns>ProcessStartInfo of the test host.</returns>
         TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo);
-        
+
+        /// <summary>
+        /// Gets paths of any additional extensions.
+        /// A test host manager may choose to provide a custom extensions acquisition and discovery
+        /// mechanism. E.g. for .net core, extensions are discovered from the <c>testproject.deps.json</c> file.
+        /// </summary>
+        /// <param name="sources">List of test sources.</param>
+        /// <returns>List of paths to extension assemblies.</returns>
+        IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources);
+
         /// <summary>
         /// Register for the exit event.
         /// </summary>

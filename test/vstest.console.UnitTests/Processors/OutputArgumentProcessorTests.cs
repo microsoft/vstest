@@ -2,7 +2,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
-    using Implementations;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using Processors;
@@ -87,12 +86,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var options = CommandLineOptions.Instance;
             OutputArgumentExecutor executor = new OutputArgumentExecutor(options);
             string testOutput = @"C:\OutputDir";
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (path) =>
-            {
-                return string.Equals(path, testOutput);
-            };
-            executor.FileHelper = mockFileHelper;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(testOutput)).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
 
             executor.Initialize(testOutput);
             Assert.AreEqual(testOutput, options.Output);
