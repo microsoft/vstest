@@ -60,7 +60,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Test Run was aborted because {0}.
+        ///    Looks up a localized string similar to The active Test Discovery was aborted..
+        /// </summary>
+        public static string AbortedTestDiscovery {
+            get {
+                return ResourceManager.GetString("AbortedTestDiscovery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The active Test Run was aborted..
         /// </summary>
         public static string AbortedTestRun {
             get {
@@ -74,6 +83,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities {
         public static string ConnectionClosed {
             get {
                 return ResourceManager.GetString("ConnectionClosed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Unable to communicate to testhost .
+        /// </summary>
+        public static string UnableToCommunicateToTestHost {
+            get {
+                return ResourceManager.GetString("UnableToCommunicateToTestHost", resourceCulture);
             }
         }
     }

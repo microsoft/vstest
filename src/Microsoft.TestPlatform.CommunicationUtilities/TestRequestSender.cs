@@ -1,17 +1,18 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
-    using ObjectModel;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using ObjectModel;
 
     /// <summary>
     /// Utility class that facilitates the IPC comunication. Acts as server.
@@ -23,6 +24,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private bool sendMessagesToRemoteHost = true;
 
         private IDataSerializer dataSerializer;
+
+        /// <summary>
+        /// Use to cancel blocking tasks associated with testhost process
+        /// </summary>
+        private CancellationTokenSource testhostExitCancellationTokenSource;
 
         public TestRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
@@ -40,6 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns></returns>
         public int InitializeCommunication()
         {
+            this.testhostExitCancellationTokenSource = new CancellationTokenSource();
             var port = this.communicationManager.HostServer();
             this.communicationManager.AcceptClientAsync();
             return port;
@@ -47,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
-            return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
+                return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
         }
 
         public void Dispose()
@@ -71,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions);
+                this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions);
         }
 
         /// <summary>
@@ -81,47 +88,59 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions);
+                this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions);
         }
 
         /// <summary>
         /// Discovers tests in the sources passed with the criteria specifief.
         /// </summary>
         /// <param name="discoveryCriteria"> The criteria for discovery. </param>
-        /// <param name="eventHandler"> The handler for discovery events from the test host. </param>
+        /// <param name="discoveryEventsHandler"> The handler for discovery events from the test host. </param>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler discoveryEventsHandler)
         {
-            this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria);
-
-            var isDiscoveryComplete = false;
-
-            // Cycle through the messages that the testhost sends. 
-            // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
-            while (!isDiscoveryComplete)
+            try
             {
-                //TODO Handle communication failures
-                var rawMessage = this.communicationManager.ReceiveRawMessage();
+                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria);
 
-                // Send raw message first to unblock handlers waiting to send message to IDEs
-                discoveryEventsHandler.HandleRawMessage(rawMessage);
+                var isDiscoveryComplete = false;
 
-                var message = this.dataSerializer.DeserializeMessage(rawMessage);
-                if (string.Equals(MessageType.TestCasesFound, message.MessageType))
+                // Cycle through the messages that the testhost sends. 
+                // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
+                while (!isDiscoveryComplete)
                 {
-                    var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
-                    discoveryEventsHandler.HandleDiscoveredTests(testCases);
+                    var rawMessage = this.TryReceiveRawMessage();
+                    EqtTrace.Info("received message: {0}", rawMessage);
+
+                    // Send raw message first to unblock handlers waiting to send message to IDEs
+                    discoveryEventsHandler.HandleRawMessage(rawMessage);
+
+                    var message = this.dataSerializer.DeserializeMessage(rawMessage);
+                    if (string.Equals(MessageType.TestCasesFound, message.MessageType))
+                    {
+                        var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
+                        discoveryEventsHandler.HandleDiscoveredTests(testCases);
+                    }
+                    else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
+                    {
+                        var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                        discoveryEventsHandler.HandleDiscoveryComplete(
+                            discoveryCompletePayload.TotalTests,
+                            discoveryCompletePayload.LastDiscoveredTests,
+                            discoveryCompletePayload.IsAborted);
+                        isDiscoveryComplete = true;
+                    }
+                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                    {
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        discoveryEventsHandler.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
+                    }
                 }
-                else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
-                {
-                    var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
-                    discoveryEventsHandler.HandleDiscoveryComplete(discoveryCompletePayload.TotalTests, discoveryCompletePayload.LastDiscoveredTests, discoveryCompletePayload.IsAborted);
-                    isDiscoveryComplete = true;
-                }
-                else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                {
-                    var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
-                    discoveryEventsHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
-                }
+            }
+            catch (Exception)
+            {
+                this.OnDiscoveryAbort(discoveryEventsHandler);
             }
         }
 
@@ -131,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void EndSession()
         {
             // don't try to communicate if connection is broken
-            if (!sendMessagesToRemoteHost)
+            if (!this.sendMessagesToRemoteHost)
             {
                 EqtTrace.Error("Connection has been broken: not sending SessionEnd message");
                 return;
@@ -147,10 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="eventHandler">The handler for execution events from the test host.</param>
         public void StartTestRun(TestRunCriteriaWithSources runCriteria, ITestRunEventsHandler eventHandler)
         {
-            this.communicationManager.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria);
-
-            // This needs to happen asynchronously.
-            Task.Run(() => this.ListenAndReportTestResults(eventHandler));
+            this.StartTestRunAndListenAndReportTestResults(MessageType.StartTestExecutionWithSources, runCriteria, eventHandler);
         }
 
         /// <summary>
@@ -160,22 +176,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="eventHandler">The handler for execution events from the test host.</param>
         public void StartTestRun(TestRunCriteriaWithTests runCriteria, ITestRunEventsHandler eventHandler)
         {
-            this.communicationManager.SendMessage(MessageType.StartTestExecutionWithTests, runCriteria);
+            this.StartTestRunAndListenAndReportTestResults(MessageType.StartTestExecutionWithTests, runCriteria, eventHandler);
+        }
 
-            // This needs to happen asynchronously.
-            Task.Run(() => this.ListenAndReportTestResults(eventHandler));
+        private void StartTestRunAndListenAndReportTestResults(
+            string messageType,
+            object payload,
+            ITestRunEventsHandler eventHandler)
+        {
+            try
+            {
+                this.communicationManager.SendMessage(messageType, payload);
+
+                // This needs to happen asynchronously.
+                Task.Run(() => this.ListenAndReportTestResults(eventHandler));
+            }
+            catch (Exception exception)
+            {
+                this.OnTestRunAbort(eventHandler, exception);
+            }
         }
 
         private void ListenAndReportTestResults(ITestRunEventsHandler testRunEventsHandler)
         {
             var isTestRunComplete = false;
+
             // Cycle through the messages that the testhost sends. 
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isTestRunComplete)
             {
                 try
                 {
-                    var rawMessage = this.communicationManager.ReceiveRawMessage();
+                    var rawMessage = this.TryReceiveRawMessage();
 
                     // Send raw message first to unblock handlers waiting to send message to IDEs
                     testRunEventsHandler.HandleRawMessage(rawMessage);
@@ -183,12 +215,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     var message = this.dataSerializer.DeserializeMessage(rawMessage);
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
-                        var testRunChangedArgs = dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
+                        var testRunChangedArgs = this.dataSerializer.DeserializePayload<TestRunChangedEventArgs>(
+                            message);
                         testRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
                     }
                     else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
                     {
-                        var testRunCompletePayload = dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                        var testRunCompletePayload =
+                            this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
                         testRunEventsHandler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
@@ -200,7 +234,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     else if (string.Equals(MessageType.TestMessage, message.MessageType))
                     {
                         var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
-                        testRunEventsHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                        testRunEventsHandler.HandleLogMessage(
+                            testMessagePayload.MessageLevel,
+                            testMessagePayload.Message);
                     }
                     else if (string.Equals(MessageType.LaunchAdapterProcessWithDebuggerAttached, message.MessageType))
                     {
@@ -208,36 +244,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         int processId = testRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
 
                         this.communicationManager.SendMessage(
-                            MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback, processId);
+                            MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
+                            processId);
                     }
                 }
-                catch(System.IO.IOException exception)
+                catch (IOException exception)
                 {
-                    EqtTrace.Error("Server: TestExecution: Receive raw message failed with {0}", exception);
+                    // To avoid furthur communication with remote host
+                    this.sendMessagesToRemoteHost = false;
 
-                    // to avoid furthur communication with remote host
-                    sendMessagesToRemoteHost = false;
-
-                    OnTestRunAbort(testRunEventsHandler, exception, Resources.ConnectionClosed);
+                    this.OnTestRunAbort(testRunEventsHandler, exception);
                     isTestRunComplete = true;
                 }
                 catch (Exception exception)
                 {
-                    EqtTrace.Error("Server: TestExecution: Message Deserialization failed with {0}", exception);
-                    OnTestRunAbort(testRunEventsHandler, exception, exception.Message);
+                    this.OnTestRunAbort(testRunEventsHandler, exception);
                     isTestRunComplete = true;
                 }
             }
         }
 
-        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, string reason)
+        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception)
         {
-            // log console message to vstest console
-            var errorMessage = string.Format(Resources.AbortedTestRun, reason);
-            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, errorMessage);
+            EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
 
-            //log console message to vstest console wrapper
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = string.Format(Resources.AbortedTestRun, reason) };
+            // log console message to vstest console
+            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestRun);
+
+            // log console message to vstest console wrapper
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = Resources.AbortedTestRun };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
             testRunEventsHandler.HandleRawMessage(rawMessage);
 
@@ -250,7 +285,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // notify of a test run complete and bail out.
             testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
         }
-        
+
+        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler)
+        {
+            // Log to vstest console 
+            eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestDiscovery);
+
+            // Log to vs ide test output
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = Resources.AbortedTestDiscovery };
+            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+            eventHandler.HandleRawMessage(rawMessage);
+
+            // Notify discovery abort to IDE test output
+            var payload = new DiscoveryCompletePayload()
+            {
+                IsAborted = true,
+                LastDiscoveredTests = null,
+                TotalTests = -1
+            };
+            rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
+            eventHandler.HandleRawMessage(rawMessage);
+            
+            // Complete discovery
+            eventHandler.HandleDiscoveryComplete(-1, null, true);
+        }
+
         /// <summary>
         /// Send the cancel message to test host
         /// </summary>
@@ -262,6 +321,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendTestRunAbort()
         {
             this.communicationManager.SendMessage(MessageType.AbortTestRun);
+        }
+
+        public void OnClientProcessExit()
+        {
+            this.testhostExitCancellationTokenSource.Cancel();
+        }
+
+        private string TryReceiveRawMessage()
+        {
+            string message = null;
+            var receiverMessageTask = this.communicationManager.ReceiveRawMessageAsync(this.testhostExitCancellationTokenSource.Token);
+            receiverMessageTask.Wait();
+            message = receiverMessageTask.Result;
+
+            if (message == null)
+            {
+                if (this.testhostExitCancellationTokenSource.IsCancellationRequested)
+                {
+                    EqtTrace.Error("Stoping server due to testhost exit");
+                    this.communicationManager.StopServer();
+                }
+
+                EqtTrace.Error("Unable to receive message from testhost");
+                throw new IOException(Resources.UnableToCommunicateToTestHost);
+            }
+
+            return message;
         }
     }
 }

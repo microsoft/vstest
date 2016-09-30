@@ -30,7 +30,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private CancellationTokenSource cancellationTokenSource;
+        /// <summary>
+        /// Use to cancel blocking tasks associated with vstest.console process
+        /// </summary>
+        private CancellationTokenSource processExitCancellationTokenSource;
 
         #region Constructor
 
@@ -55,6 +58,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <returns>Port Number of hosted server on this side</returns>
         public int InitializeCommunication()
         {
+            this.processExitCancellationTokenSource = new CancellationTokenSource();
             this.handShakeSuccessful = false;
             this.handShakeComplete.Reset();
             int port = -1;
@@ -207,7 +211,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         public void OnProcessExited()
         {
-            this.cancellationTokenSource.Cancel();
+            this.processExitCancellationTokenSource.Cancel();
         }
 
         public void Close()
@@ -365,14 +369,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private Message TryReceiveMessage()
         {
             Message message = null;
-            this.cancellationTokenSource = new CancellationTokenSource();
-            var receiverMessageTask = this.communicationManager.ReceiveMessageAsync(this.cancellationTokenSource.Token);
+            var receiverMessageTask = this.communicationManager.ReceiveMessageAsync(this.processExitCancellationTokenSource.Token);
             receiverMessageTask.Wait();
             message = receiverMessageTask.Result;
 
             if (message == null)
             {
-                this.communicationManager.StopServer();
+                if (this.processExitCancellationTokenSource.IsCancellationRequested)
+                {
+                    // Cleanup communication layer on process exit 
+                    this.communicationManager.StopServer();
+                }
+
                 throw new TransationLayerException(Resources.FailedToReceiveMessage);
             }
 

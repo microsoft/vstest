@@ -71,8 +71,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     null,
                     new TestRunnerConnectionInfo { Port = portNumber });
 
-                // TODO: monitor test host exit and clean up
                 this.testHostManager.LaunchTestHost(testHostStartInfo);
+                this.testHostManager.RegisterForExitNotification(() => this.RequestSender.OnClientProcessExit());
 
                 this.initialized = true;
             }
