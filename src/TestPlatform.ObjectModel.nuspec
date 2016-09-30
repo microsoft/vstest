@@ -12,9 +12,9 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <copyright>Copyright © Microsoft Corporation</copyright>
     <dependencies>
-      <group targetFramework=".NETFramework4.6">
+      <group targetFramework="net46">
       </group>
-      <group targetFramework=".NETStandard1.5">
+      <group targetFramework="netstandard1.5">
         <dependency id="NETStandard.Library" version="[1.6.0, )" />
         <dependency id="System.Runtime.Serialization.Primitives" version="[4.1.1, )" />
         <dependency id="System.Runtime.Extensions" version="[4.1.0, )" />

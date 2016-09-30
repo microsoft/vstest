@@ -99,6 +99,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.TestPlatform.PerformanceTests", "test\Performance\Microsoft.TestPlatform.PerformanceTests\Microsoft.TestPlatform.PerformanceTests.xproj", "{12D59CED-9916-4C3F-AF82-12E019757FD2}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.TestPlatform.Build", "src\Microsoft.TestPlatform.Build\Microsoft.TestPlatform.Build.xproj", "{03FC3BAA-417B-460B-B9EF-AB9A4D2A974A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -241,6 +243,10 @@ Global
 		{12D59CED-9916-4C3F-AF82-12E019757FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12D59CED-9916-4C3F-AF82-12E019757FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12D59CED-9916-4C3F-AF82-12E019757FD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03FC3BAA-417B-460B-B9EF-AB9A4D2A974A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03FC3BAA-417B-460B-B9EF-AB9A4D2A974A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03FC3BAA-417B-460B-B9EF-AB9A4D2A974A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03FC3BAA-417B-460B-B9EF-AB9A4D2A974A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -285,5 +291,6 @@ Global
 		{0CC51637-B665-47B0-A093-042D31785928} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
 		{44DABCFB-7AA0-4682-B7F7-067E0ABA1D14} = {463031A2-7F16-4E38-9944-1F5161D04933}
 		{12D59CED-9916-4C3F-AF82-12E019757FD2} = {44DABCFB-7AA0-4682-B7F7-067E0ABA1D14}
+		{03FC3BAA-417B-460B-B9EF-AB9A4D2A974A} = {D8EF073C-279A-4279-912D-E9D4B0635E17}
 	EndGlobalSection
 EndGlobal

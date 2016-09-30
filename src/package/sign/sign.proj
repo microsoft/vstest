@@ -13,8 +13,14 @@
     <IncludeLegacyComponents Condition="'$(IncludeLegacyComponents)' == ''">False</IncludeLegacyComponents>
 
     <PackagesDirectory Condition="'$(PackagesDirectory)' == ''">$(RootDirectory)packages\</PackagesDirectory>
-    <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
-    <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(RootDirectory)artifacts\obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
+    <ArtifactsBaseDirectory Condition="'$(ArtifactsBaseDirectory)' == ''">$(RootDirectory)artifacts\$(BuildConfiguration)\</ArtifactsBaseDirectory>
+
+    <!-- Directory with .NET 4.6 binaries -->
+    <ArtifactsDirectory Condition="'$(ArtifactsDirectory)' == ''">$(ArtifactsBaseDirectory)$(TargetFramework)\$(TargetRuntime)\</ArtifactsDirectory>
+
+    <!-- Directory with .NETCore binaries -->
+    <ArtifactsCoreDirectory Condition="'$(ArtifactsCoreDirectory)' == ''">$(ArtifactsBaseDirectory)netcoreapp1.0\</ArtifactsCoreDirectory>
+    <IntermediatesDirectory Condition="'$(IntermediatesDirectory)' == ''">$(ArtifactsBaseDirectory)obj\$(BuildConfiguration)\$(TargetFramework)\$(TargetRuntime)\</IntermediatesDirectory>
   </PropertyGroup>
 
   <ImportGroup>
@@ -47,7 +53,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
     </ItemGroup>
 
-    <!-- Sign test platform v2 assemblies -->
+    <!-- Sign test platform v2 assemblies for .NET 4.6-->
     <ItemGroup>
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.TestPlatform.CoreUtilities.dll" />
@@ -59,11 +65,11 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)testhost.x86.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.exe" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
-    </ItemGroup>
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
 
-    <!-- Sign NetCore Assemblies -->
-    <ItemGroup>
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\DataCollector.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CommunicationUtilities.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CoreUtilities.dll" />
@@ -80,11 +86,44 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
     </ItemGroup>
 
+    <!-- Sign test platform v2 assemblies for .NET Core -->
+    <ItemGroup>
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)DataCollector.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.CoreUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.Utilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.Client.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)testhost.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)vstest.console.dll" />
+
+      <!-- NetCoreExtensions -->
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
+    </ItemGroup>
+
+    <!-- Sign Microsoft.TestPlatform.Build -->
+    <ItemGroup>
+      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.Build.dll" />
+    </ItemGroup>
+
     <ItemGroup>
       <AssembliesToSign>
         <Authenticode>Microsoft</Authenticode>
         <StrongName>StrongName</StrongName>
       </AssembliesToSign>
+
+      <CoreAssembliesToSign>
+        <Authenticode>Microsoft</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </CoreAssembliesToSign>
+
+      <BuildAssembliesToSign>
+        <Authenticode>Microsoft</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </BuildAssembliesToSign>
     </ItemGroup>
 
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
@@ -92,11 +131,23 @@
                BinariesDirectory="$(ArtifactsDirectory)"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(CoreAssembliesToSign)"/>
+    <SignFiles Files="@(CoreAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsCoreDirectory)"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+
+    <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(BuildAssembliesToSign)"/>
+    <SignFiles Files="@(BuildAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
   </Target>
 
   <Target Name="SignVsix">
     <PropertyGroup>
-      <VsixOutDir>$(ArtifactsDirectory)..\..\</VsixOutDir>
+      <VsixOutDir>$(ArtifactsBaseDirectory)</VsixOutDir>
     </PropertyGroup>
 
     <ItemGroup>
