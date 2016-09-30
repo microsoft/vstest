@@ -278,7 +278,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryDoesNotExist()
         {
-            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" });
 
             Assert.AreEqual(0, extensions.Count());
@@ -287,7 +287,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void GetTestPlatformExtensionsShouldReturnLibariesFromSourceDirectory()
         {
-            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.TestAdapter.dll" });
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" });
 
@@ -298,7 +298,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryIsEmpty()
         {
             // Parent directory is empty since the input source is file "test.dll"
-            this.mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.dll" });
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource);
 
