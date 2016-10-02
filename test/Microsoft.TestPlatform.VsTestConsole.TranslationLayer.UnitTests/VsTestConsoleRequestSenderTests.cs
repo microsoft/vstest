@@ -204,7 +204,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         [TestMethod]
         public void DiscoverTestsShouldCompleteWithZeroTests()
         {
-//            this.InitializeCommunication();
+            this.InitializeCommunication();
 
             var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
 

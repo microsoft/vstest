@@ -39,6 +39,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
 
+        /// <summary>
+        /// Path to additional extensions to reinitialize vstest.console
+        /// </summary>
         private IEnumerable<string> pathToAdditionalExtensions;
 
         #endregion

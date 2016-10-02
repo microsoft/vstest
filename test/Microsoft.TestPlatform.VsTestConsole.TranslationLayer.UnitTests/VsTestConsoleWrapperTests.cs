@@ -451,7 +451,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             public void ShutdownProcess()
             {
                 ProcessExited?.Invoke(this, null);
-
             }
 
             public void StartProcess(string[] args)

@@ -366,10 +366,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             // To unblock reader when vstestconsole exit
             var messageReceivedEvent = new AutoResetEvent(false);
             Message message = null;
-             
             Exception receiveMessageException = null;
             var cancellationTokenSource = new CancellationTokenSource();
-
             Task receiverMessageTask = Task.Run(() =>
             {
                 try
