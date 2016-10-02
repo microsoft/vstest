@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.requestSender = requestSender;
             this.vstestConsoleProcessManager = processManager;
-            this.vstestConsoleProcessManager.ProcessExited += this.ProcessManagerOnProcessExited;
+            this.vstestConsoleProcessManager.ProcessExited += (sender, args) => this.requestSender.OnProcessExited();
             this.sessionStarted = false;
         }
 
@@ -168,13 +168,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void EnsureInitialized()
         {
-
             if (!this.vstestConsoleProcessManager.IsProcessInitialized())
             {
                 this.StartSession();
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
                 this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
             }
+
             if (!this.sessionStarted && this.requestSender != null)
             {
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
@@ -184,11 +184,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 throw new TransationLayerException("Error connecting to Vstest Command Line");
             }
-        }
-
-        private void ProcessManagerOnProcessExited(object sender, EventArgs eventArgs)
-        {
-            this.requestSender?.OnProcessExited();
         }
     }
 }

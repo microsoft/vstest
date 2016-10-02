@@ -22,13 +22,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
     // with the /str option, or rebuild your VS project.
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resource {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
-        internal Resource() {
+        internal Resources() {
         }
         
         /// <summary>
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resource", typeof(Resource).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -74,6 +74,24 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
         public static string AbortedTestsRun {
             get {
                 return ResourceManager.GetString("AbortedTestsRun", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to Failed to receive message from vstest.console process.
+        /// </summary>
+        public static string FailedToReceiveMessage {
+            get {
+                return ResourceManager.GetString("FailedToReceiveMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to vstest.console process exited abnormally.
+        /// </summary>
+        public static string VsTestProcessExitedAbnormally {
+            get {
+                return ResourceManager.GetString("VsTestProcessExitedAbnormally", resourceCulture);
             }
         }
     }

@@ -16,6 +16,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.Win32.SafeHandles;
 
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
@@ -30,7 +31,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private ManualResetEvent processExitedResetEvent = new ManualResetEvent(false);
+        private AutoResetEvent processExitedResetEvent = new AutoResetEvent(false);
 
         #region Constructor
 
@@ -107,20 +108,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="eventHandler"></param>
         public void DiscoverTests(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler eventHandler)
         {
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.StartDiscovery,
-                    new DiscoveryRequestPayload() { Sources = sources, RunSettings = runSettings });
-                this.processExitedResetEvent.Reset();
-                this.ListenAndReportTestCases(eventHandler);
-            }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, Resource.AbortedTestsDiscovery);
-                eventHandler.HandleDiscoveryComplete(-1, null, true);
-            }
+                this.SendMessageAndListenAndReportTestCases(sources, runSettings, eventHandler);
         }
 
         /// <summary>
@@ -131,18 +119,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="runEventsHandler">EventHandler for test run events</param>
         public void StartTestRun(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler)
         {
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.TestRunAllSourcesWithDefaultHost,
-                    new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings });
-                this.processExitedResetEvent.Reset();
-                this.ListenAndReportTestResults(runEventsHandler, null);
-            }
-            catch (Exception exception)
-            {
-                this.AbortRunOperation(runEventsHandler, exception);
-            }
+            this.SendMessageAndListenAndReportTestResults(
+                MessageType.TestRunAllSourcesWithDefaultHost,
+                new TestRunRequestPayload() { Sources = sources.ToList(), RunSettings = runSettings },
+                runEventsHandler,
+                null);
         }
 
         /// <summary>
@@ -153,18 +134,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="runEventsHandler">EventHandler for test run events</param>
         public void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler)
         {
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.TestRunSelectedTestCasesDefaultHost,
-                    new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings });
-                this.processExitedResetEvent.Reset();
-                this.ListenAndReportTestResults(runEventsHandler, null);
-            }
-            catch (Exception exception)
-            {
-                this.AbortRunOperation(runEventsHandler, exception);
-            }
+            this.SendMessageAndListenAndReportTestResults(
+                MessageType.TestRunAllSourcesWithDefaultHost,
+                new TestRunRequestPayload() { TestCases = testCases.ToList(), RunSettings = runSettings },
+                runEventsHandler,
+                null);
         }
 
         /// <summary>
@@ -173,26 +147,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="sources">Sources for test run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
-        public void StartTestRunWithCustomHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler, 
+        public void StartTestRunWithCustomHost(
+            IEnumerable<string> sources,
+            string runSettings,
+            ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.GetTestRunnerProcessStartInfoForRunAll,
-                    new TestRunRequestPayload()
-                        {
-                        Sources = sources.ToList(),
-                        RunSettings = runSettings,
-                        DebuggingEnabled = customHostLauncher.IsDebug
-                    });
-                this.processExitedResetEvent.Reset();
-                this.ListenAndReportTestResults(runEventsHandler, customHostLauncher);
-            }
-            catch (Exception exception)
-            {
-                this.AbortRunOperation(runEventsHandler, exception);
-            }
+            this.SendMessageAndListenAndReportTestResults(
+                MessageType.GetTestRunnerProcessStartInfoForRunAll,
+                new TestRunRequestPayload()
+                {
+                    Sources = sources.ToList(),
+                    RunSettings = runSettings,
+                    DebuggingEnabled = customHostLauncher.IsDebug
+                },
+                runEventsHandler,
+                customHostLauncher);
         }
 
         /// <summary>
@@ -207,23 +177,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             ITestRunEventsHandler runEventsHandler,
             ITestHostLauncher customHostLauncher)
         {
-            try
-            {
-                this.communicationManager.SendMessage(
-                    MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-                    new TestRunRequestPayload()
-                        {
-                        TestCases = testCases.ToList(),
-                        RunSettings = runSettings,
-                        DebuggingEnabled = customHostLauncher.IsDebug
-                    });
-                this.processExitedResetEvent.Reset();
-                this.ListenAndReportTestResults(runEventsHandler, customHostLauncher);
-            }
-            catch (Exception exception)
-            {
-                this.AbortRunOperation(runEventsHandler, exception);
-            }
+            this.SendMessageAndListenAndReportTestResults(
+                MessageType.GetTestRunnerProcessStartInfoForRunSelected,
+                new TestRunRequestPayload()
+                {
+                    TestCases = testCases.ToList(),
+                    RunSettings = runSettings,
+                    DebuggingEnabled = customHostLauncher.IsDebug
+                },
+                runEventsHandler,
+                customHostLauncher);
         }
 
 
@@ -296,125 +259,150 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return success;
         }
 
-        private void ListenAndReportTestCases(ITestDiscoveryEventsHandler eventHandler)
+        private void SendMessageAndListenAndReportTestCases(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler eventHandler)
         {
-            var isDiscoveryComplete = false;
-
-            // Cycle through the messages that the vstest.console sends. 
-            // Currently each of the operations are not separate tasks since they should not each take much time. 
-            // This is just a notification.
-            while (!isDiscoveryComplete)
+            try
             {
-                var message = this.ReceiveMessageWithListeningToOnProcessExit();
+                this.communicationManager.SendMessage(
+                            MessageType.StartDiscovery,
+                            new DiscoveryRequestPayload() { Sources = sources, RunSettings = runSettings });
+                var isDiscoveryComplete = false;
 
-                if (string.Equals(MessageType.TestCasesFound, message.MessageType))
+                // Cycle through the messages that the vstest.console sends. 
+                // Currently each of the operations are not separate tasks since they should not each take much time. 
+                // This is just a notification.
+                while (!isDiscoveryComplete)
                 {
-                    var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
+                    var message = this.ReceiveMessageWithListeningToOnProcessExit();
 
-                    eventHandler.HandleDiscoveredTests(testCases);
-                }
-                else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
-                {
-                    var discoveryCompletePayload =
-                        this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+                    if (string.Equals(MessageType.TestCasesFound, message.MessageType))
+                    {
+                        var testCases = this.dataSerializer.DeserializePayload<IEnumerable<TestCase>>(message);
 
-                    eventHandler.HandleDiscoveryComplete(
-                        discoveryCompletePayload.TotalTests,
-                        discoveryCompletePayload.LastDiscoveredTests,
-                        discoveryCompletePayload.IsAborted);
-                    isDiscoveryComplete = true;
+                        eventHandler.HandleDiscoveredTests(testCases);
+                    }
+                    else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
+                    {
+                        var discoveryCompletePayload =
+                            this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+
+                        eventHandler.HandleDiscoveryComplete(
+                            discoveryCompletePayload.TotalTests,
+                            discoveryCompletePayload.LastDiscoveredTests,
+                            discoveryCompletePayload.IsAborted);
+                        isDiscoveryComplete = true;
+                    }
+                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                    {
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                    }
                 }
-                else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                {
-                    var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
-                    eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
-                }
+            }
+            catch (Exception exception)
+            {
+                EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsDiscovery);
+                eventHandler.HandleDiscoveryComplete(-1, null, true);
             }
         }
 
-        private void ListenAndReportTestResults(ITestRunEventsHandler eventHandler, ITestHostLauncher customHostLauncher)
+        private void SendMessageAndListenAndReportTestResults(string messageType, object payload, ITestRunEventsHandler eventHandler, ITestHostLauncher customHostLauncher)
         {
-            var isTestRunComplete = false;
+            try
+            {
+                this.communicationManager.SendMessage(messageType, payload);
+                var isTestRunComplete = false;
 
-            // Cycle through the messages that the testhost sends. 
-            // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
-            while (!isTestRunComplete)
-            { 
-                var message = this.ReceiveMessageWithListeningToOnProcessExit();
+                // Cycle through the messages that the testhost sends. 
+                // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
+                while (!isTestRunComplete)
+                {
+                    var message = this.ReceiveMessageWithListeningToOnProcessExit();
 
-                if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
-                {
-                    var testRunChangedArgs = this.dataSerializer.DeserializePayload<TestRunChangedEventArgs>(message);
-                    eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
-                }
-                else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
-                {
-                    var testRunCompletePayload = this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+                    if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
+                    {
+                        var testRunChangedArgs = this.dataSerializer.DeserializePayload<TestRunChangedEventArgs>(
+                            message);
+                        eventHandler.HandleTestRunStatsChange(testRunChangedArgs);
+                    }
+                    else if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
+                    {
+                        var testRunCompletePayload =
+                            this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
 
-                    eventHandler.HandleTestRunComplete(
-                        testRunCompletePayload.TestRunCompleteArgs,
-                        testRunCompletePayload.LastRunTests,
-                        testRunCompletePayload.RunAttachments,
-                        testRunCompletePayload.ExecutorUris);
-                    isTestRunComplete = true;
-                }
-                else if (string.Equals(MessageType.TestMessage, message.MessageType))
-                {
-                    var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
-                    eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
-                }
-                else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
-                {
-                    var testProcessStartInfo = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
+                        eventHandler.HandleTestRunComplete(
+                            testRunCompletePayload.TestRunCompleteArgs,
+                            testRunCompletePayload.LastRunTests,
+                            testRunCompletePayload.RunAttachments,
+                            testRunCompletePayload.ExecutorUris);
+                        isTestRunComplete = true;
+                    }
+                    else if (string.Equals(MessageType.TestMessage, message.MessageType))
+                    {
+                        var testMessagePayload = this.dataSerializer.DeserializePayload<TestMessagePayload>(message);
+                        eventHandler.HandleLogMessage(testMessagePayload.MessageLevel, testMessagePayload.Message);
+                    }
+                    else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
+                    {
+                        var testProcessStartInfo = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
 
-                    var processId = customHostLauncher != null
-                        ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
-                        : -1;
-                    this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, processId);
+                        var processId = customHostLauncher != null
+                                            ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
+                                            : -1;
+                        this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, processId);
+                    }
                 }
             }
-                
+            catch (Exception exception)
+            {
+                EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
+                this.AbortRunOperation(eventHandler, exception);
+            }
         }
 
         private Message ReceiveMessageWithListeningToOnProcessExit()
         {
             // To unblock reader when vstestconsole exit
-            var messageReceivedEvent = new ManualResetEvent(false);
+            var messageReceivedEvent = new AutoResetEvent(false);
             Message message = null;
+             
             Exception receiveMessageException = null;
             var cancellationTokenSource = new CancellationTokenSource();
-            var cancellationToken = cancellationTokenSource.Token;
 
-            Task.Run(() =>
+            Task receiverMessageTask = Task.Run(() =>
             {
                 try
                 {
-                    message = this.communicationManager.ReceiveMessage();
+                    message = this.communicationManager.ReceiveMessage(cancellationTokenSource.Token);
                     EqtTrace.Info("received message: {0}", message);
                 }
                 catch (Exception exception)
                 {
+                    EqtTrace.Error("error while reading message: {0}", exception);
                     receiveMessageException = exception;
                 }
                 finally
                 {
                     messageReceivedEvent.Set();
                 }
-            }, cancellationToken);
+            }, cancellationTokenSource.Token);
 
             WaitHandle[] waitHandles = { messageReceivedEvent, this.processExitedResetEvent };
             var index = WaitHandle.WaitAny(waitHandles);
 
-            if (index == 1)
+            if (message == null)
             {
-                // Signal from process exit
-                cancellationTokenSource.Cancel();
-                throw new TransationLayerException("Process exited abnormally.");
-            }
+                string reasonForfailure = Resources.FailedToReceiveMessage;
+                if (index == 1)
+                {
+                    cancellationTokenSource.Cancel();
+                    receiverMessageTask.Wait();
+                    reasonForfailure = Resources.VsTestProcessExitedAbnormally;
+                }
 
-            if (receiveMessageException != null)
-            {
-                throw new TransationLayerException("Failed to receive message.", receiveMessageException);
+                this.communicationManager.StopServer();
+                throw new TransationLayerException(reasonForfailure, receiveMessageException);
             }
 
             return message;
@@ -422,8 +410,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void AbortRunOperation(ITestRunEventsHandler eventHandler, Exception exception)
         {
-            EqtTrace.Error("Aborting Test Run Operation: {0}",  exception);
-            eventHandler.HandleLogMessage(TestMessageLevel.Error, Resource.AbortedTestsRun);
+            eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsRun);
             var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
             eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
         }

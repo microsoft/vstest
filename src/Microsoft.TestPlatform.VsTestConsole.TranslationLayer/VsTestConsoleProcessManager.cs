@@ -82,6 +82,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 this.process.Kill();
                 this.process.Dispose();
+                this.process = null;
             }
         }
 

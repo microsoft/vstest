@@ -123,4 +123,10 @@
   <data name="AbortedTestsDiscovery" xml:space="preserve">
     <value>The active Tests Discovery was aborted.</value>
   </data>
+  <data name="FailedToReceiveMessage" xml:space="preserve">
+    <value>Failed to receive message from vstest.console process</value>
+  </data>
+  <data name="VsTestProcessExitedAbnormally" xml:space="preserve">
+    <value>vstest.console process exited abnormally</value>
+  </data>
 </root>

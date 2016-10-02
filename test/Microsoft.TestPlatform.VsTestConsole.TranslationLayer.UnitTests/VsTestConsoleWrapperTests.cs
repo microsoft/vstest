@@ -79,21 +79,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(false);
             mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
-            
+
             // To call private method EnsureInitialize call InitializeExtensions
-            this.consoleWrapper.InitializeExtensions(new []{"path/to/adapter"});
-            
+            this.consoleWrapper.InitializeExtensions(new[] { "path/to/adapter" });
+
             mockProcessManager.Verify(pm => pm.StartProcess(It.IsAny<string[]>()));
         }
 
         [TestMethod]
-        public void PathToExtensionsShouldCacheOnInitializeExtension()
+        public void InitializeExtensionShouldCachePathToExtensions()
         {
             Mock<IProcessManager> mockProcessManager = new Mock<IProcessManager>();
             Mock<ITranslationLayerRequestSender> mockRequestSender = new Mock<ITranslationLayerRequestSender>();
             this.consoleWrapper = new VsTestConsoleWrapper(mockRequestSender.Object, mockProcessManager.Object);
 
-            var pathToExtensions = new[] {"path/to/adapter"};
+            var pathToExtensions = new[] { "path/to/adapter" };
             mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(true);
             mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
@@ -113,9 +113,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             Mock<IProcessManager> mockProcessManager = new Mock<IProcessManager>();
             Mock<ITranslationLayerRequestSender> mockRequestSender = new Mock<ITranslationLayerRequestSender>();
             this.consoleWrapper = new VsTestConsoleWrapper(mockRequestSender.Object, mockProcessManager.Object);
-            
-            mockProcessManager.Raise( pm => pm.ProcessExited += null, EventArgs.Empty);
-            
+
+            mockProcessManager.Raise(pm => pm.ProcessExited += null, EventArgs.Empty);
+
             mockRequestSender.Verify(rs => rs.OnProcessExited(), Times.Once);
         }
 
