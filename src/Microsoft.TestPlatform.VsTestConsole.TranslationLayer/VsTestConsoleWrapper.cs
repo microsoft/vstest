@@ -4,8 +4,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Diagnostics;
+    using System.Globalization;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -173,13 +173,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             if (!this.vstestConsoleProcessManager.IsProcessInitialized())
             {
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is not started.");
                 this.StartSession();
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
-                this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+
+                if (this.sessionStarted)
+                {
+                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
+                    this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+                }
             }
 
             if (!this.sessionStarted && this.requestSender != null)
             {
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is started. Validate the connection.");
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
             }
             
