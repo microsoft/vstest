@@ -104,15 +104,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            // Only send this if needed.
-            if (TestPluginCache.Instance.PathToAdditionalExtensions != null
-                && TestPluginCache.Instance.PathToAdditionalExtensions.Any())
+            var sourceList = sources.ToList();
+            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList).ToList();
+            if (TestPluginCache.Instance.PathToAdditionalExtensions != null)
             {
-                this.SetupChannel(sources);
+                extensions.AddRange(TestPluginCache.Instance.PathToAdditionalExtensions);
+            }
 
-                this.RequestSender.InitializeDiscovery(
-                    TestPluginCache.Instance.PathToAdditionalExtensions,
-                    TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+            // Only send this if needed.
+            if (extensions.Count > 0)
+            {
+                this.SetupChannel(sourceList);
+
+                this.RequestSender.InitializeDiscovery(extensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
         }
     }

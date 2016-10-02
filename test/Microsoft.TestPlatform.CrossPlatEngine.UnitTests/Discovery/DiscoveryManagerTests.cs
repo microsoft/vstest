@@ -42,7 +42,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void InitializeShouldUpdateAdditionalExtenions()
         {
-            var testableTestPluginCache = TestPluginCacheTests.SetupMockPathUtilities();
+            var testableTestPluginCache = TestPluginCacheTests.SetupMockTestPluginCache();
 
             // Stub the default extensions folder.
             testableTestPluginCache.DoesDirectoryExistSetter = false;

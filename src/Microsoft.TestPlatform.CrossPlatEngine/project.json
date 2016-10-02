@@ -10,7 +10,6 @@
     "Microsoft.TestPlatform.CommunicationUtilities": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "Microsoft.TestPlatform.Common": "15.0.0-*"
-    //"Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc2-20896"
   },
 
   "frameworks": {

@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Implementations;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -21,31 +20,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using CoreUtilities.Tracing;
     using CoreUtilities.Tracing.Interfaces;
 
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
     // Tests for ListTestsArgumentProcessor
     // </summary>
     [TestClass]
     public class ListTestsArgumentProcessorTests
     {
-        MockFileHelper mockFileHelper;
-        string dummyTestFilePath = "DummyTest.dll";
+        private readonly Mock<IFileHelper> mockFileHelper;
+        private string dummyTestFilePath = "DummyTest.dll";
 
-        private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
+        private readonly Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         public ListTestsArgumentProcessorTests()
         {
-            this.mockFileHelper = new MockFileHelper();
+            this.mockFileHelper = new Mock<IFileHelper>();
+            this.mockFileHelper.Setup(fh => fh.Exists(this.dummyTestFilePath)).Returns(true);
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
-            this.mockFileHelper.ExistsInvoker = (path) =>
-            {
-                if (string.Equals(path, this.dummyTestFilePath))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            };            
         }
 
         /// <summary>
@@ -95,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            CommandLineOptions.Instance.FileHelper = this.mockFileHelper;
+            CommandLineOptions.Instance.FileHelper = this.mockFileHelper.Object;
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             ListTestsArgumentExecutor executor = new ListTestsArgumentExecutor(
@@ -270,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             CommandLineOptions.Instance.Reset();
 
-            CommandLineOptions.Instance.FileHelper = this.mockFileHelper;
+            CommandLineOptions.Instance.FileHelper = this.mockFileHelper.Object;
             CommandLineOptions.Instance.AddSource(this.dummyTestFilePath);
         }
     }
