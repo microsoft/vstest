@@ -2,6 +2,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
+    using System;
+    using System.Collections.Generic;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -19,6 +21,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         public bool Exists(string path)
         {
             return File.Exists(path);
+        }
+
+        /// <inheritdoc/>
+        public bool DirectoryExists(string path)
+        {
+            return Directory.Exists(path);
+        }
+
+        /// <inheritdoc/>
+        public Stream GetStream(string filePath, FileMode mode)
+        {
+            return new FileStream(filePath, mode);
+        }
+
+        /// <inheritdoc/>
+        IEnumerable<string> IFileHelper.EnumerateFiles(string directory, string pattern, SearchOption searchOption)
+        {
+            return Directory.EnumerateFiles(directory, pattern, searchOption);
         }
     }
 }

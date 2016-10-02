@@ -1,19 +1,17 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 {
-    using Implementations;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Processors;
-    using System;
     using System.Collections.Generic;
-    using TestPlatform.CommandLine.Processors;
-    using TestPlatform.Utilities.Helpers.Interfaces;
-    using Utilities;
     using System.Linq;
-    using System.Reflection;
-    using CoreUtilities.Tracing;
+
+    using CoreUtilities.Tracing.Interfaces;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using CoreUtilities.Tracing.Interfaces;
+
+    using Utilities;
 
     [TestClass]
     public class ExecutorUnitTests

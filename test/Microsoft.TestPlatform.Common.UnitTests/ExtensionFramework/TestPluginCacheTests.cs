@@ -10,17 +10,15 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
+
     [TestClass]
     public class TestPluginCacheTests
     {
-        [TestInitialize]
-        public void TestInit()
+        public TestPluginCacheTests()
         {
             // Reset the singleton.
             TestPluginCache.Instance = null;
@@ -77,9 +75,9 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         }
 
         [TestMethod]
-        public void UpdateAdditionalExtensionsShouldNotThrowIfExtenionPathIsEmpty()
+        public void UpdateAdditionalExtensionsShouldNotThrowIfExtensionPathIsEmpty()
         {
-            TestPluginCache.Instance.UpdateAdditionalExtensions(new List<string> {}, true);
+            TestPluginCache.Instance.UpdateAdditionalExtensions(new List<string>(), true);
             Assert.IsNull(TestPluginCache.Instance.PathToAdditionalExtensions);
         }
 
@@ -103,22 +101,22 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                                                typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location
                                            };
             TestPluginCache.Instance.UpdateAdditionalExtensions(additionalExtensions, true);
-            var updatedExtensions = TestPluginCache.Instance.PathToAdditionalExtensions;
+            var updatedExtensions = TestPluginCache.Instance.PathToAdditionalExtensions.ToList();
 
             Assert.IsNotNull(updatedExtensions);
-            Assert.AreEqual(1, updatedExtensions.Count());
-            CollectionAssert.AreEqual(new List<string> { additionalExtensions.First() }, updatedExtensions.ToList());
+            Assert.AreEqual(1, updatedExtensions.Count);
+            CollectionAssert.AreEqual(new List<string> { additionalExtensions.First() }, updatedExtensions);
         }
 
         [TestMethod]
-        public void UpdateAdditionalExtensionsShouldNotUpdateInvalidPaths()
+        public void UpdateAdditionalExtensionsShouldUpdatePathsThatDoNotExist()
         {
             var additionalExtensions = new List<string> { "foo.dll" };
             TestPluginCache.Instance.UpdateAdditionalExtensions(additionalExtensions, true);
             var updatedExtensions = TestPluginCache.Instance.PathToAdditionalExtensions;
 
             Assert.IsNotNull(updatedExtensions);
-            Assert.AreEqual(0, updatedExtensions.Count());
+            Assert.AreEqual(1, updatedExtensions.Count());
         }
 
         [TestMethod]
@@ -156,7 +154,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var extensionPaths = new List<string> { Path.Combine(candidateDirectory, "foo.dll") };
             
             // Setup mocks.
-            SetupMockPathUtilities();
+            SetupMockTestPluginCache();
 
             TestPluginCache.Instance.UpdateAdditionalExtensions(extensionPaths, true);
             var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();
@@ -170,7 +168,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetDefaultResolutionPathsShouldReturnDefaultExtensionsDirectoryIfPresent()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = true;
             
             // Setup the testable instance.
@@ -225,7 +223,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void DefaultExtensionsShouldReturnExtensionsFolder()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = true;
             testableTestPluginCache.FilesInDirectory = (path, pattern) => { return new string[] { path }; };
 
@@ -244,7 +242,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void DefaultExtensionsShouldReturnEmptyIfExtensionsDirectoryDoesNotExist()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = false;
 
             // Setup the testable instance.
@@ -257,7 +255,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void DefaultExtensionsShouldReturnAllSupportedFilesUnderExtensionsFolder()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = true;
 
             var dllFiles = new string[] { "t1.dll" };
@@ -292,7 +290,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void DefaultExtensionsShouldReturnAssemblyExtensionsIfFolderContainsDllsOnly()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = true;
 
             var dllFiles = new string[] { "t1.dll", "t2.dll" };
@@ -333,7 +331,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldAddTestExtensionsDiscoveredToCache()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             
             // Setup mocks.
             var testExtensions = new TestExtensions();
@@ -361,7 +359,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldGetTestExtensionsFromCache()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
 
             // Setup mocks.
             var testExtensions = new TestExtensions();
@@ -391,7 +389,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldAddTestExtensionsToExistingCache()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
 
             // Setup mocks.
             var testExtensions = new TestExtensions[2];
@@ -436,7 +434,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetTestExtensionsShouldShouldThrowIfDiscovererThrows()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
 
             // Setup mocks.
             var testExtensions = new TestExtensions();
@@ -458,7 +456,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void DiscoverAllTestExtensionsShouldDiscoverExtensionsFromDefaultExtensionsFolder()
         {
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = true;
             testableTestPluginCache.FilesInDirectory = (path, pattern) =>
                 {
@@ -539,7 +537,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         public static TestableTestPluginCache SetupMockAdditionalPathExtensions(string[] extensions)
         {
-            var testableTestPluginCache = SetupMockPathUtilities();
+            var testableTestPluginCache = SetupMockTestPluginCache();
 
             // Stub the default extensions folder.
             testableTestPluginCache.DoesDirectoryExistSetter = false;
@@ -549,13 +547,9 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             return testableTestPluginCache;
         }
 
-        public static TestableTestPluginCache SetupMockPathUtilities()
+        public static TestableTestPluginCache SetupMockTestPluginCache()
         {
-            var mockPathUtilities = new Mock<IPathUtilities>();
-            var testableTestPluginCache = new TestableTestPluginCache(mockPathUtilities.Object);
-
-            mockPathUtilities.Setup(pu => pu.GetUniqueValidPaths(It.IsAny<IList<string>>()))
-                .Returns((IList<string> paths) => { return new HashSet<string>(paths); });
+            var testableTestPluginCache = new TestableTestPluginCache();
 
             TestPluginCache.Instance = testableTestPluginCache;
 
@@ -575,7 +569,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public static void SetupMockExtensions(string[] extensions, Action callback)
         {
             // Setup mocks.
-            var testableTestPluginCache = new TestableTestPluginCache(new Mock<IPathUtilities>().Object);
+            var testableTestPluginCache = new TestableTestPluginCache();
             testableTestPluginCache.DoesDirectoryExistSetter = true;
 
             testableTestPluginCache.FilesInDirectory = (path, pattern) =>
@@ -605,11 +599,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
     public class TestableTestPluginCache : TestPluginCache
     {
-        public TestableTestPluginCache(IPathUtilities pathUtilities)
-            : base(pathUtilities)
-        {
-        }
-
         internal Func<string, string, string[]> FilesInDirectory
         {
             get;

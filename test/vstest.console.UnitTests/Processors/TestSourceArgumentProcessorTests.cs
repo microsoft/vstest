@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Implementations;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -83,22 +83,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecuterInitializeWithValidSourceShouldAddItToTestSources()
         {
             var testFilePath = "DummyTestFile.txt";
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (path) =>
-                {
-                    if (string.Equals(path, testFilePath))
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                };
-            
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
             var options = CommandLineOptions.Instance;
             options.Reset();
-            options.FileHelper = mockFileHelper;
+            options.FileHelper = mockFileHelper.Object;
             var executor = new TestSourceArgumentExecutor(options);
 
             executor.Initialize(testFilePath);

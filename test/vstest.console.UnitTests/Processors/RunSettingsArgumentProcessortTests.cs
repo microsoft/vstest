@@ -6,13 +6,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.IO;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Implementations;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+    using Moq;
 
     [TestClass]
     public class RunSettingsArgumentProcessortTests
@@ -85,11 +87,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var fileName = "C:\\Imaginary\\nonExistentFile.txt";
 
             var executor = new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null);
-            // Setup mocks.
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (string filePath) => { return false; };
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
 
-            executor.FileHelper = mockFileHelper;
+            executor.FileHelper = mockFileHelper.Object;
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize(fileName),
@@ -113,10 +114,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 settingsXml);
 
             // Setup mocks.
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (string filePath) => { return true; };
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
 
-            executor.FileHelper = mockFileHelper;
+            executor.FileHelper = mockFileHelper.Object;
 
             // Act and Assert.
             ExceptionUtilities.ThrowsException<CommandLineException>(
@@ -139,10 +140,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 settingsXml);
             
             // Setup mocks.
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (string filePath) => { return true; };
-
-            executor.FileHelper = mockFileHelper;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
 
             // Act.
             executor.Initialize(fileName);
@@ -167,10 +167,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 settingsXml);
 
             // Setup mocks.
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (string filePath) => { return true; };
-
-            executor.FileHelper = mockFileHelper;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
 
             // Act.
             executor.Initialize(fileName);
@@ -196,10 +195,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 settingsXml);
 
             // Setup mocks.
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (string filePath) => { return true; };
-
-            executor.FileHelper = mockFileHelper;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
 
             // Act.
             executor.Initialize(fileName);

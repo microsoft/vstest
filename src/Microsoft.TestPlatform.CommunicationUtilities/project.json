@@ -7,7 +7,7 @@
   },
 
   "dependencies": {
-    "Newtonsoft.Json": "7.0.1",
+    "Newtonsoft.Json": "9.0.1",
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "Microsoft.TestPlatform.Common": "15.0.0-*"

@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
+    using System.Runtime.InteropServices;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using System.Runtime.InteropServices;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -91,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                startInfo.FileName = GetDotnetHostFullPath();
+                startInfo.FileName = this.GetDotnetHostFullPath();
             }
 
             // .NET core host manager is not a shared host. It will expect a single test source to be provided.
@@ -131,15 +130,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
-            startInfo.WorkingDirectory = sourceDirectory;
+            startInfo.WorkingDirectory = Directory.GetCurrentDirectory();
 
             return startInfo;
         }
 
+        /// <inheritdoc/>
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+        {
+            var sourceDirectory = Path.GetDirectoryName(sources.Single());
+
+            if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
+            {
+                return this.fileHelper.EnumerateFiles(sourceDirectory, "*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
+            }
+
+            return Enumerable.Empty<string>();
+        }
+
+        /// <inheritdoc/>
+        public void RegisterForExitNotification(Action abortCallback)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public void DeregisterForExitNotification()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
-        /// Get full path for the dotnet host
+        /// Get full path for the .net host
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Full path to <c>dotnet</c> executable</returns>
         private string GetDotnetHostFullPath()
         {
             char separator = ';'; 
@@ -157,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             foreach (string path in pathString.Split(separator))
             {
                 string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
-                if (fileHelper.Exists(exeFullPath))
+                if (this.fileHelper.Exists(exeFullPath))
                 {
                     return exeFullPath;
                 }
@@ -165,18 +189,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             EqtTrace.Error("Unable to find path for dotnet host");
             return dotnetExeName;
-        }
-
-        /// <inheritdoc/>
-        public void RegisterForExitNotification(Action abortCallback)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public void DeregisterForExitNotification()
-        {
-            throw new NotImplementedException();
         }
     }
 
