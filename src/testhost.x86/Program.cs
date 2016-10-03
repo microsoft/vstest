@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
 
     using CrossPlatEngine;
@@ -71,8 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// <summary>
         /// To parse int argument value.
         /// </summary>
-        /// <param name="args">
-        /// Array of all arguments Ex: { "--port", "12312", "--parentprocessid", "2312" }
+        /// <param name="argsDictionary">
+        /// Dictionary of all arguments Ex: { "--port":"12312", "--parentprocessid":"2312" }
         /// </param>
         /// <param name="fullname">
         /// The fullname for required argument. Ex: "--port"
@@ -85,23 +86,16 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </returns>
         /// <exception cref="ArgumentException">
         /// </exception>
-        private static int GetIntArg(string[] args, string fullname, string shortname)
+        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname, string shortname)
         {
             var val = -1;
-
-            for (var i = 0; i < args.Length; i++)
+            if (argsDictionary.ContainsKey(fullname) && argsDictionary[fullname] != null)
             {
-                bool isFullname = fullname != null && string.Equals(fullname, args[i], StringComparison.OrdinalIgnoreCase);
-                bool isShortname = shortname != null && string.Equals(shortname, args[i], StringComparison.OrdinalIgnoreCase);
-                if (isFullname || isShortname)
-                {
-                    if (i < args.Length - 1)
-                    {
-                        int.TryParse(args[i + 1], out val);
-                    }
-
-                    break;
-                }
+                int.TryParse(argsDictionary[fullname], out val);
+            }
+            else if (argsDictionary.ContainsKey(shortname) && argsDictionary[shortname] != null)
+            {
+                int.TryParse(argsDictionary[shortname], out val);
             }
 
             if (val < 0)
@@ -112,13 +106,45 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             return val;
         }
 
+        /// <summary>
+        /// The get args dictionary.
+        /// </summary>
+        /// <param name="args">
+        /// args Ex: { "--port", "12312", "--parentprocessid", "2312" }
+        /// </param>
+        /// <returns>
+        /// The <see cref="IDictionary"/>.
+        /// </returns>
+        private static IDictionary<string, string> getArgsDictionary(string[] args)
+        {
+            IDictionary<string, string> argsDictionary = new Dictionary<string, string>();
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i].StartsWith("-"))
+                {
+                    if (i < args.Length - 1 && !args[i + 1].StartsWith("-"))
+                    {
+                        argsDictionary.Add(args[i], args[i + 1]);
+                        i++;
+                    }
+                    else
+                    {
+                        argsDictionary.Add(args[i], null);
+                    }
+                }
+            }
+
+            return argsDictionary;
+        }
+
         private static void Run(string[] args)
         {
+            IDictionary<string, string> argsDictionary = getArgsDictionary(args);
             TestPlatformEventSource.Instance.TestHostStart();
-            var portNumber = GetIntArg(args, PortLongname, PortShortname);
+            var portNumber = GetIntArgFromDict(argsDictionary, PortLongname, PortShortname);
             var requestHandler = new TestRequestHandler();
             requestHandler.InitializeCommunication(portNumber);
-            var parentProcessId = GetIntArg(args, ParentProcessIdLongname, ParentProcessIdShortname);
+            var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdLongname, ParentProcessIdShortname);
             OnParentProcessExit(parentProcessId, requestHandler);
 
             // setup the factory.
