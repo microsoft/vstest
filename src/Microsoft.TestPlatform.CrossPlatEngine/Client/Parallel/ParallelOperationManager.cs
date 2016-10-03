@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region ConcurrentManagerInstanceData
 
         protected Func<T> CreateNewConcurrentManager { get; set; }
+        public bool Shared { get; private set; }
 
         protected T[] concurrentManagerInstances;
 
@@ -32,10 +33,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #endregion
 
-        protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel)
+        protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel, bool shared)
         {
-            this.CreateNewConcurrentManager = createNewManager;         
-
+            this.CreateNewConcurrentManager = createNewManager;
+            this.Shared = shared;
             // Update Parallel Level
             UpdateParallelLevel(parallelLevel);
         }

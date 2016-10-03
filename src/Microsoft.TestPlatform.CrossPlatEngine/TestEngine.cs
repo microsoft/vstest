@@ -63,9 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings))
                         : new ProxyExecutionManager(testHostManager);
 
-            if (parallelLevel > 1)
+            if (parallelLevel > 1 || testHostManager.Shared)
             {
-                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel);
+                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel, testHostManager.Shared);
             }
             else
             {
