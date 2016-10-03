@@ -2,7 +2,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
-    using Implementations;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using Processors;
@@ -87,12 +86,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var options = CommandLineOptions.Instance;
             BuildBasePathArgumentExecutor executor = new BuildBasePathArgumentExecutor(options);
             string testBuildBasePath = @"C:\BuildDir";
-            var mockFileHelper = new MockFileHelper();
-            mockFileHelper.ExistsInvoker = (path) =>
-            {
-                return string.Equals(path, testBuildBasePath);
-            };
-            executor.FileHelper = mockFileHelper;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(testBuildBasePath)).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
             
             executor.Initialize(testBuildBasePath);
             Assert.AreEqual(testBuildBasePath, options.BuildBasePath);

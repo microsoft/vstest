@@ -1,11 +1,11 @@
 // Copyright (c) Microsoft. All rights reserved.
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Runtime.InteropServices;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -131,15 +131,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
-            startInfo.WorkingDirectory = sourceDirectory;
+            startInfo.WorkingDirectory = Directory.GetCurrentDirectory();
 
             return startInfo;
         }
 
+        /// <inheritdoc/>
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+        {
+            var sourceDirectory = Path.GetDirectoryName(sources.Single());
+
+            if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
+            {
+                return this.fileHelper.EnumerateFiles(sourceDirectory, "*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
+            }
+
+            return Enumerable.Empty<string>();
+        }
+
+        /// <inheritdoc/>
+        public void RegisterForExitNotification(Action abortCallback)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public void DeregisterForExitNotification()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
-        /// Get full path for the dotnet host
+        /// Get full path for the .net host
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Full path to <c>dotnet</c> executable</returns>
         private string GetDotnetHostFullPath()
         {
             char separator = ';'; 
@@ -165,18 +190,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             EqtTrace.Error("Unable to find path for dotnet host");
             return dotnetExeName;
-        }
-
-        /// <inheritdoc/>
-        public void RegisterForExitNotification(Action abortCallback)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
-        public void DeregisterForExitNotification()
-        {
-            throw new NotImplementedException();
         }
     }
 

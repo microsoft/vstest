@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.Reflection;
     
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -27,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     {
         #region Private Members
 
-        private Dictionary<string, Assembly> resolvedAssemblies;
+        private readonly Dictionary<string, Assembly> resolvedAssemblies;
 
         /// <summary>
         /// Specify the path to additional extensions
@@ -53,30 +52,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         private List<string> defaultExtensionPaths;
 
-        private IPathUtilities pathUtilities;
-
         private const string DefaultExtensionsFolder = "Extensions";
 
         #endregion
 
         #region Constructor
 
-        private TestPluginCache()
-            : this(new PathUtilities())
-        {
-        }
-
         /// <summary>
-        /// Added for unit testing.
+        /// Initializes a new instance of the <see cref="TestPluginCache"/> class. 
         /// </summary>
-        /// <param name="pathUtilities"></param>
-        protected TestPluginCache(IPathUtilities pathUtilities)
+        protected TestPluginCache()
         {
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
             this.pathToAdditionalExtensions = null;
             this.loadOnlyWellKnownExtensions = false;
             this.lockForAdditionalExtensionsUpdate = new object();
-            this.pathUtilities = pathUtilities;
         }
 
         #endregion
@@ -301,15 +291,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.loadOnlyWellKnownExtensions = shouldLoadOnlyWellKnownExtensions;
 
-                if (additionalExtensionsPath == null || !additionalExtensionsPath.Any())
+                IList<string> extensions = additionalExtensionsPath?.ToList();
+                if (extensions == null || extensions.Count == 0)
                 {
                     return;
                 }
 
                 string extensionString;
                 if (this.pathToAdditionalExtensions != null
-                    && additionalExtensionsPath.Count() == this.pathToAdditionalExtensions.Count()
-                    && additionalExtensionsPath.All(e => this.pathToAdditionalExtensions.Contains(e)))
+                    && extensions.Count == this.pathToAdditionalExtensions.Count()
+                    && extensions.All(e => this.pathToAdditionalExtensions.Contains(e)))
                 {
                     extensionString = this.pathToAdditionalExtensions != null
                                           ? string.Join(",", this.pathToAdditionalExtensions.ToArray())
@@ -320,20 +311,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                     return;
                 }
-                
-                var newExtensionPaths = this.pathUtilities.GetUniqueValidPaths(additionalExtensionsPath);
-                
+
+                // Don't do a strict check for existence of the extension path. The extension paths may or may
+                // not exist on the disk. In case of .net core, the paths are relative to the nuget packages
+                // directory. The path to nuget directory is automatically setup for CLR to resolve.
+                // Test platform tries to load every extension by assembly name. If it is not resolved, we don't
+                // an error.
+                var newExtensionPaths = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
                 if (this.pathToAdditionalExtensions != null)
                 {
-                    foreach (var existingExtension in this.pathToAdditionalExtensions)
-                    {
-                        newExtensionPaths.Add(existingExtension);
-                    }
+                    newExtensionPaths.AddRange(this.pathToAdditionalExtensions);
                 }
 
                 // Use the new paths and set the extensions discovered to false so that the next time 
                 // any one tries to get the additional extensions, we rediscover. 
-                this.pathToAdditionalExtensions = newExtensionPaths.ToList();
+                this.pathToAdditionalExtensions = newExtensionPaths;
 
                 this.AreDefaultExtensionsDiscovered = false;
 
@@ -413,8 +406,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Gets the test extensions defined in the extension assembly list.
         /// </summary>
-        /// <param name="extensions">Extension assembly paths.</param>
-        /// <returns></returns>
+        /// <param name="extensionPaths">Extension assembly paths.</param>
+        /// <returns>List of extensions.</returns>
         /// <remarks>Added to mock out dependency from the actual test plugin discovery as such.</remarks>
         internal virtual TestExtensions GetTestExtensions(IEnumerable<string> extensionPaths)
         {
@@ -424,10 +417,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         }
 
         /// <summary>
-        /// Gets the resoltuion paths for the extension assembly to falicitate assembly resolution.
+        /// Gets the resolution paths for the extension assembly to facilitate assembly resolution.
         /// </summary>
         /// <param name="extensionAssembly">The extension assembly.</param>
-        /// <returns></returns>
+        /// <returns>Resolution paths for the assembly.</returns>
         internal IList<string> GetResolutionPaths(string extensionAssembly)
         {
             var resolutionPaths = new List<string>();
@@ -447,7 +440,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Gets the default set of resolution paths for the assembly resolution
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of paths.</returns>
         [System.Security.SecurityCritical]
         internal IList<string> GetDefaultResolutionPaths()
         {
@@ -489,7 +482,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 resolutionPaths = this.GetResolutionPaths(extensionAssembly);
             }
 
-            //Add assembly resolver which can resolve the extensions from the specified directory.
+            // Add assembly resolver which can resolve the extensions from the specified directory.
             if (this.assemblyResolver == null)
             {
                 this.assemblyResolver = new AssemblyResolver(resolutionPaths);
