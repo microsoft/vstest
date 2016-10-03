@@ -65,5 +65,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         {
             return Path.GetDirectoryName(typeof(ProcessHelper).GetTypeInfo().Assembly.Location);
         }
+
+        public int GetCurrentProcessId()
+        {
+            return Process.GetCurrentProcess().Id;
+        }
     }
 }

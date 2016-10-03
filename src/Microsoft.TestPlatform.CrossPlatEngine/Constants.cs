@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         internal const string PortOption = "--port";
 
+        internal const string ParentProcessIdOption = "--parentprocessid";
+
         /// <summary>
         /// The connection timeout for clients in milliseconds.
         /// </summary>

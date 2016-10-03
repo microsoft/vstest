@@ -42,8 +42,8 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
             var testResults = RunAllTests(consoleWrapper, new List<string>() { testAssembly });
 
-            Console.WriteLine("Run All Test Count: " + testresults?.Count());
-            Console.WriteLine("Run All Test Result: " + testresults?.FirstOrDefault()?.TestCase?.DisplayName + " :" + testresults?.FirstOrDefault()?.Outcome);
+            Console.WriteLine("Run All Test Count: " + testResults?.Count());
+            Console.WriteLine("Run All Test Result: " + testResults?.FirstOrDefault()?.TestCase?.DisplayName + " :" + testResults?.FirstOrDefault()?.Outcome);
 
             Console.WriteLine("-------------------------------------------------------");
         }

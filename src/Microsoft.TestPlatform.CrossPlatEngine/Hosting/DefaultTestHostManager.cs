@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // Default test host manager supports shared test sources
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
-            var argumentsString = " " + Constants.PortOption + " " + connectionInfo.Port;
+            var argumentsString = " " + Constants.PortOption + " " + connectionInfo.Port + " " + Constants.ParentProcessIdOption + " " + processHelper.GetCurrentProcessId();
 
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
