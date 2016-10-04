@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Microsoft.TestPlatform.TestHost</id>
-    <version>15.0.0</version>
+    <version>$Version$</version>
     <title>Microsoft.TestPlatform.TestHost</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
@@ -12,7 +12,7 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <copyright>Copyright © Microsoft Corporation</copyright>
     <dependencies>
-      <dependency id="Microsoft.TestPlatform.ObjectModel" version="15.0.0"/>
+      <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
       <dependency id="Newtonsoft.Json" version="9.0.1"/>
     </dependencies>
   </metadata>
