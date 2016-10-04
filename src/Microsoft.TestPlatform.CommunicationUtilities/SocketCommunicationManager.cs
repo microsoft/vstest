@@ -59,7 +59,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         private object sendSyncObject = new object();
 
+        /// <summary>
+        /// Server stream to use read timeout
+        /// </summary>
         private NetworkStream serverStream;
+
+        /// <summary>
+        /// The server stream read timeout constant.
+        /// </summary>
+        private const int ServerStreamReadTimeout = 500;
 
         public SocketCommunicationManager(): this(JsonDataSerializer.Instance)
         {
@@ -80,6 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var endpoint = new IPEndPoint(IPAddress.Loopback, 0);
             this.tcpListener = new TcpListener(endpoint);
+
             this.tcpListener.Start();
 
             var portNumber = ((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
@@ -252,9 +261,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>
         /// Returns message read from the binary reader
         /// </returns>
-        public Message ReceiveMessage(CancellationToken cancellationToken)
+        public async Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken)
         {
-            var rawMessage = this.ReceiveRawMessage(cancellationToken);
+            var rawMessage = await this.ReceiveRawMessageAsync(cancellationToken);
             if (!string.IsNullOrEmpty(rawMessage))
             {
                 return this.dataSerializer.DeserializeMessage(rawMessage);
@@ -272,27 +281,54 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>
         /// Raw message string 
         /// </returns>
-        public string ReceiveRawMessage(CancellationToken cancellationToken)
+        public async Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken)
+        {
+            var str = await Task.Run(() => this.TryReceiveRawMessage(cancellationToken));
+            return str;
+        }
+
+        private string TryReceiveRawMessage(CancellationToken cancellationToken)
         {
             string str = null;
             bool success = false;
+
+            // Set read timeout to avoid blocking receive raw message
+            this.serverStream.ReadTimeout = ServerStreamReadTimeout;
             while (!cancellationToken.IsCancellationRequested && !success)
             {
-                this.serverStream.ReadTimeout = 200;
-
                 try
                 {
                     str = this.ReceiveRawMessage();
                     success = true;
                 }
-                catch (Exception)
+                catch (IOException ioException)
                 {
-                    // Ingore timeoutexception
+                    var socketException = ioException.InnerException as SocketException;
+                    if (socketException != null
+                        && socketException.SocketErrorCode == SocketError.TimedOut)
+                    {
+                        EqtTrace.Info(
+                            "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
+                            ioException);
+                    }
+                    else
+                    {
+                        EqtTrace.Error(
+                            "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                            ioException);
+                        break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    EqtTrace.Error(
+                        "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                        exception);
+                    break;
                 }
             }
 
             this.serverStream.ReadTimeout = -1;
-
             return str;
         }
 

@@ -16,7 +16,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.Win32.SafeHandles;
 
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
@@ -31,7 +30,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private AutoResetEvent processExitedResetEvent = new AutoResetEvent(false);
+        private CancellationTokenSource cancellationTokenSource;
 
         #region Constructor
 
@@ -208,7 +207,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         public void OnProcessExited()
         {
-            this.processExitedResetEvent?.Set();
+            this.cancellationTokenSource.Cancel();
         }
 
         public void Close()
@@ -273,7 +272,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // This is just a notification.
                 while (!isDiscoveryComplete)
                 {
-                    var message = this.ReceiveMessageWithListeningToOnProcessExit();
+                    var message = this.TryReceiveMessage();
 
                     if (string.Equals(MessageType.TestCasesFound, message.MessageType))
                     {
@@ -318,7 +317,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
                 while (!isTestRunComplete)
                 {
-                    var message = this.ReceiveMessageWithListeningToOnProcessExit();
+                    var message = this.TryReceiveMessage();
 
                     if (string.Equals(MessageType.TestRunStatsChange, message.MessageType))
                     {
@@ -357,60 +356,27 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
-                this.AbortRunOperation(eventHandler, exception);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsRun);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
         }
 
-        private Message ReceiveMessageWithListeningToOnProcessExit()
+        private Message TryReceiveMessage()
         {
-            // To unblock reader when vstestconsole exit
-            var messageReceivedEvent = new AutoResetEvent(false);
             Message message = null;
-            Exception receiveMessageException = null;
-            var cancellationTokenSource = new CancellationTokenSource();
-            Task receiverMessageTask = Task.Run(() =>
-            {
-                try
-                {
-                    message = this.communicationManager.ReceiveMessage(cancellationTokenSource.Token);
-                    EqtTrace.Info("received message: {0}", message);
-                }
-                catch (Exception exception)
-                {
-                    EqtTrace.Error("error while reading message: {0}", exception);
-                    receiveMessageException = exception;
-                }
-                finally
-                {
-                    messageReceivedEvent.Set();
-                }
-            }, cancellationTokenSource.Token);
-
-            WaitHandle[] waitHandles = { messageReceivedEvent, this.processExitedResetEvent };
-            var index = WaitHandle.WaitAny(waitHandles);
+            this.cancellationTokenSource = new CancellationTokenSource();
+            var receiverMessageTask = this.communicationManager.ReceiveMessageAsync(this.cancellationTokenSource.Token);
+            receiverMessageTask.Wait();
+            message = receiverMessageTask.Result;
 
             if (message == null)
             {
-                string reasonForfailure = Resources.FailedToReceiveMessage;
-                if (index == 1)
-                {
-                    cancellationTokenSource.Cancel();
-                    receiverMessageTask.Wait();
-                    reasonForfailure = Resources.VsTestProcessExitedAbnormally;
-                }
-
                 this.communicationManager.StopServer();
-                throw new TransationLayerException(reasonForfailure, receiveMessageException);
+                throw new TransationLayerException(Resources.FailedToReceiveMessage);
             }
 
             return message;
-        }
-
-        private void AbortRunOperation(ITestRunEventsHandler eventHandler, Exception exception)
-        {
-            eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsRun);
-            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
-            eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
         }
     }
 }

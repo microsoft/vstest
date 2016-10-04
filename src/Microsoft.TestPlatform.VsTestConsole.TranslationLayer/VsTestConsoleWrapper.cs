@@ -186,7 +186,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (!this.sessionStarted && this.requestSender != null)
             {
-                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is started. Validate the connection.");
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started. Waiting for connection to command line runner.");
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
             }
             
