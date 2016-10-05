@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -17,8 +18,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using System.Runtime.InteropServices;
-    using System.Text;
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -174,10 +173,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
+            var parentProcessId = 101;
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessId()).Returns(parentProcessId);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
             StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port);
+            StringAssert.Contains(startInfo.Arguments, string.Format("{0} {1}",  Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants.ParentProcessIdOption, parentProcessId));
         }
 
         [TestMethod]
@@ -206,7 +208,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns("/tmp/vstest");
             var startInfo = this.GetDefaultStartInfo();
-            var expectedArgs = "exec \"" + this.GetTesthostPath("/tmp/vstest") + "\" --port 0";
+            var expectedArgs = "exec \"" + this.GetTesthostPath("/tmp/vstest") + "\" --port 0 --parentprocessid 0";
 
             this.dotnetHostManager.LaunchTestHost(startInfo);
 

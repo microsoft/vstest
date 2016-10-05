@@ -15,7 +15,11 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "dev"
+    [System.String] $Version = "15.0.0",
+
+    [Parameter(Mandatory=$false)]
+    [Alias("vs")]
+    [System.String] $VersionSuffix = "dev"
 )
 
 $ErrorActionPreference = "Stop"
@@ -50,6 +54,7 @@ $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
+$TPB_VersionSuffix = $VersionSuffix
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -134,8 +139,8 @@ function Invoke-Build
                 #Write-Log ".. .. Build: Complete."
             #}
         #}
-        Write-Verbose "$dotnetExe build $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_Version"
-        & $dotnetExe build $_ $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_Version
+        Write-Verbose "$dotnetExe build $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_VersionSuffix"
+        & $dotnetExe build $_ $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_VersionSuffix
 
         if ($lastExitCode -ne 0) {
             Set-ScriptFailed
@@ -272,8 +277,8 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir $additionalArgs
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
