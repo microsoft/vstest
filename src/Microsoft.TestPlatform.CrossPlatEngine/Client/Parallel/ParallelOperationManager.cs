@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using System.Collections;
 
     /// <summary>
     /// Abstract class having common parallel manager implementation
@@ -17,7 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #region ConcurrentManagerInstanceData
 
         protected Func<T> CreateNewConcurrentManager { get; set; }
-        public bool Shared { get; private set; }
+
+        public bool ReuseHosts { get; private set; }
 
         protected T[] concurrentManagerInstances;
 
@@ -33,10 +35,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #endregion
 
-        protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel, bool shared)
+        #region Concurrency Keeper Objects
+
+        /// <summary>
+        /// LockObject to iterate our sourceEnumerator in parallel
+        /// We can use the sourceEnumerator itself as lockObject, but since its a changing object - it's risky to use it as one
+        /// </summary>
+        protected object sourceEnumeratorLockObject = new object();
+
+        #endregion
+
+        protected ParallelOperationManager(Func<T> createNewManager, int parallelLevel, bool reuseHosts)
         {
             this.CreateNewConcurrentManager = createNewManager;
-            this.Shared = shared;
+            this.ReuseHosts = reuseHosts;
+
             // Update Parallel Level
             UpdateParallelLevel(parallelLevel);
         }
@@ -145,6 +158,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     EqtTrace.Warning("AbstractParallelOperationManager: Exception while invoking an action on Proxy Manager instance: {0}", ex);
                 }
             }
+        }
+        
+        /// <summary>
+        /// Fetches the next data object for the concurrent executor to work on
+        /// </summary>
+        /// <param name="source">sourcedata to work on - sourcefile or testCaseList</param>
+        /// <returns>True, if data exists. False otherwise</returns>
+        protected bool FetchNextSource<Y>(IEnumerator enumerator, out Y source)
+        {
+            source = default(Y);
+            var hasNext = false;
+            lock (this.sourceEnumeratorLockObject)
+            {
+                if (enumerator.MoveNext())
+                {
+                    source = (Y)enumerator.Current;
+                    hasNext = source != null;
+                }
+            }
+
+            return hasNext;
         }
 
         #region AbstractMethods

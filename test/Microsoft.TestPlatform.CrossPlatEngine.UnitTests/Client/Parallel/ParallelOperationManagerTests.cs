@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft. All rights reserved.
+
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -25,7 +27,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return sample;
                 };
 
-            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 3, false);
+            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 3, true);
 
             Assert.AreEqual(3, createdSampleClasses.Count, "Number of Concurrent Objects created should be 3");
         }
@@ -42,7 +44,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return sample;
                 };
 
-            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 1, false);
+            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 1, true);
 
             Assert.AreEqual(1, createdSampleClasses.Count, "Number of Concurrent Objects created should be 1");
 
@@ -63,7 +65,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return sample;
                 };
 
-            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 4, false);
+            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 4, true);
 
             Assert.AreEqual(4, createdSampleClasses.Count, "Number of Concurrent Objects created should be 4");
 
@@ -84,8 +86,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private class MockParallelOperationManager : ParallelOperationManager<SampleConcurrentClass>
         {
-            public MockParallelOperationManager(Func<SampleConcurrentClass> createNewClient, int parallelLevel, bool shared) : 
-                base(createNewClient, parallelLevel, shared)
+            public MockParallelOperationManager(Func<SampleConcurrentClass> createNewClient, int parallelLevel, bool reuseHosts) : 
+                base(createNewClient, parallelLevel, reuseHosts)
             {
             }
 

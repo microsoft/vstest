@@ -22,8 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     public class TestEngine : ITestEngine
     {
         #region Private Fields
-
-        private IProxyDiscoveryManager proxyDiscoveryManager;
+        
         private ITestExtensionManager testExtensionManager;
 
         #endregion
@@ -37,7 +36,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>ITestDiscoveryManager object that can do discovery</returns>
         public IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager)
         {
-            return this.proxyDiscoveryManager ?? (this.proxyDiscoveryManager = new ProxyDiscoveryManager(testHostManager));
+            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () => new ProxyDiscoveryManager(testHostManager);
+            if (!testHostManager.Shared)
+            {
+                return new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel: Environment.ProcessorCount, reuseHosts: testHostManager.Shared);
+            }
+            else
+            {
+                return proxyDiscoveryManagerCreator();
+            }
         }
 
         /// <summary>
@@ -63,9 +70,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings))
                         : new ProxyExecutionManager(testHostManager);
 
-            if (parallelLevel > 1 || testHostManager.Shared)
+            if (parallelLevel > 1)
             {
-                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel, testHostManager.Shared);
+                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel);
+            }
+            else if(!testHostManager.Shared)
+            {
+                // If testHostManager is not shared, do not reuse hosts
+                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel: Environment.ProcessorCount, reuseHosts: false);
             }
             else
             {
