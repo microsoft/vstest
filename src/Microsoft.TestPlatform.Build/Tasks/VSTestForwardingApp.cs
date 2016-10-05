@@ -30,7 +30,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             var processInfo = new ProcessStartInfo
                                   {
                                       FileName = hostExe,
-                                      // ArgumentEscaper.EscapeAndConcatenateArgArrayForProcessStart(allArgs),
                                       Arguments = string.Join(" ", this.allArgs),
                                       UseShellExecute = false,
                                       CreateNoWindow = true,

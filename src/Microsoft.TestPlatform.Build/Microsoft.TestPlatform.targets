@@ -22,19 +22,46 @@ Copyright (c) .NET Foundation. All rights reserved.
     Main entry point for running tests through vstest.console.exe
     ============================================================
   -->
-  <Target Name="VSTest" DependsOnTargets="Build">
+  <Target Name="VSTest" >
+    <CallTarget Condition="'$(VSTestNoBuild)' != 'true'" Targets="ShowMsbuildWithParameter" />
+    
+
+    <MSBuild Condition="'$(VSTestNoBuild)' != 'true'"
+        Projects ="$(MSBuildProjectFullPath)"
+    />
+
+    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="Done Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="low" />
+    
+    <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />
+
     <Microsoft.TestPlatform.Build.Tasks.VSTestTask
       TestFileFullPath="$(TargetPath)"
       VSTestSetting="$(VSTestSetting)"
-      VSTestTests="$(VSTestTests)"
       VSTestTestAdapterPath="$(VSTestTestAdapterPath)"
-      VSTestPlatform="$(VSTestPlatform)"
-      VSTestFramework="$(VSTestFramework)"
+      VSTestFramework="$(TargetFrameworkMoniker)"
       VSTestTestCaseFilter="$(VSTestTestCaseFilter)"
       VSTestLogger="$(VSTestLogger)"
       VSTestListTests="$(VSTestListTests)"
-      VSTestParentProcessId="$(VSTestParentProcessId)"
-      VSTestPort="$(VSTestPort)"
     />
   </Target>
+  
+  <Target Name="ShowMsbuildWithParameter">
+    <Message Text="Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="low"/>
+    <Message Text="Value passed to msbuild are..." Importance="low" />
+    <Message Text="Configuration = $(Configuration)" Importance="low" />
+    <Message Text="TargetFramework = $(TargetFramework)" Importance="low" />
+    <Message Text="OutputPath = $(OutputPath)" Importance="low" />
+  </Target>
+  
+  <Target Name="ShowCallOfVSTestTaskWithParameter">
+    <Message Text="Calling task Microsoft.TestPlatform.Build.Tasks.VSTestTask with following parameter..." Importance="low" />
+    <Message Text="TestFileFullPath = $(TargetPath)" Importance="low" />
+    <Message Text="VSTestSetting = $(VSTestSetting)" Importance="low" />
+    <Message Text="VSTestTestAdapterPath = $(VSTestTestAdapterPath)" Importance="low" />
+    <Message Text="VSTestFramework = $(TargetFrameworkMoniker)" Importance="low" />
+    <Message Text="VSTestTestCaseFilter = $(VSTestTestCaseFilter)" Importance="low" />
+    <Message Text="VSTestLogger = $(VSTestLogger)" Importance="low" />
+    <Message Text="VSTestListTests = $(VSTestListTests)" Importance="low" />
+  </Target>
+
 </Project>

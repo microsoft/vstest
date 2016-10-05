@@ -116,20 +116,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// PortArgumentProcessor Help
         /// </summary>
         PortArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// ConfigurationArgumentProcessor Help
-        /// </summary>
-        ConfigurationArgumentProcessorHelpPriority,
-
-         /// <summary>
-         /// ConfigurationArgumentProcessor Help
-         /// </summary>
-        OutputArgumentProcessorHelpPriority,
-
-         /// <summary>
-         /// ConfigurationArgumentProcessor Help
-         /// </summary>
-        BuildBasePathArgumentProcessorHelpPriority,
     }
 }

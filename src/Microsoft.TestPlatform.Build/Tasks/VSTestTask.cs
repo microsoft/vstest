@@ -21,19 +21,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestTests
-        {
-            get;
-            set;
-        }
-
         public string VSTestTestAdapterPath
-        {
-            get;
-            set;
-        }
-
-        public string VSTestPlatform
         {
             get;
             set;
@@ -62,18 +50,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestParentProcessId
-        {
-            get;
-            set;
-        }
-
-        public string VSTestPort
-        {
-            get;
-            set;
-        }
-
         public override bool Execute()
         {
             var vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
@@ -96,19 +72,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--settings:" + this.AddDoubleQuotes(this.VSTestSetting));
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestTests))
-            {
-                allArgs.Add("--tests:" + this.VSTestTests);
-            }
-
             if (!string.IsNullOrEmpty(this.VSTestTestAdapterPath))
             {
                 allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(this.VSTestTestAdapterPath));
-            }
-
-            if (!string.IsNullOrEmpty(this.VSTestPlatform))
-            {
-                allArgs.Add("--platform:" + this.VSTestPlatform);
             }
 
             if (!string.IsNullOrEmpty(this.VSTestFramework))
@@ -123,27 +89,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestLogger))
             {
-                var loggers = this.VSTestLogger.Split(new[] { ';' });
-
-                foreach (var logger in loggers)
-                {
-                    allArgs.Add("--logger:" + logger);
-                }
+                allArgs.Add("--logger:" + this.VSTestLogger);
             }
 
             if (!string.IsNullOrEmpty(this.VSTestListTests))
             {
                 allArgs.Add("--listTests");
-            }
-
-            if (!string.IsNullOrEmpty(this.VSTestParentProcessId))
-            {
-                allArgs.Add("--parentProcessId:" + this.VSTestParentProcessId);
-            }
-
-            if (!string.IsNullOrEmpty(this.VSTestPort))
-            {
-                allArgs.Add("--port:" + this.VSTestPort);
             }
 
             if (string.IsNullOrEmpty(this.TestFileFullPath))
