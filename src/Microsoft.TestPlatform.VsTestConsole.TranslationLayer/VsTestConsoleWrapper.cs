@@ -2,14 +2,15 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-    using System.Diagnostics;
 
     /// <summary>
     /// An implementation of <see cref="IVsTestConsoleWrapper"/> to invoke test operations
@@ -38,6 +39,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
 
+        /// <summary>
+        /// Path to additional extensions to reinitialize vstest.console
+        /// </summary>
+        private IEnumerable<string> pathToAdditionalExtensions;
+
         #endregion
 
         #region Constructor
@@ -62,6 +68,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.requestSender = requestSender;
             this.vstestConsoleProcessManager = processManager;
+            this.vstestConsoleProcessManager.ProcessExited += (sender, args) => this.requestSender.OnProcessExited();
             this.sessionStarted = false;
         }
 
@@ -95,6 +102,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.EnsureInitialized();
             this.requestSender.InitializeExtensions(pathToAdditionalExtensions);
+            this.pathToAdditionalExtensions = pathToAdditionalExtensions;
         }
 
         /// <inheritdoc/>
@@ -163,11 +171,25 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private void EnsureInitialized()
         {
-            if (!this.sessionStarted && this.requestSender != null)
+            if (!this.vstestConsoleProcessManager.IsProcessInitialized())
             {
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is not started.");
+                this.StartSession();
                 this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
+
+                if (this.sessionStarted)
+                {
+                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
+                    this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+                }
             }
 
+            if (!this.sessionStarted && this.requestSender != null)
+            {
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started. Waiting for connection to command line runner.");
+                this.sessionStarted = this.requestSender.WaitForRequestHandlerConnection(ConnectionTimeout);
+            }
+            
             if (!this.sessionStarted)
             {
                 throw new TransationLayerException("Error connecting to Vstest Command Line");

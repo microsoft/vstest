@@ -4,33 +4,40 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    
+
     [TestClass]
     public class VsTestConsoleWrapperTests
     {
-        private IVsTestConsoleWrapper consoleWrapper;
+        private readonly IVsTestConsoleWrapper consoleWrapper;
 
-        private MockTranslationLayerSender mockSender;
+        private readonly Mock<IProcessManager> mockProcessManager;
 
-        private MockProcessManager mockProcessManager;
+        private readonly Mock<ITranslationLayerRequestSender> mockRequestSender;
 
-        [TestInitialize]
-        public void TestInit()
+        private readonly List<string> testSources = new List<string> { "Hello", "World" };
+
+        private readonly List<TestCase> testCases = new List<TestCase>
+                                              {
+                                                  new TestCase("a.b.c", new Uri("d://uri"), "a.dll"),
+                                                  new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
+                                              };
+
+        public VsTestConsoleWrapperTests()
         {
-            this.mockSender = new MockTranslationLayerSender();
-            this.mockProcessManager = new MockProcessManager();
-            this.consoleWrapper = new VsTestConsoleWrapper(mockSender, mockProcessManager);
+            this.mockRequestSender = new Mock<ITranslationLayerRequestSender>();
+            this.mockProcessManager = new Mock<IProcessManager>();
+            this.consoleWrapper = new VsTestConsoleWrapper(this.mockRequestSender.Object, this.mockProcessManager.Object);
+
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
         }
 
         [TestMethod]
@@ -38,208 +45,130 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var inputPort = 123;
             int expectedParentProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
-            string actualParentProcessIdString = "";
-            string actualPortString = "";
-            this.mockSender.SetupPort(inputPort);
-
-            var startProcessCalled = false;
-            this.mockProcessManager.VerifyArgs = (args) =>
-            {
-                startProcessCalled = true;
-                actualParentProcessIdString = args.Length > 0 ? args[0] : "";
-                actualPortString = args.Length > 1 ? args[1] : "";
-            };
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(inputPort);
 
             this.consoleWrapper.StartSession();
 
-            int actualPort = int.Parse(actualPortString.Split(':')[1]);
-            int actualParentProcessId = int.Parse(actualParentProcessIdString.Split(':')[1]);
-            Assert.IsTrue(startProcessCalled, "Start Process must be called");
-            Assert.AreEqual(expectedParentProcessId, actualParentProcessId, "Incorrect Parent Process Id fed to process args");
-            Assert.AreEqual(inputPort, actualPort, "Incorrect Port number fed to process args");
+            this.mockProcessManager.Verify(pm => pm.StartProcess(new[] { $"/parentprocessid:{expectedParentProcessId}", $"/port:{inputPort}" }), Times.Once);
         }
-
 
         [TestMethod]
         public void StartSessionShouldThrowExceptionOnBadPort()
         {
-            var inputPort = -1;
-            this.mockSender.SetupPort(inputPort);
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);
 
             Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.StartSession());
         }
 
         [TestMethod]
-        public void InitializeExtensionsShouldSucceed()
+        public void StartSessionShouldCallWhenProcessNotInitialized()
         {
-            this.mockSender.SetConnectionResult(true);
+            this.mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(false);
 
-            bool initExtCalled = false;
-            Action<IEnumerable<string>, bool> assertPaths = (paths, loadOnlyWellKnownExtensions) =>
-            {
-                initExtCalled = true;
-                Assert.IsTrue(paths != null && paths.Count() == 2, "Extension Paths must be set correctly.");
-            };
+            // To call private method EnsureInitialize call InitializeExtensions
+            this.consoleWrapper.InitializeExtensions(new[] { "path/to/adapter" });
 
-            this.mockSender.SetInitExtFunc(assertPaths);
-
-            this.consoleWrapper.InitializeExtensions(new List<string>() { "Hello", "World" });
-            Assert.IsTrue(initExtCalled, "Initialize Extensions must be called");
+            this.mockProcessManager.Verify(pm => pm.StartProcess(It.IsAny<string[]>()));
         }
 
+        [TestMethod]
+        public void InitializeExtensionsShouldCachePathToExtensions()
+        {
+            var pathToExtensions = new[] { "path/to/adapter" };
+            this.mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(true);
+
+            this.consoleWrapper.InitializeExtensions(pathToExtensions);
+
+            this.mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(false);
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
+
+            this.consoleWrapper.InitializeExtensions(pathToExtensions);
+
+            this.mockRequestSender.Verify(rs => rs.InitializeExtensions(pathToExtensions), Times.Exactly(3));
+        }
+
+        [TestMethod]
+        public void ProcessExitedEventShouldSetOnProcessExit()
+        {
+            this.mockProcessManager.Raise(pm => pm.ProcessExited += null, EventArgs.Empty);
+            
+            this.mockRequestSender.Verify(rs => rs.OnProcessExited(), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeExtensionsShouldSucceed()
+        {
+            var pathToAdditionalExtensions = new List<string> { "Hello", "World" };
+
+            this.consoleWrapper.InitializeExtensions(pathToAdditionalExtensions);
+
+            this.mockRequestSender.Verify(rs => rs.InitializeExtensions(pathToAdditionalExtensions), Times.Once);
+        }
 
         [TestMethod]
         public void InitializeExtensionsShouldThrowExceptionOnBadConnection()
         {
-            this.mockSender.SetConnectionResult(false);
-            bool initExtCalled = false;
-            Action<IEnumerable<string>, bool> assertPaths = (paths, loadOnlyWellKnownExtensions) =>
-            {
-                initExtCalled = true;
-            };
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.InitializeExtensions(new List<string>() { "Hello", "World" }));
-
-            Assert.IsFalse(initExtCalled, "Initialize Extensions must NOT be called if connection failed");
+            Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.InitializeExtensions(new List<string> { "Hello", "World" }));
+            this.mockRequestSender.Verify(rs => rs.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
         }
-
 
         [TestMethod]
         public void DiscoverTestsShouldSucceed()
         {
-            this.mockSender.SetConnectionResult(true);
+            this.consoleWrapper.DiscoverTests(this.testSources, null, new Mock<ITestDiscoveryEventsHandler>().Object);
 
-            bool discoverTestsCalled = false;
-            Action<IEnumerable<string>, string, ITestDiscoveryEventsHandler> assertSources = 
-                (paths, settings, handler) =>
-            {
-                discoverTestsCalled = true;
-                Assert.IsTrue(paths != null && paths.Count() == 2, "Sources must be set correctly.");
-                Assert.IsNotNull(handler, "TestDiscoveryEventsHandler must be set correctly.");
-            };
-
-            this.mockSender.SetupDiscoverTests(assertSources);
-
-            this.consoleWrapper.DiscoverTests(new List<string>() { "Hello", "World" }, null, new Mock<ITestDiscoveryEventsHandler>().Object);
-
-            Assert.IsTrue(discoverTestsCalled, "Discover Tests must be called on translation layer");
+            this.mockRequestSender.Verify(rs => rs.DiscoverTests(this.testSources, null, It.IsAny<ITestDiscoveryEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
         public void DiscoverTestsShouldThrowExceptionOnBadConnection()
         {
-            this.mockSender.SetConnectionResult(false);
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            bool discoverTestsCalled = false;
-            Action<IEnumerable<string>, string, ITestDiscoveryEventsHandler> assertSources =
-                (paths, settings, handler) =>
-                {
-                    discoverTestsCalled = true;
-                };
-
-            Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.DiscoverTests(new List<string>() { "Hello", "World" }, null, new Mock<ITestDiscoveryEventsHandler>().Object));
-
-            Assert.IsFalse(discoverTestsCalled, "Discover Tests must NOT be called on translation layer when connection is bad.");
+            Assert.ThrowsException<TransationLayerException>(() => this.consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, new Mock<ITestDiscoveryEventsHandler>().Object));
+            this.mockRequestSender.Verify(rs => rs.DiscoverTests(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), It.IsAny<ITestDiscoveryEventsHandler>()), Times.Never);
         }
 
         [TestMethod]
         public void RunTestsWithSourcesShouldSucceed()
         {
-            this.mockSender.SetConnectionResult(true);
+            this.consoleWrapper.RunTests(this.testSources, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
-            bool runTestsCalled = false;
-            Action<IEnumerable<string>, string, ITestRunEventsHandler> assertSources =
-                (sources, settings, handler) =>
-                {
-                    runTestsCalled = true;
-                    Assert.IsTrue(sources != null && sources.Count() == 2, "Sources must be set correctly.");
-                    Assert.IsTrue(!string.IsNullOrEmpty(settings), "RunSettings must be set correctly.");
-                    Assert.IsNotNull(handler, "TestRunEventsHandler must be set correctly.");
-                };
-
-            this.mockSender.SetupRunTestsWithSources(assertSources);
-
-            this.consoleWrapper.RunTests(new List<string>() { "Hello", "World" }, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
-
-            Assert.IsTrue(runTestsCalled, "Run Tests must be called on translation layer");
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testSources, "RunSettings", It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
         public void RunTestsWithSourcesAndCustomHostShouldSucceed()
         {
-            this.mockSender.SetConnectionResult(true);
+            this.consoleWrapper.RunTestsWithCustomTestHost(
+                this.testSources,
+                "RunSettings",
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
 
-            bool runTestsCalled = false;
-            Action<IEnumerable<string>, string, ITestRunEventsHandler, ITestHostLauncher> assertSources =
-                (sources, settings, handler, customLauncher) =>
-                {
-                    runTestsCalled = true;
-                    Assert.IsTrue(sources != null && sources.Count() == 2, "Sources must be set correctly.");
-                    Assert.IsTrue(!string.IsNullOrEmpty(settings), "RunSettings must be set correctly.");
-                    Assert.IsNotNull(handler, "TestRunEventsHandler must be set correctly.");
-                    Assert.IsNotNull(customLauncher, "Custom Launcher must be set correctly.");
-                };
-
-            this.mockSender.SetupRunTestsWithSourcesAndCustomHost(assertSources);
-
-            this.consoleWrapper.RunTestsWithCustomTestHost(new List<string>() { "Hello", "World" }, "RunSettings", 
-                new Mock<ITestRunEventsHandler>().Object, new Mock<ITestHostLauncher>().Object);
-
-            Assert.IsTrue(runTestsCalled, "Run Tests must be called on translation layer");
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testSources, "RunSettings", It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
         }
 
         [TestMethod]
         public void RunTestsWithSelectedTestsShouldSucceed()
         {
-            this.mockSender.SetConnectionResult(true);
+            this.consoleWrapper.RunTests(this.testCases, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
 
-            bool runTestsCalled = false;
-            Action<IEnumerable<TestCase>, string, ITestRunEventsHandler> assertTests =
-                (tests, settings, handler) =>
-                {
-                    runTestsCalled = true;
-                    Assert.IsTrue(tests != null && tests.Count() == 2, "TestCases must be set correctly.");
-                    Assert.IsTrue(!string.IsNullOrEmpty(settings), "RunSettings must be set correctly.");
-                    Assert.IsNotNull(handler, "TestRunEventsHandler must be set correctly.");
-                };
-
-            this.mockSender.SetupRunTestsWithSelectedTests(assertTests);
-
-            var testCases = new List<TestCase>();
-            testCases.Add(new TestCase("a.b.c", new Uri("d://uri"), "a.dll"));
-            testCases.Add(new TestCase("d.e.f", new Uri("g://uri"), "d.dll"));
-
-            this.consoleWrapper.RunTests(testCases, "RunSettings", new Mock<ITestRunEventsHandler>().Object);
-
-            Assert.IsTrue(runTestsCalled, "Run Tests must be called on translation layer");
+            this.mockRequestSender.Verify(rs => rs.StartTestRun(this.testCases, "RunSettings", It.IsAny<ITestRunEventsHandler>()), Times.Once);
         }
 
         [TestMethod]
         public void RunTestsWithSelectedTestsAndCustomLauncherShouldSucceed()
         {
-            this.mockSender.SetConnectionResult(true);
+            this.consoleWrapper.RunTestsWithCustomTestHost(
+                this.testCases,
+                "RunSettings",
+                new Mock<ITestRunEventsHandler>().Object,
+                new Mock<ITestHostLauncher>().Object);
 
-            bool runTestsCalled = false;
-            Action<IEnumerable<TestCase>, string, ITestRunEventsHandler, ITestHostLauncher> assertTests =
-                (tests, settings, handler, customLauncher) =>
-                {
-                    runTestsCalled = true;
-                    Assert.IsTrue(tests != null && tests.Count() == 2, "TestCases must be set correctly.");
-                    Assert.IsTrue(!string.IsNullOrEmpty(settings), "RunSettings must be set correctly.");
-                    Assert.IsNotNull(handler, "TestRunEventsHandler must be set correctly.");
-                    Assert.IsNotNull(customLauncher, "Custom Launcher must be set correctly.");
-                };
-
-            this.mockSender.SetupRunTestsWithSelectedTestsAndCustomHost(assertTests);
-
-            var testCases = new List<TestCase>();
-            testCases.Add(new TestCase("a.b.c", new Uri("d://uri"), "a.dll"));
-            testCases.Add(new TestCase("d.e.f", new Uri("g://uri"), "d.dll"));
-
-            this.consoleWrapper.RunTestsWithCustomTestHost(testCases, "RunSettings",
-                new Mock<ITestRunEventsHandler>().Object, new Mock<ITestHostLauncher>().Object);
-
-            Assert.IsTrue(runTestsCalled, "Run Tests must be called on translation layer");
+            this.mockRequestSender.Verify(rs => rs.StartTestRunWithCustomHost(this.testCases, "RunSettings", It.IsAny<ITestRunEventsHandler>(), It.IsAny<ITestHostLauncher>()), Times.Once);
         }
 
         [TestMethod]
@@ -247,163 +176,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             this.consoleWrapper.EndSession();
 
-            Assert.IsTrue(this.mockSender.IsCloseCalled, "Close method must be called on sender");
-            Assert.IsTrue(this.mockSender.IsSessionEnded, "SessionEnd method must be called on sender");
-        }
-
-
-        private class MockTranslationLayerSender : ITranslationLayerRequestSender
-        {
-            public bool IsCloseCalled = false;
-            public bool IsSessionEnded = false;
-
-            public void Close()
-            {
-                IsCloseCalled = true;
-            }
-
-            public void DiscoverTests(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler discoveryEventsHandler)
-            {
-                this.discoverFunc(sources, runSettings, discoveryEventsHandler);
-            }
-
-            public void Dispose()
-            {
-                
-            }
-
-            public void EndSession()
-            {
-                IsSessionEnded = true;
-            }
-
-            public int InitializeCommunication()
-            {
-                return port;
-            }
-
-            public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
-            {
-                this.initExtFunc(pathToAdditionalExtensions, false);
-            }
-
-            public void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler)
-            {
-                this.runTestsWithSelectedTestsFunc.Invoke(testCases, runSettings, runEventsHandler);
-            }
-
-            public void StartTestRun(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler)
-            {
-                this.runTestsWithSourcesFunc.Invoke(sources, runSettings, runEventsHandler);
-            }
-
-            public void StartTestRunWithCustomHost(IEnumerable<string> sources, string runSettings, 
-                ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher)
-            {
-                this.runTestsWithSourcesAndCustomLauncherFunc(sources, runSettings, runEventsHandler, customTestHostLauncher);
-            }
-
-            public void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, 
-                ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher)
-            {
-                this.runTestsWithSelectedTestsAndCustomHostFunc(testCases, runSettings, runEventsHandler, customTestHostLauncher);
-            }
-
-            public bool WaitForRequestHandlerConnection(int connectionTimeout)
-            {
-                return this.connectionResult;
-            }
-
-            private int port;
-
-            internal void SetupPort(int inputPort)
-            {
-                this.port = inputPort;
-            }
-
-            private bool connectionResult;
-
-            internal void SetConnectionResult(bool connectionResult)
-            {
-                this.connectionResult = connectionResult;
-            }
-
-            private Action<IEnumerable<string>, bool> initExtFunc;
-
-            internal void SetInitExtFunc(Action<IEnumerable<string>, bool> initExtFunc)
-            {
-                this.initExtFunc = initExtFunc;
-            }
-
-            private Action<IEnumerable<string>, string, ITestDiscoveryEventsHandler> discoverFunc;
-
-            internal void SetupDiscoverTests(Action<IEnumerable<string>, string, ITestDiscoveryEventsHandler> discoverFunc)
-            {
-                this.discoverFunc = discoverFunc;
-            }
-
-            private Action<IEnumerable<string>, string, ITestRunEventsHandler> runTestsWithSourcesFunc;
-
-            internal void SetupRunTestsWithSources(Action<IEnumerable<string>, string, ITestRunEventsHandler> runTestsFunc)
-            {
-                this.runTestsWithSourcesFunc = runTestsFunc;
-            }
-
-
-            private Action<IEnumerable<string>, string, ITestRunEventsHandler, ITestHostLauncher> runTestsWithSourcesAndCustomLauncherFunc;
-
-            internal void SetupRunTestsWithSourcesAndCustomHost(Action<IEnumerable<string>, string, ITestRunEventsHandler, ITestHostLauncher> runTestsFunc)
-            {
-                this.runTestsWithSourcesAndCustomLauncherFunc = runTestsFunc;
-            }
-
-            private Action<IEnumerable<TestCase>, string, ITestRunEventsHandler> runTestsWithSelectedTestsFunc;
-
-            internal void SetupRunTestsWithSelectedTests(Action<IEnumerable<TestCase>, string, ITestRunEventsHandler> runTestsFunc)
-            {
-                this.runTestsWithSelectedTestsFunc = runTestsFunc;
-            }
-
-            private Action<IEnumerable<TestCase>, string, ITestRunEventsHandler, ITestHostLauncher> runTestsWithSelectedTestsAndCustomHostFunc;
-
-            internal void SetupRunTestsWithSelectedTestsAndCustomHost(Action<IEnumerable<TestCase>, string, ITestRunEventsHandler, ITestHostLauncher> runTestsFunc)
-            {
-                this.runTestsWithSelectedTestsAndCustomHostFunc = runTestsFunc;
-            }
-
-            public void CancelTestRun()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void AbortTestRun()
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-
-        private class MockProcessManager : IProcessManager
-        {
-            public Action<string[]> VerifyArgs;
-
-            public bool IsProcessInitialized()
-            {
-                return true;
-            }
-
-            public void ShutdownProcess()
-            {
-
-            }
-
-            public void StartProcess(string[] args)
-            {
-                if(VerifyArgs != null)
-                {
-                    VerifyArgs(args);
-                }
-            }
+            this.mockRequestSender.Verify(rs => rs.EndSession(), Times.Once);
+            this.mockRequestSender.Verify(rs => rs.Close(), Times.Once);
         }
     }
 }
