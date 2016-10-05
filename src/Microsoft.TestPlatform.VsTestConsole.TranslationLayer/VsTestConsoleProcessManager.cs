@@ -19,9 +19,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool vstestConsoleStarted = false;
 
-        private bool vstestConsoleCrashed = false;
+        private bool vstestConsoleExited = false;
 
         private Process process;
+
+        public event EventHandler ProcessExited;
 
         #region Constructor
 
@@ -34,10 +36,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         public bool IsProcessInitialized()
         {
-            lock(syncObject)
+            lock (syncObject)
             {
-                return this.vstestConsoleStarted && !vstestConsoleCrashed && 
-                    this.process != null && !this.process.HasExited;
+                return this.vstestConsoleStarted && !vstestConsoleExited &&
+                       this.process != null;
             }
         }
 
@@ -46,38 +48,41 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         public void StartProcess(string[] args)
         {
-            using (this.process = new Process())
+            this.process = new Process();
+            process.StartInfo.FileName = vstestConsolePath;
+            if (args != null)
             {
-                process.StartInfo.FileName = vstestConsolePath;
-                if (args != null)
-                {
-                    process.StartInfo.Arguments = args.Length < 2 ? args[0] : string.Join(" ", args);
-                }
-                //process.StartInfo.WorkingDirectory = WorkingDirectory;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.Arguments = args.Length < 2 ? args[0] : string.Join(" ", args);
+            }
+            //process.StartInfo.WorkingDirectory = WorkingDirectory;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
 
-                //process.StartInfo.RedirectStandardOutput = true;
-                //process.StartInfo.RedirectStandardError = true;
+            //process.StartInfo.RedirectStandardOutput = true;
+            //process.StartInfo.RedirectStandardError = true;
 
-                EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", process.StartInfo.FileName, process.StartInfo.Arguments);
+            EqtTrace.Verbose("VsTestCommandLineWrapper: {0} {1}", process.StartInfo.FileName,
+                process.StartInfo.Arguments);
 
-                process.Exited += Process_Exited;
-                process.Start();
+            process.Start();
+            process.EnableRaisingEvents = true;
+            process.Exited += Process_Exited;
 
-                lock (syncObject)
-                {
-                    vstestConsoleStarted = true;
-                }
+            lock (syncObject)
+            {
+                vstestConsoleExited = false;
+                vstestConsoleStarted = true;
             }
         }
 
         public void ShutdownProcess()
         {
             // Ideally process should die by itself
-            if(IsProcessInitialized())
+            if (IsProcessInitialized())
             {
                 this.process.Kill();
+                this.process.Dispose();
+                this.process = null;
             }
         }
 
@@ -85,7 +90,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             lock (syncObject)
             {
-                vstestConsoleCrashed = true;
+                vstestConsoleExited = true;
+                this.ProcessExited?.Invoke(sender, e);
             }
         }
     }
