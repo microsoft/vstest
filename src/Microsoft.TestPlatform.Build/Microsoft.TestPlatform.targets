@@ -22,14 +22,35 @@ Copyright (c) .NET Foundation. All rights reserved.
     Main entry point for running tests through vstest.console.exe
     ============================================================
   -->
-  <Target Name="VSTest" DependsOnTargets="Build">
+  <Target Name="VSTest" >
+    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="Building project: $(MSBuildProjectFullPath)" />
+    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="Value passed to msbuild are..." />
+    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="Configuration = $(Configuration)" />
+    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="TargetFramework = $(TargetFramework)" />
+    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="OutputPath = $(OutputPath)" />
+
+    <MSBuild Condition="'$(VSTestNoBuild)' != 'true'"
+        Projects ="$(MSBuildProjectFullPath)"
+    />
+
+    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="Done Building project: $(MSBuildProjectFullPath)" />
+
+    <Message Text="Calling task Microsoft.TestPlatform.Build.Tasks.VSTestTask with following parameter..."/>
+    <Message Text="TestFileFullPath = $(TargetPath)" />
+    <Message Text="VSTestSetting = $(VSTestSetting)" />
+    <Message Text="VSTestTestAdapterPath = $(VSTestTestAdapterPath)" />
+    <Message Text="VSTestFramework = $(TargetFrameworkMoniker)" />
+    <Message Text="VSTestTestCaseFilter = $(VSTestTestCaseFilter)" />
+    <Message Text="VSTestLogger = $(VSTestLogger)" />
+    <Message Text="VSTestListTests = $(VSTestListTests)" />
+    <Message Text="VSTestParentProcessId = $(VSTestParentProcessId)" />
+    <Message Text="VSTestPort = $(VSTestPort)" />
+
     <Microsoft.TestPlatform.Build.Tasks.VSTestTask
       TestFileFullPath="$(TargetPath)"
       VSTestSetting="$(VSTestSetting)"
-      VSTestTests="$(VSTestTests)"
       VSTestTestAdapterPath="$(VSTestTestAdapterPath)"
-      VSTestPlatform="$(VSTestPlatform)"
-      VSTestFramework="$(VSTestFramework)"
+      VSTestFramework="$(TargetFrameworkMoniker)"
       VSTestTestCaseFilter="$(VSTestTestCaseFilter)"
       VSTestLogger="$(VSTestLogger)"
       VSTestListTests="$(VSTestListTests)"
