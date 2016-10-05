@@ -43,8 +43,6 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestTestCaseFilter = $(VSTestTestCaseFilter)" />
     <Message Text="VSTestLogger = $(VSTestLogger)" />
     <Message Text="VSTestListTests = $(VSTestListTests)" />
-    <Message Text="VSTestParentProcessId = $(VSTestParentProcessId)" />
-    <Message Text="VSTestPort = $(VSTestPort)" />
 
     <Microsoft.TestPlatform.Build.Tasks.VSTestTask
       TestFileFullPath="$(TargetPath)"
@@ -54,8 +52,6 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestTestCaseFilter="$(VSTestTestCaseFilter)"
       VSTestLogger="$(VSTestLogger)"
       VSTestListTests="$(VSTestListTests)"
-      VSTestParentProcessId="$(VSTestParentProcessId)"
-      VSTestPort="$(VSTestPort)"
     />
   </Target>
 </Project>
