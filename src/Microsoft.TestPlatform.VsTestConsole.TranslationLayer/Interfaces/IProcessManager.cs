@@ -27,5 +27,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Shutdown Process
         /// </summary>
         void ShutdownProcess();
+
+        /// <summary>
+        /// Raise event on process exit
+        /// </summary>
+        event EventHandler ProcessExited;
     }
 }
