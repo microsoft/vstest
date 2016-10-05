@@ -50,18 +50,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestParentProcessId
-        {
-            get;
-            set;
-        }
-
-        public string VSTestPort
-        {
-            get;
-            set;
-        }
-
         public override bool Execute()
         {
             var vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
@@ -107,16 +95,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             if (!string.IsNullOrEmpty(this.VSTestListTests))
             {
                 allArgs.Add("--listTests");
-            }
-
-            if (!string.IsNullOrEmpty(this.VSTestParentProcessId))
-            {
-                allArgs.Add("--parentProcessId:" + this.VSTestParentProcessId);
-            }
-
-            if (!string.IsNullOrEmpty(this.VSTestPort))
-            {
-                allArgs.Add("--port:" + this.VSTestPort);
             }
 
             if (string.IsNullOrEmpty(this.TestFileFullPath))
