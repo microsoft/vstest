@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     using Newtonsoft.Json;
+    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -73,6 +74,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// </summary>
         /// <returns> Raw message string </returns>
         string ReceiveRawMessage();
+
+        /// <summary>
+        /// Reads message from the binary reader using read timeout
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// The cancellation Token.
+        /// </param>
+        /// <returns>
+        /// Returns message read from the binary reader
+        /// </returns>
+        Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Reads message from the binary reader using read timeout 
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// The cancellation Token.
+        /// </param>
+        /// <returns>
+        /// Raw message string 
+        /// </returns>
+        Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken);
 
         /// <summary>
         ///  Writes message to the binary writer with payload

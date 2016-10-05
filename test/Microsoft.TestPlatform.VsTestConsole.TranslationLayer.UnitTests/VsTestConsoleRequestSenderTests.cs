@@ -1,15 +1,16 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -21,9 +22,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
     using Moq;
 
-    using Newtonsoft.Json.Linq;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+
     using VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+
+    using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
     public class VsTestConsoleRequestSenderTests
@@ -34,11 +38,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private int WaitTimeout = 2000;
 
-        [TestInitialize]
-        public void TestInit()
+        public VsTestConsoleRequestSenderTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.requestSender = new VsTestConsoleRequestSender(mockCommunicationManager.Object, JsonDataSerializer.Instance);
+            this.requestSender = new VsTestConsoleRequestSender(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
         }
 
         #region Communication Tests
@@ -50,9 +53,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
-
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Once);
-
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Exactly(2));
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck), Times.Once);
         }
@@ -65,14 +66,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.IsTrue(portOutput < 0, "Negative port number must be returned if Hosting Server fails.");
 
-            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(WaitTimeout);
-            Assert.IsFalse(connectionSuccess, "Connection must fail as server fai;ed to host.");
+            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
+            Assert.IsFalse(connectionSuccess, "Connection must fail as server failed to host.");
 
             this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Never);
-
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Never);
-
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Never);
         }
 
@@ -82,23 +81,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer()).Returns(dummyPortInput);
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Callback(() => { });
-
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
-
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Throws(new Exception("Fail"));
 
             var portOutput = this.requestSender.InitializeCommunication();
+
             // Hosting server didn't server, so port number should still be valid
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
 
             // Connection must not succeed as handshake failed
-            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(WaitTimeout);
+            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsFalse(connectionSuccess, "Connection must fail if handshake failed.");
-
             this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
-
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Once);
         }
 
@@ -108,7 +104,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer()).Returns(dummyPortInput);
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Callback(() => { });
-
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
 
@@ -118,7 +113,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
-            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(WaitTimeout);
+            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsFalse(connectionSuccess, "Connection must fail if version check failed.");
 
             this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
@@ -136,7 +131,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer()).Returns(dummyPortInput);
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Callback(() => { });
-
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
 
@@ -147,7 +141,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
-            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(WaitTimeout);
+            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsFalse(connectionSuccess, "Connection must fail if version check failed.");
 
             this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
@@ -170,20 +164,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 .Callback((int timeout) => Task.Delay(200).Wait());
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
-            // Give wrong version
-            var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = JToken.FromObject("2") };
 
-            Action changedMessage = () =>
-            {
-                this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(versionCheck);
-            };
+            // Give wrong version
+            var versionCheck = new Message()
+                                   {
+                                       MessageType = MessageType.VersionCheck,
+                                       Payload = JToken.FromObject("2")
+                                   };
+
+            Action changedMessage =
+                () => { this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(versionCheck); };
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(sessionConnected);
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck)).Callback(changedMessage);
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
-            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(WaitTimeout);
+            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsFalse(connectionSuccess, "Connection must fail if version check failed.");
 
             this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
@@ -209,7 +206,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var payload = new DiscoveryCompletePayload() { TotalTests = 0, LastDiscoveredTests = null, IsAborted = false };
             var discoveryComplete = new Message() { MessageType = MessageType.DiscoveryComplete,
                 Payload = JToken.FromObject(payload) };
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(discoveryComplete);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
 
             this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
 
@@ -240,9 +237,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 Payload = JToken.FromObject(payload)
             };
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsFound);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
             mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(discoveryComplete));
+                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
             this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
 
@@ -268,13 +265,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = null, IsAborted = false };
             var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsFound);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
             mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
                 .Callback(
                     (IEnumerable<TestCase> tests) =>
                         {
                             receivedTestCases = tests?.ToList();
-                            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(discoveryComplete);
+                            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
                         });
 
             this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
@@ -305,7 +302,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var payload = new DiscoveryCompletePayload() { TotalTests = 1, LastDiscoveredTests = testCaseList, IsAborted = false };
             var discoveryComplete = CreateMessage(MessageType.DiscoveryComplete, payload);
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(discoveryComplete);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
             mockHandler.Setup(mh => mh.HandleDiscoveryComplete(It.IsAny<long>(), It.IsAny<IEnumerable<TestCase>>(), It.IsAny<bool>()))
                 .Callback(
                     (long totalTests, IEnumerable<TestCase> tests, bool isAborted) =>
@@ -342,11 +339,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
             var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsFound);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsFound));
             mockHandler.Setup(mh => mh.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>())).Callback(
-                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message));
+                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message)));
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
-                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(discoveryComplete));
+                () => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete)));
 
             this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
 
@@ -355,8 +352,50 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Informational, "Hello"), Times.Once, "TestMessage event must be called");
         }
 
+        [TestMethod]
+        public void DiscoverTestsShouldAbortOnExceptionInSendMessage()
+        {
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var sources = new List<string> {"1.dll"};
+            var payload = new DiscoveryRequestPayload {Sources = sources, RunSettings = null};
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.StartDiscovery, payload)).Throws(new IOException());
+
+            this.requestSender.DiscoverTests(sources, null, mockHandler.Object);
+
+            mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once, "Discovery Complete must be called");
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldAbortWhenProcessExited()
+        {
+            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var sources = new List<string> { "1.dll" };
+            var payload = new DiscoveryRequestPayload { Sources = sources, RunSettings = null };
+            var manualEvent = new ManualResetEvent(false);
+
+            var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+            var testCaseList = new List<TestCase>() { testCase };
+            var testsFound = CreateMessage(MessageType.TestCasesFound, testCaseList);
+
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Callback(
+                (CancellationToken c) =>
+                    {
+                        Task.Run(() => this.requestSender.OnProcessExited()).Wait();
+
+                        Assert.IsTrue(c.IsCancellationRequested);
+                    }).Returns(Task.FromResult((Message)null));
+
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(-1, null, true)).Callback(() => manualEvent.Set());
+
+            this.requestSender.DiscoverTests(sources, null, mockHandler.Object);
+
+            manualEvent.WaitOne();
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
         #endregion
-        
+
         #region RunTests
 
         [TestMethod]
@@ -378,7 +417,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             };
 
             var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
 
             this.requestSender.StartTestRun(new List<string>() { "1.dll" }, null, mockHandler.Object);
 
@@ -403,7 +442,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
             var testsChangedArgs = new TestRunChangedEventArgs(null, 
-                new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
+                new List<TestResult>() { testResult }, null);
 
             var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
@@ -420,19 +459,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
             var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsPayload);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload));
 
             mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
                 (testRunChangedArgs) =>
                 {
                     Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Count() > 0, "TestResults must be passed properly");
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
                 });
 
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
                 () =>
                 {
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                 });
 
             this.requestSender.StartTestRun(new List<string>() { "1.dll" }, null, mockHandler.Object);
@@ -457,7 +496,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
-            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
+            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
             var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
             var payload = new TestRunCompletePayload()
@@ -483,20 +522,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 (testRunChangedArgs) =>
                 {
                     Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Count() > 0, "TestResults must be passed properly");
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
                 });
 
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
                 () =>
                 {
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                 });
 
             var mockLauncher = new Mock<ITestHostLauncher>();
             mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
-                (() => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsPayload));
+                (() => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload)));
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runprocessInfoPayload);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
 
             this.requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
 
@@ -524,7 +563,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                                   TestRunCompleteArgs = dummyCompleteArgs
                               };
             var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
 
             this.requestSender.StartTestRun(new List<TestCase>(), null, mockHandler.Object);
 
@@ -550,7 +589,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
-            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
+            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
             var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
             var payload = new TestRunCompletePayload()
@@ -565,19 +604,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
             var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsPayload);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload));
 
             mockHandler.Setup(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>())).Callback<TestRunChangedEventArgs>(
                 (testRunChangedArgs) =>
                 {
                     Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Count() > 0, "TestResults must be passed properly");
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
                 });
 
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
                 () =>
                 {
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                 });
 
             this.requestSender.StartTestRun(testCaseList, null, mockHandler.Object);
@@ -606,7 +645,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             TestRunChangedEventArgs receivedChangeEventArgs = null;
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
-            var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult> { testResult }, null);
+            var dummyLastRunArgs = new TestRunChangedEventArgs(null, new List<TestResult> { testResult }, null);
 
             var payload = new TestRunCompletePayload()
                               {
@@ -617,7 +656,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                               };
             var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
             
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
 
             mockHandler.Setup(mh => mh.HandleTestRunComplete(
                     It.IsAny<TestRunCompleteEventArgs>(),
@@ -666,7 +705,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var testsChangedArgs = new TestRunChangedEventArgs(
                 null,
-                new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult },
+                new List<TestResult>() { testResult },
                 null);
             var testsRunStatsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
@@ -679,7 +718,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                                              };
             var runComplete = CreateMessage(MessageType.ExecutionComplete, testRunCompletepayload);
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsRunStatsPayload);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsRunStatsPayload));
 
             mockHandler.Setup(mh => mh.HandleTestRunStatsChange(
                     It.IsAny<TestRunChangedEventArgs>()))
@@ -687,7 +726,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     (TestRunChangedEventArgs stats) =>
                     {
                         receivedChangeEventArgs = stats;
-                        this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+                        this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                     });
 
             this.requestSender.StartTestRun(testCaseList, null, mockHandler.Object);
@@ -718,7 +757,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
             var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
 
-            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<VisualStudio.TestPlatform.ObjectModel.TestResult>() { testResult }, null);
+            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
 
             var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
 
@@ -740,20 +779,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 (testRunChangedArgs) =>
                 {
                     Assert.IsTrue(testRunChangedArgs.NewTestResults != null && testsChangedArgs.NewTestResults.Count() > 0, "TestResults must be passed properly");
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message));
                 });
 
             mockHandler.Setup(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>())).Callback(
                 () =>
                 {
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                 });
 
             var mockLauncher = new Mock<ITestHostLauncher>();
             mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
-                (() => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(testsPayload));
+                (() => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(testsPayload)));
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runprocessInfoPayload);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
 
             this.requestSender.StartTestRunWithCustomHost(testCaseList, null, mockHandler.Object, mockLauncher.Object);
 
@@ -784,17 +823,17 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                                       };
             var runComplete = CreateMessage(MessageType.ExecutionComplete, completepayload);
 
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message1);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message1));
             mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
                 .Callback<TestProcessStartInfo>((startInfo) =>
                {
                    if(startInfo.FileName.Equals(p1.FileName))
                    {
-                       this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(message2);
+                       this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message2));
                    }
                    else if (startInfo.FileName.Equals(p2.FileName))
                    {
-                       this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(runComplete);
+                       this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                    }
                });
 
@@ -802,11 +841,58 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
         }
+        
+        [TestMethod]
+        public void StartTestRunShouldAbortOnExceptionInSendMessage()
+        {
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+            var sources = new List<string> { "1.dll" };
+            var payload = new TestRunRequestPayload { Sources = sources, RunSettings = null };
+            var exception = new IOException();
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload)).Throws(exception);
+
+            this.requestSender.StartTestRun(sources, null, mockHandler.Object);
+
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once, "Test Run Complete must be called");
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
+        }
+
+        [TestMethod]
+        public void StartRunTestsShouldAbortOnProcessExited()
+        {
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+            var manualEvent = new ManualResetEvent(false);
+            var sources = new List<string> { "1.dll" };
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
+            var payload = new TestRunCompletePayload()
+            {
+                ExecutorUris = null,
+                LastRunTests = dummyLastRunArgs,
+                RunAttachments = null,
+                TestRunCompleteArgs = dummyCompleteArgs
+            };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
+                .Callback((CancellationToken c) =>
+                {
+                    Task.Run(() => this.requestSender.OnProcessExited()).Wait();
+
+                    Assert.IsTrue(c.IsCancellationRequested);
+                }).Returns(Task.FromResult((Message)null));
+
+            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(() => manualEvent.Set());
+
+            this.requestSender.StartTestRun(sources, null, mockHandler.Object);
+
+            manualEvent.WaitOne();
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
 
         #endregion
 
         #region private methods
-        
+
         private static Message CreateMessage<T>(string messageType, T payload)
         {
             var message = new Message()
@@ -846,7 +932,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
-            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(WaitTimeout);
+            var connectionSuccess = this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout);
             Assert.IsTrue(connectionSuccess, "Connection must succeed.");
         }
 

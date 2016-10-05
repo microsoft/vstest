@@ -1,17 +1,16 @@
 // Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
+    using System;
     using System.IO;
-
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Net;
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-    using System;
+
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Facilitates communication using sockets
@@ -60,7 +59,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         private object sendSyncObject = new object();
 
-        public SocketCommunicationManager() : this(JsonDataSerializer.Instance)
+        /// <summary>
+        /// Server stream to use read timeout
+        /// </summary>
+        private NetworkStream serverStream;
+
+        /// <summary>
+        /// The server stream read timeout constant.
+        /// </summary>
+        private const int ServerStreamReadTimeout = 500;
+
+        public SocketCommunicationManager(): this(JsonDataSerializer.Instance)
         {
         }
 
@@ -79,6 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var endpoint = new IPEndPoint(IPAddress.Loopback, 0);
             this.tcpListener = new TcpListener(endpoint);
+
             this.tcpListener.Start();
 
             var portNumber = ((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
@@ -98,10 +108,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.clientConnectedEvent.Reset();
 
                 var client = await this.tcpListener.AcceptTcpClientAsync();
-                var networkStream = client.GetStream();
 
-                this.binaryReader = new BinaryReader(networkStream);
-                this.binaryWriter = new BinaryWriter(networkStream);
+                this.serverStream = client.GetStream();
+
+                this.binaryReader = new BinaryReader(this.serverStream);
+                this.binaryWriter = new BinaryWriter(this.serverStream);
 
                 this.clientConnectedEvent.Set();
 
@@ -116,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>True if Client is connected, false otherwise</returns>
         public bool WaitForClientConnection(int clientConnectionTimeout)
         {
-           return this.clientConnectedEvent.WaitOne(clientConnectionTimeout);
+            return this.clientConnectedEvent.WaitOne(clientConnectionTimeout);
         }
 
         /// <summary>
@@ -126,6 +137,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.tcpListener?.Stop();
             this.tcpListener = null;
+            this.binaryReader.Dispose();
+            this.binaryWriter.Dispose();
         }
 
         #endregion
@@ -178,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendMessage(string messageType)
         {
             var serializedObject = this.dataSerializer.SerializeMessage(messageType);
-            WriteAndFlushToChannel(serializedObject);
+            this.WriteAndFlushToChannel(serializedObject);
         }
 
         /// <summary>
@@ -188,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public Message ReceiveMessage()
         {
             var rawMessage = this.ReceiveRawMessage();
-            return dataSerializer.DeserializeMessage(rawMessage);
+            return this.dataSerializer.DeserializeMessage(rawMessage);
         }
 
         /// <summary>
@@ -199,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendMessage(string messageType, object payload)
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
-            WriteAndFlushToChannel(rawMessage);
+            this.WriteAndFlushToChannel(rawMessage);
         }
 
         /// <summary>
@@ -225,22 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="rawMessage">serialized message</param>
         public void SendRawMessage(string rawMessage)
         {
-            WriteAndFlushToChannel(rawMessage);
-        }
-
-        /// <summary>
-        /// Writes the data on socket and flushes the buffer
-        /// </summary>
-        /// <param name="rawMessage">message to write</param>
-        private void WriteAndFlushToChannel(string rawMessage)
-        {
-            // Writing Message on binarywriter is not Thread-Safe
-            // Need to sync one by one to avoid buffer corruption
-            lock (sendSyncObject)
-            {
-                this.binaryWriter.Write(rawMessage);
-                this.binaryWriter.Flush();
-            }
+            this.WriteAndFlushToChannel(rawMessage);
         }
 
         /// <summary>
@@ -252,6 +250,101 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public T DeserializePayload<T>(Message message)
         {
             return this.dataSerializer.DeserializePayload<T>(message);
+        }
+
+        /// <summary>
+        /// Reads message from the binary reader using read timeout
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// The cancellation Token.
+        /// </param>
+        /// <returns>
+        /// Returns message read from the binary reader
+        /// </returns>
+        public async Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken)
+        {
+            var rawMessage = await this.ReceiveRawMessageAsync(cancellationToken);
+            if (!string.IsNullOrEmpty(rawMessage))
+            {
+                return this.dataSerializer.DeserializeMessage(rawMessage);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Reads message from the binary reader using read timeout 
+        /// </summary>
+        /// <param name="cancellationToken">
+        /// The cancellation Token.
+        /// </param>
+        /// <returns>
+        /// Raw message string 
+        /// </returns>
+        public async Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken)
+        {
+            var str = await Task.Run(() => this.TryReceiveRawMessage(cancellationToken));
+            return str;
+        }
+
+        private string TryReceiveRawMessage(CancellationToken cancellationToken)
+        {
+            string str = null;
+            bool success = false;
+
+            // Set read timeout to avoid blocking receive raw message
+            this.serverStream.ReadTimeout = ServerStreamReadTimeout;
+            while (!cancellationToken.IsCancellationRequested && !success)
+            {
+                try
+                {
+                    str = this.ReceiveRawMessage();
+                    success = true;
+                }
+                catch (IOException ioException)
+                {
+                    var socketException = ioException.InnerException as SocketException;
+                    if (socketException != null
+                        && socketException.SocketErrorCode == SocketError.TimedOut)
+                    {
+                        EqtTrace.Info(
+                            "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
+                            ioException);
+                    }
+                    else
+                    {
+                        EqtTrace.Error(
+                            "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                            ioException);
+                        break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    EqtTrace.Error(
+                        "SocketCommunicationManager ReceiveMessage: failed to receive message {0}",
+                        exception);
+                    break;
+                }
+            }
+
+            this.serverStream.ReadTimeout = -1;
+            return str;
+        }
+
+        /// <summary>
+        /// Writes the data on socket and flushes the buffer
+        /// </summary>
+        /// <param name="rawMessage">message to write</param>
+        private void WriteAndFlushToChannel(string rawMessage)
+        {
+            // Writing Message on binarywriter is not Thread-Safe
+            // Need to sync one by one to avoid buffer corruption
+            lock (this.sendSyncObject)
+            {
+                this.binaryWriter.Write(rawMessage);
+                this.binaryWriter.Flush();
+            }
         }
     }
 }
