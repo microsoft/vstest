@@ -822,7 +822,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                                           TestRunCompleteArgs = dummyCompleteArgs
                                       };
             var runComplete = CreateMessage(MessageType.ExecutionComplete, completepayload);
-
+            
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message1));
             mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
                 .Callback<TestProcessStartInfo>((startInfo) =>
@@ -836,7 +836,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                        this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete));
                    }
                });
-
+            this.requestSender.InitializeCommunication();
             this.requestSender.StartTestRunWithCustomHost(sources, null, mockHandler.Object, mockLauncher.Object);
 
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
