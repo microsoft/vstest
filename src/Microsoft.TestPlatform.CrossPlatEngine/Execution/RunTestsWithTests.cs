@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     }
                     finally
                     {
-                        if (appDomain == null) AppDomain.Unload(appDomain);
+                        if (appDomain != null) AppDomain.Unload(appDomain);
                     }
                 }
 
