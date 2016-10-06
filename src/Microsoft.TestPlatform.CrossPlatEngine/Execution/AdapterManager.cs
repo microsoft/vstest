@@ -68,17 +68,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 try
                 {
-                    var runContext = new RunContext();
-                    runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(runSettings);
-                    runContext.KeepAlive = false;
-                    runContext.InIsolation = true;
-                    runContext.IsDataCollectionEnabled = false;
-                    runContext.IsBeingDebugged = isBeingDebugged;
-
-                    var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
-                    runContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
-                    runContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
-
+                    var runContext = CreateRunContextFromSettings(runSettings, isBeingDebugged);
+                    // Trigger in-proc DC
                     frameworkHandle.inProcDataCollectionExtensionManager?.TriggerTestSessionStart();
 
                     this.adapterExecutor.RunTests(sources, runContext, frameworkHandle);
@@ -106,18 +97,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 try
                 {
                     var testCases = JsonDataSerializer.Instance.Deserialize<List<TestCase>>(serializedTestCases);
+                    var runContext = CreateRunContextFromSettings(runSettings, isBeingDebugged);
 
-                    var runContext = new RunContext();
-                    runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(runSettings);
-                    runContext.KeepAlive = false;
-                    runContext.InIsolation = true;
-                    runContext.IsDataCollectionEnabled = false;
-                    runContext.IsBeingDebugged = isBeingDebugged;
-
-                    var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
-                    runContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
-                    runContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
-
+                    // Trigger in-proc DC
                     frameworkHandle.inProcDataCollectionExtensionManager?.TriggerTestSessionStart();
 
                     this.adapterExecutor.RunTests(testCases, runContext, frameworkHandle);
@@ -131,6 +113,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     frameworkHandle.inProcDataCollectionExtensionManager?.TriggerTestSessionEnd();
                 }
             }
+        }
+
+        private IRunContext CreateRunContextFromSettings(string settingsXml, bool isBeingDebugged)
+        {
+            var runContext = new RunContext();
+            runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(settingsXml);
+            runContext.KeepAlive = false;
+            runContext.InIsolation = true;
+            runContext.IsDataCollectionEnabled = false;
+            runContext.IsBeingDebugged = isBeingDebugged;
+
+            var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+            runContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
+            runContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
+
+            return runContext;
         }
     }
 #endif
