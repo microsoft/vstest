@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using ObjectModel.Adapter;
+    using CommunicationUtilities;
 
     /// <summary>
     /// The in process data collection extension manager.
@@ -25,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IDictionary<Guid, List<TestResult>> testResultDictionary;
         private HashSet<Guid> testCaseEndStatusMap;
-        private ITestRunCache testRunCache;
+        private FrameworkHandleProxy frameworkHandle;
 
         /// <summary>
         /// Loaded in-proc datacollectors collection
@@ -34,9 +36,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private object testCaseEndStatusSyncObject = new object();
 
-        public InProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache)
+        public InProcDataCollectionExtensionManager(string runSettings, FrameworkHandleProxy frameworkHandle)
         {
-            this.testRunCache = testRunCache;
+            this.frameworkHandle = frameworkHandle;
 
             this.inProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
@@ -164,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                             this.SetInProcDataCollectionDataInTestResult(testResult);
 
                             // TestResult updated with in-proc data, just flush
-                            this.testRunCache.OnNewTestResult(testResult);
+                            this.frameworkHandle.RecordResult(JsonDataSerializer.Instance.Serialize<TestResult>(testResult));
                         }
 
                         this.testResultDictionary.Remove(testCase.Id);
@@ -221,7 +223,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 foreach(var result in results)
                 {
-                    this.testRunCache.OnNewTestResult(result);
+                    this.frameworkHandle.RecordResult(JsonDataSerializer.Instance.Serialize<TestResult>(result));
                 }
             }
         }

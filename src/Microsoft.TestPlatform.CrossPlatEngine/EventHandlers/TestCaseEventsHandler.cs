@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
     internal class TestCaseEventsHandler : ITestCaseEventsHandler
     {
 
-        private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
+     //   private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
         private ITestCaseEventsHandler testCaseEvents;
 
         /// <summary>
@@ -27,9 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <param name="inProcDCExtMgr">
         /// The in proc tidc helper.
         /// </param>
-        public TestCaseEventsHandler(InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager, ITestCaseEventsHandler testCaseEvents)
+        public TestCaseEventsHandler(ITestCaseEventsHandler testCaseEvents)
         {
-            this.inProcDataCollectionExtensionManager = inProcDataCollectionExtensionManager;
+           // this.inProcDataCollectionExtensionManager = inProcDataCollectionExtensionManager;
             this.testCaseEvents = testCaseEvents;
         }
 
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// </param>
         public void SendTestCaseStart(TestCase testCase)
         {
-            this.inProcDataCollectionExtensionManager.TriggerTestCaseStart(testCase);
+           // this.inProcDataCollectionExtensionManager.TriggerTestCaseStart(testCase);
             this.testCaseEvents?.SendTestCaseStart(testCase);
         }
 
@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// </param>
         public void SendTestCaseEnd(TestCase testCase, TestOutcome outcome)
         {
-            this.inProcDataCollectionExtensionManager.TriggerTestCaseEnd(testCase, outcome);
+           // this.inProcDataCollectionExtensionManager.TriggerTestCaseEnd(testCase, outcome);
             this.testCaseEvents?.SendTestCaseEnd(testCase, outcome);
         }
 
@@ -68,9 +68,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// </param>
         public bool SendTestResult(TestResult result)
         {
-            var flushResult = this.inProcDataCollectionExtensionManager.TriggerUpdateTestResult(result);
+          //  var flushResult = this.inProcDataCollectionExtensionManager.TriggerUpdateTestResult(result);
             this.testCaseEvents?.SendTestResult(result);
-            return flushResult;
+            return true;
         }
     }
 }

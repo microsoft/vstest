@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using ObjectModel;
     using ObjectModel.Client;
+    using CommunicationUtilities;
+    using ObjectModel.Utilities;
 
     internal class RunTestsWithTests : BaseRunTests
     {
@@ -62,6 +64,51 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected override void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUri, RunContext runContext, IFrameworkHandle frameworkHandle)
         {
+#if NET46
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runContext.RunSettings.SettingsXml);
+            if (runConfiguration.DisableAppDomain)
+            {
+                var testCases = this.executorUriVsTestList[executorUri];
+
+                var sourceTestCaseMap = new Dictionary<string, List<TestCase>>();
+                foreach (var test in testCases)
+                {
+                    var source = test.Source;
+                    if (!sourceTestCaseMap.ContainsKey(source))
+                    {
+                        sourceTestCaseMap.Add(source, new List<TestCase>() { test });
+                    }
+                    else
+                    {
+                        sourceTestCaseMap[source].Add(test);
+                    }
+                }
+
+                foreach (var sourceTests in sourceTestCaseMap)
+                {
+                    AppDomain appDomain = null;
+                    try
+                    {
+                        appDomain = AppDomainHelper.CreateAppDomain(sourceTests.Key);
+
+                        var proxyFrameworkHandle = new FrameworkHandleProxy(frameworkHandle);
+
+                        var appDomainFrameworkHandle = AppDomainHelper.CreateObjectInNewDomain<FrameworkHandleInAppDomain>(appDomain, proxyFrameworkHandle, runContext.RunSettings.SettingsXml);
+
+                        var adapterManager = AppDomainHelper.CreateObjectInNewDomain<AdapterManager>(appDomain, executor.Value.GetType().ToString(), executor.Value.GetType().Assembly.FullName);
+
+                        var testCasesString = JsonDataSerializer.Instance.Serialize<List<TestCase>>(sourceTests.Value);
+                        adapterManager.InvokeTestRun(testCasesString, runContext.RunSettings.SettingsXml, appDomainFrameworkHandle, runContext.IsBeingDebugged);
+                    }
+                    finally
+                    {
+                        if (appDomain == null) AppDomain.Unload(appDomain);
+                    }
+                }
+
+                return;
+            }
+#endif
             executor?.Value.RunTests(this.executorUriVsTestList[executorUri], runContext, frameworkHandle);
         }
 
