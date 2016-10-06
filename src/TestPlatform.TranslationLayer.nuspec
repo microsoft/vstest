@@ -12,7 +12,8 @@
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <copyright>Copyright © Microsoft Corporation</copyright>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="7.0.1"/>
+      <!-- VS has a dependency on 8.0.3 version of NewtonSoft.Json. -->
+      <dependency id="Newtonsoft.Json" version="8.0.3"/>
     </dependencies>
   </metadata>
   <files>
