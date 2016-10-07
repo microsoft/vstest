@@ -13,6 +13,8 @@
     <copyright>Copyright © Microsoft Corporation</copyright>
     <dependencies>
       <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
+
+      <!-- CommunicationUtilities requires 8.0.3, but 8.0.3 doesn't provide a netcoreapp1.0 target -->
       <dependency id="Newtonsoft.Json" version="9.0.1"/>
     </dependencies>
   </metadata>
