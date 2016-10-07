@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private IDictionary<IProxyDiscoveryManager, ITestDiscoveryEventsHandler> concurrentManagerHandlerMap;
 
         private ITestDiscoveryEventsHandler currentDiscoveryEventsHandler;
+
         private ParallelDiscoveryDataAggregator currentDiscoveryDataAggregator;
 
         #endregion
@@ -39,14 +40,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private object discoveryStatusLockObject = new object();
 
         #endregion
-
-        public ParallelProxyDiscoveryManager(Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel)
-            : base(actualProxyManagerCreator, parallelLevel, true)
-        {
-        }
-
-        public ParallelProxyDiscoveryManager(Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool reuseHosts)
-            : base(actualProxyManagerCreator, parallelLevel, reuseHosts)
+        
+        public ParallelProxyDiscoveryManager(Func<IProxyDiscoveryManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+            : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
         }
 
@@ -89,14 +85,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <inheritdoc/>
         public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
-            var allDiscoverysCompleted = false;
+            var allDiscoverersCompleted = false;
 
-            if (!this.ReuseHosts)
+            if (!this.SharedHosts)
             {
                 this.concurrentManagerHandlerMap.Remove(proxyDiscoveryManager);
                 proxyDiscoveryManager.Close();
 
-                proxyDiscoveryManager = CreateNewConcurrentManager();
+                proxyDiscoveryManager = this.CreateNewConcurrentManager();
 
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                                                proxyDiscoveryManager,
@@ -115,11 +111,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     // Each concurrent Executor calls this method 
                     // So, we need to keep track of total discoverycomplete calls
                     this.discoveryCompletedClients++;
-                    allDiscoverysCompleted = this.discoveryCompletedClients == this.concurrentManagerInstances.Length;
+                    allDiscoverersCompleted = this.discoveryCompletedClients == this.concurrentManagerInstances.Length;
                 }
 
                 // verify that all executors are done with the discovery and there are no more sources/testcases to execute
-                if (allDiscoverysCompleted)
+                if (allDiscoverersCompleted)
                 {
                     // Reset enumerators
                     this.sourceEnumerator = null;
@@ -136,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 }
             }
 
-            return allDiscoverysCompleted;
+            return allDiscoverersCompleted;
         }
 
         #endregion
@@ -216,12 +212,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// </summary>
         /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
         /// <returns>True, if discovery triggered</returns>
-        private bool DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager ProxyDiscoveryManager)
+        private bool DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager)
         {
             DiscoveryCriteria discoveryCriteria = null;
 
             string nextSource = null;
-            if (this.FetchNextSource(this.sourceEnumerator, out nextSource))
+            if (this.TryFetchNextSource(this.sourceEnumerator, out nextSource))
             {
                 EqtTrace.Info("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", nextSource);
                 discoveryCriteria = new DiscoveryCriteria(new List<string>() { nextSource }, this.actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, this.actualDiscoveryCriteria.DiscoveredTestEventTimeout, this.actualDiscoveryCriteria.RunSettings);
@@ -229,10 +225,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (discoveryCriteria != null)
             {
-                ProxyDiscoveryManager.DiscoverTests(discoveryCriteria, this.concurrentManagerHandlerMap[ProxyDiscoveryManager]);
+                proxyDiscoveryManager.DiscoverTests(discoveryCriteria, this.concurrentManagerHandlerMap[proxyDiscoveryManager]);
+                return true;
             }
 
-            return discoveryCriteria != null;
+            return false;
         }
     }
 }

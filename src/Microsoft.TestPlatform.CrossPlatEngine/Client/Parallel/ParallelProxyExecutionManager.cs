@@ -52,8 +52,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
         }
 
-        public ParallelProxyExecutionManager(Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, bool reuseHosts)
-            : base(actualProxyManagerCreator, parallelLevel, reuseHosts)
+        public ParallelProxyExecutionManager(Func<IProxyExecutionManager> actualProxyManagerCreator, int parallelLevel, bool sharedHosts)
+            : base(actualProxyManagerCreator, parallelLevel, sharedHosts)
         {
         }
 
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var allRunsCompleted = false;
 
-            if(!this.ReuseHosts)
+            if(!this.SharedHosts)
             {
                 this.concurrentManagerHandlerMap.Remove(proxyExecutionManager);
                 proxyExecutionManager.Close();
@@ -266,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (!this.hasSpecificTestsRun)
             {
                 string nextSource = null;
-                if (this.FetchNextSource(this.sourceEnumerator, out nextSource))
+                if (this.TryFetchNextSource(this.sourceEnumerator, out nextSource))
                 {
                     EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", nextSource);
 
@@ -276,7 +276,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             else
             {
                 List<TestCase> nextSetOfTests = null;
-                if (this.FetchNextSource(this.testCaseListEnumerator, out nextSetOfTests))
+                if (this.TryFetchNextSource(this.testCaseListEnumerator, out nextSetOfTests))
                 {
                     EqtTrace.Info("ProxyParallelExecutionManager: Triggering test run for next source: {0}", nextSetOfTests?.FirstOrDefault()?.Source);
 

@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             if (parallelDiscoveryComplete)
             {
                 // In case of sequential discovery - RawMessage would have contained a 'DiscoveryCompletePayload' object
-                // To send a rawmessge - we need to create rawmessage from an aggregated payload object 
+                // To send a raw message - we need to create raw message from an aggregated payload object 
                 var testDiscoveryCompletePayload = new DiscoveryCompletePayload()
                 {
                     TotalTests = discoveryDataAggregator.TotalTests,
@@ -82,8 +82,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     LastDiscoveredTests = null
                 };
 
-                // we have to send rawmessages as we block the discoverycomplete actual raw messages
-                ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
+                // we have to send raw messages as we block the discoverycomplete actual raw messages
+                this.ConvertToRawMessageAndSend(MessageType.DiscoveryComplete, testDiscoveryCompletePayload);
 
                 // send actual test discoverycomplete to clients
                 this.actualDiscoveryEventsHandler.HandleDiscoveryComplete(discoveryDataAggregator.TotalTests, null, discoveryDataAggregator.IsAborted);

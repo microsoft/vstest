@@ -33,7 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 3);
+            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 3, false);
             this.proxyParallelDiscoveryManager.Initialize();
 
             Assert.AreEqual(3, createdMockManagers.Count, "Number of Concurrent Managers created should be 3");
@@ -56,7 +56,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 4);
+            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 4, false);
             this.proxyParallelDiscoveryManager.Abort();
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
@@ -79,7 +79,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 2);
+            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 2, false);
 
             var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
             var sources = new List<string>() { "1.dll", "2.dll" };
@@ -147,7 +147,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 2);
+            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 2, false);
 
             var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
 
