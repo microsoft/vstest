@@ -81,5 +81,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Send the request to abort the test run
         /// </summary>
         void SendTestRunAbort();
+
+        /// <summary>
+        /// handle client process exit
+        /// </summary>
+        void OnClientProcessExit();
     }
 }
