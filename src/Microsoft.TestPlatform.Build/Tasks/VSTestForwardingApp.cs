@@ -43,6 +43,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             using (var process = new Process { StartInfo = processInfo })
             {
                 process.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
+                process.ErrorDataReceived += (sender, args) => Console.WriteLine(args.Data);
 
                 process.Start();
                 process.BeginOutputReadLine();
