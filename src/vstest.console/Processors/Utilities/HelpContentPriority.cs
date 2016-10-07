@@ -116,5 +116,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// PortArgumentProcessor Help
         /// </summary>
         PortArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// EnableDiagArgumentProcessor Help
+        /// </summary>
+        EnableDiagArgumentProcessorHelpPriority
     }
 }

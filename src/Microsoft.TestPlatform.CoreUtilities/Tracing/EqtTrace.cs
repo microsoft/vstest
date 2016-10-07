@@ -6,14 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Text;
-
-#if NET46
-    using System.Configuration;
-    using Microsoft.Win32;
-    using Utilities;
     using System.IO;
-#endif
+    using System.Text;
+    using System.Threading;
+
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
     /// <summary>
     /// Wrapper class for tracing.
@@ -30,43 +27,40 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public static class EqtTrace
     {
-
-#if NET46
-        /// <summary>
-        /// To which system event log we log if cannot log to trace file.
-        /// </summary>
-        private const string SystemEventLogSource = "Application";
-
-        /// <summary>
-        /// Name of the trace listener.
-        /// </summary>
-        private const string ListenerName = "TptTraceListener";
-
-        /// <summary>
-        /// Maximum size of the trace log file (in kilobytes).
-        /// </summary>
-        private const string TraceLogMaxFileSizeInKB = "TraceLogMaxFileSizeInKb";
+        #region Fields
 
         /// <summary>
         /// The switch for tracing TestPlaform messages only. Initialize Trace listener as a part of this
         /// to avoid a separate Static concstructor (to fix CA1810)
         /// </summary>
-        private static readonly TraceSwitch traceLevelSwitch = new TraceSwitch("TpTraceLevel", null);
-        
+        private static readonly TraceSwitch s_traceLevelSwitch = new TraceSwitch("TpTraceLevel", null);
+
         // Current process name/id that called trace so that it's easier to read logs.
         // We cache them for performance reason.
-        private static readonly string processName = GetProcessName();
+        private static readonly string s_processName = GetProcessName();
 
-        private static readonly int processId = GetProcessId();
+        private static readonly int s_processId = GetProcessId();
 
+#if TODO
         /// <summary>
         /// We log to system log only this # of times in order not to overflow it.
         /// </summary>
-        //private static int timesCanWriteToSystemLog = 10;
-        
+        private static int s_timesCanWriteToSystemLog = 10;
+#endif
+
+        /// <summary>
+        /// To which system event log we log if cannot log to trace file.
+        /// </summary>
+        private const string SystemEventLogSource = "Application";
+
         /// Specifies whether the trace is initialized or not
         /// </summary>
         private static bool isInitialized = false;
+
+        /// <summary>
+        /// Name of the trace listener.
+        /// </summary>
+        private const string ListenerName = "TptTraceListener";
 
         /// <summary>
         /// Trace listener object to which all Testplatform traces are written.
@@ -76,28 +70,29 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Lock over initialization
         /// </summary>
-        private static object initializationLock = new object();
+        private static object isInitializationLock = new object();
 
-        private static int TraceFileSize = 0;
-        private static int DefaultTraceFileSize = 10240; // 10Mb.
+        private static int traceFileSize = 0;
+        private static int s_DefaultTraceFileSize = 10240; // 10Mb.
 
         /// <summary>
         /// Log file name to setup custom file for logging.
         /// </summary>
         private static string logFileName = null;
-#endif
+#endregion
+
+
         /// <summary>
         /// Ensure the trace is initialized
         /// </summary>
         static void EnsureTraceIsInitialized()
         {
-#if NET46
             if (isInitialized)
             {
                 return;
             }
 
-            lock (initializationLock)
+            lock (isInitializationLock)
             {
                 if (isInitialized)
                 {
@@ -113,19 +108,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Path.Combine(
                             logsDirectory,
                             Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName) +
-                                ".TpTrace.log"
-                        );
+                                ".TpTrace.log");
                 }
-
-
+#if TODO
                 string traceFileSizeStr = ConfigurationManager.AppSettings[TraceLogMaxFileSizeInKB];
                 if (!int.TryParse(traceFileSizeStr, out TraceFileSize)
                         || TraceFileSize <= 0)
                 {
                     TraceFileSize = DefaultTraceFileSize;
                 }
-
-                //listener = new RollingFileTraceListener(logFileName, ListenerName, TraceFileSize);
+#endif
+                traceFileSize = s_DefaultTraceFileSize;
+                listener = new RollingFileTraceListener(logFileName, ListenerName, traceFileSize);
                 Trace.Listeners.Add(listener);
                 // Set the auto-flush flag, so that log entries are written immediately. This is done so that if the
                 // process exits or is killed, we will have as much log information as possible in the log.
@@ -133,10 +127,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 isInitialized = true;
             }
-#endif
         }
 
-#if NET46
+        /// <summary>
+        /// Initializes the verbose tracing with custom log file
+        /// And overrides if any trace is set before
+        /// </summary>
+        public static void InitializeVerboseTrace(string customLogFile)
+        {
+            isInitialized = false;
+
+            logFileName = customLogFile;
+            TraceLevel = TraceLevel.Verbose;
+        }
+
+#if TODO
         /// <summary>
         /// Setup remote trace listener in the child domain.
         /// If calling domain, doesn't have tracing enabled nothing is done.
@@ -144,6 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="childDomain"></param>
         public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)
         {
+            Debug.Assert(childDomain != null, "domain");
             if (null != childDomain)
             {
                 RemoteEqtTrace remoteEqtTrace = (RemoteEqtTrace)childDomain.CreateInstanceFromAndUnwrap(
@@ -167,50 +173,64 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     remoteEqtTrace.SetupRemoteListeners(tptListner);
                 }
             }
-        }
 
-        /// <summary>
-        /// Setup trace listenrs. It should be called when setting trace listener for child domain.
-        /// </summary>
-        /// <param name="listener"></param>
-        internal static void SetupRemoteListeners(TraceListener traceListener)
-        {
-            lock (initializationLock)
-            {
-                // Add new listeners.
-                if (null != listener)
-                {
-                    Trace.Listeners.Add(listener);
-                    listener = traceListener;
-                }
-                isInitialized = true;
-            }
         }
 #endif
 
         /// <summary>
+        /// Setup a custom trace listener instead of default trace listener created by rocksteady.
+        /// This is needed by DTA Agent where it needs to listen rocksteady traces but doesn't use rocksteady listener.
+        /// </summary>
+        public static void SetupListener(TraceListener listener)
+        {
+            lock (isInitializationLock)
+            {
+
+                // Add new listeners.
+                EqtTrace.listener = listener;
+                if (null != listener)
+                {
+                    Trace.Listeners.Add(listener);
+                }
+                isInitialized = true;
+            }
+        }
+
+        /// <summary>
         /// Setup trace listenrs. It should be called when setting trace listener for child domain.
         /// </summary>
         /// <param name="listener"></param>
-        internal static void SetupRemoteListeners()
+        internal static void SetupRemoteListeners(TraceListener listener)
         {
+
+            lock (isInitializationLock)
+            {
+
+                // Add new listeners.
+                if (null != listener)
+                {
+                    Trace.Listeners.Add(listener);
+                    EqtTrace.listener = listener;
+                }
+                isInitialized = true;
+            }
         }
 
-        #region TraceLevel, ShouldTrace
 
-#if NET46
+
+#region TraceLevel, ShouldTrace
         public static System.Diagnostics.TraceLevel TraceLevel
         {
             get
             {
-                return traceLevelSwitch.Level;
+                return s_traceLevelSwitch.Level;
             }
 
             set
             {
                 try
                 {
-                    traceLevelSwitch.Level = value;
+                    s_traceLevelSwitch.Level = value;
                 }
                 catch (ArgumentException e)
                 {
@@ -218,13 +238,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
             }
         }
-#endif
         /// <summary>
         ///     Boolean flag to know if tracing error statements is enabled.
         /// </summary>
         public static bool IsErrorEnabled
         {
-            get { return false; }
+            get
+            {
+                return ShouldTrace(TraceLevel.Error);
+            }
         }
 
         /// <summary>
@@ -232,7 +254,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public static bool IsInfoEnabled
         {
-            get { return false; }
+            get
+            {
+                return ShouldTrace(TraceLevel.Info);
+            }
         }
 
         /// <summary>
@@ -240,7 +265,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public static bool IsVerboseEnabled
         {
-            get { return false; }
+            get
+            {
+                return ShouldTrace(TraceLevel.Verbose);
+            }
         }
 
         /// <summary>
@@ -248,7 +276,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public static bool IsWarningEnabled
         {
-            get { return false; }
+            get
+            {
+                return ShouldTrace(TraceLevel.Warning);
+            }
         }
 
         /// <summary>
@@ -257,516 +288,802 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         /// <param name="traceLevel"></param>
         /// <returns></returns>
-        public static bool ShouldTrace()
+        public static bool ShouldTrace(TraceLevel traceLevel)
         {
-            return false;
+            switch (traceLevel)
+            {
+                case TraceLevel.Off:
+                    return false;
+                case TraceLevel.Error:
+                    return s_traceLevelSwitch.TraceError;
+                case TraceLevel.Warning:
+                    return s_traceLevelSwitch.TraceWarning;
+                case TraceLevel.Info:
+                    return s_traceLevelSwitch.TraceInfo;
+                case TraceLevel.Verbose:
+                    return s_traceLevelSwitch.TraceVerbose;
+                default:
+                    Debug.Fail("Should never get here!");
+                    return false;
+            }
         }
-        #endregion
+#endregion
 
-        #region Error
+#region Error
 
-                /// <summary>
-                /// Prints an error message and prompts with a Debug dialog
-                /// </summary>
-                /// <param name="message">the error message</param>
-                [ConditionalAttribute("TRACE")]
-                public static void Fail(string message)
+        /// <summary>
+        /// Prints an error message and prompts with a Debug dialog
+        /// </summary>
+        /// <param name="message">the error message</param>
+        [ConditionalAttribute("TRACE")]
+        public static void Fail(string message)
+        {
+            Error(message);
+            Debug.Fail(message);
+        }
+
+
+        /// <summary>
+        /// Combines together EqtTrace.Fail and Debug.Fail:
+        /// Prints an formatted error message and prompts with a Debug dialog.
+        /// </summary>
+        /// <param name="format">the formatted error message</param>
+        /// <param name="args">arguments to the format</param>
+        [ConditionalAttribute("TRACE")]
+        public static void Fail(string format, params object[] args)
+        {
+            string message = string.Format(CultureInfo.InvariantCulture, format, args);
+            Error(message);
+#if DEBUG
+            Debug.Fail(message);
+#endif
+        }
+
+
+
+        [ConditionalAttribute("TRACE")]
+        public static void Error(string message)
+        {
+            if (ShouldTrace(TraceLevel.Error))
+            {
+                WriteLine(TraceLevel.Error, message);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the message if the condition is true
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void ErrorIf(bool condition, string message)
+        {
+            if (condition)
+            {
+                Error(message);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void ErrorUnless(bool condition, string message)
+        {
+            ErrorIf(!condition, message);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void ErrorUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string message)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, message);
+            }
+            else
+            {
+                Error(message);
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void Error(string format, params object[] args)
+        {
+            Debug.Assert(format != null);
+
+            // Check level before doing string.Format to avoid string creation if tracing is off.
+            if (ShouldTrace(TraceLevel.Error))
+            {
+                Error(string.Format(CultureInfo.InvariantCulture, format, args));
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void ErrorUnless(bool condition, string format, params object[] args)
+        {
+            ErrorIf(!condition, format, args);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void ErrorUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string format, params object[] args)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, format, args);
+            }
+            else
+            {
+                Error(format, args);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is true
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void ErrorIf(bool condition, string format, params object[] args)
+        {
+            if (condition)
+            {
+                Error(format, args);
+            }
+        }
+
+        /// <summary>
+        /// EqtTrace.Error and Debug.Fail combined in one call.
+        /// </summary>
+        /// <param name="message">The message to send to Debug.Fail and EqtTrace.Error.</param>
+        /// <param name="args">Params to string.Format.</param>
+        [ConditionalAttribute("TRACE")]
+        public static void ErrorAssert(string format, params object[] args)
+        {
+            Debug.Assert(format != null);
+            string message = string.Format(CultureInfo.InvariantCulture, format, args);
+            Error(message);
+            Debug.Fail(message);
+        }
+
+        /// <summary>
+        /// Write a exception if tracing for error is enabled
+        /// </summary>
+        /// <param name="exceptionToTrace">The exception to write.</param>
+        [ConditionalAttribute("TRACE")]
+        public static void Error(Exception exceptionToTrace)
+        {
+            Debug.Assert(exceptionToTrace != null);
+
+            // Write only if tracing for error is enabled.
+            // Done upfront to avoid perf hit.
+            if (ShouldTrace(TraceLevel.Error))
+            {
+                // Write at error level
+                WriteLine(TraceLevel.Error, FormatException(exceptionToTrace));
+            }
+        }
+
+#endregion
+
+#region Warning
+
+        [ConditionalAttribute("TRACE")]
+        public static void Warning(string message)
+        {
+            if (ShouldTrace(TraceLevel.Warning))
+            {
+                WriteLine(TraceLevel.Warning, message);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is true
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void WarningIf(bool condition, string message)
+        {
+            if (condition)
+            {
+                Warning(message);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void WarningUnless(bool condition, string message)
+        {
+            WarningIf(!condition, message);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void WarningUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string message)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, message);
+            }
+            else
+            {
+                Warning(message);
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void Warning(string format, params object[] args)
+        {
+            Debug.Assert(format != null);
+
+            // Check level before doing string.Format to avoid string creation if tracing is off.
+            if (ShouldTrace(TraceLevel.Warning))
+            {
+                Warning(string.Format(CultureInfo.InvariantCulture, format, args));
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void WarningIf(bool condition, string format, params object[] args)
+        {
+            if (condition)
+            {
+                Warning(format, args);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void WarningUnless(bool condition, string format, params object[] args)
+        {
+            WarningIf(!condition, format, args);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void WarningUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string format, params object[] args)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, format, args);
+            }
+            else
+            {
+                Warning(format, args);
+            }
+        }
+#endregion
+
+#region Info
+
+        [ConditionalAttribute("TRACE")]
+        public static void Info(string message)
+        {
+            if (ShouldTrace(TraceLevel.Info))
+            {
+                WriteLine(TraceLevel.Info, message);
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void InfoIf(bool condition, string message)
+        {
+            if (condition)
+            {
+                Info(message);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void InfoUnless(bool condition, string message)
+        {
+            InfoIf(!condition, message);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void InfoUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string message)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, message);
+            }
+            else
+            {
+                Info(message);
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void Info(string format, params object[] args)
+        {
+            Debug.Assert(format != null);
+
+            // Check level before doing string.Format to avoid string creation if tracing is off.
+            if (ShouldTrace(TraceLevel.Info))
+            {
+                Info(string.Format(CultureInfo.InvariantCulture, format, args));
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void InfoIf(bool condition, string format, params object[] args)
+        {
+            if (condition)
+            {
+                Info(format, args);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void InfoUnless(bool condition, string format, params object[] args)
+        {
+            InfoIf(!condition, format, args);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void InfoUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string format, params object[] args)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, format, args);
+            }
+            else
+            {
+                Info(format, args);
+            }
+        }
+#endregion
+
+#region Verbose
+
+        [ConditionalAttribute("TRACE")]
+        public static void Verbose(string message)
+        {
+            if (ShouldTrace(TraceLevel.Verbose))
+            {
+                WriteLine(TraceLevel.Verbose, message);
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void VerboseIf(bool condition, string message)
+        {
+            if (condition)
+            {
+                Verbose(message);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void VerboseUnless(bool condition, string message)
+        {
+            VerboseIf(!condition, message);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void VerboseUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string message)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, message);
+            }
+            else
+            {
+                Verbose(message);
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void Verbose(string format, params object[] args)
+        {
+            Debug.Assert(format != null);
+
+            // Check level before doing string.Format to avoid string creation if tracing is off.
+            if (ShouldTrace(TraceLevel.Verbose))
+            {
+                Verbose(string.Format(CultureInfo.InvariantCulture, format, args));
+            }
+        }
+
+        [ConditionalAttribute("TRACE")]
+        public static void VerboseIf(bool condition, string format, params object[] args)
+        {
+            if (condition)
+            {
+                Verbose(format, args);
+            }
+        }
+
+        /// <summary>
+        /// Only prints the formatted message if the condition is false
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void VerboseUnless(bool condition, string format, params object[] args)
+        {
+            VerboseIf(!condition, format, args);
+        }
+
+        /// <summary>
+        /// Prints the message if the condition is false. If the condition is true,
+        /// the message is instead printed at the specified trace level.
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="message"></param>
+        [ConditionalAttribute("TRACE")]
+        public static void VerboseUnlessAlterTrace(bool condition, TraceLevel bumpLevel, string format, params object[] args)
+        {
+            if (condition)
+            {
+                WriteAtLevel(bumpLevel, format, args);
+            }
+            else
+            {
+                Verbose(format, args);
+            }
+        }
+#endregion
+
+#region Helpers
+
+        /// <summary>
+        /// Formats an exception into a nice looking message.
+        /// </summary>
+        /// <param name="exceptionToTrace">The exception to write.</param>
+        /// <returns>The formatted string.</returns>
+        private static string FormatException(Exception exceptionToTrace)
+        {
+            // Prefix for each line
+            string prefix = Environment.NewLine + '\t';
+
+            // Format this exception
+            StringBuilder message = new StringBuilder();
+            message.Append(string.Format(CultureInfo.InvariantCulture,
+                "Exception: {0}{1}Message: {2}{3}Stack Trace: {4}",
+                exceptionToTrace.GetType(), prefix, exceptionToTrace.Message,
+                prefix, exceptionToTrace.StackTrace));
+
+            // If there is base exception, add that to message
+            if (exceptionToTrace.GetBaseException() != null)
+            {
+                message.Append(string.Format(CultureInfo.InvariantCulture,
+                    "{0}BaseExceptionMessage: {1}",
+                    prefix, exceptionToTrace.GetBaseException().Message));
+            }
+
+            // If there is inner exception, add that to message
+            // We deliberately avoid recursive calls here.
+            if (exceptionToTrace.InnerException != null)
+            {
+                // Format same as outer exception except
+                // "InnerException" is prefixed to each line
+                Exception inner = exceptionToTrace.InnerException;
+                prefix += "InnerException";
+                message.Append(string.Format(CultureInfo.InvariantCulture,
+                    "{0}: {1}{2} Message: {3}{4} Stack Trace: {5}",
+                    prefix, inner.GetType(), prefix, inner.Message, prefix, inner.StackTrace));
+
+                if (inner.GetBaseException() != null)
                 {
-                    Error(message);
-                }
-
-
-                /// <summary>
-                /// Combines together EqtTrace.Fail and Debug.Fail:
-                /// Prints an formatted error message and prompts with a Debug dialog.
-                /// </summary>
-                /// <param name="format">the formatted error message</param>
-                /// <param name="args">arguments to the format</param>
-                [ConditionalAttribute("TRACE")]
-                public static void Fail(string format, params object[] args)
-                {
-                    if (IsErrorEnabled)
-                    {
-                        var message = string.Format(CultureInfo.InvariantCulture, format, args);
-                        Error(message);
-        #if DEBUG
-                        Debug.Fail(message);
-        #endif
-                    }
-                }
-
-
-
-                [ConditionalAttribute("TRACE")]
-                public static void Error(string message)
-                {
-                    // Todo Add logging.
-                }
-
-                /// <summary>
-                /// Only prints the message if the condition is true
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void ErrorIf(bool condition, string message)
-                {
-                    if (condition)
-                    {
-                        Error(message);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void ErrorUnless(bool condition, string message)
-                {
-                    ErrorIf(!condition, message);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void ErrorUnlessAlterTrace(bool condition, string message)
-                {
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void Error(string format, params object[] args)
-                {
-                    if (IsErrorEnabled)
-                    {
-                        Debug.Assert(format != null);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void ErrorUnless(bool condition, string format, params object[] args)
-                {
-                    ErrorIf(!condition, format, args);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void ErrorUnlessAlterTrace(bool condition, string format, params object[] args)
-                {
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is true
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void ErrorIf(bool condition, string format, params object[] args)
-                {
-                    if (condition)
-                    {
-                        Error(format, args);
-                    }
-                }
-
-                /// <summary>
-                /// EqtTrace.Error and Debug.Fail combined in one call.
-                /// </summary>
-                /// <param name="message">The message to send to Debug.Fail and EqtTrace.Error.</param>
-                /// <param name="args">Params to string.Format.</param>
-                [ConditionalAttribute("TRACE")]
-                public static void ErrorAssert(string format, params object[] args)
-                {
-                }
-
-                /// <summary>
-                /// Write a exception if tracing for error is enabled
-                /// </summary>
-                /// <param name="exceptionToTrace">The exception to write.</param>
-                [ConditionalAttribute("TRACE")]
-                public static void Error(Exception exceptionToTrace)
-                {
-                    if (IsErrorEnabled)
-                    {
-                        Debug.Assert(exceptionToTrace != null);
-                    }
-                }
-
-        #endregion
-
-        #region Warning
-
-                [ConditionalAttribute("TRACE")]
-                public static void Warning(string message)
-                {
-                    if (IsWarningEnabled)
-                    {
-                        // Add logging.
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is true
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void WarningIf(bool condition, string message)
-                {
-                    if (condition)
-                    {
-                        Warning(message);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void WarningUnless(bool condition, string message)
-                {
-                    WarningIf(!condition, message);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void WarningUnlessAlterTrace(bool condition, string message)
-                {
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void Warning(string format, params object[] args)
-                {
-                    if (IsWarningEnabled)
-                    {
-                        Debug.Assert(format != null);
-                    }
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void WarningIf(bool condition, string format, params object[] args)
-                {
-                    if (condition)
-                    {
-                        Warning(format, args);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void WarningUnless(bool condition, string format, params object[] args)
-                {
-                    WarningIf(!condition, format, args);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void WarningUnlessAlterTrace(bool condition, string format, params object[] args)
-                {
-                }
-        #endregion
-
-        #region Info
-
-                [ConditionalAttribute("TRACE")]
-                public static void Info(string message)
-                {
-                    if (IsInfoEnabled)
-                    {
-                        // Add logging.
-                    }
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void InfoIf(bool condition, string message)
-                {
-                    if (condition)
-                    {
-                        Info(message);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void InfoUnless(bool condition, string message)
-                {
-                    InfoIf(!condition, message);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void InfoUnlessAlterTrace(bool condition, string message)
-                {
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void Info(string format, params object[] args)
-                {
-                    if (IsInfoEnabled)
-                    {
-                        Debug.Assert(format != null);
-
-                        // Check level before doing string.Format to avoid string creation if tracing is off.
-                    }
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void InfoIf(bool condition, string format, params object[] args)
-                {
-                    if (condition)
-                    {
-                        Info(format, args);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void InfoUnless(bool condition, string format, params object[] args)
-                {
-                    InfoIf(!condition, format, args);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void InfoUnlessAlterTrace(bool condition, string format, params object[] args)
-                {
-                }
-        #endregion
-
-        #region Verbose
-
-                [ConditionalAttribute("TRACE")]
-                public static void Verbose(string message)
-                {
-                    if (IsVerboseEnabled)
-                    {
-                        // Add logging.
-                    }
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void VerboseIf(bool condition, string message)
-                {
-                    if (condition)
-                    {
-                        Verbose(message);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void VerboseUnless(bool condition, string message)
-                {
-                    VerboseIf(!condition, message);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void VerboseUnlessAlterTrace(bool condition, string message)
-                {
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void Verbose(string format, params object[] args)
-                {
-                    if (IsVerboseEnabled)
-                    {
-                        Debug.Assert(format != null);
-                    }
-                }
-
-                [ConditionalAttribute("TRACE")]
-                public static void VerboseIf(bool condition, string format, params object[] args)
-                {
-                    if (condition)
-                    {
-                        Verbose(format, args);
-                    }
-                }
-
-                /// <summary>
-                /// Only prints the formatted message if the condition is false
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void VerboseUnless(bool condition, string format, params object[] args)
-                {
-                    VerboseIf(!condition, format, args);
-                }
-
-                /// <summary>
-                /// Prints the message if the condition is false. If the condition is true,
-                /// the message is instead printed at the specified trace level.
-                /// </summary>
-                /// <param name="condition"></param>
-                /// <param name="message"></param>
-                [ConditionalAttribute("TRACE")]
-                public static void VerboseUnlessAlterTrace(bool condition, string format, params object[] args)
-                {
-                }
-        #endregion
-
-        #region Helpers
-
-                /// <summary>
-                /// Formats an exception into a nice looking message.
-                /// </summary>
-                /// <param name="exceptionToTrace">The exception to write.</param>
-                /// <returns>The formatted string.</returns>
-                private static string FormatException(Exception exceptionToTrace)
-                {
-                    // Prefix for each line
-                    string prefix = Environment.NewLine + '\t';
-
-                    // Format this exception
-                    StringBuilder message = new StringBuilder();
                     message.Append(string.Format(CultureInfo.InvariantCulture,
-                        "Exception: {0}{1}Message: {2}{3}Stack Trace: {4}",
-                        exceptionToTrace.GetType(), prefix, exceptionToTrace.Message,
-                        prefix, exceptionToTrace.StackTrace));
+                        "{0}BaseExceptionMessage: {1}",
+                        prefix, inner.GetBaseException().Message));
+                }
+            }
 
-                    // If there is base exception, add that to message
-                    if (exceptionToTrace.GetBaseException() != null)
+            // Append a new line
+            message.Append(Environment.NewLine);
+
+            return message.ToString();
+        }
+
+        /// <summary>
+        /// Get the process name. Note: we cache it, use m_processName.
+        /// </summary>
+        [SuppressMessage("Microsoft.Design", "CA1031")]
+        private static string GetProcessName()
+        {
+            try
+            {
+                //return ProcessHelper.GetProcessName();
+                string processName = null;
+
+                string[] args = Environment.GetCommandLineArgs();
+
+                if (args != null && args.Length != 0)
+                {
+                    // Leave the extension if specified, otherwise don't add it (e.g. case a.exe.exe).
+                    // It seems that if .exe suffix is not specified Framework adds .EXE to agrs[0].
+                    processName = Path.GetFileName(args[0]);
+                }
+
+                // If we still have not got process name from command line - use the slow way.
+                // This should never happen unless the process is called from execv with empty cmdline.
+                if (processName == null || processName.Length == 0)
+                {
+                    Debug.Fail("Could not get process name from command line, will try to use the slow way.");
+                    using (Process process = Process.GetCurrentProcess())
                     {
-                        message.Append(string.Format(CultureInfo.InvariantCulture,
-                            "{0}BaseExceptionMessage: {1}",
-                            prefix, exceptionToTrace.GetBaseException().Message));
+                        processName = process.ProcessName;
                     }
-
-                    // If there is inner exception, add that to message
-                    // We deliberately avoid recursive calls here.
-                    if (exceptionToTrace.InnerException != null)
-                    {
-                        // Format same as outer exception except
-                        // "InnerException" is prefixed to each line
-                        Exception inner = exceptionToTrace.InnerException;
-                        prefix += "InnerException";
-                        message.Append(string.Format(CultureInfo.InvariantCulture,
-                            "{0}: {1}{2} Message: {3}{4} Stack Trace: {5}",
-                            prefix, inner.GetType(), prefix, inner.Message, prefix, inner.StackTrace));
-
-                        if (inner.GetBaseException() != null)
-                        {
-                            message.Append(string.Format(CultureInfo.InvariantCulture,
-                                "{0}BaseExceptionMessage: {1}",
-                                prefix, inner.GetBaseException().Message));
-                        }
-                    }
-
-                    // Append a new line
-                    message.Append(Environment.NewLine);
-
-                    return message.ToString();
                 }
 
-                /// <summary>
-                /// Get the process name. Note: we cache it, use m_processName.
-                /// </summary>
-                [SuppressMessage("Microsoft.Design", "CA1031")]
-                private static string GetProcessName()
+                return processName;
+            }
+            catch (Exception e) // valid suppress
+            {
+                Debug.Fail("Could not get process name: " + e.ToString());
+                LogIgnoredException(e);
+                return Resources.Utility_ProcessNameWhenCannotGetIt;
+            }
+        }
+
+        private static int GetProcessId()
+        {
+            try
+            {
+                using (Process process = Process.GetCurrentProcess())
                 {
-                    return string.Empty;
+                    return process.Id;
                 }
+            }
+            catch (InvalidOperationException e)
+            {
+                Debug.Fail("Could not get process id: " + e.ToString());
+                LogIgnoredException(e);
+                return -1;
+            }
+        }
 
-                private static int GetProcessId()
+        private static void WriteAtLevel(TraceLevel level, string message)
+        {
+            switch (level)
+            {
+                case TraceLevel.Off:
+                    return;
+                case TraceLevel.Error:
+                    Error(message);
+                    break;
+                case TraceLevel.Warning:
+                    Warning(message);
+                    break;
+                case TraceLevel.Info:
+                    Info(message);
+                    break;
+                case TraceLevel.Verbose:
+                    Verbose(message);
+                    break;
+                default:
+                    Debug.Fail("We should never get here!");
+                    break;
+            }
+        }
+
+        private static void WriteAtLevel(TraceLevel level, string format, params object[] args)
+        {
+            Debug.Assert(format != null);
+            WriteAtLevel(level, string.Format(CultureInfo.InvariantCulture, format, args));
+        }
+
+        /// <summary>
+        /// Adds the message to the trace log.
+        /// The line becomes: 
+        ///     [I, PID, ThreadID, 2003/06/11 11:56:07.445] CallingAssemblyName: message.
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="message">The message to add to trace.</param>
+        [SuppressMessage("Microsoft.Design", "CA1031")]
+        [SuppressMessage("Microsoft.Globalization", "CA1303")]
+        private static void WriteLine(System.Diagnostics.TraceLevel level, string message)
+        {
+            Debug.Assert(message != null);
+            Debug.Assert(s_processName != null && s_processName.Length != 0);
+
+            // Ensure trace is initlized
+            EnsureTraceIsInitialized();
+
+            string entryType = null;
+            switch (level)
+            {
+                case TraceLevel.Error:
+                    entryType = "E"; break;
+
+                case TraceLevel.Warning:
+                    entryType = "W"; break;
+
+                case TraceLevel.Info:
+                    entryType = "I"; break;
+
+                case TraceLevel.Verbose:
+                    entryType = "V"; break;
+
+                default:
+                    Debug.Fail("Should never get here. Unexpected TraceLevel: " + level.ToString()); break;
+            }
+
+            // The format below is a CSV so that Excel could be used easily to
+            // view/filter the logs.
+            string log = string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}, {1}, {2}, {3:yyyy}/{3:MM}/{3:dd}, {3:HH}:{3:mm}:{3:ss}.{3:fff}, {6}, {4}, {5}",
+                entryType,
+                s_processId,
+                Thread.CurrentThread.ManagedThreadId,
+                DateTime.Now,
+                s_processName,
+                message,
+                Stopwatch.GetTimestamp());
+
+            try
+            {
+                if (null != listener)
                 {
-                    return -1;
+                    listener.WriteLine(log);
+                    listener.Flush();
                 }
-
-                private static void WriteAtLevel(string message)
+                else
                 {
+                    Trace.WriteLine(log);
                 }
+            }
+            catch (Exception e) // valid suppress
+            {
+                // Log exception from tracing into event viewer. 
+                LogIgnoredException(e);
+            }
+        }
 
-                private static void WriteAtLevel(string format, params object[] args)
+        /// <summary>
+        /// Auxillary method: logs the exception that is being ignored.
+        /// </summary>
+        /// <param name="e">The exception to log.</param>
+        [SuppressMessage("Microsoft.Design", "CA1031")]
+        private static void LogIgnoredException(Exception e)
+        {
+#if TODO
+            Debug.Assert(e != null);
+
+            EnsureTraceIsInitialized();
+
+            try
+            {
+                //string message = Messages.Utility_IgnoredThrownException(e.ToString(), e.StackTrace);
+                string message = string.Format(CultureInfo.CurrentCulture,
+                    EqtMessages.Utility_IgnoredThrownException, e.ToString(), e.StackTrace);
+
+                // Write to the system event log and to debug listener. 
+                // Note: Debug.WriteLine may throw if there is a problem in .config file.
+                WriteEventLogEntry(message, EventLogEntryType.Error);
+                Debug.WriteLine(message);
+            }
+            catch // valid suppress
+            {
+                // Ignore everything at this point.
+            }
+#endif
+        }
+
+#if TODO
+        private static void WriteEventLogEntry(string message, EventLogEntryType logType)
+        {
+            Debug.Assert(message != null);
+
+            if (s_timesCanWriteToSystemLog > 0)
+            {
+                EventLog.WriteEntry(SystemEventLogSource, message, logType);
+
+                if (Interlocked.Decrement(ref s_timesCanWriteToSystemLog) == 0)
                 {
-                    Debug.Assert(format != null);
+                    EventLog.WriteEntry(SystemEventLogSource, EqtMessages.Common_EqtTraceReachedMaxEventLogEntries, EventLogEntryType.Warning);
                 }
+            }
+        }
+#endif
 
-                /// <summary>
-                /// Adds the message to the trace log.
-                /// The line becomes: 
-                ///     [I, PID, ThreadID, 2003/06/11 11:56:07.445] CallingAssemblyName: message.
-                /// </summary>
-                /// <param name="level"></param>
-                /// <param name="message">The message to add to trace.</param>
-                [SuppressMessage("Microsoft.Design", "CA1031")]
-                [SuppressMessage("Microsoft.Globalization", "CA1303")]
-                private static void WriteLine(string message)
-                {
-                }
-
-                /// <summary>
-                /// Auxillary method: logs the exception that is being ignored.
-                /// </summary>
-                /// <param name="e">The exception to log.</param>
-                [SuppressMessage("Microsoft.Design", "CA1031")]
-                private static void LogIgnoredException(Exception e)
-                {
-                }
-
-                private static void WriteEventLogEntry(string message)
-                {
-                }
-
-        #endregion
+#endregion
     }
+
+#if TODO
+    /// <summary>
+    /// A class used to expose EqtTrace functionality across AppDomains.
+    /// <see cref="EqtTrace.GetRemoteEqtTrace"/>
+    /// </summary>
+    public sealed class RemoteEqtTrace : MarshalByRefObject
+    {
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Used in remote objects.")]
+        public TraceLevel TraceLevel
+        {
+            get
+            {
+                return EqtTrace.TraceLevel;
+            }
+
+            set
+            {
+                EqtTrace.TraceLevel = value;
+            }
+        }
+
+        /// <summary>
+        /// Register listeners from parent domain in current domain.
+        /// </summary>
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Used in remote objects.")]
+        internal void SetupRemoteListeners(TraceListener listener)
+        {
+            EqtTrace.SetupRemoteListeners(listener);
+        }
+    }
+#endif
+
 }

@@ -138,4 +138,7 @@
   <data name="QueuePausedDisposeError" xml:space="preserve">
     <value>The {0} queue cannot be disposed while paused.</value>
   </data>
+  <data name="Utility_ProcessNameWhenCannotGetIt" xml:space="preserve">
+    <value>Error getting process name.</value>
+  </data>
 </root>

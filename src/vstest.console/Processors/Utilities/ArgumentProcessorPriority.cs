@@ -52,6 +52,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         StartLogging = 11,
 
         /// <summary>
+        /// Priority of the Diag processor.
+        /// </summary>
+        Diag = 12,
+
+        /// <summary>
         /// Priority of a ParentProcessId processor.
         /// </summary>
         ParentProcessId = 45,
