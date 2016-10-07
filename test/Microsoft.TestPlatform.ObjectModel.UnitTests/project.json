@@ -14,7 +14,6 @@
       "exclude": "compile"
     },
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
-    "Newtonsoft.Json": "9.0.1" 
   },
 
   "frameworks": {
@@ -32,13 +31,18 @@
         "dotnet-test-mstest": {
           "version": "1.1.1-preview",
           "exclude": "compile"
-        }
+        },
+        "Newtonsoft.Json": "9.0.1" 
       }
     },
 
     "net46": {
       "frameworkAssemblies": {
         "System.Runtime": ""
+      },
+
+      "dependencies": {
+        "Newtonsoft.Json": "8.0.3" 
       }
     } 
   },
