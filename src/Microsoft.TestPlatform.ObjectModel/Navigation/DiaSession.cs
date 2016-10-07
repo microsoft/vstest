@@ -50,39 +50,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public DiaSession(string binaryPath, string searchPath)
         {
             ValidateArg.NotNullOrEmpty(binaryPath, "binaryPath");
-            RegistryFreeActivationContext activationContext = null;
-            try
+            using (var activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom()))
             {
-                activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom());
-                activationContext.ActivateContext();
-
-                this.source = new DiaSource();
-                this.source.loadDataForExe(binaryPath, searchPath, null);
-                this.source.openSession(out this.session);
-                PopulateCacheForTypeAndMethodSymbols();
-            }
-            catch (COMException)
-            {
-                Dispose();
-                throw;
-            }
-            finally
-            {
-                // Deactivating the context here itself since a dispose can happen
-                // on a different thread and deactivating context from a different thread would throw an SEH exception.
-                // The DIA dll would have been loaded by now. So the activation context is not needed post this point anyway.
+                // Activating and Deactivating the context here itself since deactivating context from a different thread would throw an SEH exception.
+                // We do not need the activation context post this point since the DIASession COM object is created here only.
                 try
                 {
-                    activationContext?.Dispose();
+                    activationContext.ActivateContext();
+
+                    this.source = new DiaSource();
+                    this.source.loadDataForExe(binaryPath, searchPath, null);
+                    this.source.openSession(out this.session);
+                    PopulateCacheForTypeAndMethodSymbols();
                 }
-                catch (Exception ex)
+                catch (COMException)
                 {
-                    // This should never get hit ideally but putting it in for safety.
-                    // Log but do not throw. We do not want the adapters to be throwing exceptions/warnings about this. 
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(ex);
-                    }
+                    Dispose();
+                    throw;
                 }
             }
         }
