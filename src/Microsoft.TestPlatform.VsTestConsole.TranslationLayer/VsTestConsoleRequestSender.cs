@@ -307,6 +307,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsDiscovery);
                 eventHandler.HandleDiscoveryComplete(-1, null, true);
+
+                CleanupCommunicationIfProcessExit();
             }
         }
 
@@ -363,9 +365,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
+                CleanupCommunicationIfProcessExit();
             }
         }
 
+        private void CleanupCommunicationIfProcessExit()
+        {
+            if (this.processExitCancellationTokenSource != null
+                && this.processExitCancellationTokenSource.IsCancellationRequested)
+            {
+                this.communicationManager.StopServer();
+            }
+        }
         private Message TryReceiveMessage()
         {
             Message message = null;
@@ -375,12 +386,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (message == null)
             {
-                if (this.processExitCancellationTokenSource.IsCancellationRequested)
-                {
-                    // Cleanup communication layer on process exit 
-                    this.communicationManager.StopServer();
-                }
-
                 throw new TransationLayerException(Resources.FailedToReceiveMessage);
             }
 

@@ -8,11 +8,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
-    using ObjectModel;
 
     /// <summary>
     /// Utility class that facilitates the IPC comunication. Acts as server.
@@ -28,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Use to cancel blocking tasks associated with testhost process
         /// </summary>
-        private CancellationTokenSource testhostExitCancellationTokenSource;
+        private CancellationTokenSource clientExitCancellationSource;
 
         public TestRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
@@ -46,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns></returns>
         public int InitializeCommunication()
         {
-            this.testhostExitCancellationTokenSource = new CancellationTokenSource();
+            this.clientExitCancellationSource = new CancellationTokenSource();
             var port = this.communicationManager.HostServer();
             this.communicationManager.AcceptClientAsync();
             return port;
@@ -54,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
-                return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
+            return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
         }
 
         public void Dispose()
@@ -78,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-                this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions);
+            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions);
         }
 
         /// <summary>
@@ -88,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-                this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions);
+            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions);
         }
 
         /// <summary>
@@ -264,6 +263,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
         }
 
+        private void CleanupCommunicationIfProcessExit()
+        {
+            if (this.clientExitCancellationSource != null && this.clientExitCancellationSource.IsCancellationRequested)
+            {
+                this.communicationManager.StopServer();
+            }
+        }
+
         private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception)
         {
             EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
@@ -284,6 +291,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             // notify of a test run complete and bail out.
             testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+
+            this.CleanupCommunicationIfProcessExit();
         }
 
         private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler)
@@ -308,6 +317,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             
             // Complete discovery
             eventHandler.HandleDiscoveryComplete(-1, null, true);
+
+            this.CleanupCommunicationIfProcessExit();
         }
 
         /// <summary>
@@ -325,24 +336,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         public void OnClientProcessExit()
         {
-            this.testhostExitCancellationTokenSource.Cancel();
+            this.clientExitCancellationSource.Cancel();
         }
 
         private string TryReceiveRawMessage()
         {
             string message = null;
-            var receiverMessageTask = this.communicationManager.ReceiveRawMessageAsync(this.testhostExitCancellationTokenSource.Token);
+            var receiverMessageTask = this.communicationManager.ReceiveRawMessageAsync(this.clientExitCancellationSource.Token);
             receiverMessageTask.Wait();
             message = receiverMessageTask.Result;
 
             if (message == null)
             {
-                if (this.testhostExitCancellationTokenSource.IsCancellationRequested)
-                {
-                    EqtTrace.Error("Stoping server due to testhost exit");
-                    this.communicationManager.StopServer();
-                }
-
                 EqtTrace.Error("Unable to receive message from testhost");
                 throw new IOException(Resources.UnableToCommunicateToTestHost);
             }

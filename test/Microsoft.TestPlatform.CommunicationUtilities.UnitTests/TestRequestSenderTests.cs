@@ -124,7 +124,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
                     this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.IsAny<string>())).Returns(completeMessage);
                     this.mockDataSerializer.Setup(ds => ds.DeserializePayload<DiscoveryCompletePayload>(completeMessage)).Returns(completePayload);
                 });
-            
+
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartDiscovery, discoveryCriteria), Times.Once);

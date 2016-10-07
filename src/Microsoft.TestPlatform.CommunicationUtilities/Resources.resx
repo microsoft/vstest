@@ -127,6 +127,6 @@
     <value>The active Test Discovery was aborted.</value>
   </data>
   <data name="UnableToCommunicateToTestHost" xml:space="preserve">
-    <value>Unable to communicate to testhost </value>
+    <value>Unable to communicate with test execution process.</value>
   </data>
 </root>

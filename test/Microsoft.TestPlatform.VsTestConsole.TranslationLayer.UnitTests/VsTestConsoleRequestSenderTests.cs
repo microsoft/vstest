@@ -364,6 +364,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once, "Discovery Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
+            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Never);
         }
 
         [TestMethod]
@@ -377,7 +378,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
             var testCaseList = new List<TestCase>() { testCase };
             var testsFound = CreateMessage(MessageType.TestCasesFound, testCaseList);
-
+            this.requestSender.InitializeCommunication();
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Callback(
                 (CancellationToken c) =>
                     {
@@ -392,6 +393,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             manualEvent.WaitOne();
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
         }
 
         #endregion
@@ -822,7 +824,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                                           TestRunCompleteArgs = dummyCompleteArgs
                                       };
             var runComplete = CreateMessage(MessageType.ExecutionComplete, completepayload);
-            
+
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(message1));
             mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
                 .Callback<TestProcessStartInfo>((startInfo) =>
@@ -849,12 +851,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var sources = new List<string> { "1.dll" };
             var payload = new TestRunRequestPayload { Sources = sources, RunSettings = null };
             var exception = new IOException();
+            
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload)).Throws(exception);
 
             this.requestSender.StartTestRun(sources, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once, "Test Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
+            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Never);
         }
 
         [TestMethod]
@@ -872,7 +876,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 RunAttachments = null,
                 TestRunCompleteArgs = dummyCompleteArgs
             };
-            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
+            this.requestSender.InitializeCommunication();
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()))
                 .Callback((CancellationToken c) =>
                 {
@@ -887,6 +891,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             manualEvent.WaitOne();
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Once);
         }
 
         #endregion

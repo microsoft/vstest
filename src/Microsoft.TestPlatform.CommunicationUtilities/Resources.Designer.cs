@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to Unable to communicate to testhost .
+        ///    Looks up a localized string similar to Unable to communicate with test execution process..
         /// </summary>
         public static string UnableToCommunicateToTestHost {
             get {
