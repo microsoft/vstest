@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // with sources.
                 this.InitializeExtensions(discoveryCriteria.Sources);
             }
-
+            
             this.SetupChannel(discoveryCriteria.Sources);
             this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
         }

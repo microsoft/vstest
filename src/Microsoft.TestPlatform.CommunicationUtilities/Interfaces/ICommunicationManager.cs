@@ -2,7 +2,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
-    using Newtonsoft.Json;
     using System.Threading;
     using System.Threading.Tasks;
 
