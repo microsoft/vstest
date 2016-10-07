@@ -60,14 +60,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private object sendSyncObject = new object();
 
         /// <summary>
-        /// Server stream to use read timeout
+        /// Stream to use read timeout
         /// </summary>
-        private NetworkStream serverStream;
+        private NetworkStream stream;
 
         /// <summary>
         /// The server stream read timeout constant.
         /// </summary>
-        private const int ServerStreamReadTimeout = 500;
+        private const int StreamReadTimeout = 1000;
 
         public SocketCommunicationManager(): this(JsonDataSerializer.Instance)
         {
@@ -102,17 +102,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public async Task AcceptClientAsync()
         {
-
             if (this.tcpListener != null)
             {
                 this.clientConnectedEvent.Reset();
 
                 var client = await this.tcpListener.AcceptTcpClientAsync();
-
-                this.serverStream = client.GetStream();
-
-                this.binaryReader = new BinaryReader(this.serverStream);
-                this.binaryWriter = new BinaryWriter(this.serverStream);
+                this.stream = client.GetStream();
+                this.binaryReader = new BinaryReader(this.stream);
+                this.binaryWriter = new BinaryWriter(this.stream);
 
                 this.clientConnectedEvent.Set();
 
@@ -137,8 +134,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.tcpListener?.Stop();
             this.tcpListener = null;
-            this.binaryReader.Dispose();
-            this.binaryWriter.Dispose();
+            this.binaryReader?.Dispose();
+            this.binaryWriter?.Dispose();
         }
 
         #endregion
@@ -154,9 +151,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Info("Trying to connect to server on port : {0}", portNumber);
             this.tcpClient = new TcpClient();
             await this.tcpClient.ConnectAsync(IPAddress.Loopback, portNumber);
-            var networkStream = this.tcpClient.GetStream();
-            this.binaryReader = new BinaryReader(networkStream);
-            this.binaryWriter = new BinaryWriter(networkStream);
+            this.stream = this.tcpClient.GetStream();
+            this.binaryReader = new BinaryReader(this.stream);
+            this.binaryWriter = new BinaryWriter(this.stream);
             this.clientConnectionAcceptedEvent.Set();
             EqtTrace.Info("Connected to the server successfully ");
         }
@@ -180,6 +177,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.tcpClient?.Dispose();
             this.tcpClient = null;
+            this.binaryReader?.Dispose();
+            this.binaryWriter?.Dispose();
         }
 
         #endregion
@@ -293,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             bool success = false;
 
             // Set read timeout to avoid blocking receive raw message
-            this.serverStream.ReadTimeout = ServerStreamReadTimeout;
+            this.stream.ReadTimeout = StreamReadTimeout;
             while (!cancellationToken.IsCancellationRequested && !success)
             {
                 try
@@ -328,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
             }
 
-            this.serverStream.ReadTimeout = -1;
+            this.stream.ReadTimeout = -1;
             return str;
         }
 
