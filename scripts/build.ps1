@@ -19,7 +19,11 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
-    [System.String] $VersionSuffix = "dev"
+    [System.String] $VersionSuffix = "dev",
+
+    [Parameter(Mandatory=$false)]
+    [Alias("ff")]
+    [System.Boolean] $FailFast = $true
 )
 
 $ErrorActionPreference = "Stop"
@@ -335,6 +339,10 @@ function Get-ElapsedTime([System.Diagnostics.Stopwatch] $timer)
 
 function Set-ScriptFailed
 {
+    if ($FailFast -eq $true) {
+        Write-Error "Build failed. Stopping as fail fast is set."
+    }
+
     $Script:ScriptFailed = $true
 }
 
