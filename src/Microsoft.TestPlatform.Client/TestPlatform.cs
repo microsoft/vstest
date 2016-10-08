@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration.TargetPlatform, runconfiguration.TargetFrameworkVersion);
             
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager);
+            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
             discoveryManager.Initialize();
 
             return new DiscoveryRequest(discoveryCriteria, discoveryManager);
