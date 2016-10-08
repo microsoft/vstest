@@ -1,4 +1,5 @@
-// Copyright(c) Microsoft.All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
@@ -31,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             if (string.IsNullOrWhiteSpace(traceDisplayName))
             {
                 throw new ArgumentException(Resources.CannotBeNullOrEmpty, traceDisplayName);
-            }            
+            }
 
             if (delegates != null)
             {

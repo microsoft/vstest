@@ -1,4 +1,7 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#pragma warning disable SA1402 // FileMayOnlyContainASingleClass. This is a ported class from ObjectModel.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
@@ -9,6 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Linq;
     using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+
     /// <summary>
     /// Helper to validate parameters.
     /// </summary>
@@ -17,8 +22,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Throws ArgumentNullException if the argument is null, otherwise passes it through.
         /// </summary>
-        /// <param name="arg">The argument to check.</param>
-        /// <param name="parameterName">The parameter name of the argument.</param>
+        /// <typeparam name="T">
+        /// Type to validate.
+        /// </typeparam>
+        /// <param name="arg">
+        /// The argument to check.
+        /// </param>
+        /// <param name="parameterName">
+        /// The parameter name of the argument.
+        /// </param>
+        /// <returns>
+        /// Type of argument.
+        /// </returns>
         [DebuggerStepThrough]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static T NotNull<T>([ValidatedNotNull]T arg, string parameterName)
@@ -28,17 +43,33 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 throw new ArgumentNullException(parameterName);
             }
+
             return arg;
         }
 
+        /// <summary>
+        /// Validate a string is not null or empty.
+        /// </summary>
+        /// <param name="arg">
+        /// Input string.
+        /// </param>
+        /// <param name="parameterName">
+        /// Name of the parameter to validate.
+        /// </param>
+        /// <returns>
+        /// Validated string.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the input string is null or empty.
+        /// </exception>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static string NotNullOrEmpty([ValidatedNotNull]string arg, string parameterName)
         {
             if (string.IsNullOrEmpty(arg))
             {
                 throw new ArgumentNullException(parameterName);
             }
+
             return arg;
         }
 
@@ -48,12 +79,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="arg">The argument to check.</param>
         /// <param name="parameterName">The parameter name of the argument.</param>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static void NotNegative(int arg, string parameterName)
         {
             if (arg < 0)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentIsNegative);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentIsNegative);
                 throw new ArgumentOutOfRangeException(parameterName, arg, message);
             }
         }
@@ -69,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (arg < 0)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentIsNegative);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentIsNegative);
                 throw new ArgumentOutOfRangeException(parameterName, arg, message);
             }
         }
@@ -77,17 +107,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Throws ArgumentNullException if the string is null, ArgumentException if the string is empty.
         /// </summary>
+        /// <typeparam name="T">Type of parameter to validate.</typeparam>
         /// <param name="arg">The argument to check.</param>
         /// <param name="parameterName">The parameter name of the argument.</param>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
         public static void NotNullOrEmpty<T>([ValidatedNotNull]IEnumerable<T> arg, string parameterName)
         {
             NotNull(arg, parameterName);
 
             if (!arg.Any())
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentIsEmpty);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentIsEmpty);
                 throw new ArgumentException(message, parameterName);
             }
         }
@@ -101,13 +131,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DebuggerStepThrough]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification = "This is shared source. This method may not be called in the current assembly.")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
-        public static void TypeOf<T>([ValidatedNotNull]object arg, string parameterName) where T : class
+        public static void TypeOf<T>([ValidatedNotNull]object arg, string parameterName)
+            where T : class
         {
             NotNull(arg, parameterName);
 
             if (!(arg is T))
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentNotTypeOf, typeof(T).FullName);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentNotTypeOf, typeof(T).FullName);
                 throw new ArgumentException(message, parameterName);
             }
         }
@@ -121,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Throws ArgumentException if the argument is null.
         /// </summary>
-        /// <param name="arg">The argument to check (e.g. Param1.PropertyA).</param>
+        /// <param name="arg">The argument to check (e.g. <c>Param1.PropertyA</c>).</param>
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <param name="propertyName">The property name of the argument.</param>
         [DebuggerStepThrough]
@@ -130,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (arg == null)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentPropertyIsNull, propertyName);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentPropertyIsNull, propertyName);
                 throw new ArgumentNullException(parameterName, message);
             }
         }
@@ -138,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Throws ArgumentException if the argument is less than zero.
         /// </summary>
-        /// <param name="arg">The argument to check (e.g. Param1.PropertyA).</param>
+        /// <param name="arg">The argument to check (e.g. <c>Param1.PropertyA</c>).</param>
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <param name="propertyName">The property name of the argument.</param>
         [DebuggerStepThrough]
@@ -147,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (arg < 0)
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentPropertyIsNegative, propertyName);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentPropertyIsNegative, propertyName);
                 throw new ArgumentException(message, parameterName);
             }
         }
@@ -155,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Throws ArgumentException if the argument string is null or empty.
         /// </summary>
-        /// <param name="arg">The argument to check (e.g. Param1.PropertyA).</param>
+        /// <param name="arg">The argument to check (e.g. <c>Param1.PropertyA</c>).</param>
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <param name="propertyName">The property name of the argument.</param>
         [DebuggerStepThrough]
@@ -164,9 +195,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             NotNull(arg, parameterName, propertyName);
 
-            if (String.IsNullOrEmpty(arg))
+            if (string.IsNullOrEmpty(arg))
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentPropertyIsEmpty, propertyName);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentPropertyIsEmpty, propertyName);
                 throw new ArgumentException(message, parameterName);
             }
         }
@@ -174,133 +205,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Throws ArgumentException if the argument is null or is not the correct type.
         /// </summary>
-        /// <param name="arg">The argument to check (e.g. Param1.PropertyA).</param>
+        /// <param name="arg">The argument to check (e.g. <c>Param1.PropertyA</c>).</param>
         /// <param name="parameterName">The parameter name of the argument.</param>
         /// <param name="propertyName">The property name of the argument.</param>
         /// <typeparam name="T">The type of the expected argument.</typeparam>
         [DebuggerStepThrough]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Justification="This simplifies the caller.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "This is shared source. This method may not be called in the current assembly.")]
-        public static void TypeOf<T>([ValidatedNotNull]object arg, string parameterName, string propertyName) where T : class
+        public static void TypeOf<T>([ValidatedNotNull]object arg, string parameterName, string propertyName)
+            where T : class
         {
             NotNull(arg, parameterName, propertyName);
 
             if (!(arg is T))
             {
-                string message = String.Format(CultureInfo.CurrentCulture, ValidateArgStrings.Error_ArgumentPropertyNotTypeOf, propertyName, typeof(T).FullName);
+                var message = string.Format(CultureInfo.CurrentCulture, Resources.Error_ArgumentPropertyNotTypeOf, propertyName, typeof(T).FullName);
                 throw new ArgumentException(message, parameterName);
-            }
-        }
-    }
-
-    /// <summary>
-    ///   A strongly-typed resource class, for looking up localized strings, etc.
-    /// </summary>
-    // This class was auto-generated by the StronglyTypedResourceBuilder
-    // class via a tool like ResGen or Visual Studio.
-    // To add or remove a member, edit your .ResX file then rerun ResGen
-    // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class ValidateArgStrings {
-        
-        private static global::System.Resources.ResourceManager resourceMan;
-        
-        private static global::System.Globalization.CultureInfo resourceCulture;
-        
-        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal ValidateArgStrings() {
-        }
-        
-        /// <summary>
-        ///   Returns the cached ResourceManager instance used by this class.
-        /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.ObjectModel.ValidateArgStrings", typeof(ValidateArgStrings).GetTypeInfo().Assembly);
-                    resourceMan = temp;
-                }
-                return resourceMan;
-            }
-        }
-        
-        /// <summary>
-        ///   Overrides the current thread's CurrentUICulture property for all
-        ///   resource lookups using this strongly typed resource class.
-        /// </summary>
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
-                return resourceCulture;
-            }
-            set {
-                resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified argument cannot be an empty string..
-        /// </summary>
-        internal static string Error_ArgumentIsEmpty {
-            get {
-                return ResourceManager.GetString("Error_ArgumentIsEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified argument cannot be negative..
-        /// </summary>
-        internal static string Error_ArgumentIsNegative {
-            get {
-                return ResourceManager.GetString("Error_ArgumentIsNegative", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified argument must have the following type: {0}..
-        /// </summary>
-        internal static string Error_ArgumentNotTypeOf {
-            get {
-                return ResourceManager.GetString("Error_ArgumentNotTypeOf", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified argument has the following property, which cannot be an empty string: {0}..
-        /// </summary>
-        internal static string Error_ArgumentPropertyIsEmpty {
-            get {
-                return ResourceManager.GetString("Error_ArgumentPropertyIsEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The  specified argument has the following property, which cannot be negative: {0}..
-        /// </summary>
-        internal static string Error_ArgumentPropertyIsNegative {
-            get {
-                return ResourceManager.GetString("Error_ArgumentPropertyIsNegative", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified argument has the following property, which cannot be null: {0}..
-        /// </summary>
-        internal static string Error_ArgumentPropertyIsNull {
-            get {
-                return ResourceManager.GetString("Error_ArgumentPropertyIsNull", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The specified argument has the following property: {0}. This property must have the following type: {1}..
-        /// </summary>
-        internal static string Error_ArgumentPropertyNotTypeOf {
-            get {
-                return ResourceManager.GetString("Error_ArgumentPropertyNotTypeOf", resourceCulture);
             }
         }
     }
@@ -313,4 +231,3 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
     }
 }
-

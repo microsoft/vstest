@@ -129,6 +129,27 @@
   <data name="CommandLineWarning" xml:space="preserve">
     <value>Warning: {0}</value>
   </data>
+  <data name="Error_ArgumentIsEmpty" xml:space="preserve">
+    <value>The specified argument cannot be empty.</value>
+  </data>
+  <data name="Error_ArgumentIsNegative" xml:space="preserve">
+    <value>The specified argument cannot be negative.</value>
+  </data>
+  <data name="Error_ArgumentNotTypeOf" xml:space="preserve">
+    <value>The specified argument must have the following type: {0}.</value>
+  </data>
+  <data name="Error_ArgumentPropertyIsEmpty" xml:space="preserve">
+    <value>The specified argument has the following property, which cannot be an empty string: {0}.</value>
+  </data>
+  <data name="Error_ArgumentPropertyIsNegative" xml:space="preserve">
+    <value>The specified argument has the following property, which cannot be negative: {0}.</value>
+  </data>
+  <data name="Error_ArgumentPropertyIsNull" xml:space="preserve">
+    <value>The specified argument has the following property, which cannot be null: {0}.</value>
+  </data>
+  <data name="Error_ArgumentPropertyNotTypeOf" xml:space="preserve">
+    <value>The specified argument has the following property: {0}. This property must have the following type: {1}.</value>
+  </data>
   <data name="ExceptionFromJobProcessor" xml:space="preserve">
     <value>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</value>
   </data>

@@ -1,39 +1,32 @@
-// ---------------------------------------------------------------------------
-// <copyright file="RollingFileTraceListener.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation. All rights reserved.
-// </copyright>
-// <summary>
-//      Performs logging to a file and rolls the output file when either time or size
-//      thresholds are exceeded. 
-//      This code is copied from Microsoft.Practices.EnterpriseLibrary.Logging.TraceListeners
-// </summary>
-// <owner>satins</owner> 
-// ---------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Text;
-    using System.Diagnostics.CodeAnalysis;
 
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 
     /// <summary>
-    /// Performs logging to a file and rolls the output file when either time or size thresholds are 
+    /// Performs logging to a file and rolls the output file when either time or size thresholds are
     /// exceeded.
     /// </summary>
     public class RollingFileTraceListener : TextWriterTraceListener
     {
-        private readonly StreamWriterRollingHelper m_rollingHelper;
+        private readonly StreamWriterRollingHelper rollingHelper;
 
-        private readonly int m_rollSizeInBytes;
+        private readonly int rollSizeInBytes;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="RollingFlatFileTraceListener"/> 
+        /// Initializes a new instance of the <see cref="RollingFileTraceListener"/> class.
         /// </summary>
         /// <param name="fileName">The filename where the entries will be logged.</param>
-        /// <param name="rollSizeKB">The maxium file size (KB) before rolling.</param>
+        /// <param name="name">Name of the trace listener.</param>
+        /// <param name="rollSizeKB">The maximum file size (KB) before rolling.</param>
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "the fileStream is passed into the TextWriterTraceListener")]
         public RollingFileTraceListener(
             string fileName,
@@ -43,21 +36,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             if (string.IsNullOrWhiteSpace(fileName))
             {
-                throw new ArgumentException(Resources.CannotBeNullOrEmpty, "fileName");
+                throw new ArgumentException(Resources.CannotBeNullOrEmpty, nameof(fileName));
             }
 
             if (rollSizeKB <= 0)
             {
-                throw new ArgumentOutOfRangeException("rollSizeKB");
+                throw new ArgumentOutOfRangeException(nameof(rollSizeKB));
             }
 
             this.TraceFileName = fileName;
-            this.m_rollSizeInBytes = rollSizeKB * 1024;
-            this.m_rollingHelper = new StreamWriterRollingHelper(this);
+            this.rollSizeInBytes = rollSizeKB * 1024;
+            this.rollingHelper = new StreamWriterRollingHelper(this);
         }
 
         /// <summary>
-        /// File name of the Trace file.
+        /// Gets name of the Trace file.
         /// </summary>
         internal string TraceFileName
         {
@@ -73,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </value>
         internal StreamWriterRollingHelper RollingHelper
         {
-            get { return m_rollingHelper; }
+            get { return this.rollingHelper; }
         }
 
         /// <summary>
@@ -82,30 +75,28 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="message">Trace message string</param>
         public override void WriteLine(string message)
         {
-            m_rollingHelper.RollIfNecessary();
+            this.rollingHelper.RollIfNecessary();
             base.WriteLine(message);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (m_rollingHelper != null)
-            {
-                m_rollingHelper.Dispose();
-            }
-
-            base.Dispose(disposing);
         }
 
         /// <summary>
         /// Opens specified file and returns text writer.
         /// </summary>
         /// <param name="fileName">The file to open.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+        /// <returns>A <see cref="TallyKeepingFileStreamWriter"/> instance.</returns>
         internal static TallyKeepingFileStreamWriter OpenTextWriter(string fileName)
         {
             return new TallyKeepingFileStreamWriter(
                                     File.Open(fileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite),
                                     GetEncodingWithFallback());
+        }
+
+        /// <inheritdoc/>
+        protected override void Dispose(bool disposing)
+        {
+            this.rollingHelper?.Dispose();
+
+            base.Dispose(disposing);
         }
 
         private static Encoding GetEncodingWithFallback()
@@ -129,33 +120,35 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// <summary>
             /// Synchronisation lock.
             /// </summary>
-            private object m_synclock = new object();
+            private object synclock = new object();
 
             /// <summary>
             /// Whether the object is disposed or not.
             /// </summary>
-            private bool m_disposed = false;
+            private bool disposed = false;
 
             /// <summary>
             /// A tally keeping writer used when file size rolling is configured.<para/>
             /// The original stream writer from the base trace listener will be replaced with
             /// this listener.
             /// </summary>
-            TallyKeepingFileStreamWriter m_managedWriter;
+            private TallyKeepingFileStreamWriter managedWriter;
 
             /// <summary>
             /// The trace listener for which rolling is being managed.
             /// </summary>
-            RollingFileTraceListener m_owner;
+            private RollingFileTraceListener owner;
 
             /// <summary>
-            /// Initialize a new instance of the <see cref="StreamWriterRollingHelper"/> class with a <see cref="RollingFlatFileTraceListener"/>.
+            /// Initializes a new instance of the <see cref="StreamWriterRollingHelper"/> class.
             /// </summary>
-            /// <param name="owner">The <see cref="RollingFlatFileTraceListener"/> to use.</param>
+            /// <param name="owner">
+            /// The <see cref="RollingFileTraceListener"/> to use.
+            /// </param>
             public StreamWriterRollingHelper(RollingFileTraceListener owner)
             {
-                this.m_owner = owner;
-                this.m_managedWriter = owner.Writer as TallyKeepingFileStreamWriter;
+                this.owner = owner;
+                this.managedWriter = owner.Writer as TallyKeepingFileStreamWriter;
             }
 
             /// <summary>
@@ -169,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             public DateTime? CheckIsRollNecessary()
             {
                 // check for size roll, if enabled.
-                if (m_managedWriter != null && m_managedWriter.Tally > m_owner.m_rollSizeInBytes)
+                if (this.managedWriter != null && this.managedWriter.Tally > this.owner.rollSizeInBytes)
                 {
                     return DateTime.Now;
                 }
@@ -184,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// <param name="rollDateTime">The roll date.</param>
             public void PerformRoll(DateTime rollDateTime)
             {
-                string actualFileName = ((FileStream)((StreamWriter)m_owner.Writer).BaseStream).Name;
+                string actualFileName = ((FileStream)((StreamWriter)this.owner.Writer).BaseStream).Name;
 
                 // calculate archive name
                 string directory = Path.GetDirectoryName(actualFileName);
@@ -197,18 +190,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 fileNameBuilder.Append(extension);
 
                 string archiveFileName = Path.Combine(directory, fileNameBuilder.ToString());
-
 #if TODO
-                // close file
-                m_owner.Writer.Close();
+
+// close file
+                owner.Writer.Close();
 #endif
+
                 // move file
                 SafeMove(actualFileName, archiveFileName, rollDateTime);
 
                 // update writer - let TWTL open the file as needed to keep consistency
-                m_owner.Writer = null;
-                m_managedWriter = null;
-                UpdateRollingInformationIfNecessary();
+                this.owner.Writer = null;
+                this.managedWriter = null;
+                this.UpdateRollingInformationIfNecessary();
             }
 
             /// <summary>
@@ -216,29 +210,62 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// </summary>
             public void RollIfNecessary()
             {
-                if (!UpdateRollingInformationIfNecessary())
+                if (!this.UpdateRollingInformationIfNecessary())
                 {
                     // an error was detected while handling roll information - avoid further processing
                     return;
                 }
 
                 DateTime? rollDateTime;
-                if ((rollDateTime = CheckIsRollNecessary()) != null)
+                if ((rollDateTime = this.CheckIsRollNecessary()) != null)
                 {
-                    lock (m_synclock)
+                    lock (this.synclock)
                     {
                         // double check if the roll is still required and do it...
-                        if ((rollDateTime = CheckIsRollNecessary()) != null)
+                        if ((rollDateTime = this.CheckIsRollNecessary()) != null)
                         {
-                            PerformRoll(rollDateTime.Value);
+                            this.PerformRoll(rollDateTime.Value);
                         }
                     }
                 }
             }
 
-            static void SafeMove(string actualFileName,
-                          string archiveFileName,
-                          DateTime currentDateTime)
+            /// <summary>
+            /// Updates bookeeping information necessary for rolling, as required by the specified
+            /// rolling configuration.
+            /// </summary>
+            /// <returns>true if update was successful, false if an error occurred.</returns>
+            public bool UpdateRollingInformationIfNecessary()
+            {
+                // replace writer with the tally keeping version if necessary for size rolling
+                if (this.managedWriter == null)
+                {
+                    try
+                    {
+                        this.managedWriter = OpenTextWriter(this.owner.TraceFileName);
+                    }
+                    catch (Exception)
+                    {
+                        // there's a slight chance of error here - abort if this occurs and just let TWTL handle it without attempting to roll
+                        return false;
+                    }
+
+                    this.owner.Writer = this.managedWriter;
+                }
+
+                return true;
+            }
+
+            /// <summary>
+            /// Disposes this instance
+            /// </summary>
+            public void Dispose()
+            {
+                this.Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            private static void SafeMove(string actualFileName, string archiveFileName, DateTime currentDateTime)
             {
                 try
                 {
@@ -246,6 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     {
                         File.Delete(archiveFileName);
                     }
+
                     // take care of tunneling issues http://support.microsoft.com/kb/172190
                     File.SetCreationTime(actualFileName, currentDateTime);
                     File.Move(actualFileName, archiveFileName);
@@ -259,65 +287,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     {
                         File.Move(actualFileName, archiveFileName);
                     }
-                    catch (IOException) { }
+                    catch (IOException)
+                    {
+                    }
                 }
             }
 
-            /// <summary>
-            /// Updates bookeeping information necessary for rolling, as required by the specified
-            /// rolling configuration.
-            /// </summary>
-            /// <returns>true if update was successful, false if an error occurred.</returns>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "the fileStream is passed into the TallyKeepingFileStream")]
-            public bool UpdateRollingInformationIfNecessary()
+            private void Dispose(bool disposing)
             {
-                // replace writer with the tally keeping version if necessary for size rolling
-                if (m_managedWriter == null)
+                if (!this.disposed)
                 {
-                    try
-                    {
-                        m_managedWriter = RollingFileTraceListener.OpenTextWriter(m_owner.TraceFileName);
-                    }
-                    catch (Exception)
-                    {
-                        // there's a slight chance of error here - abort if this occurs and just let TWTL handle it without attempting to roll
-                        return false;
-                    }
-
-                    m_owner.Writer = m_managedWriter;
-                }
-
-                return true;
-            }
-
-#region IDisposable
-
-            /// <summary>
-            /// Disposes this instance
-            /// </summary>
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            internal void Dispose(bool disposing)
-            {
-                if (!m_disposed)
-                {
-                    if (disposing && m_managedWriter != null)
+                    if (disposing && this.managedWriter != null)
                     {
 #if TODO
-                        m_managedWriter.Close();
+                        managedWriter.Close();
 #endif
                     }
 
-                    m_disposed = true;
+                    this.disposed = true;
                 }
             }
-
-#endregion IDisposable
         }
 
         /// <summary>
@@ -325,43 +314,48 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         internal sealed class TallyKeepingFileStreamWriter : StreamWriter
         {
-            long m_tally;
+            private long tally;
 
             /// <summary>
-            /// Initialize a new instance of the <see cref="TallyKeepingFileStreamWriter"/> class with a <see cref="FileStream"/>.
+            /// Initializes a new instance of the <see cref="TallyKeepingFileStreamWriter"/> class.
             /// </summary>
-            /// <param name="stream">The <see cref="FileStream"/> to write to.</param>
+            /// <param name="stream">
+            /// The <see cref="FileStream"/> to write to.
+            /// </param>
             public TallyKeepingFileStreamWriter(FileStream stream)
                 : base(stream)
             {
                 if (stream == null)
                 {
-                    throw new ArgumentNullException("stream");
+                    throw new ArgumentNullException(nameof(stream));
                 }
 
-                m_tally = stream.Length;
+                this.tally = stream.Length;
             }
 
             /// <summary>
-            /// Initialize a new instance of the <see cref="TallyKeepingFileStreamWriter"/> class with a <see cref="FileStream"/>.
+            /// Initializes a new instance of the <see cref="TallyKeepingFileStreamWriter"/> class.
             /// </summary>
-            /// <param name="stream">The <see cref="FileStream"/> to write to.</param>
-            /// <param name="encoding">The <see cref="Encoding"/> to use.</param>
-            public TallyKeepingFileStreamWriter(FileStream stream,
-                                                Encoding encoding)
+            /// <param name="stream">
+            /// The <see cref="FileStream"/> to write to.
+            /// </param>
+            /// <param name="encoding">
+            /// The <see cref="Encoding"/> to use.
+            /// </param>
+            public TallyKeepingFileStreamWriter(FileStream stream, Encoding encoding)
                 : base(stream, encoding)
             {
                 if (stream == null)
                 {
-                    throw new ArgumentNullException("stream");
+                    throw new ArgumentNullException(nameof(stream));
                 }
 
                 if (encoding == null)
                 {
-                    throw new ArgumentNullException("encoding");
+                    throw new ArgumentNullException(nameof(encoding));
                 }
 
-                m_tally = stream.Length;
+                this.tally = stream.Length;
             }
 
             /// <summary>
@@ -372,70 +366,110 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             /// </value>
             public long Tally
             {
-                get { return m_tally; }
+                get { return this.tally; }
             }
 
-            ///<summary>
-            ///Writes a character to the stream.
-            ///</summary>
-            ///
-            ///<param name="value">The character to write to the text stream. </param>
-            ///<exception cref="T:System.ObjectDisposedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and current writer is closed. </exception>
-            ///<exception cref="T:System.NotSupportedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the <see cref="T:System.IO.StreamWriter"></see> is at the end the stream. </exception>
-            ///<exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
+            /// <summary>
+            /// Writes a character to the stream.
+            /// </summary>
+            /// <param name="value">
+            /// The character to write to the text stream.
+            /// </param>
+            /// <exception cref="T:System.ObjectDisposedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and current writer is closed.
+            /// </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the<see cref="T:System.IO.StreamWriter"></see>is at the end the stream.
+            /// </exception>
+            /// <exception cref="T:System.IO.IOException">
+            /// An I/O error occurs.
+            /// </exception>
+            /// <filterpriority>1</filterpriority>
             public override void Write(char value)
             {
                 base.Write(value);
-                m_tally += Encoding.GetByteCount(new char[] { value });
+                this.tally += this.Encoding.GetByteCount(new[] { value });
             }
 
-            ///<summary>
-            ///Writes a character array to the stream.
-            ///</summary>
-            ///
-            ///<param name="buffer">A character array containing the data to write. If buffer is null, nothing is written. </param>
-            ///<exception cref="T:System.ObjectDisposedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and current writer is closed. </exception>
-            ///<exception cref="T:System.NotSupportedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the <see cref="T:System.IO.StreamWriter"></see> is at the end the stream. </exception>
-            ///<exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
+            /// <summary>
+            /// Writes a character array to the stream.
+            /// </summary>
+            /// <param name="buffer">
+            /// A character array containing the data to write. If buffer is null, nothing is written.
+            /// </param>
+            /// <exception cref="T:System.ObjectDisposedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and current writer is closed.
+            /// </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the<see cref="T:System.IO.StreamWriter"></see>is at the end the stream.
+            /// </exception>
+            /// <exception cref="T:System.IO.IOException">
+            /// An I/O error occurs.
+            /// </exception>
+            /// <filterpriority>1</filterpriority>
             public override void Write(char[] buffer)
             {
                 base.Write(buffer);
-                m_tally += Encoding.GetByteCount(buffer);
+                this.tally += this.Encoding.GetByteCount(buffer);
             }
 
-            ///<summary>
-            ///Writes a subarray of characters to the stream.
-            ///</summary>
-            ///
-            ///<param name="count">The number of characters to read from buffer. </param>
-            ///<param name="buffer">A character array containing the data to write. </param>
-            ///<param name="index">The index into buffer at which to begin writing. </param>
-            ///<exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            ///<exception cref="T:System.ObjectDisposedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and current writer is closed. </exception>
-            ///<exception cref="T:System.NotSupportedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the <see cref="T:System.IO.StreamWriter"></see> is at the end the stream. </exception>
-            ///<exception cref="T:System.ArgumentOutOfRangeException">index or count is negative. </exception>
-            ///<exception cref="T:System.ArgumentException">The buffer length minus index is less than count. </exception>
-            ///<exception cref="T:System.ArgumentNullException">buffer is null. </exception><filterpriority>1</filterpriority>
-            public override void Write(char[] buffer,
-                                       int index,
-                                       int count)
+            /// <summary>
+            /// Writes an array of characters to the stream.
+            /// </summary>
+            /// <param name="buffer">
+            /// A character array containing the data to write.
+            /// </param>
+            /// <param name="index">
+            /// The index into buffer at which to begin writing.
+            /// </param>
+            /// <param name="count">
+            /// The number of characters to read from buffer.
+            /// </param>
+            /// <exception cref="T:System.IO.IOException">
+            /// An I/O error occurs.
+            /// </exception>
+            /// <exception cref="T:System.ObjectDisposedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and current writer is closed.
+            /// </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the<see cref="T:System.IO.StreamWriter"></see>is at the end the stream.
+            /// </exception>
+            /// <exception cref="T:System.ArgumentOutOfRangeException">
+            /// index or count is negative.
+            /// </exception>
+            /// <exception cref="T:System.ArgumentException">
+            /// The buffer length minus index is less than count.
+            /// </exception>
+            /// <exception cref="T:System.ArgumentNullException">
+            /// buffer is null.
+            /// </exception>
+            /// <filterpriority>1</filterpriority>
+            public override void Write(char[] buffer, int index, int count)
             {
                 base.Write(buffer, index, count);
-                m_tally += Encoding.GetByteCount(buffer, index, count);
+                this.tally += this.Encoding.GetByteCount(buffer, index, count);
             }
 
-            ///<summary>
-            ///Writes a string to the stream.
-            ///</summary>
-            ///
-            ///<param name="value">The string to write to the stream. If value is null, nothing is written. </param>
-            ///<exception cref="T:System.ObjectDisposedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and current writer is closed. </exception>
-            ///<exception cref="T:System.NotSupportedException"><see cref="P:System.IO.StreamWriter.AutoFlush"></see> is true or the <see cref="T:System.IO.StreamWriter"></see> buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the <see cref="T:System.IO.StreamWriter"></see> is at the end the stream. </exception>
-            ///<exception cref="T:System.IO.IOException">An I/O error occurs. </exception><filterpriority>1</filterpriority>
+            /// <summary>
+            /// Writes a string to the stream.
+            /// </summary>
+            /// <param name="value">
+            /// The string to write to the stream. If value is null, nothing is written.
+            /// </param>
+            /// <exception cref="T:System.ObjectDisposedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and current writer is closed.
+            /// </exception>
+            /// <exception cref="T:System.NotSupportedException">
+            /// <see cref="P:System.IO.StreamWriter.AutoFlush"></see>is true or the<see cref="T:System.IO.StreamWriter"></see>buffer is full, and the contents of the buffer cannot be written to the underlying fixed size stream because the<see cref="T:System.IO.StreamWriter"></see>is at the end the stream.
+            /// </exception>
+            /// <exception cref="T:System.IO.IOException">
+            /// An I/O error occurs.
+            /// </exception>
+            /// <filterpriority>1</filterpriority>
             public override void Write(string value)
             {
                 base.Write(value);
-                m_tally += Encoding.GetByteCount(value);
+                this.tally += this.Encoding.GetByteCount(value);
             }
         }
     }

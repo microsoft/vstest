@@ -1,7 +1,11 @@
-// Copyright(c) Microsoft.All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#pragma warning disable SA1649 // SA1649FileNameMustMatchTypeName. This is a generic type.
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -15,10 +19,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         #region Constructor
 
         /// <summary>
-        /// Initializes with the job to be processed.
+        /// Initializes a new instance of the <see cref="Job{TPayload}"/> class.
         /// </summary>
-        /// <param name="job"> Job to be processed. </param>
-        /// <param name="size"> The size. </param>
+        /// <param name="job">
+        /// Job to be processed.
+        /// </param>
+        /// <param name="size">
+        /// Size of payload.
+        /// </param>
         public Job(TPayload job, int size)
         {
             this.Payload = job;
@@ -26,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         }
 
         /// <summary>
-        /// Constructor used for creating special jobs.
+        /// Prevents a default instance of the <see cref="Job{TPayload}"/> class from being created.
         /// </summary>
         private Job()
         {
@@ -36,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         #endregion
 
         #region Properties
-        
+
         /// <summary>
         /// Gets a special job that indicates the queue should shutdown.
         /// </summary>

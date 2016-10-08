@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
@@ -12,15 +13,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public static class OutputUtilities
     {
-        #region Extension Methods
-
         /// <summary>
         /// Output an error message.
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
         /// <param name="format">Format string for the error message.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Error(this IOutput output, String format, params object[] args)
+        public static void Error(this IOutput output, string format, params object[] args)
         {
             using (new ConsoleColorHelper(ConsoleColor.Red))
             {
@@ -53,13 +52,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             Output(output, OutputLevel.Information, Resources.CommandLineInformational, format, args);
         }
 
-        #endregion
-
-        #region Private Methods
-
         /// <summary>
         /// Formats the message.
         /// </summary>
+        /// <param name="output">An output instance to write the message.</param>
+        /// <param name="level">Message level.</param>
         /// <param name="messageTypeFormat">Format string for the message type.</param>
         /// <param name="format">Format string for the error message.</param>
         /// <param name="args">Arguments to format into the format string.</param>
@@ -67,11 +64,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             if (output == null)
             {
-                throw new ArgumentNullException("output");
+                throw new ArgumentNullException(nameof(output));
             }
 
-            string message = Format(messageTypeFormat, format, args);
-            output.WriteLine(message, level);
+            output.WriteLine(Format(messageTypeFormat, format, args), level);
         }
 
         /// <summary>
@@ -80,36 +76,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="messageTypeFormat">Format string for the message type.</param>
         /// <param name="format">Format string for the error message.</param>
         /// <param name="args">Arguments to format into the format string.</param>
+        /// <returns>Formatted message.</returns>
         private static string Format(string messageTypeFormat, string format, params object[] args)
         {
-            if (format==null || String.IsNullOrEmpty(format.Trim()))
+            if (format == null || string.IsNullOrEmpty(format.Trim()))
             {
-                throw new ArgumentException(Resources.CannotBeNullOrEmpty, "format");
+                throw new ArgumentException(Resources.CannotBeNullOrEmpty, nameof(format));
             }
 
             string message = null;
             if (args != null && args.Length > 0)
             {
-                message =
-                    String.Format(
-                        CultureInfo.CurrentCulture,
-                        format,
-                        args);
+                message = string.Format(CultureInfo.CurrentCulture, format, args);
             }
             else
             {
                 message = format;
             }
 
-            message =
-                String.Format(
-                    CultureInfo.CurrentCulture,
-                    messageTypeFormat,
-                    message);
-
-            return message;
+            return string.Format(CultureInfo.CurrentCulture, messageTypeFormat, message);
         }
-
-        #endregion
     }
 }

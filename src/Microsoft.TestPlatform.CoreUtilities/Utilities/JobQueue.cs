@@ -1,4 +1,7 @@
-// Copyright(c) Microsoft.All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+#pragma warning disable SA1649 // SA1649FileNameMustMatchTypeName. This is a generic type.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
@@ -67,13 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// set so the queue can continue processing.
         /// </summary>
         private ManualResetEvent queueProcessing;
-        
+
         /// <summary>
         /// The background thread which is processing the jobs.  Used when disposing to wait
         /// for the thread to complete.
         /// </summary>
         private Task backgroundJobProcessor;
-
 
         /// <summary>
         /// Keeps track of if we are disposed.
@@ -90,14 +92,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         #region Constructor
 
         /// <summary>
-        /// Initializes with the action to handle the processing of the job.
+        /// Initializes a new instance of the <see cref="JobQueue{T}"/> class.
         /// </summary>
-        /// <param name="processJob"> Action to handle the processing of the job. </param>
-        /// <param name="displayName"> Name to used when displaying information about this queue. </param>
-        /// <param name="maxQueueLength"> The max Queue Length. </param>
-        /// <param name="maxQueueSize"> The max Queue Size. </param>
-        /// <param name="enableBounds"> The enable Bounds. </param>
-        /// <param name="exceptionLogger"> The exception Logger. </param>
+        /// <param name="processJob">Action to handle the processing of the job.</param>
+        /// <param name="displayName">Name to used when displaying information about this queue.</param>
+        /// <param name="maxQueueLength">The max Queue Length.</param>
+        /// <param name="maxQueueSize">The max Queue Size.</param>
+        /// <param name="enableBounds">The enable Bounds.</param>
+        /// <param name="exceptionLogger">The exception Logger.</param>
         public JobQueue(Action<T> processJob, string displayName, int maxQueueLength, int maxQueueSize, bool enableBounds, Action<string> exceptionLogger)
         {
             if (processJob == null)
@@ -210,7 +212,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return;
             }
 
-
             // If the queue is paused, then throw.
             if (!this.queueProcessing.WaitOne(0))
             {
@@ -243,11 +244,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         #region Private Methods
 
         /// <summary>
-        /// Block the queue call. 
+        /// Block the queue call.
         /// A separate protected virtual method had to be made so that it can be over-ridden when writing unit test to check
         /// if bounds on the queue are applied correctly.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the queue is empty.</returns>
         protected virtual bool WaitForQueueToGetEmpty()
         {
             EqtTrace.Verbose("blocking on over filled queue.");
@@ -272,6 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 {
                     this.WaitForQueueToGetEmpty();
                 }
+
                 this.jobsQueue.Enqueue(job);
                 this.currentNumberOfBytesQueueIsHolding += job.Size;
                 this.jobAdded.Set();

@@ -1,17 +1,27 @@
 ﻿{
   "version": "15.0.0-*",
+
   "buildOptions": {
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "additionalArguments": [ "/ruleset:../../scripts/stylecop.ruleset", "/additionalFile:../../scripts/stylecop.json" ],
+    "xmlDoc": true
   },
+
   "dependencies": {
     "System.Diagnostics.Tracing": "4.1.0",
     "System.Diagnostics.Process": "4.1.0",
     "System.Diagnostics.TraceSource": "4.0.0",
     "System.Threading.Thread": "4.0.0",
-    "System.Diagnostics.TextWriterTraceListener":  "4.0.0"
+    "System.Diagnostics.TextWriterTraceListener":  "4.0.0",
+
+    "StyleCop.Analyzers": { 
+      "version": "1.0.0", 
+      "type": "build" 
+    }
   },
+
   "frameworks": {
     "netstandard1.5": {
       "imports": [

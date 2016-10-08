@@ -132,21 +132,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            if (String.IsNullOrWhiteSpace(argument))
+            if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(Resources.EnableDiagUsage);
             }
 
             FileInfo fileInfo = new FileInfo(argument);
 
-            //Checking if the file is readonly
+            // Checking if the file is readonly
             if (fileInfo.Exists && this.IsFileReadOnly(fileInfo))
             {
                 throw new CommandLineException(string.Format(Resources.LoggerFileIsReadOnly, argument));
             }
-            else if (String.IsNullOrWhiteSpace(fileInfo.Extension))
+            else if (string.IsNullOrWhiteSpace(fileInfo.Extension))
             {
-                //Throwing error if the argument is just path and not a file
+                // Throwing error if the argument is just path and not a file
                 throw new CommandLineException(Resources.EnableDiagUsage);
             }
 
@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Executes the argument processor.
         /// </summary>
-        /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
+        /// <returns>The <see cref="ArgumentProcessorResult"/>.</returns>
         public ArgumentProcessorResult Execute()
         {
             // Nothing to do since we updated the parameter during initialize parameter
@@ -170,10 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         internal virtual bool IsFileReadOnly(FileInfo fileInfo)
         {
-            if ((fileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                return true;
-            else
-                return false;
+            return (fileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
         }
 
         #endregion
