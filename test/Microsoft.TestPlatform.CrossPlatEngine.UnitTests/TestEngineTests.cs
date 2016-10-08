@@ -26,20 +26,36 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             this.testEngine = new TestEngine();
             this.mockTestHostManager = new Mock<ITestHostManager>();
+            
+            // Default setting for host manager
+            this.mockTestHostManager.Setup(p => p.Shared).Returns(true);
         }
 
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnANonNullInstance()
         {
-            Assert.IsNotNull(this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object));
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
+            Assert.IsNotNull(this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object, discoveryCriteria));
         }
 
         [TestMethod]
-        public void GetDiscoveryManagerShouldReturnCachedInstance()
+        public void GetDiscoveryManagerShouldReturnsNewInstanceOfProxyDiscoveryManagerIfTestHostIsShared()
         {
-            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object);
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
+            var discoveryManager = this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object, discoveryCriteria);
 
-            Assert.AreSame(discoveryManager, this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object));
+            Assert.AreNotSame(discoveryManager, this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object, discoveryCriteria));
+            Assert.IsInstanceOfType(this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object, discoveryCriteria), typeof(ProxyDiscoveryManager));
+        }
+
+        [TestMethod]
+        public void GetDiscoveryManagerShouldReturnsParallelDiscoveryManagerIfTestHostIsNotShared()
+        {
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
+            this.mockTestHostManager.Setup(p => p.Shared).Returns(false);
+            
+            Assert.IsNotNull(this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object, discoveryCriteria));
+            Assert.IsInstanceOfType(this.testEngine.GetDiscoveryManager(this.mockTestHostManager.Object, discoveryCriteria), typeof(ParallelProxyDiscoveryManager));
         }
 
         [TestMethod]
@@ -84,6 +100,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration></RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+
+            Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
+            Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria), typeof(ParallelProxyExecutionManager));
+        }
+
+        [TestMethod]
+        public void GetExecutionManagerShouldReturnParallelExecutionManagerIfHostIsNotShared()
+        {
+            this.mockTestHostManager.Setup(p => p.Shared).Returns(false);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, null);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria));
             Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.mockTestHostManager.Object, testRunCriteria), typeof(ParallelProxyExecutionManager));
