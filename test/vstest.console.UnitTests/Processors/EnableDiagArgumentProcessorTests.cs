@@ -75,6 +75,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        public void EnableDiagArgumentProcessorExecutorShouldNotCreateDirectoryIfAFileIsProvided()
+        {
+            this.diagProcessor.Executor.Value.Initialize("log.txt");
+
+            this.mockFileHelper.Verify(fh => fh.CreateDirectory(It.IsAny<string>()), Times.Never);
+        }
+
+        [TestMethod]
         public void EnableDiagArgumentProcessorExecutorShouldEnableVerboseLogging()
         {
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);

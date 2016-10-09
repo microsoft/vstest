@@ -3,13 +3,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using System.Diagnostics.Contracts;
     using System.IO;
 
-    using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -22,11 +18,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         public const string CommandName = "/Diag";
 
+        private readonly IFileHelper fileHelper;
+
         private Lazy<IArgumentProcessorCapabilities> metadata;
 
         private Lazy<IArgumentExecutor> executor;
-
-        private IFileHelper fileHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableDiagArgumentProcessor"/> class.
@@ -141,9 +137,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(Resources.EnableDiagUsage);
             }
 
-            if (!this.fileHelper.DirectoryExists(argument))
+            // Create the base directory for logging if doesn't exist. Directory could be empty if just a
+            // filename is provided. E.g. log.txt
+            var logDirectory = Path.GetDirectoryName(argument);
+            if (!string.IsNullOrEmpty(logDirectory) && !this.fileHelper.DirectoryExists(logDirectory))
             {
-                this.fileHelper.CreateDirectory(Path.GetDirectoryName(argument));
+                this.fileHelper.CreateDirectory(logDirectory);
             }
 
             EqtTrace.InitializeVerboseTrace(argument);

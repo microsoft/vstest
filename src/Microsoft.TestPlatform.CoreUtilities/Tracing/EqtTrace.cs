@@ -4,8 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Text;
@@ -34,10 +34,50 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private const string ListenerName = "TptTraceListener";
 
         /// <summary>
-        /// The switch for tracing test platform messages only. Initialize Trace listener as a part of this
-        /// to avoid a separate Static constructor (to fix CA1810).
+        /// Use a custom trace source. This doesn't pollute the default tracing for user applications.
         /// </summary>
-        private static readonly TraceSwitch TraceLevelSwitch = new TraceSwitch("TpTraceLevel", null);
+        private static readonly TraceSource Source = new TraceSource("TpTrace", SourceLevels.Off);
+
+        /// <summary>
+        /// Create static maps for TraceLevel to SourceLevels. The APIs need to provide TraceLevel
+        /// for backward compatibility with older versions of Object Model.
+        /// </summary>
+        private static readonly Dictionary<TraceLevel, SourceLevels> TraceSourceLevelsMap =
+            new Dictionary<TraceLevel, SourceLevels>
+                {
+                        { TraceLevel.Error, SourceLevels.Error },
+                        { TraceLevel.Info, SourceLevels.Information },
+                        { TraceLevel.Off, SourceLevels.Off },
+                        { TraceLevel.Verbose, SourceLevels.Verbose },
+                        { TraceLevel.Warning, SourceLevels.Warning }
+                };
+
+        /// <summary>
+        /// Create static maps for SourceLevels to TraceLevel. The APIs need to provide TraceLevel
+        /// for backward compatibility with older versions of Object Model.
+        /// </summary>
+        private static readonly Dictionary<SourceLevels, TraceLevel> SourceTraceLevelsMap =
+            new Dictionary<SourceLevels, TraceLevel>
+                {
+                        { SourceLevels.Error, TraceLevel.Error },
+                        { SourceLevels.Information, TraceLevel.Info },
+                        { SourceLevels.Off, TraceLevel.Off },
+                        { SourceLevels.Verbose, TraceLevel.Verbose },
+                        { SourceLevels.Warning, TraceLevel.Warning }
+                };
+
+        /// <summary>
+        /// Create static maps for SourceLevels to TraceLevel. The APIs need to provide TraceLevel
+        /// for backward compatibility with older versions of Object Model.
+        /// </summary>
+        private static readonly Dictionary<TraceLevel, TraceEventType> TraceLevelEventTypeMap =
+            new Dictionary<TraceLevel, TraceEventType>
+                {
+                        { TraceLevel.Error, TraceEventType.Error },
+                        { TraceLevel.Info, TraceEventType.Information },
+                        { TraceLevel.Verbose, TraceEventType.Verbose },
+                        { TraceLevel.Warning, TraceEventType.Warning }
+                };
 
         // Current process name/id that called trace so that it's easier to read logs.
         // We cache them for performance reason.
@@ -49,11 +89,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Specifies whether the trace is initialized or not
         /// </summary>
         private static bool isInitialized = false;
-
-        /// <summary>
-        /// Trace listener object to which all test platform traces are written.
-        /// </summary>
-        private static TraceListener listener;
 
         /// <summary>
         /// Lock over initialization
@@ -75,14 +110,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return TraceLevelSwitch.Level;
+                return SourceTraceLevelsMap[Source.Switch.Level];
             }
 
             set
             {
                 try
                 {
-                    TraceLevelSwitch.Level = value;
+                    Source.Switch.Level = TraceSourceLevelsMap[value];
                 }
                 catch (ArgumentException e)
                 {
@@ -146,6 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             logFileName = customLogFile;
             TraceLevel = TraceLevel.Verbose;
+            Source.Switch.Level = SourceLevels.All;
         }
 
 #if NET46
@@ -195,10 +231,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             lock (isInitializationLock)
             {
                 // Add new listeners.
-                EqtTrace.listener = listener;
                 if (listener != null)
                 {
-                    Trace.Listeners.Add(listener);
+                    Source.Listeners.Add(listener);
                 }
 
                 isInitialized = true;
@@ -217,13 +252,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 case TraceLevel.Off:
                     return false;
                 case TraceLevel.Error:
-                    return TraceLevelSwitch.TraceError;
+                    return Source.Switch.ShouldTrace(TraceEventType.Error);
                 case TraceLevel.Warning:
-                    return TraceLevelSwitch.TraceWarning;
+                    return Source.Switch.ShouldTrace(TraceEventType.Warning);
                 case TraceLevel.Info:
-                    return TraceLevelSwitch.TraceInfo;
+                    return Source.Switch.ShouldTrace(TraceEventType.Information);
                 case TraceLevel.Verbose:
-                    return TraceLevelSwitch.TraceVerbose;
+                    return Source.Switch.ShouldTrace(TraceEventType.Verbose);
                 default:
                     Debug.Fail("Should never get here!");
                     return false;
@@ -792,8 +827,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // Add new listeners.
                 if (listener != null)
                 {
-                    Trace.Listeners.Add(listener);
-                    EqtTrace.listener = listener;
+                    Source.Listeners.Add(listener);
                 }
 
                 isInitialized = true;
@@ -822,18 +856,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // Set the trace level and add the trace listener
                 if (logFileName == null)
                 {
-                    logFileName = Path.Combine(
-                        logsDirectory,
-                        Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName) + ".TpTrace.log");
+                    using (var process = Process.GetCurrentProcess())
+                    {
+                        // In case of parallel execution, there may be several processes with same name.
+                        // Add a process id to make the traces unique.
+                        logFileName = Path.Combine(
+                            logsDirectory,
+                            Path.GetFileNameWithoutExtension(process.MainModule.FileName) + "." + process.Id + ".TpTrace.log");
+                    }
                 }
 
+                // Add a default listener
                 traceFileSize = defaultTraceFileSize;
-                listener = new RollingFileTraceListener(logFileName, ListenerName, traceFileSize);
-                Trace.Listeners.Add(listener);
-
-                // Set the auto-flush flag, so that log entries are written immediately. This is done so that if the
-                // process exits or is killed, we will have as much log information as possible in the log.
-                Trace.AutoFlush = true;
+                Source.Listeners.Add(new RollingFileTraceListener(logFileName, ListenerName, traceFileSize));
 
                 isInitialized = true;
             }
@@ -1012,36 +1047,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // Ensure trace is initlized
             EnsureTraceIsInitialized();
 
-            string entryType = null;
-            switch (level)
-            {
-                case TraceLevel.Error:
-                    entryType = "E";
-                    break;
-
-                case TraceLevel.Warning:
-                    entryType = "W";
-                    break;
-
-                case TraceLevel.Info:
-                    entryType = "I";
-                    break;
-
-                case TraceLevel.Verbose:
-                    entryType = "V";
-                    break;
-
-                default:
-                    Debug.Fail("Should never get here. Unexpected TraceLevel: " + level);
-                    break;
-            }
-
             // The format below is a CSV so that Excel could be used easily to
             // view/filter the logs.
             var log = string.Format(
                 CultureInfo.InvariantCulture,
-                "{0}, {1}, {2}, {3:yyyy}/{3:MM}/{3:dd}, {3:HH}:{3:mm}:{3:ss}.{3:fff}, {6}, {4}, {5}",
-                entryType,
+                "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
                 ProcessId,
                 Thread.CurrentThread.ManagedThreadId,
                 DateTime.Now,
@@ -1051,15 +1061,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             try
             {
-                if (listener != null)
-                {
-                    listener.WriteLine(log);
-                    listener.Flush();
-                }
-                else
-                {
-                    Trace.WriteLine(log);
-                }
+                Source.TraceEvent(TraceLevelEventTypeMap[level], 0, log);
+                Source.Flush();
             }
             catch (Exception e)
             {
