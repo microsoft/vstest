@@ -136,6 +136,10 @@
   <data name="FileNotFound" xml:space="preserve">
     <value>Could not find file {0}.</value>
   </data>
+  <data name="HostDebuggerWarning" xml:space="preserve">
+    <value>Host debugging is enabled. Please attach debugger to testhost process to continue.</value>
+    <comment>Host, testhost are key words, it should not be localized</comment>
+  </data>
   <data name="IgnoringExecutorAsNoDefaultExecutorUriAttribute" xml:space="preserve">
     <value>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</value>
   </data>

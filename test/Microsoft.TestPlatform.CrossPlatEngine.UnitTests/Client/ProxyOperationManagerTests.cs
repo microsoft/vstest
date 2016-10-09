@@ -4,6 +4,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -48,6 +49,38 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo)), Times.Once);
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldCreateTimestampedLogFileForHost()
+        {
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+            EqtTrace.InitializeVerboseTrace("log.txt");
+            
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockTestHostManager.Verify(
+                th =>
+                    th.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        null,
+                        It.Is<TestRunnerConnectionInfo>(t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yyMMdd")))));
+            EqtTrace.TraceLevel = TraceLevel.Off;
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldAddRunnerProcessIdForTestHost()
+        {
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+            
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockTestHostManager.Verify(
+                th =>
+                    th.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        null,
+                        It.Is<TestRunnerConnectionInfo>(t => t.RunnerProcessId.Equals(Process.GetCurrentProcess().Id))));
         }
 
         [TestMethod]

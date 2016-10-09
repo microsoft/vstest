@@ -172,14 +172,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
-            var parentProcessId = 101;
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessId()).Returns(parentProcessId);
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
-            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port);
-            StringAssert.Contains(startInfo.Arguments, string.Format("{0} {1}",  Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants.ParentProcessIdOption, parentProcessId));
+            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --parentprocessid 101");
         }
 
         [TestMethod]
@@ -195,12 +192,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithNullEnvironmentVariablesOrArgs()
         {
-            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(111);
+            var expectedProcessId = Process.GetCurrentProcess().Id;
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
             var startInfo = this.GetDefaultStartInfo();
 
             var processId = this.dotnetHostManager.LaunchTestHost(startInfo);
 
-            Assert.AreEqual(111, processId);
+            Assert.AreEqual(expectedProcessId, processId);
         }
 
         [TestMethod]

@@ -63,7 +63,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         { SourceLevels.Information, TraceLevel.Info },
                         { SourceLevels.Off, TraceLevel.Off },
                         { SourceLevels.Verbose, TraceLevel.Verbose },
-                        { SourceLevels.Warning, TraceLevel.Warning }
+                        { SourceLevels.Warning, TraceLevel.Warning },
+                        { SourceLevels.All, TraceLevel.Verbose }
                 };
 
         /// <summary>
@@ -99,9 +100,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private static int defaultTraceFileSize = 10240; // 10Mb.
 
         /// <summary>
-        /// Log file name to setup custom file for logging.
+        /// Gets the log file for tracing.
         /// </summary>
-        private static string logFileName = null;
+        public static string LogFile
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Gets or sets the trace level.
@@ -179,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             isInitialized = false;
 
-            logFileName = customLogFile;
+            LogFile = customLogFile;
             TraceLevel = TraceLevel.Verbose;
             Source.Switch.Level = SourceLevels.All;
         }
@@ -854,13 +859,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 string logsDirectory = Path.GetTempPath();
 
                 // Set the trace level and add the trace listener
-                if (logFileName == null)
+                if (LogFile == null)
                 {
                     using (var process = Process.GetCurrentProcess())
                     {
                         // In case of parallel execution, there may be several processes with same name.
                         // Add a process id to make the traces unique.
-                        logFileName = Path.Combine(
+                        LogFile = Path.Combine(
                             logsDirectory,
                             Path.GetFileNameWithoutExtension(process.MainModule.FileName) + "." + process.Id + ".TpTrace.log");
                     }
@@ -868,7 +873,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 // Add a default listener
                 traceFileSize = defaultTraceFileSize;
-                Source.Listeners.Add(new RollingFileTraceListener(logFileName, ListenerName, traceFileSize));
+                Source.Listeners.Add(new RollingFileTraceListener(LogFile, ListenerName, traceFileSize));
 
                 isInitialized = true;
             }

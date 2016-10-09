@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -26,6 +27,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private readonly IFileHelper fileHelper;
 
         private ITestHostLauncher testHostLauncher;
+
+        private Process testHostProcess;
+
+        private EventHandler registeredExitHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -65,7 +70,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public int LaunchTestHost(TestProcessStartInfo testHostStartInfo)
         {
-            return this.testHostLauncher.LaunchTestHost(testHostStartInfo);
+            var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
+            this.testHostProcess = Process.GetProcessById(processId);
+            return processId;
         }
 
         /// <inheritdoc/>
@@ -119,8 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // Add the testhost path and other arguments
             var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
-            args += " \"" + testHostPath + "\" " + CrossPlatEngine.Constants.PortOption + " " + connectionInfo.Port + 
-                " " + CrossPlatEngine.Constants.ParentProcessIdOption + " " + this.processHelper.GetCurrentProcessId();
+            args += " \"" + testHostPath + "\" " + connectionInfo.ToCommandLineOptions();
 
             // Sample command line for the spawned test host
             // "D:\dd\gh\Microsoft\vstest\tools\dotnet\dotnet.exe" exec
@@ -152,13 +158,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public void RegisterForExitNotification(Action abortCallback)
         {
-            throw new NotImplementedException();
+            if (this.testHostProcess != null && abortCallback != null)
+            {
+                this.registeredExitHandler = (sender, args) => abortCallback();
+                this.testHostProcess.Exited += this.registeredExitHandler;
+            }
         }
 
         /// <inheritdoc/>
         public void DeregisterForExitNotification()
         {
-            throw new NotImplementedException();
+            if (this.testHostProcess != null && this.registeredExitHandler != null)
+            {
+                this.testHostProcess.Exited -= this.registeredExitHandler;
+            }
         }
 
         /// <summary>

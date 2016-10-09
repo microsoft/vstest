@@ -5,13 +5,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
+    using Resources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -23,6 +26,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private bool initialized;
 
         private readonly int connectionTimeout;
+
+        private readonly IProcessHelper processHelper;
 
         #region Constructors
 
@@ -37,6 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
+            this.processHelper = new ProcessHelper();
             this.initialized = false;
         }
 
@@ -63,14 +69,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             if (!this.initialized)
             {
                 var portNumber = this.RequestSender.InitializeCommunication();
+                var processId = this.processHelper.GetCurrentProcessId();
+                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Get the test process start info
                 // TODO: Fix the environment variables usage
-                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(
-                    sources,
-                    null,
-                    new TestRunnerConnectionInfo { Port = portNumber });
+                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
 
+                // Warn the user that execution will wait for debugger attach.
+                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+                {
+                    ConsoleOutput.Instance.WriteLine(Resources.HostDebuggerWarning, OutputLevel.Warning);
+                }
+
+                // Launch the test host and monitor exit.
                 this.testHostManager.LaunchTestHost(testHostStartInfo);
                 this.testHostManager.RegisterForExitNotification(() => this.RequestSender.OnClientProcessExit());
 
@@ -102,19 +115,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #endregion
 
-        #region private methods
-
-        /// <summary>
-        /// Setup the command line options to include port.
-        /// </summary>
-        /// <param name="portNumber"> The port number. </param>
-        /// <returns> The commandLine arguments as a list. </returns>
-        private IList<string> GetCommandLineArguments(int portNumber)
+        private string GetTimestampedLogFile(string logFile)
         {
-            var commandlineArguments = new List<string> { Constants.PortOption, portNumber.ToString() };
-            return commandlineArguments;
+            return Path.ChangeExtension(logFile, "host." + DateTime.Now.ToString("yyMMddhhmmss") + Path.GetExtension(logFile));
         }
-        
-        #endregion
     }
 }
