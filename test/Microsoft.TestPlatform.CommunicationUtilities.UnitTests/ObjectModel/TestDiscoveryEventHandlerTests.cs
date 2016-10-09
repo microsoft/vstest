@@ -46,8 +46,9 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
         [TestMethod]
         public void HandleDiscoveryMessageShouldSendMessageToClient()
         {
-            this.testDiscoveryEventHandler.HandleLogMessage(TestMessageLevel.Informational,null);
-            this.mockClient.Verify(th => th.SendLog(0, null), Times.AtLeast(1));
+            this.testDiscoveryEventHandler.HandleLogMessage(TestMessageLevel.Informational, string.Empty);
+
+            this.mockClient.Verify(th => th.SendLog(TestMessageLevel.Informational, string.Empty), Times.AtLeast(1));
         }
     }
 }

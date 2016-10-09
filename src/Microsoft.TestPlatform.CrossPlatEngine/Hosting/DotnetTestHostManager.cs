@@ -20,6 +20,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
     /// </summary>
+    /// <remarks>
+    /// Note that some functionality of this entity overlaps with that of <see cref="DefaultTestHostManager"/>. That is
+    /// intentional since we want to move this to a separate assembly (with some runtime extensibility discovery).
+    /// </remarks>
     public class DotnetTestHostManager : ITestHostManager
     {
         private readonly IProcessHelper processHelper;
@@ -35,7 +39,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
-        public DotnetTestHostManager() : this(new DefaultTestHostLauncher(), new ProcessHelper(), new FileHelper())
+        public DotnetTestHostManager()
+            : this(new DefaultTestHostLauncher(), new ProcessHelper(), new FileHelper())
         {
         }
 
@@ -45,7 +50,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <param name="testHostLauncher">A test host launcher instance.</param>
         /// <param name="processHelper">Process helper instance.</param>
         /// <param name="fileHelper">File helper instance.</param>
-        internal DotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper)
+        internal DotnetTestHostManager(
+            ITestHostLauncher testHostLauncher,
+            IProcessHelper processHelper,
+            IFileHelper fileHelper)
         {
             this.testHostLauncher = testHostLauncher;
             this.processHelper = processHelper;
