@@ -361,7 +361,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The /Diag parameter requires a file to be provided to write the logs.
+        ///    Looks up a localized string similar to --Diag|/Diag:&lt;Path to log file&gt;
+        ///      Enable verbose logs for test platform.
+        ///      Logs are written to the provided file..
         /// </summary>
         public static string EnableDiagUsage {
             get {

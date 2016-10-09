@@ -6,7 +6,8 @@
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
     "additionalArguments": [ "/ruleset:../../scripts/stylecop.ruleset", "/additionalFile:../../scripts/stylecop.json" ],
-    "xmlDoc": true
+    "xmlDoc": true,
+    "define": ["TRACE"]
   },
 
   "dependencies": {

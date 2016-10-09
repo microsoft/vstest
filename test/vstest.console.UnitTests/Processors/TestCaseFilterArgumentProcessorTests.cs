@@ -2,8 +2,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
+
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using TestPlatform.CommandLine.Processors;
 
     [TestClass]

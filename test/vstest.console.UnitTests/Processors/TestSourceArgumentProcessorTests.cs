@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Moq;
     
     // <summary>
-    //   Tests for TestSourceArgumentProcessor
+    // Tests for TestSourceArgumentProcessor
     // </summary>
     [TestClass]
     public class TestSourceArgumentProcessorTests

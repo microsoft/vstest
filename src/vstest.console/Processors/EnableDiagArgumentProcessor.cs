@@ -10,23 +10,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
-        #region Constants
-
         /// <summary>
         /// The name of the command line argument that the ListTestsArgumentExecutor handles.
         /// </summary>
         public const string CommandName = "/Diag";
 
-        #endregion
-
         private Lazy<IArgumentProcessorCapabilities> metadata;
 
         private Lazy<IArgumentExecutor> executor;
+
+        private IFileHelper fileHelper;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnableDiagArgumentProcessor"/> class.
+        /// </summary>
+        public EnableDiagArgumentProcessor() : this(new FileHelper())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnableDiagArgumentProcessor"/> class.
+        /// </summary>
+        /// <param name="fileHelper">A file helper instance.</param>
+        protected EnableDiagArgumentProcessor(IFileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
+        }
 
         public Lazy<IArgumentProcessorCapabilities> Metadata
         {
@@ -50,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), ConsoleOutput.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableDiagArgumentExecutor(this.fileHelper));
                 }
 
                 return this.executor;
@@ -86,40 +102,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// </summary>
     internal class EnableDiagArgumentExecutor : IArgumentExecutor
     {
-        #region Fields
-
-        /// <summary>
-        /// Used for getting sources.
-        /// </summary>
-        private CommandLineOptions commandLineOptions;
-
-        /// <summary>
-        /// The test platform instance.
-        /// </summary>
-        private ITestPlatform testPlatform;
-
-        /// <summary>
-        /// Used for sending output.
-        /// </summary>
-        private IOutput output;
-
-        #endregion
+        private readonly IFileHelper fileHelper;
 
         #region Constructor
 
         /// <summary>
         /// Default constructor.
         /// </summary>
-        /// <param name="options"> The options. </param>
-        /// <param name="testPlatform">The test platform</param>
-        /// <param name="output">The output</param>
-        public EnableDiagArgumentExecutor(CommandLineOptions options, ITestPlatform testPlatform, IOutput output)
+        /// <param name="fileHelper">The file helper.</param>
+        public EnableDiagArgumentExecutor(IFileHelper fileHelper)
         {
-            Contract.Requires(options != null);
-
-            this.commandLineOptions = options;
-            this.testPlatform = testPlatform;
-            this.output = output;
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -137,22 +130,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(Resources.EnableDiagUsage);
             }
 
-            FileInfo fileInfo = new FileInfo(argument);
-
             // Checking if the file is readonly
-            if (fileInfo.Exists && this.IsFileReadOnly(fileInfo))
+            if (this.fileHelper.Exists(argument) && this.IsFileReadOnly(argument))
             {
                 throw new CommandLineException(string.Format(Resources.LoggerFileIsReadOnly, argument));
             }
-            else if (string.IsNullOrWhiteSpace(fileInfo.Extension))
+            else if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
             {
                 // Throwing error if the argument is just path and not a file
                 throw new CommandLineException(Resources.EnableDiagUsage);
             }
 
-            if (!fileInfo.Directory.Exists)
+            if (!this.fileHelper.DirectoryExists(argument))
             {
-                fileInfo.Directory.Create();
+                this.fileHelper.CreateDirectory(Path.GetDirectoryName(argument));
             }
 
             EqtTrace.InitializeVerboseTrace(argument);
@@ -168,9 +159,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        internal virtual bool IsFileReadOnly(FileInfo fileInfo)
+        private bool IsFileReadOnly(string path)
         {
-            return (fileInfo.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
+            return (this.fileHelper.GetFileAttributes(path) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
         }
 
         #endregion

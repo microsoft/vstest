@@ -12,6 +12,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
     public interface IFileHelper
     {
         /// <summary>
+        /// Creates a directory.
+        /// </summary>
+        /// <param name="path">Path of the directory.</param>
+        /// <returns><see cref="DirectoryInfo"/> for the created directory.</returns>
+        DirectoryInfo CreateDirectory(string path);
+
+        /// <summary>
         /// Exists utility to check if file exists
         /// </summary>
         /// <param name="path"> The path of file. </param>
@@ -41,5 +48,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="searchOption"><see cref="SearchOption"/> for directory.</param>
         /// <returns>List of files matching the pattern.</returns>
         IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption);
+
+        /// <summary>
+        /// Gets attributes of a file.
+        /// </summary>
+        /// <param name="path">Full path of the file.</param>
+        /// <returns>Attributes of the file.</returns>
+        FileAttributes GetFileAttributes(string path);
     }
 }
