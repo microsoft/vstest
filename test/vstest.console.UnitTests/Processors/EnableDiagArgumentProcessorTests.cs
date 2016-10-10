@@ -2,6 +2,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
+    using System.Diagnostics;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
@@ -88,6 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
             
             Assert.IsTrue(EqtTrace.IsVerboseEnabled);
+            EqtTrace.TraceLevel = TraceLevel.Off;
         }
 
         private class TestableEnableDiagArgumentProcessor : EnableDiagArgumentProcessor
