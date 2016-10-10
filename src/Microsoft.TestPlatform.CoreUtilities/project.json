@@ -34,7 +34,7 @@
     },
     "net46": {
       "frameworkAssemblies": {
-        "System.Configuration": "",
+        "System.Configuration": ""
       }
     }
   }
