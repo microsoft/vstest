@@ -97,7 +97,7 @@ function Invoke-Test
                 Write-Log ".. Test: Source: $_"
 
                 # Tests are only built for x86 at the moment, though we don't have architecture requirement
-                $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.0.3-preview\build\_common"
+                $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.3-preview\build\_common"
                 $testContainerName = $_.Directory.Name
                 $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/$($Script:TPT_TargetFramework)/$($Script:TPT_TargetRuntime)"
                 $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
