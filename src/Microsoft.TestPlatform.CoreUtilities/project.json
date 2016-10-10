@@ -11,12 +11,6 @@
   },
 
   "dependencies": {
-    "System.Diagnostics.Tracing": "4.1.0",
-    "System.Diagnostics.Process": "4.1.0",
-    "System.Diagnostics.TraceSource": "4.0.0",
-    "System.Threading.Thread": "4.0.0",
-    "System.Diagnostics.TextWriterTraceListener":  "4.0.0",
-
     "StyleCop.Analyzers": { 
       "version": "1.0.0", 
       "type": "build" 
@@ -30,12 +24,17 @@
         "portable-net45+win8"
       ],
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "NETStandard.Library": "1.6.0",
+        "System.Diagnostics.Tracing": "4.1.0",
+        "System.Diagnostics.Process": "4.1.0",
+        "System.Diagnostics.TraceSource": "4.0.0",
+        "System.Threading.Thread": "4.0.0",
+        "System.Diagnostics.TextWriterTraceListener":  "4.0.0"
       }
     },
     "net46": {
       "frameworkAssemblies": {
-        "System.Configuration": ""
+        "System.Configuration": "",
       }
     }
   }
