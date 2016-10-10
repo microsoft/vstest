@@ -361,6 +361,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to --Diag|/Diag:&lt;Path to log file&gt;
+        ///      Enable verbose logs for test platform.
+        ///      Logs are written to the provided file..
+        /// </summary>
+        public static string EnableDiagUsage {
+            get {
+                return ResourceManager.GetString("EnableDiagUsage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to  --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
         ///      Visual Studio Test Results File (TRX) use  /logger:trx.
@@ -449,7 +460,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         ///    Looks up a localized string similar to --Framework|/Framework:&lt;Framework Version&gt;
         ///      Target .Net Framework version to be used for test execution. 
         ///      Valid values are &quot;.NETFramework,Version=v4.6&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
-        ///      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.
+        ///      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10..
         /// </summary>
         public static string FrameworkArgumentHelp {
             get {
@@ -697,6 +708,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine {
         public static string ListTestsHelp {
             get {
                 return ResourceManager.GetString("ListTestsHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The file {0} provided is read only.
+        /// </summary>
+        public static string LoggerFileIsReadOnly {
+            get {
+                return ResourceManager.GetString("LoggerFileIsReadOnly", resourceCulture);
             }
         }
         

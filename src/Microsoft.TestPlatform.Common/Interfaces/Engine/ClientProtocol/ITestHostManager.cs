@@ -75,5 +75,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
             get;
             set;
         }
+
+        /// <summary>
+        /// Gets or sets the diagnostics log file.
+        /// </summary>
+        public string LogFile
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the runner process id.
+        /// </summary>
+        public int RunnerProcessId
+        {
+            get;
+            set;
+        }
     }
 }

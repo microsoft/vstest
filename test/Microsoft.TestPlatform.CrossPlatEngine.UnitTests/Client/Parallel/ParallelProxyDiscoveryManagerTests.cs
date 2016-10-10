@@ -188,7 +188,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 proxyParallelDiscoveryManager.DiscoverTests(discoveryCriteria, mockHandler.Object);
             });
 
-            Assert.IsTrue(eventHandle.WaitOne(5000), "eventHandle was not set");
+            Assert.IsTrue(eventHandle.WaitOne(15000), "eventHandle was not set");
 
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
 
@@ -207,7 +207,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
             }
-
         }
     }
 }

@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Launches the test host for discovery/execution.
         /// </summary>
-        /// <param name="testHostStartInfo"></param>
+        /// <param name="testHostStartInfo">Test host start information.</param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
         public int LaunchTestHost(TestProcessStartInfo testHostStartInfo)
         {
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // Default test host manager supports shared test sources
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
-            var argumentsString = " " + Constants.PortOption + " " + connectionInfo.Port + " " + Constants.ParentProcessIdOption + " " + processHelper.GetCurrentProcessId();
+            var argumentsString = " " + connectionInfo.ToCommandLineOptions();
 
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
 
@@ -141,10 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return Enumerable.Empty<string>();
         }
 
-        /// <summary>
-        /// Register for the exit event.
-        /// </summary>
-        /// <param name="abortCallback"> The callback on exit. </param>
+        /// <inheritdoc/>
         public virtual void RegisterForExitNotification(Action abortCallback)
         {
             if (this.testHostProcess != null && abortCallback != null)
@@ -154,9 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
-        /// <summary>
-        /// Deregister for the exit event.
-        /// </summary>
+        /// <inheritdoc/>
         public virtual void DeregisterForExitNotification()
         {
             if (this.testHostProcess != null && this.registeredExitHandler != null)

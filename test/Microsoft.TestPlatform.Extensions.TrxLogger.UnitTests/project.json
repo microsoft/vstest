@@ -8,7 +8,7 @@
   },
 
   "dependencies": {
-    "MSTest.TestFramework": "1.0.0-preview",
+    "MSTest.TestFramework": "1.0.4-preview",
     "MSTest.TestAdapter.Dotnet": {
       "version": "1.0.4-preview",
       "exclude": "compile"

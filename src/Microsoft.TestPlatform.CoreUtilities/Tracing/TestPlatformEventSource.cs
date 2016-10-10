@@ -1,130 +1,162 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
 {
     using System.Diagnostics.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 
-    // <inheritdoc/>    
+    /// <inheritdoc/>
     [EventSource(Name = "TestPlatform")]
     public class TestPlatformEventSource : EventSource, ITestPlatformEventSource
-    {        
-        public static TestPlatformEventSource Instance = new TestPlatformEventSource();
+    {
+        private static readonly TestPlatformEventSource LocalInstance = new TestPlatformEventSource();
 
+        /// <summary>
+        /// Gets the instance of <see cref="TestPlatformEventSource"/>.
+        /// </summary>
+        public static ITestPlatformEventSource Instance
+        {
+            get
+            {
+                return LocalInstance;
+            }
+        }
+
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.VsTestConsoleStartEventId)]
         public void VsTestConsoleStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.VsTestConsoleStartEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.VsTestConsoleStopEventId)]
         public void VsTestConsoleStop()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.VsTestConsoleStopEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.DiscoveryRequestStartEventId)]
         public void DiscoveryRequestStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryRequestStartEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.DiscoveryRequestStopEventId)]
         public void DiscoveryRequestStop()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryRequestStopEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.ExecutionRequestStartEventId)]
         public void ExecutionRequestStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionRequestStartEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.ExecutionRequestStopEventId)]
         public void ExecutionRequestStop()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionRequestStopEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.TestHostStartEventId)]
         public void TestHostStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.TestHostStartEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.TestHostStopEventId)]
         public void TestHostStop()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.TestHostStopEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.AdapterSearchStartEventId)]
         public void AdapterSearchStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSearchStartEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.AdapterSearchStopEventId)]
         public void AdapterSearchStop()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.AdapterSearchStopEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.AdapterExecutionStartEventId)]
         public void AdapterExecutionStart(string executorUri)
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.AdapterExecutionStartEventId, executorUri);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.AdapterExecutionStopEventId)]
         public void AdapterExecutionStop(long numberOfTests)
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.AdapterExecutionStopEventId, numberOfTests);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.AdapterDiscoveryStartEventId)]
         public void AdapterDiscoveryStart(string executorUri)
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.AdapterDiscoveryStartEventId, executorUri);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.AdapterDiscoveryStopEventId)]
         public void AdapterDiscoveryStop(long numberOfTests)
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.AdapterDiscoveryStopEventId, numberOfTests);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.DiscoveryStartEventId)]
         public void DiscoveryStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryStartEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.DiscoveryStopEventId)]
         public void DiscoveryStop(long numberOfTests)
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.DiscoveryStopEventId, numberOfTests);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.ExecutionStartEventId)]
         public void ExecutionStart()
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionStartEventId);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.ExecutionStopEventId)]
         public void ExecutionStop(long numberOfTests)
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.ExecutionStopEventId, numberOfTests);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.DataCollectionStartEventId)]
         public void DataCollectionStart(string dataCollectorUri)
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.DataCollectionStartEventId, dataCollectorUri);
         }
 
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.DataCollectionStopEventId)]
         public void DataCollectionStop()
         {

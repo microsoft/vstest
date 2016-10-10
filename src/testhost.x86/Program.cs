@@ -25,13 +25,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = 5 * 1000;
 
-        private const string PortLongname = "--port";
+        private const string PortArgument = "--port";
 
-        private const string PortShortname = "-p";
+        private const string ParentProcessIdArgument = "--parentprocessid";
 
-        private const string ParentProcessIdLongname = "--parentprocessid";
-
-        private const string ParentProcessIdShortname = "-i";
+        private const string LogFileArgument = "--diag";
 
         /// <summary>
         /// The main.
@@ -43,24 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             try
             {
-                var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-                if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
-                {
-                    ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
-
-                    var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
-                    ConsoleOutput.Instance.WriteLine(
-                        string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
-                        OutputLevel.Information);
-
-                    while (!System.Diagnostics.Debugger.IsAttached)
-                    {
-                        System.Threading.Thread.Sleep(1000);
-                    }
-
-                    System.Diagnostics.Debugger.Break();
-                }
-
+                WaitForDebuggerIfEnabled();
                 Run(args);
             }
             catch (Exception ex)
@@ -69,53 +50,51 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        /// <summary>
-        /// To parse int argument value.
-        /// </summary>
-        /// <param name="argsDictionary">
-        /// Dictionary of all arguments Ex: { "--port":"12312", "--parentprocessid":"2312" }
-        /// </param>
-        /// <param name="fullname">
-        /// The fullname for required argument. Ex: "--port"
-        /// </param>
-        /// <param name="shortname">
-        /// The shortname for required argument. Ex: "-p"
-        /// </param>
-        /// <returns>
-        /// The <see cref="int"/>.
-        /// </returns>
-        /// <exception cref="ArgumentException">
-        /// </exception>
-        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname, string shortname)
+        private static void Run(string[] args)
         {
-            var val = -1;
-            if (argsDictionary.ContainsKey(fullname) && argsDictionary[fullname] != null)
+            TestPlatformEventSource.Instance.TestHostStart();
+            var argsDictionary = GetArguments(args);
+            var requestHandler = new TestRequestHandler();
+
+            // Attach to exit of parent process
+            var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
+            OnParentProcessExit(parentProcessId, requestHandler);
+
+            // Setup logging if enabled
+            string logFile;
+            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
             {
-                int.TryParse(argsDictionary[fullname], out val);
-            }
-            else if (argsDictionary.ContainsKey(shortname) && argsDictionary[shortname] != null)
-            {
-                int.TryParse(argsDictionary[shortname], out val);
+                EqtTrace.InitializeVerboseTrace(logFile);
             }
 
-            if (val < 0)
+            // Get port number and initialize communication
+            var portNumber = GetIntArgFromDict(argsDictionary, PortArgument);
+            requestHandler.InitializeCommunication(portNumber);
+
+            // Setup the factory
+            var managerFactory = new TestHostManagerFactory();
+
+            // Wait for the connection to the sender and start processing requests from sender
+            if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
             {
-                throw new ArgumentException($"Incorrect/No number for: {fullname}/{shortname}");
+                requestHandler.ProcessRequests(managerFactory);
+            }
+            else
+            {
+                EqtTrace.Info("TestHost: RequestHandler timed out while connecting to the Sender.");
+                requestHandler.Close();
+                throw new TimeoutException();
             }
 
-            return val;
+            TestPlatformEventSource.Instance.TestHostStop();
         }
 
         /// <summary>
-        /// The get args dictionary.
+        /// Parse command line arguments to a dictionary.
         /// </summary>
-        /// <param name="args">
-        /// args Ex: { "--port", "12312", "--parentprocessid", "2312" }
-        /// </param>
-        /// <returns>
-        /// The <see cref="IDictionary"/>.
-        /// </returns>
-        private static IDictionary<string, string> getArgsDictionary(string[] args)
+        /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312" }</c></param>
+        /// <returns>Dictionary of arguments keys and values.</returns>
+        private static IDictionary<string, string> GetArguments(string[] args)
         {
             IDictionary<string, string> argsDictionary = new Dictionary<string, string>();
             for (int i = 0; i < args.Length; i++)
@@ -137,38 +116,24 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             return argsDictionary;
         }
 
-        private static void Run(string[] args)
+        /// <summary>
+        /// Parse the value of an argument as an integer.
+        /// </summary>
+        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
+        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
+        /// <returns>Value of the argument.</returns>
+        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
+        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
         {
-            IDictionary<string, string> argsDictionary = getArgsDictionary(args);
-            TestPlatformEventSource.Instance.TestHostStart();
-            var portNumber = GetIntArgFromDict(argsDictionary, PortLongname, PortShortname);
-            var requestHandler = new TestRequestHandler();
-            requestHandler.InitializeCommunication(portNumber);
-            var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdLongname, ParentProcessIdShortname);
-            OnParentProcessExit(parentProcessId, requestHandler);
-
-            // setup the factory.
-            var managerFactory = new TestHostManagerFactory();
-
-            // Wait for the connection to the sender and start processing requests from sender
-            if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
-            {
-                requestHandler.ProcessRequests(managerFactory);
-            }
-            else
-            {
-                EqtTrace.Info("TestHost: RequestHandler timed out while connecting to the Sender.");
-                requestHandler.Close();
-                throw new TimeoutException();
-            }
-
-            TestPlatformEventSource.Instance.TestHostStop();
+            string optionValue;
+            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
         }
+
 
         private static void OnParentProcessExit(int parentProcessId, ITestRequestHandler requestHandler)
         {
             EqtTrace.Info("TestHost: exits itself because parent process exited");
-            Process process = Process.GetProcessById(parentProcessId);
+            var process = Process.GetProcessById(parentProcessId);
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) =>
                 {
@@ -177,6 +142,27 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     process.Dispose();
                     Environment.Exit(0);
                 };
+        }
+
+        private static void WaitForDebuggerIfEnabled()
+        {
+            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
+
+                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                ConsoleOutput.Instance.WriteLine(
+                    string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
+                    OutputLevel.Information);
+
+                while (!System.Diagnostics.Debugger.IsAttached)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+                System.Diagnostics.Debugger.Break();
+            }
         }
     }
 }

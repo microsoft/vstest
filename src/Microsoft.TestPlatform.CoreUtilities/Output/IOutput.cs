@@ -1,16 +1,10 @@
-// ---------------------------------------------------------------------------
-// <copyright file="IOutput.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation. All rights reserved.
-// </copyright>
-// <summary>
-//     Interface for outputing information under the command line.
-// </summary>
-// ---------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     /// <summary>
-    /// Interface for outputing information under the command line.
+    /// Interface to output information under the command line.
     /// </summary>
     public interface IOutput
     {

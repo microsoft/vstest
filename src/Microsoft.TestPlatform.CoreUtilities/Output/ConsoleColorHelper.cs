@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
@@ -9,35 +10,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public sealed class ConsoleColorHelper : IDisposable
     {
-        #region Fields
-
-        private bool m_isDisposed;
-        private ConsoleColor m_previousForgroundColor;
-
-        #endregion
-
-        #region Constructor
+        private readonly ConsoleColor previousForegroundColor;
+        private bool disposed;
 
         /// <summary>
-        /// Initializes with the color to set the console forground to.
+        /// Initializes a new instance of the <see cref="ConsoleColorHelper"/> class.
         /// </summary>
-        /// <param name="forgroundColor">Color to set the console forground to.</param>
+        /// <param name="foregroundColor">
+        /// Color to set the console foreground to.
+        /// </param>
         public ConsoleColorHelper(ConsoleColor foregroundColor)
         {
-            m_previousForgroundColor = Console.ForegroundColor;
+            this.previousForegroundColor = Console.ForegroundColor;
             Console.ForegroundColor = foregroundColor;
         }
 
-        #endregion
-
-        #region Methods
-
         /// <summary>
-        /// Restores the original forground color.
+        /// Restores the original foreground color.
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
+            this.Dispose(true);
 
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
@@ -47,19 +40,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <summary>
         /// Disposes the composition container.
         /// </summary>
+        /// <param name="disposing">True if the object is disposing.</param>
         private void Dispose(bool disposing)
         {
-            if (!m_isDisposed)
+            if (!this.disposed)
             {
                 if (disposing)
                 {
-                    Console.ForegroundColor = m_previousForgroundColor;
+                    Console.ForegroundColor = this.previousForegroundColor;
                 }
 
-                m_isDisposed = true;
+                this.disposed = true;
             }
         }
-
-        #endregion
     }
 }

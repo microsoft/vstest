@@ -96,6 +96,69 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to The specified argument cannot be empty..
+        /// </summary>
+        public static string Error_ArgumentIsEmpty {
+            get {
+                return ResourceManager.GetString("Error_ArgumentIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The specified argument cannot be negative..
+        /// </summary>
+        public static string Error_ArgumentIsNegative {
+            get {
+                return ResourceManager.GetString("Error_ArgumentIsNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The specified argument must have the following type: {0}..
+        /// </summary>
+        public static string Error_ArgumentNotTypeOf {
+            get {
+                return ResourceManager.GetString("Error_ArgumentNotTypeOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The specified argument has the following property, which cannot be an empty string: {0}..
+        /// </summary>
+        public static string Error_ArgumentPropertyIsEmpty {
+            get {
+                return ResourceManager.GetString("Error_ArgumentPropertyIsEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The specified argument has the following property, which cannot be negative: {0}..
+        /// </summary>
+        public static string Error_ArgumentPropertyIsNegative {
+            get {
+                return ResourceManager.GetString("Error_ArgumentPropertyIsNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The specified argument has the following property, which cannot be null: {0}..
+        /// </summary>
+        public static string Error_ArgumentPropertyIsNull {
+            get {
+                return ResourceManager.GetString("Error_ArgumentPropertyIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///    Looks up a localized string similar to The specified argument has the following property: {0}. This property must have the following type: {1}..
+        /// </summary>
+        public static string Error_ArgumentPropertyNotTypeOf {
+            get {
+                return ResourceManager.GetString("Error_ArgumentPropertyNotTypeOf", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Unhandled exception occurred while processing a job from the &apos;{0}&apos; queue: {1}.
         /// </summary>
         public static string ExceptionFromJobProcessor {
@@ -121,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities {
                 return ResourceManager.GetString("QueuePausedDisposeError", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///    Looks up a localized string similar to Error getting process name..
         /// </summary>
