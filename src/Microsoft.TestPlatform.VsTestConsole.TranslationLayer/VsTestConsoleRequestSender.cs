@@ -198,7 +198,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         public void CancelTestRun()
         {
-                this.communicationManager.SendMessage(MessageType.CancelTestRun);
+            this.communicationManager.SendMessage(MessageType.CancelTestRun);
         }
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
-                CleanupCommunicationIfProcessExit();
+                this.CleanupCommunicationIfProcessExit();
             }
         }
 
@@ -377,6 +377,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.communicationManager.StopServer();
             }
         }
+
         private Message TryReceiveMessage()
         {
             Message message = null;

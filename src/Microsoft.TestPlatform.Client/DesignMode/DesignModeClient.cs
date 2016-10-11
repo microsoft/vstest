@@ -7,13 +7,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System.Diagnostics;
 
     /// <summary>
     /// The design mode client.
@@ -74,11 +72,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         {
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
             this.communicationManager.SetupClientAsync(port);
-            this.communicationManager.SendMessage(MessageType.SessionConnected);
 
             // Wait for the connection to the server and listen for requests.
             if (this.communicationManager.WaitForServerConnection(ClientListenTimeOut))
             {
+                this.communicationManager.SendMessage(MessageType.SessionConnected);
                 this.ProcessRequests(testRequestManager);
             }
             else
@@ -99,7 +97,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <summary>
         /// Process Requests from the IDE
         /// </summary>
-        /// <param name="handler"></param>
+        /// <param name="testRequestManager">
+        /// The test Request Manager.
+        /// </param>
         private void ProcessRequests(ITestRequestManager testRequestManager)
         {
             var isSessionEnd = false;
