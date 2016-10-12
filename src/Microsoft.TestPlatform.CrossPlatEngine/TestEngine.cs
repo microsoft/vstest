@@ -22,8 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     public class TestEngine : ITestEngine
     {
         #region Private Fields
-
-        private IProxyDiscoveryManager proxyDiscoveryManager;
+        
         private ITestExtensionManager testExtensionManager;
 
         #endregion
@@ -35,9 +34,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// <param name="testHostManager"></param>
         /// <returns>ITestDiscoveryManager object that can do discovery</returns>
-        public IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager)
+        public IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager, DiscoveryCriteria discoveryCriteria)
         {
-            return this.proxyDiscoveryManager ?? (this.proxyDiscoveryManager = new ProxyDiscoveryManager(testHostManager));
+            int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
+
+            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = () => new ProxyDiscoveryManager(testHostManager);
+            if (!testHostManager.Shared)
+            {
+                return new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared);
+            }
+            else
+            {
+                return proxyDiscoveryManagerCreator();
+            }
         }
 
         /// <summary>
@@ -50,7 +59,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </returns>
         public IProxyExecutionManager GetExecutionManager(ITestHostManager testHostManager, TestRunCriteria testRunCriteria)
         {
-            int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(testRunCriteria);
+            var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
+            int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
 
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
             var architecture = runconfiguration.TargetPlatform;
@@ -63,9 +73,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings))
                         : new ProxyExecutionManager(testHostManager);
 
-            if (parallelLevel > 1)
+            // parallelLevel = 1 for desktop should go via else route.
+            if (parallelLevel > 1 || !testHostManager.Shared)
             {
-                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel);
+                return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared);
             }
             else
             {
@@ -101,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         #endregion
-
+ 
         private static int GetDistinctNumberOfSources(TestRunCriteria testRunCriteria)
         {
             // No point in creating more processes if number of sources is less than what user configured for
@@ -124,14 +135,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// <param name="testRunCriteria">Test Run Criteria</param>
         /// <returns>Parallel Level to use</returns>
-        private int VerifyParallelSettingAndCalculateParallelLevel(TestRunCriteria testRunCriteria)
+        private int VerifyParallelSettingAndCalculateParallelLevel(int sourceCount, string runSettings)
         {
             // Default is 1
             int parallelLevelToUse = 1;
             try
             {
                 // Check the User Parallel Setting
-                int userParallelSetting = RunSettingsUtilities.GetMaxCpuCount(testRunCriteria.TestRunSettings);
+                int userParallelSetting = RunSettingsUtilities.GetMaxCpuCount(runSettings);
                 parallelLevelToUse = userParallelSetting == 0 ? Environment.ProcessorCount : userParallelSetting;
                 var enableParallel = parallelLevelToUse > 1;
 
@@ -141,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 // we should use number of sources as the parallel level, if sources count is less than parallel level
                 if (enableParallel)
                 {
-                    parallelLevelToUse = Math.Min(GetDistinctNumberOfSources(testRunCriteria), parallelLevelToUse);
+                    parallelLevelToUse = Math.Min(sourceCount, parallelLevelToUse);
 
                     // If only one source, no need to use parallel service client
                     enableParallel = parallelLevelToUse > 1;

@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
 {
@@ -13,11 +14,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
     /// </summary>
     public class FileHelper : IFileHelper
     {
-        /// <summary>
-        /// Exists utility to check if file exists
-        /// </summary>
-        /// <param name="path"> The path of file. </param>
-        /// <returns> True if file exists <see cref="bool"/>. </returns>
+        /// <inheritdoc/>
+        public DirectoryInfo CreateDirectory(string path)
+        {
+            return Directory.CreateDirectory(path);
+        }
+
+        /// <inheritdoc/>
         public bool Exists(string path)
         {
             return File.Exists(path);
@@ -36,9 +39,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-        IEnumerable<string> IFileHelper.EnumerateFiles(string directory, string pattern, SearchOption searchOption)
+        public IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption)
         {
             return Directory.EnumerateFiles(directory, pattern, searchOption);
+        }
+
+        /// <inheritdoc/>
+        public FileAttributes GetFileAttributes(string path)
+        {
+            return new FileInfo(path).Attributes;
         }
     }
 }

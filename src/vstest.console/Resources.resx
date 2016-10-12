@@ -606,4 +606,12 @@
   <data name="HelpArgumentsText" xml:space="preserve">
     <value>Arguments:</value>
   </data>
+  <data name="EnableDiagUsage" xml:space="preserve">
+    <value>--Diag|/Diag:&lt;Path to log file&gt;
+      Enable verbose logs for test platform.
+      Logs are written to the provided file.</value>
+  </data>
+  <data name="LoggerFileIsReadOnly" xml:space="preserve">
+    <value>The file {0} provided is read only</value>
+  </data>
 </root>

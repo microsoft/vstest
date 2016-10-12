@@ -1,66 +1,54 @@
-// ---------------------------------------------------------------------------
-// <copyright file="ConsoleOutput.cs" company="Microsoft">
-//     Copyright (c) Microsoft Corporation. All rights reserved.
-// </copyright>
-// <summary>
-//     Sends output to the console.
-// </summary>
-// ---------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
     using System.IO;
-    using System.Text;    
 
     /// <summary>
     /// Sends output to the console.
-    /// </summary>    
+    /// </summary>
     public class ConsoleOutput : IOutput
     {
-        #region Fields
+        private static object lockObject = new object();
+        private static ConsoleOutput consoleOutput = null;
 
-        private TextWriter m_standardOutput = null;
-        private TextWriter m_standardError = null;
-        private static Object s_lockObject = new object();
-        private static ConsoleOutput s_consoleOutput = null;
-
-        #endregion
-
-        #region Constructor
+        private TextWriter standardOutput = null;
+        private TextWriter standardError = null;
 
         /// <summary>
-        /// Default constructor.
+        /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.
         /// </summary>
         internal ConsoleOutput()
         {
-            m_standardOutput = Console.Out;
-            m_standardError = Console.Error;
+            this.standardOutput = Console.Out;
+            this.standardError = Console.Error;
         }
 
-        #endregion
-
+        /// <summary>
+        /// Gets the instance of <see cref="ConsoleOutput"/>.
+        /// </summary>
         public static ConsoleOutput Instance
         {
             get
             {
-                if (s_consoleOutput != null)
+                if (consoleOutput != null)
                 {
-                    return s_consoleOutput;
+                    return consoleOutput;
                 }
-                
-                lock (s_lockObject)
+
+                lock (lockObject)
                 {
-                    if (s_consoleOutput == null)
+                    if (consoleOutput == null)
                     {
-                        s_consoleOutput = new ConsoleOutput();
+                        consoleOutput = new ConsoleOutput();
                     }
                 }
-                return s_consoleOutput;
+
+                return consoleOutput;
             }
         }
-
-        #region IOutput
 
         /// <summary>
         /// Writes the message with a new line.
@@ -69,8 +57,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="level">Level of the message.</param>
         public void WriteLine(string message, OutputLevel level)
         {
-            Write(message, level);
-            Write(Environment.NewLine, level);
+            this.Write(message, level);
+            this.Write(Environment.NewLine, level);
         }
 
         /// <summary>
@@ -84,20 +72,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 case OutputLevel.Information:
                 case OutputLevel.Warning:
-                    m_standardOutput.Write(message);
+                    this.standardOutput.Write(message);
                     break;
 
                 case OutputLevel.Error:
-                    m_standardError.Write(message);
+                    this.standardError.Write(message);
                     break;
 
                 default:
-                    m_standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
+                    this.standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
                     break;
             }
         }
-
-        #endregion
-
     }
 }

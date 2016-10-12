@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
@@ -19,6 +20,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
     /// </summary>
+    /// <remarks>
+    /// Note that some functionality of this entity overlaps with that of <see cref="DefaultTestHostManager"/>. That is
+    /// intentional since we want to move this to a separate assembly (with some runtime extensibility discovery).
+    /// </remarks>
     public class DotnetTestHostManager : ITestHostManager
     {
         private readonly IProcessHelper processHelper;
@@ -27,10 +32,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private ITestHostLauncher testHostLauncher;
 
+        private Process testHostProcess;
+
+        private EventHandler registeredExitHandler;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
-        public DotnetTestHostManager() : this(new DefaultTestHostLauncher(), new ProcessHelper(), new FileHelper())
+        public DotnetTestHostManager()
+            : this(new DefaultTestHostLauncher(), new ProcessHelper(), new FileHelper())
         {
         }
 
@@ -40,7 +50,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <param name="testHostLauncher">A test host launcher instance.</param>
         /// <param name="processHelper">Process helper instance.</param>
         /// <param name="fileHelper">File helper instance.</param>
-        internal DotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper)
+        internal DotnetTestHostManager(
+            ITestHostLauncher testHostLauncher,
+            IProcessHelper processHelper,
+            IFileHelper fileHelper)
         {
             this.testHostLauncher = testHostLauncher;
             this.processHelper = processHelper;
@@ -65,7 +78,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public int LaunchTestHost(TestProcessStartInfo testHostStartInfo)
         {
-            return this.testHostLauncher.LaunchTestHost(testHostStartInfo);
+            var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
+            this.testHostProcess = Process.GetProcessById(processId);
+            return processId;
         }
 
         /// <inheritdoc/>
@@ -119,8 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // Add the testhost path and other arguments
             var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
-            args += " \"" + testHostPath + "\" " + CrossPlatEngine.Constants.PortOption + " " + connectionInfo.Port + 
-                " " + CrossPlatEngine.Constants.ParentProcessIdOption + " " + this.processHelper.GetCurrentProcessId();
+            args += " \"" + testHostPath + "\" " + connectionInfo.ToCommandLineOptions();
 
             // Sample command line for the spawned test host
             // "D:\dd\gh\Microsoft\vstest\tools\dotnet\dotnet.exe" exec
@@ -152,13 +166,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public void RegisterForExitNotification(Action abortCallback)
         {
-            throw new NotImplementedException();
+            if (this.testHostProcess != null && abortCallback != null)
+            {
+                this.registeredExitHandler = (sender, args) => abortCallback();
+                this.testHostProcess.Exited += this.registeredExitHandler;
+            }
         }
 
         /// <inheritdoc/>
         public void DeregisterForExitNotification()
         {
-            throw new NotImplementedException();
+            if (this.testHostProcess != null && this.registeredExitHandler != null)
+            {
+                this.testHostProcess.Exited -= this.registeredExitHandler;
+            }
         }
 
         /// <summary>

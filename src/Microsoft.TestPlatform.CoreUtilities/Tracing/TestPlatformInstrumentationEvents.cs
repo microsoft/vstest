@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
 {
@@ -38,12 +39,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         public const int AdapterExecutionStopEventId = 0x8;
 
         /// <summary>
-        /// The vs test console start event id.
+        /// The console runner start event id.
         /// </summary>
         public const int VsTestConsoleStartEventId = 0x10;
 
         /// <summary>
-        /// The vs test console stop event id.
+        /// The console runner stop event id.
         /// </summary>
         public const int VsTestConsoleStopEventId = 0x11;
 

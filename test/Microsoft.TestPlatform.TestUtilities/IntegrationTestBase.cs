@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private readonly IntegrationTestEnvironment testEnvironment;
 
-        private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.0.3-preview\build\_common";
+        private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.3-preview\build\_common";
 
         public IntegrationTestBase()
         {

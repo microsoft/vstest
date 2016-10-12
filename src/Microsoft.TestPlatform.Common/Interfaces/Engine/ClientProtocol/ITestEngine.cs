@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <param name="testHostManager">Test host manager for the current test discovery.</param>
         /// <returns>ITestDiscoveryManager object that can do discovery</returns>
-        IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager);
+        IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager, DiscoveryCriteria discoveryCriteria);
 
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.

@@ -3,5 +3,8 @@
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
     <!-- XML documentation checks are not required for test projects -->
     <Rule Id="SA1652" Action="None" />
+
+    <!-- Allow use of regions -->
+    <Rule Id="SA1124" Action="None" />
   </Rules>
 </RuleSet>

@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 process.StartInfo.Arguments = arguments;
                 process.EnableRaisingEvents = true;
 
+                EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
                 process.Start();
             }
             catch (Exception exception)

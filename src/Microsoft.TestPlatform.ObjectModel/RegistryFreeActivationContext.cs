@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Initializes a new instance of RegistryFreeActivationContext class. 
         /// </summary>
-        ///<param name=manifest">Manifest file path.</param>
+        ///<param name="manifest">Manifest file path.</param>
         public RegistryFreeActivationContext(string manifest)
         {
             this.manifestFilePath = manifest;
@@ -103,7 +103,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             catch (Exception ex)
             {
-                throw new Exception("Fail to deactivate registry-free COM context", ex);
+                // Log any exceptions during deactivation. 
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error(ex);
+                }
             }
         }
     }

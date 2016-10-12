@@ -1,9 +1,20 @@
 ﻿{
   "version": "15.0.0-*",
+
   "buildOptions": {
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "additionalArguments": [ "/ruleset:../../scripts/stylecop.ruleset", "/additionalFile:../../scripts/stylecop.json" ],
+    "xmlDoc": true,
+    "define": ["TRACE"]
+  },
+
+  "dependencies": {
+    "StyleCop.Analyzers": { 
+      "version": "1.0.0", 
+      "type": "build" 
+    }
   },
 
   "frameworks": {
@@ -13,7 +24,12 @@
         "portable-net45+win8"
       ],
       "dependencies": {
-        "NETStandard.Library": "1.6.0"
+        "NETStandard.Library": "1.6.0",
+        "System.Diagnostics.Tracing": "4.1.0",
+        "System.Diagnostics.Process": "4.1.0",
+        "System.Diagnostics.TraceSource": "4.0.0",
+        "System.Threading.Thread": "4.0.0",
+        "System.Diagnostics.TextWriterTraceListener":  "4.0.0"
       }
     },
     "net46": {
