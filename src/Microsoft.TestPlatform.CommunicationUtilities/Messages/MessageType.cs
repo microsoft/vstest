@@ -160,6 +160,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string AfterTestRunEndResult = "DataCollection.AfterTestRunEndResult";
 
         #endregion
-
     }
 }
