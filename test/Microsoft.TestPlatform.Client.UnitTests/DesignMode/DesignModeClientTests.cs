@@ -56,19 +56,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             var verCheck = new Message { MessageType = MessageType.VersionCheck };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(verCheck);
-
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>())).Callback
-                (() =>
-                {
-                    this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(sessionEnd);
-                });
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
 
             this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
 
             this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(PortNumber), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Once());
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void DesignModeClientConnectShouldNotSendConnectedIfServerConnectionTimesOut()
+        {
+            var verCheck = new Message { MessageType = MessageType.VersionCheck };
+            var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
+
+            Assert.ThrowsException<TimeoutException>(() => this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object));
+
+            this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(PortNumber), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Never);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>()), Times.Never);
         }
 
         [TestMethod]
@@ -97,16 +108,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 .Returns(testRunPayload);
 
             this.mockTestRequestManager.Setup(
-                trm =>
-                trm.RunTests(
-                    It.IsAny<TestRunRequestPayload>(),
-                    It.IsAny<ITestHostLauncher>(),
-                    It.IsAny<ITestRunEventsRegistrar>()))
+                    trm =>
+                        trm.RunTests(
+                            It.IsAny<TestRunRequestPayload>(),
+                            It.IsAny<ITestHostLauncher>(),
+                            It.IsAny<ITestRunEventsRegistrar>()))
                 .Callback(
                     (TestRunRequestPayload trp,
                      ITestHostLauncher testHostManager,
                      ITestRunEventsRegistrar testRunEventsRegistrar) =>
-                    {
+                        {
                             allTasksComplete.Set();
                             receivedTestRunPayload = trp;
                         });

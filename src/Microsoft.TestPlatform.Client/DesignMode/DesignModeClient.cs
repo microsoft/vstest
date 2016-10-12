@@ -45,6 +45,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="communicationManager">
         /// The communication manager.
         /// </param>
+        /// <param name="dataSerializer">
+        /// The data Serializer.
+        /// </param>
         internal DesignModeClient(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
         {
             this.communicationManager = communicationManager;
@@ -67,7 +70,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <summary>
         /// Creates a client and waits for server to accept connection asynchronously
         /// </summary>
-        /// <param name="port">port number to connect</param>
+        /// <param name="port">
+        /// Port number to connect
+        /// </param>
+        /// <param name="testRequestManager">
+        /// The test Request Manager.
+        /// </param>
         public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
         {
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
@@ -202,7 +210,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <summary>
         /// Send a custom host launch message to IDE
         /// </summary>
-        /// <param name="customTestHostLaunchPayload">Payload required to launch a custom host</param>
+        /// <param name="testProcessStartInfo">
+        /// The test Process Start Info.
+        /// </param>
         public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo)
         {
             lock (ackLockObject)
