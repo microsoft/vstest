@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
+namespace Microsoft.VisualStudio.TestPlatform.Client.Resources {
     using System;
     using System.Reflection;
     
@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.Client.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,38 +60,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Tests Discovery was aborted..
+        ///    Looks up a localized string similar to The test run could not be executed because the initial state was invalid..
         /// </summary>
-        public static string AbortedTestsDiscovery {
+        public static string InvalidStateForExecution {
             get {
-                return ResourceManager.GetString("AbortedTestsDiscovery", resourceCulture);
+                return ResourceManager.GetString("InvalidStateForExecution", resourceCulture);
             }
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Tests Run was aborted..
+        ///    Looks up a localized string similar to Wait for completion operation is not allowed when there is no active test run. .
         /// </summary>
-        public static string AbortedTestsRun {
+        public static string WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive {
             get {
-                return ResourceManager.GetString("AbortedTestsRun", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to Failed to receive message from vstest.console process.
-        /// </summary>
-        public static string FailedToReceiveMessage {
-            get {
-                return ResourceManager.GetString("FailedToReceiveMessage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///    Looks up a localized string similar to vstest.console process exited abnormally.
-        /// </summary>
-        public static string VsTestProcessExitedAbnormally {
-            get {
-                return ResourceManager.GetString("VsTestProcessExitedAbnormally", resourceCulture);
+                return ResourceManager.GetString("WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive", resourceCulture);
             }
         }
     }

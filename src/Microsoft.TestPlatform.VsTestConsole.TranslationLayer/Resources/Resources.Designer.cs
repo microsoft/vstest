@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities {
+namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources {
     using System;
     using System.Reflection;
     
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.CommunicationUtilities.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,38 +60,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Test Discovery was aborted..
+        ///    Looks up a localized string similar to The active Tests Discovery was aborted..
         /// </summary>
-        public static string AbortedTestDiscovery {
+        public static string AbortedTestsDiscovery {
             get {
-                return ResourceManager.GetString("AbortedTestDiscovery", resourceCulture);
+                return ResourceManager.GetString("AbortedTestsDiscovery", resourceCulture);
             }
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The active Test Run was aborted..
+        ///    Looks up a localized string similar to The active Tests Run was aborted..
         /// </summary>
-        public static string AbortedTestRun {
+        public static string AbortedTestsRun {
             get {
-                return ResourceManager.GetString("AbortedTestRun", resourceCulture);
+                return ResourceManager.GetString("AbortedTestsRun", resourceCulture);
             }
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to An existing connection was forcibly closed by the remote host..
+        ///    Looks up a localized string similar to Failed to receive message from vstest.console process.
         /// </summary>
-        public static string ConnectionClosed {
+        public static string FailedToReceiveMessage {
             get {
-                return ResourceManager.GetString("ConnectionClosed", resourceCulture);
+                return ResourceManager.GetString("FailedToReceiveMessage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to Unable to communicate with test execution process..
+        ///    Looks up a localized string similar to vstest.console process exited abnormally.
         /// </summary>
-        public static string UnableToCommunicateToTestHost {
+        public static string VsTestProcessExitedAbnormally {
             get {
-                return ResourceManager.GetString("UnableToCommunicateToTestHost", resourceCulture);
+                return ResourceManager.GetString("VsTestProcessExitedAbnormally", resourceCulture);
             }
         }
     }

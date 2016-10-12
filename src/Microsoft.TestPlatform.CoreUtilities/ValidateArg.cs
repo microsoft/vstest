@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 
     /// <summary>
     /// Helper to validate parameters.

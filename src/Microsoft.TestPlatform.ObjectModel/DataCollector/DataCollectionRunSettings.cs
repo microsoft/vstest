@@ -8,6 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Linq;
     using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// The in procedure data collection run settings.
     /// </summary>

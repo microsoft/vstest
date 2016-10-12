@@ -7,6 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System.Linq;
     using System.Runtime.Serialization;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// Defines the discovery criterion.
     /// </summary>
