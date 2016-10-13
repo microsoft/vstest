@@ -4,6 +4,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// Attribute applied to ISettingsProviders to associate it with a settings
     /// name.  This name will be used to request the settings from the RunSettings.

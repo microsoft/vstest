@@ -9,6 +9,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
     /// <summary>
     /// Class for all tests
     /// </summary>
@@ -272,8 +274,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             return string.Format(
                 CultureInfo.InvariantCulture,
                 "'{0}' {1}",
-                this.name != null ? this.name : TrxResource.Common_NullInMessages,
-                this.id != null ? this.id.ToString() : TrxResource.Common_NullInMessages);
+                this.name != null ? this.name : TrxLoggerResources.Common_NullInMessages,
+                this.id != null ? this.id.ToString() : TrxLoggerResources.Common_NullInMessages);
         }
 
         /// <summary>

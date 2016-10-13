@@ -29,26 +29,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             if ((fileName == null) ||
                 (fileName = fileName.Trim()).Length == 0)
             {
-                throw new ArgumentException(Resources.Common_CannotBeNullOrEmpty, "fileName");
+                throw new ArgumentException(Resources.Resources.Common_CannotBeNullOrEmpty, "fileName");
             }
 
             // Make sure the filename provided is not a reserved filename.
             if (FileHelper.IsReservedFileName(fileName))
             {
-                throw new ArgumentException(string.Format(Resources.DataCollectionSink_ReservedFilenameUsed, new object[] { fileName }), "fileName");
+                throw new ArgumentException(string.Format(Resources.Resources.DataCollectionSink_ReservedFilenameUsed, new object[] { fileName }), "fileName");
             }
 
             // Make sure just the filename was provided.
             string invalidCharacters;
             if (!FileHelper.IsValidFileName(fileName, out invalidCharacters))
             {
-                throw new ArgumentException(string.Format(Resources.DataCollectionSink_InvalidFileNameCharacters, new object[] { fileName, invalidCharacters }), "fileName");
+                throw new ArgumentException(string.Format(Resources.Resources.DataCollectionSink_InvalidFileNameCharacters, new object[] { fileName, invalidCharacters }), "fileName");
             }
 
             // If we can not read the stream, throw.
             if (!stream.CanRead)
             {
-                throw new InvalidOperationException(Resources.DataCollectionSink_CanNotReadStream);
+                throw new InvalidOperationException(Resources.Resources.DataCollectionSink_CanNotReadStream);
             }
 
             Stream = stream;

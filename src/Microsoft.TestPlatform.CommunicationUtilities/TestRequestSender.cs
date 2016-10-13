@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved.
+
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
@@ -12,6 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
     /// Utility class that facilitates the IPC comunication. Acts as server.
@@ -276,10 +279,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
 
             // log console message to vstest console
-            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestRun);
+            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, CommonResources.AbortedTestRun);
 
             // log console message to vstest console wrapper
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = Resources.AbortedTestRun };
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = CommonResources.AbortedTestRun };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
             testRunEventsHandler.HandleRawMessage(rawMessage);
 
@@ -298,10 +301,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler)
         {
             // Log to vstest console 
-            eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestDiscovery);
+            eventHandler.HandleLogMessage(TestMessageLevel.Error, CommonResources.AbortedTestDiscovery);
 
             // Log to vs ide test output
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = Resources.AbortedTestDiscovery };
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = CommonResources.AbortedTestDiscovery };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
             eventHandler.HandleRawMessage(rawMessage);
 
@@ -349,7 +352,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (message == null)
             {
                 EqtTrace.Error("Unable to receive message from testhost");
-                throw new IOException(Resources.UnableToCommunicateToTestHost);
+                throw new IOException(CommonResources.UnableToCommunicateToTestHost);
             }
 
             return message;

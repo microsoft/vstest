@@ -6,8 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
 
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     ///  An argument processor that allows the user to specify the target platform architecture
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
-        public override string HelpContentResourceName =>  Resources.PlatformArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.PlatformArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.PlatformArgumentProcessorHelpPriority;
     }
@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(Resources.PlatformTypeRequired);
+                throw new CommandLineException(CommandLineResources.PlatformTypeRequired);
             }
 
             Architecture platform;
@@ -137,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, Resources.InvalidPlatformType, argument));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidPlatformType, argument));
             }
 
             if (EqtTrace.IsInfoEnabled)

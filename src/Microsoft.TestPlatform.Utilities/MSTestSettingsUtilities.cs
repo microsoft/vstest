@@ -10,6 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resource;
+
     /// <summary>
     /// The legacy mstest.exe settings utilities.
     /// </summary>
@@ -32,14 +34,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             if (IsLegacyTestSettingsFile(settingsFile) == false)
             {
-                throw new XmlException(string.Format(CultureInfo.CurrentCulture, Resource.UnExpectedSettingsFile));
+                throw new XmlException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.UnExpectedSettingsFile));
             }
 
             var navigator = defaultRunSettings.CreateNavigator();
 
             if (!navigator.MoveToChild(Constants.RunSettingsName, string.Empty))
             {
-                throw new XmlException(Resource.NoRunSettingsNodeFound);
+                throw new XmlException(UtilitiesResources.NoRunSettingsNodeFound);
             }
 
             var settingsNode = GenerateMSTestXml(settingsFile);

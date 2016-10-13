@@ -11,6 +11,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.Text;
     using System.Text.RegularExpressions;
 
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
     /// <summary>
     /// Helper function to deal with file name.
     /// </summary>
@@ -80,7 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             if (replaced.Length == 0)
             {
                 Debug.Fail(string.Format(CultureInfo.InvariantCulture, "After replacing invalid chars in file '{0}' there's nothing left...", fileName));
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TrxResource.Common_NothingLeftAfterReplaciingBadCharsInName, fileName));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_NothingLeftAfterReplaciingBadCharsInName, fileName));
             }
 
             if (IsReservedFileName(replaced))
@@ -275,7 +277,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             }
             while (iteration != uint.MaxValue);
 
-            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxResource.Common_CannotGetNextIterationName, originalName, baseDirectoryName));
+            throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotGetNextIterationName, originalName, baseDirectoryName));
         }
 
         private abstract class IterationHelper

@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using Resources = Microsoft.VisualStudio.TestPlatform.Client.Resources;
+    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                 if (this.State != TestRunState.Pending)
                 {
-                    throw new InvalidOperationException(Resources.InvalidStateForExecution);
+                    throw new InvalidOperationException(ClientResources.InvalidStateForExecution);
                 }
 
                 EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                         || this.State == TestRunState.Aborted))
             {
                 // If run is already terminated, then we should not throw an exception. 
-                throw new InvalidOperationException(Resources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);
+                throw new InvalidOperationException(ClientResources.WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive);
             }
 
             // This method is not synchronized as it can lead to dead-lock 

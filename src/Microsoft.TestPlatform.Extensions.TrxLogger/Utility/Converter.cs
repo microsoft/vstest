@@ -13,8 +13,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
 
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
-    using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
     /// <summary>
     /// The converter class.
@@ -223,7 +225,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     {
                         string errorMsg = string.Format(
                             CultureInfo.CurrentCulture,
-                            TrxResource.FailureToAttach,
+                            TrxLoggerResources.FailureToAttach,
                             attachmentSet.DisplayName, 
                             e.GetType().ToString(), 
                             e.Message);
@@ -425,7 +427,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                 {
                     string errorMsg = string.Format(
                         CultureInfo.CurrentCulture,
-                        TrxResource.FailureToAttach,
+                        TrxLoggerResources.FailureToAttach,
                         attachmentSet.DisplayName, 
                         e.GetType().ToString(), 
                         e.Message);

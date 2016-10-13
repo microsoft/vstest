@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     // <summary>
     //     Argument Executor for the "-?|--Help|/?|/Help" Help command line argument.
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override string ShortCommandName => HelpArgumentProcessor.ShortCommandName;
 
-        public override string HelpContentResourceName => Resources.HelpArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.HelpArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.HelpArgumentProcessorHelpPriority;
 
@@ -124,9 +124,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ArgumentProcessorResult Execute()
         {
             // Output the stock ouput text
-            OutputSection(Resources.HelpUsageText);
-            OutputSection(Resources.HelpDescriptionText);
-            OutputSection(Resources.HelpArgumentsText);
+            OutputSection(CommandLineResources.HelpUsageText);
+            OutputSection(CommandLineResources.HelpDescriptionText);
+            OutputSection(CommandLineResources.HelpArgumentsText);
 
             var argumentProcessorFactory = ArgumentProcessorFactory.Create();
             List<IArgumentProcessor> processors = new List<IArgumentProcessor>();
@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             // Output the help description for each available argument processor
-            OutputSection(Resources.HelpOptionsText);
+            OutputSection(CommandLineResources.HelpOptionsText);
             foreach (var argumentProcessor in processors)
             {
                 helpDescription = LookupHelpDescription(argumentProcessor);
@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     OutputSection(helpDescription);
                 }
             }
-            OutputSection(Resources.Examples);
+            OutputSection(CommandLineResources.Examples);
 
             // When Help has finished abort any subsequent argument processor operations
             return ArgumentProcessorResult.Abort;

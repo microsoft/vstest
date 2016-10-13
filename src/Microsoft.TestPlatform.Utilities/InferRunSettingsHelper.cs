@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-    using Resources = Microsoft.VisualStudio.TestPlatform.Utilities.Resource;
+    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resource;
 
     /// <summary>
     /// Utility class for Inferring the runsettings from the current environment and the user specified command line switches.
@@ -86,8 +86,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 throw new XmlException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.RunSettingsParseError,
-                        Resources.MissingRunSettingsNode));
+                        UtilitiesResources.RunSettingsParseError,
+                        UtilitiesResources.MissingRunSettingsNode));
             }
 
             if (runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
@@ -98,10 +98,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     throw new XmlException(
                         string.Format(
                             CultureInfo.CurrentCulture,
-                            Resources.RunSettingsParseError,
+                            UtilitiesResources.RunSettingsParseError,
                             string.Format(
                                 CultureInfo.CurrentCulture,
-                                Resources.InvalidSettingsIncorrectValue,
+                                UtilitiesResources.InvalidSettingsIncorrectValue,
                                 Constants.RunConfigurationSettingsName,
                                 nodeXml,
                                 TargetPlatformNodeName)));
@@ -112,10 +112,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     throw new XmlException(
                         string.Format(
                             CultureInfo.CurrentCulture,
-                            Resources.RunSettingsParseError,
+                            UtilitiesResources.RunSettingsParseError,
                             string.Format(
                                 CultureInfo.CurrentCulture,
-                                Resources.InvalidSettingsIncorrectValue,
+                                UtilitiesResources.InvalidSettingsIncorrectValue,
                                 Constants.RunConfigurationSettingsName,
                                 nodeXml,
                                 TargetFrameworkNodeName)));
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 return;
             }
 
-            throw new SettingsException(string.Format(CultureInfo.CurrentCulture, Resources.SystemArchitectureIncompatibleWithTargetPlatform, architecture, osArchitecture));
+            throw new SettingsException(string.Format(CultureInfo.CurrentCulture, UtilitiesResources.SystemArchitectureIncompatibleWithTargetPlatform, architecture, osArchitecture));
         }
 
         /// <summary>
