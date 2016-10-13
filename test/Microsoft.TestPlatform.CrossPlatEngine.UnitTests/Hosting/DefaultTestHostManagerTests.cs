@@ -15,6 +15,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     [TestClass]
     public class DefaultTestHostManagerTests
@@ -28,14 +29,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
 
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
 
         [TestMethod]
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 

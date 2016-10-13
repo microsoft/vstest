@@ -135,14 +135,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANonNullInstance()
         {
-            Assert.IsNotNull(this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework));
+            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86 };
+            Assert.IsNotNull(this.testEngine.GetDefaultTestHostManager(rc));
         }
 
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANewInstanceEverytime()
         {
-            var instance1 = this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework);
-            var instance2 = this.testEngine.GetDefaultTestHostManager(Architecture.X86, Framework.DefaultFramework);
+            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86 };
+            var instance1 = this.testEngine.GetDefaultTestHostManager(rc);
+            var instance2 = this.testEngine.GetDefaultTestHostManager(rc);
 
             Assert.AreNotEqual(instance1, instance2);
         }
@@ -150,9 +152,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsDotnetCoreHostManagerIfFrameworkIsNetCore()
         {
-            var testHostManager = this.testEngine.GetDefaultTestHostManager(
-                Architecture.X64,
-                Framework.FromString(".NETCoreApp,Version=v1.0"));
+            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETCoreApp,Version=v1.0"), TargetPlatform = Architecture.X64 };
+            var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
 
             Assert.AreEqual(typeof(DotnetTestHostManager), testHostManager.GetType());
         }

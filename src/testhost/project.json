@@ -7,7 +7,10 @@
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
     "compile": [
-      "../testhost.x86/Program.cs"
+      "../testhost.x86/Program.cs",
+      "../testhost.x86/DefaultEngineInvoker.cs",
+      "../testhost.x86/IEngineInvoker.cs",
+      "../testhost.x86/AppDomainEngineInvoker.cs"
     ]
   },
 
@@ -39,6 +42,10 @@
         "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
       }
     },
-    "net46": {}
+    "net46": {
+      "frameworkAssemblies": {
+        "System.Xml.Linq": ""
+      }
+    }
   }
 }
