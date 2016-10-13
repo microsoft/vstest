@@ -65,7 +65,7 @@
             var appDomainSetup = new AppDomainSetup();
 
             var testSourceFolder = Path.GetDirectoryName(testSourcePath);
-            EqtTrace.Info("AppDomainEngineInvoker: Creating new appdomain and Setting AppBase to: {0}", testSourceFolder);
+            EqtTrace.Info("AppDomainEngineInvoker: Using '{0}' as AppBase for new AppDomain.", testSourceFolder);
 
             // Set AppBase to TestAssembly location
             appDomainSetup.ApplicationBase = testSourceFolder;
@@ -74,8 +74,20 @@
             // Set User Config file as app domain config
             SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder, out mergedConfigFile);
 
+            EqtTrace.Info("AppDomainEngineInvoker: Creating new appdomain");
             // Create new AppDomain
             var appDomain = AppDomain.CreateDomain("TestHostAppDomain", null, appDomainSetup);
+
+            // Create Custom assembly resolver in new appdomain before anything else to resolve testplatform assemblies
+            appDomain.CreateInstanceFromAndUnwrap(
+                    typeof(CustomAssemblyResolver).Assembly.Location,
+                    typeof(CustomAssemblyResolver).FullName,
+                    false,
+                    BindingFlags.Default,
+                    null,
+                    new object[] { Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) },
+                    null,
+                    null);
 
             var invokerType = typeof(T);
             EqtTrace.Info("AppDomainEngineInvoker: Creating Invoker of type '{0}' in new AppDomain.", invokerType);
