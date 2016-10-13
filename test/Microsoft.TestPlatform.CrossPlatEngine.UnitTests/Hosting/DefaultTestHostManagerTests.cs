@@ -84,6 +84,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeTestSourcePathInArgumentsIfNonShared()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, shared: false);
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
+
+            var source = "C:\temp\a.dll";
+            var info = this.testHostManager.GetTestHostProcessStartInfo(
+                new List<string>() { source },
+                null,
+                connectionInfo);
+
+            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + "\"" + source + "\"", info.Arguments);
+        }
+
+        [TestMethod]
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
             this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(Process.GetCurrentProcess());

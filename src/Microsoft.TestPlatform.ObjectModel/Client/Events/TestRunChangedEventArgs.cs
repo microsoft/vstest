@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -23,8 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public TestRunChangedEventArgs(ITestRunStatistics stats, IEnumerable<TestResult> newTestResults, IEnumerable<TestCase> activeTests)
         {
             this.TestRunStatistics = stats;
-            this.NewTestResults = newTestResults;
-            this.ActiveTests = activeTests;
+            this.NewTestResults = newTestResults ?? Enumerable.Empty<TestResult>();
+            this.ActiveTests = activeTests ?? Enumerable.Empty<TestCase>();
         }
 
         /// <summary>
