@@ -60,10 +60,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
 #if NET46
             // If Args contains test source argument, invoker Engine in new appdomain 
-            if (argsDictionary.ContainsKey(TestSourceArgumentString))
+            string testSourcePath;
+            if (argsDictionary.TryGetValue(TestSourceArgumentString, out testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
             {
-                string testSourcePath = argsDictionary[TestSourceArgumentString];
-
                 // remove the test source arg from dictionary
                 argsDictionary.Remove(TestSourceArgumentString);
 
