@@ -6,14 +6,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using ObjectModel.Utilities;
-    using ObjectModel;
 
     [TestClass]
     public class TestPlatformTests
