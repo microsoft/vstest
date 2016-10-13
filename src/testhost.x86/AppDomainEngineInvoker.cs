@@ -34,6 +34,8 @@
             try
             {
                 var invoker = CreateInvokerInAppDomain(testSourcePath, out mergedTempConfigFile);
+
+                EqtTrace.Info("AppDomainEngineInvoker: Invoking Actual Engine.");
                 invoker.Invoke(argsDictionary);
             }
             finally

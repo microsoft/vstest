@@ -20,24 +20,33 @@
         /// </summary>
         private const int ClientListenTimeOut = 5 * 1000;
 
-        private const string PortLongname = "--port";
+        private const string PortArgument = "--port";
 
-        private const string PortShortname = "-p";
+        private const string ParentProcessIdArgument = "--parentprocessid";
 
-        private const string ParentProcessIdLongname = "--parentprocessid";
-
-        private const string ParentProcessIdShortname = "-i";
+        private const string LogFileArgument = "--diag";
 
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
             TestPlatformEventSource.Instance.TestHostStart();
-            var portNumber = GetIntArgFromDict(argsDictionary, PortLongname, PortShortname);
             var requestHandler = new TestRequestHandler();
-            requestHandler.InitializeCommunication(portNumber);
-            var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdLongname, ParentProcessIdShortname);
+
+            // Attach to exit of parent process
+            var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
             OnParentProcessExit(parentProcessId, requestHandler);
 
-            // setup the factory.
+            // Setup logging if enabled
+            string logFile;
+            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            {
+                EqtTrace.InitializeVerboseTrace(logFile);
+            }
+
+            // Get port number and initialize communication
+            var portNumber = GetIntArgFromDict(argsDictionary, PortArgument);
+            requestHandler.InitializeCommunication(portNumber);
+
+            // Setup the factory
             var managerFactory = new TestHostManagerFactory();
 
             // Wait for the connection to the sender and start processing requests from sender
@@ -62,29 +71,15 @@
         /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
         /// <returns>Value of the argument.</returns>
         /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
-        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname, string shortname)
+        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
         {
-            var val = -1;
-            if (argsDictionary.ContainsKey(fullname) && argsDictionary[fullname] != null)
-            {
-                int.TryParse(argsDictionary[fullname], out val);
-            }
-            else if (argsDictionary.ContainsKey(shortname) && argsDictionary[shortname] != null)
-            {
-                int.TryParse(argsDictionary[shortname], out val);
-            }
-
-            if (val < 0)
-            {
-                throw new ArgumentException($"Incorrect/No number for: {fullname}/{shortname}");
-            }
-
-            return val;
+            string optionValue;
+            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
         }
 
         private static void OnParentProcessExit(int parentProcessId, ITestRequestHandler requestHandler)
         {
-            EqtTrace.Info("TestHost: exits itself because parent process exited");
+            EqtTrace.Info("DefaultEngineInvoker: Exiting self because parent process exited");
             var process = Process.GetProcessById(parentProcessId);
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) =>

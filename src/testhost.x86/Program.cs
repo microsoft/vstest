@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.IO;
 
     /// <summary>
     /// The program.
@@ -27,25 +26,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             try
             {
-                var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-                if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
-                {
-                    ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
-
-                    var currentProcess = Process.GetCurrentProcess();
-                    ConsoleOutput.Instance.WriteLine(
-                        string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
-                        OutputLevel.Information);
-
-                    while (!Debugger.IsAttached)
-                    {
-                        System.Threading.Thread.Sleep(1000);
-                    }
-
-                    Debugger.Break();
-                }
-
-                RunArgs(args);
+                WaitForDebuggerIfEnabled();
+                Run(args);
             }
             catch (Exception ex)
             {
@@ -53,9 +35,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private static void RunArgs(string[] args)
+        private static void Run(string[] args)
         {
-            var argsDictionary = ParseArgsIntoDictionary(args);
+            var argsDictionary = GetArguments(args);
             IEngineInvoker invoker = null;
 
 #if NET46
@@ -66,8 +48,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 // remove the test source arg from dictionary
                 argsDictionary.Remove(TestSourceArgumentString);
 
-                // Only DLL and EXEs can have app.configs or ".exe.config" or ".dll.config"
-                if (File.Exists(testSourcePath) && (testSourcePath.EndsWith(".dll") || testSourcePath.EndsWith(".exe")))
+                // Only DLLs and EXEs can have app.configs or ".exe.config" or ".dll.config"
+                if (System.IO.File.Exists(testSourcePath) && 
+                        (testSourcePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) 
+                        || testSourcePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)))
                 {
                     invoker = new AppDomainEngineInvoker<DefaultEngineInvoker>(testSourcePath);
                 }
@@ -82,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", "C:\temp\1.dll" }</c></param>
         /// <returns>Dictionary of arguments keys and values.</returns>
-        private static IDictionary<string, string> ParseArgsIntoDictionary(string[] args)
+        private static IDictionary<string, string> GetArguments(string[] args)
         {
             IDictionary<string, string> argsDictionary = new Dictionary<string, string>();
             for (int i = 0; i < args.Length; i++)
@@ -102,6 +86,27 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 
             return argsDictionary;
+        }
+
+        private static void WaitForDebuggerIfEnabled()
+        {
+            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
+
+                var currentProcess = Process.GetCurrentProcess();
+                ConsoleOutput.Instance.WriteLine(
+                    string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
+                    OutputLevel.Information);
+
+                while (!Debugger.IsAttached)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+                Debugger.Break();
+            }
         }
     }
 }
