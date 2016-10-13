@@ -79,14 +79,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         }
 
         /// <summary>
-        /// The get args dictionary.
+        /// Parse command line arguments to a dictionary.
         /// </summary>
-        /// <param name="args">
-        /// args Ex: { "--port", "12312", "--parentprocessid", "2312" }
-        /// </param>
-        /// <returns>
-        /// The <see cref="IDictionary"/>.
-        /// </returns>
+        /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", "C:\temp\1.dll" }</c></param>
+        /// <returns>Dictionary of arguments keys and values.</returns>
         private static IDictionary<string, string> ParseArgsIntoDictionary(string[] args)
         {
             IDictionary<string, string> argsDictionary = new Dictionary<string, string>();

@@ -56,22 +56,12 @@
         }
 
         /// <summary>
-        /// To parse int argument value.
+        /// Parse the value of an argument as an integer.
         /// </summary>
-        /// <param name="argsDictionary">
-        /// Dictionary of all arguments Ex: { "--port":"12312", "--parentprocessid":"2312" }
-        /// </param>
-        /// <param name="fullname">
-        /// The fullname for required argument. Ex: "--port"
-        /// </param>
-        /// <param name="shortname">
-        /// The shortname for required argument. Ex: "-p"
-        /// </param>
-        /// <returns>
-        /// The <see cref="int"/>.
-        /// </returns>
-        /// <exception cref="ArgumentException">
-        /// </exception>
+        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
+        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
+        /// <returns>Value of the argument.</returns>
+        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
         private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname, string shortname)
         {
             var val = -1;

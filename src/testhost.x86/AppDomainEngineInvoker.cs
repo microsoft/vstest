@@ -33,7 +33,7 @@
             string mergedTempConfigFile = null;
             try
             {
-                var invoker = CreateInvokerInAppDomain(typeof(T), testSourcePath, out mergedTempConfigFile);
+                var invoker = CreateInvokerInAppDomain(testSourcePath, out mergedTempConfigFile);
                 invoker.Invoke(argsDictionary);
             }
             finally
@@ -45,9 +45,9 @@
                         File.Delete(mergedTempConfigFile);
                     }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // ignore
+                    EqtTrace.Error("AppDomainEngineInvoker: Error occured while trying to delete a temp file: {0}, Exception: {1}", mergedTempConfigFile, ex);
                 }
             }
         }
@@ -58,21 +58,28 @@
         /// <param name="testSourcePath">Test Source to run/discover tests for</param>
         /// <param name="mergedConfigFile">Merged config file if there is any merging of test config and test host config</param>
         /// <returns></returns>
-        private static IEngineInvoker CreateInvokerInAppDomain(Type invokerType, string testSourcePath, out string mergedConfigFile)
+        private IEngineInvoker CreateInvokerInAppDomain(string testSourcePath, out string mergedConfigFile)
         {
             var appDomainSetup = new AppDomainSetup();
+
+            var testSourceFolder = Path.GetDirectoryName(testSourcePath);
+            EqtTrace.Info("AppDomainEngineInvoker: Creating new appdomain and Setting AppBase to: {0}", testSourceFolder);
+
             // Set AppBase to TestAssembly location
-            appDomainSetup.ApplicationBase = Path.GetDirectoryName(testSourcePath);
+            appDomainSetup.ApplicationBase = testSourceFolder;
             appDomainSetup.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
             // Set User Config file as app domain config
-            SetConfigurationFile(appDomainSetup, testSourcePath, out mergedConfigFile);
+            SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder, out mergedConfigFile);
 
             // Create new AppDomain
             var appDomain = AppDomain.CreateDomain("TestHostAppDomain", null, appDomainSetup);
 
+            var invokerType = typeof(T);
+            EqtTrace.Info("AppDomainEngineInvoker: Creating Invoker of type '{0}' in new AppDomain.", invokerType);
+
             // Create Invoker object in new appdomain
-            return (IEngineInvoker)appDomain.CreateInstanceFromAndUnwrap(
+            return (IEngineInvoker) appDomain.CreateInstanceFromAndUnwrap(
                     invokerType.Assembly.Location,
                     invokerType.FullName,
                     false,
@@ -83,30 +90,34 @@
                     null);
         }
 
-        private static void SetConfigurationFile(AppDomainSetup appDomainSetup, string testSource, out string mergedConfigFile)
+        private static void SetConfigurationFile(AppDomainSetup appDomainSetup, string testSource, string testSourceFolder, out string mergedConfigFile)
         {
-            var configFile = GetConfigFile(testSource);
+            var configFile = GetConfigFile(testSource, testSourceFolder);
+            EqtTrace.Info("AppDomainEngineInvoker: User Configuration file '{0}' for testSource '{1}'", configFile, testSource);
+
             mergedConfigFile = null;
+            var testHostAppConfigFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
 
             if (!string.IsNullOrEmpty(configFile))
             {
-                // Merge user's config file and testHost config file and use merged one 
-                mergedConfigFile = MergeApplicationConfigFiles(configFile, AppDomain.CurrentDomain.SetupInformation.ConfigurationFile);
+                EqtTrace.Info("AppDomainEngineInvoker: Merging test configuration file '{0}' and TestHost configuration file '{1}'", configFile, testHostAppConfigFile);
 
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("UnitTestAdapter: Using configuration file {0} for testSource {1}.", configFile, testSource);
-                }
-                appDomainSetup.ConfigurationFile = Path.GetFullPath(mergedConfigFile);
+                // Merge user's config file and testHost config file and use merged one 
+                mergedConfigFile = MergeApplicationConfigFiles(configFile, testHostAppConfigFile);
+
+                EqtTrace.Info("AppDomainEngineInvoker: Using merged configuration file: {0}.", mergedConfigFile);
+                appDomainSetup.ConfigurationFile = mergedConfigFile;
             }
             else
             {
+                EqtTrace.Info("AppDomainEngineInvoker: No User configuration file found. Using TestHost Config File: {0}.", testHostAppConfigFile);
+
                 // Use the current domains configuration setting.
-                appDomainSetup.ConfigurationFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
+                appDomainSetup.ConfigurationFile = testHostAppConfigFile;
             }
         }
 
-        private static string GetConfigFile(string testSource)
+        private static string GetConfigFile(string testSource, string testSourceFolder)
         {
             string configFile = null;
 
@@ -117,7 +128,7 @@
             }
             else
             {
-                var netAppConfigFile = Path.Combine(Path.GetDirectoryName(testSource), "App.Config");
+                var netAppConfigFile = Path.Combine(testSourceFolder, "App.Config");
                 if (File.Exists(netAppConfigFile))
                 {
                     configFile = netAppConfigFile;
