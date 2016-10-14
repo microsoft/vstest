@@ -4,7 +4,8 @@
   "buildOptions": {
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "embed": [ "Resources/*.resx" ]
   },
 
   "dependencies": {

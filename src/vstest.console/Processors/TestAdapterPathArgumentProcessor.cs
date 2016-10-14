@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Allows the user to specify a path to load custom adapters from.
@@ -81,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.TestAdapterPath;
 
-        public override string HelpContentResourceName => CommandLine.Resources.TestAdapterPathHelp;
+        public override string HelpContentResourceName => CommandLineResources.TestAdapterPathHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.TestAdapterPathArgumentProcessorHelpPriority;
     }
@@ -139,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLine.Resources.TestAdapterPathValueRequired));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequired));
             }
 
             string customAdaptersPath;
@@ -152,13 +153,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 customAdaptersPath = Path.GetFullPath(argument);
                 if (!Directory.Exists(customAdaptersPath))
                 {
-                    throw new DirectoryNotFoundException(CommandLine.Resources.TestAdapterPathDoesNotExist);
+                    throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
                 }
             }
             catch (Exception e)
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLine.Resources.InvalidTestAdapterPathCommand, argument, e.Message));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, argument, e.Message));
             }
 
             this.commandLineOptions.TestAdapterPath = customAdaptersPath;
@@ -171,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 // Print a warning about not finding any test adapter in provided path...
-                this.output.Warning(CommandLine.Resources.NoAdaptersFoundInTestAdapterPath, argument);
+                this.output.Warning(CommandLineResources.NoAdaptersFoundInTestAdapterPath, argument);
                 this.output.WriteLine(string.Empty, OutputLevel.Information);
             }
         }

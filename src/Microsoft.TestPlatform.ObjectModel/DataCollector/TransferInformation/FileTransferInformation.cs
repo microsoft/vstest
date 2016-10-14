@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             // Make sure the file exists.
             if (!File.Exists(path))
             {
-                throw new FileNotFoundException(string.Format(Resources.Common_FileNotExist, new object[] { path }), path);
+                throw new FileNotFoundException(string.Format(Resources.Resources.Common_FileNotExist, new object[] { path }), path);
             }
 
             // Make sure the path we have is a full path (not relative).

@@ -377,7 +377,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                 throw new SettingsException(
                                     string.Format(
                                         CultureInfo.CurrentCulture,
-                                        Resources.InvalidSettingsIncorrectValue,
+                                        Resources.Resources.InvalidSettingsIncorrectValue,
                                         Constants.RunConfigurationSettingsName,
                                         cpuCount,
                                         elementName));
@@ -394,7 +394,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             if (!bool.TryParse(disableAppDomainValueString, out disableAppDomainCheck))
                             {
                                 throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableAppDomainValueString, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableAppDomainValueString, elementName));
                             }
                             runConfiguration.DisableAppDomain = disableAppDomainCheck;
                             break;
@@ -407,7 +407,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             if (!bool.TryParse(disableParallelizationValueString, out disableParallelizationCheck))
                             {
                                 throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableParallelizationValueString, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableParallelizationValueString, elementName));
                             }
                             runConfiguration.DisableParallelization = disableParallelizationCheck;
                             break;
@@ -424,7 +424,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     throw new SettingsException(
                                         string.Format(
                                             CultureInfo.CurrentCulture,
-                                            Resources.InvalidSettingsIncorrectValue,
+                                            Resources.Resources.InvalidSettingsIncorrectValue,
                                             Constants.RunConfigurationSettingsName,
                                             value,
                                             elementName));
@@ -433,7 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             catch (ArgumentException)
                             {
                                 throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
                             }
 
                             runConfiguration.TargetPlatform = archType;
@@ -452,7 +452,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     throw new SettingsException(
                                         string.Format(
                                             CultureInfo.CurrentCulture,
-                                            Resources.InvalidSettingsIncorrectValue,
+                                            Resources.Resources.InvalidSettingsIncorrectValue,
                                             Constants.RunConfigurationSettingsName,
                                             value,
                                             elementName));
@@ -461,7 +461,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             catch (ArgumentException)
                             {
                                 throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
                             }
 
                             runConfiguration.TargetFrameworkVersion = frameworkType;
@@ -485,12 +485,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             catch (ArgumentException)
                             {
                                 throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
                             }
                             catch (FormatException)
                             {
                                 throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, value, elementName));
                             }
 
                             runConfiguration.TreatTestAdapterErrorsAsWarnings = treatTestAdapterErrorsAsWarnings;
@@ -504,7 +504,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             {
                                 if (EqtTrace.IsErrorEnabled)
                                 {
-                                    EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.SolutionDirectoryNotExists, solutionDirectory));
+                                    EqtTrace.Error(string.Format(CultureInfo.CurrentCulture, Resources.Resources.SolutionDirectoryNotExists, solutionDirectory));
                                 }
 
                                 solutionDirectory = null;
@@ -523,7 +523,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             throw new SettingsException(
                                 string.Format(
                                     CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsXmlElement,
+                                    Resources.Resources.InvalidSettingsXmlElement,
                                     Constants.RunConfigurationSettingsName,
                                     reader.Name));
                     }

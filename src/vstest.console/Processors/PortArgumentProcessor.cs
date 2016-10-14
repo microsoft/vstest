@@ -2,14 +2,17 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using System;
-    using System.Diagnostics.Contracts;
-    using TestPlatformHelpers;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
     using System.Diagnostics;
+    using System.Diagnostics.Contracts;
+
+    using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
+
+    using TestPlatformHelpers;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Argument Processor for the "--Port|/Port" command line argument.
@@ -78,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
-        public override string HelpContentResourceName => Resources.PortArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.PortArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.PortArgumentProcessorHelpPriority;
     }
@@ -149,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             int portNumber;
             if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out portNumber))
             {
-                throw new CommandLineException(Resources.InvalidPortArgument);
+                throw new CommandLineException(CommandLineResources.InvalidPortArgument);
             }
 
             this.commandLineOptions.Port = portNumber;

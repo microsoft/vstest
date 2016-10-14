@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx">
+    <body>
+      <trans-unit id="DiscovererInstantiationException">
+        <source>Exception occurred while instantiating discoverer : {0}</source>
+        <target state="new">Exception occurred while instantiating discoverer : {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DuplicateAdaptersFound">
+        <source>Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</source>
+        <target state="new">Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</target>
+        <note>{0} is the unique identifier of test adapter. {1} is the name of the test adapter that shares a unique identifier with a previously loaded adapter.</note>
+      </trans-unit>
+      <trans-unit id="DuplicateSource">
+        <source>Ignoring the specified duplicate source '{0}'.</source>
+        <target state="new">Ignoring the specified duplicate source '{0}'.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ExceptionFromLoadTests">
+        <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
+        <target state="new">An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ExceptionFromRunTests">
+        <source>An exception occurred while invoking executor '{0}': {1}</source>
+        <target state="new">An exception occurred while invoking executor '{0}': {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="FileNotFound">
+        <source>Could not find file {0}.</source>
+        <target state="new">Could not find file {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="HostDebuggerWarning">
+        <source>Host debugging is enabled. Please attach debugger to testhost process to continue.</source>
+        <target state="new">Host debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <note>Host, testhost are key words, it should not be localized</note>
+      </trans-unit>
+      <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
+        <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
+        <target state="new">Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InitializationFailed">
+        <source>Failed to initialize client proxy: could not connect to test process.</source>
+        <target state="new">Failed to initialize client proxy: could not connect to test process.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
+        <source>This operation is not allowed in the context of a non-debug run.</source>
+        <target state="new">This operation is not allowed in the context of a non-debug run.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoDiscovererRegistered">
+        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
+        <target state="new">No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoMatchingExecutor">
+        <source>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</source>
+        <target state="new">Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</target>
+        <note>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</note>
+      </trans-unit>
+      <trans-unit id="NoValidSourceFoundForDiscovery">
+        <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
+        <target state="new">None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StringSeperator">
+        <source>, </source>
+        <target state="new">, </target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
+        <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
+        <target state="new">No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
+        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
+        <target state="new">No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

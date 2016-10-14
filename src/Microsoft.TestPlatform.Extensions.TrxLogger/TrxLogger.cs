@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using System.Text;
     using System.Xml;
 
-    using Microsoft.TestPlatform.Extensions.TrxLogger;
     using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
@@ -21,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using ObjectModel.Logging;
 
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// Logger for Generating TRX
@@ -360,7 +360,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 {
                     FileStream fs = File.OpenWrite(trxFileName);
                     rootElement.OwnerDocument.Save(fs);
-                    String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxResource.TrxLoggerResultsFile, trxFileName);
+                    String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
                     Console.WriteLine(resultsFileMessage);
                 }
                 catch (System.UnauthorizedAccessException fileWriteException)
@@ -421,7 +421,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             ObjectModel.TestCase testCase = rsTestResult.TestCase;
             string testCaseName = !string.IsNullOrEmpty(testCase.DisplayName) ? testCase.DisplayName : testCase.FullyQualifiedName;
-            string message = String.Format(CultureInfo.CurrentCulture, TrxResource.MessageForSkippedTests, testCaseName);
+            string message = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, testCaseName);
             this.AddRunLevelInformationalMessage(message);
         }
 

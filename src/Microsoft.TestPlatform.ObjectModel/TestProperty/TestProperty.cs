@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
             else
             {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.UnexpectedTypeOfProperty, valueType, id));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.UnexpectedTypeOfProperty, valueType, id));
             }
 
             this.Id = id;
@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         // not the data valueType we expect, throw an exception
                         string message = string.Format(
                             CultureInfo.CurrentCulture,
-                            Resources.Exception_RegisteredTestPropertyHasDifferentValueType,
+                            Resources.Resources.Exception_RegisteredTestPropertyHasDifferentValueType,
                             id,
                             valueType.ToString(),
                             propertyTypePair.Key.ValueType);

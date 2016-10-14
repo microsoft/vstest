@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Argument Executor for the "/TestCaseFilter" command line argument.
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
-        public override string HelpContentResourceName => Resources.TestCaseFilterArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.TestCaseFilterArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.TestCaseFilterArgumentProcessorHelpPriority;
     }
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, Resources.TestCaseFilterValueRequired));
+                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestCaseFilterValueRequired));
             }
 
             this.commandLineOptions.TestCaseFilterValue = argument;

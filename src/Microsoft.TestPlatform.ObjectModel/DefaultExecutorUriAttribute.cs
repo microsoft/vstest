@@ -4,6 +4,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// This attribute is applied on the discoverers to inform the framework about their default executor. 
     /// </summary>

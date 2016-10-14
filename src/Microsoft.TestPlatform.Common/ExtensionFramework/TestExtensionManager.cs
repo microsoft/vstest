@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources;
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     /// <summary>
     /// Generic base class for managing extensions and looking them up by their URI. 

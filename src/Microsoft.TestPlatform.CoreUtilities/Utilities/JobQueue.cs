@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>

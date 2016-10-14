@@ -11,15 +11,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the test host process.
@@ -171,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             {
                 if (!File.Exists(source))
                 {
-                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngine.Resources.FileNotFound, source);
+                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FileNotFound, source);
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
 
                     continue;
@@ -179,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (!verifiedSources.Add(source))
                 {
-                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngine.Resources.DuplicateSource, source);
+                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DuplicateSource, source);
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
 
                     continue;
@@ -190,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             if (!verifiedSources.Any())
             {
                 var sourcesString = string.Join(",", sources.ToArray());
-                var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngine.Resources.NoValidSourceFoundForDiscovery, sourcesString);
+                var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoValidSourceFoundForDiscovery, sourcesString);
                 logger.SendMessage(TestMessageLevel.Warning, errorMessage);
 
                 EqtTrace.Warning("TestDiscoveryManager: None of the source {0} is valid. ", sourcesString);

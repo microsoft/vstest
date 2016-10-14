@@ -4,6 +4,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
     using System.Diagnostics.Contracts;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     
     /// <summary>
     /// Breaks a string down into command and argument based on the following format:
@@ -44,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(input))
             {
-                throw new ArgumentException(Resources.CannotBeNullOrEmpty, "input");
+                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, "input");
             }
             Contract.Ensures(!String.IsNullOrWhiteSpace(Command));
 
@@ -60,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(command))
             {
-                throw new ArgumentException(Resources.CannotBeNullOrEmpty, "command");
+                throw new ArgumentException(CommandLineResources.CannotBeNullOrEmpty, "command");
             }
             
             Contract.Ensures(Command == command);

@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             throw new SettingsException(
                                 string.Format(
                                     CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsXmlElement,
+                                    Resources.Resources.InvalidSettingsXmlElement,
                                     Constants.TestRunParametersName,
                                     reader.Name));
                     }

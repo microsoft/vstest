@@ -8,14 +8,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Xml;
     using System.Xml.XPath;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class RunSettingsArgumentProcessor : IArgumentProcessor
     {
@@ -80,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.RunSettings;
 
-        public override string HelpContentResourceName => Resources.RunSettingsArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.RunSettingsArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.RunSettingsArgumentProcessorHelpPriority;
     }
@@ -103,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(Resources.RunSettingsRequired);
+                throw new CommandLineException(CommandLineResources.RunSettingsRequired);
             }
 
             if (!this.FileHelper.Exists(argument))
@@ -111,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.RunSettingsFileNotFound,
+                        CommandLineResources.RunSettingsFileNotFound,
                         argument));
             }
 
@@ -131,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             catch (XmlException exception)
             {
-                throw new CommandLineException(Resources.MalformedRunSettingsFile, exception);
+                throw new CommandLineException(CommandLineResources.MalformedRunSettingsFile, exception);
             }
             catch (SettingsException exception)
             {
@@ -171,7 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 if (this.commandLineOptions.FrameworkVersionSpecified && this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework)
                 {
                     IOutput output = ConsoleOutput.Instance;
-                    output.Warning(Resources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+                    output.Warning(CommandLineResources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
                 }
 
                 var architecture = this.commandLineOptions.ArchitectureSpecified
@@ -189,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
                 catch (XPathException e)
                 {
-                    throw new SettingsException(Resources.MalformedRunSettingsFile, e);
+                    throw new SettingsException(CommandLineResources.MalformedRunSettingsFile, e);
                 }
             }
 

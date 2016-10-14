@@ -13,6 +13,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
     /// <summary>
     /// Class for unit test result.
     /// </summary>
@@ -288,7 +290,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                 if (this.testRun == null)
                 {
                     Debug.Fail("'m_testRun' is null");
-                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, TrxResource.Common_MissingRunInResult));
+                    throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunInResult));
                 }
 
                 return this.testRun.GetResultFilesDirectory(this);

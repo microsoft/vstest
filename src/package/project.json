@@ -36,6 +36,10 @@
         "NuGet.CommandLine": {
           "type": "build",
           "version": "3.4.3"
+        },
+        "fmdev.xlftool": {
+          "type": "build",
+          "version": "0.1.1"
         }
       }
     },
