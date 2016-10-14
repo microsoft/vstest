@@ -2,7 +2,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-#if NET46
+
 
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
@@ -27,5 +27,4 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
     }
 
-#endif
 }

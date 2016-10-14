@@ -2,18 +2,22 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-#if NET46
-
     using System;
-    using System.Collections.Generic;
-    using System.Runtime.InteropServices;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Reflection;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Collections.Generic;
+    using Navigation;
 
+#if NET46
     using Dia;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
+    using System.Diagnostics;
+    using System.Runtime.InteropServices;
+#else
+    using System.Runtime.Loader;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+#endif
 
     /// <summary>
     /// The class that enables us to get debug information from both managed and native binaries.
@@ -21,10 +25,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Dia is a specific name.")]
     public class DiaSession : INavigationSession
     {
+        /// <summary>
+        /// Characters that should be stripped off the end of test names.
+        /// </summary>
+        private static readonly char[] s_testNameStripChars = { '(', ')', ' ' };
+        private bool isDisposed;
+#if NET46
         private IDiaDataSource source;
         private IDiaSession session;
-        private bool isDisposed;
-
         /// <summary>
         /// Holds type symbols avaiable in the source.
         /// </summary>
@@ -43,12 +51,28 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private const string ManifestFileNameX86 = "TestPlatform.ObjectModel.x86.manifest";
         private const string ManifestFileNameX64 = "TestPlatform.ObjectModel.manifest";
 
+
+#else
+        /// <summary>
+        /// Key in first dict is Type FullName
+        /// Key in second dict is method name
+        /// </summary>
+        private Dictionary<string, Dictionary<string, DiaNavigationData>> methodsNavigationDataForType = new Dictionary<string, Dictionary<string, DiaNavigationData>>();
+
+#endif
         public DiaSession(string binaryPath) : this(binaryPath, null)
         {
         }
 
         public DiaSession(string binaryPath, string searchPath)
         {
+            if (binaryPath == null)
+            {
+                throw new ArgumentNullException(nameof(binaryPath));
+            }
+
+#if NET46
+
             ValidateArg.NotNullOrEmpty(binaryPath, "binaryPath");
             using (var activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom()))
             {
@@ -69,16 +93,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     throw;
                 }
             }
+#else
+            this.PopulateCacheForTypeAndMethodSymbols(binaryPath);
+#endif
         }
 
         public void Dispose()
         {
             this.Dispose(true);
-
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
             GC.SuppressFinalize(this);
         }
+
 
         /// <summary>
         /// Gets the navigation data for a method declared in a type.
@@ -102,13 +129,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNullOrEmpty(declaringTypeName, "declaringTypeName");
             ValidateArg.NotNullOrEmpty(methodName, "methodName");
-
             methodName = methodName.TrimEnd(s_testNameStripChars);
-
             DiaNavigationData navigationData = null;
-
+#if NET46
             IDiaSymbol methodSymbol = null;
-
 
             IDiaSymbol typeSymbol = GetTypeSymbol(declaringTypeName, SymTagEnum.SymTagCompiland);
             if (typeSymbol != null)
@@ -128,16 +152,28 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 navigationData = GetSymbolNavigationData(methodSymbol);
             }
-
+           
+#else
+            if (this.methodsNavigationDataForType.ContainsKey(declaringTypeName))
+            {
+                var methodDict = this.methodsNavigationDataForType[declaringTypeName];
+                if (methodDict.ContainsKey(methodName))
+                {
+                    navigationData = methodDict[methodName];
+                }
+            }
+#endif
             return navigationData;
         }
 
         private void Dispose(bool disposing)
         {
-            if (!isDisposed)
+
+            if (!this.isDisposed)
             {
                 if (disposing)
                 {
+#if NET46
                     foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in methodSymbols.Values)
                     {
                         foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
@@ -158,12 +194,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     typeSymbols = null;
                     ReleaseComObject(ref this.session);
                     ReleaseComObject(ref this.source);
+#else
+                    foreach (Dictionary<string, DiaNavigationData> methodsNavigationData in this.methodsNavigationDataForType.Values)
+                    {
+                        methodsNavigationData.Clear();
+                    }
+
+                    this.methodsNavigationDataForType.Clear();
+                    this.methodsNavigationDataForType = null;
+#endif
                 }
 
-                isDisposed = true;
+                this.isDisposed = true;
             }
         }
 
+#if NET46
         /// <summary>
         /// Gets the appropraite manifest file for reg free COM. This is dependent on the architecture of the current running process.
         /// </summary>
@@ -191,7 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         private static void ReleaseComObject<T>(ref T obj)
-            where T : class
+           where T : class
         {
             if (obj != null)
             {
@@ -199,11 +245,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 obj = null;
             }
         }
-
-        /// <summary>
-        /// Characters that should be stripped off the end of test names.
-        /// </summary>
-        private static readonly char[] s_testNameStripChars = { '(', ')', ' ' };
 
         private DiaNavigationData GetSymbolNavigationData(IDiaSymbol symbol)
         {
@@ -328,9 +369,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 ReleaseComObject(ref global);
             }
         }
-
-
-
 
         private IDiaSymbol GetTypeSymbol(string typeName, SymTagEnum symTag)
         {
@@ -492,7 +530,63 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             methodSymbolCache[methodName] = methodSymbol;
         }
-    }
+#else
+        /// <summary>
+        /// Caches NavigationData for each method in each type in give binaryPath
+        /// </summary>
+        /// <param name="binaryPath"></param>
+        private void PopulateCacheForTypeAndMethodSymbols(string binaryPath)
+        {
+            try
+            {
+                var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
+                using (var pdbReader = new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open)))
+                {
+                    // Load assembly
+                    Assembly asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(binaryPath);
 
+                    // Get all types to dict, fullname as key
+                    var typesDict = asm.GetTypes().ToDictionary(type => type.FullName);
+                    foreach (var typeEntry in typesDict)
+                    {
+                        // Get method infos for all types in assembly
+                        var methodInfoDict = typeEntry.Value.GetMethods().ToDictionary(methodInfo => methodInfo.Name);
+                        var methodsNavigationData = new Dictionary<string, DiaNavigationData>();
+                        this.methodsNavigationDataForType.Add(typeEntry.Key, methodsNavigationData);
+
+                        foreach (var methodEntry in methodInfoDict)
+                        {
+                            if (string.CompareOrdinal(methodEntry.Value.Module.FullyQualifiedName, binaryPath) != 0)
+                            {
+                                // Get source info for methods only defined in given binaryPath
+                                continue;
+                            }
+
+                            var sourceInfo = pdbReader.GetSourceInformation(methodEntry.Value);
+                            if (sourceInfo != null)
+                            {
+                                methodsNavigationData.Add(
+                                    methodEntry.Key,
+                                    new DiaNavigationData(sourceInfo.Filename, sourceInfo.LineNumber, sourceInfo.LineNumber));
+                            }
+                            else
+                            {
+                                EqtTrace.Error(
+                                    string.Format(
+                                        "Unable to find source information for method: {0} type: {1}",
+                                        methodEntry.Key,
+                                        typeEntry.Key));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                this.Dispose();
+                throw;
+            }
+        }
 #endif
+    }
 }
