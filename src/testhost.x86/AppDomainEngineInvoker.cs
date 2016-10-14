@@ -171,13 +171,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             var runtimeTestHostNode = testHostConfigDoc.Descendants("runtime")?.FirstOrDefault();
             if (runtimeTestHostNode != null)
             {
-                // remove test host relative probing paths' element
-                // TestHost Probing Paths do not make sense since we are setting "AppBase" to user's test assembly location
-                runtimeTestHostNode.Descendants().Where((element) => string.Equals(element.Name.LocalName, "probing")).Remove();
-
                 var runTimeNode = mergedDoc.Descendants("runtime")?.FirstOrDefault();
                 if (runTimeNode == null)
                 {
+                    // remove test host relative probing paths' element
+                    // TestHost Probing Paths do not make sense since we are setting "AppBase" to user's test assembly location
+                    runtimeTestHostNode.Descendants().Where((element) => string.Equals(element.Name.LocalName, "probing")).Remove();
+
                     // no runtime node exists in user's config - just add ours entirely
                     mergedDoc.Root.Add(runtimeTestHostNode);
                 }
