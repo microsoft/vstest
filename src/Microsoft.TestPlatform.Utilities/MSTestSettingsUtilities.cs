@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resource;
+    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 
     /// <summary>
     /// The legacy mstest.exe settings utilities.

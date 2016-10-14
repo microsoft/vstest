@@ -1,0 +1,846 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx">
+    <body>
+      <trans-unit id="DuplicateSource">
+        <source>Duplicate source {0} specified.</source>
+        <target state="new">Ignoring the specified duplicate source '{0}'.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="FileNotFound">
+        <source>'{0}' not found.</source>
+        <target state="new">Could not find file {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AvailableDiscoverersHeaderMessage">
+        <source>The following Test Discovery Add-Ins are available:</source>
+        <target state="new">The following Test Discovery Add-Ins are available:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AvailableExecutorsHeaderMessage">
+        <source>The following Test Execution Add-Ins are available:</source>
+        <target state="new">The following Test Execution Add-Ins are available:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AvailableExtensionFormat">
+        <source>    {0}</source>
+        <target state="new">    {0}</target>
+        <note>{Locked}</note>
+      </trans-unit>
+      <trans-unit id="AvailableExtensionsMetadataFormat">
+        <source>        {0}: {1}</source>
+        <target state="new">        {0}: {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AvailableLoggersHeaderMessage">
+        <source>The following Test Logger Add-Ins are available:</source>
+        <target state="new">The following Test Logger Add-Ins are available:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AvailableTestsFormat">
+        <source>    {0}</source>
+        <target state="new">    {0}</target>
+        <note>{Locked}</note>
+      </trans-unit>
+      <trans-unit id="CommandLineError">
+        <source>Error: {0}</source>
+        <target state="new">Error: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CommaSeparatedFormat">
+        <source>, {0}</source>
+        <target state="new">, {0}</target>
+        <note>Format used to comma separate a list of values.</note>
+      </trans-unit>
+      <trans-unit id="DuplicateArgumentError">
+        <source>The parameter "{0}" should be provided only once.</source>
+        <target state="new">The parameter "{0}" should be provided only once.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ExceptionFromExtension">
+        <source>Exception occurred when instantiating extension '{0}': {1}</source>
+        <target state="new">Exception occurred when instantiating extension '{0}': {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ListTestsHeaderMessage">
+        <source>The following Tests are available:</source>
+        <target state="new">The following Tests are available:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoArgumentProcessorFound">
+        <source>Unrecognized parameter "{0}".</source>
+        <target state="new">Unrecognized parameter "{0}".</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestSourceFileNotFound">
+        <source>The test source file "{0}" provided was not found.</source>
+        <target state="new">The test source file "{0}" provided was not found.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LoggerUriInvalid">
+        <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
+        <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CommandLineInformational">
+        <source>Information: {0}</source>
+        <target state="new">Information: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CommandLineWarning">
+        <source>Warning: {0}</source>
+        <target state="new">Warning: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="HelpArgumentHelp">
+        <source>-?|--Help|/?|/Help
+      Display this usage message.</source>
+        <target state="new">-?|--Help|/?|/Help
+      Display this usage message.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CopyrightCommandLineTitle">
+        <source>Copyright (c) Microsoft Corporation.  All rights reserved.</source>
+        <target state="new">Copyright (c) Microsoft Corporation.  All rights reserved.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MicrosoftCommandLineTitle">
+        <source>Microsoft (R) Test Execution Command Line Tool Version {0}</source>
+        <target state="new">Microsoft (R) Test Execution Command Line Tool Version {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnableLoggersArgumentHelp">
+        <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Specify a logger for test results.  For example, to log results into a 
+      Visual Studio Test Results File (TRX) use  /logger:trx.
+      To publish test results to Team Foundation Server, use TfsPublisher as shown below
+      Example: /logger:TfsPublisher;
+                Collection=&lt;team project collection url&gt;;
+                BuildName=&lt;build name&gt;;
+                TeamProject=&lt;team project name&gt;
+                [;Platform=&lt;Defaults to "Any CPU"&gt;]
+                [;Flavor=&lt;Defaults to "Debug"&gt;]
+                [;RunTitle=&lt;title&gt;]</source>
+        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Specify a logger for test results.  For example, to log results into a 
+      Visual Studio Test Results File (TRX) use  /logger:trx.
+      To publish test results to Team Foundation Server, use TfsPublisher as shown below
+      Example: /logger:TfsPublisher;
+                Collection=&lt;team project collection url&gt;;
+                BuildName=&lt;build name&gt;;
+                TeamProject=&lt;team project name&gt;
+                [;Platform=&lt;Defaults to "Any CPU"&gt;]
+                [;Flavor=&lt;Defaults to "Debug"&gt;]
+                [;RunTitle=&lt;title&gt;]</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="HelpDescriptionText">
+        <source>Description: Runs tests from the specified files.</source>
+        <target state="new">Description: Runs tests from the specified files.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="HelpOptionsText">
+        <source>Options:</source>
+        <target state="new">Options:</target>
+        <note>Section Header for subsequent command help listing</note>
+      </trans-unit>
+      <trans-unit id="HelpUsageText">
+        <source>Usage: vstest.console.exe [Arguments] [Options]</source>
+        <target state="new">Usage: vstest.console.exe [Arguments] [Options]</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MissingTestSourceFile">
+        <source>No test source files were specified.</source>
+        <target state="new">No test source files were specified.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoArgumentsProvided">
+        <source>No arguments were specified.</source>
+        <target state="new">No arguments were specified.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunTestsArgumentHelp">
+        <source>[TestFileNames]
+      Run tests from the specified files. Separate multiple test file names
+      by spaces.
+      Examples: mytestproject.dll
+                mytestproject.dll myothertestproject.exe</source>
+        <target state="new">[TestFileNames]
+      Run tests from the specified files. Separate multiple test file names
+      by spaces.
+      Examples: mytestproject.dll
+                mytestproject.dll myothertestproject.exe</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AvailableSettingsProvidersHeaderMessage">
+        <source>The following Settings Providers Add-Ins are available:</source>
+        <target state="new">The following Settings Providers Add-Ins are available:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunSettingsArgumentHelp">
+        <source>--Settings|/Settings:&lt;Settings File&gt;
+      Settings to use when running tests.</source>
+        <target state="new">--Settings|/Settings:&lt;Settings File&gt;
+      Settings to use when running tests.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunSettingsRequired">
+        <source>The /Settings parameter requires a settings file to be provided.</source>
+        <target state="new">The /Settings parameter requires a settings file to be provided.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunSettingsFileNotFound">
+        <source>The Settings file '{0}' could not be found.</source>
+        <target state="new">The Settings file '{0}' could not be found.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunFailed">
+        <source>Test Run Failed.</source>
+        <target state="new">Test Run Failed.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSuccessful">
+        <source>Test Run Successful.</source>
+        <target state="new">Test Run Successful.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidInIsolationCommand">
+        <source>Argument {0} is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.</source>
+        <target state="new">Argument {0} is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SuggestUseVsixExtensionsIfNoTestsIsFound">
+        <source>Additionally, you can try specifying '/UseVsixExtensions' command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true</source>
+        <target state="new">Additionally, you can try specifying '/UseVsixExtensions' command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="UseVsixExtensionsValueRequired">
+        <source>The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</source>
+        <target state="new">The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidUseVsixExtensionsCommand">
+        <source>Argument {0} is not expected in the 'UseVsixExtensions' command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again.</source>
+        <target state="new">Argument {0} is not expected in the 'UseVsixExtensions' command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InIsolationHelp">
+        <source>/InIsolation
+      Runs the tests in an isolated process. This makes vstest.console.exe 
+      process less likely to be stopped on an error in the tests, but tests 
+      may run slower.</source>
+        <target state="new">/InIsolation
+      Runs the tests in an isolated process. This makes vstest.console.exe 
+      process less likely to be stopped on an error in the tests, but tests 
+      may run slower.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="UseVsixExtensionsHelp">
+        <source>/UseVsixExtensions
+      This makes vstest.console.exe process use or skip the VSIX extensions 
+      installed(if any) in the test run. 
+      Example  /UseVsixExtensions:true</source>
+        <target state="new">/UseVsixExtensions
+      This makes vstest.console.exe process use or skip the VSIX extensions 
+      installed(if any) in the test run. 
+      Example  /UseVsixExtensions:true</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BatchSizeRequired">
+        <source>The /BatchSize argument requires the size of the batch.  Example:  /BatchSize:10</source>
+        <target state="new">The /BatchSize argument requires the size of the batch.  Example:  /BatchSize:10</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidBatchSize">
+        <source>Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10</source>
+        <target state="new">Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Examples">
+        <source>  To run tests in the same process:
+    &gt;vstest.console.exe tests.dll 
+  To run tests in a separate process:
+    &gt;vstest.console.exe /inIsolation tests.dll
+  To run tests with additional settings such as  data collectors:
+    &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
+        <target state="new">  To run tests in the same process:
+    &gt;vstest.console.exe tests.dll 
+  To run tests in a separate process:
+    &gt;vstest.console.exe /inIsolation tests.dll
+  To run tests with additional settings such as  data collectors:
+    &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ListDiscoverersHelp">
+        <source>/ListDiscoverers
+      Lists installed test discoverers.</source>
+        <target state="new">/ListDiscoverers
+      Lists installed test discoverers.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ListExecutorsHelp">
+        <source>/ListExecutors
+      Lists installed test executors.</source>
+        <target state="new">/ListExecutors
+      Lists installed test executors.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ListLoggersHelp">
+        <source>/ListLoggers
+      Lists installed test loggers.</source>
+        <target state="new">/ListLoggers
+      Lists installed test loggers.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ListSettingsProvidersHelp">
+        <source>/ListSettingsProviders
+      Lists installed test settings providers.</source>
+        <target state="new">/ListSettingsProviders
+      Lists installed test settings providers.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ListTestsHelp">
+        <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
+      Lists discovered tests from the given test container.</source>
+        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
+      Lists discovered tests from the given test container.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TimeElapsed">
+        <source>Time elapsed :</source>
+        <target state="new">Time elapsed :</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SpecificTestsRequired">
+        <source>The /Tests argument requires one or more specific test names or their substrings.
+       Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </source>
+        <target state="new">The /Tests argument requires one or more specific test names or their substrings.
+       Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableAfterFiltering">
+        <source>A total of {0} tests were discovered but no test matches the specified selection criteria({1}). Use right value(s) and try again.</source>
+        <target state="new">A total of {0} tests were discovered but no test matches the specified selection criteria({1}). Use right value(s) and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SearchStringDelimiter">
+        <source>,</source>
+        <target state="new">,</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunSpecificTestsHelp">
+        <source>--Tests|/Tests:&lt;Test Names&gt;
+      Run tests with names that match the provided values. To provide multiple
+      values, separate them by commas.
+      Examples: /Tests:TestMethod1
+                /Tests:TestMethod1,testMethod2</source>
+        <target state="new">--Tests|/Tests:&lt;Test Names&gt;
+      Run tests with names that match the provided values. To provide multiple
+      values, separate them by commas.
+      Examples: /Tests:TestMethod1
+                /Tests:TestMethod1,testMethod2</target>
+        <note>Please verify if the console output looks good after modifiaction. </note>
+      </trans-unit>
+      <trans-unit id="SwitchToNoIsolation">
+        <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
+        <target state="new">Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SwitchToIsolationInAppContainerMode">
+        <source>Using Isolation mode to run unit tests for Windows Store apps. Use the /InIsolation parameter to suppress this warning.</source>
+        <target state="new">Using Isolation mode to run unit tests for Windows Store apps. Use the /InIsolation parameter to suppress this warning.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DisablingDataCollectionInAppContainerTestExecution">
+        <source>Diagnostic data adapters are not supported when running unit tests for Windows Store apps. Remove diagnostic data adapters settings from settings.</source>
+        <target state="new">Diagnostic data adapters are not supported when running unit tests for Windows Store apps. Remove diagnostic data adapters settings from settings.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoTestsFoundWarningMessageWithSuggestionToUseVsix">
+        <source>{0} {1}</source>
+        <target state="new">{0} {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LoggerFriendlyNameFormat">
+        <source>        FriendlyName: {0}</source>
+        <target state="new">        FriendlyName: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ExtensionUriFormat">
+        <source>        Uri: {0}</source>
+        <target state="new">        Uri: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SuggestUseVsixExtensionsInListLoggersCommand">
+        <source>The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
+        <target state="new">The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SuggestUseVsixExtensionsInListExecutorsCommand">
+        <source>The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
+        <target state="new">The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SuggestUseVsixExtensionsInListDiscoverersCommand">
+        <source>The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
+        <target state="new">The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SuggestUseVsixExtensionsInListSettingsProviderCommand">
+        <source>The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
+        <target state="new">The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SettingFormat">
+        <source>        SettingName: {0}</source>
+        <target state="new">        SettingName: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SupportedFileTypesIndicator">
+        <source>        Supported File Types:</source>
+        <target state="new">        Supported File Types:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SupportedFileWithoutSeparator">
+        <source> {0}</source>
+        <target state="new"> {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SupportedFileWithSeparator">
+        <source> {0},</source>
+        <target state="new"> {0},</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="UriOfDefaultExecutor">
+        <source>        Default Executor Uri: {0}</source>
+        <target state="new">        Default Executor Uri: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LoggerUriFormat">
+        <source>        Uri: {0}</source>
+        <target state="new">        Uri: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidPlatformType">
+        <source>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</source>
+        <target state="new">Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PlatformTypeRequired">
+        <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>
+        <target state="new">The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PlatformArgumentHelp">
+        <source>--Platform|/Platform:&lt;Platform type&gt;
+      Target platform architecture to be used for test execution. 
+      Valid values are x86, x64 and ARM.</source>
+        <target state="new">--Platform|/Platform:&lt;Platform type&gt;
+      Target platform architecture to be used for test execution. 
+      Valid values are x86, x64 and ARM.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SwitchToIsolationInMultiTargetingMode">
+        <source>Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning.</source>
+        <target state="new">Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="FrameworkArgumentHelp">
+        <source>--Framework|/Framework:&lt;Framework Version&gt;
+      Target .Net Framework version to be used for test execution. 
+      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
+        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
+      Target .Net Framework version to be used for test execution. 
+      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="FrameworkVersionRequired">
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
+        <target state="new">The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidFrameworkVersion">
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
+        <target state="new">Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AppContainerTestPrerequisiteFail">
+        <source>Could not start test run for unit tests for Windows Store app: {0}.</source>
+        <target state="new">Could not start test run for unit tests for Windows Store app: {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestCaseFilterArgumentHelp">
+        <source>--TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
+      Run tests that match the given expression.
+      &lt;Expression&gt; is of the format &lt;property&gt;Operator&lt;value&gt;[|&amp;&lt;Expression&gt;]
+         where Operator is one of =, != or ~  (Operator ~ has 'contains'
+         semantics and is applicable for string properties like DisplayName).
+         Parenthesis () can be used to group sub-expressions.
+      Examples: /TestCaseFilter:"Priority=1"
+                /TestCaseFilter:"(FullyQualifiedName~Nightly
+                                  |Name=MyTestMethod)"</source>
+        <target state="new">--TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
+      Run tests that match the given expression.
+      &lt;Expression&gt; is of the format &lt;property&gt;Operator&lt;value&gt;[|&amp;&lt;Expression&gt;]
+         where Operator is one of =, != or ~  (Operator ~ has 'contains'
+         semantics and is applicable for string properties like DisplayName).
+         Parenthesis () can be used to group sub-expressions.
+      Examples: /TestCaseFilter:"Priority=1"
+                /TestCaseFilter:"(FullyQualifiedName~Nightly
+                                  |Name=MyTestMethod)"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestCaseFilterValueRequired">
+        <source>The /TestCaseFilter argument requires the filter value.
+        Filter value can be &lt;property&gt;=&lt;value&gt; type.
+        Examples: "Priority=1", "TestCategory=Nightly"</source>
+        <target state="new">The /TestCaseFilter argument requires the filter value.
+        Filter value can be &lt;property&gt;=&lt;value&gt; type.
+        Examples: "Priority=1", "TestCategory=Nightly"</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidTestCaseFilterValueForSpecificTests">
+        <source>The /TestCaseFilter argument cannot be specified with /Tests. Filtering of test cases is not applicable when tests are specified.</source>
+        <target state="new">The /TestCaseFilter argument cannot be specified with /Tests. Filtering of test cases is not applicable when tests are specified.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NonDefaultFrameworkAndOrArchDetected">
+        <source>{0} is built for {1}/{2}. The test assemblies specified in a run should have a common target .Net framework and platform.</source>
+        <target state="new">{0} is built for {1}/{2}. The test assemblies specified in a run should have a common target .Net framework and platform.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunSingleAppContainerSource">
+        <source>Only one app package (.appx file) can be specified for running tests.</source>
+        <target state="new">Only one app package (.appx file) can be specified for running tests.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartingDiscovery">
+        <source>Starting test discovery, please wait...</source>
+        <target state="new">Starting test discovery, please wait...</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StartingExecution">
+        <source>Starting test execution, please wait...</source>
+        <target state="new">Starting test execution, please wait...</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DisablingDCOnExceptionWhileParsingDCInfo">
+        <source>Reading diagnostic data adapter settings threw an running '{0}'. All diagnostic data adapters will be skipped in this run.</source>
+        <target state="new">Reading diagnostic data adapter settings threw an running '{0}'. All diagnostic data adapters will be skipped in this run.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
+        <source>/EnableCodeCoverage
+      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
+      settings are used if not specified using settings file.</source>
+        <target state="new">/EnableCodeCoverage
+      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
+      settings are used if not specified using settings file.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidEnableCodeCoverageCommand">
+        <source>Argument {0} is not expected in the 'EnableCodeCoverage' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again.</source>
+        <target state="new">Argument {0} is not expected in the 'EnableCodeCoverage' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MalformedRunSettingsFile">
+        <source>Settings file provided do not confirm to required format. </source>
+        <target state="new">Settings file provided do not confirm to required format. </target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoTestEntryPoint">
+        <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</source>
+        <target state="new">App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
+        <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
+        <target state="new">Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SomeTestsUnavailableAfterFiltering">
+        <source>A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again.</source>
+        <target state="new">A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestAdapterPathHelp">
+        <source>--TestAdapterPath|/TestAdapterPath
+      This makes vstest.console.exe process use custom test adapters
+      from a given path (if any) in the test run. 
+      Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
+        <target state="new">--TestAdapterPath|/TestAdapterPath
+      This makes vstest.console.exe process use custom test adapters
+      from a given path (if any) in the test run. 
+      Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestAdapterPathValueRequired">
+        <source>The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters</source>
+        <target state="new">The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidTestAdapterPathCommand">
+        <source>The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}</source>
+        <target state="new">The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestAdapterPathDoesNotExist">
+        <source>The custom test adapter search path provided was not found, provide a valid path and try again.</source>
+        <target state="new">The custom test adapter search path provided was not found, provide a valid path and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoAdaptersFoundInTestAdapterPath">
+        <source>The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.</source>
+        <target state="new">The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PhoneAppContainerTestPrerequisiteFail">
+        <source>Could not start test run for the tests for Windows Phone app: {0}.</source>
+        <target state="new">Could not start test run for the tests for Windows Phone app: {0}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SwitchToIsolationInPhoneAppContainerMode">
+        <source>Using Isolation mode to run unit tests for Windows Phone apps. Use the /InIsolation parameter to suppress this warning.</source>
+        <target state="new">Using Isolation mode to run unit tests for Windows Phone apps. Use the /InIsolation parameter to suppress this warning.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DisablingCodeCoverageInPhoneAppContainerTestExecution">
+        <source>Code coverage is not available for Windows Phone apps. Code coverage analysis skipped for this test run.</source>
+        <target state="new">Code coverage is not available for Windows Phone apps. Code coverage analysis skipped for this test run.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DisablingDataCollectionInPhoneAppContainerTestExecution">
+        <source>Diagnostic data adapters are not supported when running unit tests for Windows Phone apps. Remove diagnostic data adapters settings from settings.</source>
+        <target state="new">Diagnostic data adapters are not supported when running unit tests for Windows Phone apps. Remove diagnostic data adapters settings from settings.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PhoneNoTestEntryPoint">
+        <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Phone apps, create app package using Windows Phone Unit Test App project.</source>
+        <target state="new">App package '{0}' does not has test executor entry point. For running unit tests for Windows Phone apps, create app package using Windows Phone Unit Test App project.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestSettingsFrameworkMismatch">
+        <source>Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning.</source>
+        <target state="new">Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AppxBundleSourceWarning">
+        <source>No test found in the specified test containers. Additionally, Microsoft Windows Store Unit test adapter does not support .appxbundle files. Create an appx (set Generate App bundle option to Never) when creating App Package and try again.</source>
+        <target state="new">No test found in the specified test containers. Additionally, Microsoft Windows Store Unit test adapter does not support .appxbundle files. Create an appx (set Generate App bundle option to Never) when creating App Package and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ParallelArgumentProcessorHelp">
+        <source>--Parallel|/Parallel
+      Specifies that the tests be executed in parallel. By default up
+      to all available cores on the machine may be used.
+      The number of cores to use may be configured using a settings file.</source>
+        <target state="new">--Parallel|/Parallel
+      Specifies that the tests be executed in parallel. By default up
+      to all available cores on the machine may be used.
+      The number of cores to use may be configured using a settings file.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidParallelCommand">
+        <source>Argument {0} is not expected in the 'Parallel' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again.</source>
+        <target state="new">Argument {0} is not expected in the 'Parallel' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CannotBeNullOrEmpty">
+        <source>Cannot be null or empty</source>
+        <target state="new">Cannot be null or empty</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PortArgumentHelp">
+        <source>--Port|/Port:&lt;Port&gt;
+      The Port for socket connection and receiving the event messages.</source>
+        <target state="new">--Port|/Port:&lt;Port&gt;
+      The Port for socket connection and receiving the event messages.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidPortArgument">
+        <source>The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.</source>
+        <target state="new">The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AssemblyPathInvalid">
+        <source>Unable to find the assembly under test. Please make sure that the project is built.</source>
+        <target state="new">Unable to find the assembly under test. Please make sure that the project is built.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ProjectPathNotFound">
+        <source>The Path {0} does not exist.</source>
+        <target state="new">The Path {0} does not exist.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BuildBasePathArgumentHelp">
+        <source>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
+      The directory containing the temporary outputs.</source>
+        <target state="new">--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
+      The directory containing the temporary outputs.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ConfigurationArgumentHelp">
+        <source>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
+      The configuration the project is built for i.e. Debug/Release</source>
+        <target state="new">-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
+      The configuration the project is built for i.e. Debug/Release</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidConfiguration">
+        <source>The given configuration is invalid.</source>
+        <target state="new">The given configuration is invalid.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="OutputArgumentHelp">
+        <source>-o|--Output|/o|/Output:&lt;Output&gt;
+      The directory containing the binaries to run.</source>
+        <target state="new">-o|--Output|/o|/Output:&lt;Output&gt;
+      The directory containing the binaries to run.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="BuildBasePathNotFound">
+        <source>The BuildBasePath was not found, provide a valid path and try again.</source>
+        <target state="new">The BuildBasePath was not found, provide a valid path and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="OutputPathNotFound">
+        <source>The Output path was not found, provide a valid path and try again.</source>
+        <target state="new">The Output path was not found, provide a valid path and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AddnlInfoMessagesBanner">
+        <source>Additional Information Messages:</source>
+        <target state="new">Additional Information Messages:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Days">
+        <source>Days</source>
+        <target state="new">Days</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ErrorMessageBanner">
+        <source>Error Message:</source>
+        <target state="new">Error Message:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ExecutionTimeFormatString">
+        <source>Test execution time: {0:0.0000} {1}</source>
+        <target state="new">Test execution time: {0:0.0000} {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Hours">
+        <source>Hours</source>
+        <target state="new">Hours</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LoggerNotFound">
+        <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
+        <target state="new">Could not find a test logger with URI or FriendlyName '{0}'.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Minutes">
+        <source>Minutes</source>
+        <target state="new">Minutes</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="Seconds">
+        <source>Seconds</source>
+        <target state="new">Seconds</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StacktraceBanner">
+        <source>Stack Trace:</source>
+        <target state="new">Stack Trace:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StdErrMessagesBanner">
+        <source>Standard Error Messages:</source>
+        <target state="new">Standard Error Messages:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="StdOutMessagesBanner">
+        <source>Standard Output Messages:</source>
+        <target state="new">Standard Output Messages:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestMessageFormattingPrefix">
+        <source> </source>
+        <target state="new"> </target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentsBanner">
+        <source>Attachments:</source>
+        <target state="new">Attachments:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AttachmentOutputFormat">
+        <source>  {0}</source>
+        <target state="new">  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoTestsAvailableInSources">
+        <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
+        <target state="new">No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="FailedTestIndicator">
+        <source>Failed   {0}</source>
+        <target state="new">Failed   {0}</target>
+        <note>Message which is written to the console when a test fails.</note>
+      </trans-unit>
+      <trans-unit id="PassedTestIndicator">
+        <source>Passed   {0}</source>
+        <target state="new">Passed   {0}</target>
+        <note>Message which is written to the console when a test passes.</note>
+      </trans-unit>
+      <trans-unit id="SkippedTestIndicator">
+        <source>Skipped  {0}</source>
+        <target state="new">Skipped  {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunSummary">
+        <source>Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</source>
+        <target state="new">Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DiscoveryFailed">
+        <source>Discovery failed for given sources. Exception : {0}</source>
+        <target state="new">Discovery failed for given sources. Exception : {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ParentProcessIdArgumentHelp">
+        <source>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
+      Process Id of the Parent Process responsible for launching current process.</source>
+        <target state="new">--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
+      Process Id of the Parent Process responsible for launching current process.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidParentProcessIdArgument">
+        <source>The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</source>
+        <target state="new">The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="HelpArgumentsText">
+        <source>Arguments:</source>
+        <target state="new">Arguments:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnableDiagUsage">
+        <source>--Diag|/Diag:&lt;Path to log file&gt;
+      Enable verbose logs for test platform.
+      Logs are written to the provided file.</source>
+        <target state="new">--Diag|/Diag:&lt;Path to log file&gt;
+      Enable verbose logs for test platform.
+      Logs are written to the provided file.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LoggerFileIsReadOnly">
+        <source>The file {0} provided is read only</source>
+        <target state="new">The file {0} provided is read only</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

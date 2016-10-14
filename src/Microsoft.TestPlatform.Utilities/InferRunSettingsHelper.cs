@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resource;
+    using UtilitiesResources = Microsoft.VisualStudio.TestPlatform.Utilities.Resources.Resources;
 
     /// <summary>
     /// Utility class for Inferring the runsettings from the current environment and the user specified command line switches.

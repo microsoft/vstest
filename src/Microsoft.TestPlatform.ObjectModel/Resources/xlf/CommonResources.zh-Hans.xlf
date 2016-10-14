@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../CommonResources.resx">
+    <body>
+      <trans-unit id="CannotBeNullOrEmpty">
+        <source>The parameter cannot be null or empty.</source>
+        <target state="new">The parameter cannot be null or empty.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DisplayChosenSettings">
+        <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
+        <target state="new">Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoMatchingSourcesFound">
+        <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
+        <target state="new">None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
