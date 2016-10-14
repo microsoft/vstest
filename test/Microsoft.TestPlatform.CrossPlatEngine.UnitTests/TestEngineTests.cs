@@ -161,7 +161,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsASharedManagerIfDisableAppDomainIsFalse()
         {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86 };
+            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETFramework,Version=v4.6"), TargetPlatform = Architecture.X86 };
 
             var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
             Assert.IsNotNull(testHostManager);
@@ -172,7 +172,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANonSharedManagerIfDisableAppDomainIsFalse()
         {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86, DisableAppDomain = true };
+            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETFramework,Version=v4.6"), TargetPlatform = Architecture.X86, DisableAppDomain = true };
 
             var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
             Assert.IsNotNull(testHostManager);

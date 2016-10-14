@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
     /// <summary>
     /// The program.
@@ -26,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             try
             {
+                TestPlatformEventSource.Instance.TestHostStart();
                 WaitForDebuggerIfEnabled();
                 Run(args);
             }
@@ -33,13 +35,22 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 EqtTrace.Error("TestHost: Error occured during initialization of TestHost : {0}", ex);
             }
+            finally
+            {
+                TestPlatformEventSource.Instance.TestHostStop();
+            }
         }
 
         private static void Run(string[] args)
         {
             var argsDictionary = GetArguments(args);
-            IEngineInvoker invoker = null;
+            // Invoke the engine with arguments
+            GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
+        }
 
+        private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
+        {
+            IEngineInvoker invoker = null;
 #if NET46
             // If Args contains test source argument, invoker Engine in new appdomain 
             string testSourcePath;
@@ -49,16 +60,15 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 argsDictionary.Remove(TestSourceArgumentString);
 
                 // Only DLLs and EXEs can have app.configs or ".exe.config" or ".dll.config"
-                if (System.IO.File.Exists(testSourcePath) && 
-                        (testSourcePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) 
+                if (System.IO.File.Exists(testSourcePath) &&
+                        (testSourcePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
                         || testSourcePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)))
                 {
                     invoker = new AppDomainEngineInvoker<DefaultEngineInvoker>(testSourcePath);
                 }
             }
 #endif
-            invoker = invoker ?? new DefaultEngineInvoker();
-            invoker.Invoke(argsDictionary);
+            return invoker ?? new DefaultEngineInvoker();
         }
 
         /// <summary>

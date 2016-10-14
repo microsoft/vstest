@@ -1,4 +1,6 @@
-﻿namespace Microsoft.VisualStudio.TestPlatform.TestHost
+﻿// Copyright (c) Microsoft. All rights reserved.
+
+namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
     using System.Collections.Generic;

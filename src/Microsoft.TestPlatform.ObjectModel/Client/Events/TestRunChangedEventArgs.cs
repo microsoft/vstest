@@ -24,8 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public TestRunChangedEventArgs(ITestRunStatistics stats, IEnumerable<TestResult> newTestResults, IEnumerable<TestCase> activeTests)
         {
             this.TestRunStatistics = stats;
-            this.NewTestResults = newTestResults ?? Enumerable.Empty<TestResult>();
-            this.ActiveTests = activeTests ?? Enumerable.Empty<TestCase>();
+            this.NewTestResults = newTestResults;
+            this.ActiveTests = activeTests;
         }
 
         /// <summary>
