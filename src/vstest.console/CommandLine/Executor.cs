@@ -25,15 +25,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.Diagnostics.Contracts;
     using System.Reflection;
+
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -157,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 else
                 {
                     // No known processor was found, report an error and continue
-                    Output.Error(String.Format(CultureInfo.CurrentCulture, Resources.NoArgumentProcessorFound, arg));
+                    Output.Error(String.Format(CultureInfo.CurrentCulture, CommandLineResources.NoArgumentProcessorFound, arg));
 
                     // Add the help processor
                     if (result == 0)
@@ -230,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
                         // Update the count so we do not print the error out for this argument multiple times.
                         commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
-                        Output.Error(String.Format(CultureInfo.CurrentCulture, Resources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
+                        Output.Error(String.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
                     }
                 }
             }
@@ -292,10 +295,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         private void PrintSplashScreen()
         {
             var version = typeof(Executor).GetTypeInfo().Assembly.GetName().Version;
-            string commandLineBanner = String.Format(CultureInfo.CurrentUICulture, Resources.MicrosoftCommandLineTitle, version.ToString());
+            string commandLineBanner = String.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, version.ToString());
             Output.WriteLine(commandLineBanner, OutputLevel.Information);
 
-            Output.WriteLine(Resources.CopyrightCommandLineTitle, OutputLevel.Information);
+            Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
             Output.WriteLine(string.Empty, OutputLevel.Information);
         }
 

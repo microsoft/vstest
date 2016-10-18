@@ -2,13 +2,12 @@
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
-    using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
 
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
+
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// The test list category.
@@ -80,7 +79,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                         if (uncategorizedResults == null)
                         {
                             uncategorizedResults = new TestListCategory(
-                                TrxResource.TS_UncategorizedResults, TestListCategoryId.Uncategorized, TestListCategoryId.Root);
+                                TrxLoggerResources.TS_UncategorizedResults, TestListCategoryId.Uncategorized, TestListCategoryId.Root);
                         }
                     }
                 }
@@ -103,7 +102,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
                         if (allResults == null)
                         {
                             allResults = new TestListCategory(
-                                        TrxResource.TS_AllResults, TestListCategoryId.AllItems, TestListCategoryId.Root);
+                                        TrxLoggerResources.TS_AllResults, TestListCategoryId.AllItems, TestListCategoryId.Root);
                         }
                     }
                 }

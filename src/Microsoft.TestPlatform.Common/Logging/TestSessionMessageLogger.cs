@@ -7,6 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
     
     /// <summary>
     /// The test session message logger.
@@ -61,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             if (string.IsNullOrWhiteSpace(message))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "message");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "message");
             }
 
             if (this.TreatTestAdapterErrorsAsWarnings

@@ -253,7 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 throw new SettingsException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.InvalidSettingsXmlAttribute,
+                        Resources.Resources.InvalidSettingsXmlAttribute,
                         Constants.RunConfigurationSettingsName,
                         reader.Name));
             }

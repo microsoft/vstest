@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Diag;
 
-        public override string HelpContentResourceName => CommandLine.Resources.EnableDiagUsage;
+        public override string HelpContentResourceName => CommandLineResources.EnableDiagUsage;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.EnableDiagArgumentProcessorHelpPriority;
     }
@@ -123,18 +123,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(Resources.EnableDiagUsage);
+                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
             }
 
             // Checking if the file is readonly
             if (this.fileHelper.Exists(argument) && this.IsFileReadOnly(argument))
             {
-                throw new CommandLineException(string.Format(Resources.LoggerFileIsReadOnly, argument));
+                throw new CommandLineException(string.Format(CommandLineResources.LoggerFileIsReadOnly, argument));
             }
             else if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
             {
                 // Throwing error if the argument is just path and not a file
-                throw new CommandLineException(Resources.EnableDiagUsage);
+                throw new CommandLineException(CommandLineResources.EnableDiagUsage);
             }
 
             // Create the base directory for logging if doesn't exist. Directory could be empty if just a

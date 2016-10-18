@@ -11,6 +11,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
 
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
     /// <summary>
     /// Class having information about a test run.
     /// </summary>
@@ -172,13 +174,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
             if (this.RunConfiguration == null)
             {
                 Debug.Fail("'RunConfiguration' is null");
-                throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxResource.Common_MissingRunConfigInRun));
+                throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunConfigInRun));
             }
 
             if (string.IsNullOrEmpty(this.RunConfiguration.RunDeploymentRootDirectory))
             {
                 Debug.Fail("'RunConfiguration.RunDeploymentRootDirectory' is null or empty");
-                throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxResource.Common_MissingRunDeploymentRootInRunConfig));
+                throw new Exception(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_MissingRunDeploymentRootInRunConfig));
             }
 
             return this.RunConfiguration.RunDeploymentInDirectory;
@@ -194,7 +196,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         private void Initialize()
         {
             this.id = Guid.NewGuid();
-            this.name = String.Format(CultureInfo.CurrentCulture, TrxResource.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+            this.name = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
             this.runUser = WindowsIdentity.GetCurrent().Name;
             this.created = DateTime.Now.ToUniversalTime();
             this.queued = DateTime.Now.ToUniversalTime();

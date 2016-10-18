@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     using Moq;
 
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
     public class EnableDiagArgumentProcessorTests
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(null, this.diagProcessor.Metadata.Value.ShortCommandName);
             Assert.AreEqual(ArgumentProcessorPriority.Diag, this.diagProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.EnableDiagArgumentProcessorHelpPriority, this.diagProcessor.Metadata.Value.HelpPriority);
-            Assert.AreEqual(Resources.EnableDiagUsage, this.diagProcessor.Metadata.Value.HelpContentResourceName);
+            Assert.AreEqual(CommandLineResources.EnableDiagUsage, this.diagProcessor.Metadata.Value.HelpContentResourceName);
         }
 
         [TestMethod]

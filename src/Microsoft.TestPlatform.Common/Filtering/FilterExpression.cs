@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     /// <summary>
     /// Represents an expression tree.
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 if (filterStack.Count < 2)
                 {
-                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, Common.Resources.MissingOperand));
+                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperand));
                 }
 
                 var filterRight = filterStack.Pop();
@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             {
                 if (filterStack.Count < 2)
                 {
-                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, Common.Resources.MissingOperand));
+                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperand));
                 }
 
                 var filterRight = filterStack.Pop();
@@ -143,12 +143,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             }
             else if (op == Operator.OpenBrace)
             {
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, Common.Resources.MissingCloseParenthesis));
+                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingCloseParenthesis));
             }
             else
             {
                 Debug.Assert(false, "ProcessOperator called for Unexpected operator.");
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, string.Empty));
+                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Empty));
             }
         }
 
@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             var invalidInput = Regex.Match(filterString, @"\(\s*\)");
             if (invalidInput.Success)
             {
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, Common.Resources.EmptyParenthesis));
+                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.EmptyParenthesis));
             }
 
             var tokens = Regex.Split(filterString, filterExpressionSeperatorString);
@@ -260,7 +260,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                         // If stack is empty at any time, than matching OpenBrace is missing from the expression.
                         if (operatorStack.Count == 0)
                         {
-                            throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, Common.Resources.MissingOpenParenthesis));
+                            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOpenParenthesis));
                         }
 
                         Operator temp = operatorStack.Pop();
@@ -269,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                             ProcessOperator(filterStack, temp);
                             if (operatorStack.Count == 0)
                             {
-                                throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, Common.Resources.MissingOpenParenthesis));
+                                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOpenParenthesis));
                             }
                             temp = operatorStack.Pop();
                         }
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
 
             if (filterStack.Count != 1)
             {
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, Common.Resources.MissingOperator));
+                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperator));
             }
 
             return filterStack.Pop();

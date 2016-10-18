@@ -5,10 +5,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
-
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System.Runtime.Versioning;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     ///  An argument processor that allows the user to specify the target platform architecture
@@ -77,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
-        public override string HelpContentResourceName => Resources.FrameworkArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.FrameworkArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.FrameworkArgumentProcessorHelpPriority;
     }
@@ -121,14 +120,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(Resources.FrameworkVersionRequired);
+                throw new CommandLineException(CommandLineResources.FrameworkVersionRequired);
             }
             
             var validFramework = Framework.FromString(argument);
             if (validFramework == null)
             { 
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, Resources.InvalidFrameworkVersion, argument));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
             }
             commandLineOptions.TargetFrameworkVersion = validFramework;
 

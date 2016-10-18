@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 
     /// <summary>
     /// Performs logging to a file and rolls the output file when either time or size thresholds are

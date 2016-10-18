@@ -12,6 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
     /// <summary>
     /// Provides user specified runSettings and framework provided context of the run. 
     /// </summary>
@@ -78,9 +80,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 
                 if (invalidProperties != null)
                 {
-                    var invalidPropertiesString = string.Join(CrossPlatEngine.Resources.StringSeperator, invalidProperties);
-                    var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngine.Resources.StringSeperator, supportedProperties.ToArray());
-                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngine.Resources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
+                    var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
+                    var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
+                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
                     throw new TestPlatformFormatException(errorMessage, this.FilterExpressionWrapper.FilterString);
                 }
             }
