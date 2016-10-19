@@ -116,15 +116,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         private MetadataReaderProvider provider;
 
         public PortablePdbReader(Stream stream)
-            : this(MetadataReaderProvider.FromPortablePdbStream(stream))
         {
             if (!IsPortable(stream))
             {
                 throw new Exception("Given stream is not portable stream");
             }
+
+            this.Setup(MetadataReaderProvider.FromPortablePdbStream(stream));
         }
 
-        internal PortablePdbReader(MetadataReaderProvider provider)
+        private void Setup(MetadataReaderProvider provider)
         {
             this.provider = provider;
             this.reader = provider.GetMetadataReader();
