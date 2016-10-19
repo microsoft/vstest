@@ -9,6 +9,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+    using System.Text;
 
     [TestClass]
     public class AppDomainEngineInvokerTests
@@ -79,15 +80,8 @@
                                     </startup>
                                 </configuration>";
 
-            var userConfigFile = Path.GetTempFileName();
-            File.WriteAllText(userConfigFile, appConfig);
+            var doc = TestableEngineInvoker.MergeConfigXmls(appConfig, testHostConfigXml);
 
-            var testHostConfigFile = Path.GetTempFileName();
-            File.WriteAllText(testHostConfigFile, testHostConfigXml);
-
-            string mergedConfigFile = TestableEngineInvoker.MergeConfigFiles(userConfigFile, testHostConfigFile);
-
-            var doc = XDocument.Load(mergedConfigFile);
             var startupElements = doc.Descendants("startup");
 
             Assert.AreEqual(1, startupElements.Count(), "Merged config must have only one 'startup' element");
@@ -138,15 +132,8 @@
                                   </runtime>
                                 </configuration>";
 
-            var userConfigFile = Path.GetTempFileName();
-            File.WriteAllText(userConfigFile, appConfig);
+            var doc = TestableEngineInvoker.MergeConfigXmls(appConfig, testHostConfigXml);
 
-            var testHostConfigFile = Path.GetTempFileName();
-            File.WriteAllText(testHostConfigFile, testHostConfigXml);
-
-            string mergedConfigFile = TestableEngineInvoker.MergeConfigFiles(userConfigFile, testHostConfigFile);
-
-            var doc = XDocument.Load(mergedConfigFile);
             var runtimeEle = doc.Descendants("runtime").FirstOrDefault();
 
             Assert.AreEqual(0, runtimeEle.Descendants("legacyUnhandledExceptionPolicy").Count(), "legacyUnhandledExceptionPolicy element must NOT be present.");
@@ -189,15 +176,7 @@
                                   </appSettings>
                                 </configuration>";
 
-            var userConfigFile = Path.GetTempFileName();
-            File.WriteAllText(userConfigFile, appConfig);
-
-            var testHostConfigFile = Path.GetTempFileName();
-            File.WriteAllText(testHostConfigFile, testHostConfigXml);
-
-            string mergedConfigFile = TestableEngineInvoker.MergeConfigFiles(userConfigFile, testHostConfigFile);
-
-            var doc = XDocument.Load(mergedConfigFile);
+            var doc = TestableEngineInvoker.MergeConfigXmls(appConfig,testHostConfigXml);
 
             var diagEle = doc.Descendants("system.diagnostics").FirstOrDefault();
             var appSettingsEle = doc.Descendants("appSettings").FirstOrDefault();
@@ -222,9 +201,11 @@
             {
             }
 
-            public static string MergeConfigFiles(string userConfig, string testHostConfig)
+            public static XDocument MergeConfigXmls(string userConfigText, string testHostConfigText)
             {
-                return MergeApplicationConfigFiles(userConfig, testHostConfig);
+                return MergeApplicationConfigFiles(
+                    XDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(userConfigText))), 
+                    XDocument.Load(new MemoryStream(Encoding.UTF8.GetBytes(testHostConfigText))));
             }
 
             public AppDomain NewAppDomain => this.appDomain;

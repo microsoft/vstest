@@ -4,6 +4,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
 #if NET46
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+
     using System;
     using System.IO;
     using System.Linq;
@@ -23,12 +25,16 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         protected readonly IEngineInvoker actualInvoker;
 
-        private readonly string mergedConfigFile = null;
+        private string mergedTempConfigFile = null;
 
         public AppDomainEngineInvoker(string testSourcePath)
         {
-            this.appDomain = CreateNewAppDomain(testSourcePath, out mergedConfigFile);
+            TestPlatformEventSource.Instance.TestHostAppDomainCreationStart();
+
+            this.appDomain = CreateNewAppDomain(testSourcePath);
             this.actualInvoker = CreateInvokerInAppDomain(appDomain);
+
+            TestPlatformEventSource.Instance.TestHostAppDomainCreationStop();
         }
 
         /// <summary>
@@ -50,9 +56,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                         AppDomain.Unload(appDomain);
                     }
 
-                    if (this.mergedConfigFile != null && File.Exists(mergedConfigFile))
+                    if (!string.IsNullOrWhiteSpace(this.mergedTempConfigFile) && File.Exists(mergedTempConfigFile))
                     {
-                        File.Delete(mergedConfigFile);
+                        File.Delete(mergedTempConfigFile);
                     }
                 }
                 catch
@@ -62,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private AppDomain CreateNewAppDomain(string testSourcePath, out string mergedConfigFile)
+        private AppDomain CreateNewAppDomain(string testSourcePath)
         {
             var appDomainSetup = new AppDomainSetup();
             var testSourceFolder = Path.GetDirectoryName(testSourcePath);
@@ -72,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             appDomainSetup.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
             // Set User Config file as app domain config
-            SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder, out mergedConfigFile);
+            SetConfigurationFile(appDomainSetup, testSourcePath, testSourceFolder);
 
             // Create new AppDomain
             return AppDomain.CreateDomain("TestHostAppDomain", null, appDomainSetup);
@@ -110,17 +116,25 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     null);
         }
 
-        private static void SetConfigurationFile(AppDomainSetup appDomainSetup, string testSource, string testSourceFolder, out string mergedConfigFile)
+        private void SetConfigurationFile(AppDomainSetup appDomainSetup, string testSource, string testSourceFolder)
         {
-            var configFile = GetConfigFile(testSource, testSourceFolder);
-            mergedConfigFile = null;
+            var userConfigFile = GetConfigFile(testSource, testSourceFolder);
             var testHostAppConfigFile = AppDomain.CurrentDomain.SetupInformation.ConfigurationFile;
 
-            if (!string.IsNullOrEmpty(configFile))
+            if (!string.IsNullOrEmpty(userConfigFile))
             {
+                var userConfigDoc = XDocument.Load(userConfigFile);
+                var testHostConfigDoc = XDocument.Load(testHostAppConfigFile);
+
                 // Merge user's config file and testHost config file and use merged one 
-                mergedConfigFile = MergeApplicationConfigFiles(configFile, testHostAppConfigFile);
-                appDomainSetup.ConfigurationFile = mergedConfigFile;
+                var mergedConfigDocument = MergeApplicationConfigFiles(userConfigDoc, testHostConfigDoc);
+
+                // Create a temp file with config
+                this.mergedTempConfigFile = Path.GetTempFileName();
+                mergedConfigDocument.Save(this.mergedTempConfigFile);
+
+                // Set config file to merged one
+                appDomainSetup.ConfigurationFile = this.mergedTempConfigFile;
             }
             else
             {
@@ -150,11 +164,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             return configFile;
         }
 
-        protected static string MergeApplicationConfigFiles(string userConfigFile, string testHostConfigFile)
+        protected static XDocument MergeApplicationConfigFiles(XDocument userConfigDoc, XDocument testHostConfigDoc)
         {
-            var userConfigDoc = XDocument.Load(userConfigFile);
-            var testHostConfigDoc = XDocument.Load(testHostConfigFile);
-
             // Start with User's config file as the base
             var mergedDoc = new XDocument(userConfigDoc);
 
@@ -208,10 +219,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
             }
 
-            var tempFile = Path.GetTempFileName();
-            mergedDoc.Save(tempFile);
-
-            return tempFile;
+            return mergedDoc;
         }
     }
 
