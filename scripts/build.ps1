@@ -23,7 +23,11 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("ff")]
-    [System.Boolean] $FailFast = $true
+    [System.Boolean] $FailFast = $true,
+
+    [Parameter(Mandatory=$false)]
+    [Alias("loc")]
+    [System.Boolean] $Localized = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -303,6 +307,31 @@ function Copy-PackageItems($packageName)
     Copy-Item -Path $binariesDirectory -Destination $publishDirectory -Recurse -Force
 }
 
+function Update-LocalizedResources
+{
+    $timer = Start-Timer
+
+    Write-Log "Update-LocalizedResources: Started."
+
+    # For each resx file, file the xlf files in all languages
+    # Sync the resx to xlf to ensure all new resources are added
+    $xlfTool = Join-Path $env:TP_PACKAGES_DIR "fmdev.xlftool\0.1.2\tools\xlftool.exe"
+    $resxFiles = Get-ChildItem -Recurse -Include *.resx "$env:TP_ROOT_DIR\src"
+
+    foreach ($resxFile in $resxFiles) {
+        Write-Log "... Resource: $resxFile"
+
+        foreach ($lang in @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")) {
+            $xlfFile = Join-Path $($resxFile.Directory.FullName) "xlf\$($resxFile.BaseName).$lang.xlf"
+
+            Write-VerboseLog "$xlfTool update -resx $($resxFile.FullName) -xlf $xlfFile -verbose"
+            & $xlfTool update -resx $resxFile.FullName -xlf $xlfFile -verbose
+        }
+    }
+
+    Write-Log "Update-LocalizedResources: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
 #
 # Helper functions
 #
@@ -357,6 +386,7 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Forma
 
 Install-DotNetCli
 Restore-Package
+Update-LocalizedResources
 Invoke-Build
 Publish-Package
 Create-VsixPackage
