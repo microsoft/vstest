@@ -81,7 +81,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             var expectedTime = 150;
             Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
 
-            this.testEnvironment.TargetFramework = currentTargetFrameWork; 
+            this.testEnvironment.TargetFramework = currentTargetFrameWork;
         }
     }
 }

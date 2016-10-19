@@ -112,18 +112,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
     internal class PortablePdbReader : IDisposable
     {
-        private MetadataReader _reader;
-        private MetadataReaderProvider _provider;
+        private MetadataReader reader;
+        private MetadataReaderProvider provider;
 
         public PortablePdbReader(Stream stream)
             : this(MetadataReaderProvider.FromPortablePdbStream(stream))
         {
+            if (!IsPortable(stream))
+            {
+                throw new Exception("Given stream is not portable stream");
+            }
         }
 
         internal PortablePdbReader(MetadataReaderProvider provider)
         {
-            _provider = provider;
-            _reader = provider.GetMetadataReader();
+            this.provider = provider;
+            this.reader = provider.GetMetadataReader();
         }
 
         public SourceInformation GetSourceInformation(MethodInfo methodInfo)
@@ -140,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         private SourceInformation GetSourceInformation(MethodDebugInformationHandle handle)
         {
-            if (_reader == null)
+            if (this.reader == null)
             {
                 throw new ObjectDisposedException(nameof(PortablePdbReader));
             }
@@ -148,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             SourceInformation sourceInformation = null;
             try
             {
-                var methodDebugDefinition = _reader.GetMethodDebugInformation(handle);
+                var methodDebugDefinition = this.reader.GetMethodDebugInformation(handle);
                 var fileName = GetMethodFileName(methodDebugDefinition);
                 int startLineNumber, endLineNumber;
                 GetMethodStartAndEndLineNumber(methodDebugDefinition, out startLineNumber, out endLineNumber);
@@ -177,8 +181,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             var fileName = string.Empty;
             if (!methodDebugDefinition.Document.IsNil)
             {
-                var document = _reader.GetDocument(methodDebugDefinition.Document);
-                fileName = _reader.GetString(document.Name);
+                var document = this.reader.GetDocument(methodDebugDefinition.Document);
+                fileName = this.reader.GetString(document.Name);
             }
 
             return fileName;
@@ -186,20 +190,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
         public void Dispose()
         {
-            _provider?.Dispose();
-            _provider = null;
-            _reader = null;
+            this.provider?.Dispose();
+            this.provider = null;
+            this.reader = null;
         }
 
         private static bool IsPortable(Stream stream)
         {
             bool result = stream.ReadByte() == 'B' && stream.ReadByte() == 'S' && stream.ReadByte() == 'J' && stream.ReadByte() == 'B';
-            stream.Position = 0;
-            return result;
-        }
-        private static bool IsPE(Stream stream)
-        {
-            bool result = stream.ReadByte() == 'M' && stream.ReadByte() == 'Z';
             stream.Position = 0;
             return result;
         }
@@ -223,11 +221,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
     internal static class MetadataExtensions
     {
-        private static PropertyInfo s_methodInfoMethodTokenProperty = typeof(MethodInfo).GetProperty("MetadataToken");
+        private static PropertyInfo methodInfoMethodTokenProperty = typeof(MethodInfo).GetProperty("MetadataToken");
 
         internal static int GetMethodToken(this MethodInfo methodInfo)
         {
-            return (int)s_methodInfoMethodTokenProperty.GetValue(methodInfo);
+            return (int)methodInfoMethodTokenProperty.GetValue(methodInfo);
         }
 
         internal static MethodDebugInformationHandle GetMethodDebugInformationHandle(this MethodInfo methodInfo)

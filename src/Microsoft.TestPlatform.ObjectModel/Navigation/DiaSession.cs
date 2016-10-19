@@ -35,11 +35,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         internal DiaSession(string binaryPath, string searchPath, ISymbolReader symbolReader)
         {
             this.symbolReader = symbolReader;
-            if (binaryPath == null)
-            {
-                throw new ArgumentNullException(nameof(binaryPath));
-            }
-
             ValidateArg.NotNullOrEmpty(binaryPath, "binaryPath");
             this.symbolReader.CacheSymbols(binaryPath, searchPath);
         }
