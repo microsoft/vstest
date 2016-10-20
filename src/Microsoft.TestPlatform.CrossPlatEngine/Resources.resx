@@ -146,6 +146,10 @@
   <data name="InitializationFailed" xml:space="preserve">
     <value>Failed to initialize client proxy: could not connect to test process.</value>
   </data>
+  <data name="JsonFileDoesNotExist" xml:space="preserve">
+    <value>The file {0} does not exist.</value>
+    <comment>{0} - Full name of the testDllname.deps.json</comment>
+  </data>
   <data name="LaunchDebugProcessNotAllowedForANonDebugRun" xml:space="preserve">
     <value>This operation is not allowed in the context of a non-debug run.</value>
   </data>
@@ -155,6 +159,9 @@
   <data name="NoMatchingExecutor" xml:space="preserve">
     <value>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</value>
     <comment>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</comment>
+  </data>
+  <data name="NoTestHostFileExist" xml:space="preserve">
+    <value>The testhost.dll could not be found (are you missing a nuget reference of package "microsoft.testplatform.testhost")</value>
   </data>
   <data name="NoValidSourceFoundForDiscovery" xml:space="preserve">
     <value>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </value>

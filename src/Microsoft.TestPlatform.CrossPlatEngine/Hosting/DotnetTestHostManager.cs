@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Linq;
     using System.Runtime.InteropServices;
 
+    using Microsoft.VisualStudio.TestPlatform;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -16,6 +17,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using Microsoft.Extensions.DependencyModel;
+    using Common.Logging;
+    using ObjectModel.Logging;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -35,6 +41,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private Process testHostProcess;
 
         private EventHandler registeredExitHandler;
+
+        private TestSessionMessageLogger logger = TestSessionMessageLogger.Instance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -91,17 +99,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         {
             // This host manager can create process start info for dotnet core targets only.
             // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
-            var startInfo = new TestProcessStartInfo { FileName = "dotnet" };
+            var startInfo = new TestProcessStartInfo();
 
-            var testHostExecutable = Path.Combine("NetCore", "testhost.dll");
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
-            var testRunnerDirectory = Path.GetDirectoryName(currentProcessPath);
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
                 startInfo.FileName = currentProcessPath;
-                testHostExecutable = "testhost.dll";
-                testRunnerDirectory = this.processHelper.GetTestEngineDirectory();
             }
             else
             {
@@ -126,28 +130,92 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (this.fileHelper.Exists(depsFilePath))
             {
                 args += " --depsfile \"" + depsFilePath + "\"";
+
+                var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
+                if (this.fileHelper.Exists(runtimeConfigDevPath))
+                {
+                    var testHostPath = GetTestHostPath(runtimeConfigDevPath, depsFilePath);
+                    args += " \"" + testHostPath + "\" " + connectionInfo.ToCommandLineOptions();
+                }
+                else
+                {
+                    logger.SendMessage(TestMessageLevel.Error, string.Format(CrossPlatEngine.Resources.JsonFileDoesNotExist, runtimeConfigDevPath));
+                }
+            }
+            else
+            {
+                logger.SendMessage(TestMessageLevel.Error, string.Format(CrossPlatEngine.Resources.JsonFileDoesNotExist, depsFilePath));
             }
 
             // Create a additional probing path args with Nuget.Client
             // args += "--additionalprobingpath xxx"
             // TODO this may be required in ASP.net, requires validation
 
-            // Add the testhost path and other arguments
-            var testHostPath = Path.Combine(testRunnerDirectory, testHostExecutable);
-            args += " \"" + testHostPath + "\" " + connectionInfo.ToCommandLineOptions();
-
             // Sample command line for the spawned test host
             // "D:\dd\gh\Microsoft\vstest\tools\dotnet\dotnet.exe" exec
             // --runtimeconfig G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.runtimeconfig.json
             // --depsfile G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.deps.json
             // --additionalprobingpath C:\Users\armahapa\.nuget\packages\ 
-            // G:\packages\testhost.dll
+            // G:\nuget-package-path\microsoft.testplatform.testhost\version\**\testhost.dll
             // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
             startInfo.WorkingDirectory = Directory.GetCurrentDirectory();
 
             return startInfo;
+        }
+
+        private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath)
+        {
+            string testHostPackageName = "microsoft.testplatform.testhost";
+            string testHostPath = string.Empty;
+
+            // Get testhost relative path
+            using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open))
+            {
+                var context = new DependencyContextJsonReader().Read(stream);
+                var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName)).FirstOrDefault();
+
+                foreach (var runtimeAssemblyGroup in testhostPackage?.RuntimeAssemblyGroups)
+                {
+                    foreach (var path in runtimeAssemblyGroup.AssetPaths)
+                    {
+                        if (path.Contains("testhost.dll"))
+                        {
+                            testHostPath = path;
+                        }
+                    }
+                }
+
+                testHostPath = Path.Combine(testhostPackage?.Path, testHostPath);
+            }
+
+            // Get probing path
+            List<string> prabingPath = new List<string>();
+
+            using (StreamReader file = File.OpenText(runtimeConfigDevPath))
+            using (JsonTextReader reader = new JsonTextReader(file))
+            {
+                JObject context = (JObject)JToken.ReadFrom(reader);
+                JObject runtimeOptions = (JObject)context.GetValue("runtimeOptions");
+                JToken additionalProbingPaths = runtimeOptions.GetValue("additionalProbingPaths");
+                foreach (var x in additionalProbingPaths)
+                {
+                    prabingPath.Add(x.ToString());
+                }
+            }
+
+            foreach (string pb in prabingPath)
+            {
+                string testHostFullPath = Path.Combine(pb, testHostPath);
+                if (this.fileHelper.Exists(testHostFullPath))
+                {
+                    return testHostFullPath;
+                }
+            }
+
+            logger.SendMessage(TestMessageLevel.Error, CrossPlatEngine.Resources.NoTestHostFileExist);
+            return string.Empty;
         }
 
         /// <inheritdoc/>
@@ -188,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>Full path to <c>dotnet</c> executable</returns>
         private string GetDotnetHostFullPath()
         {
-            char separator = ';'; 
+            char separator = ';';
             var dotnetExeName = "dotnet.exe";
 
             // Use semicolon(;) as path separator for windows
