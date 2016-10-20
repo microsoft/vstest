@@ -265,8 +265,8 @@ function Create-NugetPackages
     $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.SDK.nuspec")
-    $targetFiles = @("Microsoft.Net.Test.SDK.targets")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec")
+    $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
     foreach ($file in $nuspecFiles + $targetFiles) {
