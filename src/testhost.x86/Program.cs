@@ -6,30 +6,16 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Collections.Generic;
     using System.Diagnostics;
 
-    using CrossPlatEngine;
-
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
     /// <summary>
     /// The program.
     /// </summary>
     public class Program
     {
-        /// <summary>
-        /// The timeout for the client to connect to the server.
-        /// </summary>
-        private const int ClientListenTimeOut = 5 * 1000;
-
-        private const string PortArgument = "--port";
-
-        private const string ParentProcessIdArgument = "--parentprocessid";
-
-        private const string LogFileArgument = "--diag";
+        private const string TestSourceArgumentString = "--testsourcepath";
 
         /// <summary>
         /// The main.
@@ -41,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         {
             try
             {
+                TestPlatformEventSource.Instance.TestHostStart();
                 WaitForDebuggerIfEnabled();
                 Run(args);
             }
@@ -48,51 +35,46 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 EqtTrace.Error("TestHost: Error occured during initialization of TestHost : {0}", ex);
             }
+            finally
+            {
+                TestPlatformEventSource.Instance.TestHostStop();
+            }
         }
 
         private static void Run(string[] args)
         {
-            TestPlatformEventSource.Instance.TestHostStart();
             var argsDictionary = GetArguments(args);
-            var requestHandler = new TestRequestHandler();
+            // Invoke the engine with arguments
+            GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
+        }
 
-            // Attach to exit of parent process
-            var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
-            OnParentProcessExit(parentProcessId, requestHandler);
-
-            // Setup logging if enabled
-            string logFile;
-            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+        private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
+        {
+            IEngineInvoker invoker = null;
+#if NET46
+            // If Args contains test source argument, invoker Engine in new appdomain 
+            string testSourcePath;
+            if (argsDictionary.TryGetValue(TestSourceArgumentString, out testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))
             {
-                EqtTrace.InitializeVerboseTrace(logFile);
+                // remove the test source arg from dictionary
+                argsDictionary.Remove(TestSourceArgumentString);
+
+                // Only DLLs and EXEs can have app.configs or ".exe.config" or ".dll.config"
+                if (System.IO.File.Exists(testSourcePath) &&
+                        (testSourcePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
+                        || testSourcePath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)))
+                {
+                    invoker = new AppDomainEngineInvoker<DefaultEngineInvoker>(testSourcePath);
+                }
             }
-
-            // Get port number and initialize communication
-            var portNumber = GetIntArgFromDict(argsDictionary, PortArgument);
-            requestHandler.InitializeCommunication(portNumber);
-
-            // Setup the factory
-            var managerFactory = new TestHostManagerFactory();
-
-            // Wait for the connection to the sender and start processing requests from sender
-            if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
-            {
-                requestHandler.ProcessRequests(managerFactory);
-            }
-            else
-            {
-                EqtTrace.Info("TestHost: RequestHandler timed out while connecting to the Sender.");
-                requestHandler.Close();
-                throw new TimeoutException();
-            }
-
-            TestPlatformEventSource.Instance.TestHostStop();
+#endif
+            return invoker ?? new DefaultEngineInvoker();
         }
 
         /// <summary>
         /// Parse command line arguments to a dictionary.
         /// </summary>
-        /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312" }</c></param>
+        /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", "C:\temp\1.dll" }</c></param>
         /// <returns>Dictionary of arguments keys and values.</returns>
         private static IDictionary<string, string> GetArguments(string[] args)
         {
@@ -116,34 +98,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             return argsDictionary;
         }
 
-        /// <summary>
-        /// Parse the value of an argument as an integer.
-        /// </summary>
-        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
-        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
-        /// <returns>Value of the argument.</returns>
-        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
-        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
-        {
-            string optionValue;
-            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
-        }
-
-
-        private static void OnParentProcessExit(int parentProcessId, ITestRequestHandler requestHandler)
-        {
-            EqtTrace.Info("TestHost: exits itself because parent process exited");
-            var process = Process.GetProcessById(parentProcessId);
-            process.EnableRaisingEvents = true;
-            process.Exited += (sender, args) =>
-                {
-                    requestHandler?.Close();
-                    TestPlatformEventSource.Instance.TestHostStop();
-                    process.Dispose();
-                    Environment.Exit(0);
-                };
-        }
-
         private static void WaitForDebuggerIfEnabled()
         {
             var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
@@ -151,17 +105,17 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             {
                 ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
 
-                var currentProcess = System.Diagnostics.Process.GetCurrentProcess();
+                var currentProcess = Process.GetCurrentProcess();
                 ConsoleOutput.Instance.WriteLine(
                     string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
                     OutputLevel.Information);
 
-                while (!System.Diagnostics.Debugger.IsAttached)
+                while (!Debugger.IsAttached)
                 {
                     System.Threading.Thread.Sleep(1000);
                 }
 
-                System.Diagnostics.Debugger.Break();
+                Debugger.Break();
             }
         }
     }

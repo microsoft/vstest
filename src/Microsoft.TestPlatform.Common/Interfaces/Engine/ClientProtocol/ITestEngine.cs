@@ -36,9 +36,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Fetches the Test Host manager for this engine. This manager would provide extensibility
         /// features that this engine supports.
         /// </summary>
-        /// <param name="architecture">Architecture of the test run.</param>
-        /// <param name="framework">Runtime framework for this run.</param>
+        /// <param name="runConfiguration">RunConfiguration information which contains info like Architecture, Framework for the test run.</param>
         /// <returns>Launcher for the test host process</returns>
-        ITestHostManager GetDefaultTestHostManager(Architecture architecture, Framework framework);
+        ITestHostManager GetDefaultTestHostManager(RunConfiguration runConfiguration);
     }
 }
