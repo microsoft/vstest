@@ -15,6 +15,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     [TestClass]
     public class DefaultTestHostManagerTests
@@ -28,14 +29,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
 
-            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
 
         [TestMethod]
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(Architecture.X86, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
@@ -80,6 +81,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeCurrentWorkingDirectory()
         {
             Assert.AreEqual(Directory.GetCurrentDirectory(), this.startInfo.WorkingDirectory);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeTestSourcePathInArgumentsIfNonShared()
+        {
+            this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, shared: false);
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
+
+            var source = "C:\temp\a.dll";
+            var info = this.testHostManager.GetTestHostProcessStartInfo(
+                new List<string>() { source },
+                null,
+                connectionInfo);
+
+            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + "\"" + source + "\"", info.Arguments);
         }
 
         [TestMethod]
