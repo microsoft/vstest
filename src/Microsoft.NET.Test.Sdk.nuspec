@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Microsoft.NET.Test.SDK</id>
+    <id>Microsoft.NET.Test.Sdk</id>
     <version>1.0.0-preview</version>
     <title>The MSbuild targets and properties for building the .Net core test projects.</title>
     <authors>Microsoft</authors>
@@ -10,11 +10,11 @@
     <description>The MSbuild targets and properties for building the .Net core test projects.</description>
     <copyright>Copyright 2015</copyright>
     <dependencies>
-        <dependency id="Microsoft.TestPlatform.TestHost" version="15.0.0-preview-20161012-02" />
+      <dependency id="Microsoft.TestPlatform.TestHost" version="15.0.0-preview-20161012-02" />
     </dependencies>
   </metadata>
   <files>
-    <file src="Microsoft.NET.Test.SDK.targets" target="build\netcoreapp1.0\" />
-    <file src="Microsoft.NET.Test.SDK.targets" target="build\net46\" />
+    <file src="Microsoft.NET.Test.Sdk.targets" target="build\netcoreapp1.0\" />
+    <file src="Microsoft.NET.Test.Sdk.targets" target="build\net46\" />
   </files>
 </package>
