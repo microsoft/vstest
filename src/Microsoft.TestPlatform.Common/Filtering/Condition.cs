@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
 
     internal enum Operation
     {
@@ -158,14 +158,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             string[] parts = Regex.Split(conditionString, propertyNameValueSeperatorString);
             if (parts.Length != 3)
             {
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, Common.Resources.InvalidCondition, conditionString)));
+                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
             }
 
             for (int index = 0; index < 3; index++)
             {
                 if (string.IsNullOrWhiteSpace(parts[index]))
                 {
-                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, Common.Resources.InvalidCondition, conditionString)));
+                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
                 }
                 parts[index] = parts[index].Trim();
             }
@@ -235,7 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 case "~":
                     return Operation.Contains;
             }
-            throw new FormatException(string.Format(CultureInfo.CurrentCulture, Common.Resources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, Common.Resources.InvalidOperator, operationString)));
+            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidOperator, operationString)));
         }
 
         /// <summary>

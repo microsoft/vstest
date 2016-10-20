@@ -12,12 +12,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Enumerates through all the discoverers.
@@ -103,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 {
                     var mesage = string.Format(
                         CultureInfo.CurrentUICulture,
-                        CrossPlatEngine.Resources.DiscovererInstantiationException,
+                        CrossPlatEngineResources.DiscovererInstantiationException,
                         e.Message);
                     logger.SendMessage(TestMessageLevel.Warning, mesage);
                     EqtTrace.Error(e);
@@ -138,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 {
                     var message = string.Format(
                         CultureInfo.CurrentUICulture,
-                        CrossPlatEngine.Resources.ExceptionFromLoadTests,
+                        CrossPlatEngineResources.ExceptionFromLoadTests,
                         discovererType.Name,
                         e.Message);
 
@@ -185,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // No discoverer available, log a warning
                 logger.SendMessage(
                     TestMessageLevel.Warning,
-                    String.Format(CultureInfo.CurrentCulture, CrossPlatEngine.Resources.NoDiscovererRegistered));
+                    String.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoDiscovererRegistered));
 
                 return null;
             }

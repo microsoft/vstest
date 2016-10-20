@@ -4,6 +4,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// This attribute is applied to ITestDiscoverers.  It indicates
     /// which file extensions the test discoverer knows how to process.

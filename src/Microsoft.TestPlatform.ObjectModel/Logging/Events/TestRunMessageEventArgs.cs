@@ -5,6 +5,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging
     using System;
     using System.Runtime.Serialization;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// Event arguments used for raising Test Run Message events.
     /// </summary>

@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 throw new SettingsException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.InvalidRunSettingsRootNode));
+                        Resources.Resources.InvalidRunSettingsRootNode));
             }
         }
 

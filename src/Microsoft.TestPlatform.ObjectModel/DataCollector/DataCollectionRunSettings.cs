@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 throw new SettingsException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.InvalidSettingsXmlAttribute,
+                        Resources.Resources.InvalidSettingsXmlAttribute,
                         dataCollectorsName,
                         reader.Name));
             }
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         throw new SettingsException(
                             string.Format(
                                 CultureInfo.CurrentCulture,
-                                Resources.InvalidSettingsXmlElement,
+                                Resources.Resources.InvalidSettingsXmlElement,
                                 dataCollectorsName,
                                 reader.Name));
                     }
@@ -195,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 throw new SettingsException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.InvalidSettingsXmlAttribute,
+                        Resources.Resources.InvalidSettingsXmlAttribute,
                         dataCollectorsName,
                         reader.Name));
             }
@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         throw new SettingsException(
                                 string.Format(
                                     CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsXmlElement,
+                                    Resources.Resources.InvalidSettingsXmlElement,
                                     dataCollectorsName,
                                     reader.Name));
                     }

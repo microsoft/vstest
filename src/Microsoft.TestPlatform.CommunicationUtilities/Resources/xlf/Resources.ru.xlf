@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="ru" original="../Resources.resx">
+    <body>
+      <trans-unit id="AbortedTestRun">
+        <source>The active Test Run was aborted.</source>
+        <target state="new">The active Test Run was aborted.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ConnectionClosed">
+        <source>An existing connection was forcibly closed by the remote host.</source>
+        <target state="new">An existing connection was forcibly closed by the remote host.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="AbortedTestDiscovery">
+        <source>The active Test Discovery was aborted.</source>
+        <target state="new">The active Test Discovery was aborted.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="UnableToCommunicateToTestHost">
+        <source>Unable to communicate with test execution process.</source>
+        <target state="new">Unable to communicate with test execution process.</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

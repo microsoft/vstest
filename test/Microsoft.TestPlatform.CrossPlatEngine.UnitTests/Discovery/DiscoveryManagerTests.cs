@@ -8,16 +8,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Reflection;
     
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
+
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     [TestClass]
     public class DiscoveryManagerTests
@@ -87,7 +87,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
             var sourcesString = string.Join(",", sources.ToArray());
-            var errorMessage = string.Format(CultureInfo.CurrentCulture, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.NoValidSourceFoundForDiscovery, sourcesString);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoValidSourceFoundForDiscovery, sourcesString);
             mockLogger.Verify(
                 l =>
                 l.HandleLogMessage(
@@ -114,7 +114,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
-            var errorMessage = string.Format(CultureInfo.CurrentCulture, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.DuplicateSource, sources[0]);
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DuplicateSource, sources[0]);
             mockLogger.Verify(
                 l =>
                 l.HandleLogMessage(

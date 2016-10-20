@@ -49,6 +49,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         void TestHostStop();
 
         /// <summary>
+        /// The test host AppDomain Start.
+        /// </summary>
+        void TestHostAppDomainCreationStart();
+
+        /// <summary>
+        /// The test host AppDomain Stop.
+        /// </summary>
+        void TestHostAppDomainCreationStop();
+
+        /// <summary>
         /// The adapter search start.
         /// </summary>
         void AdapterSearchStart();

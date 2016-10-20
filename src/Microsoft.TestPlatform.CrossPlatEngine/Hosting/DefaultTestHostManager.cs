@@ -40,8 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         /// <param name="architecture">Platform architecture of the host process.</param>
         /// <param name="framework">Runtime framework for the host process.</param>
-        public DefaultTestHostManager(Architecture architecture, Framework framework)
-            : this(architecture, framework, new ProcessHelper())
+        public DefaultTestHostManager(Architecture architecture, Framework framework, bool shared)
+            : this(architecture, framework, new ProcessHelper(), shared)
         {
         }
 
@@ -51,16 +51,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <param name="architecture">Platform architecture of the host process.</param>
         /// <param name="framework">Runtime framework for the host process.</param>
         /// <param name="processHelper">Process helper instance.</param>
-        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper)
+        /// <param name="shared">Share the manager for multiple sources or not</param>
+        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper, bool shared)
         {
             this.architecture = architecture;
             this.framework = framework;
             this.processHelper = processHelper;
             this.testHostProcess = null;
+
+            this.Shared = shared;
         }
 
         /// <inheritdoc/>
-        public bool Shared => true;
+        public bool Shared { get; private set; }
 
         /// <summary>
         /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
@@ -122,6 +125,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 // "TestHostfx" is the name of the folder which contain Full CLR built testhost package assemblies inside Core CLR package folder.
                 testHostProcessName = Path.Combine("TestHostfx", testHostProcessName);
+            }
+
+            if (!this.Shared)
+            {
+                // Not sharing the host which means we need to pass the test assembly path as argument
+                // so that the test host can create an appdomain on startup (Main method) and set appbase
+                argumentsString += " " + "--testsourcepath " + "\"" + sources.FirstOrDefault() + "\"";
             }
 
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);

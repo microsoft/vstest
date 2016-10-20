@@ -3,11 +3,10 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Globalization;
-    using System.Linq;
-    using System.Threading.Tasks;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Parallel Option Argument processor that allows the user to specify if tests are to be run in parallel.
@@ -72,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
-        public override string HelpContentResourceName => Resources.ParallelArgumentProcessorHelp;
+        public override string HelpContentResourceName => CommandLineResources.ParallelArgumentProcessorHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.ParallelArgumentProcessorHelpPriority;
     }
@@ -118,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (!string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, Resources.InvalidParallelCommand, argument));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidParallelCommand, argument));
             }
 
             commandLineOptions.Parallel = true;

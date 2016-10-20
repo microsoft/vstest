@@ -99,8 +99,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <param name="architecture">The architecture we want the test host manager for.</param>
         /// <param name="framework">Framework for the test session.</param>
         /// <returns>An instance of the test host manager.</returns>
-        public ITestHostManager GetDefaultTestHostManager(Architecture architecture, Framework framework)
+        public ITestHostManager GetDefaultTestHostManager(RunConfiguration runConfiguration)
         {
+            var framework = runConfiguration.TargetFrameworkVersion;
+
             // This is expected to be called once every run so returning a new instance every time.
             if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
                 || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -108,7 +110,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return new DotnetTestHostManager();
             }
 
-            return new DefaultTestHostManager(architecture, framework);
+            // Only share the manager if DisableAppDomain is "false"
+            // meaning AppDomain is enabled and we can reuse the host for multiple sources
+            return new DefaultTestHostManager(runConfiguration.TargetPlatform, framework, shared: !runConfiguration.DisableAppDomain);
         }
 
         #endregion

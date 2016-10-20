@@ -3,20 +3,25 @@
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 {
     using System;
-
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
-    using VisualStudio.TestPlatform.ObjectModel.Client;
-    using Moq;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Globalization;
+    using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
+    using Utility;
+
+    using VisualStudio.TestPlatform.ObjectModel;
+    using VisualStudio.TestPlatform.ObjectModel.Client;
     using VisualStudio.TestPlatform.ObjectModel.Logging;
+
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
-    using System.Globalization;
-    using VisualStudio.TestPlatform.ObjectModel;
-    using System.Collections.ObjectModel;
-    using Utility;
-    using System.Linq;
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     [TestClass]
     public class TrxLoggerTests
@@ -209,7 +214,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             this.trxLogger.TestResultHandler(new object(), skip1.Object);
 
-            string expectedMessage = String.Format(CultureInfo.CurrentCulture, TrxResource.MessageForSkippedTests, "Skip1");
+            string expectedMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, "Skip1");
 
             Assert.AreEqual(String.Compare(this.trxLogger.GetRunLevelInformationalMessage(), expectedMessage, true), 0);
         }

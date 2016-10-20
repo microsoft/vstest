@@ -2,9 +2,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
-    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using System;
     using System.Diagnostics.Contracts;
+
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Argument Processor for the "--ParentProcessId|/ParentProcessId" command line argument.
@@ -73,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.ParentProcessId;
 
-        public override string HelpContentResourceName => Resources.ParentProcessIdArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.ParentProcessIdArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.ParentProcessIdArgumentProcessorHelpPriority;
     }
@@ -117,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             int parentProcessId;
             if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out parentProcessId))
             {
-                throw new CommandLineException(Resources.InvalidParentProcessIdArgument);
+                throw new CommandLineException(CommandLineResources.InvalidParentProcessIdArgument);
             }
 
             this.commandLineOptions.ParentProcessId = parentProcessId;

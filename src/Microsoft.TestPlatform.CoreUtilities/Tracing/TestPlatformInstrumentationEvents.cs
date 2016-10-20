@@ -107,5 +107,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// The adapter discovery stop event id.
         /// </summary>
         public const int AdapterDiscoveryStopEventId = 0x28;
+
+        /// <summary>
+        /// The test host appdomain start event id.
+        /// </summary>
+        public const int TestHostAppDomainCreationStartEventId = 0x30;
+
+        /// <summary>
+        /// The test host appdomain stop event id.
+        /// </summary>
+        public const int TestHostAppDomainCreationStopEventId = 0x31;
     }
 }

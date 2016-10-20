@@ -3,10 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
-    using System.Collections.Generic;
     using System.Globalization;
-    using System.Linq;
-    using System.Threading.Tasks;
     using System.Xml;
 
     /// <summary>
@@ -159,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             throw new SettingsException(
                                 String.Format(
                                     CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsXmlAttribute,
+                                    Resources.Resources.InvalidSettingsXmlAttribute,
                                     Constants.DataCollectionRunSettingsName,
                                     reader.Name));
                     }
@@ -170,14 +167,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             if (settings.Uri == null)
             {
                 throw new SettingsException(
-                    String.Format(CultureInfo.CurrentCulture, Resources.MissingDataCollectorAttributes, "Uri"));
+                    String.Format(CultureInfo.CurrentCulture, Resources.Resources.MissingDataCollectorAttributes, "Uri"));
             }
             if (settings.AssemblyQualifiedName == null)
             {
                 throw new SettingsException(
                     String.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.MissingDataCollectorAttributes,
+                        Resources.Resources.MissingDataCollectorAttributes,
                         "AssemblyQualifiedName"));
             }
 
@@ -199,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             throw new SettingsException(
                                 String.Format(
                                     CultureInfo.CurrentCulture,
-                                    Resources.InvalidSettingsXmlElement,
+                                    Resources.Resources.InvalidSettingsXmlElement,
                                     Constants.DataCollectionRunSettingsName,
                                     reader.Name));
                     }

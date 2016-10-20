@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-            var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration.TargetPlatform, runconfiguration.TargetFrameworkVersion);
+            var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration);
             
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
             discoveryManager.Initialize();
@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-            var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration.TargetPlatform, runConfiguration.TargetFrameworkVersion);
+            var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
 
             if (testRunCriteria.TestHostLauncher != null)
             {

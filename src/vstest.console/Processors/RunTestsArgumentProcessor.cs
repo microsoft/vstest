@@ -4,20 +4,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Diagnostics.Contracts;
+    using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class RunTestsArgumentProcessor : IArgumentProcessor
     {
@@ -71,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
-        public override string HelpContentResourceName => Resources.RunTestsArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.RunTestsArgumentHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.RunTestsArgumentProcessorHelpPriority;
 
@@ -151,12 +150,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (anySource == null)
             {
 #if TODO
-                logger.SendMessage(TestMessageLevel.Error, Resources.MissingTestSourceFile);
+                logger.SendMessage(TestMessageLevel.Error, CommandLineResources.MissingTestSourceFile);
 #endif
                 return ArgumentProcessorResult.Fail;
             }
 
-            this.output.WriteLine(Resources.StartingExecution, OutputLevel.Information);
+            this.output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);
 
             var success = true;
             if (this.commandLineOptions.Sources.Any())
@@ -233,7 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     // Indicate the user to use vsix extensions command if there are no tests found
                     //if (Utilities.ShouldIndicateTheUserToUseVsixExtensionsCommand(testsFoundInAnySource, commandLineOptions))
                     //{
-                    //    output.Information(Resources.SuggestUseVsixExtensionsIfNoTestsIsFound);
+                    //    output.Information(CommandLineResources.SuggestUseVsixExtensionsIfNoTestsIsFound);
                     //    output.WriteLine(string.Empty, OutputLevel.Information);
                     //}
                 }
