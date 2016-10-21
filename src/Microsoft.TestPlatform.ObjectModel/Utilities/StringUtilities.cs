@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             string result = input;
             if (input == null)
             {
-                result = Resources.NullString;
+                result = Resources.Resources.NullString;
             }
 
             result = result.TrimEnd(Environment.NewLine.ToCharArray());

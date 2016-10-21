@@ -80,6 +80,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         }
 
         /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestHostAppDomainCreationStartEventId)]
+        public void TestHostAppDomainCreationStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestHostAppDomainCreationStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TestHostAppDomainCreationStopEventId)]
+        public void TestHostAppDomainCreationStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TestHostAppDomainCreationStopEventId);
+        }
+
+        /// <inheritdoc/>
         [Event(TestPlatformInstrumentationEvents.AdapterSearchStartEventId)]
         public void AdapterSearchStart()
         {

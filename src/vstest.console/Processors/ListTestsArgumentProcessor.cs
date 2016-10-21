@@ -6,15 +6,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
     /// Argument Executor for the "-lt|--ListTests|/lt|/ListTests" command line argument.
@@ -95,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
-        public override string HelpContentResourceName => Resources.ListTestsHelp;
+        public override string HelpContentResourceName => CommandLineResources.ListTestsHelp;
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.ListTestsArgumentProcessorHelpPriority;
     }
@@ -200,12 +202,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (this.commandLineOptions.Sources.Count() <= 0)
             {
 #if TODO
-                this.logger.SendMessage(TestMessageLevel.Error, Resources.MissingTestSourceFile);
+                this.logger.SendMessage(TestMessageLevel.Error, CommandLineResources.MissingTestSourceFile);
 #endif
                 return ArgumentProcessorResult.Fail;
             }
 
-            this.output.WriteLine(Resources.ListTestsHeaderMessage, OutputLevel.Information);
+            this.output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
 
             var runSettings = RunSettingsUtilities.GetRunSettings(this.runSettingsManager, this.commandLineOptions);
 
@@ -254,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
 
                     output.WriteLine(String.Format(CultureInfo.CurrentUICulture,
-                                                    Resources.AvailableTestsFormat,
+                                                    CommandLineResources.AvailableTestsFormat,
                                                     test.DisplayName),
                                        OutputLevel.Information);
                 }

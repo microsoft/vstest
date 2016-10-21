@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
 
     /// <summary>
     /// Utility Methods for sending output to IOutput.

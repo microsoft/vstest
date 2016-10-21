@@ -6,6 +6,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.Diagnostics;
     using System.Globalization;
 
+    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+
     /// <summary>
     /// Class to be used for parameter verification.
     /// </summary>
@@ -58,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             Debug.Assert(!string.IsNullOrEmpty(parameter), string.Format(CultureInfo.InvariantCulture, "'{0}' is null or empty", parameterName));
             if (string.IsNullOrEmpty(parameter))
             {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TrxResource.Common_CannotBeNullOrEmpty));
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotBeNullOrEmpty));
             }
         }
 

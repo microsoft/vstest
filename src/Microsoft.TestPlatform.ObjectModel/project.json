@@ -4,7 +4,8 @@
     "outputName": "Microsoft.VisualStudio.TestPlatform.ObjectModel",
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "embed": [ "Resources/*.resx" ]
   },
   "dependencies": {
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",

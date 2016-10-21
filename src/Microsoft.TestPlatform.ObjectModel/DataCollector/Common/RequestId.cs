@@ -5,6 +5,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     using System;
     using System.Diagnostics.CodeAnalysis;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// Wrapper class for a request ID that can be used for messages or events for identification
     /// purposes

@@ -4,6 +4,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
+
     /// <summary>
     /// This attribute is applied to extensions so they can be uniquely identified.
     /// It indicates the Uri which uniquely identifies the extension.  If this attribute

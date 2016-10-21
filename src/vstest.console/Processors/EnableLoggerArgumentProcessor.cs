@@ -10,6 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
     /// <summary>
     /// An argument processor that allows the user to enable a specific logger
     /// from the command line using the --Logger|/Logger command line switch.
@@ -96,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Gets the help content resource name.
         /// </summary>
-        public override string HelpContentResourceName => Resources.EnableLoggersArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.EnableLoggersArgumentHelp;
 
         /// <summary>
         /// Gets the help priority.
@@ -168,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                             throw new CommandLineException(
                             String.Format(
                             CultureInfo.CurrentUICulture,
-                            Resources.LoggerNotFound,
+                            CommandLineResources.LoggerNotFound,
                             argument));
                         }
                     }
@@ -205,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             throw new CommandLineException(
                 string.Format(
                     CultureInfo.CurrentUICulture,
-                    Resources.LoggerUriInvalid,
+                    CommandLineResources.LoggerUriInvalid,
                     argument));
         }
 

@@ -4,23 +4,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Diagnostics.Contracts;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
     {
@@ -72,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool AllowMultiple => false;
 
-        public override string HelpContentResourceName => Resources.RunSpecificTestsHelp;
+        public override string HelpContentResourceName => CommandLineResources.RunSpecificTestsHelp;
         
         public override HelpContentPriority HelpPriority => HelpContentPriority.RunSpecificTestsArgumentProcessorHelpPriority;
 
@@ -175,11 +173,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (!string.IsNullOrWhiteSpace(argument))
             {
-                selectedTestNames = new Collection<string>(argument.Split(new string[] { Resources.SearchStringDelimiter }, StringSplitOptions.RemoveEmptyEntries));
+                selectedTestNames = new Collection<string>(argument.Split(new string[] { CommandLineResources.SearchStringDelimiter }, StringSplitOptions.RemoveEmptyEntries));
             }
             if (selectedTestNames == null || selectedTestNames.Count <= 0)
             {
-                throw new CommandLineException(Resources.SpecificTestsRequired);
+                throw new CommandLineException(CommandLineResources.SpecificTestsRequired);
             }
 
             // by default all filters are not discovered on launch
@@ -199,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (commandLineOptions.Sources.Count() <= 0)
             {
 #if TODO
-                logger.SendMessage(TestMessageLevel.Error, Resources.MissingTestSourceFile);
+                logger.SendMessage(TestMessageLevel.Error, CommandLineResources.MissingTestSourceFile);
 #endif
                 return ArgumentProcessorResult.Fail;
             }
@@ -207,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (!string.IsNullOrWhiteSpace(commandLineOptions.TestCaseFilterValue))
             {
 #if TODO
-                logger.SendMessage(TestMessageLevel.Error, Resources.InvalidTestCaseFilterValueForSpecificTests);
+                logger.SendMessage(TestMessageLevel.Error, CommandLineResources.InvalidTestCaseFilterValueForSpecificTests);
 #endif
                 return ArgumentProcessorResult.Fail;
             }
@@ -235,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="testPlatform">TestPlatform created based on the command line options</param>
         private bool DiscoverTestsAndSelectSpecified(IEnumerable<string> sources)
         {
-            output.WriteLine(Resources.StartingDiscovery, OutputLevel.Information);
+            output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
             return this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = sources, RunSettings = effectiveRunSettings }, this.discoveryEventsRegistrar);
         }
@@ -251,7 +249,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 if (undiscoveredFilters.Count() != 0)
                 {
                     string missingFilters = string.Join(", ", undiscoveredFilters);
-                    string warningMessage = string.Format(CultureInfo.CurrentCulture, Resources.SomeTestsUnavailableAfterFiltering, discoveredTestCount, missingFilters);
+                    string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, discoveredTestCount, missingFilters);
                     output.Warning(warningMessage);
                 }
                 
@@ -268,16 +266,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 if (discoveredTestCount > 0)
                 {
                     // No tests that matched any of the given strings.
-                    warningMessage = string.Format(CultureInfo.CurrentCulture, Resources.NoTestsAvailableAfterFiltering, discoveredTestCount, String.Join(", ", selectedTestNames));
+                    warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsAvailableAfterFiltering, discoveredTestCount, String.Join(", ", selectedTestNames));
                 }
                 else
                 {
                     // No tests were discovered from the given sources.
-                    warningMessage = string.Format(CultureInfo.CurrentUICulture, Resources.NoTestsAvailableInSources, string.Join(", ", commandLineOptions.Sources));
+                    warningMessage = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.NoTestsAvailableInSources, string.Join(", ", commandLineOptions.Sources));
                      
                     if (!commandLineOptions.UseVsixExtensions)
                     {
-                        warningMessage = string.Format(CultureInfo.CurrentCulture, Resources.NoTestsFoundWarningMessageWithSuggestionToUseVsix, warningMessage, Resources.SuggestUseVsixExtensionsIfNoTestsIsFound);
+                        warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoTestsFoundWarningMessageWithSuggestionToUseVsix, warningMessage, CommandLineResources.SuggestUseVsixExtensionsIfNoTestsIsFound);
                     }
                 }
                 output.Warning(warningMessage);

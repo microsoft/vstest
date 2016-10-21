@@ -6,20 +6,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
-    using ObjectModel.Logging;
+
     using ObjectModel.Client;
+    using ObjectModel.Logging;
+
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     internal class RunTestsWithSources : BaseRunTests
     {
@@ -65,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     TestMessageLevel.Warning,
                     string.Format(
                         CultureInfo.CurrentUICulture,
-                        CrossPlatEngine.Resources.TestRunFailed_NoTestsAreAvailableInTheSources,
+                        CrossPlatEngineResources.TestRunFailed_NoTestsAreAvailableInTheSources,
                         sourcesString));
             }
         }
@@ -138,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     {
                         string errorMessage = string.Format(
                             CultureInfo.CurrentUICulture,
-                            CrossPlatEngine.Resources.IgnoringExecutorAsNoDefaultExecutorUriAttribute,
+                            CrossPlatEngineResources.IgnoringExecutorAsNoDefaultExecutorUriAttribute,
                             discoverer.Value);
                         logger.SendMessage(TestMessageLevel.Warning, errorMessage);
                         continue;
@@ -154,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     {
                         string errorMessage = string.Format(
                             CultureInfo.CurrentUICulture,
-                            CrossPlatEngine.Resources.DuplicateAdaptersFound,
+                            CrossPlatEngineResources.DuplicateAdaptersFound,
                             executorUri,
                             discoverer.Value);
                         logger.SendMessage(TestMessageLevel.Warning, errorMessage);

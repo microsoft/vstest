@@ -16,6 +16,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+
     /// <summary>
     /// Manages the settings provider extensions.
     /// </summary>
@@ -181,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
         {
             if (string.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "settingsName");
             }
 
             LazyExtension<ISettingsProvider, ISettingsProviderCapabilities> settingsProvider;
@@ -208,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
                         TestMessageLevel.Error,
                         string.Format(
                             CultureInfo.CurrentUICulture,
-                            Common.Resources.DuplicateSettingsName,
+                            CommonResources.DuplicateSettingsName,
                             settingsProvider.Metadata.SettingsName));
                 }
                 else

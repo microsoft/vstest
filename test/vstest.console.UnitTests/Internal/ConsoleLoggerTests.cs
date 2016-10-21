@@ -2,21 +2,24 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 {
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
     using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
-    using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System.Globalization;
     using System.Collections.ObjectModel;
-    using Resources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources;
+    using System.Globalization;
+    using System.Threading;
+
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
     public class ConsoleLoggerTests
@@ -102,12 +105,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
             this.FlushLoggerMessages();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -130,8 +133,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Raise an event on mock object
             this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.TestRunSummary, 1, 1, 0, 0), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(Resources.TestRunSuccessful, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 1, 1, 0, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -144,8 +147,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Raise an event on mock object
             this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(1, 0, 0, 0)));
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.TestRunSummary, 1, 0, 1, 0), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(Resources.TestRunFailed, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 1, 0, 1, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunFailed, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -162,10 +165,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, false, null, null, new TimeSpan(0, 0, 0, 1)));
 
             // Verify PrintTimeSpan with different formats
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Days), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Hours), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Minutes), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.ExecutionTimeFormatString, 1, Resources.Seconds), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Days), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Hours), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Minutes), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, 1, CommandLineResources.Seconds), OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -181,10 +184,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
             this.FlushLoggerMessages();
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}{1}", Resources.TestMessageFormattingPrefix, "ErrorMessage"), OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, "{0}{1}", CommandLineResources.TestMessageFormattingPrefix, "ErrorMessage"), OutputLevel.Error), Times.Once());
             this.mockOutput.Verify(o => o.Write(string.Format(CultureInfo.CurrentCulture, "{0}", "ErrorStackTrace"), OutputLevel.Error), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(Resources.ErrorMessageBanner, OutputLevel.Error), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(Resources.StacktraceBanner, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.ErrorMessageBanner, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StacktraceBanner, OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
@@ -208,13 +211,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Added this for synchronization
             SpinWait.SpinUntil(() => count == 3, 300);
 
-            this.mockOutput.Verify(o => o.WriteLine(Resources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.Write(" StandardOutCategory", OutputLevel.Information), Times.Once());
 
-            this.mockOutput.Verify(o => o.WriteLine(Resources.StdErrMessagesBanner, OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Error), Times.Once());
             this.mockOutput.Verify(o => o.Write(" StandardErrorCategory", OutputLevel.Error), Times.Once());
 
-            this.mockOutput.Verify(o => o.WriteLine(Resources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.Write(" AdditionalInfoCategory AnotherAdditionalInfoCategory", OutputLevel.Information), Times.Once());
         }
 
@@ -233,8 +236,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
             this.testRunRequest.Raise(m => m.OnRunCompletion += null, testRunCompleteEventArgs);
 
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, Resources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment1.Uri.LocalPath), OutputLevel.Information), Times.Once());
         }
 
         /// <summary>

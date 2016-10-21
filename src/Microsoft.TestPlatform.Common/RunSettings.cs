@@ -18,6 +18,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
+
     /// <summary>
     /// Used for loading settings for a run.
     /// </summary>
@@ -66,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         {
             if (StringUtilities.IsNullOrWhiteSpace(settingsName))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, "settingsName");
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "settingsName");
             }
 
             // Try and lookup the settings provider.
@@ -91,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         {
             if (StringUtilities.IsNullOrWhiteSpace(settings))
             {
-                throw new ArgumentException(CommonResources.CannotBeNullOrEmpty, settings);
+                throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, settings);
             }
 
             using (var stringReader = new StringReader(settings))
@@ -140,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
                 throw new SettingsException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.RunSettingsParseError,
+                        CommonResources.RunSettingsParseError,
                         e.Message),
                     e);
             }
@@ -155,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             // If settings have already been loaded, throw.
             if (this.isSettingsLoaded)
             {
-                throw new InvalidOperationException(Resources.RunSettingsAlreadyLoaded);
+                throw new InvalidOperationException(CommonResources.RunSettingsAlreadyLoaded);
             }
 
             this.isSettingsLoaded = true;
@@ -185,7 +188,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
                 throw new SettingsException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        Resources.RunSettingsParseError,
+                        CommonResources.RunSettingsParseError,
                         e.Message),
                     e);
             }
@@ -207,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             {
                 TestSessionMessageLogger.Instance.SendMessage(
                     TestMessageLevel.Error,
-                    string.Format(CultureInfo.CurrentCulture, Resources.DuplicateSettingsProvided, reader.Name));
+                    string.Format(CultureInfo.CurrentCulture, CommonResources.DuplicateSettingsProvided, reader.Name));
 
                 return;
             }
@@ -228,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
                     provider = CreateLazyThrower(
                         string.Format(
                             CultureInfo.CurrentCulture,
-                            Resources.SettingsProviderInitializationError,
+                            CommonResources.SettingsProviderInitializationError,
                             provider.Metadata.SettingsName,
                             e.Message),
                         provider.Metadata,
@@ -242,7 +245,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
 
                 var message = string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.SettingsProviderNotFound,
+                    CommonResources.SettingsProviderNotFound,
                     metadata.SettingsName);
 
                 provider = CreateLazyThrower(message, metadata);

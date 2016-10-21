@@ -12,6 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Utilities.Helpers;
     using Utilities.Helpers.Interfaces;
 
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+
     /// <summary>
     /// Provides access to the command-line options.
     /// </summary>
@@ -236,20 +238,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         {
             if (String.IsNullOrWhiteSpace(source))
             {
-                throw new CommandLineException(Resources.CannotBeNullOrEmpty);
+                throw new CommandLineException(CommandLineResources.CannotBeNullOrEmpty);
             }
 
             source = source.Trim();
             if (!FileHelper.Exists(source))
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentUICulture, Resources.TestSourceFileNotFound, source));
+                    string.Format(CultureInfo.CurrentUICulture, CommandLineResources.TestSourceFileNotFound, source));
             }
 
             if (this.sources.Contains(source, StringComparer.OrdinalIgnoreCase))
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, Resources.DuplicateSource, source));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateSource, source));
             }
 
             this.sources.Add(source);

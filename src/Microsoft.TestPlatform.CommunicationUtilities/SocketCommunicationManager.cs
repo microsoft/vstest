@@ -64,12 +64,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         private NetworkStream stream;
 
-        /// <summary>
-        /// The server stream read timeout constant.
-        /// </summary>
-        private const int StreamReadTimeout = 1000;
+        private Socket socket;
 
-        public SocketCommunicationManager(): this(JsonDataSerializer.Instance)
+        /// <summary>
+        /// The server stream read timeout constant (in microseconds).
+        /// </summary>
+        private const int StreamReadTimeout = 1000 * 1000;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SocketCommunicationManager"/> class.
+        /// </summary>
+        public SocketCommunicationManager() : this(JsonDataSerializer.Instance)
         {
         }
 
@@ -107,6 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.clientConnectedEvent.Reset();
 
                 var client = await this.tcpListener.AcceptTcpClientAsync();
+                this.socket = client.Client;
                 this.stream = client.GetStream();
                 this.binaryReader = new BinaryReader(this.stream);
                 this.binaryWriter = new BinaryWriter(this.stream);
@@ -150,6 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.clientConnectionAcceptedEvent.Reset();
             EqtTrace.Info("Trying to connect to server on port : {0}", portNumber);
             this.tcpClient = new TcpClient();
+            this.socket = this.tcpClient.Client;
             await this.tcpClient.ConnectAsync(IPAddress.Loopback, portNumber);
             this.stream = this.tcpClient.GetStream();
             this.binaryReader = new BinaryReader(this.stream);
@@ -292,13 +299,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             bool success = false;
 
             // Set read timeout to avoid blocking receive raw message
-            this.stream.ReadTimeout = StreamReadTimeout;
             while (!cancellationToken.IsCancellationRequested && !success)
             {
                 try
                 {
-                    str = this.ReceiveRawMessage();
-                    success = true;
+                    if (this.socket.Poll(StreamReadTimeout, SelectMode.SelectRead))
+                    {
+                        str = this.ReceiveRawMessage();
+                        success = true;
+                    }
                 }
                 catch (IOException ioException)
                 {
@@ -327,7 +336,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
             }
 
-            this.stream.ReadTimeout = -1;
             return str;
         }
 

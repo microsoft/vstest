@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx">
+    <body>
+      <trans-unit id="DataCollectionMessageFormat">
+        <source>Diagnostic data adapter message: {0}</source>
+        <target state="new">Diagnostic data adapter message: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorMessageFormat">
+        <source>Diagnostic data adapter ('{0}') message: {1}.</source>
+        <target state="new">Diagnostic data adapter ('{0}') message: {1}.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DuplicateExtensionUri">
+        <source>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</source>
+        <target state="new">Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DuplicateSettingsName">
+        <source>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</source>
+        <target state="new">Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DuplicateSettingsProvided">
+        <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
+        <target state="new">Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EmptyParenthesis">
+        <source>Error: Empty parenthesis ( )</source>
+        <target state="new">Error: Empty parenthesis ( )</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidCondition">
+        <source>Error: Invalid Condition '{0}'</source>
+        <target state="new">Error: Invalid Condition '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidExtensionUriFormat">
+        <source>Test Extension has an invalid URI '{0}': {1}</source>
+        <target state="new">Test Extension has an invalid URI '{0}': {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidOperator">
+        <source>Error: Invalid operator '{0}'</source>
+        <target state="new">Error: Invalid operator '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LoggerInitializationError">
+        <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
+        <target state="new">Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LoggerNotFound">
+        <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
+        <target state="new">Could not find a test logger with URI or FriendlyName '{0}'.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MissingCloseParenthesis">
+        <source>Error: Missing ')'</source>
+        <target state="new">Error: Missing ')'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MissingOpenParenthesis">
+        <source>Error: Missing '('</source>
+        <target state="new">Error: Missing '('</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MissingOperand">
+        <source>Error: Missing operand</source>
+        <target state="new">Error: Missing operand</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MissingOperator">
+        <source>Missing Operator '|' or '&amp;'</source>
+        <target state="new">Missing Operator '|' or '&amp;'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunSettingsAlreadyLoaded">
+        <source>The Run Settings have already been loaded.</source>
+        <target state="new">The Run Settings have already been loaded.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="RunSettingsParseError">
+        <source>An error occurred while loading the run settings.  Error: {0}</source>
+        <target state="new">An error occurred while loading the run settings.  Error: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SettingsNodeInvalidName">
+        <source>Invalid settings node specified. The name property of the settings node must be non-empty.</source>
+        <target state="new">Invalid settings node specified. The name property of the settings node must be non-empty.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SettingsProviderInitializationError">
+        <source>An error occurred while initializing the settings provider named '{0}'. Error: {1}</source>
+        <target state="new">An error occurred while initializing the settings provider named '{0}'. Error: {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="SettingsProviderNotFound">
+        <source>Settings Provider named '{0}' was not found.  The settings can not be loaded.</source>
+        <target state="new">Settings Provider named '{0}' was not found.  The settings can not be loaded.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestCaseFilterFormatException">
+        <source>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</source>
+        <target state="new">Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</target>
+        <note></note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

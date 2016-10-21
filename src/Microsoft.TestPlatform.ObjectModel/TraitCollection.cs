@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // Trying to access resources will throw "MissingManifestResourceException" percolated as "TypeInitialization" exception
             "Traits",
 #else
-            Resources.TestCasePropertyTraitsLabel,
+            Resources.Resources.TestCasePropertyTraitsLabel,
 #endif
             typeof(KeyValuePair<string, string>[]),
 #pragma warning disable 618

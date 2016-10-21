@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             // Add the outcome of the test and the name of the test.
             result.AppendFormat(
                 CultureInfo.CurrentUICulture,
-                Resources.BasicTestResultFormat,
+                Resources.Resources.BasicTestResultFormat,
                 this.TestCase.DisplayName,
                 TestOutcomeHelper.GetOutcomeString(this.Outcome));
 
@@ -225,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 // Add Error message.
                 result.AppendLine();
-                result.AppendFormat(CultureInfo.CurrentUICulture, Resources.TestFailureMessageFormat, this.ErrorMessage);
+                result.AppendFormat(CultureInfo.CurrentUICulture, Resources.Resources.TestFailureMessageFormat, this.ErrorMessage);
 
                 // Add stack trace if we have one.
                 if (!string.IsNullOrWhiteSpace(this.ErrorStackTrace))
@@ -233,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     result.AppendLine();
                     result.AppendFormat(
                         CultureInfo.CurrentUICulture,
-                        Resources.TestFailureStackTraceFormat,
+                        Resources.Resources.TestFailureStackTraceFormat,
                         this.ErrorStackTrace);
                 }
             }
@@ -248,7 +248,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     {
                         testMessages.AppendFormat(
                             CultureInfo.CurrentUICulture,
-                            Resources.TestResultMessageFormat,
+                            Resources.Resources.TestResultMessageFormat,
                             message.Category,
                             message.Text);
                     }
@@ -257,7 +257,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 result.AppendLine();
                 result.AppendFormat(
                     CultureInfo.CurrentUICulture,
-                    Resources.TestResultTextMessagesFormat,
+                    Resources.Resources.TestResultTextMessagesFormat,
                     testMessages.ToString());
             }
 
@@ -359,28 +359,28 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", "Error Stack Trace", typeof(string), typeof(TestResult));
 #else
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", Resources.TestResultPropertyDisplayNameLabel, typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
+        public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", Resources.Resources.TestResultPropertyDisplayNameLabel, typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.TestResultPropertyComputerNameLabel, string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.Resources.TestResultPropertyComputerNameLabel, string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", Resources.TestResultPropertyOutcomeLabel, string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", Resources.Resources.TestResultPropertyOutcomeLabel, string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty Duration = TestProperty.Register("TestResult.Duration", Resources.TestResultPropertyDurationLabel, typeof(TimeSpan), typeof(TestResult));
+        public static readonly TestProperty Duration = TestProperty.Register("TestResult.Duration", Resources.Resources.TestResultPropertyDurationLabel, typeof(TimeSpan), typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty StartTime = TestProperty.Register("TestResult.StartTime", Resources.TestResultPropertyStartTimeLabel, typeof(DateTimeOffset), typeof(TestResult));
+        public static readonly TestProperty StartTime = TestProperty.Register("TestResult.StartTime", Resources.Resources.TestResultPropertyStartTimeLabel, typeof(DateTimeOffset), typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty EndTime = TestProperty.Register("TestResult.EndTime", Resources.TestResultPropertyEndTimeLabel, typeof(DateTimeOffset), typeof(TestResult));
+        public static readonly TestProperty EndTime = TestProperty.Register("TestResult.EndTime", Resources.Resources.TestResultPropertyEndTimeLabel, typeof(DateTimeOffset), typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ErrorMessage = TestProperty.Register("TestResult.ErrorMessage", Resources.TestResultPropertyErrorMessageLabel, typeof(string), typeof(TestResult));
+        public static readonly TestProperty ErrorMessage = TestProperty.Register("TestResult.ErrorMessage", Resources.Resources.TestResultPropertyErrorMessageLabel, typeof(string), typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", Resources.TestResultPropertyErrorStackTraceLabel, typeof(string), typeof(TestResult));
+        public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", Resources.Resources.TestResultPropertyErrorStackTraceLabel, typeof(string), typeof(TestResult));
 #endif
 
         private static bool ValidateComputerName(object value)

@@ -17,6 +17,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
+    using TranslationLayerResources = Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
     /// </summary>
@@ -198,7 +200,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         public void CancelTestRun()
         {
-                this.communicationManager.SendMessage(MessageType.CancelTestRun);
+            this.communicationManager.SendMessage(MessageType.CancelTestRun);
         }
 
         /// <summary>
@@ -305,7 +307,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsDiscovery);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsDiscovery);
                 eventHandler.HandleDiscoveryComplete(-1, null, true);
 
                 CleanupCommunicationIfProcessExit();
@@ -362,10 +364,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, Resources.AbortedTestsRun);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
-                CleanupCommunicationIfProcessExit();
+                this.CleanupCommunicationIfProcessExit();
             }
         }
 
@@ -377,6 +379,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 this.communicationManager.StopServer();
             }
         }
+
         private Message TryReceiveMessage()
         {
             Message message = null;
@@ -386,7 +389,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (message == null)
             {
-                throw new TransationLayerException(Resources.FailedToReceiveMessage);
+                throw new TransationLayerException(TranslationLayerResources.FailedToReceiveMessage);
             }
 
             return message;

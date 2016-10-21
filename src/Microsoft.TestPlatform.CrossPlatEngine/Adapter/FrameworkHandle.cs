@@ -4,13 +4,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
 {
     using System;
     using System.Collections.Generic;
+
     using Execution;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Handle to the framework which is passed to the test executors.
@@ -92,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             // If it is not a debug run, then throw an error
             if (!this.testExecutionContext.IsDebug)
             {
-                throw new InvalidOperationException(CrossPlatEngine.Resources.LaunchDebugProcessNotAllowedForANonDebugRun);
+                throw new InvalidOperationException(CrossPlatEngineResources.LaunchDebugProcessNotAllowedForANonDebugRun);
             }
 
             var processInfo = new TestProcessStartInfo()

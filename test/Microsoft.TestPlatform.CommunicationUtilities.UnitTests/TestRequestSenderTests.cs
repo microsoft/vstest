@@ -5,6 +5,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -14,9 +15,9 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using CommunicationUtilitiesResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
+
     using Moq;
-    using System.IO;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class TestRequestSenderTests
@@ -450,7 +451,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             waitHandle.WaitOne();
             this.testRequestSender.EndSession();
 
-            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.AbortedTestRun, Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.ConnectionClosed)), Times.Once);
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(CommunicationUtilitiesResources.AbortedTestRun, CommunicationUtilitiesResources.ConnectionClosed)), Times.Once);
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(testCompleteRawMessage), Times.Once);
             mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.SessionEnd), Times.Never);

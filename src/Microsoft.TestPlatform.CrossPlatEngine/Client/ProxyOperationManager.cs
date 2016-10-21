@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-    using Resources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
                 if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
                 {
-                    ConsoleOutput.Instance.WriteLine(Resources.HostDebuggerWarning, OutputLevel.Warning);
+                    ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
                 }
 
                 // Launch the test host and monitor exit.
@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Wait for a timeout for the client to connect.
             if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
             {
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngine.Resources.InitializationFailed));
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.InitializationFailed));
             }
         }
 
