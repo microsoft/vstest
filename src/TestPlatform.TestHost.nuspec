@@ -15,13 +15,13 @@
       <group targetFramework="netcoreapp1.0">
       <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
         
-        <!-- CommunicationUtilities requires 8.0.3, but 8.0.3 doesn't provide a netcoreapp1.0 target -->
+      <!-- CommunicationUtilities requires 8.0.3, but 8.0.3 doesn't provide a netcoreapp1.0 target -->
       <dependency id="Newtonsoft.Json" version="9.0.1"/>
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="EmptyFile\_._" target="lib\net46\" />
+    <file src="_._" target="lib\net46\" />
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\netstandard1.5\" />

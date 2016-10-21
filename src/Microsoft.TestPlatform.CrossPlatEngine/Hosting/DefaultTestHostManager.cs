@@ -135,6 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
             // For IDEs and other scenario, current directory should be the
             // working directory (not the vstest.console.exe location).

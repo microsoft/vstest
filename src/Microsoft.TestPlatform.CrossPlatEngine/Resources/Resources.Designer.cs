@@ -141,15 +141,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The file {0} does not exist..
-        /// </summary>
-        public static string JsonFileDoesNotExist {
-            get {
-                return ResourceManager.GetString("JsonFileDoesNotExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///    Looks up a localized string similar to This operation is not allowed in the context of a non-debug run..
         /// </summary>
         public static string LaunchDebugProcessNotAllowedForANonDebugRun {
@@ -177,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to The testhost.dll could not be found (are you missing a nuget reference of package &quot;microsoft.testplatform.testhost&quot;).
+        ///    Looks up a localized string similar to Could not find testhost.dll. Make sure test project has a nuget reference of package &quot;microsoft.testplatform.testhost&quot;..
         /// </summary>
         public static string NoTestHostFileExist {
             get {
