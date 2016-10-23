@@ -2,7 +2,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -17,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     /// The datacollection launcher.
     /// This works for Desktop local scenarios
     /// </summary>
-    public class DataCollectionLauncher : IDataCollectionLauncher
+    internal class DataCollectionLauncher : IDataCollectionLauncher
     {
         private const string X64DataCollectorProcessName = "datacollector.exe";
         private const string X86DataCollectorProcessName = "datacollector.x86.exe";
@@ -31,19 +30,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// The constructor.
         /// </summary>
-        ///  <param name="architecture">
-        /// The architecture.
-        /// </param>
         public DataCollectionLauncher()
             : this(new ProcessHelper())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultdataCollectorProcessManager"/> class.
+        /// Initializes a new instance of the <see cref="DataCollectionLauncher"/> class.
         /// </summary>
-        /// <param name="architecture"> The architecture. </param>
-        /// <param name="processHelper"> The process helper. </param>
+        /// <param name="processHelper">
+        /// The process helper. 
+        /// </param>
         internal DataCollectionLauncher(IProcessHelper processHelper)
         {
             this.processHelper = processHelper;

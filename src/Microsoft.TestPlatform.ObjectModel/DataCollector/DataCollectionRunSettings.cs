@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Xml;
@@ -80,6 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>
         /// The <see cref="XmlElement"/>.
         /// </returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public override XmlElement ToXml()
         {
             XmlDocument doc = new XmlDocument();

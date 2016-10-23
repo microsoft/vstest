@@ -7,6 +7,13 @@
     "warningsAsErrors": true,
     "embed": [ "Resources/*.resx" ]
   },
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "CODE_ANALYSIS", "DEBUG", "TRACE" ]
+      }
+    } 
+  },
   "dependencies": {
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
     "System.Runtime.InteropServices.RuntimeInformation": "4.0.0"

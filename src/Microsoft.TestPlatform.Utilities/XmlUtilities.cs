@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Security;
     using System.Xml;
     using System.Xml.XPath;
@@ -46,6 +47,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// If xml node exists with given path, its value is set to innerXml, otherwise a new node is created.
         /// </summary>
         /// <remarks> Ensure that the navigator is set to right parent.</remarks>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         internal static void AppendOrModifyChild(
             XPathNavigator parentNavigator,
             string nodeXPath,
