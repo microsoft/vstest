@@ -277,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
 
                 // Get probing path
-                using (StreamReader file = File.OpenText(runtimeConfigDevPath))
+                using (StreamReader file = new StreamReader(this.fileHelper.GetStream(runtimeConfigDevPath, FileMode.Open)))
                 using (JsonTextReader reader = new JsonTextReader(file))
                 {
                     JObject context = (JObject)JToken.ReadFrom(reader);
