@@ -84,13 +84,13 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)vstest.console.dll" />
 	  
-	  <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHostfx\Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHostfx\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHostfx\Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHostfx\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHostfx\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHostfx\testhost.exe" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHostfx\testhost.x86.exe" />
+	  <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.exe" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.x86.exe" />
 
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
