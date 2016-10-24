@@ -2,28 +2,49 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
-    using Navigation;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
     /// <summary>
-    /// The class that enables us to get debug information from both managed and native binaries.
+    ///     The class that enables us to get debug information from both managed and native binaries.
     /// </summary>
-    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", Justification = "Dia is a specific name.")]
+    [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
+         Justification = "Dia is a specific name.")]
     public class DiaSession : INavigationSession
     {
         /// <summary>
-        /// Characters that should be stripped off the end of test names.
+        ///     Characters that should be stripped off the end of test names.
         /// </summary>
-        private static readonly char[] s_testNameStripChars = { '(', ')', ' ' };
+        private static readonly char[] TestNameStripChars = { '(', ')', ' ' };
 
-        private ISymbolReader symbolReader;
+        /// <summary>
+        /// The symbol reader.
+        /// </summary>
+        private readonly ISymbolReader symbolReader;
 
-        public DiaSession(string binaryPath) : this(binaryPath, null)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiaSession"/> class.
+        /// </summary>
+        /// <param name="binaryPath">
+        /// The binary path.
+        /// </param>
+        public DiaSession(string binaryPath)
+            : this(binaryPath, null)
         {
         }
 
-        public DiaSession(string binaryPath, string searchPath):
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiaSession"/> class.
+        /// </summary>
+        /// <param name="binaryPath">
+        /// The binary path.
+        /// </param>
+        /// <param name="searchPath">
+        /// The search path.
+        /// </param>
+        public DiaSession(string binaryPath, string searchPath)
+            :
 #if NET46
             this(binaryPath, searchPath, new FullSymbolReader())
 #else
@@ -32,6 +53,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiaSession"/> class.
+        /// </summary>
+        /// <param name="binaryPath">
+        /// The binary path.
+        /// </param>
+        /// <param name="searchPath">
+        /// The search path.
+        /// </param>
+        /// <param name="symbolReader">
+        /// The symbol reader.
+        /// </param>
         internal DiaSession(string binaryPath, string searchPath, ISymbolReader symbolReader)
         {
             this.symbolReader = symbolReader;
@@ -39,18 +72,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.symbolReader.CacheSymbols(binaryPath, searchPath);
         }
 
+        /// <summary>
+        /// The dispose.
+        /// </summary>
         public void Dispose()
         {
             this.symbolReader?.Dispose();
         }
 
-
         /// <summary>
-        /// Gets the navigation data for a method declared in a type.
+        ///     Gets the navigation data for a method declared in a type.
         /// </summary>
         /// <param name="declaringTypeName"> The declaring type name. </param>
         /// <param name="methodName"> The method name. </param>
-        /// <returns> The <see cref="INavigationData"/> for that method. </returns>
+        /// <returns> The <see cref="INavigationData" /> for that method. </returns>
         /// <remarks> Leaving this method in place to preserve back compatibility. </remarks>
         public DiaNavigationData GetNavigationData(string declaringTypeName, string methodName)
         {
@@ -58,16 +93,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets the navigation data for a method declared in a type.
+        ///     Gets the navigation data for a method declared in a type.
         /// </summary>
         /// <param name="declaringTypeName"> The declaring type name. </param>
         /// <param name="methodName"> The method name. </param>
-        /// <returns> The <see cref="INavigationData"/> for that method. </returns>
+        /// <returns> The <see cref="INavigationData" /> for that method. </returns>
         public INavigationData GetNavigationDataForMethod(string declaringTypeName, string methodName)
         {
             ValidateArg.NotNullOrEmpty(declaringTypeName, "declaringTypeName");
             ValidateArg.NotNullOrEmpty(methodName, "methodName");
-            methodName = methodName.TrimEnd(s_testNameStripChars);
+            methodName = methodName.TrimEnd(TestNameStripChars);
             return this.symbolReader.GetNavigationData(declaringTypeName, methodName);
         }
     }
