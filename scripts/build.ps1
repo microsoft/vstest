@@ -197,7 +197,7 @@ function Publish-Package
     Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force
 
     # Copy over the Full CLR built testhost package assemblies to the Core CLR package folder.
-    $netFull_Dir = "TestHostfx"
+    $netFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force

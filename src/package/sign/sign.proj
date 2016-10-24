@@ -69,21 +69,6 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.x86.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
-
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\DataCollector.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.Utilities.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.VisualStudio.TestPlatform.Client.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\testhost.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\vstest.console.dll" />
-
-      <!-- NetCoreExtensions -->
-      <AssembliesToSign Include="$(ArtifactsDirectory)NetCore\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET Core -->
@@ -97,8 +82,15 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.Client.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.Common.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)testhost.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)vstest.console.dll" />
+	  
+	  <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.exe" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.x86.exe" />
 
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
@@ -107,6 +99,14 @@
     <!-- Sign Microsoft.TestPlatform.Build -->
     <ItemGroup>
       <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.Build.dll" />
+    </ItemGroup>
+	
+	<!-- Sign Microsoft.TestPlatform.TestHost -->
+    <ItemGroup>
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.dll" />
+	  <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+	  <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+	  <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.Common.dll" />
     </ItemGroup>
 
     <ItemGroup>
@@ -124,6 +124,11 @@
         <Authenticode>Microsoft</Authenticode>
         <StrongName>StrongName</StrongName>
       </BuildAssembliesToSign>
+	  
+	  <TestHostCoreAssembliesToSign>
+        <Authenticode>Microsoft</Authenticode>
+        <StrongName>StrongName</StrongName>
+      </TestHostCoreAssembliesToSign>
     </ItemGroup>
 
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(AssembliesToSign)"/>
@@ -141,6 +146,12 @@
     <Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(BuildAssembliesToSign)"/>
     <SignFiles Files="@(BuildAssembliesToSign)"
                BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build"
+               IntermediatesDirectory="$(IntermediatesDirectory)"
+               Type="$(SignType)" />
+			   
+	<Message Text="Signing using authenticode certificate '%(AssembliesToSign.Authenticode)' for @(TestHostCoreAssembliesToSign)"/>
+    <SignFiles Files="@(TestHostCoreAssembliesToSign)"
+               BinariesDirectory="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost"
                IntermediatesDirectory="$(IntermediatesDirectory)"
                Type="$(SignType)" />
   </Target>

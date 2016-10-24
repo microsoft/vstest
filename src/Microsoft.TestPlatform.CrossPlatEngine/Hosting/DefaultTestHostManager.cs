@@ -123,8 +123,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
-                // "TestHostfx" is the name of the folder which contain Full CLR built testhost package assemblies inside Core CLR package folder.
-                testHostProcessName = Path.Combine("TestHostfx", testHostProcessName);
+                // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies inside Core CLR package folder.
+                testHostProcessName = Path.Combine("TestHost", testHostProcessName);
             }
 
             if (!this.Shared)
