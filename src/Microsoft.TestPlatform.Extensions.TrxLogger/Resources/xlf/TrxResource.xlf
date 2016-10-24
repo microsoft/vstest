@@ -93,7 +93,6 @@
       <trans-unit id="FailureToAttach">
         <source>Failed to attach files from: {0}
 Error Details: {1}:{2}</source>
-Error Details: {1}:{2}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="MessageForSkippedTests">

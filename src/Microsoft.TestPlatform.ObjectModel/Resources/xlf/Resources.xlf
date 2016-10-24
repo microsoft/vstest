@@ -21,13 +21,11 @@
       <trans-unit id="TestResultMessageFormat">
         <source>  {0}:
 {1}</source>
-{1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestResultTextMessagesFormat">
         <source>  Test Messages:
 {0}</source>
-{0}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestFailureMessageFormat">
@@ -37,7 +35,6 @@
       <trans-unit id="TestFailureStackTraceFormat">
         <source>  StackTrace:
 {0}</source>
-{0}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="NullString">

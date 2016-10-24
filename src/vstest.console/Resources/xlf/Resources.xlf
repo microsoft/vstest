@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
@@ -77,7 +77,6 @@
       <trans-unit id="HelpArgumentHelp">
         <source>-?|--Help|/?|/Help
       Display this usage message.</source>
-      Display this usage message.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="CopyrightCommandLineTitle">
@@ -100,16 +99,6 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use  /logger:trx.
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
         <note></note>
       </trans-unit>
       <trans-unit id="HelpDescriptionText">
@@ -138,10 +127,6 @@
       by spaces.
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe</source>
-      Run tests from the specified files. Separate multiple test file names
-      by spaces.
-      Examples: mytestproject.dll
-                mytestproject.dll myothertestproject.exe</target>
         <note></note>
       </trans-unit>
       <trans-unit id="AvailableSettingsProvidersHeaderMessage">
@@ -151,7 +136,6 @@
       <trans-unit id="RunSettingsArgumentHelp">
         <source>--Settings|/Settings:&lt;Settings File&gt;
       Settings to use when running tests.</source>
-      Settings to use when running tests.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="RunSettingsRequired">
@@ -191,9 +175,6 @@
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-      Runs the tests in an isolated process. This makes vstest.console.exe 
-      process less likely to be stopped on an error in the tests, but tests 
-      may run slower.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="UseVsixExtensionsHelp">
@@ -201,9 +182,6 @@
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-      This makes vstest.console.exe process use or skip the VSIX extensions 
-      installed(if any) in the test run. 
-      Example  /UseVsixExtensions:true</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BatchSizeRequired">
@@ -221,41 +199,31 @@
     &gt;vstest.console.exe /inIsolation tests.dll
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-    &gt;vstest.console.exe tests.dll 
-  To run tests in a separate process:
-    &gt;vstest.console.exe /inIsolation tests.dll
-  To run tests with additional settings such as  data collectors:
-    &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ListDiscoverersHelp">
         <source>/ListDiscoverers
       Lists installed test discoverers.</source>
-      Lists installed test discoverers.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ListExecutorsHelp">
         <source>/ListExecutors
       Lists installed test executors.</source>
-      Lists installed test executors.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ListLoggersHelp">
         <source>/ListLoggers
       Lists installed test loggers.</source>
-      Lists installed test loggers.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ListSettingsProvidersHelp">
         <source>/ListSettingsProviders
       Lists installed test settings providers.</source>
-      Lists installed test settings providers.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists discovered tests from the given test container.</source>
-      Lists discovered tests from the given test container.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TimeElapsed">
@@ -265,7 +233,6 @@
       <trans-unit id="SpecificTestsRequired">
         <source>The /Tests argument requires one or more specific test names or their substrings.
        Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </source>
-       Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </target>
         <note></note>
       </trans-unit>
       <trans-unit id="NoTestsAvailableAfterFiltering">
@@ -282,10 +249,6 @@
       values, separate them by commas.
       Examples: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</source>
-      Run tests with names that match the provided values. To provide multiple
-      values, separate them by commas.
-      Examples: /Tests:TestMethod1
-                /Tests:TestMethod1,testMethod2</target>
         <note>Please verify if the console output looks good after modifiaction. </note>
       </trans-unit>
       <trans-unit id="SwitchToNoIsolation">
@@ -364,8 +327,6 @@
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-      Target platform architecture to be used for test execution. 
-      Valid values are x86, x64 and ARM.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="SwitchToIsolationInMultiTargetingMode">
@@ -377,9 +338,6 @@
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-      Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
@@ -404,22 +362,12 @@
       Examples: /TestCaseFilter:"Priority=1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</source>
-      Run tests that match the given expression.
-      &lt;Expression&gt; is of the format &lt;property&gt;Operator&lt;value&gt;[|&amp;&lt;Expression&gt;]
-         where Operator is one of =, != or ~  (Operator ~ has 'contains'
-         semantics and is applicable for string properties like DisplayName).
-         Parenthesis () can be used to group sub-expressions.
-      Examples: /TestCaseFilter:"Priority=1"
-                /TestCaseFilter:"(FullyQualifiedName~Nightly
-                                  |Name=MyTestMethod)"</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestCaseFilterValueRequired">
         <source>The /TestCaseFilter argument requires the filter value.
         Filter value can be &lt;property&gt;=&lt;value&gt; type.
         Examples: "Priority=1", "TestCategory=Nightly"</source>
-        Filter value can be &lt;property&gt;=&lt;value&gt; type.
-        Examples: "Priority=1", "TestCategory=Nightly"</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidTestCaseFilterValueForSpecificTests">
@@ -450,8 +398,6 @@
         <source>/EnableCodeCoverage
       Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
       settings are used if not specified using settings file.</source>
-      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
-      settings are used if not specified using settings file.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidEnableCodeCoverageCommand">
@@ -479,9 +425,6 @@
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-      This makes vstest.console.exe process use custom test adapters
-      from a given path (if any) in the test run. 
-      Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestAdapterPathValueRequired">
@@ -533,9 +476,6 @@
       Specifies that the tests be executed in parallel. By default up
       to all available cores on the machine may be used.
       The number of cores to use may be configured using a settings file.</source>
-      Specifies that the tests be executed in parallel. By default up
-      to all available cores on the machine may be used.
-      The number of cores to use may be configured using a settings file.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidParallelCommand">
@@ -549,7 +489,6 @@
       <trans-unit id="PortArgumentHelp">
         <source>--Port|/Port:&lt;Port&gt;
       The Port for socket connection and receiving the event messages.</source>
-      The Port for socket connection and receiving the event messages.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidPortArgument">
@@ -567,13 +506,11 @@
       <trans-unit id="BuildBasePathArgumentHelp">
         <source>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       The directory containing the temporary outputs.</source>
-      The directory containing the temporary outputs.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ConfigurationArgumentHelp">
         <source>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
       The configuration the project is built for i.e. Debug/Release</source>
-      The configuration the project is built for i.e. Debug/Release</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidConfiguration">
@@ -583,7 +520,6 @@
       <trans-unit id="OutputArgumentHelp">
         <source>-o|--Output|/o|/Output:&lt;Output&gt;
       The directory containing the binaries to run.</source>
-      The directory containing the binaries to run.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="BuildBasePathNotFound">
@@ -677,7 +613,6 @@
       <trans-unit id="ParentProcessIdArgumentHelp">
         <source>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
       Process Id of the Parent Process responsible for launching current process.</source>
-      Process Id of the Parent Process responsible for launching current process.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidParentProcessIdArgument">
@@ -692,8 +627,6 @@
         <source>--Diag|/Diag:&lt;Path to log file&gt;
       Enable verbose logs for test platform.
       Logs are written to the provided file.</source>
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="LoggerFileIsReadOnly">
