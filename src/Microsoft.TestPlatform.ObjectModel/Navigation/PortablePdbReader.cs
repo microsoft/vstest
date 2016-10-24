@@ -2,6 +2,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
+#if !NET46
     using System;
     using System.IO;
     using System.Linq;
@@ -15,18 +16,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
     internal class PortablePdbReader : IDisposable
     {
         /// <summary>
-        /// The method info method token property.
+        /// Use to get method token 
         /// </summary>
         private static readonly PropertyInfo MethodInfoMethodTokenProperty =
             typeof(MethodInfo).GetProperty("MetadataToken");
 
         /// <summary>
-        /// The provider.
+        /// Metadata reader provider from portable pdb stream
+        /// To get Metadate reader
         /// </summary>
         private MetadataReaderProvider provider;
 
         /// <summary>
-        /// The reader.
+        /// Metadata reader from portable pdb stream
+        /// To get method debug info from mehthod info
         /// </summary>
         private MetadataReader reader;
 
@@ -34,9 +37,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// Initializes a new instance of the <see cref="PortablePdbReader"/> class.
         /// </summary>
         /// <param name="stream">
-        /// The stream.
+        /// Portable pdb stream
         /// </param>
         /// <exception cref="Exception">
+        /// Raises Exception on given stream is not portable pdb stream
         /// </exception>
         public PortablePdbReader(Stream stream)
         {
@@ -45,11 +49,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 throw new Exception("Given stream is not portable stream");
             }
 
-            this.Setup(MetadataReaderProvider.FromPortablePdbStream(stream));
+            this.provider = MetadataReaderProvider.FromPortablePdbStream(stream);
+            this.reader = this.provider.GetMetadataReader();
         }
 
         /// <summary>
-        /// The dispose.
+        /// Dispose Metadata reader
         /// </summary>
         public void Dispose()
         {
@@ -59,10 +64,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         }
 
         /// <summary>
-        /// The get dia navigation data.
+        /// Gets dia navigation data from Metadata reader 
         /// </summary>
         /// <param name="methodInfo">
-        /// The method info.
+        /// Method info.
         /// </param>
         /// <returns>
         /// The <see cref="DiaNavigationData"/>.
@@ -79,15 +84,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return this.GetDiaNavigationData(handle);
         }
 
-        /// <summary>
-        /// The get method debug information handle.
-        /// </summary>
-        /// <param name="methodInfo">
-        /// The method info.
-        /// </param>
-        /// <returns>
-        /// The <see cref="MethodDebugInformationHandle"/>.
-        /// </returns>
         internal static MethodDebugInformationHandle GetMethodDebugInformationHandle(MethodInfo methodInfo)
         {
             var methodToken = (int)MethodInfoMethodTokenProperty.GetValue(methodInfo);
@@ -95,58 +91,36 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return handle;
         }
 
-        /// <summary>
-        /// The get method start and end line number.
-        /// </summary>
-        /// <param name="methodDebugDefinition">
-        /// The method debug definition.
-        /// </param>
-        /// <param name="startLineNumber">
-        /// The start line number.
-        /// </param>
-        /// <param name="endLineNumber">
-        /// The end line number.
-        /// </param>
         private static void GetMethodStartAndEndLineNumber(
             MethodDebugInformation methodDebugDefinition,
             out int startLineNumber,
             out int endLineNumber)
         {
-            var stratPoint = methodDebugDefinition.GetSequencePoints().OrderBy(s => s.StartLine).FirstOrDefault();
-            startLineNumber = stratPoint.StartLine;
+            var startPoint = methodDebugDefinition.GetSequencePoints().OrderBy(s => s.StartLine).FirstOrDefault();
+            startLineNumber = startPoint.StartLine;
             var endPoint =
                 methodDebugDefinition.GetSequencePoints().OrderByDescending(s => s.StartLine).FirstOrDefault();
             endLineNumber = endPoint.StartLine;
         }
 
         /// <summary>
-        /// The is portable.
+        /// Checks gives stream is from portable pdb or not
         /// </summary>
         /// <param name="stream">
-        /// The stream.
+        /// Stream.
         /// </param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
         private static bool IsPortable(Stream stream)
         {
+            // First four bytes should be 'BSJB'
             var result = (stream.ReadByte() == 'B') && (stream.ReadByte() == 'S') && (stream.ReadByte() == 'J')
                          && (stream.ReadByte() == 'B');
             stream.Position = 0;
             return result;
         }
 
-        /// <summary>
-        /// The get dia navigation data.
-        /// </summary>
-        /// <param name="handle">
-        /// The handle.
-        /// </param>
-        /// <returns>
-        /// The <see cref="DiaNavigationData"/>.
-        /// </returns>
-        /// <exception cref="ObjectDisposedException">
-        /// </exception>
         private DiaNavigationData GetDiaNavigationData(MethodDebugInformationHandle handle)
         {
             if (this.reader == null)
@@ -164,22 +138,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
                 diaNavigationData = new DiaNavigationData(fileName, startLineNumber, endLineNumber);
             }
-            catch (BadImageFormatException)
+            catch (BadImageFormatException exception)
             {
+                EqtTrace.Error("failed to get dia navigation data", exception);
             }
 
             return diaNavigationData;
         }
 
-        /// <summary>
-        /// The get method file name.
-        /// </summary>
-        /// <param name="methodDebugDefinition">
-        /// The method debug definition.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
         private string GetMethodFileName(MethodDebugInformation methodDebugDefinition)
         {
             var fileName = string.Empty;
@@ -191,17 +157,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             return fileName;
         }
-
-        /// <summary>
-        /// The setup.
-        /// </summary>
-        /// <param name="provider">
-        /// The provider.
-        /// </param>
-        private void Setup(MetadataReaderProvider provider)
-        {
-            this.provider = provider;
-            this.reader = provider.GetMetadataReader();
-        }
     }
+#endif
 }

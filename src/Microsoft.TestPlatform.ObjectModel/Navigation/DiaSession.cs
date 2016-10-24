@@ -7,14 +7,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
 
     /// <summary>
-    ///     The class that enables us to get debug information from both managed and native binaries.
+    /// The class that enables us to get debug information from both managed and native binaries.
     /// </summary>
     [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
          Justification = "Dia is a specific name.")]
     public class DiaSession : INavigationSession
     {
         /// <summary>
-        ///     Characters that should be stripped off the end of test names.
+        /// Characters that should be stripped off the end of test names.
         /// </summary>
         private static readonly char[] TestNameStripChars = { '(', ')', ' ' };
 
@@ -38,10 +38,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Initializes a new instance of the <see cref="DiaSession"/> class.
         /// </summary>
         /// <param name="binaryPath">
-        /// The binary path.
+        /// The binary path is assembly path Ex: \path\to\bin\Debug\simpleproject.dll
         /// </param>
         /// <param name="searchPath">
-        /// The search path.
+        /// search path.
         /// </param>
         public DiaSession(string binaryPath, string searchPath)
             :
@@ -53,18 +53,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DiaSession"/> class.
-        /// </summary>
-        /// <param name="binaryPath">
-        /// The binary path.
-        /// </param>
-        /// <param name="searchPath">
-        /// The search path.
-        /// </param>
-        /// <param name="symbolReader">
-        /// The symbol reader.
-        /// </param>
         internal DiaSession(string binaryPath, string searchPath, ISymbolReader symbolReader)
         {
             this.symbolReader = symbolReader;
@@ -73,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// The dispose.
+        /// Dispose symbol reader
         /// </summary>
         public void Dispose()
         {
@@ -81,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        ///     Gets the navigation data for a method declared in a type.
+        /// Gets the navigation data for a method declared in a type.
         /// </summary>
         /// <param name="declaringTypeName"> The declaring type name. </param>
         /// <param name="methodName"> The method name. </param>
@@ -93,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        ///     Gets the navigation data for a method declared in a type.
+        /// Gets the navigation data for a method declared in a type.
         /// </summary>
         /// <param name="declaringTypeName"> The declaring type name. </param>
         /// <param name="methodName"> The method name. </param>

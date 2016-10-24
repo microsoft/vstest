@@ -1,22 +1,29 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
-
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
 #if NET46
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Runtime.InteropServices;
-    using Dia;
     using System.IO;
     using System.Reflection;
+    using System.Runtime.InteropServices;
 
+    using Dia;
+
+    /// <summary>
+    /// To get method's file name, startline and endline from desktop assembly file.
+    /// </summary>
     internal class FullSymbolReader : ISymbolReader 
     {
-
+        /// <summary>
+        /// To check isDisposed
+        /// </summary>
         private bool isDisposed;
+
         private IDiaDataSource source;
         private IDiaSession session;
+
         /// <summary>
         /// Holds type symbols avaiable in the source.
         /// </summary>
@@ -35,14 +42,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         private const string ManifestFileNameX86 = "TestPlatform.ObjectModel.x86.manifest";
         private const string ManifestFileNameX64 = "TestPlatform.ObjectModel.manifest";
 
+        /// <summary>
+        /// dispose caches
+        /// </summary>
         public void Dispose()
         {
             this.Dispose(true);
+
             // Use SupressFinalize in case a subclass
             // of this type implements a finalizer.
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Cache symbols from binary path
+        /// </summary>
+        /// <param name="binaryPath">
+        /// The binary path is assembly path Ex: \path\to\bin\Debug\simpleproject.dll
+        /// </param>
+        /// <param name="searchPath">
+        /// search path.
+        /// </param>
         public void CacheSymbols(string binaryPath, string searchPath)
         {
             using (var activationContext = new RegistryFreeActivationContext(this.GetManifestFileForRegFreeCom()))
@@ -56,25 +76,38 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     this.source = new DiaSource();
                     this.source.loadDataForExe(binaryPath, searchPath, null);
                     this.source.openSession(out this.session);
-                    PopulateCacheForTypeAndMethodSymbols();
+                    this.PopulateCacheForTypeAndMethodSymbols();
                 }
                 catch (COMException)
                 {
-                    Dispose();
+                    this.Dispose();
                     throw;
                 }
             }
         }
 
+        /// <summary>
+        /// Gets Navigation data from caches
+        /// </summary>
+        /// <param name="declaringTypeName">
+        /// Type name Ex: MyNameSpace.MyType
+        /// </param>
+        /// <param name="methodName">
+        /// Method name in declaringTypeName Ex: Method1
+        /// </param>
+        /// <returns>
+        /// <see cref="INavigationData"/>.
+        /// Returns INavigationData which contains filename and linenumber.
+        /// </returns>
         public INavigationData GetNavigationData(string declaringTypeName, string methodName)
         {
             INavigationData navigationData = null;
             IDiaSymbol methodSymbol = null;
 
-            IDiaSymbol typeSymbol = GetTypeSymbol(declaringTypeName, SymTagEnum.SymTagCompiland);
+            IDiaSymbol typeSymbol = this.GetTypeSymbol(declaringTypeName, SymTagEnum.SymTagCompiland);
             if (typeSymbol != null)
             {
-                methodSymbol = GetMethodSymbol(typeSymbol, methodName);
+                methodSymbol = this.GetMethodSymbol(typeSymbol, methodName);
             }
             else
             {
@@ -82,13 +115,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 string fullMethodName = declaringTypeName.Replace(".", "::");
                 fullMethodName = fullMethodName + "::" + methodName;
 
-                methodSymbol = GetTypeSymbol(fullMethodName, SymTagEnum.SymTagFunction);
+                methodSymbol = this.GetTypeSymbol(fullMethodName, SymTagEnum.SymTagFunction);
             }
 
             if (methodSymbol != null)
             {
-                navigationData = GetSymbolNavigationData(methodSymbol);
+                navigationData = this.GetSymbolNavigationData(methodSymbol);
             }
+
             return navigationData;
         }
 
@@ -121,8 +155,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     {
                         sourceFile = lineNumber.sourceFile;
 
-                        //The magic hex constant below works around weird data reported from GetSequencePoints.
-                        //The constant comes from ILDASM's source code, which performs essentially the same test.
+                        // The magic hex constant below works around weird data reported from GetSequencePoints.
+                        // The constant comes from ILDASM's source code, which performs essentially the same test.
                         const uint Magic = 0xFEEFEE;
                         if (lineNumber.lineNumber >= Magic || lineNumber.lineNumberEnd >= Magic)
                         {
@@ -158,13 +192,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 global.findChildren(SymTagEnum.SymTagCompiland, null, 0, out enumTypeSymbols);
                 uint celtTypeSymbol;
                 IDiaSymbol typeSymbol = null;
+
                 // NOTE::
                 // If foreach loop is used instead of Enumerator iterator, for some reason it leaves
                 // the reference to pdb active, which prevents pdb from being rebuilt (in VS IDE scenario).
                 enumTypeSymbols.Next(1, out typeSymbol, out celtTypeSymbol);
                 while (celtTypeSymbol == 1 && null != typeSymbol)
                 {
-                    typeSymbols[typeSymbol.name] = typeSymbol;
+                    this.typeSymbols[typeSymbol.name] = typeSymbol;
 
                     IDiaEnumSymbols enumMethodSymbols = null;
                     try
@@ -181,19 +216,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                             UpdateMethodSymbolCache(methodSymbol.name, methodSymbol, methodSymbolsForType);
                             enumMethodSymbols.Next(1, out methodSymbol, out celtMethodSymbol);
                         }
-                        methodSymbols[typeSymbol.name] = methodSymbolsForType;
+
+                        this.methodSymbols[typeSymbol.name] = methodSymbolsForType;
                     }
                     catch (Exception ex)
                     {
                         if (EqtTrace.IsErrorEnabled)
                         {
-                            EqtTrace.Error("Ignoring the exception while iterating method symbols:{0} for type:{1}", ex, typeSymbol.name);
+                            EqtTrace.Error(
+                                "Ignoring the exception while iterating method symbols:{0} for type:{1}",
+                                ex,
+                                typeSymbol.name);
                         }
                     }
                     finally
                     {
                         ReleaseComObject(ref enumMethodSymbols);
                     }
+
                     enumTypeSymbols.Next(1, out typeSymbol, out celtTypeSymbol);
                 }
             }
@@ -224,10 +264,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             try
             {
                 typeName = typeName.Replace('+', '.');
-                if (typeSymbols.ContainsKey(typeName))
+                if (this.typeSymbols.ContainsKey(typeName))
                 {
-                    return typeSymbols[typeName];
+                    return this.typeSymbols[typeName];
                 }
+
                 global = this.session.globalScope;
                 global.findChildren(symTag, typeName, 0, out enumSymbols);
 
@@ -255,6 +296,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                             children.Add(childSymbol.name);
                             ReleaseComObject(ref childSymbol);
                         }
+
                         Debug.Assert(children.Count > 0);
                     }
                     finally
@@ -262,6 +304,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                         ReleaseComObject(ref enumAllSymbols);
                     }
                 }
+
 #endif
             }
             finally
@@ -269,10 +312,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 ReleaseComObject(ref enumSymbols);
                 ReleaseComObject(ref global);
             }
+
             if (null != typeSymbol)
             {
-                typeSymbols[typeName] = typeSymbol;
+                this.typeSymbols[typeName] = typeSymbol;
             }
+
             return typeSymbol;
         }
 
@@ -288,9 +333,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             try
             {
 
-                if (methodSymbols.ContainsKey(typeSymbol.name))
+                if (this.methodSymbols.ContainsKey(typeSymbol.name))
                 {
-                    methodSymbolsForType = methodSymbols[typeSymbol.name];
+                    methodSymbolsForType = this.methodSymbols[typeSymbol.name];
                     if (methodSymbolsForType.ContainsKey(methodName))
                     {
                         return methodSymbolsForType[methodName];
@@ -300,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 else
                 {
                     methodSymbolsForType = new Dictionary<string, IDiaSymbol>();
-                    methodSymbols[typeSymbol.name] = methodSymbolsForType;
+                    this.methodSymbols[typeSymbol.name] = methodSymbolsForType;
                 }
 
                 typeSymbol.findChildren(SymTagEnum.SymTagFunction, methodName, 0, out enumSymbols);
@@ -338,16 +383,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                         ReleaseComObject(ref enumAllSymbols);
                     }
                 }
+
 #endif
             }
             finally
             {
                 ReleaseComObject(ref enumSymbols);
             }
+
             if (null != methodSymbol)
             {
                 methodSymbolsForType[methodName] = methodSymbol;
             }
+
             return methodSymbol;
         }
 
@@ -362,7 +410,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             // #827589, In case a type has overloaded methods, then there could be a method already in the 
             // cache which should be disposed. 
-            // 
             IDiaSymbol oldSymbol;
             if (methodSymbolCache.TryGetValue(methodName, out oldSymbol))
             {
@@ -381,6 +428,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 obj = null;
             }
         }
+
         private string GetManifestFileForRegFreeCom()
         {
             var currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -393,6 +441,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             {
                 manifestFieName = ManifestFileNameX64;
             }
+
             var manifestFile = Path.Combine(currentDirectory, manifestFieName);
 
             if (!File.Exists(manifestFile))
@@ -410,24 +459,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             {
                 if (disposing)
                 {
-                    foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in methodSymbols.Values)
+                    foreach (Dictionary<string, IDiaSymbol> methodSymbolsForType in this.methodSymbols.Values)
                     {
                         foreach (IDiaSymbol methodSymbol in methodSymbolsForType.Values)
                         {
                             IDiaSymbol symToRelease = methodSymbol;
                             ReleaseComObject(ref symToRelease);
                         }
+
                         methodSymbolsForType.Clear();
                     }
-                    methodSymbols.Clear();
-                    methodSymbols = null;
-                    foreach (IDiaSymbol typeSymbol in typeSymbols.Values)
+
+                    this.methodSymbols.Clear();
+                    this.methodSymbols = null;
+                    foreach (IDiaSymbol typeSymbol in this.typeSymbols.Values)
                     {
                         IDiaSymbol symToRelease = typeSymbol;
                         ReleaseComObject(ref symToRelease);
                     }
-                    typeSymbols.Clear();
-                    typeSymbols = null;
+
+                    this.typeSymbols.Clear();
+                    this.typeSymbols = null;
                     ReleaseComObject(ref this.session);
                     ReleaseComObject(ref this.source);
                 }
