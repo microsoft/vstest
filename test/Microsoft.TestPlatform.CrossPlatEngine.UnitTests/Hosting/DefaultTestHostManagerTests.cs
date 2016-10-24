@@ -50,6 +50,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeFileNameFromTestHostfxFolderWhenCurrentProcessIsDotnet()
+        {
+            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("dotnet.exe");
+
+            var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
+
+            Assert.IsTrue(startInfo.FileName.EndsWith(@"TestHostfx\testhost.exe"));
+        }
+
+        [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
