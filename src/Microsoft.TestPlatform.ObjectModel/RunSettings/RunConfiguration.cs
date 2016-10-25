@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Xml;
@@ -289,6 +290,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #endregion
         
         /// <inheritdoc/>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public override XmlElement ToXml()
         {
             XmlDocument doc = new XmlDocument();

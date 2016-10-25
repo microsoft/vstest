@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.Xml;
@@ -140,11 +141,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
 
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         protected virtual XmlReader GetReaderForFile(string runSettingsFile)
         {
             return XmlReader.Create(runSettingsFile, XmlRunSettingsUtilities.ReaderSettings);
         }
 
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private IXPathNavigable GetRunSettingsDocument(string runSettingsFile)
         {
             IXPathNavigable runSettingsDocument;

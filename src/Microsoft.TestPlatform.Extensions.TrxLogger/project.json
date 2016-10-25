@@ -8,6 +8,14 @@
     "embed": [ "Resources/*.resx" ]
   },
 
+  "configurations": {
+    "Debug": {
+      "buildOptions": {
+        "define": [ "CODE_ANALYSIS", "DEBUG", "TRACE" ]
+      }
+    } 
+  },
+
   "dependencies": {
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*"

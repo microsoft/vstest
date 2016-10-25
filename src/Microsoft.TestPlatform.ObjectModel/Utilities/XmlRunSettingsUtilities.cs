@@ -4,10 +4,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Runtime.InteropServices;
-    using System.Security;
     using System.Xml;
     using System.Xml.XPath;
 
@@ -36,10 +36,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </summary>
         public static ObjectModel.Architecture OSArchitecture
         {
-            [SecuritySafeCritical]
             get
             {
-                var  arch = RuntimeInformation.OSArchitecture;
+                var arch = RuntimeInformation.OSArchitecture;
 
                 switch (arch)
                 {
@@ -60,10 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             get
             {
-                var settings = new XmlReaderSettings();
-                settings.IgnoreComments = true;
-                settings.IgnoreWhitespace = true;
-                return settings;
+                return new XmlReaderSettings { IgnoreComments = true, IgnoreWhitespace = true, DtdProcessing = DtdProcessing.Prohibit };
             }
         }
 
@@ -153,6 +149,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <summary>
         /// Create a default run settings
         /// </summary>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static IXPathNavigable CreateDefaultRunSettings()
         {
             // Create a new default xml doc that looks like this:
@@ -206,6 +204,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </summary>
         /// <param name="runSettingsXml"> The run Settings Xml. </param>
         /// <returns> The <see cref="DataCollectionRunSettings"/>. </returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static DataCollectionRunSettings GetDataCollectionRunSettings(string runSettingsXml)
         {
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
@@ -259,6 +259,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
         }
 
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private static T GetNodeValue<T>(string settingsXml, string nodeName, Func<XmlReader, T> nodeParser)
         {
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
@@ -297,9 +299,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// <param name="runSettingsXml">
         /// The run Settings Xml.
         /// </param>
-        /// <returns>
-        /// The <see cref="InProcDataCollectionRunSettings"/>.
-        /// </returns>
+        /// <returns>Data collection run settings.</returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static DataCollectionRunSettings GetInProcDataCollectionRunSettings(string runSettingsXml)
         {
             // use XmlReader to avoid loading of the plugins in client code (mainly from VS).            
