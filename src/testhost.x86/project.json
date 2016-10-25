@@ -36,6 +36,10 @@
         "System.ComponentModel.TypeConverter": "4.1.0"
       }
     },
-    "net46": {}
+    "net46": {
+      "frameworkAssemblies": {
+        "System.Xml.Linq": ""
+      }
+    }
   }
 }

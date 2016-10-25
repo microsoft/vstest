@@ -9,7 +9,6 @@ namespace TestPlatform.Common.UnitTests.Logging
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Threading;
-    using TestPlatform.Common.UnitTests.Utilities;
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
@@ -17,6 +16,7 @@ namespace TestPlatform.Common.UnitTests.Logging
     {
         private TestSessionMessageLogger testSessionMessageLogger;
         private InternalTestLoggerEvents loggerEvents;
+
         [TestInitialize]
         public void Initialize()
         {
@@ -39,7 +39,6 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        [Timeout(300)]
         public void RaiseMessageShouldInvokeRegisteredEventHandlerIfTestRunMessageEventArgsIsPassed()
         {
             EventWaitHandle waitHandle = new AutoResetEvent(false);
@@ -59,7 +58,9 @@ namespace TestPlatform.Common.UnitTests.Logging
             // Send the test mesage event.
             loggerEvents.RaiseMessage(new TestRunMessageEventArgs(TestMessageLevel.Informational, message));
 
-            waitHandle.WaitOne();
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+
             Assert.IsTrue(testMessageReceived);
             Assert.IsNotNull(eventArgs);
             Assert.AreEqual(message, eventArgs.Message);
@@ -67,7 +68,6 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        [Timeout(300)]
         public void RaiseMessageShouldInvokeRegisteredEventHandlerIfTestTestResultEventArgsIsPassed()
         {
             EventWaitHandle waitHandle = new AutoResetEvent(false);
@@ -87,7 +87,9 @@ namespace TestPlatform.Common.UnitTests.Logging
             // Send the test result event.
             loggerEvents.RaiseTestResult(new TestResultEventArgs(result));
 
-            waitHandle.WaitOne();
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
+
             Assert.IsTrue(testResultReceived);
             Assert.IsNotNull(eventArgs);
             Assert.AreEqual(result, eventArgs.Result);
@@ -112,7 +114,6 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        [Timeout(300)]
         public void CompleteTestRunShouldInvokeRegisteredEventHandler()
         {
             bool testRunCompleteReceived = false;
@@ -128,11 +129,12 @@ namespace TestPlatform.Common.UnitTests.Logging
                 waitHandle.Set();
             };
 
-            // Send the test run complete event.
             loggerEvents.EnableEvents();
+            // Send the test run complete event.
             loggerEvents.CompleteTestRun(null, false, false, null, null, new TimeSpan());
 
-            waitHandle.WaitOne();
+            var waitSuccess = waitHandle.WaitOne(500);
+            Assert.IsTrue(waitSuccess, "Event must be raised within timeout.");
             Assert.IsTrue(testRunCompleteReceived);
             Assert.IsNotNull(eventArgs);
         }
