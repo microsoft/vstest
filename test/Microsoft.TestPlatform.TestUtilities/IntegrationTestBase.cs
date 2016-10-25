@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
 
-        private readonly IntegrationTestEnvironment testEnvironment;
+        protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.3-preview\build\_common";
 
@@ -178,7 +178,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected string GetSampleTestAssembly()
         {
-            return this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
+            return this.GetAssetFullPath("SimpleTestProject.dll");
+        }
+
+        protected string GetAssetFullPath(string assetName)
+        {
+            return this.testEnvironment.GetTestAsset(assetName);
         }
 
         protected string GetTestAdapterPath()
