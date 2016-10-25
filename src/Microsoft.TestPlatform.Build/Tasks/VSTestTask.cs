@@ -6,6 +6,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
+    using System;
+    using System.IO;
 
     public class VSTestTask : Task
     {
@@ -53,6 +55,10 @@ namespace Microsoft.TestPlatform.Build.Tasks
         public override bool Execute()
         {
             var vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
+            if(!string.IsNullOrEmpty(this.VSTestFramework))
+            {
+                Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
+            }
             vsTestForwardingApp.Execute();
             return true;
         }
@@ -104,6 +110,15 @@ namespace Microsoft.TestPlatform.Build.Tasks
             else
             {
                 allArgs.Add(this.AddDoubleQuotes(this.TestFileFullPath));
+            }
+
+            // For Full CLR, add source directory as test adapter path.
+            if (string.IsNullOrEmpty(this.VSTestTestAdapterPath))
+            {
+                if (this.VSTestFramework.StartsWith(".NETFramework", System.StringComparison.CurrentCultureIgnoreCase))
+                {
+                    allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(Path.GetDirectoryName(this.TestFileFullPath)));
+                }
             }
 
             return allArgs;
