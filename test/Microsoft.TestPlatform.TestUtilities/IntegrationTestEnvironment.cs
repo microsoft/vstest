@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         public string TargetFramework
         {
             get;
-            private set;
+            set;
         }
 
         /// <summary>
