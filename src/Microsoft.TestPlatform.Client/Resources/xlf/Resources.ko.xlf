@@ -1,16 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="-1886586043">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">27</count>
+        <count count-type="x-adjWordCount">22.95</count>
+        <count count-type="x-curAdjWordCount">22.95</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">27</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="InvalidStateForExecution">
         <source>The test run could not be executed because the initial state was invalid.</source>
-        <target state="new">The test run could not be executed because the initial state was invalid.</target>
+        <target state="translated">초기 상태가 잘못되어 테스트 실행을 실행할 수 없습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">초기 상태가 잘못 되어 실행 된 테스트를 실행할 수 없습니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive">
         <source>Wait for completion operation is not allowed when there is no active test run. </source>
-        <target state="new">Wait for completion operation is not allowed when there is no active test run. </target>
+        <target state="translated">활성 테스트 실행이 없으면 완료 작업을 대기할 수 없습니다. </target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">될 때까지 기다렸다가 없습니다 현재 테스트가 실행 되는 작업이 완료 되지 않습니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
     </body>
   </file>

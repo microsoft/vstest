@@ -1,111 +1,213 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="cs" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="cs" original="../Resources.resx" build-num="-976370077">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">178</count>
+        <count count-type="x-adjWordCount">151.3</count>
+        <count count-type="x-curAdjWordCount">151.3</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">178</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Diagnostic data adapter message: {0}</source>
-        <target state="new">Diagnostic data adapter message: {0}</target>
+        <target state="translated">Zpráva adaptéru diagnostických dat: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Zpráva pro adaptér diagnostických dat: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Diagnostic data adapter ('{0}') message: {1}.</source>
-        <target state="new">Diagnostic data adapter ('{0}') message: {1}.</target>
+        <target state="translated">Zpráva adaptéru diagnostických dat ({0}): {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Diagnostická data adaptéru ({0}) zpráva: {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="DuplicateExtensionUri">
         <source>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</source>
-        <target state="new">Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</target>
+        <target state="translated">Duplicitní identifikátor URI testu rozšíření {0}. Duplicitní rozšíření se ignoruje.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Duplikujte test rozšíření identifikátoru URI {0}.  Ignorovat duplicitní přípona.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsName">
         <source>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</source>
-        <target state="new">Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</target>
+        <target state="translated">Duplicitní poskytovatel nastavení s názvem {0}. Duplicitní poskytovatel se ignoruje.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Duplicitní nastavení zprostředkovatele s názvem {0}.  Ignorovat duplicitní zprostředkovatele.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="new">Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</target>
+        <target state="translated">Našel se duplicitní oddíl parametrů spouštění s názvem {0}. Duplicitní nastavení se ignoruje.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Spustit nastavení v části s názvem '{0}' nalezen duplicitní.  Ignoruje duplicitní nastavení.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="EmptyParenthesis">
         <source>Error: Empty parenthesis ( )</source>
-        <target state="new">Error: Empty parenthesis ( )</target>
+        <target state="translated">Chyba: Prázdné závorky ( )</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Chyba: Prázdné závorky)</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="InvalidCondition">
         <source>Error: Invalid Condition '{0}'</source>
-        <target state="new">Error: Invalid Condition '{0}'</target>
+        <target state="translated">Chyba: Neplatná podmínka {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Chyba: Neplatná podmínka {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="InvalidExtensionUriFormat">
         <source>Test Extension has an invalid URI '{0}': {1}</source>
-        <target state="new">Test Extension has an invalid URI '{0}': {1}</target>
+        <target state="translated">Rozšíření testu má neplatný identifikátor URI {0}: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Testování rozšíření má neplatný identifikátor URI {0}: {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="InvalidOperator">
         <source>Error: Invalid operator '{0}'</source>
-        <target state="new">Error: Invalid operator '{0}'</target>
+        <target state="translated">Chyba: Neplatný operátor {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Chyba: Neplatný operátor {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
-        <target state="new">Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</target>
+        <target state="translated">Během inicializace protokolovače s identifikátorem URI {0} došlo k výjimce. Protokolovač se nepoužije.  Výjimka: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Při inicializaci protokolovacího nástroje s identifikátorem URI {0}' došlo k výjimce.  Protokolování nebude použito.  Výjimka: {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
-        <target state="new">Could not find a test logger with URI or FriendlyName '{0}'.</target>
+        <target state="translated">Nepovedlo se najít protokolovač testu s identifikátorem URI nebo popisným názvem {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nelze najít zkušební protokoly s identifikátorem URI nebo FriendlyName {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="MissingCloseParenthesis">
         <source>Error: Missing ')'</source>
-        <target state="new">Error: Missing ')'</target>
+        <target state="translated">Chyba: Chybí ).</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Došlo k chybě ")"</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="MissingOpenParenthesis">
         <source>Error: Missing '('</source>
-        <target state="new">Error: Missing '('</target>
+        <target state="translated">Chyba: Chybí (.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Chyba: Chybějící "("</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="MissingOperand">
         <source>Error: Missing operand</source>
-        <target state="new">Error: Missing operand</target>
+        <target state="translated">Chyba: Chybí operand.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Chyba: Chybí operand</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="MissingOperator">
         <source>Missing Operator '|' or '&amp;'</source>
-        <target state="new">Missing Operator '|' or '&amp;'</target>
+        <target state="translated">Chybí operátor | nebo &amp;.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Chybí operátor ' |' nebo 'a'</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="RunSettingsAlreadyLoaded">
         <source>The Run Settings have already been loaded.</source>
-        <target state="new">The Run Settings have already been loaded.</target>
+        <target state="translated">Parametry spouštění jsou už načtené.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Spustit nastavení již byly načteny.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the run settings.  Error: {0}</source>
-        <target state="new">An error occurred while loading the run settings.  Error: {0}</target>
+        <target state="translated">Při načítání parametrů spouštění se stala chyba. Chyba: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Došlo k chybě při načítání nastavení spuštění.  Chyba: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="SettingsNodeInvalidName">
         <source>Invalid settings node specified. The name property of the settings node must be non-empty.</source>
-        <target state="new">Invalid settings node specified. The name property of the settings node must be non-empty.</target>
+        <target state="translated">Zadal se neplatný uzel nastavení. Vlastnost name uzlu nastavení nesmí být prázdná.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Neplatné nastavení uzel zadán. Vlastnost název uzlu nastavení musí být neprázdný.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="SettingsProviderInitializationError">
         <source>An error occurred while initializing the settings provider named '{0}'. Error: {1}</source>
-        <target state="new">An error occurred while initializing the settings provider named '{0}'. Error: {1}</target>
+        <target state="translated">Při inicializaci poskytovatele nastavení s názvem {0} se stala chyba. Chyba: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Došlo k chybě při inicializaci nastavení zprostředkovatele s názvem {0}. Chyba: {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="SettingsProviderNotFound">
         <source>Settings Provider named '{0}' was not found.  The settings can not be loaded.</source>
-        <target state="new">Settings Provider named '{0}' was not found.  The settings can not be loaded.</target>
+        <target state="translated">Poskytovatel nastavení s názvem {0} se nenašel.  Nastavení nešlo načíst.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nastavení zprostředkovatele s názvem '{0}' nebyl nalezen.  Nastavení nelze načíst.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="TestCaseFilterFormatException">
         <source>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</source>
-        <target state="new">Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</target>
+        <target state="translated">Nesprávný formát pro TestCaseFilter {0}. Zadejte správný formát a zkuste to znovu. Poznámka: Nesprávný formát může vést k tomu, že se nespustí žádný test.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nesprávný formát pro TestCaseFilter {0}. Zadejte ve správném formátu a opakujte akci. Všimněte si, že nesprávný formát může vést k získání provedeny zkoušky.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
     </body>
   </file>
