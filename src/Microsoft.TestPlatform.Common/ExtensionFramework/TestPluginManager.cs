@@ -125,7 +125,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <typeparam name="TMetadata">Concrete type of metadata</typeparam>
         /// <param name="unfiltered">Receives unfiltered list of test extensions</param>
         /// <param name="filtered">Receives test extensions filtered by Identifier data</param>
-        [System.Security.SecuritySafeCritical]
         public void GetTestExtensions<IExtension, IMetadata, TMetadata>(
             out IEnumerable<LazyExtension<IExtension, Dictionary<string, object>>> unfiltered,
             out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered) where TMetadata : IMetadata

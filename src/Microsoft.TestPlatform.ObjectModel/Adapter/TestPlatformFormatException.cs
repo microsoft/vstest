@@ -88,7 +88,6 @@ using System.Security.Permissions;
         /// </summary>
         /// <param name="info">Serialization info to add to</param>
         /// <param name="context">not used</param>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)

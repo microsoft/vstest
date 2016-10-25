@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Xml;
@@ -27,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="architecture"> The architecture. </param>
         /// <param name="frameworkVersion"> The framework Version. </param>
         /// <returns> Updated RunSetting Xml document with imported settings. </returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static IXPathNavigable Import(string settingsFile, IXPathNavigable defaultRunSettings, Architecture architecture, FrameworkVersion frameworkVersion)
         {
             ValidateArg.NotNull(settingsFile, "settingsFile");
@@ -78,6 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                                 || string.Equals(Path.GetExtension(settingsFile), ".vsmdi", StringComparison.OrdinalIgnoreCase);
         }
 
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private static XPathNavigator GenerateMSTestXml(string settingsFile)
         {
             // Generate the MSTest xml

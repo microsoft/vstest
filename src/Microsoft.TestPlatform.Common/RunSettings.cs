@@ -33,7 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         private Dictionary<string, LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> settings;
 
-
         /// <summary>
         /// Used to keep track if settings have been loaded.
         /// </summary>
@@ -90,6 +89,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Load the settings from the provided xml string.
         /// </summary>
         /// <param name="settings">xml string</param>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public void LoadSettingsXml(string settings)
         {
             if (StringUtilities.IsNullOrWhiteSpace(settings))
@@ -108,6 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Initialize settings providers with the settings xml.
         /// </summary>
         /// <param name="settings"> The settings xml string. </param>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public void InitializeSettingsProviders(string settings)
         {
             using (var stringReader = new StringReader(settings))
@@ -125,7 +128,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Validate the runsettings checking that it is well formed.
         /// This would throw XML exception on failure.
         /// </summary>
-        /// <param name="path">path to the run settings file</param>
+        /// <param name="reader">A xml reader instance.</param>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private void ValidateAndSaveSettings(XmlReader reader)
         {
             try
