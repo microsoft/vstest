@@ -10,7 +10,8 @@
   "dependencies": {
     "Microsoft.TestPlatform.CommunicationUtilities": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
-    "Microsoft.TestPlatform.Common": "15.0.0-*"
+    "Microsoft.TestPlatform.Common": "15.0.0-*",
+    "Microsoft.Extensions.DependencyModel": "1.0.1-beta-000933"
   },
 
   "frameworks": {
