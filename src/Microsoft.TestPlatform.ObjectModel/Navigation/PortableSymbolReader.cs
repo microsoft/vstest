@@ -108,6 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                         {
                             if (string.CompareOrdinal(methodEntry.Value.Module.FullyQualifiedName, binaryPath) != 0)
                             {
+                                // Ignore inherent methods
                                 continue;
                             }
 

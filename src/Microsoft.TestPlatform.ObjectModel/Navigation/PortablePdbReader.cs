@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             }
             catch (BadImageFormatException exception)
             {
-                EqtTrace.Error("failed to get dia navigation data", exception);
+                EqtTrace.Error("failed to get dia navigation data: {0}", exception);
             }
 
             return diaNavigationData;
