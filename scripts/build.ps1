@@ -162,34 +162,45 @@ function Publish-Package
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
     $testHostProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost"
+    $testHostx86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost.x86"
+    $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
+    $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
     $vstestConsoleProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\vstest.console"
     $dataCollectorProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector"
+    $dataCollectorx86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86"
 
-    Write-Log ".. Package: Publish package\project.json"
-    
-    Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFramework --no-build --configuration $TPB_Configuration --output $fullCLRPackageDir"
-    & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --runtime $TPB_TargetRuntime --framework $TPB_TargetFramework --no-build --configuration $TPB_Configuration --output $fullCLRPackageDir
-    
-    Write-Verbose "$dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
-    & $dotnetExe publish $env:TP_PACKAGE_PROJ_DIR\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
-	
-    # Publish testhost, vstest.console and datacollector exclusively because *.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
-    Write-Log ".. Package: Publish src\vstest.console\project.json"
-    Write-Verbose "$dotnetExe publish $vstestConsoleProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
-    & $dotnetExe publish $vstestConsoleProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
-    
-    Write-Log ".. Package: Publish src\testhost\project.json"
-    Write-Verbose "$dotnetExe publish $testHostProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
-    & $dotnetExe publish $testHostProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
-    
-    Write-Log ".. Package: Publish src\datacollector\project.json"
-    Write-Verbose "$dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir"
-    & $dotnetExe publish $dataCollectorProjectDirectory\project.json --framework $TPB_TargetFrameworkCore --no-build --configuration $TPB_Configuration --output $coreCLRPackageDir
+    Write-Log "Package: Publish package\project.json"
+    Publish-Package-Internal $env:TP_PACKAGE_PROJ_DIR\project.json $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $env:TP_PACKAGE_PROJ_DIR\project.json $TPB_TargetFrameworkCore $coreCLRPackageDir
 
-    # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
-    Copy-PackageItems "Microsoft.TestPlatform.Build"
-    #Copy-PackageItems "Microsoft.TestPlatform.ObjectModel"
-    #Copy-PackageItems "TestHost"
+    # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
+    Write-Log "Package: Publish src\vstest.console\project.json"
+    Publish-Package-Internal $vstestConsoleProjectDirectory\project.json $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $vstestConsoleProjectDirectory\project.json $TPB_TargetFrameworkCore $coreCLRPackageDir
+
+    Write-Log "Package: Publish src\datacollector\project.json"
+    Publish-Package-Internal $dataCollectorProjectDirectory\project.json $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $dataCollectorProjectDirectory\project.json $TPB_TargetFrameworkCore $coreCLRPackageDir
+
+    Write-Log "Package: Publish src\datacollector.x86\project.json"
+    Publish-Package-Internal $dataCollectorx86ProjectDirectory\project.json $TPB_TargetFramework $fullCLRPackageDir
+
+    # Publish testhost
+    Write-Log "Package: Publish testhost\project.json"
+    Publish-Package-Internal $testHostProjectDirectory\project.json $TPB_TargetFramework $testhostFullPackageDir
+    Publish-Package-Internal $testHostProjectDirectory\project.json $TPB_TargetFrameworkCore $testhostCorePackageDir
+
+    Write-Log "Package: Publish testhost.x86\project.json"
+    Publish-Package-Internal $testHostx86ProjectDirectory\project.json $TPB_TargetFramework $testhostFullPackageDir
+
+    # Copy over the Full CLR built testhost package assemblies to the $fullCLRPackageDir
+    Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force
+
+    # Copy over the Full CLR built testhost package assemblies to the Core CLR package folder.
+    $netFull_Dir = "TestHost"
+    $fullDestDir = Join-Path $coreCLRPackageDir $netFull_Dir
+    New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed
@@ -214,13 +225,17 @@ function Publish-Package
         Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
     }
 
-    # Copy over the Core CLR built assemblies to the Full CLR package folder.
-    $netCore_Dir = "NetCore"
-    $coreDestDir = Join-Path $fullCLRPackageDir $netCore_Dir
-    New-Item -ItemType directory -Path $coreDestDir -Force | Out-Null
-    Copy-Item -Recurse $coreCLRPackageDir\* $coreDestDir -Force
+    # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
+    Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+
+function Publish-Package-Internal($packagename, $framework, $output, $runtime)
+{
+    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output"
+    & $dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output
 }
 
 function Create-VsixPackage
@@ -233,8 +248,6 @@ function Create-VsixPackage
     # Copy vsix manifests
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
-        "testhost.x86.exe.config",
-        "testhost.exe.config",
         "TestPlatform.ObjectModel.manifest",
         "TestPlatform.ObjectModel.x86.manifest")
     foreach ($file in $vsixManifests) {
@@ -272,6 +285,9 @@ function Create-NugetPackages
     foreach ($file in $nuspecFiles + $targetFiles) {
         Copy-Item $tpSrcDir\$file $stagingDir -Force
     }
+
+    # Copy over empty file
+    Copy-Item -Recurse $tpSrcDir\package\"_._" $stagingDir -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"

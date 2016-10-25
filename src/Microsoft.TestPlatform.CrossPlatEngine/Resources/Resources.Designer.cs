@@ -168,6 +168,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to Could not find testhost.dll. Make sure test project has a nuget reference of package &quot;microsoft.testplatform.testhost&quot;..
+        /// </summary>
+        public static string NoTestHostFileExist {
+            get {
+                return ResourceManager.GetString("NoTestHostFileExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to None of the specified source(s) &apos;{0}&apos; is valid. Fix the above errors/warnings and then try again. .
         /// </summary>
         public static string NoValidSourceFoundForDiscovery {
