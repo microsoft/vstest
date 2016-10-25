@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
         public override bool Execute()
         {
             var vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
-            if(!string.IsNullOrEmpty(this.VSTestFramework))
+            if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
                 Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
             }
@@ -115,7 +115,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // For Full CLR, add source directory as test adapter path.
             if (string.IsNullOrEmpty(this.VSTestTestAdapterPath))
             {
-                if (this.VSTestFramework.StartsWith(".NETFramework", System.StringComparison.CurrentCultureIgnoreCase))
+                if (this.VSTestFramework.StartsWith(".NETFramework", StringComparison.OrdinalIgnoreCase))
                 {
                     allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(Path.GetDirectoryName(this.TestFileFullPath)));
                 }
