@@ -1,86 +1,169 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx" build-num="1612553793">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">228</count>
+        <count count-type="x-adjWordCount">193.8</count>
+        <count count-type="x-curAdjWordCount">193.8</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">228</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="DiscovererInstantiationException">
         <source>Exception occurred while instantiating discoverer : {0}</source>
-        <target state="new">Exception occurred while instantiating discoverer : {0}</target>
+        <target state="translated" state-qualifier="mt-suggestion">Bulucu örneği oluşturulurken özel durum oluştu: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Discoverer oluşturulurken özel durum oluştu: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="DuplicateAdaptersFound">
         <source>Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</source>
-        <target state="new">Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Aynı '{0}' URI’sine sahip birden fazla test bağdaştırıcısı bulundu. '{1}' bağdaştırıcısı yoksayılıyor. Bu uyarıyı önlemek için lütfen çakışan bağdaştırıcıları kaldırın.</target>
         <note>{0} is the unique identifier of test adapter. {1} is the name of the test adapter that shares a unique identifier with a previously loaded adapter.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Aynı '{0}' URI ile birden çok test bağdaştırıcısı bulunamadı. Bağdaştırıcı '{1}' yok sayılıyor. Lütfen bu uyarıyı önlemek için çakışan bağdaştırıcıları kaldırın.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="DuplicateSource">
         <source>Ignoring the specified duplicate source '{0}'.</source>
-        <target state="new">Ignoring the specified duplicate source '{0}'.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Belirtilen '{0}' yinelenen kaynağı yoksayılıyor.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Belirtilen '{0}' yinelenen kaynak yoksayılıyor.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromLoadTests">
         <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
-        <target state="new">An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</target>
+        <target state="translated" state-qualifier="mt-suggestion">'{0}' test bulucusu testleri yüklerken bir özel durum oluştu. Özel durum: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Testleri test discoverer '{0}' yüklenirken bir özel durum oluştu. Özel durum: {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromRunTests">
         <source>An exception occurred while invoking executor '{0}': {1}</source>
-        <target state="new">An exception occurred while invoking executor '{0}': {1}</target>
+        <target state="translated" state-qualifier="mt-suggestion">'{0}' yürütücüsü çağrılırken bir özel durum oluştu: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Çağrılan gerçekleştirme uygulaması sırasında '{0}' özel durum oluştu: {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="FileNotFound">
         <source>Could not find file {0}.</source>
-        <target state="new">Could not find file {0}.</target>
+        <target state="translated" state-qualifier="mt-suggestion">{0} dosyası bulunamadı.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0} dosyası bulunamadı.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="HostDebuggerWarning">
         <source>Host debugging is enabled. Please attach debugger to testhost process to continue.</source>
-        <target state="new">Host debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Konak hata ayıklaması etkin. Devam etmek için lütfen hata ayıklayıcısını testhost işlemine ekleyin.</target>
         <note>Host, testhost are key words, it should not be localized</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ana bilgisayar hata ayıklama etkin. Lütfen testhost işlemine devam etmek için hata ayıklayıcı iliştirin.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
         <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
-        <target state="new">Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Bulucu DefaultExecutorUri özniteliğine sahip olmadığından {0} test bulucusuna karşılık gelen test yürütücüsü yoksayılıyor. Test bağdaştırıcısı eklentisini yeniden yüklemeniz gerekebilir.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Discoverer DefaultExecutorUri özniteliğine sahip olmadığından {0} discoverer sınamak için karşılık gelen test gerçekleştirme uygulaması yok sayılıyor. Test bağdaştırıcısı eklenti yeniden yüklemeniz gerekebilir.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
       <trans-unit id="InitializationFailed">
         <source>Failed to initialize client proxy: could not connect to test process.</source>
-        <target state="new">Failed to initialize client proxy: could not connect to test process.</target>
+        <target state="translated" state-qualifier="mt-suggestion">İstemci proxy’si başlatılamadı: Test işlemine bağlanılamadı.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">İstemci proxy başlatılamadı: işlemi sınamak için bağlanamadı.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
         <source>This operation is not allowed in the context of a non-debug run.</source>
-        <target state="new">This operation is not allowed in the context of a non-debug run.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Bu işlem hata ayıklama dışındaki bir çalıştırmanın bağlamında yapılamaz.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Bir olmayan-çalıştırmak debug bağlamında bu işleme izin verilmez.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
         <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="new">No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Test örneklerinin bulunması için kaydedilmiş test bulucu yok. Bir test bulucu kaydedin ve yeniden deneyin.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Hiçbir test discoverer test çalışmalarının keşfi gerçekleştirmek için kaydedilir. Test discoverer kaydedin ve yeniden deneyin.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
       <trans-unit id="NoMatchingExecutor">
         <source>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</source>
-        <target state="new">Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</target>
+        <target state="translated" state-qualifier="mt-suggestion">URI’si '{0}' olan test yürütücüsü bulunamadı. Test yürütücüsünün yüklendiğinden ve .NET çalışma zamanı {1} sürümünü desteklediğinden emin olun.</target>
         <note>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">URI '{0}' ile test gerçekleştirme uygulaması bulunamadı.  Test gerçekleştirme uygulaması yüklü ve .net çalışma zamanı sürüm {1} destekler emin olun.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="NoValidSourceFoundForDiscovery">
         <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
-        <target state="new">None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </target>
+        <target state="translated" state-qualifier="mt-suggestion">Belirtilen '{0}' kaynaklarının hiçbiri geçerli değil. Yukarıdaki hataları/uyarıları düzeltin ve yeniden deneyin.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Belirtilen '{0}' kaynağı ile hiçbiri geçerli değil. Yukarıdaki hata/uyarı düzeltin ve yeniden deneyin.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="StringSeperator">
         <source>, </source>
-        <target state="new">, </target>
+        <target state="translated" state-qualifier="leveraged-tm">, </target>
         <note></note>
+        <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
+          <source />
+          <target state-qualifier="tm-suggestion">,</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
       <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</target>
+        <target state="translated" state-qualifier="mt-suggestion">{0} içinde test yok. Yüklü test bulucu ve yürütücülerinin, platform ve çerçeve sürümü ayarlarının uygun olduğundan emin olun ve yeniden deneyin.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Hiçbir test {0}'de kullanılabilir. Yüklü discoverers &amp; executors, uygun platform &amp; framework sürüm ayarları sınamak ve yeniden deneyin emin olun.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="new">No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Geçerli olmayan bir veya daha fazla özellik içerdiğinden filtre ile eşleşen test yok ({0}). Geçerli değerleri ({1}) içeren bir filtre ifadesi belirtin ve yeniden deneyin.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">({0}) geçerli olmayan bir veya daha fazla özellikler içerdiğinden hiçbir test filtre eşleşti. Filtre ifadesi geçerli özelliklerini ({1}) içeren belirtin ve yeniden deneyin.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
     </body>
   </file>
