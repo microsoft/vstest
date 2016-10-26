@@ -3,10 +3,15 @@
 namespace Microsoft.TestPlatform.TestUtilities
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -15,10 +20,10 @@ namespace Microsoft.TestPlatform.TestUtilities
     public class IntegrationTestBase
     {
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
-        private string standardTestOutput = string.Empty;
-        private string standardTestError = string.Empty;
+        private string standardTestOutput = String.Empty;
+        private string standardTestError = String.Empty;
 
-        private readonly IntegrationTestEnvironment testEnvironment;
+        protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.3-preview\build\_common";
 
@@ -36,23 +41,18 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns>Command line arguments string.</returns>
         public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings)
         {
-            string arguments = " /platform:x64 ";
-            if (string.IsNullOrWhiteSpace(runSettings))
+            var arguments = EncloseInQuotes(testAssembly);
+
+            if (!string.IsNullOrWhiteSpace(testAdapterPath))
             {
-                arguments = string.Concat("\"", testAssembly, "\"", " /testadapterpath:\"", testAdapterPath, "\"");
+                // Append adapter path
+                arguments = string.Concat(arguments, " /testadapterpath:", EncloseInQuotes(testAdapterPath));
             }
-            else
+
+            if (!string.IsNullOrWhiteSpace(runSettings))
             {
-                arguments = string.Concat(
-                    "\"",
-                    testAssembly,
-                    "\"",
-                    " /testadapterpath:\"",
-                    testAdapterPath,
-                    "\"",
-                    " /settings:\"",
-                    runSettings,
-                    "\"");
+                // Append run settings
+                arguments = string.Concat(arguments, " /settings:", EncloseInQuotes(runSettings));
             }
 
             return arguments;
@@ -178,7 +178,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected string GetSampleTestAssembly()
         {
-            return this.testEnvironment.GetTestAsset("SimpleTestProject.dll");
+            return this.GetAssetFullPath("SimpleTestProject.dll");
+        }
+
+        protected string GetAssetFullPath(string assetName)
+        {
+            return this.testEnvironment.GetTestAsset(assetName);
         }
 
         protected string GetTestAdapterPath()
@@ -235,6 +240,46 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             this.standardTestError = Regex.Replace(this.standardTestError, @"\s+", " ");
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"\s+", " ");
+        }
+
+        public static string EncloseString(string innerString, string outerString)
+        {
+            return string.Format("{1}{0}{1}", innerString, outerString);
+        }
+
+        public static string EncloseInQuotes(string innerString)
+        {
+            return EncloseString(innerString, "\"");
+        }
+
+        /// <summary>
+        /// Create runsettings file from runConfigurationDictionary at destinationRunsettingsPath
+        /// </summary>
+        /// <param name="destinationRunsettingsPath">
+        /// Destination runsettings path where resulted file saves
+        /// </param>
+        /// <param name="runConfigurationDictionary">
+        /// Contains run configuratin settings
+        /// </param>
+        public static void CreateRunSettingsFile(string destinationRunsettingsPath, IDictionary<string, string> runConfigurationDictionary)
+        {
+            var doc = new XmlDocument();
+            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
+
+            doc.AppendChild(xmlDeclaration);
+            var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
+            doc.AppendChild(runSettingsNode);
+            var runConfigNode = doc.CreateElement(Constants.RunConfigurationSettingsName);
+            runSettingsNode.AppendChild(runConfigNode);
+
+            foreach (var settingsEntry in runConfigurationDictionary)
+            {
+                var childNode = doc.CreateElement(settingsEntry.Key);
+                childNode.InnerText = settingsEntry.Value;
+                runConfigNode.AppendChild(childNode);
+            }
+
+            doc.Save(new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create));
         }
     }
 }
