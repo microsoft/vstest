@@ -77,7 +77,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// <summary>
         /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
         /// </summary>
-        [System.Security.SecuritySafeCritical]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
 #if NET46

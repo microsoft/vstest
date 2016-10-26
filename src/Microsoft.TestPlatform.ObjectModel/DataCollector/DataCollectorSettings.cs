@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Xml;
 
@@ -71,6 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>
         /// The <see cref="XmlElement"/>.
         /// </returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public XmlElement ToXml()
         {
             XmlDocument doc = new XmlDocument();
@@ -93,6 +96,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns>
         /// The <see cref="XmlElement"/>.
         /// </returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public XmlElement ToXml(string dataCollectorName)
         {
             XmlDocument doc = new XmlDocument();
@@ -118,6 +123,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <exception cref="SettingsException">
         /// Settings exception
         /// </exception>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         internal static DataCollectorSettings FromXml(XmlReader reader)
         {
             DataCollectorSettings settings = new DataCollectorSettings();

@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
-        
+
         private readonly Architecture architecture;
         private readonly Framework framework;
         private ITestHostLauncher customTestHostLauncher;
@@ -40,8 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         /// <param name="architecture">Platform architecture of the host process.</param>
         /// <param name="framework">Runtime framework for the host process.</param>
-        public DefaultTestHostManager(Architecture architecture, Framework framework)
-            : this(architecture, framework, new ProcessHelper())
+        public DefaultTestHostManager(Architecture architecture, Framework framework, bool shared)
+            : this(architecture, framework, new ProcessHelper(), shared)
         {
         }
 
@@ -51,16 +51,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <param name="architecture">Platform architecture of the host process.</param>
         /// <param name="framework">Runtime framework for the host process.</param>
         /// <param name="processHelper">Process helper instance.</param>
-        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper)
+        /// <param name="shared">Share the manager for multiple sources or not</param>
+        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper, bool shared)
         {
             this.architecture = architecture;
             this.framework = framework;
             this.processHelper = processHelper;
             this.testHostProcess = null;
+
+            this.Shared = shared;
         }
 
         /// <inheritdoc/>
-        public bool Shared => true;
+        public bool Shared { get; private set; }
 
         /// <summary>
         /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
@@ -115,8 +118,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
+            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+
+            if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies inside Core CLR package folder.
+                testHostProcessName = Path.Combine("TestHost", testHostProcessName);
+            }
+
+            if (!this.Shared)
+            {
+                // Not sharing the host which means we need to pass the test assembly path as argument
+                // so that the test host can create an appdomain on startup (Main method) and set appbase
+                argumentsString += " " + "--testsourcepath " + "\"" + sources.FirstOrDefault() + "\"";
+            }
 
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+            EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
             // For IDEs and other scenario, current directory should be the
             // working directory (not the vstest.console.exe location).
@@ -125,12 +144,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var processWorkingDirectory = Directory.GetCurrentDirectory();
 
             return new TestProcessStartInfo
-                       {
-                           FileName = testhostProcessPath,
-                           Arguments = argumentsString,
-                           EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
-                           WorkingDirectory = processWorkingDirectory
-                       };
+            {
+                FileName = testhostProcessPath,
+                Arguments = argumentsString,
+                EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
+                WorkingDirectory = processWorkingDirectory
+            };
         }
 
         /// <inheritdoc/>

@@ -526,7 +526,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.AreEqual(this.runTestsInstance.GetTestRunCache.TestRunStatistics.ExecutedTests, receivedRunStatusArgs.TestRunStatistics.ExecutedTests);
             Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
             Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
-            Assert.IsNull(receivedRunStatusArgs.ActiveTests);
+            Assert.IsTrue(receivedRunStatusArgs.ActiveTests == null || receivedRunStatusArgs.ActiveTests.Count() == 0);
 
             // Attachments
             Assert.IsNotNull(receivedattachments);

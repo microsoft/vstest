@@ -162,7 +162,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// </summary>
         /// <param name="sources"> Paths to source file to look for tests in.  </param>
         /// <returns> The list of verified sources. </returns>
-        [System.Security.SecuritySafeCritical]
         internal static IEnumerable<string> GetValidSources(IEnumerable<string> sources, IMessageLogger logger)
         {
             Debug.Assert(sources != null, "sources");

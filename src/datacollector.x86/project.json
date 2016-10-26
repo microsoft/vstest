@@ -32,8 +32,7 @@
         "Microsoft.NETCore.App": {
           "version": "1.0.0",
           "type": "platform"
-        },
-        "Microsoft.DotNet.ProjectModel": "1.0.0-rc2-002702"
+        }
       }
     },
     "net46": {}

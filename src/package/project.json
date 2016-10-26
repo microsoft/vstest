@@ -6,10 +6,6 @@
       "include": [
         "[Content_Types].xml",
         "extension.vsixmanifest",
-        // Have to drop a time stamped version of testhost config because the build system does not honour the
-        // users config file when building from a dependent exe. It does honor while building from testhost.x86 project though.
-        "testhost.x86.exe.config",
-        "testhost.exe.config",
         "TestPlatform.ObjectModel.manifest",
         "TestPlatform.ObjectModel.x86.manifest"
       ]
@@ -21,10 +17,6 @@
       "frameworkAssemblies": {
       },
       "dependencies": {
-        "testhost": "15.0.0-*",
-        "datacollector": "15.0.0-*",
-        "testhost.x86": "15.0.0-*",
-        "datacollector.x86": "15.0.0-*",
         "Microsoft.Internal.TestPlatform.Extensions": {
           "type": "build",
           "version": "15.0.0"
@@ -39,7 +31,7 @@
         },
         "fmdev.xlftool": {
           "type": "build",
-          "version": "0.1.1"
+          "version": "0.1.2"
         }
       }
     },

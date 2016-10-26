@@ -164,6 +164,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             return this.CreateRootElement(name, this.namespaceUri);
         }
 
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         private XmlElement CreateRootElement(string name, string namespaceUri)
         {
             if (namespaceUri == null)

@@ -337,17 +337,20 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
                 ExecutorUris = null, LastRunTests = null, RunAttachments = null, TestRunCompleteArgs = null
             };
             var completeMessage = new Message() { MessageType = MessageType.ExecutionComplete, Payload = null };
+            var waitHandle = new AutoResetEvent(false);
             mockHandler.Setup(mh => mh.HandleLogMessage(TestMessageLevel.Error, rawMessage)).Callback(
                 () =>
                 {
                     this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(It.IsAny<string>())).Returns(completeMessage);
                     this.mockDataSerializer.Setup(ds => ds.DeserializePayload<TestRunCompletePayload>(completeMessage)).Returns(completePayload);
+                    waitHandle.Set();
                 });
 
             this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
+            waitHandle.WaitOne();
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithSources, runCriteria), Times.Once);
-            this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.Once);
+            this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(It.IsAny<string>()), Times.Exactly(2));
             mockHandler.Verify(mh => mh.HandleLogMessage(payload.MessageLevel, payload.Message), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.AtLeastOnce);
         }
