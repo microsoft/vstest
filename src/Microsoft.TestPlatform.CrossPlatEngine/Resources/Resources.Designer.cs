@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to Could not find testhost.dll. Make sure test project has a nuget reference of package &quot;microsoft.testplatform.testhost&quot;..
+        ///    Looks up a localized string similar to Could not find testhost.dll. Make sure test project has a nuget reference of package &quot;microsoft.testplatform.testhost&quot; ({0})..
         /// </summary>
         public static string NoTestHostFileExist {
             get {
