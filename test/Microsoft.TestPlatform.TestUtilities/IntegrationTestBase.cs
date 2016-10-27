@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 failedTestsCount,
                 skippedTestsCount);
 
-            Assert.IsTrue(this.standardTestOutput.Contains(summaryStatus), "The Test summary does not match. Expected: {0} Test Output: {1}", this.standardTestOutput, summaryStatus);
+            Assert.IsTrue(this.standardTestOutput.Contains(summaryStatus), "The Test summary does not match. Expected: {1} Test Output: {0}", this.standardTestOutput, summaryStatus);
         }
 
         /// <summary>
@@ -280,6 +280,17 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             doc.Save(new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create));
+        }
+
+        protected string BuildMultipleAssemblyPath(params string[] assetNames)
+        {
+            var assertFullPaths = new string[assetNames.Length];
+            for (var i = 0; i < assetNames.Length; i++)
+            {
+                assertFullPaths[i] = IntegrationTestBase.EncloseString(this.GetAssetFullPath(assetNames[i]), "\"");
+            }
+
+            return string.Join(" ", assertFullPaths);
         }
     }
 }

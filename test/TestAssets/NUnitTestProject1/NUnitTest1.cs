@@ -3,8 +3,6 @@ using NUnit.Framework;
 
 namespace NUnitTestProject1
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     [TestFixture]
     public class NUnitTest1
     {
