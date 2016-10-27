@@ -1,41 +1,87 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="489786346">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">49</count>
+        <count count-type="x-adjWordCount">38.65</count>
+        <count count-type="x-curAdjWordCount">38.65</count>
+        <count count-type="x-repeatAdjWordCount">1.25</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">44</count>
+        <count count-type="repetition">5</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="InvalidRunSettingsXml">
         <source>Run settings XML does not contain "RunSettings" node.</source>
-        <target state="new">Run settings XML does not contain "RunSettings" node.</target>
+        <target state="translated">실행 설정 XML에 "RunSettings" 노드가 포함되어 있지 않습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">실행 설정 XML 노드 "RunSettings"를 포함 하지 않습니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</source>
-        <target state="new">Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</target>
+        <target state="translated">'{0}' 설정이 잘못되었습니다. '{2}'에 대해 잘못된 값 '{1}'을(를) 지정했습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">설정 ' {0} '이 (가) 잘못 되었습니다. ' {1} '의 ' {2} '에 대해 지정한 값이 잘못 되었습니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="MissingRunSettingsNode">
         <source>Could not find 'RunSettings' node.</source>
-        <target state="new">Could not find 'RunSettings' node.</target>
+        <target state="translated">'RunSettings' 노드를 찾을 수 없습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">'RunSettings' 노드를 찾을 수 없습니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="NoRunSettingsNodeFound">
         <source>Could not find 'RunSettings' node.</source>
-        <target state="new">Could not find 'RunSettings' node.</target>
+        <target state="translated">'RunSettings' 노드를 찾을 수 없습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">'RunSettings' 노드를 찾을 수 없습니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="1.25" curWordcount="1.25"</note>
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the settings.  Error: {0}.</source>
-        <target state="new">An error occurred while loading the settings.  Error: {0}.</target>
+        <target state="translated">설정을 로드하는 동안 오류가 발생했습니다. 오류: {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">설정을 로드 하는 동안 오류가 발생 했습니다.  오류: {0}입니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
         <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <target state="new">Incompatible Target platform settings '{0}' with system architecture '{1}'.</target>
+        <target state="translated">대상 플랫폼 설정 '{0}'이(가) 시스템 아키텍처 '{1}'과(와) 호환되지 않습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">호환 되지 않는 대상 플랫폼 설정 ' {0} '이 (가) ' {1} ' 시스템 아키텍처를 사용 하 여.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
-        <target state="new">Unexpected settings file specified.</target>
+        <target state="translated">예기치 않은 설정 파일을 지정했습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">예기치 않은 설정 파일을 지정 합니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
     </body>
   </file>

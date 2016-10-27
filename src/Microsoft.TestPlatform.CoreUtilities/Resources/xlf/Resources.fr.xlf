@@ -1,81 +1,159 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="fr" original="../Resources.resx" build-num="296631613">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">119</count>
+        <count count-type="x-adjWordCount">101.15</count>
+        <count count-type="x-curAdjWordCount">101.15</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">119</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="new">The parameter cannot be null or empty.</target>
+        <target state="translated">Le paramètre ne peut pas avoir une valeur null ou être vide.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Le paramètre ne peut pas être null ou vide.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
-        <target state="new">Error: {0}</target>
+        <target state="translated">Erreur : {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Erreur : {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
-        <target state="new">Information: {0}</target>
+        <target state="translated">Informations : {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Informations : {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
-        <target state="new">Warning: {0}</target>
+        <target state="translated">Avertissement : {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Avertissement : {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentIsEmpty">
         <source>The specified argument cannot be empty.</source>
-        <target state="new">The specified argument cannot be empty.</target>
+        <target state="translated">L'argument spécifié ne peut pas être vide.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L’argument spécifié ne peut pas être vide.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentIsNegative">
         <source>The specified argument cannot be negative.</source>
-        <target state="new">The specified argument cannot be negative.</target>
+        <target state="translated">L'argument spécifié ne peut pas être négatif.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L’argument spécifié ne peut pas être négatif.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentNotTypeOf">
         <source>The specified argument must have the following type: {0}.</source>
-        <target state="new">The specified argument must have the following type: {0}.</target>
+        <target state="translated">L'argument spécifié doit être du type suivant : {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L’argument spécifié doit avoir le type suivant : {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsEmpty">
         <source>The specified argument has the following property, which cannot be an empty string: {0}.</source>
-        <target state="new">The specified argument has the following property, which cannot be an empty string: {0}.</target>
+        <target state="translated">L'argument spécifié a la propriété suivante, laquelle ne peut pas être une chaîne vide : {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L’argument spécifié a la propriété suivante, qui ne peut pas être une chaîne vide : {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsNegative">
         <source>The specified argument has the following property, which cannot be negative: {0}.</source>
-        <target state="new">The specified argument has the following property, which cannot be negative: {0}.</target>
+        <target state="translated">L'argument spécifié a la propriété suivante, laquelle ne peut pas être négative : {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L’argument spécifié a la propriété suivante, qui ne peut pas être négative : {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsNull">
         <source>The specified argument has the following property, which cannot be null: {0}.</source>
-        <target state="new">The specified argument has the following property, which cannot be null: {0}.</target>
+        <target state="translated">L'argument spécifié a la propriété suivante, laquelle ne peut pas être une valeur null : {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L’argument spécifié a la propriété suivante, qui ne peut être vide : {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyNotTypeOf">
         <source>The specified argument has the following property: {0}. This property must have the following type: {1}.</source>
-        <target state="new">The specified argument has the following property: {0}. This property must have the following type: {1}.</target>
+        <target state="translated">L'argument spécifié a la propriété suivante : {0}. Cette propriété doit avoir le type suivant : {1}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L’argument spécifié possède la propriété suivante : {0}. cette propriété doit avoir le type suivant : {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromJobProcessor">
         <source>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</source>
-        <target state="new">Unhandled exception occurred while processing a job from the '{0}' queue: {1}</target>
+        <target state="translated">Une exception non prise en charge s'est produite durant le traitement d'un travail à partir de la file d'attente '{0}' : {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Exception non gérée s’est produite lors du traitement d’une tâche à partir de la file d’attente '{0}' : {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="QueueAlreadyDisposed">
         <source>The {0} queue has already been disposed.</source>
-        <target state="new">The {0} queue has already been disposed.</target>
+        <target state="translated">La file d'attente {0} a déjà été supprimée.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">La file d’attente {0} a déjà été supprimé.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="QueuePausedDisposeError">
         <source>The {0} queue cannot be disposed while paused.</source>
-        <target state="new">The {0} queue cannot be disposed while paused.</target>
+        <target state="translated">Impossible de supprimer la file d'attente {0} pendant qu'elle est en pause.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">La file d’attente de {0} ne peut pas être supprimé pendant la suspension.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="Utility_ProcessNameWhenCannotGetIt">
         <source>Error getting process name.</source>
-        <target state="new">Error getting process name.</target>
+        <target state="translated">Erreur d'obtention du nom du processus.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Erreur lors de l’obtention du nom de processus.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
     </body>
   </file>

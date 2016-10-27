@@ -1,81 +1,159 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../Resources.resx" build-num="-489530206">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">119</count>
+        <count count-type="x-adjWordCount">101.15</count>
+        <count count-type="x-curAdjWordCount">101.15</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">119</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="new">The parameter cannot be null or empty.</target>
+        <target state="translated">参数不能为 NULL 或为空。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">参数不能为 null 或为空。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
-        <target state="new">Error: {0}</target>
+        <target state="translated">错误: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">错误︰ {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
-        <target state="new">Information: {0}</target>
+        <target state="translated">信息: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">信息︰ {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
-        <target state="new">Warning: {0}</target>
+        <target state="translated">警告: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">警告︰ {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentIsEmpty">
         <source>The specified argument cannot be empty.</source>
-        <target state="new">The specified argument cannot be empty.</target>
+        <target state="translated">指定的参数不能为空。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定的参数不能为空。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentIsNegative">
         <source>The specified argument cannot be negative.</source>
-        <target state="new">The specified argument cannot be negative.</target>
+        <target state="translated">指定的参数不能为负。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定的参数不能为负。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentNotTypeOf">
         <source>The specified argument must have the following type: {0}.</source>
-        <target state="new">The specified argument must have the following type: {0}.</target>
+        <target state="translated">指定的参数都必须具有以下类型: {0}。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定的参数都必须具有以下类型︰ {0}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsEmpty">
         <source>The specified argument has the following property, which cannot be an empty string: {0}.</source>
-        <target state="new">The specified argument has the following property, which cannot be an empty string: {0}.</target>
+        <target state="translated">指定的参数具有以下属性: {0}，且不能为空字符串。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定的参数具有以下的属性，不能为空字符串︰ {0}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsNegative">
         <source>The specified argument has the following property, which cannot be negative: {0}.</source>
-        <target state="new">The specified argument has the following property, which cannot be negative: {0}.</target>
+        <target state="translated">指定的参数具有以下属性: {0}，且不能为负。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定的参数具有以下的属性，不能为负︰ {0}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsNull">
         <source>The specified argument has the following property, which cannot be null: {0}.</source>
-        <target state="new">The specified argument has the following property, which cannot be null: {0}.</target>
+        <target state="translated">指定的参数具有以下属性: {0}，且不能为 null。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定的参数具有以下的属性，不能为空︰ {0}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyNotTypeOf">
         <source>The specified argument has the following property: {0}. This property must have the following type: {1}.</source>
-        <target state="new">The specified argument has the following property: {0}. This property must have the following type: {1}.</target>
+        <target state="translated">指定的参数具有以下属性: {0}。此属性必须具有以下类型: {1}。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定的参数具有以下属性︰ {0}。 此属性必须具有以下类型︰ {1}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromJobProcessor">
         <source>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</source>
-        <target state="new">Unhandled exception occurred while processing a job from the '{0}' queue: {1}</target>
+        <target state="translated">处理“{0}”队列中的作业时发生未处理的异常: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">处理从"{0} 队列作业时发生未处理的异常︰ {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="QueueAlreadyDisposed">
         <source>The {0} queue has already been disposed.</source>
-        <target state="new">The {0} queue has already been disposed.</target>
+        <target state="translated">已处置 {0} 队列。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0} 队列已被释放。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="QueuePausedDisposeError">
         <source>The {0} queue cannot be disposed while paused.</source>
-        <target state="new">The {0} queue cannot be disposed while paused.</target>
+        <target state="translated">暂停时无法处置 {0} 队列。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">在暂停时，不能释放队列 {0}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="Utility_ProcessNameWhenCannotGetIt">
         <source>Error getting process name.</source>
-        <target state="new">Error getting process name.</target>
+        <target state="translated">获取进程名称时出错。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">获取进程名称时出错。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
     </body>
   </file>
