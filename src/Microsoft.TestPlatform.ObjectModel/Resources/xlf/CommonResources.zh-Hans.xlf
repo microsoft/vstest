@@ -1,21 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../CommonResources.resx">
+  <file datatype="xml" source-language="en" target-language="zh-Hans" original="../CommonResources.resx" build-num="629660039">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">71</count>
+        <count count-type="x-adjWordCount">60.35</count>
+        <count count-type="x-curAdjWordCount">60.35</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">71</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="new">The parameter cannot be null or empty.</target>
+        <target state="translated">参数不能为 NULL 或为空。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">参数不能为 null 或为空。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
-        <target state="new">Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</target>
+        <target state="translated">测试运行将使用为框架 {0} 和平台 {1} 生成的 DLL。以下 DLL 将不是运行的一部分: {2}。转到 {3} 了解有关管理这些设置的详细信息。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">测试运行将使用 DLL(s) 框架 {0} 和 {1} 的平台的构建。按照 DLL(s) 将不能运行的过程︰ {2} 转到详细 {3} 上管理这些设置。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
-        <target state="new">None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</target>
+        <target state="translated">提供的所有测试容器均与用于测试运行的平台体系结构和 .Net Framework 设置不匹配。平台: {0}。.Net Framework: {1}。有关管理这些设置的详细信息，请转到http://go.microsoft.com/fwlink/?LinkID=330428。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">所有提供的测试容器都不匹配的平台体系结构和.Net 框架运行测试的设置。平台︰ {0}.Net 框架︰ {1}。 在管理这些设置，请转到 http://go.microsoft.com/fwlink/?LinkID=330428 了解详情。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="33" adjWordcount="28.05" curWordcount="28.05"</note>
       </trans-unit>
     </body>
   </file>

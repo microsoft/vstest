@@ -1,26 +1,60 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="pt-BR" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="pt-BR" original="../Resources.resx" build-num="1002035674">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">23</count>
+        <count count-type="x-adjWordCount">19.55</count>
+        <count count-type="x-curAdjWordCount">19.55</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">23</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="AbortedTestsRun">
         <source>The active Tests Run was aborted.</source>
-        <target state="new">The active Tests Run was aborted.</target>
+        <target state="translated">A Execução de Testes ativa foi anulada.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Execução de testes ativo foi anulada.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="AbortedTestsDiscovery">
         <source>The active Tests Discovery was aborted.</source>
-        <target state="new">The active Tests Discovery was aborted.</target>
+        <target state="translated">A Descoberta de Testes ativa foi anulada.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">A detecção ativa de testes foi anulada.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="FailedToReceiveMessage">
         <source>Failed to receive message from vstest.console process</source>
-        <target state="new">Failed to receive message from vstest.console process</target>
+        <target state="translated">Falha ao receber mensagem do processo vstest.console</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Falha ao receber mensagem de vstest.console de processo</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="VsTestProcessExitedAbnormally">
         <source>vstest.console process exited abnormally</source>
-        <target state="new">vstest.console process exited abnormally</target>
+        <target state="translated">processo de vstest.console encerrado de forma anormal</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">processo de VSTest.console saiu de forma anômala</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
     </body>
   </file>

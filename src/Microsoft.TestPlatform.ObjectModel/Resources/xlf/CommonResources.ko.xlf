@@ -1,21 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="ko" original="../CommonResources.resx">
+  <file datatype="xml" source-language="en" target-language="ko" original="../CommonResources.resx" build-num="-1195242808">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">71</count>
+        <count count-type="x-adjWordCount">60.35</count>
+        <count count-type="x-curAdjWordCount">60.35</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">71</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="new">The parameter cannot be null or empty.</target>
+        <target state="translated">매개 변수는 null이거나 비워 둘 수 없습니다.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">매개 변수는 null 이거나 비워 둘 수 없습니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
-        <target state="new">Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</target>
+        <target state="translated">테스트 실행에서는 프레임워크 {0} 및 플랫폼 {1}용으로 작성된 DLL을 사용합니다. 다음 DLL은 실행에서 사용할 수 없습니다. {2}. 이러한 설정의 관리에 대한 자세한 내용은 {3}을(를) 참조하세요.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">테스트 실행 프레임 워크 {0}에서 {1} 플랫폼에 대 한 빌드 DLL(s)를 사용 합니다. DLL(s) 다음 부분에서는 실행 되지 것입니다: 이러한 설정을 관리에 대 한 자세한 내용은 {3} {2} 이동 합니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
-        <target state="new">None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</target>
+        <target state="translated">제공된 테스트 컨테이너 중에 테스트 실행을 위한 플랫폼 아키텍처 및 .NET Framework 설정과 일치하는 것이 없습니다. 플랫폼: {0}, .NET Framework: {1}. 이러한 설정의 관리에 대한 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=330428을 참조하세요.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">제공 된 테스트 컨테이너가 일치 하는 플랫폼 아키텍처와.Net Framework 설정을 테스트 실행에 대 한. 플랫폼: {0}.Net Framework: {1}입니다. 이러한 설정을 관리에 대 한 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=330428로 이동 합니다.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="33" adjWordcount="28.05" curWordcount="28.05"</note>
       </trans-unit>
     </body>
   </file>
