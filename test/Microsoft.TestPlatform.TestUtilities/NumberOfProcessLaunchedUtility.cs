@@ -13,21 +13,21 @@ namespace TestPlatform.TestUtilities
     public class NumberOfProcessLaunchedUtility
     {
         /// <summary>
-        /// The number of process created.
+        /// To Find the process created by name during this task run
         /// </summary>
         /// <param name="cts">
-        /// The cts.
+        /// To cancel task
         /// </param>
-        /// <param name="testhostProcessName">
-        /// The testhost process name.
+        /// <param name="processName">
+        /// Name of the process
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        public static async Task<int> NumberOfProcessCreated(CancellationTokenSource cts, string testhostProcessName)
+        public static async Task<int> NumberOfProcessCreated(CancellationTokenSource cts, string processName)
         {
             var testhostProcessIDsBeforeRun = new List<int>();
-            var testhostProcessesBeforeRun = Process.GetProcessesByName(testhostProcessName);
+            var testhostProcessesBeforeRun = Process.GetProcessesByName(processName);
 
             foreach (var process in testhostProcessesBeforeRun)
             {
@@ -35,7 +35,7 @@ namespace TestPlatform.TestUtilities
             }
 
             var numOfProcessTask =
-                Task.Run(() => NumberOfProcessLaunchedDuringRun(cts.Token, testhostProcessIDsBeforeRun, testhostProcessName));
+                Task.Run(() => NumberOfProcessLaunchedDuringRun(cts.Token, testhostProcessIDsBeforeRun, processName));
             return await numOfProcessTask;
         }
 

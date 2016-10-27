@@ -4,6 +4,7 @@
   "buildOptions": {
     "delaySign": true,
     "keyFile": "../../../scripts/key.snk",
+    "warningsAsErrors": true,
     "additionalArguments": [ "/ruleset:../../../scripts/stylecop.test.ruleset", "/additionalFile:../../../scripts/stylecop.json" ]
   },
 
