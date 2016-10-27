@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>c1497516-acb5-49af-a676-51db65ff8252</ProjectGuid>
+    <ProjectGuid>70a1644a-7434-48cd-a9de-450c0da88b3f</ProjectGuid>
     <RootNamespace>Microsoft.TestPlatform.SmokeTests</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">..\..\..\artifacts\</OutputPath>

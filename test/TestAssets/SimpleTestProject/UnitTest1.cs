@@ -34,7 +34,6 @@ namespace SampleUnitTestProject
         /// <summary>
         /// The skipping test.
         /// </summary>
-        [TestProperty("Property1", "Value1")]
         [Ignore]
         [TestMethod]
         public void SkippingTest()
