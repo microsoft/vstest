@@ -252,6 +252,7 @@ function Create-VsixPackage
     # Copy vsix manifests
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
+        "License.rtf",
         "TestPlatform.ObjectModel.manifest",
         "TestPlatform.ObjectModel.x86.manifest")
     foreach ($file in $vsixManifests) {
