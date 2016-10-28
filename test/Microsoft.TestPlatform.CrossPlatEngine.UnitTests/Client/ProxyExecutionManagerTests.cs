@@ -154,11 +154,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void StartTestRunShouldThrowExceptionIfClientConnectionTimeout()
+        public void SetupChannelShouldThrowExceptionIfClientConnectionTimeout()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null));
+            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }));
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndCallHandleTestRunComplete()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+            mockTestRunEventsHandler.Verify(s => s.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null));
         }
 
         [TestMethod]

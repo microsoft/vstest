@@ -10,6 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -134,14 +135,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldThrowExceptionIfClientConnectionTimeout()
+        public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
         {
             // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
 
             // Act.
-            Assert.ThrowsException<TestPlatformException>(
-                () => this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null));
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            // Verify
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(-1, It.IsAny<IEnumerable<TestCase>>(), true));
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()));
         }
 
         [TestMethod]
