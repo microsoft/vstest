@@ -26,6 +26,13 @@ namespace Microsoft.TestPlatform.TestUtilities
         protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.3-preview\build\_common";
+        private const string NUnitTestAdapterRelativePath = @"nunittestadapter\1.2.0\lib";
+        private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\2.1.0\build\_common";
+
+        public enum UnitTestFramework
+        {
+            NUnit, XUnit, MSTest, CPP, Chutzpah
+        }
 
         public IntegrationTestBase()
         {
@@ -38,8 +45,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">Name of the test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapter.</param>
         /// <param name="runSettings">Text of run settings.</param>
+        /// <param name="framework"></param>
         /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings)
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.6")
         {
             var arguments = EncloseInQuotes(testAssembly);
 
@@ -53,6 +61,12 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Append run settings
                 arguments = string.Concat(arguments, " /settings:", EncloseInQuotes(runSettings));
+            }
+
+            if (!string.IsNullOrWhiteSpace(framework))
+            {
+                // Append framework setting
+                arguments = string.Concat(arguments, " /Framework:", EncloseInQuotes(framework));
             }
 
             return arguments;
@@ -74,9 +88,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
         /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForExecution(string testAssembly, string testAdapterPath, string runSettings = "")
+        public void InvokeVsTestForExecution(string testAssembly, string testAdapterPath, string runSettings = "", string framework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework);
             this.InvokeVsTest(arguments);
         }
 
@@ -92,7 +106,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             arguments = string.Concat(arguments, " /listtests");
             this.InvokeVsTest(arguments);
         }
-        
+
         /// <summary>
         /// Validate if the overall test count and results are matching.
         /// </summary>
@@ -186,9 +200,24 @@ namespace Microsoft.TestPlatform.TestUtilities
             return this.testEnvironment.GetTestAsset(assetName);
         }
 
-        protected string GetTestAdapterPath()
+        protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
         {
-            return this.testEnvironment.GetNugetPackage(TestAdapterRelativePath);
+            string adapterRelativePath = string.Empty;
+
+            if (testFramework == UnitTestFramework.MSTest)
+            {
+                adapterRelativePath = TestAdapterRelativePath;
+            }
+            else if (testFramework == UnitTestFramework.NUnit)
+            {
+                adapterRelativePath = NUnitTestAdapterRelativePath;
+            }
+            else if (testFramework == UnitTestFramework.XUnit)
+            {
+                adapterRelativePath = XUnitTestAdapterRelativePath;
+            }
+
+            return this.testEnvironment.GetNugetPackage(adapterRelativePath);
         }
 
         /// <summary>
@@ -242,12 +271,12 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"\s+", " ");
         }
 
-        public static string EncloseString(string innerString, string outerString)
+        private static string EncloseString(string innerString, string outerString)
         {
             return string.Format("{1}{0}{1}", innerString, outerString);
         }
 
-        public static string EncloseInQuotes(string innerString)
+        private static string EncloseInQuotes(string innerString)
         {
             return EncloseString(innerString, "\"");
         }
