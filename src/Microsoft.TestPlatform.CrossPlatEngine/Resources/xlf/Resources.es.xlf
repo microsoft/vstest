@@ -1,86 +1,169 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="1392533617">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">228</count>
+        <count count-type="x-adjWordCount">193.8</count>
+        <count count-type="x-curAdjWordCount">193.8</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">228</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="DiscovererInstantiationException">
         <source>Exception occurred while instantiating discoverer : {0}</source>
-        <target state="new">Exception occurred while instantiating discoverer : {0}</target>
+        <target state="translated">Se produjo una excepción al crear una instancia del programa de detección: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Excepción al crear instancias de descubridor: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="DuplicateAdaptersFound">
         <source>Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</source>
-        <target state="new">Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</target>
+        <target state="translated">Se han encontrado varios adaptadores de prueba con el mismo URI ({0}). Se omitirá el adaptador '{1}'. Desinstale los adaptadores que están en conflicto para evitar esta advertencia.</target>
         <note>{0} is the unique identifier of test adapter. {1} is the name of the test adapter that shares a unique identifier with a previously loaded adapter.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Se han encontrado varios adaptadores de prueba con el mismo uri '{0}'. Omitiendo adaptador '{1}'. Desinstale los adaptadores en conflicto para evitar esta advertencia.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="DuplicateSource">
         <source>Ignoring the specified duplicate source '{0}'.</source>
-        <target state="new">Ignoring the specified duplicate source '{0}'.</target>
+        <target state="translated">Se omitirá el origen duplicado especificado ({0}).</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Omitiendo el origen duplicado especificado '{0}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromLoadTests">
         <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
-        <target state="new">An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</target>
+        <target state="translated">Se produjo una excepción cuando el programa de detección de pruebas '{0}' estaba cargando pruebas. Excepción: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Se produjo una excepción al carga pruebas descubridor de prueba '{0}'. Excepción: {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromRunTests">
         <source>An exception occurred while invoking executor '{0}': {1}</source>
-        <target state="new">An exception occurred while invoking executor '{0}': {1}</target>
+        <target state="translated">Se produjo una excepción al invocar al ejecutor '{0}': {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Excepción al ejecutor invocar '{0}': {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="FileNotFound">
         <source>Could not find file {0}.</source>
-        <target state="new">Could not find file {0}.</target>
+        <target state="translated">No se encuentra el archivo {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se pudo encontrar el archivo {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="HostDebuggerWarning">
         <source>Host debugging is enabled. Please attach debugger to testhost process to continue.</source>
-        <target state="new">Host debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <target state="translated">La depuración host está habilitada. Asocie el depurador al proceso de host de prueba para continuar.</target>
         <note>Host, testhost are key words, it should not be localized</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Host de depuración está habilitada. Por favor, asociar el depurador al proceso de testhost para continuar.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
         <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
-        <target state="new">Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</target>
+        <target state="translated">Se omitirá el ejecutor de pruebas correspondiente al programa de detección de pruebas {0}, porque este último no tiene el atributo DefaultExecutorUri. Puede ser necesario reinstalar el complemento del adaptador de prueba.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Se omitirá el ejecutor de pruebas correspondiente para probar descubridor {0} porque el descubridor no tiene el atributo DefaultExecutorUri. Puede que necesite volver a instalar el adaptador complemento prueba.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
       <trans-unit id="InitializationFailed">
         <source>Failed to initialize client proxy: could not connect to test process.</source>
-        <target state="new">Failed to initialize client proxy: could not connect to test process.</target>
+        <target state="translated">No se pudo inicializar el proxy de cliente: no se puede conectar al proceso de prueba.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se pudo inicializar el proxy de cliente: no se puede conectar para probar el proceso.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
         <source>This operation is not allowed in the context of a non-debug run.</source>
-        <target state="new">This operation is not allowed in the context of a non-debug run.</target>
+        <target state="translated">Esta operación no se permite en el contexto de una ejecución que no sea de depuración.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Esta operación no se permite en el contexto de un ejecutar sin depuración.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
         <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="new">No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</target>
+        <target state="translated">No hay ningún programa de detección de pruebas registrado para detectar casos de prueba. Registre un programa de detección de pruebas y vuelva a intentarlo.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ningún descubridor prueba está registrada para realizar el descubrimiento de casos de prueba. Registrar un descubridor de prueba y vuelva a intentarlo.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
       <trans-unit id="NoMatchingExecutor">
         <source>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</source>
-        <target state="new">Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</target>
+        <target state="translated">No se encuentra el ejecutor de pruebas con el URI '{0}'. Asegúrese de que el ejecutor de pruebas está instalado y admite el entorno de ejecución .NET, versión {1}.</target>
         <note>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se pudo encontrar el ejecutor de pruebas con el URI '{0}'.  Asegúrese de que el ejecutor de pruebas está instalado y es compatible con .net runtime versión {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="NoValidSourceFoundForDiscovery">
         <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
-        <target state="new">None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </target>
+        <target state="translated">Ninguno de los orígenes especificados ({0}) es válido. Corrija los errores o advertencias y vuelva a intentarlo. </target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Los orígenes especificados '{0}' no válido. Corregir las errores o advertencias anteriores y vuelva a intentarlo.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="StringSeperator">
         <source>, </source>
-        <target state="new">, </target>
+        <target state="translated">, </target>
         <note></note>
+        <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
+          <source />
+          <target state-qualifier="tm-suggestion">,</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
       <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</target>
+        <target state="translated">No hay ninguna prueba disponible en {0}. Asegúrese de que la configuración de versión de los ejecutores y programas de detección de pruebas, la plataforma y el marco instalados es correcta y vuelva a intentarlo.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ninguna prueba está disponible en {0}. Asegúrese de que instala descubridores &amp; prueba ejecutores, configuración de versión de plataforma &amp; marco es adecuada y vuelva a intentarlo.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="new">No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</target>
+        <target state="translated">Ninguna prueba coincide con el filtro porque contiene una o varias propiedades no válidas ({0}). Especifique una expresión de filtro que contenga propiedades válidas ({1}) y vuelva a intentarlo.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No hay pruebas que coincide con el filtro porque contiene una o más propiedades que no son válidos ({0}). Especifique la expresión de filtro que contiene propiedades válidas ({1}) y vuelva a intentarlo.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
     </body>
   </file>
