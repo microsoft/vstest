@@ -157,7 +157,7 @@
     <comment>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</comment>
   </data>
   <data name="NoTestHostFileExist" xml:space="preserve">
-    <value>Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost" ({0}).</value>
+    <value>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</value>
   </data>
   <data name="NoValidSourceFoundForDiscovery" xml:space="preserve">
     <value>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </value>
