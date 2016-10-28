@@ -1351,16 +1351,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
-      <trans-unit id="TestMessageFormattingPrefix">
-        <source />
-        <target state="translated" />
-        <note></note>
-        <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
-          <source />
-          <target state-qualifier="tm-suggestion" />
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
-      </trans-unit>
       <trans-unit id="AttachmentsBanner">
         <source>Attachments:</source>
         <target state="translated">첨부 파일:</target>
