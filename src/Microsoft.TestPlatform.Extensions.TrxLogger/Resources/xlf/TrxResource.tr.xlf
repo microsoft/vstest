@@ -1,158 +1,297 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="tr" original="../TrxResource.resx">
+  <file datatype="xml" source-language="en" target-language="tr" original="../TrxResource.resx" build-num="-1500926433">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">134</count>
+        <count count-type="x-adjWordCount">113.9</count>
+        <count count-type="x-curAdjWordCount">113.9</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">134</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="TestOutcomeAborted">
         <source>Aborted</source>
-        <target state="new">Aborted</target>
+        <target state="translated" state-qualifier="mt-suggestion">İptal edildi</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">İptal edildi</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeCompleted">
         <source>Completed</source>
-        <target state="new">Completed</target>
+        <target state="translated" state-qualifier="mt-suggestion">Tamamlandı</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tamamlandı</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeDisconnected">
         <source>Disconnected</source>
-        <target state="new">Disconnected</target>
+        <target state="translated" state-qualifier="mt-suggestion">Bağlantı kesildi</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Bağlantı kesildi</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeError">
         <source>Error</source>
-        <target state="new">Error</target>
+        <target state="translated" state-qualifier="mt-suggestion">Hata</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Hata</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeFailed">
         <source>Failed</source>
-        <target state="new">Failed</target>
+        <target state="translated" state-qualifier="mt-suggestion">Başarısız</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Başarısız oldu</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeInconclusive">
         <source>Inconclusive</source>
-        <target state="new">Inconclusive</target>
+        <target state="translated" state-qualifier="mt-suggestion">Sonuçsuz</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Yetersiz</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeInProgress">
         <source>In Progress</source>
-        <target state="new">In Progress</target>
+        <target state="translated" state-qualifier="mt-suggestion">Sürüyor</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Sürüyor</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeNotExecuted">
         <source>Not Executed</source>
-        <target state="new">Not Executed</target>
+        <target state="translated" state-qualifier="mt-suggestion">Yürütülmedi</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Yürütülmeyen</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeNotRunnable">
         <source>Not Runnable</source>
-        <target state="new">Not Runnable</target>
+        <target state="translated" state-qualifier="mt-suggestion">Çalıştırılamıyor</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Yürütülemedi</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestOutcomePassed">
         <source>Passed</source>
-        <target state="new">Passed</target>
+        <target state="translated" state-qualifier="mt-suggestion">Başarılı</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Geçirilen</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
-        <target state="new">Passed (run aborted)</target>
+        <target state="translated" state-qualifier="mt-suggestion">Başarılı (çalıştırma iptal edildi)</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">(Geçirilen Çalıştır'ı iptal edildi)</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestOutcomePending">
         <source>Pending</source>
-        <target state="new">Pending</target>
+        <target state="translated" state-qualifier="mt-suggestion">Bekliyor</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Bekleyen</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeTimeout">
         <source>Timeout</source>
-        <target state="new">Timeout</target>
+        <target state="translated" state-qualifier="mt-suggestion">Zaman aşımı</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Zaman aşımı</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeWarning">
         <source>Warning</source>
-        <target state="new">Warning</target>
+        <target state="translated" state-qualifier="mt-suggestion">Uyarı</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Uyarı</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_CannotBeLessThanZero">
         <source>The parameter cannot be less than 0.</source>
-        <target state="new">The parameter cannot be less than 0.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Parametre 0’dan küçük olamaz.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Parametresi, 0'dan küçük olamaz.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="new">The parameter cannot be null or empty.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="Common_CannotGetNextIterationName">
         <source>Cannot get free name for {0}(1),(2),... in directory {1}. Please clean up this directory.</source>
-        <target state="new">Cannot get free name for {0}(1),(2),... in directory {1}. Please clean up this directory.</target>
+        <target state="translated" state-qualifier="mt-suggestion">{1} dizininde {0}(1),(2),... için boş bir ad alınamıyor. Lütfen bu dizini temizleyin.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{{1} dizini içinde..., 0}(1),(2). için ücretsiz adı alınamıyor Lütfen bu dizinini temizlemek.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="15" adjWordcount="12.75" curWordcount="12.75"</note>
       </trans-unit>
       <trans-unit id="Common_MissingRunConfigInRun">
         <source>Test Settings are not specified.</source>
-        <target state="new">Test Settings are not specified.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Test Ayarları belirtilmedi.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Test ayarları belirtilmedi.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="Common_MissingRunDeploymentRootInRunConfig">
         <source>The active Test Settings do not define the Run Deployment Directory.</source>
-        <target state="new">The active Test Settings do not define the Run Deployment Directory.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Etkin Test Ayarları içinde Çalıştırma Dağıtım Dizini tanımlanmıyor.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Etkin Test ayarlarını çalışması dağıtım dizini tanımlamayın.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="Common_MissingRunInResult">
         <source>The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</source>
-        <target state="new">The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Sonuç bir test çalıştırmasıyla ilişkili değil. Devam eden veya tamamlanmış bir test çalıştırmasından alınmış bir sonucu kullanın.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Sonuç testi ile ilişkili değil. Bir devam eden veya tamamlanmış testi çalıştırmak alındı bir sonuç kullanın.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="Common_NothingLeftAfterReplaciingBadCharsInName">
         <source>The specified file/directory name '{0}' is not valid.</source>
-        <target state="new">The specified file/directory name '{0}' is not valid.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Belirtilen '{0}' dosya/dizin adı geçerli değil.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Belirtilen dosya/dizin adı '{0}' geçerli değil.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="Common_TestRunName">
         <source>{0}@{1} {2}</source>
-        <target state="new">{0}@{1} {2}</target>
+        <target state="translated" state-qualifier="mt-suggestion">{0}@{1} {2}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0}@{1} {2}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="FailureToAttach">
         <source>Failed to attach files from: {0}
 Error Details: {1}:{2}</source>
-        <target state="new">Failed to attach files from: {0}
-Error Details: {1}:{2}</target>
+        <target state="translated" state-qualifier="mt-suggestion">Dosyalar şuradan eklenemedi: {0}
+Hata Ayrıntıları: {1}:{2}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Dosya iliştirmek için başarısız oldu: {0}
+Hata ayrıntıları: {1}: {2}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="MessageForSkippedTests">
         <source>Test '{0}' was skipped in the test run.</source>
-        <target state="new">Test '{0}' was skipped in the test run.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Test çalıştırmasında '{0}' testi atlandı.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Test çalışmasını test '{0}' geçildi.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="TrxLoggerResultsFile">
         <source>Results File: {0}</source>
-        <target state="new">Results File: {0}</target>
+        <target state="translated" state-qualifier="mt-suggestion">Sonuç Dosyası: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Sonuç dosyası: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TS_AllResults">
         <source>All Loaded Results</source>
-        <target state="new">All Loaded Results</target>
+        <target state="translated" state-qualifier="mt-suggestion">Yüklenen Tüm Sonuçlar</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Yüklenen tüm sonuçları</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TS_UncategorizedResults">
         <source>Results Not in a List</source>
-        <target state="new">Results Not in a List</target>
+        <target state="translated" state-qualifier="mt-suggestion">Bir Listede Olmayan Sonuçlar</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Sonuçlar listesinde değil</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="Common_DeploymentItem">
         <source>deployment item '{0}'</source>
-        <target state="new">deployment item '{0}'</target>
+        <target state="translated" state-qualifier="mt-suggestion">dağıtım öğesi '{0}'</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Dağıtım öğesi '{0}'</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="Common_DeploymentItemWithOutputDirectory">
         <source>deployment item '{0}' (output directory '{1}')</source>
-        <target state="new">deployment item '{0}' (output directory '{1}')</target>
+        <target state="translated" state-qualifier="mt-suggestion">dağıtım öğesi '{0}' (çıktı dizini '{1}')</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Dağıtım öğesi '{0}' (çıktı dizini '{1}')</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="Common_NullInMessages">
         <source>(null)</source>
-        <target state="new">(null)</target>
+        <target state="translated" state-qualifier="mt-suggestion">(null)</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">(boş)</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
     </body>
   </file>
