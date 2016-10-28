@@ -41,8 +41,8 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestFramework="$(TargetFrameworkMoniker)"
       VSTestTestCaseFilter="$(VSTestTestCaseFilter)"
       VSTestLogger="$(VSTestLogger)"
-      VSTestDiag="$(VSTestDiag)"
       VSTestListTests="$(VSTestListTests)"
+      VSTestDiag="$(VSTestDiag)"
     />
   </Target>
   
@@ -62,8 +62,8 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestFramework = $(TargetFrameworkMoniker)" Importance="low" />
     <Message Text="VSTestTestCaseFilter = $(VSTestTestCaseFilter)" Importance="low" />
     <Message Text="VSTestLogger = $(VSTestLogger)" Importance="low" />
-    <Message Text="VSTestDiag = $(VSTestDiag)" Importance="low" />
     <Message Text="VSTestListTests = $(VSTestListTests)" Importance="low" />
+    <Message Text="VSTestDiag = $(VSTestDiag)" Importance="low" />
   </Target>
 
 </Project>
