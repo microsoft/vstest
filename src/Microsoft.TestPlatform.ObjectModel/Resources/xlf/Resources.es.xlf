@@ -1,322 +1,591 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="es" original="../Resources.resx" build-num="-935388104">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">284</count>
+        <count count-type="x-adjWordCount">240.2</count>
+        <count count-type="x-curAdjWordCount">240.2</count>
+        <count count-type="x-repeatAdjWordCount">0.5</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">282</count>
+        <count count-type="repetition">2</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="TestOutcomeFailed">
         <source>Failed</source>
-        <target state="new">Failed</target>
+        <target state="translated">Con error</target>
         <note>Test result for failed test</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se pudo</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeNone">
         <source>None</source>
-        <target state="new">None</target>
+        <target state="translated">Ninguna</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ninguno</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomePassed">
         <source>Passed</source>
-        <target state="new">Passed</target>
+        <target state="translated">Correctas</target>
         <note>Test result for passed test</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Pasa</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="BasicTestResultFormat">
         <source>{0,-10}  {1}</source>
-        <target state="new">{0,-10}  {1}</target>
+        <target state="translated">{0,-10}  {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0, -10}  {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestResultMessageFormat">
         <source>  {0}:
 {1}</source>
-        <target state="new">  {0}:
+        <target state="translated">  {0}:
 {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0}:
+{1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestResultTextMessagesFormat">
         <source>  Test Messages:
 {0}</source>
-        <target state="new">  Test Messages:
+        <target state="translated">  Mensajes de prueba:
 {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Mensajes de prueba:
+{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestFailureMessageFormat">
         <source>  Message: {0}</source>
-        <target state="new">  Message: {0}</target>
+        <target state="translated">  Mensaje: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Mensaje: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestFailureStackTraceFormat">
         <source>  StackTrace:
 {0}</source>
-        <target state="new">  StackTrace:
+        <target state="translated">  Seguimiento de la pila:
 {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">StackTrace:
+{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="NullString">
         <source>(null)</source>
-        <target state="new">(null)</target>
+        <target state="translated">(nulo)</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">(null)</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Exception_RegisteredTestPropertyHasDifferentValueType">
         <source>Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</source>
-        <target state="new">Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</target>
+        <target state="translated">No se puede registrar la propiedad '{0}' como tipo de valor '{1}' porque ya se registró como '{2}'.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se puede registrar la propiedad '{0}' como tipo de valor '{1}' porque ya se ha registrado como '{2}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="15" adjWordcount="12.75" curWordcount="12.75"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyColumnNumberLabel">
         <source>Column Number</source>
-        <target state="new">Column Number</target>
+        <target state="translated">Número de columna</target>
         <note>The label of the test property ColumnNumber for test case.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Número de columna</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyExecutorUriLabel">
         <source>Executor Uri</source>
-        <target state="new">Executor Uri</target>
+        <target state="translated">URI del ejecutor</target>
         <note>The label of the test property ExecutorUri for test case.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Uri de ejecutor</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertySourceLabel">
         <source>Source</source>
-        <target state="new">Source</target>
+        <target state="translated">Origen</target>
         <note>The label of the test property Source for test case.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Origen</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyLineNumberLabel">
         <source>Line Number</source>
-        <target state="new">Line Number</target>
+        <target state="translated">Número de línea</target>
         <note>The label of the test property LineNumber for test case.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Número de línea</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyNameLabel">
         <source>Name</source>
-        <target state="new">Name</target>
+        <target state="translated">Nombre</target>
         <note>The label of the test property Name for test case.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nombre</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyComputerNameLabel">
         <source>Computer Name</source>
-        <target state="new">Computer Name</target>
+        <target state="translated">Nombre de equipo</target>
         <note>The label of the test property ComputerName for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nombre del equipo</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyDisplayNameLabel">
         <source>TestResult Display Name</source>
-        <target state="new">TestResult Display Name</target>
+        <target state="translated">Nombre para mostrar del resultado de la prueba</target>
         <note>The label of TestResult.DisplayName, mainly used for parameterized data tests</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nombre para mostrar de TestResult</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyDurationLabel">
         <source>Duration</source>
-        <target state="new">Duration</target>
+        <target state="translated">Duración</target>
         <note>The label of the test property Duration for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Duración</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyEndTimeLabel">
         <source>End Time</source>
-        <target state="new">End Time</target>
+        <target state="translated">Hora de finalización</target>
         <note>The label of the test property EndTime for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Hora de finalización</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyErrorColumnNumberLabel">
         <source>Error Column Number</source>
-        <target state="new">Error Column Number</target>
+        <target state="translated">Número de columna de error</target>
         <note>The label of the test property ErrorColumnNumber for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Número de columna de error</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyErrorMessageLabel">
         <source>Error Message</source>
-        <target state="new">Error Message</target>
+        <target state="translated">Mensaje de error</target>
         <note>The label of the test property ErrorMessage for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Mensaje de error</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyErrorStackTraceLabel">
         <source>Error Stack Trace</source>
-        <target state="new">Error Stack Trace</target>
+        <target state="translated">Seguimiento de la pila de errores</target>
         <note>The label of the test property ErrorStackTrace for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Seguimiento de pila de errores</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyOutcomeLabel">
         <source>Outcome</source>
-        <target state="new">Outcome</target>
+        <target state="translated">Resultado</target>
         <note>The label of the test property Outcome for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Resultado</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestResultPropertyStartTimeLabel">
         <source>Start Time</source>
-        <target state="new">Start Time</target>
+        <target state="translated">Hora de inicio</target>
         <note>The label of the test property StartTime for test result.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Hora de inicio</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ConverterNotSupported">
         <source>Cannot find TypeConverter for type {0}.</source>
-        <target state="new">Cannot find TypeConverter for type {0}.</target>
+        <target state="translated">No se encuentra TypeConverter para el tipo {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No puede encontrar un TypeConverter para el tipo {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyFilePathLabel">
         <source>File Path</source>
-        <target state="new">File Path</target>
+        <target state="translated">Ruta de acceso del archivo</target>
         <note>The label of the test property FilePath for test case.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ruta de acceso de archivo</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="NotificationFrequencyIsNotPositive">
         <source>Notification frequency need to be a positive value.</source>
-        <target state="new">Notification frequency need to be a positive value.</target>
+        <target state="translated">La frecuencia de notificación debe ser un valor positivo.</target>
         <note>frequency for DiscoveryCriteria/TestRunCriteria needs to be a positive value</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Frecuencia de notificación deben ser un valor positivo.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyIdLabel">
         <source>Id</source>
-        <target state="new">Id</target>
+        <target state="translated">Id.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Id.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="InvalidSettingsXmlAttribute">
         <source>Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</source>
-        <target state="new">Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</target>
+        <target state="translated">Configuración no válida: '{0}'. Atributo XML no esperado: '{1}'.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Configuración no válida '{0}'. XmlAttribute inesperado: '{1}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="InvalidSettingsXmlElement">
         <source>Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</source>
-        <target state="new">Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</target>
+        <target state="translated">Configuración no válida: '{0}'. Elemento XML no esperado: '{1}'.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Configuración no válida '{0}'. XmlElement inesperado: '{1}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="MissingDataCollectorAttributes">
         <source>Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</source>
-        <target state="new">Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</target>
+        <target state="translated">Configuración de recopilador de datos no válida. Se esperaba el atributo '{0}', pero no está. Una configuración típica de recopilador de datos sería como la siguiente: &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Configuración de recopiladores de datos no válidos. El atributo esperado '{0}' no existe.  Sería un recopilador de datos típica configuración &lt; uri del recopilador de datos = "dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = 1111111111111111" friendlyName = "sampleCollector" &gt;.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="26" adjWordcount="22.1" curWordcount="22.1"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeNotFound">
         <source>NotFound</source>
-        <target state="new">NotFound</target>
+        <target state="translated">No se encuentra</target>
         <note>Test result for not found test</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">NotFound</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestOutcomeSkipped">
         <source>Skipped</source>
-        <target state="new">Skipped</target>
+        <target state="translated">Se ha omitido</target>
         <note>Test result for skipped test </note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Omitido</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="NotificationTimeoutIsZero">
         <source>Notification timeout must be greater than zero.</source>
-        <target state="new">Notification timeout must be greater than zero.</target>
+        <target state="translated">El tiempo de espera de notificación debe ser mayor que cero.</target>
         <note>Timeout used during test discovery and execution must be greater than zero.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tiempo de espera de notificación debe ser mayor que cero.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</source>
-        <target state="new">Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</target>
+        <target state="translated">Configuración no válida: '{0}'. Se ha especificado un valor no válido ('{1}') para '{2}'.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Configuración no válida '{0}'.  Valor no válido '{1}' especificado para '{2}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="InvalidRunSettingsRootNode">
         <source>The root node of the run settings must be named 'RunSettings'.</source>
-        <target state="new">The root node of the run settings must be named 'RunSettings'.</target>
+        <target state="translated">El nodo raíz de los parámetros de ejecución debe denominarse 'RunSettings'.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">El nodo raíz de la configuración de ejecución debe denominarse 'RunSettings'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="NoTestCaseFilterForSpecificTests">
         <source>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</source>
-        <target state="new">Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</target>
+        <target state="translated">No se puede especificar TestCaseFilter para series de pruebas específicas. FilterCriteria se usa solo para ejecuciones con orígenes.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se puede especificar TestCaseFilter para ejecutar las pruebas específicas. FilterCriteria es sólo para ejecutar con las fuentes.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="UnexpectedTypeOfProperty">
         <source>The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </source>
-        <target state="new">The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </target>
+        <target state="translated">No se admite el tipo '{0}' de la propiedad de prueba '{1}'. Use un tipo de propiedad admitido (tipos primitivos, URI, string, string[]) y vuelva a intentarlo. </target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se admite el tipo de propiedad de prueba '{0}' de propiedad '{1}'. Utilice uno de los tipos de propiedad admitidos (tipos primitivos, uri, cadena, string[]) y vuelva a intentarlo.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="26" adjWordcount="22.1" curWordcount="22.1"</note>
       </trans-unit>
       <trans-unit id="CouldNotFindXmlNode">
         <source>Could not find '{0}' node</source>
-        <target state="new">Could not find '{0}' node</target>
+        <target state="translated">No se encuentra el nodo '{0}'</target>
         <note>Error message when the specified {0}  xml node can not be found in the run settings xml document</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se pudo encontrar el nodo '{0}'</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyFullyQualifiedNameLabel">
         <source>FullyQualifiedName</source>
-        <target state="new">FullyQualifiedName</target>
+        <target state="translated">Nombre completo</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">FullyQualifiedName</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="TestCasePropertyTraitsLabel">
         <source>Traits</source>
-        <target state="new">Traits</target>
+        <target state="translated">Rasgos</target>
         <note>The label of the test property Traits for test case.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Rasgos</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="SolutionDirectoryNotExists">
         <source>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</source>
-        <target state="new">Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</target>
+        <target state="translated">El directorio de solución '{0}' no existe. Asegúrese de que el directorio de solución especificado en Runsettings existe y de que tiene permisos de lectura para el directorio.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Directorio de la solución '{0}' no existe. Compruebe que el directorio de la solución especificada en runsettings existe y tiene permisos para el directorio de lectura.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="new">The parameter cannot be null or empty.</target>
+        <target state="translated">El parámetro no puede ser nulo ni estar vacío.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">El parámetro no puede ser nulo ni estar vacío.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="Common_FileNotExist">
         <source>File {0} does not exist.</source>
-        <target state="new">File {0} does not exist.</target>
+        <target state="translated">El archivo {0} no existe.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">El archivo {0} no existe.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="Common_ObjectMustBeOfType">
         <source>Object must be of type {0}.</source>
-        <target state="new">Object must be of type {0}.</target>
+        <target state="translated">El objeto debe ser de tipo {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Objeto debe ser del tipo {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeAborted">
         <source>Aborted</source>
-        <target state="new">Aborted</target>
+        <target state="translated">Anuladas</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Anulado</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeCompleted">
         <source>Completed</source>
-        <target state="new">Completed</target>
+        <target state="translated">Finalizadas</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Completado</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeDisconnected">
         <source>Disconnected</source>
-        <target state="new">Disconnected</target>
+        <target state="translated">Desconectadas</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Desconectado</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeError">
         <source>Error</source>
-        <target state="new">Error</target>
+        <target state="translated">Error</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Error</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeFailed">
         <source>Failed</source>
-        <target state="new">Failed</target>
+        <target state="translated">Con error</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se pudo</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.25" curWordcount="0.25"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeInconclusive">
         <source>Inconclusive</source>
-        <target state="new">Inconclusive</target>
+        <target state="translated">No concluyentes</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No concluyente</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeInProgress">
         <source>In Progress</source>
-        <target state="new">In Progress</target>
+        <target state="translated">En curso</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">En curso</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeNotExecuted">
         <source>Not Executed</source>
-        <target state="new">Not Executed</target>
+        <target state="translated">No ejecutadas</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No ejecutado</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeNotRunnable">
         <source>Not Runnable</source>
-        <target state="new">Not Runnable</target>
+        <target state="translated">No ejecutables</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se puede ejecutar</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomePassed">
         <source>Passed</source>
-        <target state="new">Passed</target>
+        <target state="translated">Correctas</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Pasa</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.25" curWordcount="0.25"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
-        <target state="new">Passed (run aborted)</target>
+        <target state="translated">Correctas (ejecución anulada)</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Pasada (ejecución anulada)</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomePending">
         <source>Pending</source>
-        <target state="new">Pending</target>
+        <target state="translated">Pendientes</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Pendiente</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeTimeout">
         <source>Timeout</source>
-        <target state="new">Timeout</target>
+        <target state="translated">Tiempo de espera agotado</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tiempo de espera</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Common_TestOutcomeWarning">
         <source>Warning</source>
-        <target state="new">Warning</target>
+        <target state="translated">Advertencia</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Advertencia</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="DataCollectionSink_CanNotReadStream">
         <source>Unable to read from the provided stream.  Data from a stream cannot be sent unless the stream supports reading.</source>
-        <target state="new">Unable to read from the provided stream.  Data from a stream cannot be sent unless the stream supports reading.</target>
+        <target state="translated">No se puede leer el flujo proporcionado. Los datos de un flujo no se pueden enviar si el flujo no admite lectura.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">No se ha podido leer desde la secuencia suministrada.  No se puede enviar datos desde una secuencia a menos que la secuencia admite operaciones de lectura.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="DataCollectionSink_InvalidFileNameCharacters">
         <source>The provided file name '{0}' contains the following invalid characters: '{1}'.</source>
-        <target state="new">The provided file name '{0}' contains the following invalid characters: '{1}'.</target>
+        <target state="translated">El nombre de archivo proporcionado ({0}) contiene los siguientes caracteres no válidos: '{1}'.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">El nombre de archivo proporcionado '{0}' contiene los siguientes caracteres no válidos: '{1}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="DataCollectionSink_ReservedFilenameUsed">
         <source>The provided file name '{0}' is reserved.</source>
-        <target state="new">The provided file name '{0}' is reserved.</target>
+        <target state="translated">El nombre de archivo proporcionado ({0}) es un nombre reservado.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">El nombre de archivo proporcionado '{0}' está reservado.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
     </body>
   </file>

@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     internal class ConsoleLogger : ITestLogger
     {
         #region Constants
+        private const string TestMessageFormattingPrefix = " ";
 
         /// <summary>
         /// Uri used to uniquely identify the console logger.
@@ -141,9 +142,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 StringBuilder sb = new StringBuilder();
                 foreach (var message in testMessageCollection)
                 {
-                    string prefix = String.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, CommandLineResources.TestMessageFormattingPrefix);
-                    string messageText = message.Text.Replace(Environment.NewLine, prefix).TrimEnd(CommandLineResources.TestMessageFormattingPrefix.ToCharArray());
-                    sb.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", CommandLineResources.TestMessageFormattingPrefix, messageText);
+                    string prefix = String.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
+                    string messageText = message.Text.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
+                    sb.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, messageText);
                 }
                 return sb.ToString();
             }
@@ -172,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 hasData = true;
                 Output.WriteLine(CommandLineResources.ErrorMessageBanner, OutputLevel.Error);
-                string errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", CommandLineResources.TestMessageFormattingPrefix, result.ErrorMessage);
+                string errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, result.ErrorMessage);
                 Output.WriteLine(errorMessage, OutputLevel.Error);
             }
 

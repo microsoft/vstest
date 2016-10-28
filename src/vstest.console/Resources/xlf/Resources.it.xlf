@@ -1,113 +1,216 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="it" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="it" original="../Resources.resx" build-num="-1294218164">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">1766</count>
+        <count count-type="x-adjWordCount">1498.1</count>
+        <count count-type="x-curAdjWordCount">1498.1</count>
+        <count count-type="x-repeatAdjWordCount">1.25</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">1761</count>
+        <count count-type="repetition">5</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="DuplicateSource">
         <source>Duplicate source {0} specified.</source>
-        <target state="new">Ignoring the specified duplicate source '{0}'.</target>
+        <target state="translated">L'origine {0} specificata è duplicata.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Duplicare l'origine {0} specificato.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="FileNotFound">
         <source>'{0}' not found.</source>
-        <target state="new">Could not find file {0}.</target>
+        <target state="translated">'{0}' non è stato trovato.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">'{0}' non trovato.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="AvailableDiscoverersHeaderMessage">
         <source>The following Test Discovery Add-Ins are available:</source>
-        <target state="new">The following Test Discovery Add-Ins are available:</target>
+        <target state="translated">Sono disponibili i componenti aggiuntivi di individuazione dei test seguenti:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Sono disponibili i seguenti Test di individuazione dei componenti aggiuntivi:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableExecutorsHeaderMessage">
         <source>The following Test Execution Add-Ins are available:</source>
-        <target state="new">The following Test Execution Add-Ins are available:</target>
+        <target state="translated">Sono disponibili i componenti aggiuntivi di esecuzione dei test seguenti:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">I seguenti Test esecuzione componenti aggiuntivi disponibili:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
-        <target state="new">    {0}</target>
+        <target state="translated">    {0}</target>
         <note>{Locked}</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="AvailableExtensionsMetadataFormat">
         <source>        {0}: {1}</source>
-        <target state="new">        {0}: {1}</target>
+        <target state="translated">        {0}: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0}: {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="AvailableLoggersHeaderMessage">
         <source>The following Test Logger Add-Ins are available:</source>
-        <target state="new">The following Test Logger Add-Ins are available:</target>
+        <target state="translated">Sono disponibili i componenti aggiuntivi di logger di test seguenti:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">I seguenti Test Logger componenti aggiuntivi disponibili:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="AvailableTestsFormat">
         <source>    {0}</source>
-        <target state="new">    {0}</target>
+        <target state="translated">    {0}</target>
         <note>{Locked}</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.25" curWordcount="0.25"</note>
       </trans-unit>
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
-        <target state="new">Error: {0}</target>
+        <target state="translated">Errore: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Errore: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="CommaSeparatedFormat">
         <source>, {0}</source>
-        <target state="new">, {0}</target>
+        <target state="translated">, {0}</target>
         <note>Format used to comma separate a list of values.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">, {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="DuplicateArgumentError">
         <source>The parameter "{0}" should be provided only once.</source>
-        <target state="new">The parameter "{0}" should be provided only once.</target>
+        <target state="translated">Il parametro "{0}" deve essere specificato una sola volta.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il parametro "{0}" deve essere fornito solo una volta.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromExtension">
         <source>Exception occurred when instantiating extension '{0}': {1}</source>
-        <target state="new">Exception occurred when instantiating extension '{0}': {1}</target>
+        <target state="translated">Si è verificata un'eccezione durante la creazione dell'istanza dell'estensione '{0}': {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Quando si crea un'istanza di estensione '{0}' si è verificata l'eccezione: {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="ListTestsHeaderMessage">
         <source>The following Tests are available:</source>
-        <target state="new">The following Tests are available:</target>
+        <target state="translated">Sono disponibili i test seguenti:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Sono disponibili i seguenti test:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="NoArgumentProcessorFound">
         <source>Unrecognized parameter "{0}".</source>
-        <target state="new">Unrecognized parameter "{0}".</target>
+        <target state="translated">Il parametro "{0}" non è stato riconosciuto.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Parametro "{0}" non riconosciuto.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestSourceFileNotFound">
         <source>The test source file "{0}" provided was not found.</source>
-        <target state="new">The test source file "{0}" provided was not found.</target>
+        <target state="translated">Il file di origine test "{0}" specificato non è stato trovato.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il file di origine di test "{0}" specificato non trovato.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="LoggerUriInvalid">
         <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
-        <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
+        <target state="translated">L'URI del logger di test '{0}' non è valido. Il logger di test verrà ignorato.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'URI di Logger Test '{0}' non è valido.  Il Logger di Test verranno ignorato.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
-        <target state="new">Information: {0}</target>
+        <target state="translated">Informazioni: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Informazioni: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
-        <target state="new">Warning: {0}</target>
+        <target state="translated">Avviso: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Avviso: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="HelpArgumentHelp">
         <source>-?|--Help|/?|/Help
       Display this usage message.</source>
-        <target state="new">-?|--Help|/?|/Help
-      Display this usage message.</target>
+        <target state="translated">-?|--Help|/?|/Help
+      Visualizza questo messaggio relativo alla sintassi.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-?| -- Guida | /? | /Help
+      Visualizzare questo messaggio.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="CopyrightCommandLineTitle">
         <source>Copyright (c) Microsoft Corporation.  All rights reserved.</source>
-        <target state="new">Copyright (c) Microsoft Corporation.  All rights reserved.</target>
+        <target state="translated">Copyright (c) Microsoft Corporation. Tutti i diritti sono riservati.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Copyright (c) Microsoft Corporation.  Tutti i diritti riservati.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="MicrosoftCommandLineTitle">
         <source>Microsoft (R) Test Execution Command Line Tool Version {0}</source>
-        <target state="new">Microsoft (R) Test Execution Command Line Tool Version {0}</target>
+        <target state="translated">Strumento da riga di comando per l'esecuzione di test Microsoft (R) Versione {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Riga di comando di esecuzione Test Microsoft (R) Tool versione {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
@@ -121,43 +224,76 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use  /logger:trx.
-      To publish test results to Team Foundation Server, use TfsPublisher as shown below
-      Example: /logger:TfsPublisher;
-                Collection=&lt;team project collection url&gt;;
-                BuildName=&lt;build name&gt;;
-                TeamProject=&lt;team project name&gt;
-                [;Platform=&lt;Defaults to "Any CPU"&gt;]
-                [;Flavor=&lt;Defaults to "Debug"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
+        <target state="translated">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
+      Specifica un logger per i risultati dei test. Ad esempio, per registrare risultati in un 
+      file di risultati dei test di Visual Studio (TRX), usare /logger:trx.
+      Per pubblicare i risultati dei test in Team Foundation Server, usare TfsPublisher come mostrato di seguito.
+      Esempio: /logger:TfsPublisher;
+                Collection=&lt;URL raccolta di progetti team&gt;;
+                BuildName=&lt;nome compilazione&gt;;
+                TeamProject=&lt;nome progetto team&gt;
+                [;Platform=&lt;valore predefinito "Any CPU"&gt;]
+                [;Flavor=&lt;valore predefinito "Debug"&gt;]
+                [;RunTitle=&lt;titolo&gt;]</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-logger | / logger: &lt; Logger Uri/FriendlyName &gt;
+      Specificare un logger per risultati di test.  Ad esempio, per registrare i risultati in un Visual Studio Test risultati File (TRX) utilizzano /logger:trx.
+      Per pubblicare i risultati dei test in Team Foundation Server, utilizzare TfsPublisher come illustrato di seguito
+      Esempio: /logger:TfsPublisher;
+                Insieme = &lt; url insieme del progetto team &gt;;
+                BuildName = &lt; nome compilazione &gt;;
+                TeamProject = &lt; nome del progetto team &gt;
+                [; Piattaforma = &lt; l'impostazione predefinita è "Any CPU" &gt;]
+                [; Gusto = &lt; l'impostazione predefinita è "Debug" &gt;]
+                [; RunTitle = &lt; title &gt;]</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="63" adjWordcount="53.55" curWordcount="53.55"</note>
       </trans-unit>
       <trans-unit id="HelpDescriptionText">
         <source>Description: Runs tests from the specified files.</source>
-        <target state="new">Description: Runs tests from the specified files.</target>
+        <target state="translated">Descrizione: esegue test dai file specificati.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Descrizione: Esegue i test dai file specificati.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="HelpOptionsText">
         <source>Options:</source>
-        <target state="new">Options:</target>
+        <target state="translated">Opzioni:</target>
         <note>Section Header for subsequent command help listing</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Opzioni:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options]</source>
-        <target state="new">Usage: vstest.console.exe [Arguments] [Options]</target>
+        <target state="translated">Sintassi: vstest.console.exe [Argomenti] [Opzioni]</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Sintassi: vstest.console.exe [argomenti] [opzioni]</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="MissingTestSourceFile">
         <source>No test source files were specified.</source>
-        <target state="new">No test source files were specified.</target>
+        <target state="translated">Non sono stati specificati file di origine test.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nessun file di origine di test specificato.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="NoArgumentsProvided">
         <source>No arguments were specified.</source>
-        <target state="new">No arguments were specified.</target>
+        <target state="translated">Non sono stati specificati argomenti.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Non sono stati specificati argomenti.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="RunTestsArgumentHelp">
         <source>[TestFileNames]
@@ -165,96 +301,164 @@
       by spaces.
       Examples: mytestproject.dll
                 mytestproject.dll myothertestproject.exe</source>
-        <target state="new">[TestFileNames]
-      Run tests from the specified files. Separate multiple test file names
-      by spaces.
-      Examples: mytestproject.dll
+        <target state="translated">[NomiFileTest]
+      Esegue test dai file specificati. Separare più nomi di file di test
+      con spazi.
+      Esempi: mytestproject.dll
                 mytestproject.dll myothertestproject.exe</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">[TestFileNames]
+      Eseguire i test dai file specificati. Separare più nomi di file di test
+      da spazi.
+      Esempi: mytestproject.dll
+                mytestproject.dll myothertestproject.exe</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
       <trans-unit id="AvailableSettingsProvidersHeaderMessage">
         <source>The following Settings Providers Add-Ins are available:</source>
-        <target state="new">The following Settings Providers Add-Ins are available:</target>
+        <target state="translated">Sono disponibili i componenti aggiuntivi di provider di impostazioni seguenti:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Le seguenti impostazioni provider di componenti aggiuntivi disponibili:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="RunSettingsArgumentHelp">
         <source>--Settings|/Settings:&lt;Settings File&gt;
       Settings to use when running tests.</source>
-        <target state="new">--Settings|/Settings:&lt;Settings File&gt;
-      Settings to use when running tests.</target>
+        <target state="translated">--Settings|/Settings:&lt;FileImpostazioni&gt;
+      Impostazioni da usare per l'esecuzione dei test.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-Impostazioni | / impostazioni: &lt; File di impostazioni &gt;
+      Impostazioni da utilizzare quando si eseguono test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="RunSettingsRequired">
         <source>The /Settings parameter requires a settings file to be provided.</source>
-        <target state="new">The /Settings parameter requires a settings file to be provided.</target>
+        <target state="translated">Con il parametro /Settings è necessario specificare un file di impostazioni.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il parametro /Settings richiede un file di impostazioni devono essere fornite.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="RunSettingsFileNotFound">
         <source>The Settings file '{0}' could not be found.</source>
-        <target state="new">The Settings file '{0}' could not be found.</target>
+        <target state="translated">Il file di impostazioni '{0}' non è stato trovato.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impossibile trovare il file di impostazioni '{0}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="TestRunFailed">
         <source>Test Run Failed.</source>
-        <target state="new">Test Run Failed.</target>
+        <target state="translated">L'esecuzione dei test non è riuscita.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Esecuzione dei test non riuscito.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="TestRunSuccessful">
         <source>Test Run Successful.</source>
-        <target state="new">Test Run Successful.</target>
+        <target state="translated">L'esecuzione dei test è riuscita.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Corretta esecuzione dei test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="InvalidInIsolationCommand">
         <source>Argument {0} is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.</source>
-        <target state="new">Argument {0} is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.</target>
+        <target state="translated">L'argomento {0} non è previsto nel comando 'InIsolation'. Specificare il comando senza l'argomento, ad esempio: vstest.console.exe myTests.dll /InIsolation, quindi riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento {0} non previsto nel comando 'InIsolation'. Specificare il comando senza l'argomento (esempio: vstest.console.exe myTests.dll /InIsolation) e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="SuggestUseVsixExtensionsIfNoTestsIsFound">
         <source>Additionally, you can try specifying '/UseVsixExtensions' command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true</source>
-        <target state="new">Additionally, you can try specifying '/UseVsixExtensions' command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true</target>
+        <target state="translated">È inoltre possibile provare a specificare il comando '/UseVsixExtensions' se l'executor e l'agente di individuazione dei test sono installati nel computer come estensioni vsix e queste ultime sono supportate dall'installazione. Esempio: vstest.console.exe myTests.dll /UseVsixExtensions:true</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Inoltre, è possibile provare a specificare ' comando degli UseVsixExtensions se il test discoverer &amp; esecutore è installato nel computer come estensioni vsix e l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe myTests.dll /UseVsixExtensions:true</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="UseVsixExtensionsValueRequired">
         <source>The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</source>
-        <target state="new">The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</target>
+        <target state="translated">Con il parametro /UseVsixExtensions è richiesto un valore. Se è 'true', le estensioni VSIX eventualmente installate verranno usate nell'esecuzione dei test. Se è false, verranno ignorate. Esempio: /UseVsixExtensions:true</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il parametro /UseVsixExtensions richiede un valore. Se 'true', le estensioni VSIX installate (se presenti) da utilizzare nell'esecuzione del test. Se è false, verrà ignorati.   Esempio: /UseVsixExtensions:true</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
       <trans-unit id="InvalidUseVsixExtensionsCommand">
         <source>Argument {0} is not expected in the 'UseVsixExtensions' command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again.</source>
-        <target state="new">Argument {0} is not expected in the 'UseVsixExtensions' command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again.</target>
+        <target state="translated">L'argomento {0} non è previsto nel comando 'UseVsixExtensions'. Specificare il comando indicando se le estensioni vsix devono essere usate o ignorate, ad esempio vstest.console.exe myTests.dll /UseVsixExtensions:true, quindi riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento {0} non previsto nel comando 'UseVsixExtensions'. Specificare il comando che indica se le estensioni vsix devono essere utilizzate o ignorate (esempio: vstest.console.exe myTests.dll /UseVsixExtensions:true) e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
       <trans-unit id="InIsolationHelp">
         <source>/InIsolation
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="new">/InIsolation
-      Runs the tests in an isolated process. This makes vstest.console.exe 
-      process less likely to be stopped on an error in the tests, but tests 
-      may run slower.</target>
+        <target state="translated">/InIsolation
+      Esegue i test in un processo isolato. In questo modo è meno probabile che 
+      il processo vstest.console.exe venga arrestato in caso di errore nei test,
+      che però potrebbero risultare più lenti.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">/ InIsolation
+      Esegue i test in un processo isolato. Ciò rende meno probabile che l'interruzione di un errore nei test di processo vstest.console.exe, ma i test possono essere eseguite più lentamente.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
       <trans-unit id="UseVsixExtensionsHelp">
         <source>/UseVsixExtensions
       This makes vstest.console.exe process use or skip the VSIX extensions 
       installed(if any) in the test run. 
       Example  /UseVsixExtensions:true</source>
-        <target state="new">/UseVsixExtensions
-      This makes vstest.console.exe process use or skip the VSIX extensions 
-      installed(if any) in the test run. 
-      Example  /UseVsixExtensions:true</target>
+        <target state="translated">/UseVsixExtensions
+      Determina se il processo vstest.console.exe usa o ignora le estensioni VSIX 
+      eventualmente installate nell'esecuzione dei test. 
+      Esempio: /UseVsixExtensions:true</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">/ UseVsixExtensions
+      Ciò rende il processo di vstest.console.exe utilizzare o ignorare le estensioni VSIX installate (se presente) nell'esecuzione del test. 
+      Esempio /UseVsixExtensions:true</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="BatchSizeRequired">
         <source>The /BatchSize argument requires the size of the batch.  Example:  /BatchSize:10</source>
-        <target state="new">The /BatchSize argument requires the size of the batch.  Example:  /BatchSize:10</target>
+        <target state="translated">Con l'argomento /BatchSize sono richieste le dimensioni del batch. Esempio: /BatchSize:10</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento /BatchSize è necessaria la dimensione del batch.  Esempio: /BatchSize:10</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="InvalidBatchSize">
         <source>Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10</source>
-        <target state="new">Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10</target>
+        <target state="translated">Le dimensioni {0} del batch non sono valide. Devono essere maggiori di zero. Esempio: /BatchSize:10</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Dimensione batch non valido: {0}. Le dimensioni del batch devono essere maggiore di zero. Esempio: /BatchSize:10</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="Examples">
         <source>  To run tests in the same process:
@@ -263,70 +467,121 @@
     &gt;vstest.console.exe /inIsolation tests.dll
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="new">  To run tests in the same process:
+        <target state="translated">  Per eseguire test nello stesso processo:
     &gt;vstest.console.exe tests.dll 
-  To run tests in a separate process:
+  Per eseguire test in un processo separato:
     &gt;vstest.console.exe /inIsolation tests.dll
-  To run tests with additional settings such as  data collectors:
+  Per eseguire test con ulteriori impostazioni, quali agenti di raccolta dati:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Per eseguire i test nello stesso processo:
+    &gt; Tests vstest.console.exe per eseguire test in un processo separato:
+    &gt; Tests /inIsolation vstest.console.exe
+  Per eseguire test con impostazioni aggiuntive, quali agenti di raccolta dati:
+    &gt; vstest.console.exe Tests /Settings:Local.RunSettings</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="35" adjWordcount="29.75" curWordcount="29.75"</note>
       </trans-unit>
       <trans-unit id="ListDiscoverersHelp">
         <source>/ListDiscoverers
       Lists installed test discoverers.</source>
-        <target state="new">/ListDiscoverers
-      Lists installed test discoverers.</target>
+        <target state="translated">/ListDiscoverers
+      Elenca gli agenti di individuazione test installati.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">/ ListDiscoverers
+      Discoverers test gli elenchi installati.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="ListExecutorsHelp">
         <source>/ListExecutors
       Lists installed test executors.</source>
-        <target state="new">/ListExecutors
-      Lists installed test executors.</target>
+        <target state="translated">/ListExecutors
+      Elenca gli executor di test installati.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">/ ListExecutors
+      Gli elenchi installati gli esecutori di test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="ListLoggersHelp">
         <source>/ListLoggers
       Lists installed test loggers.</source>
-        <target state="new">/ListLoggers
-      Lists installed test loggers.</target>
+        <target state="translated">/ListLoggers
+      Elenca i logger di test installati.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">/ ListLoggers
+      Gli elenchi installati test logger.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="ListSettingsProvidersHelp">
         <source>/ListSettingsProviders
       Lists installed test settings providers.</source>
-        <target state="new">/ListSettingsProviders
-      Lists installed test settings providers.</target>
+        <target state="translated">/ListSettingsProviders
+      Elenca i provider di impostazioni test installati.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">/ ListSettingsProviders
+      Elenca i provider di impostazioni di test installati.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="ListTestsHelp">
         <source>-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
       Lists discovered tests from the given test container.</source>
-        <target state="new">-lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
-      Lists discovered tests from the given test container.</target>
+        <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;Nome file&gt;
+      Elenca i test individuati dal contenitore di test specificato.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; nome File &gt;
+      Elenchi individuati test dal contenitore del test specificato.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="TimeElapsed">
         <source>Time elapsed :</source>
-        <target state="new">Time elapsed :</target>
+        <target state="translated">Tempo trascorso:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tempo trascorso:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SpecificTestsRequired">
         <source>The /Tests argument requires one or more specific test names or their substrings.
        Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </source>
-        <target state="new">The /Tests argument requires one or more specific test names or their substrings.
-       Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </target>
+        <target state="translated">Con l'argomento /Tests sono richiesti uno o più nomi di test specifici o relative sottostringhe.
+       Esempi: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento /Tests richiede uno o più nomi di test specifico o le sottostringhe.
+       Esempi: /Tests:TestsMethod1, /Tests:TestMethod1, method2</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
       <trans-unit id="NoTestsAvailableAfterFiltering">
         <source>A total of {0} tests were discovered but no test matches the specified selection criteria({1}). Use right value(s) and try again.</source>
-        <target state="new">A total of {0} tests were discovered but no test matches the specified selection criteria({1}). Use right value(s) and try again.</target>
+        <target state="translated">In totale sono stati individuati {0} test, ma nessuno corrisponde ai criteri di selezione specificati ({1}). Usare i valori corretti e riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Un totale di {0} test sono stati individuati ma nessun test corrisponde a criteria({1}) la selezione specificata. Utilizzare i valori di destro e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
       <trans-unit id="SearchStringDelimiter">
         <source>,</source>
-        <target state="new">,</target>
+        <target state="translated">,</target>
         <note></note>
+        <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
+          <source />
+          <target state-qualifier="tm-suggestion">,</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
       <trans-unit id="RunSpecificTestsHelp">
         <source>--Tests|/Tests:&lt;Test Names&gt;
@@ -334,142 +589,251 @@
       values, separate them by commas.
       Examples: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</source>
-        <target state="new">--Tests|/Tests:&lt;Test Names&gt;
-      Run tests with names that match the provided values. To provide multiple
-      values, separate them by commas.
-      Examples: /Tests:TestMethod1
+        <target state="translated">--Tests|/Tests:&lt;Nomi test&gt;
+      Esegue test con nomi corrispondenti ai valori specificati. Per specificare più
+      valori, separarli con virgole.
+      Esempi: /Tests:TestMethod1
                 /Tests:TestMethod1,testMethod2</target>
         <note>Please verify if the console output looks good after modifiaction. </note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-Verifica | / test: &lt; prova nomi &gt;
+      Eseguire i test con nomi che corrispondono ai valori specificati. Per fornire più
+      valori, separati da virgole.
+      Esempi: /Tests:TestMethod1
+                /Tests:TestMethod1, testMethod2</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="25" adjWordcount="21.25" curWordcount="21.25"</note>
       </trans-unit>
       <trans-unit id="SwitchToNoIsolation">
         <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="new">Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</target>
+        <target state="translated">Per eseguire i test, verrà usata la modalità di isolamento perché gli adattatori dati di diagnostica sono stati abilitati in runsettings. Usare il parametro /inIsolation per non visualizzare più questo avviso.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Utilizzando la modalità di isolamento per eseguire i test come adattatori dati di diagnostica sono stati attivati nel runsettings. Utilizzare il parametro /inIsolation per non visualizzare questo avviso.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="SwitchToIsolationInAppContainerMode">
         <source>Using Isolation mode to run unit tests for Windows Store apps. Use the /InIsolation parameter to suppress this warning.</source>
-        <target state="new">Using Isolation mode to run unit tests for Windows Store apps. Use the /InIsolation parameter to suppress this warning.</target>
+        <target state="translated">Per eseguire gli unit test per le app di Windows Store, verrà usata la modalità di isolamento. Usare il parametro /InIsolation per non visualizzare più questo avviso.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Utilizzando la modalità di isolamento per eseguire unit test per applicazioni Windows Store. Utilizzare il parametro /InIsolation per non visualizzare questo avviso.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="DisablingDataCollectionInAppContainerTestExecution">
         <source>Diagnostic data adapters are not supported when running unit tests for Windows Store apps. Remove diagnostic data adapters settings from settings.</source>
-        <target state="new">Diagnostic data adapters are not supported when running unit tests for Windows Store apps. Remove diagnostic data adapters settings from settings.</target>
+        <target state="translated">Gli adattatori dati di diagnostica non sono supportati durante l'esecuzione di unit test per app di Windows Store. Rimuovere le impostazioni degli adattatori dati di diagnostica dalle impostazioni.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Adattatori dati di diagnostica non sono supportati quando si eseguono unit test per applicazioni Windows Store. Rimuovere le impostazioni di impostazioni delle schede dati di diagnostica.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
       <trans-unit id="NoTestsFoundWarningMessageWithSuggestionToUseVsix">
         <source>{0} {1}</source>
-        <target state="new">{0} {1}</target>
+        <target state="translated">{0} {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0} {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="LoggerFriendlyNameFormat">
         <source>        FriendlyName: {0}</source>
-        <target state="new">        FriendlyName: {0}</target>
+        <target state="translated">        Nome descrittivo: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">FriendlyName: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ExtensionUriFormat">
         <source>        Uri: {0}</source>
-        <target state="new">        Uri: {0}</target>
+        <target state="translated">        URI: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">URI: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SuggestUseVsixExtensionsInListLoggersCommand">
         <source>The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="new">The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <target state="translated">I componenti aggiuntivi di logger di test installati tramite VSIX vengono ignorati. Usare il parametro /UseVsixExtensions per includerli se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">I Test Logger componenti aggiuntivi installati tramite un'installazione di VSIX vengono ignorati. Utilizzare il parametro /UseVsixExtensions per includerli, se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
       <trans-unit id="SuggestUseVsixExtensionsInListExecutorsCommand">
         <source>The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="new">The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <target state="translated">I componenti aggiuntivi di executor di test installati tramite VSIX vengono ignorati. Usare il parametro /UseVsixExtensions per includerli se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">I Test esecutore componenti aggiuntivi installati tramite un'installazione di VSIX vengono ignorati. Utilizzare il parametro /UseVsixExtensions per includerli, se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
       <trans-unit id="SuggestUseVsixExtensionsInListDiscoverersCommand">
         <source>The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="new">The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <target state="translated">I componenti aggiuntivi di individuazione test installati tramite VSIX vengono ignorati. Usare il parametro /UseVsixExtensions per includerli se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">I Test Individuazione componenti aggiuntivi installati tramite un'installazione di VSIX vengono ignorati. Utilizzare il parametro /UseVsixExtensions per includerli, se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
       <trans-unit id="SuggestUseVsixExtensionsInListSettingsProviderCommand">
         <source>The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
-        <target state="new">The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        <target state="translated">I componenti aggiuntivi di provider di impostazioni installati tramite VSIX vengono ignorati. Usare il parametro /UseVsixExtensions per includerli se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impostazioni provider di componenti aggiuntivi installati tramite un'installazione di VSIX vengono ignorati. Utilizzare il parametro /UseVsixExtensions per includerli, se l'installazione supporta le estensioni vsix. Esempio: vstest.console.exe {0} /UseVsixExtensions:true</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
       <trans-unit id="SettingFormat">
         <source>        SettingName: {0}</source>
-        <target state="new">        SettingName: {0}</target>
+        <target state="translated">        Nome impostazione: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">NomeImpostazione: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SupportedFileTypesIndicator">
         <source>        Supported File Types:</source>
-        <target state="new">        Supported File Types:</target>
+        <target state="translated">        Tipi di file supportati:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tipi di File supportati:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="SupportedFileWithoutSeparator">
         <source> {0}</source>
-        <target state="new"> {0}</target>
+        <target state="translated"> {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.25" curWordcount="0.25"</note>
       </trans-unit>
       <trans-unit id="SupportedFileWithSeparator">
         <source> {0},</source>
-        <target state="new"> {0},</target>
+        <target state="translated"> {0},</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0},</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="UriOfDefaultExecutor">
         <source>        Default Executor Uri: {0}</source>
-        <target state="new">        Default Executor Uri: {0}</target>
+        <target state="translated">        URI executor predefinito: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Uri dell'esecutore predefinito: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="LoggerUriFormat">
         <source>        Uri: {0}</source>
-        <target state="new">        Uri: {0}</target>
+        <target state="translated">        URI: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">URI: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="0.5" curWordcount="0.5"</note>
       </trans-unit>
       <trans-unit id="InvalidPlatformType">
         <source>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</source>
-        <target state="new">Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</target>
+        <target state="translated">Tipo piattaforma non valido: {0}. Tipi di piattaforma validi: x86, x64 e ARM.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tipo di piattaforma non valido: {0}. i tipi di piattaforma validi sono x86, x64 e braccio.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">
         <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>
-        <target state="new">The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</target>
+        <target state="translated">L'argomento /Platform richiede il tipo di piattaforma di destinazione per l'esecuzione dei test. Ad esempio: /Platform:x86</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento se richiede il tipo di piattaforma di destinazione per l'esecuzione dei test per essere fornito.   Esempio: /Platform:x 86</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
       <trans-unit id="PlatformArgumentHelp">
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
       Valid values are x86, x64 and ARM.</source>
-        <target state="new">--Platform|/Platform:&lt;Platform type&gt;
-      Target platform architecture to be used for test execution. 
-      Valid values are x86, x64 and ARM.</target>
+        <target state="translated">--Platform|/Platform:&lt;Tipo di piattaforma&gt;
+      Architettura della piattaforma di destinazione da usare per l'esecuzione dei test. 
+      Valori validi: x86, x64 e ARM.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-Piattaforma | / piattaforma: &lt; tipo di piattaforma &gt;
+      Architettura della piattaforma di destinazione da utilizzare per l'esecuzione del test. 
+      I valori validi sono x86, x64 e ARM.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
       <trans-unit id="SwitchToIsolationInMultiTargetingMode">
         <source>Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning.</source>
-        <target state="new">Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning.</target>
+        <target state="translated">Per eseguire i test, verrà usata la modalità di isolamento in base a quanto specificato nelle impostazioni effettive di piattaforma {0} e .NET Framework {1} per l'esecuzione dei test. Usare il parametro /inIsolation per non visualizzare più questo avviso.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Utilizzando la modalità di isolamento per l'esecuzione di test come richiesto dalla piattaforma efficiente: {0} e .net Framework: {1} impostazioni per l'esecuzione dei test. Utilizzare il parametro /inIsolation per non visualizzare questo avviso.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="26" adjWordcount="22.1" curWordcount="22.1"</note>
       </trans-unit>
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
       Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
-      Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
-      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</target>
+        <target state="translated">--Framework|/Framework:&lt;Versione framework&gt;
+      Versione di .NET Framework di destinazione da usare per l'esecuzione dei test. 
+      Valori validi: ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" e così via.
+      Altri valori supportati: Framework35, Framework40, Framework45 e FrameworkCore10.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; versione Framework &gt;
+      Destinazione di .net Framework versione da utilizzare per l'esecuzione del test. 
+      I valori validi sono ". NETFramework, versione = v4.6 ",". NETCoreApp, versione = v 1.0 "e così via.
+      Altri valori supportati sono Framework35, Framework40, Framework45 e FrameworkCore10.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
         <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="new">The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</target>
+        <target state="translated">Con l'argomento /Framework è richiesta la versione di .NET Framework di destinazione per l'esecuzione dei test. Esempio: /Framework:".NETFramework,Version=v4.6"</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento /Framework richiede la destinazione di .net Framework versione per l'esecuzione dei test.   Esempio: /Framework: ". NETFramework, versione = v4.6 "</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
-        <target state="new">Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</target>
+        <target state="translated">La versione di .NET Framework {0} non è valida. Specificare il nome completo della versione di .NET Framework di destinazione. Altre versioni di .NET Framework supportate: Framework35, Framework40 e Framework45.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">.Net valida versione Framework: {0}. assegnare fullname del TargetFramework. Altro supportato di .net Framework versioni sono Framework35, Framework40 e Framework45.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
       <trans-unit id="AppContainerTestPrerequisiteFail">
         <source>Could not start test run for unit tests for Windows Store app: {0}.</source>
-        <target state="new">Could not start test run for unit tests for Windows Store app: {0}.</target>
+        <target state="translated">Non è stato possibile avviare l'esecuzione dei test per unit test per l'app di Windows Store: {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impossibile avviare l'esecuzione dei test per unit test per l'applicazione Windows Store: {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="TestCaseFilterArgumentHelp">
         <source>--TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
@@ -481,365 +845,636 @@
       Examples: /TestCaseFilter:"Priority=1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</source>
-        <target state="new">--TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
-      Run tests that match the given expression.
-      &lt;Expression&gt; is of the format &lt;property&gt;Operator&lt;value&gt;[|&amp;&lt;Expression&gt;]
-         where Operator is one of =, != or ~  (Operator ~ has 'contains'
-         semantics and is applicable for string properties like DisplayName).
-         Parenthesis () can be used to group sub-expressions.
-      Examples: /TestCaseFilter:"Priority=1"
+        <target state="translated">--TestCaseFilter|/TestCaseFilter:&lt;Espressione&gt;
+      Esegue test corrispondenti all'espressione specificata.
+      &lt;Espressione&gt; è nel formato &lt;proprietà&gt;Operatore&lt;valore&gt;[|&amp;&lt;Espressione&gt;]
+         dove Operatore è =, != o ~  (l'operatore ~ implica la semantica 'contains'
+         ed è applicabile solo per proprietà stringa come DisplayName).
+         È possibile usare le parentesi () per raggruppare sottoespressioni.
+      Esempi: /TestCaseFilter:"Priority=1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-TestCaseFilter | / TestCaseFilter: &lt; espressione &gt;
+      Eseguire i test che corrispondono all'espressione specificata.
+      &lt; espressione &gt; ha il formato &lt; proprietà &gt; operatore &lt; valore &gt; [| &amp; &lt; espressione &gt;]
+         Se l'operatore è un =,! = o ~ (operatore ~ è 'contiene'
+         la semantica e applicabile per le proprietà di stringa come DisplayName).
+         () Parentesi può essere utilizzato per le sottoespressioni di gruppo.
+      Esempi: /TestCaseFilter: "priorità = 1"
+                /TestCaseFilter:"(FullyQualifiedName~Nightly
+                                  | Name=MyTestMethod) "</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="57" adjWordcount="48.45" curWordcount="48.45"</note>
       </trans-unit>
       <trans-unit id="TestCaseFilterValueRequired">
         <source>The /TestCaseFilter argument requires the filter value.
         Filter value can be &lt;property&gt;=&lt;value&gt; type.
         Examples: "Priority=1", "TestCategory=Nightly"</source>
-        <target state="new">The /TestCaseFilter argument requires the filter value.
-        Filter value can be &lt;property&gt;=&lt;value&gt; type.
-        Examples: "Priority=1", "TestCategory=Nightly"</target>
+        <target state="translated">Con l'argomento /TestCaseFilter è richiesto il valore di filtro.
+        Il valore di filtro può essere di tipo &lt;proprietà&gt;=&lt;valore&gt;.
+        Esempi: "Priority=1", "TestCategory=Nightly"</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento /TestCaseFilter richiede il valore del filtro.
+        Il valore del filtro può essere &lt; proprietà &gt; = &lt; valore &gt; tipo.
+        Esempi: "priorità = 1", "TestCategory = ogni notte"</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="InvalidTestCaseFilterValueForSpecificTests">
         <source>The /TestCaseFilter argument cannot be specified with /Tests. Filtering of test cases is not applicable when tests are specified.</source>
-        <target state="new">The /TestCaseFilter argument cannot be specified with /Tests. Filtering of test cases is not applicable when tests are specified.</target>
+        <target state="translated">Non è possibile specificare l'argomento /TestCaseFilter con /Tests. Il filtro dei test case non è applicabile quando si specificano test.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impossibile specificare l'argomento /TestCaseFilter con /Tests. Il filtro di test case non si applica quando vengono specificati i test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="NonDefaultFrameworkAndOrArchDetected">
         <source>{0} is built for {1}/{2}. The test assemblies specified in a run should have a common target .Net framework and platform.</source>
-        <target state="new">{0} is built for {1}/{2}. The test assemblies specified in a run should have a common target .Net framework and platform.</target>
+        <target state="translated">{0} è compilato per {1}/{2}. Gli assembly di test specificati in un'esecuzione devono disporre di una piattaforma e di un .NET Framework di destinazione comuni.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0} è concepito per {1} / {2}. Gli assembly di test specificati in un'esecuzione devono avere una piattaforma e .net framework di destinazione comune.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
       <trans-unit id="RunSingleAppContainerSource">
         <source>Only one app package (.appx file) can be specified for running tests.</source>
-        <target state="new">Only one app package (.appx file) can be specified for running tests.</target>
+        <target state="translated">Per i test in esecuzione è possibile specificare un solo pacchetto dell'app (file con estensione appx).</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il pacchetto di sola applicazione (file portali) può essere specificato per l'esecuzione di test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="StartingDiscovery">
         <source>Starting test discovery, please wait...</source>
-        <target state="new">Starting test discovery, please wait...</target>
+        <target state="translated">Avvio dell'individuazione dei test in corso. Attendere...</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Avvio individuazione di test, attendere...</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="StartingExecution">
         <source>Starting test execution, please wait...</source>
-        <target state="new">Starting test execution, please wait...</target>
+        <target state="translated">Avvio dell'esecuzione dei test in corso. Attendere...</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Avvio dell'esecuzione di test, attendere...</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="DisablingDCOnExceptionWhileParsingDCInfo">
         <source>Reading diagnostic data adapter settings threw an running '{0}'. All diagnostic data adapters will be skipped in this run.</source>
-        <target state="new">Reading diagnostic data adapter settings threw an running '{0}'. All diagnostic data adapters will be skipped in this run.</target>
+        <target state="translated">La lettura delle impostazioni dell'adattatore dati di diagnostica ha generato un oggetto '{0}' di esecuzione. Tutti gli adattatori dati di diagnostica verranno ignorati durante questa esecuzione.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Leggere le impostazioni della scheda dati di diagnostica ha generato un'esecuzione '{0}'. Tutte le schede dati di diagnostica verranno ignorate in questa esecuzione.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
       Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
       settings are used if not specified using settings file.</source>
-        <target state="new">/EnableCodeCoverage
-      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
-      settings are used if not specified using settings file.</target>
+        <target state="translated">/EnableCodeCoverage
+      Abilita l'adattatore dati di diagnostica 'CodeCoverage' nell'esecuzione dei test. Vengono 
+      usate le impostazioni predefinite se non è specificato diversamente in un file di impostazioni.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
+      Consente l'adattatore dati di diagnostica "CodeCoverage" nell'esecuzione del test. Impostazioni predefinite vengono utilizzate se non viene specificato utilizzando i file di impostazioni.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
       <trans-unit id="InvalidEnableCodeCoverageCommand">
         <source>Argument {0} is not expected in the 'EnableCodeCoverage' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again.</source>
-        <target state="new">Argument {0} is not expected in the 'EnableCodeCoverage' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again.</target>
+        <target state="translated">L'argomento {0} non è previsto nel comando 'EnableCodeCoverage'. Specificare il comando senza l'argomento, ad esempio: vstest.console.exe myTests.dll /EnableCodeCoverage, quindi riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento {0} non previsto nel comando 'EnableCodeCoverage'. Specificare il comando senza l'argomento (esempio: vstest.console.exe myTests.dll /EnableCodeCoverage) e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="MalformedRunSettingsFile">
         <source>Settings file provided do not confirm to required format. </source>
-        <target state="new">Settings file provided do not confirm to required format. </target>
+        <target state="translated">Il file di impostazioni specificato non è conforme al formato richiesto. </target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">File di impostazioni fornito conforme al formato richiesto.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="NoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</source>
-        <target state="new">App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</target>
+        <target state="translated">Il pacchetto dell'app '{0}' non contiene un punto di ingresso dell'executor di test. Per eseguire unit test per le app di Windows Store, creare il pacchetto dell'app usando il progetto Libreria unit test per app di Windows Store.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Pacchetto App '{0}' non ha punto di ingresso di prova dell'esecutore. Per l'esecuzione di unit test per applicazioni Windows Store, creare il pacchetto di applicazioni mediante progetto di libreria di Unit Test dell'applicazione Windows Store.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
-        <target state="new">Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</target>
+        <target state="translated">Il code coverage non è disponibile per le app di Windows Store. L'analisi del code coverage verrà ignorata per questa esecuzione dei test.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il code coverage non è disponibile per applicazioni Windows Store. Analisi code coverage non eseguita per l'esecuzione dei test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
       <trans-unit id="SomeTestsUnavailableAfterFiltering">
         <source>A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again.</source>
-        <target state="new">A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again.</target>
+        <target state="translated">In totale sono stati individuati {0} test, ma alcuni test non corrispondono ai criteri di selezione specificati ({1}). Usare i valori corretti e riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Un totale di {0} test sono stati individuati ma alcuni test non corrispondono a criteria({1}) la selezione specificata. Utilizzare i valori di destro e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
       <trans-unit id="TestAdapterPathHelp">
         <source>--TestAdapterPath|/TestAdapterPath
       This makes vstest.console.exe process use custom test adapters
       from a given path (if any) in the test run. 
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
-        <target state="new">--TestAdapterPath|/TestAdapterPath
-      This makes vstest.console.exe process use custom test adapters
-      from a given path (if any) in the test run. 
-      Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</target>
+        <target state="translated">--TestAdapterPath|/TestAdapterPath
+      Determina se il processo vstest.console.exe usa adattatori di test personalizzati
+      da un percorso eventualmente specificato nell'esecuzione del test. 
+      Esempio: /TestAdapterPath:&lt;percorsoAdattatoriPersonalizzati&gt;</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-TestAdapterPath | / TestAdapterPath
+      In questo modo il processo di vstest.console.exe utilizzare adattatori di test personalizzati
+      da un determinato percorso (se presente) nell'esecuzione del test. 
+      Esempio /TestAdapterPath: &lt; pathToCustomAdapters &gt;</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
       <trans-unit id="TestAdapterPathValueRequired">
         <source>The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters</source>
-        <target state="new">The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters</target>
+        <target state="translated">Con il parametro /TestAdapterPath è richiesto un valore, corrispondente al percorso di una posizione contenente adattatori di test personalizzati. Esempio: /TestAdapterPath:c:\MyCustomAdapters</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il parametro /TestAdapterPath richiede un valore che è un percorso contenente adattatori di test personalizzati. Esempio: /TestAdapterPath:c:\MyCustomAdapters</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
       <trans-unit id="InvalidTestAdapterPathCommand">
         <source>The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}</source>
-        <target state="new">The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}</target>
+        <target state="translated">Il percorso '{0}' specificato in 'TestAdapterPath' non è valido. Errore: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il percorso specificato nella finestra di 'TestAdapterPath' ' {0}' non è valido. Errore: {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="TestAdapterPathDoesNotExist">
         <source>The custom test adapter search path provided was not found, provide a valid path and try again.</source>
-        <target state="new">The custom test adapter search path provided was not found, provide a valid path and try again.</target>
+        <target state="translated">Il percorso di ricerca dell'adattatore di test personalizzato non è stato trovato. Specificare un percorso valido e riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il percorso di ricerca scheda test personalizzato fornito non è stato trovato, specificare un percorso valido e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
       <trans-unit id="NoAdaptersFoundInTestAdapterPath">
         <source>The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.</source>
-        <target state="new">The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.</target>
+        <target state="translated">Il percorso '{0}' specificato in 'TestAdapterPath' non contiene alcun adattatore di test. Specificare un percorso valido e riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il percorso specificato nella finestra di 'TestAdapterPath' ' {0}' non contenere tutti gli adattatori di test, specificare un percorso valido e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="20" adjWordcount="17" curWordcount="17"</note>
       </trans-unit>
       <trans-unit id="PhoneAppContainerTestPrerequisiteFail">
         <source>Could not start test run for the tests for Windows Phone app: {0}.</source>
-        <target state="new">Could not start test run for the tests for Windows Phone app: {0}.</target>
+        <target state="translated">Non è stato possibile avviare l'esecuzione dei test per i test per l'app di Windows Phone: {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impossibile avviare l'esecuzione dei test per i test per l'applicazione Windows Phone: {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="SwitchToIsolationInPhoneAppContainerMode">
         <source>Using Isolation mode to run unit tests for Windows Phone apps. Use the /InIsolation parameter to suppress this warning.</source>
-        <target state="new">Using Isolation mode to run unit tests for Windows Phone apps. Use the /InIsolation parameter to suppress this warning.</target>
+        <target state="translated">Per eseguire gli unit test per le app di Windows Phone, verrà usata la modalità di isolamento. Usare il parametro /InIsolation per non visualizzare più questo avviso.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Utilizzando la modalità di isolamento per eseguire unit test per le applicazioni Windows Phone. Utilizzare il parametro /InIsolation per non visualizzare questo avviso.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="DisablingCodeCoverageInPhoneAppContainerTestExecution">
         <source>Code coverage is not available for Windows Phone apps. Code coverage analysis skipped for this test run.</source>
-        <target state="new">Code coverage is not available for Windows Phone apps. Code coverage analysis skipped for this test run.</target>
+        <target state="translated">Il code coverage non è disponibile per le app di Windows Phone. L'analisi del code coverage verrà ignorata per questa esecuzione dei test.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il code coverage non è disponibile per le applicazioni Windows Phone. Analisi code coverage non eseguita per l'esecuzione dei test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="17" adjWordcount="14.45" curWordcount="14.45"</note>
       </trans-unit>
       <trans-unit id="DisablingDataCollectionInPhoneAppContainerTestExecution">
         <source>Diagnostic data adapters are not supported when running unit tests for Windows Phone apps. Remove diagnostic data adapters settings from settings.</source>
-        <target state="new">Diagnostic data adapters are not supported when running unit tests for Windows Phone apps. Remove diagnostic data adapters settings from settings.</target>
+        <target state="translated">Gli adattatori dati di diagnostica non sono supportati durante l'esecuzione di unit test per app di Windows Phone. Rimuovere le impostazioni degli adattatori dati di diagnostica dalle impostazioni.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Adattatori dati di diagnostica non sono supportati quando si eseguono unit test per le applicazioni Windows Phone. Rimuovere le impostazioni di impostazioni delle schede dati di diagnostica.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="21" adjWordcount="17.85" curWordcount="17.85"</note>
       </trans-unit>
       <trans-unit id="PhoneNoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Phone apps, create app package using Windows Phone Unit Test App project.</source>
-        <target state="new">App package '{0}' does not has test executor entry point. For running unit tests for Windows Phone apps, create app package using Windows Phone Unit Test App project.</target>
+        <target state="translated">Il pacchetto dell'app '{0}' non contiene un punto di ingresso dell'executor di test. Per eseguire unit test per le app di Windows Phone, creare il pacchetto dell'app con il progetto App unit test di Windows Phone.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Pacchetto App '{0}' non ha punto di ingresso di prova dell'esecutore. Per l'esecuzione di unit test per le applicazioni Windows Phone, creare il pacchetto di applicazioni utilizzando progetto App di Windows Phone Unit Test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="28" adjWordcount="23.8" curWordcount="23.8"</note>
       </trans-unit>
       <trans-unit id="TestSettingsFrameworkMismatch">
         <source>Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning.</source>
-        <target state="new">Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning.</target>
+        <target state="translated">Per eseguire i test, verrà usato il framework {0}. Specificare /Framework:{1} per non visualizzare più questo avviso.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Utilizzo di framework {0} per eseguire i test. Specificare /Framework: {1} per eliminare questo avviso.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="AppxBundleSourceWarning">
         <source>No test found in the specified test containers. Additionally, Microsoft Windows Store Unit test adapter does not support .appxbundle files. Create an appx (set Generate App bundle option to Never) when creating App Package and try again.</source>
-        <target state="new">No test found in the specified test containers. Additionally, Microsoft Windows Store Unit test adapter does not support .appxbundle files. Create an appx (set Generate App bundle option to Never) when creating App Package and try again.</target>
+        <target state="translated">Non è stato trovato alcun test nei contenitori di test specificati. L'adattatore di unit test di Microsoft Windows Store, inoltre, non supporta i file con estensione appxbundle. Durante la creazione di un pacchetto dell'app, creare un file appx impostando l'opzione Genera il bundle dell'app su Mai, quindi riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nessun test trovato in contenitori di test specificato. Inoltre, un adattatore per test Unit di archivio di Microsoft Windows non supporta i file .appxbundle. Creare un appx (generare App bundle opzione non impostata mai) quando la creazione del pacchetto dell'applicazione e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="37" adjWordcount="31.45" curWordcount="31.45"</note>
       </trans-unit>
       <trans-unit id="ParallelArgumentProcessorHelp">
         <source>--Parallel|/Parallel
       Specifies that the tests be executed in parallel. By default up
       to all available cores on the machine may be used.
       The number of cores to use may be configured using a settings file.</source>
-        <target state="new">--Parallel|/Parallel
-      Specifies that the tests be executed in parallel. By default up
-      to all available cores on the machine may be used.
-      The number of cores to use may be configured using a settings file.</target>
+        <target state="translated">--Parallel|/Parallel
+      Specifica che i test devono essere eseguiti in parallelo. Per impostazione
+       predefinita, è possibile usare al massimo tutti i core disponibili in questo computer.
+       Il numero di core da usare può essere configurato con un file di impostazioni.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-Parallela | / parallela
+      Specifica che i test da eseguire in parallelo. Per impostazione predefinita di
+      per tutti i core disponibili nel computer possono essere utilizzati.
+      Il numero di core da utilizzare può essere configurato utilizzando un file di impostazioni.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="36" adjWordcount="30.6" curWordcount="30.6"</note>
       </trans-unit>
       <trans-unit id="InvalidParallelCommand">
         <source>Argument {0} is not expected in the 'Parallel' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again.</source>
-        <target state="new">Argument {0} is not expected in the 'Parallel' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again.</target>
+        <target state="translated">L'argomento {0} non è previsto nel comando 'Parallel'. Specificare il comando senza l'argomento, ad esempio: vstest.console.exe myTests.dll /Parallel, quindi riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'argomento {0} non previsto nel comando "Parallelo". Specificare il comando senza l'argomento (esempio: vstest.console.exe myTests.dll /Parallel) e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>Cannot be null or empty</source>
-        <target state="new">Cannot be null or empty</target>
+        <target state="translated">Non può essere Null o vuoto</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Non può essere null o vuoto</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="PortArgumentHelp">
         <source>--Port|/Port:&lt;Port&gt;
       The Port for socket connection and receiving the event messages.</source>
-        <target state="new">--Port|/Port:&lt;Port&gt;
-      The Port for socket connection and receiving the event messages.</target>
+        <target state="translated">--Port|/Port:&lt;Porta&gt;
+      Porta per la connessione socket e la ricezione dei messaggi dell'evento.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-Porta | / porta: &lt; porta &gt;
+      La porta per la connessione al socket e la ricezione di messaggi di evento.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="InvalidPortArgument">
         <source>The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.</source>
-        <target state="new">The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.</target>
+        <target state="translated">Con l'argomento --Port|/Port è richiesto un numero di porta che corrisponde a un numero intero. Specificare la porta per la connessione socket e la ricezione dei messaggi dell'evento.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">--Porta | / argomento porta richiede il numero di porta un numero intero. Specificare la porta per la connessione al socket e la ricezione di messaggi di evento.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="23" adjWordcount="19.55" curWordcount="19.55"</note>
       </trans-unit>
       <trans-unit id="AssemblyPathInvalid">
         <source>Unable to find the assembly under test. Please make sure that the project is built.</source>
-        <target state="new">Unable to find the assembly under test. Please make sure that the project is built.</target>
+        <target state="translated">L'assembly sottoposto a test non è stato trovato. Assicurarsi che il progetto sia compilato.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impossibile trovare l'assembly in fase di test. Assicurarsi che la compilazione del progetto.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="15" adjWordcount="12.75" curWordcount="12.75"</note>
       </trans-unit>
       <trans-unit id="ProjectPathNotFound">
         <source>The Path {0} does not exist.</source>
-        <target state="new">The Path {0} does not exist.</target>
+        <target state="translated">Il percorso {0} non esiste.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il percorso {0} non esiste.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="BuildBasePathArgumentHelp">
         <source>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       The directory containing the temporary outputs.</source>
-        <target state="new">--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
-      The directory containing the temporary outputs.</target>
+        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;PercorsoBaseCompilazione&gt;
+      Directory che contiene gli output temporanei.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-BuildBasePath | / BuildBasePath: &lt; BuildBasePath &gt;
+      La directory che contiene gli output temporanei.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="ConfigurationArgumentHelp">
         <source>-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
       The configuration the project is built for i.e. Debug/Release</source>
-        <target state="new">-c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
-      The configuration the project is built for i.e. Debug/Release</target>
+        <target state="translated">-c|--Configuration|/c|/Configuration:&lt;Configurazione&gt;
+      Configurazione per cui viene compilato il progetto, ad esempio Debug/Release</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-c |-configurazione | /c | / configurazione: &lt; configurazione &gt;
+      La configurazione del progetto viene compilata per Debug/Release cioè</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="InvalidConfiguration">
         <source>The given configuration is invalid.</source>
-        <target state="new">The given configuration is invalid.</target>
+        <target state="translated">La configurazione specificata non è valida.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">La configurazione specificata non è valida.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="OutputArgumentHelp">
         <source>-o|--Output|/o|/Output:&lt;Output&gt;
       The directory containing the binaries to run.</source>
-        <target state="new">-o|--Output|/o|/Output:&lt;Output&gt;
-      The directory containing the binaries to run.</target>
+        <target state="translated">-o|--Output|/o|/Output:&lt;Output&gt;
+      Directory contenente i file binari da eseguire.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-o |-Output | /o | /output: &lt; Output &gt;
+      Directory contenente i file binari in esecuzione.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="BuildBasePathNotFound">
         <source>The BuildBasePath was not found, provide a valid path and try again.</source>
-        <target state="new">The BuildBasePath was not found, provide a valid path and try again.</target>
+        <target state="translated">Il percorso di base di compilazione non è stato trovato. Specificare un percorso valido e riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Non è stato trovato il BuildBasePath, specificare un percorso valido e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="OutputPathNotFound">
         <source>The Output path was not found, provide a valid path and try again.</source>
-        <target state="new">The Output path was not found, provide a valid path and try again.</target>
+        <target state="translated">Il percorso di output non è stato trovato. Specificare un percorso valido e riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il percorso di Output è stato Impossibile trovare la forniscono un percorso valido e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="AddnlInfoMessagesBanner">
         <source>Additional Information Messages:</source>
-        <target state="new">Additional Information Messages:</target>
+        <target state="translated">Ulteriori messaggi informativi:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Messaggi di informazioni aggiuntive:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="Days">
         <source>Days</source>
-        <target state="new">Days</target>
+        <target state="translated">Giorni</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Giorni</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="ErrorMessageBanner">
         <source>Error Message:</source>
-        <target state="new">Error Message:</target>
+        <target state="translated">Messaggio di errore:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Messaggio di errore:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="ExecutionTimeFormatString">
         <source>Test execution time: {0:0.0000} {1}</source>
-        <target state="new">Test execution time: {0:0.0000} {1}</target>
+        <target state="translated">Tempo di esecuzione dei test: {0:0.0000} {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tempo di esecuzione di test: {1} {0:0.0000}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="Hours">
         <source>Hours</source>
-        <target state="new">Hours</target>
+        <target state="translated">Ore</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ore</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
-        <target state="new">Could not find a test logger with URI or FriendlyName '{0}'.</target>
+        <target state="translated">Non è stato trovato alcun logger di test con URI o nome descrittivo '{0}'.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impossibile trovare un logger di test con l'URI o FriendlyName '{0}'.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="Minutes">
         <source>Minutes</source>
-        <target state="new">Minutes</target>
+        <target state="translated">Minuti</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Minuti</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="Seconds">
         <source>Seconds</source>
-        <target state="new">Seconds</target>
+        <target state="translated">Secondi</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Secondi</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="StacktraceBanner">
         <source>Stack Trace:</source>
-        <target state="new">Stack Trace:</target>
+        <target state="translated">Analisi dello stack:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Analisi dello stack:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="StdErrMessagesBanner">
         <source>Standard Error Messages:</source>
-        <target state="new">Standard Error Messages:</target>
+        <target state="translated">Messaggi di errore standard:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Messaggi di errore standard:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="StdOutMessagesBanner">
         <source>Standard Output Messages:</source>
-        <target state="new">Standard Output Messages:</target>
+        <target state="translated">Messaggi di output standard:</target>
         <note></note>
-      </trans-unit>
-      <trans-unit id="TestMessageFormattingPrefix">
-        <source> </source>
-        <target state="new"> </target>
-        <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Messaggi di Output standard:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="AttachmentsBanner">
         <source>Attachments:</source>
-        <target state="new">Attachments:</target>
+        <target state="translated">Allegati:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Allegati:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="AttachmentOutputFormat">
         <source>  {0}</source>
-        <target state="new">  {0}</target>
+        <target state="translated">  {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.25" curWordcount="0.25"</note>
       </trans-unit>
       <trans-unit id="NoTestsAvailableInSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</target>
+        <target state="translated">Non è disponibile alcun test in {0}. Verificare che le impostazioni delle versioni installate di piattaforma e framework, agenti di individuazione ed executor di test siano appropriate e riprovare.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nessun test è disponibile in {0}. Assicurarsi che installati verificare i discoverers e gli esecutori, le impostazioni della versione della piattaforma e framework appropriate e riprovare.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="FailedTestIndicator">
         <source>Failed   {0}</source>
-        <target state="new">Failed   {0}</target>
+        <target state="translated">Non superato   {0}</target>
         <note>Message which is written to the console when a test fails.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0} non riuscita</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="PassedTestIndicator">
         <source>Passed   {0}</source>
-        <target state="new">Passed   {0}</target>
+        <target state="translated">Superato   {0}</target>
         <note>Message which is written to the console when a test passes.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0} passato</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="SkippedTestIndicator">
         <source>Skipped  {0}</source>
-        <target state="new">Skipped  {0}</target>
+        <target state="translated">Ignorato  {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">{0} ignorato</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="TestRunSummary">
         <source>Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</source>
-        <target state="new">Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</target>
+        <target state="translated">N. totale test: {0}. Superati: {1}. Non superati: {2}. Ignorati: {3}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Totale di test: {0}. superato: {1}. Failed: {2}. ignorato: {3}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DiscoveryFailed">
         <source>Discovery failed for given sources. Exception : {0}</source>
-        <target state="new">Discovery failed for given sources. Exception : {0}</target>
+        <target state="translated">L'individuazione non è riuscita per le origini specificate. Eccezione: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Individuazione non riuscita per dato origini. Eccezione: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="ParentProcessIdArgumentHelp">
         <source>--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
       Process Id of the Parent Process responsible for launching current process.</source>
-        <target state="new">--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
-      Process Id of the Parent Process responsible for launching current process.</target>
+        <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
+      ID del processo padre responsabile dell'avvio del processo corrente.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-ParentProcessId | / ParentProcessId: &lt; ParentProcessId &gt;
+      Id di processo del processo principale responsabile dell'avvio di processo corrente.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="InvalidParentProcessIdArgument">
         <source>The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</source>
-        <target state="new">The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</target>
+        <target state="translated">Con l'argomento --ParentProcessId|/ParentProcessId è richiesto l'ID processo che corrisponde a un numero intero. Specificare l'ID del processo padre che ha avviato questo processo.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">ParentProcessId-| / ParentProcessId argomento richiede l'id di processo che è un numero intero. Specificare l'id di processo del processo che ha avviato il processo padre.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="HelpArgumentsText">
         <source>Arguments:</source>
-        <target state="new">Arguments:</target>
+        <target state="translated">Argomenti:</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Argomenti:</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="EnableDiagUsage">
         <source>--Diag|/Diag:&lt;Path to log file&gt;
       Enable verbose logs for test platform.
       Logs are written to the provided file.</source>
-        <target state="new">--Diag|/Diag:&lt;Path to log file&gt;
-      Enable verbose logs for test platform.
-      Logs are written to the provided file.</target>
+        <target state="translated">--Diag|/Diag:&lt;Percorso dei file di log&gt;
+      Abilita i log dettagliati per la piattaforma di test.
+      I log vengono scritti nel file specificato.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">-Diag | / Diag: &lt; percorso file registro &gt;
+      Attiva log dettagliato per la piattaforma di test.
+      Registri del file fornito.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="19" adjWordcount="16.15" curWordcount="16.15"</note>
       </trans-unit>
       <trans-unit id="LoggerFileIsReadOnly">
         <source>The file {0} provided is read only</source>
-        <target state="new">The file {0} provided is read only</target>
+        <target state="translated">Il file specificato {0} è di sola lettura</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Il file {0} specificato è di sola lettura</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
     </body>
   </file>

@@ -1,41 +1,87 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="tr" original="../Resources.resx" build-num="-947146296">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">49</count>
+        <count count-type="x-adjWordCount">38.65</count>
+        <count count-type="x-curAdjWordCount">38.65</count>
+        <count count-type="x-repeatAdjWordCount">1.25</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">44</count>
+        <count count-type="repetition">5</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="InvalidRunSettingsXml">
         <source>Run settings XML does not contain "RunSettings" node.</source>
-        <target state="new">Run settings XML does not contain "RunSettings" node.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Çalıştırma ayarları XML dosyası "RunSettings" düğümünü içermiyor.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Çalışma ayarı düğümü "RunSettings" XML içermiyor.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</source>
-        <target state="new">Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</target>
+        <target state="translated" state-qualifier="mt-suggestion">'{0}' ayarı geçersiz. '{2}' için geçersiz '{1}' değeri belirtildi.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">'{0}' ayarını geçersiz. '{1}' '{2}' için belirtilen değer geçersiz.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="MissingRunSettingsNode">
         <source>Could not find 'RunSettings' node.</source>
-        <target state="new">Could not find 'RunSettings' node.</target>
+        <target state="translated" state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="NoRunSettingsNodeFound">
         <source>Could not find 'RunSettings' node.</source>
-        <target state="new">Could not find 'RunSettings' node.</target>
+        <target state="translated" state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="1.25" curWordcount="1.25"</note>
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the settings.  Error: {0}.</source>
-        <target state="new">An error occurred while loading the settings.  Error: {0}.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Ayarlar yüklenirken bir hata oluştu. Hata: {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ayarları yüklenirken bir hata oluştu.  Hata: {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
         <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <target state="new">Incompatible Target platform settings '{0}' with system architecture '{1}'.</target>
+        <target state="translated" state-qualifier="mt-suggestion">'{0}' hedef platform ayarları, '{1}' sistem mimarisiyle uyumlu değil.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Uyumsuz hedef platform Ayarları '{0}' ile '{1}' sistem mimarisi.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
-        <target state="new">Unexpected settings file specified.</target>
+        <target state="translated" state-qualifier="mt-suggestion">Beklenmeyen ayarlar dosyası belirtildi.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Beklenmeyen bir ayarlar dosyası belirtilmedi.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
     </body>
   </file>
