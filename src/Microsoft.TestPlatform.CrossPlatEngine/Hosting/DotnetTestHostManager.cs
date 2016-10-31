@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
-                return this.fileHelper.EnumerateFiles(sourceDirectory, "*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, ".*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
             }
 
             return Enumerable.Empty<string>();
