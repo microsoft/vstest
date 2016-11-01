@@ -1,26 +1,60 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="it" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="it" original="../Resources.resx" build-num="-214965100">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">29</count>
+        <count count-type="x-adjWordCount">24.65</count>
+        <count count-type="x-curAdjWordCount">24.65</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">29</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active Test Run was aborted.</source>
-        <target state="new">The active Test Run was aborted.</target>
+        <target state="translated">L'esecuzione dei test attiva è stata interrotta.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Esecuzione dei Test attiva è stata interrotta.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
-        <target state="new">An existing connection was forcibly closed by the remote host.</target>
+        <target state="translated">Una connessione esistente è stata chiusa forzatamente dall'host remoto.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Una connessione esistente è stata chiusa forzatamente dall'host remoto.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active Test Discovery was aborted.</source>
-        <target state="new">The active Test Discovery was aborted.</target>
+        <target state="translated">L'individuazione dei test attiva è stata interrotta.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">L'individuazione dei Test attiva è stata interrotta.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test execution process.</source>
-        <target state="new">Unable to communicate with test execution process.</target>
+        <target state="translated">Non è possibile comunicare con il processo di esecuzione dei test.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Impossibile comunicare con il processo di esecuzione di test.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
     </body>
   </file>

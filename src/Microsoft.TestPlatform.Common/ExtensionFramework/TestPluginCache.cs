@@ -11,7 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 #if NET46
     using System.Threading;
 #else
@@ -27,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         #region Private Members
 
         private readonly Dictionary<string, Assembly> resolvedAssemblies;
+        private readonly IFileHelper fileHelper;
 
         /// <summary>
         /// Specify the path to additional extensions
@@ -61,12 +63,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginCache"/> class. 
         /// </summary>
-        protected TestPluginCache()
+        protected TestPluginCache(IFileHelper fileHelper)
         {
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
             this.pathToAdditionalExtensions = null;
             this.loadOnlyWellKnownExtensions = false;
             this.lockForAdditionalExtensionsUpdate = new object();
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -77,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             get
             {
-                return instance ?? (instance = new TestPluginCache());
+                return instance ?? (instance = new TestPluginCache(new FileHelper()));
             }
 
             internal set
@@ -369,9 +372,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     else
                     {
                         // Scan all of the DLL's and EXE's
-                        var dlls = this.GetFilesInDirectory(extensionsFolder, "*.dll");
+                        var dlls = this.GetFilesInDirectory(extensionsFolder, ".*.dll");
                         this.defaultExtensionPaths = new List<string>(dlls);
-                        var exes = this.GetFilesInDirectory(extensionsFolder, "*.exe");
+                        var exes = this.GetFilesInDirectory(extensionsFolder, ".*.exe");
                         this.defaultExtensionPaths.AddRange(exes);
                     }
                 }
@@ -388,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
         internal virtual bool DoesDirectoryExist(string path)
         {
-            return Directory.Exists(path);
+            return this.fileHelper.DirectoryExists(path);
         }
 
         /// <summary>
@@ -400,7 +403,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
         internal virtual string[] GetFilesInDirectory(string path, string searchPattern)
         {
-            return Directory.GetFiles(path, searchPattern);
+            return this.fileHelper.EnumerateFiles(path, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
         }
 
         /// <summary>

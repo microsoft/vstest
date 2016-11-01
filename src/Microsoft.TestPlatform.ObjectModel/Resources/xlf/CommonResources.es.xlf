@@ -1,21 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="es" original="../CommonResources.resx">
+  <file datatype="xml" source-language="en" target-language="es" original="../CommonResources.resx" build-num="-582752294">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">71</count>
+        <count count-type="x-adjWordCount">60.35</count>
+        <count count-type="x-curAdjWordCount">60.35</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">71</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="new">The parameter cannot be null or empty.</target>
+        <target state="translated">El parámetro no puede ser nulo ni estar vacío.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">El parámetro no puede ser nulo ni estar vacío.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
-        <target state="new">Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</target>
+        <target state="translated">La serie de pruebas usará archivos DLL compilados para el marco {0} y la plataforma {1}. Los siguientes archivos DLL no formarán parte de la ejecución: {2} Vaya a {3} para obtener más información sobre cómo administrar esta configuración.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ejecución de prueba utilizará archivos DLL construido para framework {0} y plataforma {1}. Siguiendo los archivos DLL no formarán parte de la ejecución: {2} vaya a {3} para obtener más información acerca de cómo administrar esta configuración.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
-        <target state="new">None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</target>
+        <target state="translated">Ninguno de los contenedores de prueba proporcionados coincide con la configuración de arquitectura de plataforma y .Net Framework de la serie de pruebas. Plataforma: {0}, .Net Framework: {1}. Vaya a http://go.microsoft.com/fwlink/?LinkID=330428 para obtener más información sobre cómo administrar esta configuración.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ninguno de los contenedores de prueba proporcionado coincide con la arquitectura de la plataforma y .net configuración de Framework para la ejecución de pruebas. Plataforma: {0} .net Framework: {1}. vaya a http://go.microsoft.com/fwlink/?LinkID=330428 para obtener más información acerca de cómo administrar esta configuración.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="33" adjWordcount="28.05" curWordcount="28.05"</note>
       </trans-unit>
     </body>
   </file>

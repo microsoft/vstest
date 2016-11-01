@@ -3,6 +3,7 @@
   "buildOptions": {
     "outputName": "Microsoft.TestPlatform.Build",
     "delaySign": true,
+    "publicSign": false,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
     "copyToOutput": {

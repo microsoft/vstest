@@ -1301,15 +1301,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///    Looks up a localized string similar to  .
-        /// </summary>
-        public static string TestMessageFormattingPrefix {
-            get {
-                return ResourceManager.GetString("TestMessageFormattingPrefix", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///    Looks up a localized string similar to Test Run Failed..
         /// </summary>
         public static string TestRunFailed {

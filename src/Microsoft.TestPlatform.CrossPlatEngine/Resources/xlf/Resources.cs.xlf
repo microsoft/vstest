@@ -1,85 +1,173 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="cs" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="cs" original="../Resources.resx" build-num="1496413687">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">228</count>
+        <count count-type="x-adjWordCount">193.8</count>
+        <count count-type="x-curAdjWordCount">193.8</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">228</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="DiscovererInstantiationException">
         <source>Exception occurred while instantiating discoverer : {0}</source>
-        <target state="new">Exception occurred while instantiating discoverer : {0}</target>
+        <target state="translated">Při vytváření instance nástroje zjišťování došlo k výjimce: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Při vytváření instance discoverer došlo k výjimce: {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="DuplicateAdaptersFound">
         <source>Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</source>
-        <target state="new">Multiple test adapters with the same uri '{0}' were found. Ignoring adapter '{1}'. Please uninstall the conflicting adapter(s) to avoid this warning.</target>
+        <target state="translated">Našlo se více adaptérů testů se stejným identifikátorem URI {0}. Ignoruje se adaptér {1}. Pokud se chcete tomuto upozornění vyhnout, odinstalujte prosím konfliktní adaptéry.</target>
         <note>{0} is the unique identifier of test adapter. {1} is the name of the test adapter that shares a unique identifier with a previously loaded adapter.</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Bylo nalezeno více adaptérů test pomocí stejného identifikátoru uri {0}. Ignorování adaptéru: {1}. Odinstalujte konfliktní adaptéry, aby se zabránilo tomuto upozornění.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="DuplicateSource">
         <source>Ignoring the specified duplicate source '{0}'.</source>
-        <target state="new">Ignoring the specified duplicate source '{0}'.</target>
+        <target state="translated">Ignoruje se zadaný duplicitní zdroj {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Ignorovat duplicitní zadaný zdroj: {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromLoadTests">
         <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
-        <target state="new">An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</target>
+        <target state="translated">V době, kdy nástroj zjišťování testů {0} načítal testy, došlo k výjimce. Výjimka: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Testy při zavádění discoverer test '{0}' došlo k výjimce. Výjimka: {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="ExceptionFromRunTests">
         <source>An exception occurred while invoking executor '{0}': {1}</source>
-        <target state="new">An exception occurred while invoking executor '{0}': {1}</target>
+        <target state="translated">Při volání prováděcího modulu {0} došlo k výjimce: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Při vyvolání exekutor '{0}' došlo k výjimce: {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="FileNotFound">
         <source>Could not find file {0}.</source>
-        <target state="new">Could not find file {0}.</target>
+        <target state="translated">Nepovedlo se najít soubor {0}.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nelze najít soubor {0}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="HostDebuggerWarning">
         <source>Host debugging is enabled. Please attach debugger to testhost process to continue.</source>
-        <target state="new">Host debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <target state="translated">Je povolené ladění hostitele. Pokud chcete pokračovat, připojte prosím ladicí program k procesu testhost.</target>
         <note>Host, testhost are key words, it should not be localized</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Je povoleno ladění hostitele. K testhost procesu pokračovat připojte ladicí program.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
         <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
-        <target state="new">Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</target>
+        <target state="translated">Ignoruje se prováděcí modul testování, který odpovídá nástroji zjišťování testů {0}, protože nástroj zjišťování nemá atribut DefaultExecutorUri. Možná bude nutné přeinstalovat doplněk adaptéru testu.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Testovací exekutor odpovídající testování discoverer {0}, protože discoverer nemá atribut DefaultExecutorUri je ignorován. Může být nutné znovu nainstalovat doplněk test adaptéru.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
       <trans-unit id="InitializationFailed">
         <source>Failed to initialize client proxy: could not connect to test process.</source>
-        <target state="new">Failed to initialize client proxy: could not connect to test process.</target>
+        <target state="translated">Nepovedlo se inicializovat proxy klienta: nešlo se připojit k procesu testu.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nepodařilo se inicializovat klienta proxy: Nelze se připojit k proces nejprve otestovat.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
         <source>This operation is not allowed in the context of a non-debug run.</source>
-        <target state="new">This operation is not allowed in the context of a non-debug run.</target>
+        <target state="translated">Tato operace se v kontextu běhu bez ladění nepovoluje.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Tato operace není povolena v souvislosti non ladění spustit.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
         <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="new">No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</target>
+        <target state="translated">Není zaregistrovaný žádný nástroj zjišťování testů, který by mohl zjišťovat testovací případy. Zaregistrujte nástroj zjišťování testů a zkuste to znovu.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Provést zjišťování testových případů je registrován žádný test discoverer. Test discoverer registrovat a akci opakujte.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
       </trans-unit>
       <trans-unit id="NoMatchingExecutor">
         <source>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</source>
-        <target state="new">Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</target>
+        <target state="translated">Nepovedlo se najít prováděcí modul testování s identifikátorem URI {0}. Ujistěte se, že je prováděcí modul testování nainstalovaný a že podporuje .NET runtime verze {1}.</target>
         <note>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nelze najít vykonavatele test s identifikátorem URI {0}.  Ujistěte se, že testovací exekutor je nainstalován a podporuje .net runtime verze {1}.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="22" adjWordcount="18.7" curWordcount="18.7"</note>
       </trans-unit>
       <trans-unit id="NoValidSourceFoundForDiscovery">
         <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
-        <target state="new">None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </target>
+        <target state="translated">Žádný ze zadaných zdrojů {0} není platný. Opravte chyby/upozornění výše a zkuste to znovu. </target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Žádný ze zadaného zdroje '{0}' je platná. Opravte výše uvedené chyby a varování a akci opakujte.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="StringSeperator">
         <source>, </source>
-        <target state="new">, </target>
+        <target state="translated">, </target>
         <note></note>
+        <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
+          <source />
+          <target state-qualifier="tm-suggestion">,</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
       <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</target>
+        <target state="translated">V {0} není k dispozici žádný test. Ujistěte se, že nainstalované nástroje zjišťování testů, prováděcí moduly testů a verze platformy a rozhraní jsou správné. Pak to zkuste znovu.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Žádný test je k dispozici v {0}. Přesvědčte se, zda nainstalované test discoverers &amp; vykonavatelů jsou vhodné nastavení platformy &amp; framework verze a opakujte akci.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="new">No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</target>
+        <target state="translated">Filtru neodpovídá žádný test, protože obsahuje nejméně jednu vlastnost, která není platná ({0}). Zadejte výraz filtru, který obsahuje platné vlastnosti ({1}), a zkuste to znovu.</target>
+        <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Žádné zkoušky odpovídá filtru, protože obsahuje jednu nebo více vlastností, které nejsou platné ({0}). Zadejte výraz filtru obsahující platné vlastnosti ({1}) a akci opakujte.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
+      </trans-unit>
+      <trans-unit id="NoTestHostFileExist">
+        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
+        <target state="new">Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
         <note></note>
       </trans-unit>
     </body>

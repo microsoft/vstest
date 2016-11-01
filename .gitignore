@@ -106,3 +106,5 @@ Tools
 
 *.nupkg
 *.zip
+*.props
+src/package/sign/sign.nuget.targets
