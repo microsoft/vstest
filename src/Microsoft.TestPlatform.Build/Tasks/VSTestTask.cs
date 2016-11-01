@@ -52,6 +52,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestDiag
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
@@ -101,6 +107,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
             if (!string.IsNullOrEmpty(this.VSTestListTests))
             {
                 allArgs.Add("--listTests");
+            }
+
+            if (!string.IsNullOrEmpty(this.VSTestDiag))
+            {
+                allArgs.Add("--Diag:" + this.AddDoubleQuotes(this.VSTestDiag));
             }
 
             if (string.IsNullOrEmpty(this.TestFileFullPath))

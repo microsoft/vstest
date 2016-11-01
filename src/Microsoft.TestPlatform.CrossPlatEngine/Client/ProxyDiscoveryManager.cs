@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
@@ -77,15 +78,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
         {
-            if (!this.testHostManager.Shared)
+            try
             {
-                // If the test host doesn't support sharing across sources, we must initialize it
-                // with sources.
-                this.InitializeExtensions(discoveryCriteria.Sources);
+                if (!this.testHostManager.Shared)
+                {
+                    // If the test host doesn't support sharing across sources, we must initialize it
+                    // with sources.
+                    this.InitializeExtensions(discoveryCriteria.Sources);
+                }
+
+                this.SetupChannel(discoveryCriteria.Sources);
+                this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
             }
-            
-            this.SetupChannel(discoveryCriteria.Sources);
-            this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
+            catch (Exception exception)
+            {
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
+            }
         }
 
         /// <inheritdoc/>

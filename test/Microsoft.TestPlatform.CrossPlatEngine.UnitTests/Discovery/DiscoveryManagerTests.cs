@@ -11,6 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -42,10 +43,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestMethod]
         public void InitializeShouldUpdateAdditionalExtenions()
         {
-            var testableTestPluginCache = TestPluginCacheTests.SetupMockTestPluginCache();
-
-            // Stub the default extensions folder.
-            testableTestPluginCache.DoesDirectoryExistSetter = false;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
+            TestPluginCache.Instance = new TestableTestPluginCache(mockFileHelper.Object);
 
             this.discoveryManager.Initialize(
                 new string[] { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });

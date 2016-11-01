@@ -19,14 +19,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         DirectoryInfo CreateDirectory(string path);
 
         /// <summary>
-        /// Exists utility to check if file exists
+        /// Exists utility to check if file exists (case sensitive).
         /// </summary>
         /// <param name="path"> The path of file. </param>
         /// <returns>True if file exists <see cref="bool"/>.</returns>
         bool Exists(string path);
 
         /// <summary>
-        /// Exists utility to check if directory exists
+        /// Exists utility to check if directory exists (case sensitive).
         /// </summary>
         /// <param name="path"> The path of file. </param>
         /// <returns>True if directory exists <see cref="bool"/>.</returns>
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         Stream GetStream(string filePath, FileMode mode);
 
         /// <summary>
-        /// Enumerates files in a directory.
+        /// Enumerates files which match a pattern (case insensitive) in a directory.
         /// </summary>
         /// <param name="directory">Parent directory to search.</param>
         /// <param name="pattern">Search pattern.</param>

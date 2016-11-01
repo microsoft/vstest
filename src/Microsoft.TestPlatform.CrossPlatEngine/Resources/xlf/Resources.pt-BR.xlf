@@ -166,7 +166,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
       </trans-unit>
       <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
+        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
         <target state="new">Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
         <note></note>
       </trans-unit>
