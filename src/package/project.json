@@ -6,6 +6,7 @@
       "include": [
         "[Content_Types].xml",
         "extension.vsixmanifest",
+        "License.rtf",
         "TestPlatform.ObjectModel.manifest",
         "TestPlatform.ObjectModel.x86.manifest"
       ]
