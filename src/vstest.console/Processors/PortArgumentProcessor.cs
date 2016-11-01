@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             catch(TimeoutException)
             {
-                // Todo:sasin log the exception
+                // TODO: log the exception
                 return ArgumentProcessorResult.Fail;
             }
             return ArgumentProcessorResult.Success;
