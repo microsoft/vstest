@@ -4,6 +4,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
@@ -238,18 +239,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public static void SetupMockExtensions(string[] extensions, Action callback)
         {
             // Setup mocks.
-            var testableTestPluginCache = new TestableTestPluginCache();
-            testableTestPluginCache.DoesDirectoryExistSetter = true;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), ".*.dll", SearchOption.TopDirectoryOnly))
+                .Callback(callback)
+                .Returns(extensions);
 
-            testableTestPluginCache.FilesInDirectory = (path, pattern) =>
-            {
-                if (pattern.Equals("*.dll"))
-                {
-                    callback.Invoke();
-                    return extensions;
-                }
-                return new string[] { };
-            };
+            var testableTestPluginCache = new TestableTestPluginCache(mockFileHelper.Object);
 
             // Setup the testable instance.
             TestPluginCache.Instance = testableTestPluginCache;
@@ -285,6 +281,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     public class TestableTestPluginCache : TestPluginCache
     {
+        public TestableTestPluginCache(IFileHelper fileHelper) : base(fileHelper)
+        {
+        }
+
         internal Func<string, string, string[]> FilesInDirectory
         {
             get;
