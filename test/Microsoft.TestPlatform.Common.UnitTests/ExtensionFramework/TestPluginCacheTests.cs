@@ -164,10 +164,11 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var extensionPaths = new List<string> { Path.Combine(candidateDirectory, "foo.dll") };
             
             // Setup mocks.
-            var testableTestPluginCache = new TestableTestPluginCache(new FileHelper());
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
+            var testableTestPluginCache = new TestableTestPluginCache(mockFileHelper.Object);
 
             TestPluginCache.Instance = testableTestPluginCache;
-            TestableTestPluginCache temp = testableTestPluginCache;
 
             TestPluginCache.Instance.UpdateAdditionalExtensions(extensionPaths, true);
             var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();

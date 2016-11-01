@@ -285,29 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
         }
 
-        internal Func<string, string, string[]> FilesInDirectory
-        {
-            get;
-            set;
-        }
-
-        public bool DoesDirectoryExistSetter
-        {
-            get;
-            set;
-        }
-
         public Func<IEnumerable<string>, TestExtensions> TestExtensionsSetter { get; set; }
-
-        internal override bool DoesDirectoryExist(string path)
-        {
-            return this.DoesDirectoryExistSetter;
-        }
-
-        internal override string[] GetFilesInDirectory(string path, string searchPattern)
-        {
-            return this.FilesInDirectory.Invoke(path, searchPattern);
-        }
 
         internal override TestExtensions GetTestExtensions(IEnumerable<string> extensions)
         {
