@@ -252,7 +252,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             //   Indicates that the application will probably host unique code in multiple domains, 
             //   and the loader must share resources across application domains only for globally available (strong-named) 
             //   assemblies that have been added to the global assembly cache. 
-            // See Dev10 bug 660791. 
             setupInfo.LoaderOptimization = LoaderOptimization.MultiDomainHost;
 
             if (File.Exists(path))

@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(description, "description");
             ValidateArg.NotNull(valueType, "valueType");
 
-            // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db. Fixed bug #754475
+            // If the type of property is unexpected, then fail as otherwise we will not be to serialize it over the wcf channel and serialize it in db.
             if (valueType == typeof(KeyValuePair<string, string>[]))
             {
                 this.ValueType = "System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]";
@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 || valueType.AssemblyQualifiedName.Contains("System.Private")
                 || valueType.AssemblyQualifiedName.Contains("mscorlib"))
             {
-                // This comparison is an ugly hack to ensure assembly information is not embedded in data.
+                // This comparison is a check to ensure assembly information is not embedded in data.
                 // Use type.FullName instead of type.AssemblyQualifiedName since the internal assemblies
                 // are different in desktop and coreclr. Thus AQN in coreclr includes System.Private.CoreLib which
                 // is not available on the desktop.
@@ -189,8 +189,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 }
 
                 // For UAP the type namespace for System.Uri,System.TimeSpan and System.DateTimeOffset differs from the desktop version.
-                // Hacking to set the correct type only for these two types.
-                // [Todo : aajohn] Clean this up.
                 if (type == null && typeName.StartsWith("System.Uri"))
                 {
                     type = typeof(System.Uri);

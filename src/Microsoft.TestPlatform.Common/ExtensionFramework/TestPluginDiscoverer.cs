@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     testSettingsProviders,
                     testLoggers);
 
-            // HACK HACK - In Release mode - managed dlls are packaged differently
+            // In Release mode - managed dlls are packaged differently
             // So, file search will not find them - do it manually
             if (testDiscoverers.Count < 1)
             {
@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             Debug.Assert(testSettingsProviders != null, "null testSettingsProviders");
             Debug.Assert(testLoggers != null, "null testLoggers");
 
-            // Todo: aajohn Do not see why loadOnlyWellKnowExtensions is still needed.
+            // TODO: Do not see why loadOnlyWellKnowExtensions is still needed.
             //AssemblyName executingAssemblyName = null;
             //if (loadOnlyWellKnownExtensions)
             //{
