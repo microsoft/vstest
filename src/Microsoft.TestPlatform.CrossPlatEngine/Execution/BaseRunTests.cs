@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                             EqtTrace.Error("BaseRunTests.RunTests: Failed to raise runCompletion error. Reason: {0}.", ex2);
                         }
 
-                        // TODO: aajohn this does not crash the process currently because of the job queue.
+                        // TODO: this does not crash the process currently because of the job queue.
                         // Let the process crash
                         throw;
                     }
@@ -403,7 +403,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private void SetAdapterLoggingSettings()
         {
-            // Todo: aajohn enable the below once runsettings is in.
+            // TODO: enable the below once runsettings is in.
             //var sessionMessageLogger = testExecutorFrameworkHandle as TestSessionMessageLogger;
             //if (sessionMessageLogger != null
             //        && testExecutionContext != null

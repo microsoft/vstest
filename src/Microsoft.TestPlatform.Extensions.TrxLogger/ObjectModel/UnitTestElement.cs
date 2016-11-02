@@ -42,7 +42,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 
         private int priority;
 
-        // Todo: Once the Bug 233635 is fixed, check it should populate
         private TestCategoryItemCollection testCategories;
 
         private TestExecId executionId;

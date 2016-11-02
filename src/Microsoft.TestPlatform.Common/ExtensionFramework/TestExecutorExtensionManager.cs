@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     out unfilteredTestExtensions,
                     out testExtensions);
 
-            // Todo aajohn . This can be optimized - The base class's populate map would be called repeatedly for the same extension assembly.
+            // TODO: This can be optimized - The base class's populate map would be called repeatedly for the same extension assembly.
             // Have a single instance of TestExecutorExtensionManager that keeps populating the map iteratively.
             return new TestExecutorExtensionManager(
                 unfilteredTestExtensions,
