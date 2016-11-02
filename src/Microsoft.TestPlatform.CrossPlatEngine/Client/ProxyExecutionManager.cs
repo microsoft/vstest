@@ -2,7 +2,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
+    using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -12,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
@@ -72,52 +75,61 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <returns> The process id of the runner executing tests. </returns>
         public virtual int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
-            if (!this.testHostManager.Shared)
+            try
             {
-                // Non shared test host requires test source information to launch. Provide the sources
-                // information and create the channel.
-                EqtTrace.Verbose("ProxyExecutionManager: Test host is non shared. Lazy initialize.");
-                var testSources = testRunCriteria.Sources;
-
-                // If the test execution is with a test filter, group them by sources
-                if (testRunCriteria.HasSpecificTests)
+                if (!this.testHostManager.Shared)
                 {
-                    testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                    // Non shared test host requires test source information to launch. Provide the sources
+                    // information and create the channel.
+                    EqtTrace.Verbose("ProxyExecutionManager: Test host is non shared. Lazy initialize.");
+                    var testSources = testRunCriteria.Sources;
+
+                    // If the test execution is with a test filter, group them by sources
+                    if (testRunCriteria.HasSpecificTests)
+                    {
+                        testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                    }
+
+                    this.InitializeExtensions(testSources);
                 }
 
-                this.InitializeExtensions(testSources);
+                this.SetupChannel(testRunCriteria.Sources);
+
+                var executionContext = new TestExecutionContext(
+                    testRunCriteria.FrequencyOfRunStatsChangeEvent,
+                    testRunCriteria.RunStatsChangeEventTimeout,
+                    inIsolation: false,
+                    keepAlive: testRunCriteria.KeepAlive,
+                    isDataCollectionEnabled: false,
+                    areTestCaseLevelEventsRequired: false,
+                    hasTestRun: true,
+                    isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
+                    testCaseFilter: testRunCriteria.TestCaseFilter);
+
+                if (testRunCriteria.HasSpecificSources)
+                {
+                    var runRequest = new TestRunCriteriaWithSources(
+                        testRunCriteria.AdapterSourceMap,
+                        testRunCriteria.TestRunSettings,
+                        executionContext);
+
+                    this.RequestSender.StartTestRun(runRequest, eventHandler);
+                }
+                else
+                {
+                    var runRequest = new TestRunCriteriaWithTests(
+                        testRunCriteria.Tests,
+                        testRunCriteria.TestRunSettings,
+                        executionContext);
+
+                    this.RequestSender.StartTestRun(runRequest, eventHandler);
+                }
             }
-
-            this.SetupChannel(testRunCriteria.Sources);
-
-            var executionContext = new TestExecutionContext(
-                testRunCriteria.FrequencyOfRunStatsChangeEvent,
-                testRunCriteria.RunStatsChangeEventTimeout,
-                inIsolation: false,
-                keepAlive: testRunCriteria.KeepAlive,
-                isDataCollectionEnabled: false,
-                areTestCaseLevelEventsRequired: false,
-                hasTestRun: true,
-                isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
-                testCaseFilter: testRunCriteria.TestCaseFilter);
-
-            if (testRunCriteria.HasSpecificSources)
+            catch (Exception exception)
             {
-                var runRequest = new TestRunCriteriaWithSources(
-                    testRunCriteria.AdapterSourceMap,
-                    testRunCriteria.TestRunSettings,
-                    executionContext);
-
-                this.RequestSender.StartTestRun(runRequest, eventHandler);
-            }
-            else
-            {
-                var runRequest = new TestRunCriteriaWithTests(
-                    testRunCriteria.Tests,
-                    testRunCriteria.TestRunSettings,
-                    executionContext);
-
-                this.RequestSender.StartTestRun(runRequest, eventHandler);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
 
             return 0;

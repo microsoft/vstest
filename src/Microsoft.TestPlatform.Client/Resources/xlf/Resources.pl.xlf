@@ -1,16 +1,42 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="pl" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="pl" original="../Resources.resx" build-num="-303566531">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">27</count>
+        <count count-type="x-adjWordCount">22.95</count>
+        <count count-type="x-curAdjWordCount">22.95</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">27</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="InvalidStateForExecution">
         <source>The test run could not be executed because the initial state was invalid.</source>
-        <target state="new">The test run could not be executed because the initial state was invalid.</target>
+        <target state="translated">Nie można wykonać testu, ponieważ stan początkowy jest nieprawidłowy.</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Nie można wykonać testu, ponieważ stan początkowy jest nieprawidłowy.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive">
         <source>Wait for completion operation is not allowed when there is no active test run. </source>
-        <target state="new">Wait for completion operation is not allowed when there is no active test run. </target>
+        <target state="translated">Oczekiwanie na operację zakończenia nie jest dozwolone, gdy nie ma żadnych aktywnych uruchomień testów. </target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">Czekać na ukończenie operacja nie jest dozwolona, gdy nie ma żadnych aktywnych Jazda testowa.</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
     </body>
   </file>

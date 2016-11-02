@@ -349,8 +349,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Need to sync one by one to avoid buffer corruption
             lock (this.sendSyncObject)
             {
-                this.binaryWriter.Write(rawMessage);
-                this.binaryWriter.Flush();
+                this.binaryWriter?.Write(rawMessage);
+                this.binaryWriter?.Flush();
             }
         }
     }

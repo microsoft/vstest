@@ -295,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
                     // by either engines - as both calculate at different points
-                    // If we use them, it would be an apples and oranges comparison i.e, between TAEF and Rocksteady
+                    // If we use them, it would be an incorrect comparison between TAEF and Rocksteady
                     this.OnRunCompletion.SafeInvoke(this, runCompletedEvent, "TestRun.TestRunComplete");
                 }
                 finally

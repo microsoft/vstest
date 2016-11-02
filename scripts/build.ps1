@@ -51,6 +51,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
+$env:DOTNET_CLI_VERSION = "1.0.0-preview3-003930"
 
 #
 # Build configuration
@@ -108,7 +109,7 @@ function Install-DotNetCli
 
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -252,6 +253,7 @@ function Create-VsixPackage
     # Copy vsix manifests
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
+        "License.rtf",
         "TestPlatform.ObjectModel.manifest",
         "TestPlatform.ObjectModel.x86.manifest")
     foreach ($file in $vsixManifests) {

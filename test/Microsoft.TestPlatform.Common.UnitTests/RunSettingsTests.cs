@@ -65,7 +65,7 @@ namespace TestPlatform.Common.UnitTests
             var runSettings = new RunSettings();
             var invalidSettings = this.GetInvalidRunSettings();
 
-            ExceptionUtilities.ThrowsException<SettingsException>(
+            Assert.ThrowsException<SettingsException>(
                 () => runSettings.LoadSettingsXml(invalidSettings),
                 "An error occurred while loading the run settings.");
         }
@@ -102,7 +102,7 @@ namespace TestPlatform.Common.UnitTests
             Action action =
                 () => runSettings.GetSettings("OrphanNode");
 
-            ExceptionUtilities.ThrowsException<SettingsException>(
+            Assert.ThrowsException<SettingsException>(
                 action,
                 "Settings Provider named '{0}' was not found.  The settings can not be loaded.",
                 "OrphanNode");
@@ -119,7 +119,7 @@ namespace TestPlatform.Common.UnitTests
             Action action =
                 () => runSettings.GetSettings("BadSettings");
 
-            ExceptionUtilities.ThrowsException<SettingsException>(
+            Assert.ThrowsException<SettingsException>(
                 action,
                 "An error occurred while initializing the settings provider named '{0}'",
                 "BadSettings");
@@ -129,7 +129,7 @@ namespace TestPlatform.Common.UnitTests
         public void InitializeSettingsProvidersShouldThrowIfInvalidRunSettingsIsPassed()
         {
             var runSettings = new RunSettings();
-            ExceptionUtilities.ThrowsException<SettingsException>(
+            Assert.ThrowsException<SettingsException>(
                 () => runSettings.InitializeSettingsProviders(this.GetInvalidRunSettings()),
                 "An error occurred while loading the run settings.");
         }
@@ -139,7 +139,7 @@ namespace TestPlatform.Common.UnitTests
         {
             var runSettings = new RunSettings();
             runSettings.InitializeSettingsProviders(this.GetEmptyRunSettings());
-            ExceptionUtilities.ThrowsException<InvalidOperationException>(
+            Assert.ThrowsException<InvalidOperationException>(
                 () => runSettings.InitializeSettingsProviders(this.GetEmptyRunSettings()),
                 "The Run Settings have already been loaded.");
         }

@@ -4,6 +4,7 @@
   "buildOptions": {
     "emitEntryPoint": true,
     "delaySign": true,
+    "publicSign": false,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
     "compile": [

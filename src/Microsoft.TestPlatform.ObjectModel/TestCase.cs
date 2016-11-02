@@ -228,9 +228,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             // To generate id hash "ExecutorUri + source + Name";
 
-            // HACK: if source is a file name then just use the filename for the identifier since the 
+            // If source is a file name then just use the filename for the identifier since the 
             // file might have moved between discovery and execution (in appx mode for example)
-            // This is a hack because the Source contents should be a black box to the framework. For example in the database adapter case this is not a file path.
+            // This is not elegant because the Source contents should be a black box to the framework. For example in the database adapter case this is not a file path.
             string source = this.Source;
 
             if (File.Exists(source))

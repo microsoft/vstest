@@ -2,6 +2,7 @@
   "version": "15.0.0-*",
   "buildOptions": {
     "delaySign": true,
+    "publicSign": false,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
     "embed": [ "Resources/*.resx" ]

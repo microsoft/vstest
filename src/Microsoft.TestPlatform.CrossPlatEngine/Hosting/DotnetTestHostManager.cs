@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
             var testHostPath = GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
-            
+
             if (this.fileHelper.Exists(testHostPath))
             {
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
@@ -157,8 +157,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: {0}", Resources.NoTestHostFileExist);
-                throw new FileNotFoundException(Resources.NoTestHostFileExist);
+                string message = string.Format(Resources.NoTestHostFileExist, sourcePath);
+                EqtTrace.Verbose("DotnetTestHostmanager: " + message);
+                throw new FileNotFoundException(message);
             }
 
             // Create a additional probing path args with Nuget.Client
@@ -169,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // "D:\dd\gh\Microsoft\vstest\tools\dotnet\dotnet.exe" exec
             // --runtimeconfig G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.runtimeconfig.json
             // --depsfile G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.deps.json
-            // --additionalprobingpath C:\Users\armahapa\.nuget\packages\ 
+            // --additionalprobingpath C:\Users\username\.nuget\packages\ 
             // G:\nuget-package-path\microsoft.testplatform.testhost\version\**\testhost.dll
             // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             startInfo.Arguments = args;
@@ -186,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
-                return this.fileHelper.EnumerateFiles(sourceDirectory, "*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, ".*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
             }
 
             return Enumerable.Empty<string>();

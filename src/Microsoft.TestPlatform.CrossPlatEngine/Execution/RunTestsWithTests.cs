@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 List<TestCase> testList;
 
-                // Todo aajohn Fill this in with the right extension value.
+                // TODO: Fill this in with the right extension value.
                 var executorUriExtensionTuple = new Tuple<Uri, string>(
                     test.ExecutorUri,
                     ObjectModel.Constants.UnspecifiedAdapterPath);

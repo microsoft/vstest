@@ -3,6 +3,7 @@
   "buildOptions": {
     "outputName": "Microsoft.VisualStudio.TestPlatform.Common",
     "delaySign": true,
+    "publicSign": false,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
     "embed": [ "Resources/*.resx" ]

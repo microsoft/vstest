@@ -1,111 +1,213 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
-  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx">
+  <file datatype="xml" source-language="en" target-language="zh-Hant" original="../Resources.resx" build-num="1053781791">
+    <header>
+      <count-group name="BlackBox wordcount">
+        <count count-type="x-wordCount">178</count>
+        <count count-type="x-adjWordCount">151.3</count>
+        <count count-type="x-curAdjWordCount">151.3</count>
+        <count count-type="x-repeatAdjWordCount">0</count>
+        <count count-type="x-termWordCount">0</count>
+      </count-group>
+      <count-group name="BlackBox wordcount analysis">
+        <count count-type="x-match102%">0</count>
+        <count count-type="x-match101%">0</count>
+        <count count-type="x-match100%">0</count>
+        <count count-type="x-match99-90%">0</count>
+        <count count-type="x-match89-75%">0</count>
+        <count count-type="x-mt">178</count>
+        <count count-type="repetition">0</count>
+      </count-group>
+    </header>
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Diagnostic data adapter message: {0}</source>
-        <target state="new">Diagnostic data adapter message: {0}</target>
+        <target state="translated">診斷資料配接器訊息: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">诊断数据适配器消息︰ {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Diagnostic data adapter ('{0}') message: {1}.</source>
-        <target state="new">Diagnostic data adapter ('{0}') message: {1}.</target>
+        <target state="translated">診斷資料配接器 ('{0}') 訊息: {1}。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">诊断数据适配器 ("{0}) 消息︰ {1}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="DuplicateExtensionUri">
         <source>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</source>
-        <target state="new">Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</target>
+        <target state="translated">重複的測試延伸模組 URI '{0}'。忽略重複的延伸模組。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">重复测试扩展 URI"{0}。 忽略重复的扩展。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsName">
         <source>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</source>
-        <target state="new">Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</target>
+        <target state="translated">名為 '{0}' 的重複的設定提供者。忽略重複的提供者。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">名为"{0} 的重复设置提供程序。 忽略重复的提供程序。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="new">Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</target>
+        <target state="translated">找到名為 '{0}' 的重複的執行設定區段。忽略重複的設定。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">重复的名为"{0} 找到运行的设置部分。 忽略重复设置。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="EmptyParenthesis">
         <source>Error: Empty parenthesis ( )</source>
-        <target state="new">Error: Empty parenthesis ( )</target>
+        <target state="translated">錯誤: 空的括弧 ( )</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">错误︰ 空括号 （)</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="InvalidCondition">
         <source>Error: Invalid Condition '{0}'</source>
-        <target state="new">Error: Invalid Condition '{0}'</target>
+        <target state="translated">錯誤: 條件 '{0}' 無效</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">错误︰ 无效的条件"{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="InvalidExtensionUriFormat">
         <source>Test Extension has an invalid URI '{0}': {1}</source>
-        <target state="new">Test Extension has an invalid URI '{0}': {1}</target>
+        <target state="translated">測試延伸模組的 URI '{0}' 無效: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">测试扩展具有无效的 URI"{0}: {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="8" adjWordcount="6.8" curWordcount="6.8"</note>
       </trans-unit>
       <trans-unit id="InvalidOperator">
         <source>Error: Invalid operator '{0}'</source>
-        <target state="new">Error: Invalid operator '{0}'</target>
+        <target state="translated">錯誤: 運算子 '{0}' 無效</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">错误︰ 无效的运算符"{0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
-        <target state="new">Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</target>
+        <target state="translated">將具有 URI '{0}' 的記錄器初始化時發生例外狀況。將不會使用記錄器。例外狀況: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">初始化记录器与 URI"{0} 时出现异常。 将不使用的记录器。 异常︰ {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
-        <target state="new">Could not find a test logger with URI or FriendlyName '{0}'.</target>
+        <target state="translated">找不到具有 URI 或 FriendlyName '{0}' 的測試記錄器。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">找不到测试记录器与 URI 或友好名称"{0}。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="11" adjWordcount="9.35" curWordcount="9.35"</note>
       </trans-unit>
       <trans-unit id="MissingCloseParenthesis">
         <source>Error: Missing ')'</source>
-        <target state="new">Error: Missing ')'</target>
+        <target state="translated">錯誤: 遺漏 ')'</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">错误︰ 缺少 ')</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="MissingOpenParenthesis">
         <source>Error: Missing '('</source>
-        <target state="new">Error: Missing '('</target>
+        <target state="translated">錯誤: 遺漏 '('</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">错误︰ 缺少 (</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="2" adjWordcount="1.7" curWordcount="1.7"</note>
       </trans-unit>
       <trans-unit id="MissingOperand">
         <source>Error: Missing operand</source>
-        <target state="new">Error: Missing operand</target>
+        <target state="translated">錯誤: 遺漏運算元</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">错误︰ 缺少操作数</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="3" adjWordcount="2.55" curWordcount="2.55"</note>
       </trans-unit>
       <trans-unit id="MissingOperator">
         <source>Missing Operator '|' or '&amp;'</source>
-        <target state="new">Missing Operator '|' or '&amp;'</target>
+        <target state="translated">遺漏運算子 '|' 或 '&amp;'</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">缺少运算符 | 或 &amp;</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="RunSettingsAlreadyLoaded">
         <source>The Run Settings have already been loaded.</source>
-        <target state="new">The Run Settings have already been loaded.</target>
+        <target state="translated">已載入 [回合設定]。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">已加载运行设置。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the run settings.  Error: {0}</source>
-        <target state="new">An error occurred while loading the run settings.  Error: {0}</target>
+        <target state="translated">載入回合設定時發生錯誤。錯誤: {0}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">加载运行的设置时出错。 错误︰ {0}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="SettingsNodeInvalidName">
         <source>Invalid settings node specified. The name property of the settings node must be non-empty.</source>
-        <target state="new">Invalid settings node specified. The name property of the settings node must be non-empty.</target>
+        <target state="translated">指定的設定節點無效。設定節點的名稱屬性必須為非空白。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">指定了无效的设置节点。设置节点的名称属性必须为非空。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="SettingsProviderInitializationError">
         <source>An error occurred while initializing the settings provider named '{0}'. Error: {1}</source>
-        <target state="new">An error occurred while initializing the settings provider named '{0}'. Error: {1}</target>
+        <target state="translated">將名為 '{0}' 的設定提供者初始化時發生錯誤。錯誤: {1}</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">初始化设置提供程序名为"{0} 时出错。错误︰ {1}</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="SettingsProviderNotFound">
         <source>Settings Provider named '{0}' was not found.  The settings can not be loaded.</source>
-        <target state="new">Settings Provider named '{0}' was not found.  The settings can not be loaded.</target>
+        <target state="translated">找不到名為 '{0}' 的設定提供者。無法載入設定。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">找不到名为"{0} 的设置提供程序。 无法加载设置。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="13" adjWordcount="11.05" curWordcount="11.05"</note>
       </trans-unit>
       <trans-unit id="TestCaseFilterFormatException">
         <source>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</source>
-        <target state="new">Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</target>
+        <target state="translated">TestCaseFilter {0} 的格式不正確。請指定正確的格式後再試一次。請注意，格式不正確可能會導致無法執行測試。</target>
         <note></note>
+        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
+          <target state-qualifier="mt-suggestion">对于 TestCaseFilter {0} 的格式不正确。指定正确的格式，然后重试。请注意，格式不正确可能会导致没有得到执行的测试。</target>
+        </alt-trans>
+        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
     </body>
   </file>
