@@ -19,6 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <summary>
         /// The connection timeout for clients in milliseconds.
         /// </summary>
-        internal const int ClientConnectionTimeout = 5000 * 1000;
+        internal const int ClientConnectionTimeout = 60 * 1000;
     }
 }
