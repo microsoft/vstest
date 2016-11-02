@@ -234,7 +234,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
             cts.Cancel();
 
-            expectedProcessCreated = 2;
             Assert.AreEqual(
                 expectedProcessCreated,
                 numOfProcessCreatedTask.Result,
@@ -246,14 +245,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void XUnitRunAllTestExecution()
         {
-            this.InvokeVsTestForExecution(this.GetAssetFullPath("XUnitTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.XUnit));
+            this.InvokeVsTestForExecution(this.GetAssetFullPath("XUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.XUnit));
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
         [TestMethod]
         public void NUnitRunAllTestExecution()
         {
-            this.InvokeVsTestForExecution(this.GetAssetFullPath("NUnitTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.NUnit));
+            this.InvokeVsTestForExecution(this.GetAssetFullPath("NUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.NUnit));
             this.ValidateSummaryStatus(1, 1, 0);
         }
 

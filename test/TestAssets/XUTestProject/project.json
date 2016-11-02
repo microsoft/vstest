@@ -7,9 +7,6 @@
   },
 
   "frameworks": {
-    "netstandard1.6": {
-      "imports": "dnxcore50"
-    },
     "net46": {
       "frameworkAssemblies": { "System.Runtime": "4.0.20.0" }
     }
