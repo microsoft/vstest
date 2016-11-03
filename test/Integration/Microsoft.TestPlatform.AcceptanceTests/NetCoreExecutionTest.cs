@@ -5,7 +5,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     /*[TestClass]*/
     //TODO enable netcore test when test asset project migrate to csproj
-    public class NetCoreExecutionTest:ExecutionTests
+
+    /// <summary>
+    /// Acceptance tests for netcore framework
+    /// </summary>
+    public class NetCoreExecutionTest : ExecutionTests
     {
         [TestInitialize]
         public void SetTestFrameWork()

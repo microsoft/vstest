@@ -28,6 +28,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.3-preview\build\_common";
         private const string NUnitTestAdapterRelativePath = @"nunittestadapter\1.2.0\lib";
         private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\2.1.0\build\_common";
+        private const string ChutzpahTestAdapterRelativePath = @"chutzpah\4.2.4\tools";
 
         public enum UnitTestFramework
         {
@@ -215,6 +216,10 @@ namespace Microsoft.TestPlatform.TestUtilities
             else if (testFramework == UnitTestFramework.XUnit)
             {
                 adapterRelativePath = XUnitTestAdapterRelativePath;
+            }
+            else if (testFramework == UnitTestFramework.Chutzpah)
+            {
+                adapterRelativePath = ChutzpahTestAdapterRelativePath;
             }
 
             return this.testEnvironment.GetNugetPackage(adapterRelativePath);

@@ -90,6 +90,9 @@ EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.TestPlatform.TestUtilities", "test\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.xproj", "{F52A4D48-90B3-4004-8C98-D2786CC9B965}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestAssets", "TestAssets", "{50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}"
+	ProjectSection(SolutionItems) = preProject
+		test\TestAssets\test.js = test\TestAssets\test.js
+	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleDataCollector", "test\TestAssets\SimpleDataCollector\SimpleDataCollector.xproj", "{D7F7A9F5-5646-44E7-990C-500844E9272E}"
 EndProject
@@ -111,9 +114,9 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "testhost.UnitTests", "test\
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Microsoft.TestPlatform.AcceptanceTests", "test\Integration\Microsoft.TestPlatform.AcceptanceTests\Microsoft.TestPlatform.AcceptanceTests.xproj", "{70A1644A-7434-48CD-A9DE-450C0DA88B3F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "XUnitTestProject", "test\TestAssets\XUnitTestProject\XUnitTestProject.xproj", "{EC4D597C-3AC6-48EA-84FF-23CFECBA5F92}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "XUTestProject", "test\TestAssets\XUTestProject\XUTestProject.xproj", "{AC28D648-6AC1-4C80-8972-B58C8935414E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NUnitTestProject", "test\TestAssets\NUnitTestProject\NUnitTestProject.xproj", "{24EC916A-02FA-485D-B230-4E1974C99077}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "NUTestProject", "test\TestAssets\NUTestProject\NUTestProject.xproj", "{CC8C8F75-0DE0-4AF4-BFF8-92F0362BCF46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -281,14 +284,14 @@ Global
 		{70A1644A-7434-48CD-A9DE-450C0DA88B3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70A1644A-7434-48CD-A9DE-450C0DA88B3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70A1644A-7434-48CD-A9DE-450C0DA88B3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EC4D597C-3AC6-48EA-84FF-23CFECBA5F92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EC4D597C-3AC6-48EA-84FF-23CFECBA5F92}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EC4D597C-3AC6-48EA-84FF-23CFECBA5F92}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EC4D597C-3AC6-48EA-84FF-23CFECBA5F92}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24EC916A-02FA-485D-B230-4E1974C99077}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24EC916A-02FA-485D-B230-4E1974C99077}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24EC916A-02FA-485D-B230-4E1974C99077}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24EC916A-02FA-485D-B230-4E1974C99077}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC28D648-6AC1-4C80-8972-B58C8935414E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC28D648-6AC1-4C80-8972-B58C8935414E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC28D648-6AC1-4C80-8972-B58C8935414E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC28D648-6AC1-4C80-8972-B58C8935414E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC8C8F75-0DE0-4AF4-BFF8-92F0362BCF46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC8C8F75-0DE0-4AF4-BFF8-92F0362BCF46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC8C8F75-0DE0-4AF4-BFF8-92F0362BCF46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC8C8F75-0DE0-4AF4-BFF8-92F0362BCF46}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -339,7 +342,7 @@ Global
 		{96B93E28-A33D-48E5-8793-73F686D3B999} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
 		{09599F77-A1F2-4366-BB8A-B4B90E05BCBC} = {463031A2-7F16-4E38-9944-1F5161D04933}
 		{70A1644A-7434-48CD-A9DE-450C0DA88B3F} = {6DA46479-C688-4296-A6E7-F20C20CDA3A9}
-		{EC4D597C-3AC6-48EA-84FF-23CFECBA5F92} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
-		{24EC916A-02FA-485D-B230-4E1974C99077} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
+		{AC28D648-6AC1-4C80-8972-B58C8935414E} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
+		{CC8C8F75-0DE0-4AF4-BFF8-92F0362BCF46} = {50D7D355-08F6-4DFD-AEAA-9BCE41C94C18}
 	EndGlobalSection
 EndGlobal
