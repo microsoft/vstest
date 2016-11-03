@@ -20,7 +20,8 @@
     },
 
     "Microsoft.TestPlatform.TestUtilities": "15.0.0-*",
-    "Chutzpah": "4.2.4"
+    "Chutzpah": "4.2.4",
+    "Microsoft.TestPlatform.TestAsset.NativeCPP": "1.0.0"
   },
 
   "frameworks": {

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
@@ -15,7 +16,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class ExecutionTests : IntegrationTestBase
     {
-        protected string framework = ".NETFramework,Version=v4.6";
+        private string framework = ".NETFramework,Version=v4.6";
+
+        public string Framework
+        {
+            get
+            {
+                return this.framework;
+            }
+
+            protected set
+            {
+                this.framework = value;
+            }
+        }
 
         [TestMethod]
         public void RunMultipleTestAssemblies()
@@ -26,9 +40,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(2, 2, 2);
         }
 
-        /// <summary>
-        ///     The run multiple test assemblies in parallel.
-        /// </summary>
         [TestMethod]
         public void RunMultipleTestAssembliesInParallel()
         {
@@ -180,6 +191,38 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.RunTestWithRunSettings(runConfigurationDictionary, testhostProcessName, expectedProcessCreated);
         }
 
+        [TestMethod]
+        public void XUnitRunAllTestExecution()
+        {
+            this.InvokeVsTestForExecution(this.GetAssetFullPath("XUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.XUnit));
+            this.ValidateSummaryStatus(1, 1, 0);
+        }
+
+        [TestMethod]
+        public void NUnitRunAllTestExecution()
+        {
+            this.InvokeVsTestForExecution(this.GetAssetFullPath("NUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.NUnit));
+            this.ValidateSummaryStatus(1, 1, 0);
+        }
+
+        [TestMethod]
+        public void ChutzpahRunAllTestExecution()
+        {
+            var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
+            this.InvokeVsTestForExecution(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah));
+            this.ValidateSummaryStatus(1, 1, 0);
+        }
+
+        [TestMethod]
+        public void CPPRunAllTestExecution()
+        {
+            var assemblyRelativePath =
+                @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+            this.InvokeVsTestForExecution(assemblyAbsolutePath, string.Empty);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
         private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName)
         {
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
@@ -227,39 +270,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 $"Number of {testhostProcessName} process created, expected: {expectedProcessCreated} actual: {numOfProcessCreatedTask.Result}");
             this.ValidateSummaryStatus(2, 2, 2);
             File.Delete(runsettingsPath);
-        }
-
-        [TestMethod]
-        public void XUnitRunAllTestExecution()
-        {
-            this.InvokeVsTestForExecution(this.GetAssetFullPath("XUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.XUnit));
-            this.ValidateSummaryStatus(1, 1, 0);
-        }
-
-        [TestMethod]
-        public void NUnitRunAllTestExecution()
-        {
-            this.InvokeVsTestForExecution(this.GetAssetFullPath("NUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.NUnit));
-            this.ValidateSummaryStatus(1, 1, 0);
-        }
-
-        [TestMethod]
-        public void ChutzpahRunAllTestExecution()
-        {
-            var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
-            this.InvokeVsTestForExecution(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah));
-            this.ValidateSummaryStatus(1, 1, 0);
-        }
-
-        [Ignore]
-        [TestMethod]
-        public void CPPRunAllTestExecution()
-        {
-            var assemblyRelativePath =
-                @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            this.InvokeVsTestForExecution(assemblyAbsolutePath, string.Empty);
-            this.ValidateSummaryStatus(1, 0, 0);
         }
     }
 }
