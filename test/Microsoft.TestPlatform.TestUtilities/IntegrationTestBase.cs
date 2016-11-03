@@ -116,14 +116,33 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="skippedTestsCount">Skipped test count</param>
         public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
         {
-            var summaryStatus = string.Format(
-                TestSummaryStatusMessageFormat,
-                passedTestsCount + failedTestsCount + skippedTestsCount,
-                passedTestsCount,
-                failedTestsCount,
-                skippedTestsCount);
+            var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
+            if (totalTestCount == 0)
+            {
+                // No test should be found/run
+                var summaryStatus = string.Format(
+                    TestSummaryStatusMessageFormat,
+                    @"\d+",
+                    @"\d+",
+                    @"\d+",
+                    @"\d+");
+                StringAssert.DoesNotMatch(this.standardTestOutput, new Regex(summaryStatus), "Excepted: There should not test summary, Actual: {0}", this.standardTestOutput);
+            }
+            else
+            {
+                var summaryStatus = string.Format(
+                    TestSummaryStatusMessageFormat,
+                    totalTestCount,
+                    passedTestsCount,
+                    failedTestsCount,
+                    skippedTestsCount);
 
-            Assert.IsTrue(this.standardTestOutput.Contains(summaryStatus), "The Test summary does not match. Expected: {1} Test Output: {0}", this.standardTestOutput, summaryStatus);
+                Assert.IsTrue(
+                    this.standardTestOutput.Contains(summaryStatus),
+                    "The Test summary does not match. Expected: {1} Test Output: {0}",
+                    this.standardTestOutput,
+                    summaryStatus);
+            }
         }
 
         /// <summary>
@@ -156,7 +175,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 var flag = this.standardTestOutput.Contains("Failed " + test)
                            || this.standardTestOutput.Contains("Failed " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
-                
+
                 // Verify stack information as well.
                 Assert.IsTrue(this.standardTestError.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
             }

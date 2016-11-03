@@ -1,6 +1,5 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
@@ -16,27 +15,41 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class ExecutionTests : IntegrationTestBase
     {
-        private string framework = ".NETFramework,Version=v4.6";
+        public string Framework { get; protected set; } = ".NETFramework,Version=v4.6";
 
-        public string Framework
+        [TestMethod]
+        public void ChutzpahRunAllTestExecution()
         {
-            get
-            {
-                return this.framework;
-            }
+            var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
+            this.InvokeVsTestForExecution(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah));
+            this.ValidateSummaryStatus(1, 1, 0);
+        }
 
-            protected set
-            {
-                this.framework = value;
-            }
+        [TestMethod]
+        public void CPPRunAllTestExecution()
+        {
+            var assemblyRelativePath =
+                @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+            this.InvokeVsTestForExecution(assemblyAbsolutePath, string.Empty);
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        [TestMethod]
+        public void NUnitRunAllTestExecution()
+        {
+            this.InvokeVsTestForExecution(
+                this.GetAssetFullPath("NUTestProject.dll"),
+                this.GetTestAdapterPath(UnitTestFramework.NUnit));
+            this.ValidateSummaryStatus(1, 1, 0);
         }
 
         [TestMethod]
         public void RunMultipleTestAssemblies()
         {
             var assemblyPaths =
-            this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.framework);
+                this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
+            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.Framework);
             this.ValidateSummaryStatus(2, 2, 2);
         }
 
@@ -45,7 +58,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.Framework);
             arguments = string.Concat(arguments, " /Parallel");
             arguments = string.Concat(arguments, " /Platform:x86");
             var testhostProcessName = "testhost.x86";
@@ -67,7 +80,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTests()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, " /Tests:PassingTest");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -77,7 +94,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTestsWithAndOperatorTrait()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA&Priority=3)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
@@ -86,7 +107,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTestsWithCategoryTrait()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=CategoryA\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
@@ -95,7 +120,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTestsWithClassNameTrait()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"ClassName=SampleUnitTestProject.UnitTest1\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 1);
@@ -104,7 +133,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTestsWithFullyQualifiedNameTrait()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(
                 arguments,
                 " /TestCaseFilter:\"FullyQualifiedName=SampleUnitTestProject.UnitTest1.FailingTest\"");
@@ -115,7 +148,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTestsWithNameTrait()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Name=PassingTest\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -124,7 +161,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTestsWithOrOperatorTrait()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"(TestCategory=CategoryA|Priority=2)\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
@@ -133,7 +174,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunSelectedTestsWithPriorityTrait()
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, " /TestCaseFilter:\"Priority=2\"");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -192,40 +237,49 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        public void RunTestExecutionWithTestAdapterPathFromRunSettings()
+        {
+            var runConfigurationDictionary = new Dictionary<string, string>
+                                                 {
+                                                         { "TestAdaptersPaths", this.GetTestAdapterPath() }
+                                                 };
+            var runsettingsFilePath = this.GetRunsettingsFilePath(runConfigurationDictionary);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                string.Empty,
+                runsettingsFilePath,
+                this.Framework);
+
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 1, 1);
+            File.Delete(runsettingsFilePath);
+        }
+
+        [TestMethod]
         public void XUnitRunAllTestExecution()
         {
-            this.InvokeVsTestForExecution(this.GetAssetFullPath("XUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.XUnit));
+            this.InvokeVsTestForExecution(
+                this.GetAssetFullPath("XUTestProject.dll"),
+                this.GetTestAdapterPath(UnitTestFramework.XUnit));
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        [TestMethod]
-        public void NUnitRunAllTestExecution()
+        private string GetRunsettingsFilePath(Dictionary<string, string> runConfigurationDictionary)
         {
-            this.InvokeVsTestForExecution(this.GetAssetFullPath("NUTestProject.dll"), this.GetTestAdapterPath(UnitTestFramework.NUnit));
-            this.ValidateSummaryStatus(1, 1, 0);
-        }
-
-        [TestMethod]
-        public void ChutzpahRunAllTestExecution()
-        {
-            var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
-            this.InvokeVsTestForExecution(testJSFileAbsolutePath, this.GetTestAdapterPath(UnitTestFramework.Chutzpah));
-            this.ValidateSummaryStatus(1, 1, 0);
-        }
-
-        [TestMethod]
-        public void CPPRunAllTestExecution()
-        {
-            var assemblyRelativePath =
-                @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            this.InvokeVsTestForExecution(assemblyAbsolutePath, string.Empty);
-            this.ValidateSummaryStatus(1, 0, 0);
+            var runsettingsPath = Path.Combine(
+                this.testEnvironment.TestAssetsPath,
+                "test_" + Guid.NewGuid() + ".runsettings");
+            CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
+            return runsettingsPath;
         }
 
         private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName)
         {
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.framework);
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.Framework);
             arguments = string.Concat(arguments, platformArg);
 
             var cts = new CancellationTokenSource();
@@ -251,11 +305,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            var runsettingsPath = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
-                "test_" + Guid.NewGuid() + ".runsettings");
-            IntegrationTestBase.CreateRunSettingsFile(runsettingsPath, runConfigurationDictionary);
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.framework);
+            var runsettingsPath = this.GetRunsettingsFilePath(runConfigurationDictionary);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.Framework);
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
