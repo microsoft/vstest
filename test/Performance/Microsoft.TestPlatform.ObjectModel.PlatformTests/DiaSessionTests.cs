@@ -31,6 +31,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
         [TestMethod]
         public void GetNavigationDataShouldReturnCorrectFileNameAndLineNumber()
         {
+            Debugger.Launch();
             var currentTargetFrameWork = GetAndSetTargetFrameWork(this.testEnvironment);
             var assemblyPath = this.GetSampleTestAssembly();
 
@@ -39,8 +40,8 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleTestProject\UnitTest1.cs");
-            Assert.AreEqual(diaNavigationData.MinLineNumber, 18);
-            Assert.AreEqual(diaNavigationData.MaxLineNumber, 20);
+            Assert.AreEqual(diaNavigationData.MinLineNumber, 22);
+            Assert.AreEqual(diaNavigationData.MaxLineNumber, 24);
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
         }
 
