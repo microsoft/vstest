@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             try
             {
                 var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
-                using (var pdbReader = new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open)))
+                using (var pdbReader = new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read)))
                 {
                     // Load assembly
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(binaryPath);

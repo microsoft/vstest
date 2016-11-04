@@ -35,9 +35,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-        public Stream GetStream(string filePath, FileMode mode)
+        public Stream GetStream(string filePath, FileMode mode, FileAccess access = FileAccess.ReadWrite)
         {
-            return new FileStream(filePath, mode);
+            return new FileStream(filePath, mode, access);
         }
 
         /// <inheritdoc/>

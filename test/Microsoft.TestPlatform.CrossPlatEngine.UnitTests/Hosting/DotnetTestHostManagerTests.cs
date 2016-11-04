@@ -229,7 +229,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockFileHelper.Setup(fh => fh.Exists(acceptablePath)).Returns(true);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
-            
+
             Assert.AreEqual(acceptablePath, startInfo.FileName);
         }
 
@@ -338,7 +338,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             // Absolute path to the source directory
             var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
 
-            string runtimeConfigFileContent = 
+            string runtimeConfigFileContent =
 @"{
     ""runtimeOptions"": {
         ""additionalProbingPaths"": [
@@ -382,11 +382,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 }";
 
             MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.ReadWrite)).Returns(runtimeConfigStream);
             this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
-            
+
             MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
-            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.ReadWrite)).Returns(depsFileStream);
             this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
 
             string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
@@ -414,7 +414,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             : base(testHostLauncher, processHelper, fileHelper)
         { }
     }
-    
+
     [TestClass]
     public class DefaultTestHostLauncherTests
     {
