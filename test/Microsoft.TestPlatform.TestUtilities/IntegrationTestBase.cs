@@ -23,6 +23,8 @@ namespace Microsoft.TestPlatform.TestUtilities
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
 
+        private string arguments = string.Empty;
+
         protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.3-preview\build\_common";
@@ -79,6 +81,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
         {
+            this.arguments = arguments;
             Execute(arguments, out this.standardTestOutput, out this.standardTestError);
             this.FormatStandardOutCome();
         }
@@ -126,7 +129,14 @@ namespace Microsoft.TestPlatform.TestUtilities
                     @"\d+",
                     @"\d+",
                     @"\d+");
-                StringAssert.DoesNotMatch(this.standardTestOutput, new Regex(summaryStatus), "Excepted: There should not test summary, Actual: {0}", this.standardTestOutput);
+                StringAssert.DoesNotMatch(
+                    this.standardTestOutput,
+                    new Regex(summaryStatus),
+                    "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
+                    this.standardTestOutput,
+                    this.standardTestError,
+                    Environment.NewLine,
+                    this.arguments);
             }
             else
             {
@@ -139,9 +149,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
                 Assert.IsTrue(
                     this.standardTestOutput.Contains(summaryStatus),
-                    "The Test summary does not match. Expected: {1} Test Output: {0}",
+                    "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
                     this.standardTestOutput,
-                    summaryStatus);
+                    summaryStatus,
+                    this.standardTestError,
+                    Environment.NewLine,
+                    this.arguments);
             }
         }
 
@@ -332,7 +345,9 @@ namespace Microsoft.TestPlatform.TestUtilities
                 runConfigNode.AppendChild(childNode);
             }
 
-            doc.Save(new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create));
+            Stream stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
+            doc.Save(stream);
+            stream.Dispose();
         }
 
         protected string BuildMultipleAssemblyPath(params string[] assetNames)
