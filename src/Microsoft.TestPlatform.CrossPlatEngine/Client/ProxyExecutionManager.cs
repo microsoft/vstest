@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             catch (Exception exception)
             {
-                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
