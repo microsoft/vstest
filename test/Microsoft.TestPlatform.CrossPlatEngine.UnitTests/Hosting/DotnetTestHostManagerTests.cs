@@ -8,6 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -18,7 +19,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using System.Text;
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -78,7 +78,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
+            Assert.AreEqual("\"" + DefaultDotnetPath + "\"", startInfo.FileName);
         }
 
         [TestMethod]
@@ -89,7 +89,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual("/tmp/dotnet", startInfo.FileName);
+            Assert.AreEqual("\"/tmp/dotnet\"", startInfo.FileName);
         }
 
         [TestMethod]
@@ -100,7 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual("dotnet.exe", startInfo.FileName);
+            Assert.AreEqual("\"dotnet.exe\"", startInfo.FileName);
         }
 
         [TestMethod]
@@ -223,14 +223,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 dotnetExeName = "dotnet";
             }
 
+            // Setup the first directory on PATH to return true for existence check for dotnet
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
             var acceptablePath = Path.Combine(paths[0], dotnetExeName);
-
             this.mockFileHelper.Setup(fh => fh.Exists(acceptablePath)).Returns(true);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual(acceptablePath, startInfo.FileName);
+            // The full path should be wrapped in quotes (in case it may contain whitespace)
+            Assert.AreEqual("\"" + acceptablePath + "\"", startInfo.FileName);
         }
 
         [TestMethod]
@@ -243,7 +245,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual(dotnetExeName, startInfo.FileName);
+            Assert.AreEqual("\"" + dotnetExeName + "\"", startInfo.FileName);
         }
 
         [TestMethod]
@@ -395,7 +397,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
             Assert.IsTrue(startInfo.Arguments.Contains(testHostFullPath));
-
         }
 
         private TestProcessStartInfo GetDefaultStartInfo()
