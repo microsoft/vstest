@@ -3,7 +3,7 @@
   <metadata>
     <id>Microsoft.NET.Test.Sdk</id>
     <version>1.0.0-preview</version>
-    <title>The MSbuild targets and properties for building the .Net core test projects.</title>
+    <title>Microsoft.NET.Test.Sdk</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
