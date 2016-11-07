@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
+                eventHandler.HandleDiscoveryComplete(0, new List<ObjectModel.TestCase>(), false);
             }
         }
 
