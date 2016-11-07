@@ -10,7 +10,7 @@
     <description>The MSbuild targets and properties for building the .Net core test projects.</description>
     <copyright>Copyright 2015</copyright>
     <dependencies>
-      <dependency id="Microsoft.TestPlatform.TestHost" version="15.0.0-preview-20161012-02" />
+      <dependency id="Microsoft.TestPlatform.TestHost" version="15.0.0-preview-20161101-02" />
     </dependencies>
   </metadata>
   <files>
