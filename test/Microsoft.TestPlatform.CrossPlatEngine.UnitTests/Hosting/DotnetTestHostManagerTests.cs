@@ -93,17 +93,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoShouldInvokeDotnetOnWindows()
-        {
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("c:\\tmp\\vstest.console.exe");
-            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-
-            var startInfo = this.GetDefaultStartInfo();
-
-            Assert.AreEqual("\"dotnet.exe\"", startInfo.FileName);
-        }
-
-        [TestMethod]
         public void GetTestHostProcessStartInfoShouldInvokeDotnetExec()
         {
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
@@ -262,19 +251,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             Action action = () => this.GetDefaultStartInfo();
 
             Assert.ThrowsException<FileNotFoundException>(action);
-        }
-
-        [TestMethod]
-        public void GetTestHostProcessStartInfoOnWindowsForInvalidPathReturnsDotnet()
-        {
-            // To validate the else part, set current process to exe other than dotnet
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
-            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            var dotnetExeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
-
-            var startInfo = this.GetDefaultStartInfo();
-
-            Assert.AreEqual("\"" + dotnetExeName + "\"", startInfo.FileName);
         }
 
         [TestMethod]
