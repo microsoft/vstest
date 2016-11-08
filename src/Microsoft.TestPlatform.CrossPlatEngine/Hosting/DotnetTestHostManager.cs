@@ -241,8 +241,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
             }
 
-            EqtTrace.Error("Unable to find path for dotnet host");
-            return dotnetExeName;
+            string errorMessage = String.Format(Resources.NoDotnetDotExeFileExist, dotnetExeName);
+            EqtTrace.Error(errorMessage);
+            throw new FileNotFoundException(errorMessage);
         }
 
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)

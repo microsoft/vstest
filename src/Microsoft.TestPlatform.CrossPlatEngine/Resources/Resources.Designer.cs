@@ -159,6 +159,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to Could not find {0}. Make sure that the dotnet is installed on the machine..
+        /// </summary>
+        public static string NoDotnetDotExeFileExist {
+            get {
+                return ResourceManager.GetString("NoDotnetDotExeFileExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Could not find test executor with URI &apos;{0}&apos;.  Make sure that the test executor is installed and supports .net runtime version {1}..
         /// </summary>
         public static string NoMatchingExecutor {
