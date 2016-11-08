@@ -161,9 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         /// <summary>
         ///    Looks up a localized string similar to Could not find {0}. Make sure that the dotnet is installed on the machine..
         /// </summary>
-        public static string NoDotnetDotExeFileExist {
+        public static string NoDotnetExeFound {
             get {
-                return ResourceManager.GetString("NoDotnetDotExeFileExist", resourceCulture);
+                return ResourceManager.GetString("NoDotnetExeFound", resourceCulture);
             }
         }
         

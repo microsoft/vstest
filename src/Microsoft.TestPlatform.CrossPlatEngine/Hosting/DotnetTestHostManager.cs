@@ -241,7 +241,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
             }
 
-            string errorMessage = String.Format(Resources.NoDotnetDotExeFileExist, dotnetExeName);
+            string errorMessage = String.Format(Resources.NoDotnetExeFound, dotnetExeName);
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
         }
