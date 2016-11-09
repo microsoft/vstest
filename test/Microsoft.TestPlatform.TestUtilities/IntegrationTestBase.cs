@@ -81,8 +81,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
         {
-            this.arguments = arguments;
-            Execute(arguments, out this.standardTestOutput, out this.standardTestError);
+            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError);
             this.FormatStandardOutCome();
         }
 
@@ -92,7 +91,12 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
         /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForExecution(string testAssembly, string testAdapterPath, string runSettings = "", string framework = "")
+        /// <param name="framework">Dotnet Framework of test assembly.</param>
+        public void InvokeVsTestForExecution(
+            string testAssembly,
+            string testAdapterPath,
+            string runSettings = "",
+            string framework = "")
         {
             var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework);
             this.InvokeVsTest(arguments);
@@ -275,14 +279,24 @@ namespace Microsoft.TestPlatform.TestUtilities
             return testMethodName;
         }
 
-        private static void Execute(string args, out string stdOut, out string stdError)
+        private void Execute(string args, out string stdOut, out string stdError)
         {
-            var testEnvironment = new IntegrationTestEnvironment();
+            if (this.testEnvironment.RunnerFramework == "netcoreapp1.0")
+            {
+                var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
+                vstestConsoleDll = EncloseInQuotes(vstestConsoleDll);
+                args = string.Concat(
+                    vstestConsoleDll,
+                    " ",
+                    args);
+            }
+
+            this.arguments = args;
 
             using (Process vstestconsole = new Process())
             {
                 Console.WriteLine("IntegrationTestBase.Execute: Starting vstest.console.exe");
-                vstestconsole.StartInfo.FileName = testEnvironment.GetConsoleRunnerPath();
+                vstestconsole.StartInfo.FileName = this.testEnvironment.GetConsoleRunnerPath();
                 vstestconsole.StartInfo.Arguments = args;
                 vstestconsole.StartInfo.UseShellExecute = false;
                 //vstestconsole.StartInfo.WorkingDirectory = testEnvironment.PublishDirectory;

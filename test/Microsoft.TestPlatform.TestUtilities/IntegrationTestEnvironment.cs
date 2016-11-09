@@ -16,6 +16,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     {
         private readonly string testPlatformRootDirectory;
 
+        private readonly bool runningInCli;
+
         public IntegrationTestEnvironment()
         {
             // These environment variables are set in scripts/test.ps1 or scripts/test.sh.
@@ -38,31 +40,22 @@ namespace Microsoft.TestPlatform.TestUtilities
             if (string.IsNullOrEmpty(this.testPlatformRootDirectory))
             {
                 // Running in VS/IDE. Use artifacts directory as root.
+                this.runningInCli = false;
                 this.testPlatformRootDirectory = Path.GetFullPath(@"..\..\..");
                 this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"artifacts\test\TestAssets");
-                this.PublishDirectory = Path.Combine(
-                    this.testPlatformRootDirectory,
-                    "artifacts",
-                    @"src\Microsoft.TestPlatform.VSIXCreator\bin",
-                    this.BuildConfiguration,
-                    "net461",
-                    this.TargetRuntime);
             }
             else
             {
                 // Running in command line/CI
+                this.runningInCli = true;
                 this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"test\TestAssets");
-                this.PublishDirectory = Path.Combine(
-                    this.testPlatformRootDirectory,
-                    "artifacts",
-                    this.BuildConfiguration,
-                    this.TargetFramework,
-                    this.TargetRuntime);
             }
 
             // There is an assumption that integration tests will always run from a source enlistment.
             // Need to remove this assumption when we move to a CDP.
             this.PackageDirectory = Path.Combine(this.testPlatformRootDirectory, @"packages");
+            this.ToolsDirectory = Path.Combine(this.testPlatformRootDirectory, @"tools");
+            this.RunnerFramework = "net46";
         }
 
         /// <summary>
@@ -94,8 +87,31 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// </summary>
         public string PublishDirectory
         {
-            get;
-            private set;
+            get
+            {
+                string value = string.Empty;
+                if (this.runningInCli)
+                {
+                    value = Path.Combine(
+                        this.testPlatformRootDirectory,
+                        "artifacts",
+                        this.BuildConfiguration,
+                        this.RunnerFramework,
+                        this.TargetRuntime);
+                }
+                else
+                {
+                    value = Path.Combine(
+                    this.testPlatformRootDirectory,
+                    "artifacts",
+                    @"src\Microsoft.TestPlatform.VSIXCreator\bin",
+                    this.BuildConfiguration,
+                    "net461",
+                    this.TargetRuntime);
+                }
+
+                return value;
+            }
         }
 
         /// <summary>
@@ -114,8 +130,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// </summary>
         public string TargetRuntime
         {
-            get;
-            private set;
+            get; set;
         }
 
         /// <summary>
@@ -124,6 +139,25 @@ namespace Microsoft.TestPlatform.TestUtilities
         public string TestAssetsPath
         {
             get;
+        }
+
+        /// <summary>
+        /// Gets the tools directory for dependent tools
+        /// </summary>
+        public string ToolsDirectory
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the application type.
+        /// Supported values = <c>net46</c>, <c>netcoreapp1.0</c>.
+        /// </summary>
+        public string RunnerFramework
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -172,14 +206,24 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <summary>
         /// Gets the path to <c>vstest.console.exe</c>.
         /// </summary>
-        /// <returns>Full path to <c>vstest.console.exe</c></returns>
+        /// <returns>
+        /// Full path to test runner
+        /// </returns>
         public string GetConsoleRunnerPath()
         {
-            var vstestConsolePath = Path.Combine(this.PublishDirectory, "vstest.console.exe");
+            string consoleRunnerPath = string.Empty;
 
-            Assert.IsTrue(File.Exists(vstestConsolePath), "GetConsoleRunnerPath: Path not found: {0}", vstestConsolePath);
+            if (string.Equals(this.RunnerFramework, "net46"))
+            {
+                consoleRunnerPath = Path.Combine(this.PublishDirectory, "vstest.console.exe");
+            }
+            else if (string.Equals(this.RunnerFramework, "netcoreapp1.0"))
+            {
+                consoleRunnerPath = Path.Combine(this.ToolsDirectory, @"dotnet\dotnet.exe");
+            }
 
-            return vstestConsolePath;
+            Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
+            return consoleRunnerPath;
         }
     }
 }
