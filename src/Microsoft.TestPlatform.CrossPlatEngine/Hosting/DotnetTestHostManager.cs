@@ -103,14 +103,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             // This host manager can create process start info for dotnet core targets only.
             // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
+            // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
-                startInfo.FileName = currentProcessPath;
+                startInfo.FileName = "\"" + currentProcessPath + "\"";
             }
             else
             {
-                startInfo.FileName = this.GetDotnetHostFullPath();
+                startInfo.FileName = "\"" + this.GetDotnetHostFullPath() + "\"";
             }
 
             EqtTrace.Verbose("DotnetTestHostmanager: Full path of dotnet.exe is {0}", startInfo.FileName);
@@ -148,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             var runtimeConfigDevPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.dev.json"));
-            var testHostPath = GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
+            var testHostPath = this.GetTestHostPath(runtimeConfigDevPath, depsFilePath, sourceDirectory);
 
             if (this.fileHelper.Exists(testHostPath))
             {
@@ -216,6 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Get full path for the .net host
         /// </summary>
         /// <returns>Full path to <c>dotnet</c> executable</returns>
+        /// <remarks>Debuggers require the full path of executable to launch it.</remarks>
         private string GetDotnetHostFullPath()
         {
             char separator = ';';
