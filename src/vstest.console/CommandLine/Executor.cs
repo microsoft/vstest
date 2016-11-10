@@ -19,7 +19,6 @@
 //   Help output.
 //   Required
 //   Single or multiple
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
@@ -51,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// Default constructor.
         /// </summary>
         public Executor(IOutput output): this(output, TestPlatformEventSource.Instance)
-        {            
+        {
         }
 
         internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource)
@@ -59,6 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             this.Output = output;
             this.testPlatformEventSource = testPlatformEventSource;
         }
+
         #endregion
 
         #region Properties
@@ -84,24 +84,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         internal int Execute(params string[] args)
         {
             this.testPlatformEventSource.VsTestConsoleStart();
-            
+
             int exitCode = 0;
+
             // If we have no arguments, set exit code to 1, add a message, and include the help processor in the args.
             if (args == null || args.Length == 0 || args.Any(string.IsNullOrWhiteSpace))
             {
                 args = args ?? new string[0];
                 exitCode = 1;
+
                 // Do not add help processor as we will go and try to check for project.json files in current dir
             }
 
-            PrintSplashScreen();
+            this.PrintSplashScreen();
 
             // Get the argument processors for the arguments.
             List<IArgumentProcessor> argumentProcessors;
-            exitCode |= GetArgumentProcessors(args, out argumentProcessors);
+            exitCode |= this.GetArgumentProcessors(args, out argumentProcessors);
 
             // Verify that the arguments are valid.
-            exitCode |= IdentifyDuplicateArguments(argumentProcessors);
+            exitCode |= this.IdentifyDuplicateArguments(argumentProcessors);
 
             // Quick exit for syntax error
             if (exitCode == 1
@@ -111,11 +113,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 this.testPlatformEventSource.VsTestConsoleStop();
                 return exitCode;
             }
-            
+
             // Execute all argument processors
-            foreach(var processor in argumentProcessors)
+            foreach (var processor in argumentProcessors)
             {
-                if(!ExecuteArgumentProcessor(processor, out exitCode))
+                if (!this.ExecuteArgumentProcessor(processor, ref exitCode))
                 {
                     break;
                 }
@@ -125,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             exitCode |= (TestRunResultAggregator.Instance.Outcome == TestOutcome.Passed) ? 0 : 1;
 
             EqtTrace.Verbose("Executor.Execute: Exiting with exit code of {0}", exitCode);
-            
+
             this.testPlatformEventSource.VsTestConsoleStop();
 
             return exitCode;
@@ -160,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 else
                 {
                     // No known processor was found, report an error and continue
-                    Output.Error(String.Format(CultureInfo.CurrentCulture, CommandLineResources.NoArgumentProcessorFound, arg));
+                    this.Output.Error(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NoArgumentProcessorFound, arg));
 
                     // Add the help processor
                     if (result == 0)
@@ -173,12 +175,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             // Add the internal argument processors that should always be executed.
             // Examples: processors to enable loggers that are statically configured, and to start logging,
-            //           should always be executed.
+            // should always be executed.
             var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
             processors.AddRange(processorsToAlwaysExecute);
 
             // Ensure we have an action argument.
-            EnsureActionArgumentIsPresent(processors, processorFactory);
+            this.EnsureActionArgumentIsPresent(processors, processorFactory);
 
             // Instantiate and initialize the processors in priority order.
             processors.Sort((p1, p2) => Comparer<ArgumentProcessorPriority>.Default.Compare(p1.Metadata.Value.Priority, p2.Metadata.Value.Priority));
@@ -193,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 }
                 catch (CommandLineException e)
                 {
-                    Output.Error(e.Message);
+                    this.Output.Error(e.Message);
                     result = 1;
                 }
             }
@@ -233,7 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
                         // Update the count so we do not print the error out for this argument multiple times.
                         commandSeenCount[processor.Metadata.Value.CommandName] = ++count;
-                        Output.Error(String.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
+                        this.Output.Error(string.Format(CultureInfo.CurrentCulture, CommandLineResources.DuplicateArgumentError, processor.Metadata.Value.CommandName));
                     }
                 }
             }
@@ -260,17 +262,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 argumentProcessors.Add(processorFactory.CreateDefaultActionArgumentProcessor());
             }
         }
-        
+
         /// <summary>
         /// Executes the argument processor
         /// </summary>
         /// <param name="processor">Argument processor to execute.</param>
+        /// <param name="exitCode">Exit status of Argument processor</param>
         /// <returns> true if continue execution, false otherwise.</returns>
-        private bool ExecuteArgumentProcessor(IArgumentProcessor processor, out int exitCode)
+        private bool ExecuteArgumentProcessor(IArgumentProcessor processor, ref int exitCode)
         {
-            exitCode = 0;
             var continueExecution = true;
-            var result = processor.Executor.Value.Execute();
+            ArgumentProcessorResult result;
+            try
+            {
+                result = processor.Executor.Value.Execute();
+            }
+            catch (CommandLineException ex)
+            {
+                EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
+                this.Output.Error(ex.Message);
+                result = ArgumentProcessorResult.Fail;
+            }
 
             Debug.Assert(
                 result >= ArgumentProcessorResult.Success && result <= ArgumentProcessorResult.Abort,
@@ -285,21 +297,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 continueExecution = false;
             }
-            
+
             return continueExecution;
         }
-        
+
         /// <summary>
         /// Displays the Company and Copyright splash title info immediately after launch
         /// </summary>
         private void PrintSplashScreen()
         {
             var version = typeof(Executor).GetTypeInfo().Assembly.GetName().Version;
-            string commandLineBanner = String.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, version.ToString());
-            Output.WriteLine(commandLineBanner, OutputLevel.Information);
+            string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, version.ToString());
+            this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
 
-            Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
-            Output.WriteLine(string.Empty, OutputLevel.Information);
+            this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
+            this.Output.WriteLine(string.Empty, OutputLevel.Information);
         }
 
         #endregion
