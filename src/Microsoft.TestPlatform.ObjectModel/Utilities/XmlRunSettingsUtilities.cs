@@ -39,6 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             get
             {
 #if NET46
+                // This is a workaround for https://github.com/dotnet/corefx/issues/13566
                 return WindowsSystemInformation.GetArchitecture();
 #else
                 var arch = RuntimeInformation.OSArchitecture;
