@@ -38,6 +38,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             get
             {
+#if NET46
+                var procArch = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
+                var procArch6432 = Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432");
+                if (string.Equals(procArch, "amd64", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(procArch, "ia64", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(procArch6432, "amd64", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(procArch6432, "ia64", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ObjectModel.Architecture.X64;
+                }
+                if (string.Equals(procArch, "x86", StringComparison.OrdinalIgnoreCase))
+                {
+                    return ObjectModel.Architecture.X86;
+                }
+                return ObjectModel.Architecture.ARM;
+#else
                 var arch = RuntimeInformation.OSArchitecture;
 
                 switch (arch)
@@ -49,6 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     default:
                         return ObjectModel.Architecture.ARM;
                 }
+#endif
             }
         }
 
