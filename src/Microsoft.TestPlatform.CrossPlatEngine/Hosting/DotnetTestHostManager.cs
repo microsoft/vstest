@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
@@ -241,8 +242,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
             }
 
-            EqtTrace.Error("Unable to find path for dotnet host");
-            return dotnetExeName;
+            string errorMessage = String.Format(Resources.NoDotnetExeFound, dotnetExeName);
+            EqtTrace.Error(errorMessage);
+            throw new FileNotFoundException(errorMessage);
         }
 
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)
