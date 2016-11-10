@@ -6,6 +6,7 @@
     "delaySign": true,
     "keyFile": "../../scripts/key.snk",
     "warningsAsErrors": true,
+    "platform": "anycpu",
     "embed": [ "Resources/*.resx" ]
   },
 
