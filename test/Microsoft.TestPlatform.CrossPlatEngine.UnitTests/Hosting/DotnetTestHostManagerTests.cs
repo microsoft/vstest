@@ -217,11 +217,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
+#if !NET46
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
+#endif
 
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
             var acceptablePath = Path.Combine(paths[0], dotnetExeName);
@@ -238,8 +240,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             // To validate the else part, set current process to exe other than dotnet
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+
+            char separator = ';';
+            var dotnetExeName = "dotnet.exe";
+#if !NET46
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                separator = ':';
+                dotnetExeName = "dotnet";
+            }
+#endif
+
+            var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
+
+            foreach (string path in paths)
+            {
+                string dotnetExeFullPath = Path.Combine(path.Trim(), dotnetExeName);
+                this.mockFileHelper.Setup(fh => fh.Exists(dotnetExeFullPath)).Returns(false);
+            }
+
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
-            var dotnetExeName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "dotnet.exe" : "dotnet";
 
             var startInfo = this.GetDefaultStartInfo();
 

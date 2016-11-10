@@ -15,8 +15,7 @@
     } 
   },
   "dependencies": {
-    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
-    "System.Runtime.InteropServices.RuntimeInformation": "4.0.0"
+    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*"
   },
   "frameworks": {
     "net46": {
@@ -41,6 +40,7 @@
         "System.Xml.XPath.XmlDocument": "4.0.1",
         "System.ComponentModel.EventBasedAsync": "4.0.11",
         "System.Runtime.InteropServices": "4.1.0",
+        "System.Runtime.InteropServices.RuntimeInformation": "4.0.0",
         "System.IO.FileSystem": "4.0.1",
         "System.ComponentModel.TypeConverter": "4.1.0",
         "System.Security.Cryptography.Algorithms": "4.2.0",
