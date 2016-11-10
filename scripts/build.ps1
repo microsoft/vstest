@@ -239,8 +239,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output, $runtime)
 {
-    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output"
-    & $dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output
+    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime"
+    & $dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime
 }
 
 function Create-VsixPackage
@@ -304,7 +304,7 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
