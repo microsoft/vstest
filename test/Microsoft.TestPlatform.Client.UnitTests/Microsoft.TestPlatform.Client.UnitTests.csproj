@@ -47,7 +47,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20161024-02</Version>
+      <Version>15.0.0-preview-20161109-01</Version>
  	    <IncludeAssets>Runtime</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MSTest.TestFramework">
