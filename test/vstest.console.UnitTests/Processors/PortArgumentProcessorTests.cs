@@ -122,10 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             int port = 2345;
             executor.Initialize(port.ToString());
-            var result = executor.Execute();
+            Assert.ThrowsException<CommandLineException>(() => executor.Execute());
 
             testDesignModeClient.Verify(td => td.ConnectToClientAndProcessRequests(port, testRequestManager.Object), Times.Once);
-            Assert.AreEqual(ArgumentProcessorResult.Fail, result);
         }
 
 

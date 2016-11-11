@@ -125,8 +125,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="options">
         /// The options.
         /// </param>
-        public PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager) : 
-            this (options, testRequestManager, InitializeDesignMode)
+        /// <param name="testRequestManager"> Test request manager</param>
+        public PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager)
+            : this(options, testRequestManager, InitializeDesignMode)
         {
         }
 
