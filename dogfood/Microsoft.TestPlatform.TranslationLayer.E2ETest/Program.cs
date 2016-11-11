@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 
 namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 {
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+
     public class Program
     {
         public static void Main(string[] args)
@@ -43,10 +46,17 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
             Console.WriteLine("-------------------------------------------------------");
 
-            var testResults = RunAllTests(consoleWrapper, new List<string>() { testAssembly });
+            testresults = RunAllTests(consoleWrapper, new List<string>() { testAssembly });
 
-            Console.WriteLine("Run All Test Count: " + testResults?.Count());
-            Console.WriteLine("Run All Test Result: " + testResults?.FirstOrDefault()?.TestCase?.DisplayName + " :" + testResults?.FirstOrDefault()?.Outcome);
+            Console.WriteLine("Run All Test Count: " + testresults?.Count());
+            Console.WriteLine("Run All Test Result: " + testresults?.FirstOrDefault()?.TestCase?.DisplayName + " :" + testresults?.FirstOrDefault()?.Outcome);
+
+            Console.WriteLine("-------------------------------------------------------");
+
+            testresults = RunTestsWithCustomTestHostLauncher(consoleWrapper, new List<string>() { testAssembly });
+
+            Console.WriteLine("Run All (custom launcher) Test Count: " + testresults?.Count());
+            Console.WriteLine("Run All (custom launcher) Test Result: " + testresults?.FirstOrDefault()?.TestCase?.DisplayName + " :" + testresults?.FirstOrDefault()?.Outcome);
 
             Console.WriteLine("-------------------------------------------------------");
         }
@@ -80,6 +90,59 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
             waitHandle.WaitOne();
             return handler.TestResults;
+        }
+
+        private static IEnumerable<TestResult> RunTestsWithCustomTestHostLauncher(IVsTestConsoleWrapper consoleWrapper, List<string> list)
+        {
+            var runCompleteSignal = new AutoResetEvent(false);
+            var processExitedSignal = new AutoResetEvent(false);
+            var handler = new RunEventHandler(runCompleteSignal);
+            consoleWrapper.RunTestsWithCustomTestHost(list, String.Empty, handler, new CustomTestHostLauncher(() => processExitedSignal.Set()));
+
+            // Test host exited signal comes after the run complete
+            processExitedSignal.WaitOne();
+
+            // At this point, run must have complete. Check signal for true
+            Debug.Assert(runCompleteSignal.WaitOne());
+
+            return handler.TestResults;
+        }
+    }
+
+    public class CustomTestHostLauncher : ITestHostLauncher
+    {
+        private readonly Action callback;
+
+        public CustomTestHostLauncher(Action callback)
+        {
+            this.callback = callback;
+        }
+
+        public bool IsDebug => false;
+
+        public int LaunchTestHost(TestProcessStartInfo defaultTestHostStartInfo)
+        {
+            var processInfo = new ProcessStartInfo(
+                                  defaultTestHostStartInfo.FileName,
+                                  defaultTestHostStartInfo.Arguments)
+                                  {
+                                      WorkingDirectory = defaultTestHostStartInfo.WorkingDirectory
+                                  };
+            var process = new Process { StartInfo = processInfo, EnableRaisingEvents = true };
+            process.Start();
+
+            if (process != null)
+            {
+                process.Exited += (sender, args) =>
+                    {
+                        Console.WriteLine("Test host has exited. Signal run end.");
+                        this.callback();
+                    };
+
+                return process.Id;
+            }
+
+            throw new Exception("Process in invalid state.");
         }
     }
 
