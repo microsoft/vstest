@@ -207,11 +207,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
+#if !NET46
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
+#endif
 
             // Setup the first directory on PATH to return true for existence check for dotnet
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
@@ -233,15 +235,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
+#if !NET46
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
+#endif
 
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
 
-            foreach(string path in paths)
+            foreach (string path in paths)
             {
                 string dotnetExeFullPath = Path.Combine(path.Trim(), dotnetExeName);
                 this.mockFileHelper.Setup(fh => fh.Exists(dotnetExeFullPath)).Returns(false);
