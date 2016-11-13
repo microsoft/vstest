@@ -172,6 +172,7 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
+	$packageProjectDirectory = Join-Path $env:TP_PACKAGE_PROJ_DIR "package.csproj"
     $testHostProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
@@ -181,8 +182,9 @@ function Publish-Package
     $dataCollectorx86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
-    Publish-Package-Internal $env:TP_PACKAGE_PROJ_DIR $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $env:TP_PACKAGE_PROJ_DIR $TPB_TargetFrameworkCore $coreCLRPackageDir
+	
+    Publish-Package-Internal $env:packageProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $env:packageProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
@@ -341,7 +343,7 @@ function Update-LocalizedResources
 
     # For each resx file, file the xlf files in all languages
     # Sync the resx to xlf to ensure all new resources are added
-    $xlfTool = Join-Path $env:TP_PACKAGES_DIR "fmdev.xlftool\0.2.0\tools\xlftool.exe"
+    $xlfTool = Join-Path $env:TP_PACKAGES_DIR "fmdev.xlftool\0.1.2\tools\xlftool.exe"
     $resxFiles = Get-ChildItem -Recurse -Include *.resx "$env:TP_ROOT_DIR\src"
 
     foreach ($resxFile in $resxFiles) {
@@ -417,7 +419,7 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Forma
 
 Install-DotNetCli
 Restore-Package
-#Update-LocalizedResources
+Update-LocalizedResources
 Invoke-Build
 Publish-Package
 Create-VsixPackage

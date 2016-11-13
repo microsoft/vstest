@@ -5,8 +5,8 @@
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>sign</AssemblyName>
     <RuntimeIdentifiers>win7-x64</RuntimeIdentifiers>
-    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\$(Configuration)\</OutputPath>
-    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
+    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\..\artifacts\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
