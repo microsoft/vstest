@@ -91,7 +91,6 @@ function Remove-Tools
 function Install-DotNetCli
 {
     $timer = Start-Timer
-#https://dotnetcli.blob.core.windows.net/dotnet/Sdk/rel-1.0.0/dotnet-dev-win-x64.latest.zip
     Write-Log "Install-DotNetCli: Get dotnet-install.ps1 script..."
     $dotnetInstallRemoteScript = "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1"
     $dotnetInstallScript = Join-Path $env:TP_TOOLS_DIR "dotnet-install.ps1"
@@ -233,7 +232,7 @@ function Publish-Package
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
 		
-		$netStandard1_5PackageDir =Get-NetStandard1_5CLRPackageDirectory
+        $netStandard1_5PackageDir =Get-NetStandard1_5CLRPackageDirectory
         Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $netStandard1_5PackageDir\$file $coreCLRExtensionsDir -Force
     }
