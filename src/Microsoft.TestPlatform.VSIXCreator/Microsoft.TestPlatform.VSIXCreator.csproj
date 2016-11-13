@@ -9,6 +9,8 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -71,4 +73,13 @@
   </Target>
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="WorkAroundToSkipPreprocessingBinaries" BeforeTargets="RunProduceContentAssets">
+    <ItemGroup>
+        <FileDependencies>
+         <codeLanguage Condition="'%(FileDependencies.codeLanguage)' == 'any' and '%(FileDependencies.Extension)' == '.dll'">binary</codeLanguage>
+        </FileDependencies>  
+    </ItemGroup>
+  </Target>
+
 </Project>

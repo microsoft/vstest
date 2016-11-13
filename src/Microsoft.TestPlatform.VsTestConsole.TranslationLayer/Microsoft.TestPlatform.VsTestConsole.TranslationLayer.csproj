@@ -13,13 +13,16 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
     <EmbeddedResource Include="Resources\*.resx;compiler\resources\**\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <!--<ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />-->
+    <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
 	  <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />	
 	  <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />    
     <PackageReference Include="NETStandard.Library">
@@ -48,6 +51,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
 	  <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
 	  <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />    
@@ -66,4 +70,11 @@
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="WorkAroundPackageAndProjectReferenceConflict" BeforeTargets="ResolveLockFileReferences">
+    <ItemGroup>
+      <ResolvedCompileFileDefinitions Remove="@(ResolvedCompileFileDefinitions)" Condition="'%(ResolvedCompileFileDefinitions.Filename)' == 'Microsoft.TestPlatform.Common'" />
+    </ItemGroup>
+  </Target>
+
 </Project>

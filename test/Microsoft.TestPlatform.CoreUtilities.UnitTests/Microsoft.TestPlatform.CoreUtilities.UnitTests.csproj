@@ -13,7 +13,9 @@
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>    
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <OutputPath Condition="'$(OutputPath)'=='' ">..\..\artifacts\$(Configuration)\</OutputPath>
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">..\..\artifacts\obj\$(MSBuildProjectName)</BaseIntermediateOutputPath>    
   </PropertyGroup>
 
   <ItemGroup>

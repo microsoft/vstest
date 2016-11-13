@@ -4,8 +4,18 @@
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
     <AssemblyName>package</AssemblyName>
-    <OutputType>Exe</OutputType>
+    <!--<OutputType>Exe</OutputType>-->
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
   </PropertyGroup>
 
   <ItemGroup>
@@ -69,4 +79,13 @@
   </PropertyGroup>
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="WorkAroundToSkipPreprocessingBinaries" BeforeTargets="RunProduceContentAssets">
+    <ItemGroup>
+        <FileDependencies>
+         <codeLanguage Condition="'%(FileDependencies.codeLanguage)' == 'any' and '%(FileDependencies.Extension)' == '.dll'">binary</codeLanguage>
+        </FileDependencies>  
+    </ItemGroup>
+  </Target>
+
 </Project>
