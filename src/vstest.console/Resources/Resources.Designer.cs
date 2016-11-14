@@ -278,6 +278,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///    Looks up a localized string similar to Timeout to connect or process request for DesignModeClient on port: {0}.
+        /// </summary>
+        public static string DesignModeClientTimeoutError {
+            get {
+                return ResourceManager.GetString("DesignModeClientTimeoutError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///    Looks up a localized string similar to Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run..
         /// </summary>
         public static string DisablingCodeCoverageInAppContainerTestExecution {

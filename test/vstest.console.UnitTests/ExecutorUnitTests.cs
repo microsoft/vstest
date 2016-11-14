@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 {
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using CoreUtilities.Tracing.Interfaces;
@@ -41,10 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             // Verify that messages exist
             Assert.IsTrue(mockOutput.Messages.Count > 0, "Executor must print atleast copyright info");
             Assert.IsNotNull(mockOutput.Messages.First().Message, "First Printed Message cannot be null or empty");
-            
+
             // Just check first 20 characters - don't need to check whole thing as assembly version is variable
-            Assert.IsTrue(mockOutput.Messages.First().Message.Contains(
-                CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)), 
+            Assert.IsTrue(
+                mockOutput.Messages.First()
+                    .Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
                 "First Printed message must be Microsoft Copyright");
         }
 
@@ -54,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         /// </summary>
         [TestMethod]
         public void ExecutorEmptyArgsCallRunTestsProcessor()
-        {            
+        {
             var mockOutput = new MockOutput();
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
 
@@ -89,6 +91,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             this.mockTestPlatformEventSource.Verify(x => x.VsTestConsoleStop(), Times.Once);
         }
 
+        [TestMethod]
+
+        public void ExecuteShouldExitWithErrorOnInvalidArgumentCombination()
+        {
+            // Create temp file for testsource dll to pass FileUtil.Exits()
+            var testSourceDllPath = Path.GetTempFileName();
+            string[] args = { testSourceDllPath, "/tests:Test1", "/testCasefilter:Test" };
+            var mockOutput = new MockOutput();
+
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
+
+            var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(CommandLineResources.InvalidTestCaseFilterValueForSpecificTests));
+            Assert.AreEqual(1, errorMessageCount, "Invalid Arguments Combination should display error.");
+            Assert.AreEqual(1, exitCode, "Invalid Arguments Combination execution should exit with error.");
+            File.Delete(testSourceDllPath);
+        }
+
 
         private class MockOutput : IOutput
         {
@@ -111,6 +130,4 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             public OutputLevel Level { get; set; }
         }
     }
-
-        
 }
