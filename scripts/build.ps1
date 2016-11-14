@@ -119,7 +119,6 @@ function Restore-Package
 {
     $timer = Start-Timer
     Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
-    Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     $dotnetExe = Get-DotNetPath
 
     foreach ($src in $TPB_SourceFolders) {
