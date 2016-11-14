@@ -188,16 +188,16 @@ function Publish-Package
     Write-Log "Package: Publish package\*.csproj"
 	
     Publish-Package-Internal $packageProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $packageProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-Package-InternalDotneCore $packageProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
     Publish-Package-Internal $vstestConsoleProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $vstestConsoleProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-Package-InternalDotneCore $vstestConsoleProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     Publish-Package-Internal $dataCollectorProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $dataCollectorProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-Package-InternalDotneCore $dataCollectorProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     Write-Log "Package: Publish src\datacollector.x86\datacollector.x86.csproj"
     Publish-Package-Internal $dataCollectorx86ProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
@@ -205,7 +205,7 @@ function Publish-Package
     # Publish testhost
     Write-Log "Package: Publish testhost\project.json"
     Publish-Package-Internal $testHostProjectDirectory $TPB_TargetFramework $testhostFullPackageDir
-    Publish-Package-Internal $testHostProjectDirectory $TPB_TargetFrameworkCore $testhostCorePackageDir
+    Publish-Package-InternalDotneCore $testHostProjectDirectory $TPB_TargetFrameworkCore $testhostCorePackageDir
 
     Write-Log "Package: Publish testhost.x86\project.json"
     Publish-Package-Internal $testHostx86ProjectDirectory $TPB_TargetFramework $testhostFullPackageDir
@@ -238,9 +238,8 @@ function Publish-Package
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
 		
-        $netStandard1_5PackageDir =Get-NetStandard1_5CLRPackageDirectory
         Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
-        Move-Item $netStandard1_5PackageDir\$file $coreCLRExtensionsDir -Force
+        Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
     }
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
@@ -251,6 +250,12 @@ function Publish-Package
 
 
 function Publish-Package-Internal($packagename, $framework, $output)
+{
+    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime
+}
+
+function Publish-Package-InternalDotneCore($packagename, $framework, $output)
 {
     Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output
@@ -317,8 +322,8 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Log "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -379,17 +384,12 @@ function Get-DotNetPath
 
 function Get-FullCLRPackageDirectory
 {
-    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework")
+    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFramework\$TPB_TargetRuntime")
 }
 
 function Get-CoreCLRPackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore")
-}
-
-function Get-NetStandard1_5CLRPackageDirectory
-{
-	return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\netstandard1.5")
 }
 
 function Start-Timer
