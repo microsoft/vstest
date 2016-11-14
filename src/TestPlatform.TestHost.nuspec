@@ -22,6 +22,7 @@
   </metadata>
   <files>
     <file src="_._" target="lib\net46\" />
+    <file src="_._" target="lib\net45\" />
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CrossPlatEngine.dll" target="lib\netstandard1.5\" />
