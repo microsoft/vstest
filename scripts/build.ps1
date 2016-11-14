@@ -109,6 +109,7 @@ function Install-DotNetCli
 
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
+	New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
@@ -117,6 +118,7 @@ function Install-DotNetCli
 function Restore-Package
 {
     $timer = Start-Timer
+    Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     $dotnetExe = Get-DotNetPath
 
