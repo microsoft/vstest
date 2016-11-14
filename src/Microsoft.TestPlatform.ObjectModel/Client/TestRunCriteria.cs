@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         private string testCaseFilter;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="sources">
         /// Sources which contains tests that should be executed
@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="sources">
         /// Sources which contains tests that should be executed
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="sources">
         /// Sources which contains tests that should be executed
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="sources">
         /// Sources which contains tests that should be executed
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// Create the TestRunCriteria for a test run
         /// </summary>
         /// <param name="sources">
@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="sources">
         /// Sources which contains tests that should be executed
@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="adapterSourceMap">
         /// Sources which contains tests that should be executed
@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="tests">
         /// Tests which should be executed
@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="tests">
         /// Tests which should be executed
@@ -218,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="tests">
         /// Tests which should be executed
@@ -238,7 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="tests">
         /// Tests which should be executed
@@ -261,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="tests">
         /// Tests which should be executed
@@ -279,7 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class. 
+        /// Initializes a new instance of the <see cref="TestRunCriteria"/> class.
         /// </summary>
         /// <param name="tests">
         /// Sources which contains tests that should be executed
@@ -331,7 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
 
         /// <summary>
-        /// Gets the tests that need to executed in this test run. 
+        /// Gets the tests that need to executed in this test run.
         /// This will be null if test run is created with specific test containers
         /// </summary>
         [DataMember]
@@ -393,6 +393,46 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             sb.AppendLine(string.Format(CultureInfo.CurrentCulture, "   Settingsxml={0}", this.TestRunSettings));
 
             return sb.ToString();
+        }
+
+        protected bool Equals(TestRunCriteria other)
+        {
+            return base.Equals(other)
+                && string.Equals(this.testCaseFilter, other.testCaseFilter);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            if (object.ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
+            return this.Equals((TestRunCriteria)obj);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = base.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.testCaseFilter != null ? this.testCaseFilter.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.AdapterSourceMap != null ? this.AdapterSourceMap.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (this.Tests != null ? this.Tests.GetHashCode() : 0);
+                return hashCode;
+            }
         }
     }
 
@@ -536,14 +576,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         public ITestHostLauncher TestHostLauncher { get; private set; }
 
         /// <summary>
-        /// Gets the frequency of run stats test event. 
+        /// Gets the frequency of run stats test event.
         /// </summary>
         /// <remarks>
-        /// Run stats change event will be raised after completion of these number of tests. 
-        /// Note that this event is raised asynchronously and the underlying execution process is not 
-        /// paused during the listener invocation. So if the event handler, you try to query the 
+        /// Run stats change event will be raised after completion of these number of tests.
+        /// Note that this event is raised asynchronously and the underlying execution process is not
+        /// paused during the listener invocation. So if the event handler, you try to query the
         /// next set of results, you may get more than 'FrequencyOfRunStatsChangeEvent'.
-        /// </remarks>        
+        /// </remarks>
         [DataMember]
         public long FrequencyOfRunStatsChangeEvent { get; private set; }
 
@@ -552,5 +592,47 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         [DataMember]
         public TimeSpan RunStatsChangeEventTimeout { get; private set; }
+
+        protected bool Equals(BaseTestRunCriteria other)
+        {
+            return this.KeepAlive == other.KeepAlive
+                && string.Equals(this.TestRunSettings, other.TestRunSettings)
+                && this.FrequencyOfRunStatsChangeEvent == other.FrequencyOfRunStatsChangeEvent
+                && this.RunStatsChangeEventTimeout.Equals(other.RunStatsChangeEventTimeout);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj)
+        {
+            if (object.ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (object.ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
+            return this.Equals((BaseTestRunCriteria)obj);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = this.KeepAlive.GetHashCode();
+                hashCode = (hashCode * 397) ^ (this.TestRunSettings != null ? this.TestRunSettings.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ this.FrequencyOfRunStatsChangeEvent.GetHashCode();
+                hashCode = (hashCode * 397) ^ this.RunStatsChangeEventTimeout.GetHashCode();
+                return hashCode;
+            }
+        }
     }
 }
