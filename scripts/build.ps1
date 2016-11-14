@@ -153,8 +153,6 @@ function Invoke-Build
         #foreach ($fx in $TPB_TargetFramework) {
             Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
                 Write-Log ".. .. Build: Source: $_"
-                $binPath = Join-Path $env:TP_OUT_DIR "$fx\$src\$($_.Directory.Name)\bin"
-                $objPath = Join-Path $env:TP_OUT_DIR "$fx\$src\$($_.Directory.Name)\obj"
                 Write-Verbose "$dotnetExe build $_ --output $binPath --build-base-path $objPath"
                 & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix
                 Write-Log ".. .. Build: Complete."
@@ -189,8 +187,8 @@ function Publish-Package
 
     Write-Log "Package: Publish package\*.csproj"
 	
-    Publish-Package-Internal $env:packageProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $env:packageProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-Package-Internal $packageProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $packageProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
@@ -252,7 +250,7 @@ function Publish-Package
 }
 
 
-function Publish-Package-Internal($packagename, $framework, $output, $runtime)
+function Publish-Package-Internal($packagename, $framework, $output)
 {
     Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output
