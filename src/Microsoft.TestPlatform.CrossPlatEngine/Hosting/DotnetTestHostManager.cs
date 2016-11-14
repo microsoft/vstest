@@ -224,6 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
 
+#if !NET46
             // Use semicolon(;) as path separator for windows
             // colon(:) for Linux and OSX
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -231,6 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
+#endif
 
             var pathString = Environment.GetEnvironmentVariable("PATH");
             foreach (string path in pathString.Split(separator))
