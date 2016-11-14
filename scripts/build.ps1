@@ -98,6 +98,12 @@ function Install-DotNetCli
         New-Item $env:TP_TOOLS_DIR -Type Directory | Out-Null
     }
 
+    $dotnet_dir= Join-Path $env:TP_TOOLS_DIR "dotnet"
+
+    if (-not (Test-Path $dotnet_dir)) {
+        New-Item $dotnet_dir -Type Directory | Out-Null
+    }
+
     (New-Object System.Net.WebClient).DownloadFile($dotnetInstallRemoteScript, $dotnetInstallScript)
 
     if (-not (Test-Path $dotnetInstallScript)) {
