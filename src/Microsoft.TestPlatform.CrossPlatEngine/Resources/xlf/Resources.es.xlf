@@ -170,6 +170,11 @@
         <target state="new">Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoDotnetExeFound">
+        <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
+        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
