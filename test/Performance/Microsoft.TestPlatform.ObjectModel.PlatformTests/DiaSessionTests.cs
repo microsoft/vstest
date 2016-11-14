@@ -39,8 +39,8 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleTestProject\UnitTest1.cs");
-            Assert.AreEqual(diaNavigationData.MinLineNumber, 18);
-            Assert.AreEqual(diaNavigationData.MaxLineNumber, 20);
+            Assert.AreEqual(diaNavigationData.MinLineNumber, 19);
+            Assert.AreEqual(diaNavigationData.MaxLineNumber, 21);
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
         }
 
