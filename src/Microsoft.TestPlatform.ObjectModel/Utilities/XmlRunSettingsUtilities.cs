@@ -1,4 +1,5 @@
-// Copyright(c) Microsoft.All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
 {
@@ -38,6 +39,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             get
             {
+#if NET46
+                // This is a workaround for https://github.com/dotnet/corefx/issues/13566
+                return WindowsSystemInformation.GetArchitecture();
+#else
                 var arch = RuntimeInformation.OSArchitecture;
 
                 switch (arch)
@@ -49,6 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     default:
                         return ObjectModel.Architecture.ARM;
                 }
+#endif
             }
         }
 
@@ -338,4 +344,60 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             return null;
         }
     }
+
+#if NET46
+    internal static class WindowsSystemInformation
+    {
+        internal const ushort PROCESSOR_ARCHITECTURE_INTEL = 0;
+        internal const ushort PROCESSOR_ARCHITECTURE_ARM = 5;
+        internal const ushort PROCESSOR_ARCHITECTURE_IA64 = 6;
+        internal const ushort PROCESSOR_ARCHITECTURE_AMD64 = 9;
+        internal const ushort PROCESSOR_ARCHITECTURE_UNKNOWN = 0xFFFF;
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct SYSTEM_INFO
+        {
+            public ushort wProcessorArchitecture;
+            public ushort wReserved;
+            public uint dwPageSize;
+            public IntPtr lpMinimumApplicationAddress;
+            public IntPtr lpMaximumApplicationAddress;
+            public UIntPtr dwActiveProcessorMask;
+            public uint dwNumberOfProcessors;
+            public uint dwProcessorType;
+            public uint dwAllocationGranularity;
+            public ushort wProcessorLevel;
+            public ushort wProcessorRevision;
+        };
+
+        [DllImport("kernel32.dll")]
+        internal static extern void GetNativeSystemInfo(ref SYSTEM_INFO lpSystemInfo);
+
+        public static ObjectModel.Architecture GetArchitecture()
+        {
+            SYSTEM_INFO sysInfo = new SYSTEM_INFO();
+
+            // GetNativeSystemInfo is supported from Windows XP onwards. Since test platform
+            // requires Windows 7 OS at the minimum, we don't require a fallback.
+            GetNativeSystemInfo(ref sysInfo);
+
+            switch (sysInfo.wProcessorArchitecture)
+            {
+                case PROCESSOR_ARCHITECTURE_INTEL:
+                    return ObjectModel.Architecture.X86;
+                case PROCESSOR_ARCHITECTURE_ARM:
+                    return ObjectModel.Architecture.ARM;
+                case PROCESSOR_ARCHITECTURE_IA64:
+                    return ObjectModel.Architecture.X64;
+                case PROCESSOR_ARCHITECTURE_AMD64:
+                    return ObjectModel.Architecture.X64;
+                case PROCESSOR_ARCHITECTURE_UNKNOWN:
+                    EqtTrace.Error("WindowsSystemInformation.GetArchitecture: Unknown architecture found, will use default.");
+                    break;
+            }
+
+            return ObjectModel.Architecture.Default;
+        }
+    }
+#endif
 }

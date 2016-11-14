@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 {
@@ -206,11 +207,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
+#if !NET46
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
+#endif
 
             // Setup the first directory on PATH to return true for existence check for dotnet
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
@@ -232,15 +235,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
+#if !NET46
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
+#endif
 
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
 
-            foreach(string path in paths)
+            foreach (string path in paths)
             {
                 string dotnetExeFullPath = Path.Combine(path.Trim(), dotnetExeName);
                 this.mockFileHelper.Setup(fh => fh.Exists(dotnetExeFullPath)).Returns(false);
