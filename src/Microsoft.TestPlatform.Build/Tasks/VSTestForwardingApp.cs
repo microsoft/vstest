@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.Build.Tasks
 {
@@ -18,7 +19,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
         public VSTestForwardingApp(IEnumerable<string> argsToForward)
         {
             this.allArgs.Add("exec");
-            this.allArgs.Add(GetVSTestExePath());
+
+            // Ensure that path to vstest.console is whitespace friendly. User may install
+            // dotnet-cli to any folder containing whitespace (e.g. VS installs to program files).
+            // Arguments are already whitespace friendly.
+            this.allArgs.Add("\"" + GetVSTestExePath() + "\"");
             this.allArgs.AddRange(argsToForward);
 
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_TRACE_BUILD");

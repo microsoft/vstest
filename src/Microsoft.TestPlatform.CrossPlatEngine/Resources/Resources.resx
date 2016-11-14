@@ -152,6 +152,9 @@
   <data name="NoDiscovererRegistered" xml:space="preserve">
     <value>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</value>
   </data>
+  <data name="NoDotnetExeFound" xml:space="preserve">
+    <value>Could not find {0}. Make sure that the dotnet is installed on the machine.</value>
+  </data>
   <data name="NoMatchingExecutor" xml:space="preserve">
     <value>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</value>
     <comment>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</comment>
