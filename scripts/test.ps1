@@ -94,15 +94,11 @@ function Invoke-Test
                 Write-Log ".. Test: Source: $_"
 
                 # Tests are only built for x86 at the moment, though we don't have architecture requirement
-                # $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.3-preview\build\_common"
                 $testContainerName = $_.Name
-                # $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/$($Script:TPT_TargetFramework)/$($Script:TPT_TargetRuntime)"
-                # $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
-                # $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
-
-                # TODO : Implement this later
+                
                 $skip="False"
 
+                # Target framework for projects that should be skipped for testing.
                 $targetFrameworkSkippedProjects=$Script:TPT_SkipProjects
                 if($fx -eq "netcoreapp1.0")
                 {
@@ -128,8 +124,6 @@ function Invoke-Test
                     $output = & $dotnetExe test $_ -f $fx
 
                     Reset-TestEnvironment
-                    #Write-Verbose "$dotnetExe test $_ --configuration $Configuration"
-                    #& $dotnetExe test $_ --configuration $Configuration
 
                     if ($output[-4].Contains("Test Run Successful.")) {
                         Write-Log ".. . $($output[-3])"
@@ -152,8 +146,6 @@ function Invoke-Test
                 Write-Log ".. Test: Complete."
             }
         }
-        #Write-Verbose "$dotnetExe test $src\**\project.json --configuration $Configuration"
-        #& $dotnetExe test $_ $src\**\project.json --configuration $Configuration
     }
 
     Write-Log "Invoke-Test: Complete. {$(Get-ElapsedTime($timer))}"
