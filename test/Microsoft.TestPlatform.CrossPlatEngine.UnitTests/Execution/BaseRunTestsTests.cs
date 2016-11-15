@@ -238,6 +238,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
+        [Ignore]
         public void RunTestsShouldInvokeTheTestExecutorIfAdapterAssemblyIsUnknown()
         {
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
@@ -283,6 +284,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
+        [Ignore]
         public void RunTestsShouldInstrumentAdapterExecutionStart()
         {
             this.SetupExecutorUriMock();
@@ -293,6 +295,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
+        [Ignore]
         public void RunTestsShouldInstrumentAdapterExecutionStop()
         {
             this.SetupExecutorUriMock();

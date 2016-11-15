@@ -4,7 +4,7 @@
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <VersionPrefix>15.0.0</VersionPrefix>
-    <TargetFrameworks>net46</TargetFrameworks>
+    <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
     <PlatformTarget>x64</PlatformTarget>
     <WarningsAsErrors>true</WarningsAsErrors>
     <DelaySign>true</DelaySign>
@@ -53,7 +53,7 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20161024-02</Version>
+      <Version>15.0.0-preview-20161109-01</Version>
       <IncludeAssets>Runtime</IncludeAssets>
     </PackageReference>
     <PackageReference Include="MSTest.TestFramework">

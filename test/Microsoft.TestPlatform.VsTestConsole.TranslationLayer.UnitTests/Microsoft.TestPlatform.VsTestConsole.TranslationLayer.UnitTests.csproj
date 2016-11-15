@@ -76,4 +76,22 @@
   </PropertyGroup>
   
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="WorkAroundPackageAndProjectReferenceConflict" BeforeTargets="ResolveLockFileReferences">
+    <ItemGroup>
+      <ResolvedCompileFileDefinitions Remove="@(ResolvedCompileFileDefinitions)" Condition="'%(ResolvedCompileFileDefinitions.Filename)' == 'Microsoft.TestPlatform.Common'" />
+      <ResolvedCompileFileDefinitions Remove="@(ResolvedCompileFileDefinitions)" Condition="'%(ResolvedCompileFileDefinitions.Filename)' == 'Microsoft.TestPlatform.CoreUtilities'" />
+      <ResolvedCompileFileDefinitions Remove="@(ResolvedCompileFileDefinitions)" Condition="'%(ResolvedCompileFileDefinitions.Filename)' == 'Microsoft.TestPlatform.ObjectModel'" />      
+    </ItemGroup>
+  </Target>
+
+  <Target Name="WorkAroundToSkipPreprocessingBinaries" BeforeTargets="RunProduceContentAssets">
+    <ItemGroup>
+        <FileDependencies>
+         <codeLanguage Condition="'%(FileDependencies.codeLanguage)' == 'any' and '%(FileDependencies.Extension)' == '.dll'">binary</codeLanguage>
+        </FileDependencies>  
+    </ItemGroup>
+  </Target>
+
+
 </Project>

@@ -136,6 +136,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        [Ignore]
         public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
         {
             // Setup mocks.

@@ -47,6 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
+        [Ignore]
         public void InitializeShouldLoadAndInitializeAllExtension()
         {
             var assemblyLocation = typeof(TestDiscoveryExtensionManagerTests).GetTypeInfo().Assembly.Location;

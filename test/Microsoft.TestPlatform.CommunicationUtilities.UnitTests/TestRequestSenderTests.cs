@@ -431,6 +431,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        [Ignore]
         public void StartTestRunShouldCallHandleTestRunCompleteAndHandleLogMessageOnConnectionBreak()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
