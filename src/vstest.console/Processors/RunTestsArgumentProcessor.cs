@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -150,10 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var anySource = this.commandLineOptions.Sources.FirstOrDefault();
             if (anySource == null)
             {
-#if TODO
-                logger.SendMessage(TestMessageLevel.Error, CommandLineResources.MissingTestSourceFile);
-#endif
-                return ArgumentProcessorResult.Fail;
+                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
 
             this.output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);

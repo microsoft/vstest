@@ -611,4 +611,7 @@
   <data name="LoggerFileIsReadOnly" xml:space="preserve">
     <value>The file {0} provided is read only</value>
   </data>
+  <data name="DesignModeClientTimeoutError" xml:space="preserve">
+    <value>Timeout to connect or process request for DesignModeClient on port: {0}</value>
+  </data>
 </root>

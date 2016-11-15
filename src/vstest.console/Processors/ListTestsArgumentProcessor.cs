@@ -202,10 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (this.commandLineOptions.Sources.Count() <= 0)
             {
-#if TODO
-                this.logger.SendMessage(TestMessageLevel.Error, CommandLineResources.MissingTestSourceFile);
-#endif
-                return ArgumentProcessorResult.Fail;
+                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MissingTestSourceFile));
             }
 
             this.output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);

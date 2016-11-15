@@ -111,9 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 null,
                 testRequestManager);
 
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
-
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
         [TestMethod]
