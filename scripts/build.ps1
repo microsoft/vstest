@@ -109,6 +109,7 @@ function Install-DotNetCli
 
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
+    New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
