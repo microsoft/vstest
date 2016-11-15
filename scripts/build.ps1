@@ -128,14 +128,12 @@ function Restore-Package
 
     foreach ($src in $TPB_SourceFolders) {
         Write-Log "Restore-Package: Restore for source directory: $src"
-        #& $dotnetExe restore $src --packages $env:TP_PACKAGES_DIR
-		#foreach ($fx in $TPB_TargetFramework) {
-            Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
-                Write-Log ".. .. Restore-Package: Source: $_"
-                & $dotnetExe restore $_ --packages $env:TP_PACKAGES_DIR
-                Write-Log ".. .. Restore-Package: Complete."
-            }
-        #}
+
+        Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
+            Write-Log ".. .. Restore-Package: Source: $_"
+            & $dotnetExe restore $_ --packages $env:TP_PACKAGES_DIR
+            Write-Log ".. .. Restore-Package: Complete."
+        }
     }
 
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
@@ -151,16 +149,12 @@ function Invoke-Build
         # Invoke build for each project.json since we want a custom output
         # path.
         Write-Log ".. Build: Source directory: $src"
-        #foreach ($fx in $TPB_TargetFramework) {
-            Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
-                Write-Log ".. .. Build: Source: $_"
-                Write-Verbose "$dotnetExe build $_ --output $binPath --build-base-path $objPath"
-                & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix
-                Write-Log ".. .. Build: Complete."
-            }
-        #}
-        Write-Verbose "$dotnetExe build $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_VersionSuffix"
-        #& $dotnetExe build $_ $src\**\project.json --configuration $TPB_Configuration --runtime $TPB_TargetRuntime --version-suffix $TPB_VersionSuffix
+        Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
+            Write-Log ".. .. Build: Source: $_"
+            Write-Verbose "$dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix"
+            & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix
+            Write-Log ".. .. Build: Complete."
+        }
 
         if ($lastExitCode -ne 0) {
             Set-ScriptFailed
@@ -177,39 +171,41 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
-	$packageProjectDirectory = Join-Path $env:TP_PACKAGE_PROJ_DIR "package.csproj"
-    $testHostProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
-    $testHostx86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
+    $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package.csproj"
+    $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
+    $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
-    $vstestConsoleProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
-    $dataCollectorProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
-    $dataCollectorx86ProjectDirectory = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
+    $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
+    $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
+    $dataCollectorx86Project = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
 	
-    Publish-Package-Internal $packageProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-InternalDotneCore $packageProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-Package-Internal $packageProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
+    
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
-    Publish-Package-Internal $vstestConsoleProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-InternalDotneCore $vstestConsoleProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-Package-Internal $vstestConsoleProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $vstestConsoleProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
-    Publish-Package-Internal $dataCollectorProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-InternalDotneCore $dataCollectorProjectDirectory $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-Package-Internal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     Write-Log "Package: Publish src\datacollector.x86\datacollector.x86.csproj"
-    Publish-Package-Internal $dataCollectorx86ProjectDirectory $TPB_TargetFramework $fullCLRPackageDir
+    Publish-Package-Internal $dataCollectorx86Project $TPB_TargetFramework $fullCLRPackageDir
 
     # Publish testhost
-    Write-Log "Package: Publish testhost\project.json"
-    Publish-Package-Internal $testHostProjectDirectory $TPB_TargetFramework $testhostFullPackageDir
-    Publish-Package-InternalDotneCore $testHostProjectDirectory $TPB_TargetFrameworkCore $testhostCorePackageDir
+    
+    Write-Log "Package: Publish testhost\testhost.csproj"
+    Publish-Package-Internal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
+    Publish-Package-Internal $testHostProject $TPB_TargetFrameworkCore $testhostCorePackageDir
 
-    Write-Log "Package: Publish testhost.x86\project.json"
-    Publish-Package-Internal $testHostx86ProjectDirectory $TPB_TargetFramework $testhostFullPackageDir
+    Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
+    Publish-Package-Internal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
 
     # Copy over the Full CLR built testhost package assemblies to the $fullCLRPackageDir
     Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force
@@ -252,14 +248,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output"
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime
-}
-
-function Publish-Package-InternalDotneCore($packagename, $framework, $output)
-{
-    Write-Verbose "$dotnetExe publish $packagename --no-build --configuration $TPB_Configuration --framework $framework --output $output"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output
 }
 
 function Create-VsixPackage
