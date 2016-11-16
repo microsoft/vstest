@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         #region RunSpecificTestsArgumentExecutorTests
 
         [TestMethod]
-        public void ExecutorExecuteForNoSourcesShouldReturnFail()
+        public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
         {
             CommandLineOptions.Instance.Reset();
 
@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorExecuteForValidSourceWithTestCaseFilterShouldReturnFail()
+        public void ExecutorExecuteForValidSourceWithTestCaseFilterShouldThrowCommandLineException()
         {
             this.ResetAndAddSourceToCommandLineOptions();
 
