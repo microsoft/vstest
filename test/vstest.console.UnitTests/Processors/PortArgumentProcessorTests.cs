@@ -109,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorExecuteForFailedConnectionReturnsArgumentProcessorResultFail()
+        public void ExecutorExecuteForFailedConnectionShouldThrowCommandLineException()
         {
             var testRequestManager = new Mock<ITestRequestManager>();
             var testDesignModeClient = new Mock<IDesignModeClient>();
