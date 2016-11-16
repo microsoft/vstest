@@ -8,8 +8,11 @@
     "warningsAsErrors": true
   },
 
-  "dependencies": {    
-    "MSTest.TestFramework": "1.0.4-preview"
+  "dependencies": {
+    "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
+    "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
+    "MSTest.TestFramework": "1.0.4-preview",
+    "System.Text.RegularExpressions": "4.1.0"
   },
 
   "frameworks": {
@@ -22,15 +25,17 @@
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.0.0"
-        }
+        },
+        "System.Xml.XPath.XmlDocument": "4.0.1"
       }
     },
     "net46": {
       "frameworkAssemblies": {
-        "System.Runtime": ""
+        "System.Runtime": "",
+        "System.Xml": ""
       },
       "dependencies": {
-        "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41"
+        "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41",
       }
     }
   }

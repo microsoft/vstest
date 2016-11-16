@@ -4,10 +4,15 @@
 namespace Microsoft.TestPlatform.TestUtilities
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -19,9 +24,19 @@ namespace Microsoft.TestPlatform.TestUtilities
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
 
+        private string arguments = string.Empty;
+
         protected readonly IntegrationTestEnvironment testEnvironment;
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.3-preview\build\_common";
+        private const string NUnitTestAdapterRelativePath = @"nunittestadapter\1.2.0\lib";
+        private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\2.1.0\build\_common";
+        private const string ChutzpahTestAdapterRelativePath = @"chutzpah\4.2.4\tools";
+
+        public enum UnitTestFramework
+        {
+            NUnit, XUnit, MSTest, CPP, Chutzpah
+        }
 
         public IntegrationTestBase()
         {
@@ -34,26 +49,28 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">Name of the test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapter.</param>
         /// <param name="runSettings">Text of run settings.</param>
+        /// <param name="framework"></param>
         /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings)
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.6")
         {
-            string arguments = " /platform:x64 ";
-            if (string.IsNullOrWhiteSpace(runSettings))
+            var arguments = EncloseInQuotes(testAssembly);
+
+            if (!string.IsNullOrWhiteSpace(testAdapterPath))
             {
-                arguments = string.Concat("\"", testAssembly, "\"", " /testadapterpath:\"", testAdapterPath, "\"");
+                // Append adapter path
+                arguments = string.Concat(arguments, " /testadapterpath:", EncloseInQuotes(testAdapterPath));
             }
-            else
+
+            if (!string.IsNullOrWhiteSpace(runSettings))
             {
-                arguments = string.Concat(
-                    "\"",
-                    testAssembly,
-                    "\"",
-                    " /testadapterpath:\"",
-                    testAdapterPath,
-                    "\"",
-                    " /settings:\"",
-                    runSettings,
-                    "\"");
+                // Append run settings
+                arguments = string.Concat(arguments, " /settings:", EncloseInQuotes(runSettings));
+            }
+
+            if (!string.IsNullOrWhiteSpace(framework))
+            {
+                // Append framework setting
+                arguments = string.Concat(arguments, " /Framework:", EncloseInQuotes(framework));
             }
 
             return arguments;
@@ -65,7 +82,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
         {
-            Execute(arguments, out this.standardTestOutput, out this.standardTestError);
+            this.Execute(arguments, out this.standardTestOutput, out this.standardTestError);
             this.FormatStandardOutCome();
         }
 
@@ -75,9 +92,14 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
         /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForExecution(string testAssembly, string testAdapterPath, string runSettings = "")
+        /// <param name="framework">Dotnet Framework of test assembly.</param>
+        public void InvokeVsTestForExecution(
+            string testAssembly,
+            string testAdapterPath,
+            string runSettings = "",
+            string framework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework);
             this.InvokeVsTest(arguments);
         }
 
@@ -93,7 +115,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             arguments = string.Concat(arguments, " /listtests");
             this.InvokeVsTest(arguments);
         }
-        
+
         /// <summary>
         /// Validate if the overall test count and results are matching.
         /// </summary>
@@ -102,14 +124,43 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="skippedTestsCount">Skipped test count</param>
         public void ValidateSummaryStatus(int passedTestsCount, int failedTestsCount, int skippedTestsCount)
         {
-            var summaryStatus = string.Format(
-                TestSummaryStatusMessageFormat,
-                passedTestsCount + failedTestsCount + skippedTestsCount,
-                passedTestsCount,
-                failedTestsCount,
-                skippedTestsCount);
+            var totalTestCount = passedTestsCount + failedTestsCount + skippedTestsCount;
+            if (totalTestCount == 0)
+            {
+                // No test should be found/run
+                var summaryStatus = string.Format(
+                    TestSummaryStatusMessageFormat,
+                    @"\d+",
+                    @"\d+",
+                    @"\d+",
+                    @"\d+");
+                StringAssert.DoesNotMatch(
+                    this.standardTestOutput,
+                    new Regex(summaryStatus),
+                    "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
+                    this.standardTestOutput,
+                    this.standardTestError,
+                    Environment.NewLine,
+                    this.arguments);
+            }
+            else
+            {
+                var summaryStatus = string.Format(
+                    TestSummaryStatusMessageFormat,
+                    totalTestCount,
+                    passedTestsCount,
+                    failedTestsCount,
+                    skippedTestsCount);
 
-            Assert.IsTrue(this.standardTestOutput.Contains(summaryStatus), "The Test summary does not match. Expected: {0} Test Output: {1}", this.standardTestOutput, summaryStatus);
+                Assert.IsTrue(
+                    this.standardTestOutput.Contains(summaryStatus),
+                    "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
+                    this.standardTestOutput,
+                    summaryStatus,
+                    this.standardTestError,
+                    Environment.NewLine,
+                    this.arguments);
+            }
         }
 
         /// <summary>
@@ -142,7 +193,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 var flag = this.standardTestOutput.Contains("Failed " + test)
                            || this.standardTestOutput.Contains("Failed " + GetTestMethodName(test));
                 Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
-                
+
                 // Verify stack information as well.
                 Assert.IsTrue(this.standardTestError.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
             }
@@ -187,9 +238,28 @@ namespace Microsoft.TestPlatform.TestUtilities
             return this.testEnvironment.GetTestAsset(assetName);
         }
 
-        protected string GetTestAdapterPath()
+        protected string GetTestAdapterPath(UnitTestFramework testFramework = UnitTestFramework.MSTest)
         {
-            return this.testEnvironment.GetNugetPackage(TestAdapterRelativePath);
+            string adapterRelativePath = string.Empty;
+
+            if (testFramework == UnitTestFramework.MSTest)
+            {
+                adapterRelativePath = TestAdapterRelativePath;
+            }
+            else if (testFramework == UnitTestFramework.NUnit)
+            {
+                adapterRelativePath = NUnitTestAdapterRelativePath;
+            }
+            else if (testFramework == UnitTestFramework.XUnit)
+            {
+                adapterRelativePath = XUnitTestAdapterRelativePath;
+            }
+            else if (testFramework == UnitTestFramework.Chutzpah)
+            {
+                adapterRelativePath = ChutzpahTestAdapterRelativePath;
+            }
+
+            return this.testEnvironment.GetNugetPackage(adapterRelativePath);
         }
 
         /// <summary>
@@ -210,14 +280,24 @@ namespace Microsoft.TestPlatform.TestUtilities
             return testMethodName;
         }
 
-        private static void Execute(string args, out string stdOut, out string stdError)
+        private void Execute(string args, out string stdOut, out string stdError)
         {
-            var testEnvironment = new IntegrationTestEnvironment();
+            if (this.testEnvironment.RunnerFramework == "netcoreapp1.0")
+            {
+                var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
+                vstestConsoleDll = EncloseInQuotes(vstestConsoleDll);
+                args = string.Concat(
+                    vstestConsoleDll,
+                    " ",
+                    args);
+            }
+
+            this.arguments = args;
 
             using (Process vstestconsole = new Process())
             {
                 Console.WriteLine("IntegrationTestBase.Execute: Starting vstest.console.exe");
-                vstestconsole.StartInfo.FileName = testEnvironment.GetConsoleRunnerPath();
+                vstestconsole.StartInfo.FileName = this.testEnvironment.GetConsoleRunnerPath();
                 vstestconsole.StartInfo.Arguments = args;
                 vstestconsole.StartInfo.UseShellExecute = false;
                 //vstestconsole.StartInfo.WorkingDirectory = testEnvironment.PublishDirectory;
@@ -241,6 +321,59 @@ namespace Microsoft.TestPlatform.TestUtilities
         {
             this.standardTestError = Regex.Replace(this.standardTestError, @"\s+", " ");
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"\s+", " ");
+        }
+
+        private static string EncloseString(string innerString, string outerString)
+        {
+            return string.Format("{1}{0}{1}", innerString, outerString);
+        }
+
+        private static string EncloseInQuotes(string innerString)
+        {
+            return EncloseString(innerString, "\"");
+        }
+
+        /// <summary>
+        /// Create runsettings file from runConfigurationDictionary at destinationRunsettingsPath
+        /// </summary>
+        /// <param name="destinationRunsettingsPath">
+        /// Destination runsettings path where resulted file saves
+        /// </param>
+        /// <param name="runConfigurationDictionary">
+        /// Contains run configuratin settings
+        /// </param>
+        public static void CreateRunSettingsFile(string destinationRunsettingsPath, IDictionary<string, string> runConfigurationDictionary)
+        {
+            var doc = new XmlDocument();
+            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
+
+            doc.AppendChild(xmlDeclaration);
+            var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
+            doc.AppendChild(runSettingsNode);
+            var runConfigNode = doc.CreateElement(Constants.RunConfigurationSettingsName);
+            runSettingsNode.AppendChild(runConfigNode);
+
+            foreach (var settingsEntry in runConfigurationDictionary)
+            {
+                var childNode = doc.CreateElement(settingsEntry.Key);
+                childNode.InnerText = settingsEntry.Value;
+                runConfigNode.AppendChild(childNode);
+            }
+
+            Stream stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
+            doc.Save(stream);
+            stream.Dispose();
+        }
+
+        protected string BuildMultipleAssemblyPath(params string[] assetNames)
+        {
+            var assertFullPaths = new string[assetNames.Length];
+            for (var i = 0; i < assetNames.Length; i++)
+            {
+                assertFullPaths[i] = IntegrationTestBase.EncloseString(this.GetAssetFullPath(assetNames[i]), "\"");
+            }
+
+            return string.Join(" ", assertFullPaths);
         }
     }
 }

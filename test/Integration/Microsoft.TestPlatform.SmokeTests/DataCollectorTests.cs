@@ -44,15 +44,15 @@ namespace Microsoft.TestPlatform.SmokeTests
             var testEnvironment = new IntegrationTestEnvironment();
             var inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll");
             var fileContents = @"<RunSettings>
-	                                <InProcDataCollectionRunSettings>
-		                                <InProcDataCollectors>
-			                                <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
-				                                <Configuration>
-					                                <Port>4312</Port>
-				                                </Configuration>
-			                                </InProcDataCollector>
-		                                </InProcDataCollectors>
-	                                </InProcDataCollectionRunSettings>
+                                    <InProcDataCollectionRunSettings>
+                                        <InProcDataCollectors>
+                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
+                                                <Configuration>
+                                                    <Port>4312</Port>
+                                                </Configuration>
+                                            </InProcDataCollector>
+                                        </InProcDataCollectors>
+                                    </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
             fileContents = string.Format(fileContents, "'" + inprocasm + "'");

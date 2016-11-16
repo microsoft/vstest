@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-*",
 
-  "dependencies": {    
+  "dependencies": {
     "MSTest.TestFramework": "1.0.4-preview"
   },
 
@@ -16,9 +16,6 @@
           "type": "platform",
           "version": "1.0.0"
         }
-      },
-      "buildOptions": {
-        "debugType": "portable"
       }
     },
     "net46": {
