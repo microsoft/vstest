@@ -1,22 +1,22 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using System;
-    using System.Collections.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 
     [TestClass]
     public class ParallelProxyExecutionManagerTests
@@ -104,13 +104,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var sources = new List<string>() { "1.dll", "2.dll" };
 
-            var testRunCriteria = new TestRunCriteria(sources, 100);
+            var testRunCriteria = new TestRunCriteria(sources, 100) { TestCaseFilter = "Name~Test" };
 
             var processedSources = new List<string>();
             var syncObject = new object();
@@ -127,10 +127,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             Task.Delay(100).Wait();
 
+                            // Duplicated testRunCriteria should match the actual one.
+                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
+
                             handler.HandleTestRunComplete(
-                                new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long>())
-                                , false, false, null, null, TimeSpan.Zero)
-                                , null, null, null);
+                                new TestRunCompleteEventArgs(
+                                    new TestRunStatistics(new Dictionary<TestOutcome, long>()),
+                                    false,
+                                    false,
+                                    null,
+                                    null,
+                                    TimeSpan.Zero),
+                                null,
+                                null,
+                                null);
                         });
             }
 
@@ -146,7 +156,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     completeEvent.Set();
                 });
 
-            proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
             completeEvent.WaitOne();
 
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
@@ -166,7 +176,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
             }
-
         }
 
         [TestMethod]
@@ -181,7 +190,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
@@ -210,6 +219,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             Task.Delay(100).Wait();
 
+                            // Duplicated testRunCriteria should match the actual one.
+                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
+
                             handler.HandleTestRunComplete(
                                 new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long>())
                                 , false, false, null, null, TimeSpan.Zero)
@@ -229,7 +241,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     completeEvent.Set();
                 });
 
-            proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
             completeEvent.WaitOne();
 
             Assert.AreEqual(tests.Count, processedTestCases.Count, "All Tests must be processed.");
@@ -265,7 +277,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
@@ -310,7 +322,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Task.Run(() =>
             {
-                proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
             });
 
             eventHandle.WaitOne();
@@ -348,7 +360,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
@@ -399,7 +411,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Task.Run(() =>
             {
-                proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
             });
 
             eventHandle.WaitOne();
@@ -437,7 +449,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     return manager.Object;
                 };
 
-            proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
 
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
@@ -514,7 +526,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Task.Run(() =>
             {
-                proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
             });
 
             eventHandle.WaitOne();

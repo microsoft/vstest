@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
@@ -107,11 +108,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
-                startInfo.FileName = "\"" + currentProcessPath + "\"";
+                startInfo.FileName = currentProcessPath;
             }
             else
             {
-                startInfo.FileName = "\"" + this.GetDotnetHostFullPath() + "\"";
+                startInfo.FileName = this.GetDotnetHostFullPath();
             }
 
             EqtTrace.Verbose("DotnetTestHostmanager: Full path of dotnet.exe is {0}", startInfo.FileName);
@@ -223,6 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
 
+#if !NET46
             // Use semicolon(;) as path separator for windows
             // colon(:) for Linux and OSX
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -230,6 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
+#endif
 
             var pathString = Environment.GetEnvironmentVariable("PATH");
             foreach (string path in pathString.Split(separator))
@@ -241,8 +244,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
             }
 
-            EqtTrace.Error("Unable to find path for dotnet host");
-            return dotnetExeName;
+            string errorMessage = String.Format(Resources.NoDotnetExeFound, dotnetExeName);
+            EqtTrace.Error(errorMessage);
+            throw new FileNotFoundException(errorMessage);
         }
 
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)

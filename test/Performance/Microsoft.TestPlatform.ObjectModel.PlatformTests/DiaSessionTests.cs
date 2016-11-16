@@ -31,7 +31,6 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
         [TestMethod]
         public void GetNavigationDataShouldReturnCorrectFileNameAndLineNumber()
         {
-            Debugger.Launch();
             var currentTargetFrameWork = GetAndSetTargetFrameWork(this.testEnvironment);
             var assemblyPath = this.GetSampleTestAssembly();
 
@@ -40,8 +39,10 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleTestProject\UnitTest1.cs");
-            Assert.AreEqual(diaNavigationData.MinLineNumber, 22);
-            Assert.AreEqual(diaNavigationData.MaxLineNumber, 24);
+
+            Assert.AreEqual(diaNavigationData.MinLineNumber, 23);
+            Assert.AreEqual(diaNavigationData.MaxLineNumber, 25);
+
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
         }
 
@@ -77,8 +78,8 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\PerfTestProject\UnitTest1.cs");
-            Assert.AreEqual(diaNavigationData.MinLineNumber, 16);
-            Assert.AreEqual(diaNavigationData.MaxLineNumber, 19);
+            Assert.AreEqual(diaNavigationData.MinLineNumber, 17);
+            Assert.AreEqual(diaNavigationData.MaxLineNumber, 20);
             var expectedTime = 150;
             Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
 

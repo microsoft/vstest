@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -108,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorExecuteForFailedConnectionReturnsArgumentProcessorResultFail()
+        public void ExecutorExecuteForFailedConnectionShouldThrowCommandLineException()
         {
             var testRequestManager = new Mock<ITestRequestManager>();
             var testDesignModeClient = new Mock<IDesignModeClient>();
@@ -121,10 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             int port = 2345;
             executor.Initialize(port.ToString());
-            var result = executor.Execute();
+            Assert.ThrowsException<CommandLineException>(() => executor.Execute());
 
             testDesignModeClient.Verify(td => td.ConnectToClientAndProcessRequests(port, testRequestManager.Object), Times.Once);
-            Assert.AreEqual(ArgumentProcessorResult.Fail, result);
         }
 
 

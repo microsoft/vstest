@@ -1,4 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
@@ -79,17 +80,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         #region RunTestsArgumentExecutorTests
 
         [TestMethod]
-        public void ExecutorExecuteForNoSourcesShouldReturnFail()
+        public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
         {
             CommandLineOptions.Instance.Reset();
 
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
-          
-            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
-           
-            ArgumentProcessorResult argumentProcessorResult = executor.Execute();
 
-            Assert.AreEqual(ArgumentProcessorResult.Fail, argumentProcessorResult);
+            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
+
+            Assert.ThrowsException<CommandLineException>(() => executor.Execute());
         }
 
         [TestMethod]
@@ -100,9 +99,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new TestPlatformException("DummyTestPlatformException"));
             mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            
+
             this.ResetAndAddSourceToCommandLineOptions();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
@@ -118,9 +117,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new SettingsException("DummySettingsException"));
             mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            
+
             this.ResetAndAddSourceToCommandLineOptions();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
@@ -136,9 +135,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new InvalidOperationException("DummyInvalidOperationException"));
             mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            
+
             this.ResetAndAddSourceToCommandLineOptions();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
@@ -154,9 +153,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             mockTestRunRequest.Setup(tr => tr.ExecuteAsync()).Throws(new Exception("DummyException"));
             mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Returns(mockTestRunRequest.Object);
-            
+
             this.ResetAndAddSourceToCommandLineOptions();
-            
+
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
             var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
 
@@ -167,9 +166,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecutorExecuteShouldForListOfTestsReturnSuccess()
         {
             var mockTestRunRequest = new Mock<ITestRunRequest>();
-            
+
             var result = this.RunRunArgumentProcessorExecuteWithMockSetup(mockTestRunRequest.Object);
-            
+
             mockTestRunRequest.Verify(tr => tr.ExecuteAsync(), Times.Once);
             Assert.AreEqual(ArgumentProcessorResult.Success, result);
         }
@@ -198,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         private ArgumentProcessorResult RunRunArgumentProcessorExecuteWithMockSetup(ITestRunRequest testRunRequest)
         {
-            var mockTestPlatform = new Mock<ITestPlatform>();            
+            var mockTestPlatform = new Mock<ITestPlatform>();
             var mockConsoleOutput = new Mock<IOutput>();
 
             List<TestCase> list = new List<TestCase>();
@@ -300,6 +299,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
     }
 
-    #endregion 
+    #endregion
 
 }

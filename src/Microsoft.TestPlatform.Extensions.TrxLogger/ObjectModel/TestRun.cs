@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
 {
@@ -197,7 +198,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel
         {
             this.id = Guid.NewGuid();
             this.name = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
-            this.runUser = WindowsIdentity.GetCurrent().Name;
+
+            // Fix for issue (https://github.com/Microsoft/vstest/issues/213). Since there is no way to find current user in linux machine.
+            // We are catching PlatformNotSupportedException for non windows machine.
+            try
+            {
+                this.runUser = WindowsIdentity.GetCurrent().Name;
+            }
+            catch (PlatformNotSupportedException)
+            {
+                this.runUser = string.Empty;
+            }
             this.created = DateTime.Now.ToUniversalTime();
             this.queued = DateTime.Now.ToUniversalTime();
             this.started = DateTime.Now.ToUniversalTime();

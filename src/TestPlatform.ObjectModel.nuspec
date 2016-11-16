@@ -51,8 +51,8 @@
     </frameworkAssemblies>
   </metadata>
   <files>	
-    <file src="net46\win7-x64\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net46\" />
-    <file src="net46\win7-x64\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net46\" />
+    <file src="net46\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net46\" />
+    <file src="net46\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net46\" />
 
     <file src="netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.5\" />
     <file src="netcoreapp1.0\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.5\" />

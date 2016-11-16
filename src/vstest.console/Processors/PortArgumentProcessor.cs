@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
+    using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -123,8 +125,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="options">
         /// The options.
         /// </param>
-        public PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager) : 
-            this (options, testRequestManager, InitializeDesignMode)
+        /// <param name="testRequestManager"> Test request manager</param>
+        public PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager)
+            : this(options, testRequestManager, InitializeDesignMode)
         {
         }
 
@@ -169,11 +172,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 this.designModeClient?.ConnectToClientAndProcessRequests(this.commandLineOptions.Port, this.testRequestManager);
             }
-            catch(TimeoutException)
+            catch (TimeoutException ex)
             {
-                // TODO: log the exception
-                return ArgumentProcessorResult.Fail;
+                throw new CommandLineException(string.Format(CultureInfo.CurrentUICulture, string.Format(CommandLineResources.DesignModeClientTimeoutError, this.commandLineOptions.Port)), ex);
             }
+
             return ArgumentProcessorResult.Success;
         }
 
