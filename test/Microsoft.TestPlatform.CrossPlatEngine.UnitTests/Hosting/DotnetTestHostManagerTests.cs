@@ -79,7 +79,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual("\"" + DefaultDotnetPath + "\"", startInfo.FileName);
+            Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
         }
 
         [TestMethod]
@@ -90,7 +90,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.GetDefaultStartInfo();
 
-            Assert.AreEqual("\"/tmp/dotnet\"", startInfo.FileName);
+            Assert.AreEqual("/tmp/dotnet", startInfo.FileName);
         }
 
         [TestMethod]
@@ -224,7 +224,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = this.GetDefaultStartInfo();
 
             // The full path should be wrapped in quotes (in case it may contain whitespace)
-            Assert.AreEqual("\"" + acceptablePath + "\"", startInfo.FileName);
+            Assert.AreEqual(acceptablePath, startInfo.FileName);
         }
 
         [TestMethod]
