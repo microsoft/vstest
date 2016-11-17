@@ -36,6 +36,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestPlatform
+        {
+            get;
+            set;
+        }
+
         public string VSTestTestCaseFilter
         {
             get;
@@ -93,6 +99,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
                 allArgs.Add("--framework:" + this.AddDoubleQuotes(this.VSTestFramework));
+            }
+
+            if (!string.IsNullOrEmpty(this.VSTestPlatform))
+            {
+                allArgs.Add("--platform:" + this.AddDoubleQuotes(this.VSTestPlatform));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
