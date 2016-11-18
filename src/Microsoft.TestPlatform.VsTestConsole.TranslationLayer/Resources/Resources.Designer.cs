@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources {
+namespace Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources {
     using System;
     using System.Reflection;
     
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

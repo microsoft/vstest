@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
     using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
 
     /// <summary>

@@ -117,6 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Common_CannotBeLessThanZero" xml:space="preserve">
+    <value>The parameter cannot be less than 0.</value>
+  </data>
+  <data name="Common_CannotBeNullOrEmpty" xml:space="preserve">
+    <value>The parameter cannot be null or empty.</value>
+  </data>
+  <data name="Common_CannotGetNextIterationName" xml:space="preserve">
+    <value>Cannot get free name for {0}(1),(2),... in directory {1}. Please clean up this directory.</value>
+  </data>
+  <data name="Common_DeploymentItem" xml:space="preserve">
+    <value>deployment item '{0}'</value>
+  </data>
+  <data name="Common_DeploymentItemWithOutputDirectory" xml:space="preserve">
+    <value>deployment item '{0}' (output directory '{1}')</value>
+  </data>
+  <data name="Common_MissingRunConfigInRun" xml:space="preserve">
+    <value>Test Settings are not specified.</value>
+  </data>
+  <data name="Common_MissingRunDeploymentRootInRunConfig" xml:space="preserve">
+    <value>The active Test Settings do not define the Run Deployment Directory.</value>
+  </data>
+  <data name="Common_MissingRunInResult" xml:space="preserve">
+    <value>The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</value>
+  </data>
+  <data name="Common_NothingLeftAfterReplaciingBadCharsInName" xml:space="preserve">
+    <value>The specified file/directory name '{0}' is not valid.</value>
+  </data>
+  <data name="Common_NullInMessages" xml:space="preserve">
+    <value>(null)</value>
+  </data>
+  <data name="Common_TestRunName" xml:space="preserve">
+    <value>{0}@{1} {2}</value>
+  </data>
+  <data name="FailureToAttach" xml:space="preserve">
+    <value>Failed to attach files from: {0}
+Error Details: {1}:{2}</value>
+  </data>
+  <data name="MessageForSkippedTests" xml:space="preserve">
+    <value>Test '{0}' was skipped in the test run.</value>
+  </data>
   <data name="TestOutcomeAborted" xml:space="preserve">
     <value>Aborted</value>
   </data>
@@ -159,37 +199,6 @@
   <data name="TestOutcomeWarning" xml:space="preserve">
     <value>Warning</value>
   </data>
-  <data name="Common_CannotBeLessThanZero" xml:space="preserve">
-    <value>The parameter cannot be less than 0.</value>
-  </data>
-  <data name="Common_CannotBeNullOrEmpty" xml:space="preserve">
-    <value>The parameter cannot be null or empty.</value>
-  </data>
-  <data name="Common_CannotGetNextIterationName" xml:space="preserve">
-    <value>Cannot get free name for {0}(1),(2),... in directory {1}. Please clean up this directory.</value>
-  </data>
-  <data name="Common_MissingRunConfigInRun" xml:space="preserve">
-    <value>Test Settings are not specified.</value>
-  </data>
-  <data name="Common_MissingRunDeploymentRootInRunConfig" xml:space="preserve">
-    <value>The active Test Settings do not define the Run Deployment Directory.</value>
-  </data>
-  <data name="Common_MissingRunInResult" xml:space="preserve">
-    <value>The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</value>
-  </data>
-  <data name="Common_NothingLeftAfterReplaciingBadCharsInName" xml:space="preserve">
-    <value>The specified file/directory name '{0}' is not valid.</value>
-  </data>
-  <data name="Common_TestRunName" xml:space="preserve">
-    <value>{0}@{1} {2}</value>
-  </data>
-  <data name="FailureToAttach" xml:space="preserve">
-    <value>Failed to attach files from: {0}
-Error Details: {1}:{2}</value>
-  </data>
-  <data name="MessageForSkippedTests" xml:space="preserve">
-    <value>Test '{0}' was skipped in the test run.</value>
-  </data>
   <data name="TrxLoggerResultsFile" xml:space="preserve">
     <value>Results File: {0}</value>
   </data>
@@ -198,14 +207,5 @@ Error Details: {1}:{2}</value>
   </data>
   <data name="TS_UncategorizedResults" xml:space="preserve">
     <value>Results Not in a List</value>
-  </data>
-  <data name="Common_DeploymentItem" xml:space="preserve">
-    <value>deployment item '{0}'</value>
-  </data>
-  <data name="Common_DeploymentItemWithOutputDirectory" xml:space="preserve">
-    <value>deployment item '{0}' (output directory '{1}')</value>
-  </data>
-  <data name="Common_NullInMessages" xml:space="preserve">
-    <value>(null)</value>
   </data>
 </root>
