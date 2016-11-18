@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
     using System;
     using System.IO;
 
-    public class PrintBuildStartEndTask : Task
+    public class BuildLogTask : Task
     {
         public bool BuildStarted
         {
