@@ -103,7 +103,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestPlatform))
             {
-                allArgs.Add("--platform:" + this.AddDoubleQuotes(this.VSTestPlatform));
+                allArgs.Add("--platform:" + this.VSTestPlatform);
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
