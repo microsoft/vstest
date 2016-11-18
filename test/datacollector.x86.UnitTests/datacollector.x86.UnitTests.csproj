@@ -23,20 +23,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj">
+    <ProjectReference Include="..\..\src\datacollector\datacollectorForTesting.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilitiesForTesting.csproj">
        <FromP2P>true</FromP2P> 
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModelForTesting.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngineForTesting.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilitiesForTesting.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.CommonForTesting.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>
@@ -58,7 +58,7 @@
       <IncludeAssets>Analyzers;Build;ContentFiles;Native;Runtime</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Moq">
-      <Version>4.6.36-*</Version>
+      <Version>4.6.38-*</Version>
     </PackageReference>
   </ItemGroup>
 

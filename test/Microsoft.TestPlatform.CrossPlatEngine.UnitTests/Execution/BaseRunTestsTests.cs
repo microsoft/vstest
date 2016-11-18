@@ -238,7 +238,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        [Ignore]
         public void RunTestsShouldInvokeTheTestExecutorIfAdapterAssemblyIsUnknown()
         {
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
@@ -284,7 +283,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        [Ignore]
         public void RunTestsShouldInstrumentAdapterExecutionStart()
         {
             this.SetupExecutorUriMock();
@@ -295,7 +293,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        [Ignore]
         public void RunTestsShouldInstrumentAdapterExecutionStop()
         {
             this.SetupExecutorUriMock();
@@ -308,6 +305,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsShouldReportAWarningIfExecutorUriIsNotDefinedInExtensionAssembly()
         {
+            //System.Diagnostics.Debugger.Launch();
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
             {

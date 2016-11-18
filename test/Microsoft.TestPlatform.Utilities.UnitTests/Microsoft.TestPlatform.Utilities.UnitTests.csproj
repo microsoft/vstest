@@ -23,11 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.UtilitiesForTesting.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilitiesForTesting.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModelForTesting.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>

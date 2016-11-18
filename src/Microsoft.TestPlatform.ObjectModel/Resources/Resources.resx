@@ -117,157 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="TestOutcomeFailed" xml:space="preserve">
-    <value>Failed</value>
-    <comment>Test result for failed test</comment>
-  </data>
-  <data name="TestOutcomeNone" xml:space="preserve">
-    <value>None</value>
-  </data>
-  <data name="TestOutcomePassed" xml:space="preserve">
-    <value>Passed</value>
-    <comment>Test result for passed test</comment>
-  </data>
   <data name="BasicTestResultFormat" xml:space="preserve">
     <value>{0,-10}  {1}</value>
-  </data>
-  <data name="TestResultMessageFormat" xml:space="preserve">
-    <value>  {0}:
-{1}</value>
-  </data>
-  <data name="TestResultTextMessagesFormat" xml:space="preserve">
-    <value>  Test Messages:
-{0}</value>
-  </data>
-  <data name="TestFailureMessageFormat" xml:space="preserve">
-    <value>  Message: {0}</value>
-  </data>
-  <data name="TestFailureStackTraceFormat" xml:space="preserve">
-    <value>  StackTrace:
-{0}</value>
-  </data>
-  <data name="NullString" xml:space="preserve">
-    <value>(null)</value>
-  </data>
-  <data name="Exception_RegisteredTestPropertyHasDifferentValueType" xml:space="preserve">
-    <value>Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</value>
-  </data>
-  <data name="TestCasePropertyColumnNumberLabel" xml:space="preserve">
-    <value>Column Number</value>
-    <comment>The label of the test property ColumnNumber for test case.</comment>
-  </data>
-  <data name="TestCasePropertyExecutorUriLabel" xml:space="preserve">
-    <value>Executor Uri</value>
-    <comment>The label of the test property ExecutorUri for test case.</comment>
-  </data>
-  <data name="TestCasePropertySourceLabel" xml:space="preserve">
-    <value>Source</value>
-    <comment>The label of the test property Source for test case.</comment>
-  </data>
-  <data name="TestCasePropertyLineNumberLabel" xml:space="preserve">
-    <value>Line Number</value>
-    <comment>The label of the test property LineNumber for test case.</comment>
-  </data>
-  <data name="TestCasePropertyNameLabel" xml:space="preserve">
-    <value>Name</value>
-    <comment>The label of the test property Name for test case.</comment>
-  </data>
-  <data name="TestResultPropertyComputerNameLabel" xml:space="preserve">
-    <value>Computer Name</value>
-    <comment>The label of the test property ComputerName for test result.</comment>
-  </data>
-  <data name="TestResultPropertyDisplayNameLabel" xml:space="preserve">
-    <value>TestResult Display Name</value>
-    <comment>The label of TestResult.DisplayName, mainly used for parameterized data tests</comment>
-  </data>
-  <data name="TestResultPropertyDurationLabel" xml:space="preserve">
-    <value>Duration</value>
-    <comment>The label of the test property Duration for test result.</comment>
-  </data>
-  <data name="TestResultPropertyEndTimeLabel" xml:space="preserve">
-    <value>End Time</value>
-    <comment>The label of the test property EndTime for test result.</comment>
-  </data>
-  <data name="TestResultPropertyErrorColumnNumberLabel" xml:space="preserve">
-    <value>Error Column Number</value>
-    <comment>The label of the test property ErrorColumnNumber for test result.</comment>
-  </data>
-  <data name="TestResultPropertyErrorMessageLabel" xml:space="preserve">
-    <value>Error Message</value>
-    <comment>The label of the test property ErrorMessage for test result.</comment>
-  </data>
-  <data name="TestResultPropertyErrorStackTraceLabel" xml:space="preserve">
-    <value>Error Stack Trace</value>
-    <comment>The label of the test property ErrorStackTrace for test result.</comment>
-  </data>
-  <data name="TestResultPropertyOutcomeLabel" xml:space="preserve">
-    <value>Outcome</value>
-    <comment>The label of the test property Outcome for test result.</comment>
-  </data>
-  <data name="TestResultPropertyStartTimeLabel" xml:space="preserve">
-    <value>Start Time</value>
-    <comment>The label of the test property StartTime for test result.</comment>
-  </data>
-  <data name="ConverterNotSupported" xml:space="preserve">
-    <value>Cannot find TypeConverter for type {0}.</value>
-  </data>
-  <data name="TestCasePropertyFilePathLabel" xml:space="preserve">
-    <value>File Path</value>
-    <comment>The label of the test property FilePath for test case.</comment>
-  </data>
-  <data name="NotificationFrequencyIsNotPositive" xml:space="preserve">
-    <value>Notification frequency need to be a positive value.</value>
-    <comment>frequency for DiscoveryCriteria/TestRunCriteria needs to be a positive value</comment>
-  </data>
-  <data name="TestCasePropertyIdLabel" xml:space="preserve">
-    <value>Id</value>
-  </data>
-  <data name="InvalidSettingsXmlAttribute" xml:space="preserve">
-    <value>Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</value>
-  </data>
-  <data name="InvalidSettingsXmlElement" xml:space="preserve">
-    <value>Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</value>
-  </data>
-  <data name="MissingDataCollectorAttributes" xml:space="preserve">
-    <value>Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</value>
-  </data>
-  <data name="TestOutcomeNotFound" xml:space="preserve">
-    <value>NotFound</value>
-    <comment>Test result for not found test</comment>
-  </data>
-  <data name="TestOutcomeSkipped" xml:space="preserve">
-    <value>Skipped</value>
-    <comment>Test result for skipped test </comment>
-  </data>
-  <data name="NotificationTimeoutIsZero" xml:space="preserve">
-    <value>Notification timeout must be greater than zero.</value>
-    <comment>Timeout used during test discovery and execution must be greater than zero.</comment>
-  </data>
-  <data name="InvalidSettingsIncorrectValue" xml:space="preserve">
-    <value>Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</value>
-  </data>
-  <data name="InvalidRunSettingsRootNode" xml:space="preserve">
-    <value>The root node of the run settings must be named 'RunSettings'.</value>
-  </data>
-  <data name="NoTestCaseFilterForSpecificTests" xml:space="preserve">
-    <value>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</value>
-  </data>
-  <data name="UnexpectedTypeOfProperty" xml:space="preserve">
-    <value>The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </value>
-  </data>
-  <data name="CouldNotFindXmlNode" xml:space="preserve">
-    <value>Could not find '{0}' node</value>
-    <comment>Error message when the specified {0}  xml node can not be found in the run settings xml document</comment>
-  </data>
-  <data name="TestCasePropertyFullyQualifiedNameLabel" xml:space="preserve">
-    <value>FullyQualifiedName</value>
-  </data>
-  <data name="TestCasePropertyTraitsLabel" xml:space="preserve">
-    <value>Traits</value>
-    <comment>The label of the test property Traits for test case.</comment>
-  </data>
-  <data name="SolutionDirectoryNotExists" xml:space="preserve">
-    <value>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</value>
   </data>
   <data name="Common_CannotBeNullOrEmpty" xml:space="preserve">
     <value>The parameter cannot be null or empty.</value>
@@ -320,6 +171,13 @@
   <data name="Common_TestOutcomeWarning" xml:space="preserve">
     <value>Warning</value>
   </data>
+  <data name="ConverterNotSupported" xml:space="preserve">
+    <value>Cannot find TypeConverter for type {0}.</value>
+  </data>
+  <data name="CouldNotFindXmlNode" xml:space="preserve">
+    <value>Could not find '{0}' node</value>
+    <comment>Error message when the specified {0}  xml node can not be found in the run settings xml document</comment>
+  </data>
   <data name="DataCollectionSink_CanNotReadStream" xml:space="preserve">
     <value>Unable to read from the provided stream.  Data from a stream cannot be sent unless the stream supports reading.</value>
   </data>
@@ -328,5 +186,147 @@
   </data>
   <data name="DataCollectionSink_ReservedFilenameUsed" xml:space="preserve">
     <value>The provided file name '{0}' is reserved.</value>
+  </data>
+  <data name="Exception_RegisteredTestPropertyHasDifferentValueType" xml:space="preserve">
+    <value>Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</value>
+  </data>
+  <data name="InvalidRunSettingsRootNode" xml:space="preserve">
+    <value>The root node of the run settings must be named 'RunSettings'.</value>
+  </data>
+  <data name="InvalidSettingsIncorrectValue" xml:space="preserve">
+    <value>Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</value>
+  </data>
+  <data name="InvalidSettingsXmlAttribute" xml:space="preserve">
+    <value>Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</value>
+  </data>
+  <data name="InvalidSettingsXmlElement" xml:space="preserve">
+    <value>Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</value>
+  </data>
+  <data name="MissingDataCollectorAttributes" xml:space="preserve">
+    <value>Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</value>
+  </data>
+  <data name="NoTestCaseFilterForSpecificTests" xml:space="preserve">
+    <value>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</value>
+  </data>
+  <data name="NotificationFrequencyIsNotPositive" xml:space="preserve">
+    <value>Notification frequency need to be a positive value.</value>
+    <comment>frequency for DiscoveryCriteria/TestRunCriteria needs to be a positive value</comment>
+  </data>
+  <data name="NotificationTimeoutIsZero" xml:space="preserve">
+    <value>Notification timeout must be greater than zero.</value>
+    <comment>Timeout used during test discovery and execution must be greater than zero.</comment>
+  </data>
+  <data name="NullString" xml:space="preserve">
+    <value>(null)</value>
+  </data>
+  <data name="SolutionDirectoryNotExists" xml:space="preserve">
+    <value>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</value>
+  </data>
+  <data name="TestCasePropertyColumnNumberLabel" xml:space="preserve">
+    <value>Column Number</value>
+    <comment>The label of the test property ColumnNumber for test case.</comment>
+  </data>
+  <data name="TestCasePropertyExecutorUriLabel" xml:space="preserve">
+    <value>Executor Uri</value>
+    <comment>The label of the test property ExecutorUri for test case.</comment>
+  </data>
+  <data name="TestCasePropertyFilePathLabel" xml:space="preserve">
+    <value>File Path</value>
+    <comment>The label of the test property FilePath for test case.</comment>
+  </data>
+  <data name="TestCasePropertyFullyQualifiedNameLabel" xml:space="preserve">
+    <value>FullyQualifiedName</value>
+  </data>
+  <data name="TestCasePropertyIdLabel" xml:space="preserve">
+    <value>Id</value>
+  </data>
+  <data name="TestCasePropertyLineNumberLabel" xml:space="preserve">
+    <value>Line Number</value>
+    <comment>The label of the test property LineNumber for test case.</comment>
+  </data>
+  <data name="TestCasePropertyNameLabel" xml:space="preserve">
+    <value>Name</value>
+    <comment>The label of the test property Name for test case.</comment>
+  </data>
+  <data name="TestCasePropertySourceLabel" xml:space="preserve">
+    <value>Source</value>
+    <comment>The label of the test property Source for test case.</comment>
+  </data>
+  <data name="TestCasePropertyTraitsLabel" xml:space="preserve">
+    <value>Traits</value>
+    <comment>The label of the test property Traits for test case.</comment>
+  </data>
+  <data name="TestFailureMessageFormat" xml:space="preserve">
+    <value>  Message: {0}</value>
+  </data>
+  <data name="TestFailureStackTraceFormat" xml:space="preserve">
+    <value>  StackTrace:
+{0}</value>
+  </data>
+  <data name="TestOutcomeFailed" xml:space="preserve">
+    <value>Failed</value>
+    <comment>Test result for failed test</comment>
+  </data>
+  <data name="TestOutcomeNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="TestOutcomeNotFound" xml:space="preserve">
+    <value>NotFound</value>
+    <comment>Test result for not found test</comment>
+  </data>
+  <data name="TestOutcomePassed" xml:space="preserve">
+    <value>Passed</value>
+    <comment>Test result for passed test</comment>
+  </data>
+  <data name="TestOutcomeSkipped" xml:space="preserve">
+    <value>Skipped</value>
+    <comment>Test result for skipped test </comment>
+  </data>
+  <data name="TestResultMessageFormat" xml:space="preserve">
+    <value>  {0}:
+{1}</value>
+  </data>
+  <data name="TestResultPropertyComputerNameLabel" xml:space="preserve">
+    <value>Computer Name</value>
+    <comment>The label of the test property ComputerName for test result.</comment>
+  </data>
+  <data name="TestResultPropertyDisplayNameLabel" xml:space="preserve">
+    <value>TestResult Display Name</value>
+    <comment>The label of TestResult.DisplayName, mainly used for parameterized data tests</comment>
+  </data>
+  <data name="TestResultPropertyDurationLabel" xml:space="preserve">
+    <value>Duration</value>
+    <comment>The label of the test property Duration for test result.</comment>
+  </data>
+  <data name="TestResultPropertyEndTimeLabel" xml:space="preserve">
+    <value>End Time</value>
+    <comment>The label of the test property EndTime for test result.</comment>
+  </data>
+  <data name="TestResultPropertyErrorColumnNumberLabel" xml:space="preserve">
+    <value>Error Column Number</value>
+    <comment>The label of the test property ErrorColumnNumber for test result.</comment>
+  </data>
+  <data name="TestResultPropertyErrorMessageLabel" xml:space="preserve">
+    <value>Error Message</value>
+    <comment>The label of the test property ErrorMessage for test result.</comment>
+  </data>
+  <data name="TestResultPropertyErrorStackTraceLabel" xml:space="preserve">
+    <value>Error Stack Trace</value>
+    <comment>The label of the test property ErrorStackTrace for test result.</comment>
+  </data>
+  <data name="TestResultPropertyOutcomeLabel" xml:space="preserve">
+    <value>Outcome</value>
+    <comment>The label of the test property Outcome for test result.</comment>
+  </data>
+  <data name="TestResultPropertyStartTimeLabel" xml:space="preserve">
+    <value>Start Time</value>
+    <comment>The label of the test property StartTime for test result.</comment>
+  </data>
+  <data name="TestResultTextMessagesFormat" xml:space="preserve">
+    <value>  Test Messages:
+{0}</value>
+  </data>
+  <data name="UnexpectedTypeOfProperty" xml:space="preserve">
+    <value>The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </value>
   </data>
 </root>

@@ -6,7 +6,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <DelaySign>true</DelaySign>
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
-    <AssemblyName>Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger</AssemblyName>
+    <AssemblyName>Microsoft.VisualStudio.TestPlatform.Extensions.TrxLoggerForTesting</AssemblyName>
     <AssemblyOriginatorKeyFile>../../scripts/key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
@@ -24,8 +24,8 @@
     <EmbeddedResource Include="Resources\*.resx;compiler\resources\**\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModelForTesting.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilitiesForTesting.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk">

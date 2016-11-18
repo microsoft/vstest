@@ -56,8 +56,8 @@ $Script:TPT_TargetFramework = "net46"
 $Script:TPB_TargetFrameworkCore = "netcoreapp1.0"
 $Script:TPT_TargetFrameworks =@("netcoreapp1.0","net46")
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjectsDotNet = @("testhost.UnitTests")
-$Script:TPT_SkipProjects = @("vstest.console.UnitTests","datacollector.x86.UnitTests","testhost.UnitTests")
+$Script:TPT_SkipProjectsDotNet = @("testhost.UnitTests","Microsoft.TestPlatform.Utilities.UnitTests")
+$Script:TPT_SkipProjects = @("vstest.console.UnitTests","datacollector.x86.UnitTests","testhost.UnitTests","Microsoft.TestPlatform.Utilities.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
 #
@@ -121,6 +121,7 @@ function Invoke-Test
                     Set-TestEnvironment
 
                     Write-Log "$dotnetExe test $_ -f $fx"
+                    $restore = & $dotnetExe restore $_
                     $output = & $dotnetExe test $_ -f $fx
 
                     Reset-TestEnvironment
@@ -204,5 +205,7 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPT_") } | Forma
 Invoke-Test
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+
+Write-Log $Script:ScriptFailed
 
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }

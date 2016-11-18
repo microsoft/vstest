@@ -19,7 +19,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Moq;
 
     [TestClass]
-    [Ignore]
     public class ParallelProxyExecutionManagerTests
     {
         private IParallelProxyExecutionManager proxyParallelExecutionManager;

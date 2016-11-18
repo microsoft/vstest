@@ -6,7 +6,7 @@
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <DelaySign>true</DelaySign>
-    <AssemblyName>Microsoft.TestPlatform.VsTestConsole.TranslationLayer</AssemblyName>
+    <AssemblyName>Microsoft.TestPlatform.VsTestConsole.TranslationLayerForTesting</AssemblyName>
     <AssemblyOriginatorKeyFile>../../scripts/key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
@@ -19,10 +19,10 @@
     <EmbeddedResource Include="Resources\*.resx;compiler\resources\**\*" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
-    <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.CommonForTesting.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilitiesForTesting.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModelForTesting.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilitiesForTesting.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="NETStandard.Library">
