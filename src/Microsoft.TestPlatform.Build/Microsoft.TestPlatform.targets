@@ -16,6 +16,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
+  <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.PrintBuildStartEndTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
 
   <!--
     ============================================================
@@ -24,14 +25,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     ============================================================
   -->
   <Target Name="VSTest" >
-    <CallTarget Condition="'$(VSTestNoBuild)' != 'true'" Targets="ShowMsbuildWithParameter" />
-    
-
-    <MSBuild Condition="'$(VSTestNoBuild)' != 'true'"
-        Projects ="$(MSBuildProjectFullPath)"
-    />
-
-    <Message Condition="'$(VSTestNoBuild)' != 'true'" Text="Done Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="low" />
+    <CallTarget Condition="'$(VSTestNoBuild)' != 'true'" Targets="BuildProject" />
     
     <CallTarget Targets="ShowCallOfVSTestTaskWithParameter" />
 
@@ -46,6 +40,16 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestListTests="$(VSTestListTests)"
       VSTestDiag="$(VSTestDiag)"
     />
+  </Target>
+
+  <Target Name="BuildProject">
+    <CallTarget Targets="ShowMsbuildWithParameter" />
+
+    <Microsoft.TestPlatform.Build.Tasks.PrintBuildStartEndTask BuildStarted="True" />
+    <MSBuild Projects ="$(MSBuildProjectFullPath)" />
+    <Microsoft.TestPlatform.Build.Tasks.PrintBuildStartEndTask />
+
+    <Message Text="Done Building project $(MSBuildProjectFullPath) for TargetFramework=$(TargetFramework)" Importance="low" />
   </Target>
   
   <Target Name="ShowMsbuildWithParameter">

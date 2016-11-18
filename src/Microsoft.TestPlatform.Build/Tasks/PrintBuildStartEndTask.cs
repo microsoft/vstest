@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
     public class PrintBuildStartEndTask : Task
     {
-        public string BuildStartEnd
+        public bool BuildStarted
         {
             get;
             set;
@@ -20,11 +20,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         public override bool Execute()
         {
-            if (!string.IsNullOrEmpty(BuildStartEnd) && BuildStartEnd.Contains("BuildStarted"))
+            if (BuildStarted)
             {
                 Console.WriteLine("Build started, please wait...");
             }
-            else if (!string.IsNullOrEmpty(BuildStartEnd) && BuildStartEnd.Contains("BuildCompleted"))
+            else
             {
                 Console.WriteLine("Build completed.");
                 Console.WriteLine();
