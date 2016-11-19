@@ -57,7 +57,7 @@ $env:DOTNET_CLI_VERSION = "1.0.0-preview3-004056"
 # Build configuration
 #
 Write-Verbose "Setup build configuration."
-$TPB_SourceFolders = @("src", "test")
+$TPB_SourceFolders = @("src")
 $TPB_TargetFramework = "net46"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_Configuration = $Configuration
@@ -130,9 +130,12 @@ function Restore-Package
         Write-Log "Restore-Package: Restore for source directory: $src"
 
         Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
-            Write-Log ".. .. Restore-Package: Source: $_"
-            & $dotnetExe restore $_ --packages $env:TP_PACKAGES_DIR
-            Write-Log ".. .. Restore-Package: Complete."
+            if(!$_.Name.Contains("ForTesting"))
+            {
+                Write-Log ".. .. Restore-Package: Source: $_"
+                & $dotnetExe restore $_ --packages $env:TP_PACKAGES_DIR
+                Write-Log ".. .. Restore-Package: Complete."
+            }
         }
     }
 
@@ -150,10 +153,13 @@ function Invoke-Build
         # path.
         Write-Log ".. Build: Source directory: $src"
         Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
-            Write-Log ".. .. Build: Source: $_"
-            Write-Verbose "$dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix"
-            & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix
-            Write-Log ".. .. Build: Complete."
+            if(!$_.Name.Contains("ForTesting"))
+            {
+                Write-Log ".. .. Build: Source: $_"
+                Write-Verbose "$dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix"
+                & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix
+                Write-Log ".. .. Build: Complete."
+            }
         }
 
         if ($lastExitCode -ne 0) {

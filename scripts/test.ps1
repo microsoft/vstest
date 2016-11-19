@@ -52,8 +52,6 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFramework = "net46"
-$Script:TPB_TargetFrameworkCore = "netcoreapp1.0"
 $Script:TPT_TargetFrameworks =@("netcoreapp1.0","net46")
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjectsDotNet = @("testhost.UnitTests","Microsoft.TestPlatform.Utilities.UnitTests")
