@@ -5,7 +5,7 @@
     "delaySign": true,
     "publicSign": false,
     "keyFile": "../../scripts/key.snk",
-    "warningsAsErrors": true
+    "warningsAsErrors": false
   },
 
   "dependencies": {
