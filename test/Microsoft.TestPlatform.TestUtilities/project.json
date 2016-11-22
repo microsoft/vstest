@@ -5,14 +5,13 @@
     "delaySign": true,
     "publicSign": false,
     "keyFile": "../../scripts/key.snk",
-    "warningsAsErrors": false
+    "warningsAsErrors": true
   },
 
   "dependencies": {
     "Microsoft.TestPlatform.CoreUtilities": "15.0.0-*",
     "Microsoft.TestPlatform.ObjectModel": "15.0.0-*",
-    "MSTest.TestFramework": "1.0.4-preview",
-    "System.Text.RegularExpressions": "4.1.0"
+    "MSTest.TestFramework": "1.0.4-preview"
   },
 
   "frameworks": {
@@ -26,7 +25,8 @@
           "type": "platform",
           "version": "1.0.0"
         },
-        "System.Xml.XPath.XmlDocument": "4.0.1"
+        "System.Xml.XPath.XmlDocument": "4.0.1",
+        "System.Text.RegularExpressions": "4.1.0"
       }
     },
     "net46": {
@@ -36,6 +36,7 @@
       },
       "dependencies": {
         "Microsoft.Diagnostics.Tracing.TraceEvent": "1.0.41",
+        "System.Text.RegularExpressions": "4.0.10.0"
       }
     }
   }
