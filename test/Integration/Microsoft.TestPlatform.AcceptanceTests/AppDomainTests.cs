@@ -10,16 +10,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     public abstract class AppDomainTests : AcceptanceTestBase
     {
-        private static bool IsFilesContentEqual(string filePath1, string filePath2)
-        {
-            Assert.IsTrue(File.Exists(filePath1), "File doesn't exist: {0}.", filePath1);
-            Assert.IsTrue(File.Exists(filePath2), "File doesn't exist: {0}.", filePath2);
-            var content1 = File.ReadAllText(filePath1);
-            var content2 = File.ReadAllText(filePath2);
-            Assert.IsTrue(string.Equals(content1, content2, StringComparison.Ordinal), "Content miss match file1 content:{2}{0}{2} file2 content:{2}{1}{2}", content1, content2, Environment.NewLine);
-            return string.Equals(content1, content2, StringComparison.Ordinal);
-        }
-
 #if NET46
         [TestMethod]
         public void RunTestExecutionWithDisableAppDomain()
@@ -44,6 +34,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             File.Delete(runsettingsFilePath);
         }
 #endif
+
+        private static bool IsFilesContentEqual(string filePath1, string filePath2)
+        {
+            Assert.IsTrue(File.Exists(filePath1), "File doesn't exist: {0}.", filePath1);
+            Assert.IsTrue(File.Exists(filePath2), "File doesn't exist: {0}.", filePath2);
+            var content1 = File.ReadAllText(filePath1);
+            var content2 = File.ReadAllText(filePath2);
+            Assert.IsTrue(string.Equals(content1, content2, StringComparison.Ordinal), "Content miss match file1 content:{2}{0}{2} file2 content:{2}{1}{2}", content1, content2, Environment.NewLine);
+            return string.Equals(content1, content2, StringComparison.Ordinal);
+        }
 
         private string GetInProcDataCollectionRunsettingsFile(bool disableAppDomain)
         {
