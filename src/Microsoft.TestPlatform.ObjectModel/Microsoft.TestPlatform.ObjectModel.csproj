@@ -1,17 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
   <PropertyGroup>
-    <VersionPrefix>15.0.0</VersionPrefix>
-    <WarningsAsErrors>true</WarningsAsErrors>
-    <DelaySign>true</DelaySign>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
+  </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+  <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
-    <AssemblyOriginatorKeyFile>../../scripts/key.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
+    <WarningsAsErrors>true</WarningsAsErrors>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <PackageReference Include="Microsoft.Internal.Dia.Interop">
@@ -37,11 +34,7 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk">
-      <Version>1.0.0-alpha-20161104-2</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation">
+      <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation">
       <Version>4.0.0</Version>
     </PackageReference>
   </ItemGroup>
@@ -115,14 +108,5 @@
   <PropertyGroup Label="Configuration">
     <RootNamespace>Microsoft.VisualStudio.TestPlatform.ObjectModel</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworks>net46;netstandard1.5</TargetFrameworks>
-  </PropertyGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

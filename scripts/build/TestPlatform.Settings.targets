@@ -20,6 +20,10 @@
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk">
       <Version>1.0.0-alpha-20161104-2</Version>
