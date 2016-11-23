@@ -101,6 +101,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--framework:" + this.AddDoubleQuotes(this.VSTestFramework));
             }
 
+            // vstest.console only support x86 and x64 for argument platform
             if (!string.IsNullOrEmpty(this.VSTestPlatform) && !this.VSTestPlatform.Contains("AnyCPU"))
             {
                 allArgs.Add("--platform:" + this.VSTestPlatform);
