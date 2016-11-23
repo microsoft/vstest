@@ -72,8 +72,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
             }
-            vsTestForwardingApp.Execute();
-            return true;
+
+            int returnCode = vsTestForwardingApp.Execute();
+            return returnCode == 0 ? true : false;
         }
 
         private string AddDoubleQuotes(string x)
