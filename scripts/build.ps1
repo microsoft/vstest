@@ -57,7 +57,7 @@ $env:DOTNET_CLI_VERSION = "1.0.0-preview3-004056"
 # Build configuration
 #
 Write-Verbose "Setup build configuration."
-$TPB_SourceFolders = @("src")
+$TPB_SourceFolders = @("src", "test")
 $TPB_TargetFramework = "net46"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_Configuration = $Configuration
@@ -156,8 +156,8 @@ function Invoke-Build
             if(!$_.Name.Contains("ForTesting"))
             {
                 Write-Log ".. .. Build: Source: $_"
-                Write-Verbose "$dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix"
-                & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix
+                Write-Verbose "$dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal"
+                & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal
                 Write-Log ".. .. Build: Complete."
             }
         }
@@ -254,8 +254,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal
 }
 
 function Create-VsixPackage

@@ -6,7 +6,7 @@
   
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.VSIXCreator</AssemblyName>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFrameworks>net46</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
   </PropertyGroup>

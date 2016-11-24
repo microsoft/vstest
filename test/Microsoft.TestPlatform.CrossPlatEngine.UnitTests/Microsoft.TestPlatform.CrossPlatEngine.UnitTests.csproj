@@ -20,14 +20,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngineForTesting.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModelForTesting.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.CommonForTesting.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.Common.UnitTests\Microsoft.TestPlatform.Common.UnitTests.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilitiesForTesting.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilitiesForTesting.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>

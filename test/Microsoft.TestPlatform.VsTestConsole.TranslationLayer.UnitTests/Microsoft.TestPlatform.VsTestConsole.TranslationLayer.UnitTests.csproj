@@ -20,13 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayerForTesting.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilitiesForTesting.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModelForTesting.csproj" />
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilitiesForTesting.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.CommonForTesting.csproj">
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>

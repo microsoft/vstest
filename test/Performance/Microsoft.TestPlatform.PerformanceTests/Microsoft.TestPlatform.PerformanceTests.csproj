@@ -34,6 +34,12 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
+    <ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
@@ -50,6 +56,16 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+
+  <!-- Workaround for https://github.com/dotnet/sdk/issues/364 -->
+  <Target Name="WorkAroundPackageAndProjectReferenceConflict" 
+    BeforeTargets="ResolveLockFileReferences">
+    <ItemGroup>
+      <ResolvedCompileFileDefinitions 
+        Remove="@(ResolvedCompileFileDefinitions)" 
+        Condition="'%(ResolvedCompileFileDefinitions.Filename)' == 'Microsoft.TestPlatform.CoreUtilities' Or '%(ResolvedCompileFileDefinitions.Filename)' == 'Microsoft.VisualStudio.TestPlatform.ObjectModel'" />
+    </ItemGroup>
+  </Target>
 
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
