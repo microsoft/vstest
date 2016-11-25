@@ -8,7 +8,8 @@
     <owners>Microsoft</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The MSbuild targets and properties for building the .Net core test projects.</description>
-    <copyright>Copyright 2015</copyright>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <dependencies>
       <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
     </dependencies>

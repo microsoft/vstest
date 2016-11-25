@@ -10,7 +10,8 @@
     <description>Testplatform host executes the test using specified adapter.</description>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
-    <copyright>Copyright © Microsoft Corporation</copyright>
+    <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <dependencies>
       <group targetFramework="netcoreapp1.0">
       <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
@@ -21,6 +22,8 @@
     </dependencies>
   </metadata>
   <files>
+    <!-- Add a thirt party notice file -->
+    <file src="ThirdPartyNotices.txt" target="" />
     <file src="_._" target="lib\net45\" />
 
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\netstandard1.5\" />

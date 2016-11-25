@@ -6,11 +6,12 @@
     <title>Microsoft.TestPlatform.ObjectModel</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
-    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>The Microsoft Test Platform Object Model.</description>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
-    <copyright>Copyright © Microsoft Corporation</copyright>
+    <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <dependencies>
       <group targetFramework="net46">
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.0.0, )" />
