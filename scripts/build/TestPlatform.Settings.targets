@@ -5,11 +5,13 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
   </PropertyGroup>
   <PropertyGroup>
-    <VersionPrefix>15.0.0</VersionPrefix>
+    <VersionPrefix>1.1.1</VersionPrefix>
+    <!--<Version>1.1.1</Version>
+    <AssemblyVersion>1.1.1</AssemblyVersion>-->
     <WarningsAsErrors>true</WarningsAsErrors>
-    <DelaySign>true</DelaySign>
+    <!--<DelaySign>true</DelaySign>-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/oss_key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
