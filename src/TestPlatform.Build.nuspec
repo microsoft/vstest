@@ -6,7 +6,7 @@
     <title>Microsoft.TestPlatform.Build</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Build tasks and targets for running tests with Test Platform</description>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
