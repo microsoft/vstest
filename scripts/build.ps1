@@ -295,7 +295,7 @@ function Create-NugetPackages
 
     # Copy over empty and third patry notice file
     Copy-Item $tpSrcDir\package\"_._" $stagingDir -Force
-	Copy-Item $tpSrcDir\package\"ThirdPartyNotices.txt" $stagingDir -Force
+    Copy-Item $tpSrcDir\package\"ThirdPartyNotices.txt" $stagingDir -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
