@@ -15,7 +15,7 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.0.0",
+    [System.String] $Version = "99.99.99",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -27,7 +27,11 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("loc")]
-    [System.Boolean] $Localized = $false
+    [System.Boolean] $Localized = $false,
+
+    [Parameter(Mandatory=$false)]
+    [Alias("real")]
+    [System.Boolean] $RealBuild = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -144,8 +148,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -405,7 +409,7 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Forma
 
 Install-DotNetCli
 Restore-Package
-Update-LocalizedResources
+#Update-LocalizedResources
 Invoke-Build
 Publish-Package
 Create-VsixPackage

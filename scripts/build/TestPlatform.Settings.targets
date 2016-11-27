@@ -5,9 +5,10 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
   </PropertyGroup>
   <PropertyGroup>
-    <VersionPrefix>1.1.1</VersionPrefix>
-    <!--<Version>1.1.1</Version>
-    <AssemblyVersion>1.1.1</AssemblyVersion>-->
+    <!-- Versioning is defined from the build script. Use a default dev build if it's not defined. -->
+    <Version Condition="'$(Version)' == ''">99.99.99</Version>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
+
     <WarningsAsErrors>true</WarningsAsErrors>
     <!--<DelaySign>true</DelaySign>-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
