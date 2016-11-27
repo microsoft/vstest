@@ -9,7 +9,6 @@
     <TargetFrameworks>net46;netstandard1.5</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <!--<PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback> -->
-    <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <PackageReference Include="Microsoft.Internal.Dia.Interop">

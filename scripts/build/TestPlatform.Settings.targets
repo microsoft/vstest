@@ -27,6 +27,7 @@
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup>
 
+  <!-- Common dependencies for all projects -->
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk">
       <Version>1.0.0-alpha-20161104-2</Version>
@@ -55,4 +56,11 @@
       <Version>4.6.38-*</Version>
     </PackageReference>
   </ItemGroup>
+
+  <!-- Code analysis settings -->
+  <PropertyGroup>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <!--<CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>-->
+    <!--<CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>-->
+  </PropertyGroup>
 </Project>

@@ -9,7 +9,6 @@
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />

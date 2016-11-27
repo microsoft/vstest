@@ -9,7 +9,6 @@
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <!-- <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback> -->
-    <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
