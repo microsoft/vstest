@@ -57,7 +57,7 @@ $env:DOTNET_CLI_VERSION = "latest"
 # Build configuration
 #
 Write-Verbose "Setup build configuration."
-$TPB_SourceFolders = @("src", "test")
+$TPB_Solution = "TestPlatform.sln"
 $TPB_TargetFramework = "net46"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_Configuration = $Configuration
@@ -126,17 +126,12 @@ function Restore-Package
     Write-Log "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     $dotnetExe = Get-DotNetPath
 
-    foreach ($src in $TPB_SourceFolders) {
-        Write-Log "Restore-Package: Restore for source directory: $src"
+    Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
+    & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal
+    Write-Log ".. .. Restore-Package: Complete."
 
-        Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
-            if(!$_.Name.Contains("ForTesting"))
-            {
-                Write-Log ".. .. Restore-Package: Source: $_"
-                & $dotnetExe restore $_ --packages $env:TP_PACKAGES_DIR
-                Write-Log ".. .. Restore-Package: Complete."
-            }
-        }
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
     }
 
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
@@ -148,23 +143,13 @@ function Invoke-Build
     Write-Log "Invoke-Build: Start build."
     $dotnetExe = Get-DotNetPath
 
-    foreach ($src in $TPB_SourceFolders) {
-        # Invoke build for each project.json since we want a custom output
-        # path.
-        Write-Log ".. Build: Source directory: $src"
-        Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
-            if(!$_.Name.Contains("ForTesting"))
-            {
-                Write-Log ".. .. Build: Source: $_"
-                Write-Verbose "$dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal"
-                & $dotnetExe build $_ --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal
-                Write-Log ".. .. Build: Complete."
-            }
-        }
+    Write-Log ".. .. Build: Source: $TPB_Solution"
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal
+    Write-Log ".. .. Build: Complete."
 
-        if ($lastExitCode -ne 0) {
-            Set-ScriptFailed
-        }
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
     }
 
     Write-Log "Invoke-Build: Complete. {$(Get-ElapsedTime($timer))}"
