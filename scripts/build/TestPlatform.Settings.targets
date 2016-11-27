@@ -37,4 +37,22 @@
       <!--<PrivateAssets>All</PrivateAssets>-->
     <!--</PackageReference>-->
   </ItemGroup>
+
+  <!-- Test project references -->
+  <ItemGroup Condition="$(TestProject) == 'true'">
+    <PackageReference Include="Microsoft.NET.Test.Sdk">
+      <Version>15.0.0-preview-20161024-02</Version>
+      <IncludeAssets>Runtime</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MSTest.TestFramework">
+      <Version>1.0.6-preview</Version>
+    </PackageReference>
+    <PackageReference Include="MSTest.TestAdapter">
+      <Version>1.1.5-preview</Version>
+      <IncludeAssets>Analyzers;Build;ContentFiles;Native;Runtime</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Moq">
+      <Version>4.6.38-*</Version>
+    </PackageReference>
+  </ItemGroup>
 </Project>
