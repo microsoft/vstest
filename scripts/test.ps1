@@ -52,7 +52,8 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFrameworks =@("netcoreapp1.0","net46")
+$Script:TPT_TargetFrameworks =@("netcoreapp1.0")
+$Script:TPT_RunnerTargetFramework = "net46"
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjectsDotNet = @("testhost.UnitTests","Microsoft.TestPlatform.Utilities.UnitTests")
 $Script:TPT_SkipProjects = @("vstest.console.UnitTests","datacollector.x86.UnitTests","testhost.UnitTests","Microsoft.TestPlatform.Utilities.UnitTests")
@@ -82,17 +83,21 @@ function Invoke-Test
 {
     $timer = Start-Timer
     Write-Log "Invoke-Test: Start test."
-    $dotnetExe = Get-DotNetPath
 
     foreach ($src in $Script:TPT_SourceFolders) {
         # Invoke test for each project.json since we want a custom output
         # path.
         foreach ($fx in $Script:TPT_TargetFrameworks) {
+            $Script:TPT_TargetFramework = $fx
+            $vstestConsolePath = Join-Path (Get-PackageDirectory) "vstest.console.exe"
             Get-ChildItem -Recurse -Path $src -Include *.csproj | ForEach-Object {
                 Write-Log ".. Test: Source: $_"
 
                 # Tests are only built for x86 at the moment, though we don't have architecture requirement
-                $testContainerName = $_.Name
+                $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.5-preview\build\_common"
+                $testContainerName = $_.Directory.Name
+                $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/$($Script:TPT_TargetFramework)"
+                $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
                 
                 $skip="False"
 
@@ -101,6 +106,9 @@ function Invoke-Test
                 if($fx -eq "netcoreapp1.0")
                 {
                     $targetFrameworkSkippedProjects=$Script:TPT_SkipProjectsDotNet
+                    $testFrameWork = ".NETCoreApp,Version=v1.0"
+                } else{
+                    $testFrameWork = ".NETFramework,Version=v4.6"
                 }
 
                 foreach ($project in $targetFrameworkSkippedProjects) {
@@ -118,15 +126,13 @@ function Invoke-Test
                 } else {
                     Set-TestEnvironment
 
-                    Write-Log "$dotnetExe test $_ -f $fx"
-                    $restore = & $dotnetExe restore $_
-                    $output = & $dotnetExe test $_ -f $fx
+                    Write-Verbose "$vstestConsolePath $testContainerPath /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
+                    $output = & $vstestConsolePath $testContainerPath /framework:$testFrameWork /testAdapterPath:"$testAdapterPath"
 
                     Reset-TestEnvironment
 
-                    if ($output[-4].Contains("Test Run Successful.")) {
+                    if ($output[-2].Contains("Test Run Successful.")) {
                         Write-Log ".. . $($output[-3])"
-                        Write-Log ".. . $($output[-5])"
                     } else {
                         Write-Log ".. . $($output[-2])"
                         Write-Log ".. . Failed tests:"
@@ -161,6 +167,11 @@ function Get-DotNetPath
     }
 
     return $dotnetPath
+}
+
+function Get-PackageDirectory
+{
+    return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($Script:TPT_RunnerTargetFramework)\$($Script:TPT_TargetRuntime)")
 }
 
 function Start-Timer
