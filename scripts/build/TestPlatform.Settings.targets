@@ -41,16 +41,31 @@
 
   <!-- Test project references -->
   <ItemGroup Condition="$(TestProject) == 'true'">
-    <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20161024-02</Version>
-      <IncludeAssets>Runtime</IncludeAssets>
-    </PackageReference>
+    <!-- Test projects take a direct dependency on TestHost. Indirect dependencies must be included.
+         This is required to enable selfhost the latest testhost bits. -->
+    <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+
+    <!--<PackageReference Include="Microsoft.NET.Test.Sdk">-->
+      <!--<Version>15.0.0-preview-20161024-02</Version>-->
+      <!--<IncludeAssets>Runtime</IncludeAssets>-->
+    <!--</PackageReference>-->
     <PackageReference Include="MSTest.TestFramework">
       <Version>1.0.6-preview</Version>
     </PackageReference>
     <PackageReference Include="MSTest.TestAdapter">
       <Version>1.1.5-preview</Version>
-      <IncludeAssets>Analyzers;Build;ContentFiles;Native;Runtime</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Moq">
       <Version>4.6.38-*</Version>
@@ -60,7 +75,7 @@
   <!-- Code analysis settings -->
   <PropertyGroup>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <!--<CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>-->
-    <!--<CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>-->
+    <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 </Project>
