@@ -10,9 +10,10 @@
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
 
     <WarningsAsErrors>true</WarningsAsErrors>
+    <PublicSign>true</PublicSign>
     <!--<DelaySign>true</DelaySign>-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/oss_key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
