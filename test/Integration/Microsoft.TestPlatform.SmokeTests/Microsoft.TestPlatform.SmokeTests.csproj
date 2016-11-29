@@ -1,11 +1,12 @@
 ﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../../</TestPlatformRoot>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../../</TestPlatformRoot>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   
   <PropertyGroup>
     <TestProject>true</TestProject>
+    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <AssemblyName>Microsoft.TestPlatform.SmokeTests</AssemblyName>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback> 
@@ -17,9 +18,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />      
-    <ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
+    <!--<ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">-->
+      <!--<FromP2P>true</FromP2P>-->
+    <!--</ProjectReference>-->
     <ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>

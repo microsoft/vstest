@@ -114,7 +114,7 @@ function Invoke-Test
         # path.
         foreach ($fx in $Script:TPT_TargetFrameworks) {
             Write-Log ".. Start run ($fx)"
-            $Script:TPT_TargetFramework = $fx
+            #$Script:TPT_TargetFramework = $fx
             $vstestConsolePath = Join-Path (Get-PackageDirectory) "vstest.console.exe"
             if (!(Test-Path $vstestConsolePath)) {
                 Write-Log "Unable to find vstest.console.exe at $vstestConsolePath. Did you run build.cmd?"

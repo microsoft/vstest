@@ -274,6 +274,9 @@ function Create-VsixPackage
 
     # Zip the folder
     # TODO remove vsix creator
+    $dotnetExe = Get-DotNetPath
+    & $dotnetExe restore src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj
+    & $dotnetExe build src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj
     & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net46\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"

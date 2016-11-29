@@ -21,7 +21,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="**\*.cs" />
     <Content Include="[Content_Types].xml;extension.vsixmanifest;License.rtf;TestPlatform.ObjectModel.manifest;TestPlatform.ObjectModel.x86.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>    
@@ -81,5 +80,4 @@
     </ItemGroup>
   </Target>-->
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
-
 </Project>

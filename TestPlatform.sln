@@ -1,47 +1,47 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.25916.0
+VisualStudioVersion = 15.0.25923.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED0C35EB-7F31-4841-A24F-8EB708FFA959}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CoreUtilities", "src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj", "{50C00046-0DA3-4B5C-9F6F-7BE1145E156A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.CoreUtilities", "src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj", "{50C00046-0DA3-4B5C-9F6F-7BE1145E156A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CoreUtilities.UnitTests", "test\Microsoft.TestPlatform.CoreUtilities.UnitTests\Microsoft.TestPlatform.CoreUtilities.UnitTests.csproj", "{01409D95-A5F1-4EBE-94B1-909D5D2D0DC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.CoreUtilities.UnitTests", "test\Microsoft.TestPlatform.CoreUtilities.UnitTests\Microsoft.TestPlatform.CoreUtilities.UnitTests.csproj", "{01409D95-A5F1-4EBE-94B1-909D5D2D0DC3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "datacollector", "src\datacollector\datacollector.csproj", "{2C7CE1F8-E73E-4987-8023-B5A0EBAC86E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "datacollector", "src\datacollector\datacollector.csproj", "{2C7CE1F8-E73E-4987-8023-B5A0EBAC86E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "datacollector.x86", "src\datacollector.x86\datacollector.x86.csproj", "{2820F090-3F3D-4DA2-8CBA-B8273D695333}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "datacollector.x86", "src\datacollector.x86\datacollector.x86.csproj", "{2820F090-3F3D-4DA2-8CBA-B8273D695333}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Build", "src\Microsoft.TestPlatform.Build\Microsoft.TestPlatform.Build.csproj", "{6F5EC38C-4A11-40D3-827C-F607B90BEFF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Build", "src\Microsoft.TestPlatform.Build\Microsoft.TestPlatform.Build.csproj", "{6F5EC38C-4A11-40D3-827C-F607B90BEFF0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logger", "Logger", "{5E7F18A8-F843-4C8A-AB02-4C7D9205C6CF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Client", "src\Microsoft.TestPlatform.Client\Microsoft.TestPlatform.Client.csproj", "{E19B5128-3469-492E-82E1-725631C4A68C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Client", "src\Microsoft.TestPlatform.Client\Microsoft.TestPlatform.Client.csproj", "{E19B5128-3469-492E-82E1-725631C4A68C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Common", "src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj", "{68ADC720-316E-4895-9F8E-C3CCADD262BE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Common", "src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj", "{68ADC720-316E-4895-9F8E-C3CCADD262BE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CommunicationUtilities", "src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj", "{1621415E-7723-4F46-A589-4C4620C0751A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.CommunicationUtilities", "src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj", "{1621415E-7723-4F46-A589-4C4620C0751A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CrossPlatEngine", "src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj", "{987898D9-724E-4324-BF91-77B1A6DBE8F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.CrossPlatEngine", "src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj", "{987898D9-724E-4324-BF91-77B1A6DBE8F1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ObjectModel", "src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj", "{FD63F778-3938-45D2-900B-51EC770F70E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.ObjectModel", "src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj", "{FD63F778-3938-45D2-900B-51EC770F70E5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Utilities", "src\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj", "{61F7F446-9EF3-4768-B33A-4D75F60E1059}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Utilities", "src\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj", "{61F7F446-9EF3-4768-B33A-4D75F60E1059}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.TrxLogger", "src\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj", "{D5296435-3A3F-4B1A-81D1-434EC9E97DEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Extensions.TrxLogger", "src\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj", "{D5296435-3A3F-4B1A-81D1-434EC9E97DEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.VsTestConsole.TranslationLayer", "src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj", "{790B8030-00C2-4121-B125-EDC4CE329BA3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.VsTestConsole.TranslationLayer", "src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj", "{790B8030-00C2-4121-B125-EDC4CE329BA3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost", "src\testhost\testhost.csproj", "{27DFBD04-64B2-4F1B-82B2-006620CCA6F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testhost", "src\testhost\testhost.csproj", "{27DFBD04-64B2-4F1B-82B2-006620CCA6F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.x86", "src\testhost.x86\testhost.x86.csproj", "{71CB42FF-E750-4A3B-9C3A-AC938853CC89}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testhost.x86", "src\testhost.x86\testhost.x86.csproj", "{71CB42FF-E750-4A3B-9C3A-AC938853CC89}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.console", "src\vstest.console\vstest.console.csproj", "{10B6ADE1-F808-4612-801D-4452F5B52242}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vstest.console", "src\vstest.console\vstest.console.csproj", "{10B6ADE1-F808-4612-801D-4452F5B52242}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.VSIXCreator", "src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj", "{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.VSIXCreator", "src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj", "{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{46250E12-4CF1-4051-B4A7-80C8C06E0068}"
 EndProject
@@ -51,57 +51,57 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance", "Performance"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestAssets", "TestAssets", "{DD34CC1B-7286-495F-B1B4-93B1C4EB60A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "datacollector.x86.UnitTests", "test\datacollector.x86.UnitTests\datacollector.x86.UnitTests.csproj", "{F1001A64-974E-461E-B972-1A1330635677}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "datacollector.x86.UnitTests", "test\datacollector.x86.UnitTests\datacollector.x86.UnitTests.csproj", "{F1001A64-974E-461E-B972-1A1330635677}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Client.UnitTests", "test\Microsoft.TestPlatform.Client.UnitTests\Microsoft.TestPlatform.Client.UnitTests.csproj", "{0D59BA81-6279-4650-AEBB-4EA735C28A1A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Client.UnitTests", "test\Microsoft.TestPlatform.Client.UnitTests\Microsoft.TestPlatform.Client.UnitTests.csproj", "{0D59BA81-6279-4650-AEBB-4EA735C28A1A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Common.UnitTests", "test\Microsoft.TestPlatform.Common.UnitTests\Microsoft.TestPlatform.Common.UnitTests.csproj", "{DE730F17-7D5C-4D9D-B479-025024BF4F1D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Common.UnitTests", "test\Microsoft.TestPlatform.Common.UnitTests\Microsoft.TestPlatform.Common.UnitTests.csproj", "{DE730F17-7D5C-4D9D-B479-025024BF4F1D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CommunicationUtilities.UnitTests", "test\Microsoft.TestPlatform.CommunicationUtilities.UnitTests\Microsoft.TestPlatform.CommunicationUtilities.UnitTests.csproj", "{E062FFD6-DEB1-4DB4-8B6E-ADBF04129545}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.CommunicationUtilities.UnitTests", "test\Microsoft.TestPlatform.CommunicationUtilities.UnitTests\Microsoft.TestPlatform.CommunicationUtilities.UnitTests.csproj", "{E062FFD6-DEB1-4DB4-8B6E-ADBF04129545}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.CrossPlatEngine.UnitTests", "test\Microsoft.TestPlatform.CrossPlatEngine.UnitTests\Microsoft.TestPlatform.CrossPlatEngine.UnitTests.csproj", "{F582949D-8B92-47BD-9DD7-9F2BFCCC290C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.CrossPlatEngine.UnitTests", "test\Microsoft.TestPlatform.CrossPlatEngine.UnitTests\Microsoft.TestPlatform.CrossPlatEngine.UnitTests.csproj", "{F582949D-8B92-47BD-9DD7-9F2BFCCC290C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ObjectModel.UnitTests", "test\Microsoft.TestPlatform.ObjectModel.UnitTests\Microsoft.TestPlatform.ObjectModel.UnitTests.csproj", "{376A7588-50DF-46CD-955B-0309F491D830}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.ObjectModel.UnitTests", "test\Microsoft.TestPlatform.ObjectModel.UnitTests\Microsoft.TestPlatform.ObjectModel.UnitTests.csproj", "{376A7588-50DF-46CD-955B-0309F491D830}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.TestUtilities", "test\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj", "{5DF3CF65-3E11-4639-964D-7BEB4109DCF9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.TestUtilities", "test\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj", "{5DF3CF65-3E11-4639-964D-7BEB4109DCF9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Utilities.UnitTests", "test\Microsoft.TestPlatform.Utilities.UnitTests\Microsoft.TestPlatform.Utilities.UnitTests.csproj", "{D3E8A13B-92EE-45A8-BB24-40EC3CC9DB34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Utilities.UnitTests", "test\Microsoft.TestPlatform.Utilities.UnitTests\Microsoft.TestPlatform.Utilities.UnitTests.csproj", "{D3E8A13B-92EE-45A8-BB24-40EC3CC9DB34}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests", "test\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests.csproj", "{8FD97A6B-5C83-4985-9432-08347A2C2A47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests", "test\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests.csproj", "{8FD97A6B-5C83-4985-9432-08347A2C2A47}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.UnitTests", "test\testhost.UnitTests\testhost.UnitTests.csproj", "{9EFCEFB5-253E-4DE2-8A70-821D7B8189DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testhost.UnitTests", "test\testhost.UnitTests\testhost.UnitTests.csproj", "{9EFCEFB5-253E-4DE2-8A70-821D7B8189DF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "vstest.console.UnitTests", "test\vstest.console.UnitTests\vstest.console.UnitTests.csproj", "{3A8080FB-9C93-45B9-8EB5-828DDC31FDF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vstest.console.UnitTests", "test\vstest.console.UnitTests\vstest.console.UnitTests.csproj", "{3A8080FB-9C93-45B9-8EB5-828DDC31FDF0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.AcceptanceTests", "test\Integration\Microsoft.TestPlatform.AcceptanceTests\Microsoft.TestPlatform.AcceptanceTests.csproj", "{1771E50F-614E-45CF-8738-400329AD17BF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.AcceptanceTests", "test\Integration\Microsoft.TestPlatform.AcceptanceTests\Microsoft.TestPlatform.AcceptanceTests.csproj", "{1771E50F-614E-45CF-8738-400329AD17BF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.SmokeTests", "test\Integration\Microsoft.TestPlatform.SmokeTests\Microsoft.TestPlatform.SmokeTests.csproj", "{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.SmokeTests", "test\Integration\Microsoft.TestPlatform.SmokeTests\Microsoft.TestPlatform.SmokeTests.csproj", "{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests", "test\Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests\Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.csproj", "{BFF7714C-E5A3-4EEB-B04B-5FA47F29AD03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests", "test\Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests\Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.csproj", "{BFF7714C-E5A3-4EEB-B04B-5FA47F29AD03}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ObjectModel.PlatformTests", "test\Performance\Microsoft.TestPlatform.ObjectModel.PlatformTests\Microsoft.TestPlatform.ObjectModel.PlatformTests.csproj", "{EA04E940-E63D-4239-94C7-43DB4A0A364B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.ObjectModel.PlatformTests", "test\Performance\Microsoft.TestPlatform.ObjectModel.PlatformTests\Microsoft.TestPlatform.ObjectModel.PlatformTests.csproj", "{EA04E940-E63D-4239-94C7-43DB4A0A364B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.PerformanceTests", "test\Performance\Microsoft.TestPlatform.PerformanceTests\Microsoft.TestPlatform.PerformanceTests.csproj", "{3E2CECF0-19F5-4503-A245-B8092D63EA5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.PerformanceTests", "test\Performance\Microsoft.TestPlatform.PerformanceTests\Microsoft.TestPlatform.PerformanceTests.csproj", "{3E2CECF0-19F5-4503-A245-B8092D63EA5C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NUTestProject", "test\TestAssets\NUTestProject\NUTestProject.csproj", "{03026650-068C-47A2-8CDF-6637244D1D40}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUTestProject", "test\TestAssets\NUTestProject\NUTestProject.csproj", "{03026650-068C-47A2-8CDF-6637244D1D40}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTestProject", "test\TestAssets\PerfTestProject\PerfTestProject.csproj", "{CF29ABF7-E912-4D6A-A827-D3C8B5F30F61}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfTestProject", "test\TestAssets\PerfTestProject\PerfTestProject.csproj", "{CF29ABF7-E912-4D6A-A827-D3C8B5F30F61}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleDataCollector", "test\TestAssets\SimpleDataCollector\SimpleDataCollector.csproj", "{5B2948D9-BB77-4E86-A498-07E088F4198A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleDataCollector", "test\TestAssets\SimpleDataCollector\SimpleDataCollector.csproj", "{5B2948D9-BB77-4E86-A498-07E088F4198A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTestProject", "test\TestAssets\SimpleTestProject\SimpleTestProject.csproj", "{DB8FA538-B1EC-4AC1-B064-148C492AC45A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleTestProject", "test\TestAssets\SimpleTestProject\SimpleTestProject.csproj", "{DB8FA538-B1EC-4AC1-B064-148C492AC45A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTestProject2", "test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj", "{8BA77782-9AAF-4114-A1D5-7CB23C283D6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleTestProject2", "test\TestAssets\SimpleTestProject2\SimpleTestProject2.csproj", "{8BA77782-9AAF-4114-A1D5-7CB23C283D6B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUTestProject", "test\TestAssets\XUTestProject\XUTestProject.csproj", "{C3D28E4C-8F4A-4DDB-8E7E-225BDEC6EAAC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUTestProject", "test\TestAssets\XUTestProject\XUTestProject.csproj", "{C3D28E4C-8F4A-4DDB-8E7E-225BDEC6EAAC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dogfood", "dogfood", "{B9AB7A3D-4F63-48D2-86C0-70F52F6509AB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.E2ETest", "dogfood\Microsoft.TestPlatform.E2ETest\Microsoft.TestPlatform.E2ETest.csproj", "{B2C2FFD5-3C7D-42A3-B9B6-DEF63DE969AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.E2ETest", "dogfood\Microsoft.TestPlatform.E2ETest\Microsoft.TestPlatform.E2ETest.csproj", "{B2C2FFD5-3C7D-42A3-B9B6-DEF63DE969AD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.TranslationLayer.E2ETest", "dogfood\Microsoft.TestPlatform.TranslationLayer.E2ETest\Microsoft.TestPlatform.TranslationLayer.E2ETest.csproj", "{0DD55440-38DC-4580-879C-70B043F77B1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.TranslationLayer.E2ETest", "dogfood\Microsoft.TestPlatform.TranslationLayer.E2ETest\Microsoft.TestPlatform.TranslationLayer.E2ETest.csproj", "{0DD55440-38DC-4580-879C-70B043F77B1C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTestProject", "dogfood\UnitTestProject\UnitTestProject.csproj", "{4514113D-07C0-4062-A673-04F188A79B7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "dogfood\UnitTestProject\UnitTestProject.csproj", "{4514113D-07C0-4062-A673-04F188A79B7D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{EE49F5DC-5835-4AE3-B3BA-8BDE0AD56330}"
 	ProjectSection(SolutionItems) = preProject
@@ -114,7 +114,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Nuget.config = Nuget.config
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "package", "src\package\package.csproj", "{D496D1A0-BC41-48C2-808B-34D8935BE96D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "package", "src\package\package.csproj", "{D496D1A0-BC41-48C2-808B-34D8935BE96D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -320,16 +320,16 @@ Global
 		{10B6ADE1-F808-4612-801D-4452F5B52242}.Release|x86.Build.0 = Release|x86
 		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x64.ActiveCfg = Debug|x64
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x64.Build.0 = Debug|x64
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x86.ActiveCfg = Debug|x86
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x86.Build.0 = Debug|x86
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x64.Build.0 = Debug|Any CPU
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Debug|x86.Build.0 = Debug|Any CPU
 		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x64.ActiveCfg = Release|x64
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x64.Build.0 = Release|x64
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x86.ActiveCfg = Release|x86
-		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x86.Build.0 = Release|x86
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x64.ActiveCfg = Release|Any CPU
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x64.Build.0 = Release|Any CPU
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5C17A3B-A6E6-4FB4-B089-827EECD5EDCB}.Release|x86.Build.0 = Release|Any CPU
 		{F1001A64-974E-461E-B972-1A1330635677}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F1001A64-974E-461E-B972-1A1330635677}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1001A64-974E-461E-B972-1A1330635677}.Debug|x64.ActiveCfg = Debug|x64
@@ -476,16 +476,16 @@ Global
 		{1771E50F-614E-45CF-8738-400329AD17BF}.Release|x86.Build.0 = Release|x86
 		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x64.ActiveCfg = Debug|x64
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x64.Build.0 = Debug|x64
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x86.ActiveCfg = Debug|x86
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x86.Build.0 = Debug|x86
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x64.Build.0 = Debug|Any CPU
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Debug|x86.Build.0 = Debug|Any CPU
 		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x64.ActiveCfg = Release|x64
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x64.Build.0 = Release|x64
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x86.ActiveCfg = Release|x86
-		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x86.Build.0 = Release|x86
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x64.ActiveCfg = Release|Any CPU
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x64.Build.0 = Release|Any CPU
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x86.ActiveCfg = Release|Any CPU
+		{39DFC851-A220-49FE-8DAC-5CEA7246FF7E}.Release|x86.Build.0 = Release|Any CPU
 		{BFF7714C-E5A3-4EEB-B04B-5FA47F29AD03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BFF7714C-E5A3-4EEB-B04B-5FA47F29AD03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFF7714C-E5A3-4EEB-B04B-5FA47F29AD03}.Debug|x64.ActiveCfg = Debug|x64

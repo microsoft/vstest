@@ -2,17 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
   <PropertyGroup>
-    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined. -->
-    <Version Condition="'$(Version)' == ''">99.99.99</Version>
+    <Version Condition="'$(Version)' == ''">15.0.0</Version>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
 
     <WarningsAsErrors>true</WarningsAsErrors>
     <PublicSign>true</PublicSign>
     <!--<DelaySign>true</DelaySign>-->
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
     <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
@@ -40,38 +40,42 @@
     <!--</PackageReference>-->
   </ItemGroup>
 
-  <!-- Test project references -->
-  <ItemGroup Condition="$(TestProject) == 'true'">
-    <!-- Test projects take a direct dependency on TestHost. Indirect dependencies must be included.
-         This is required to enable selfhost the latest testhost bits. -->
-    <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj" />
-    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
-    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
-    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
-    <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
+  <Choose>
+    <When Condition="$(TestProject) == 'true'"> 
+      <PropertyGroup>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+      </PropertyGroup>
 
-    <!--<PackageReference Include="Microsoft.NET.Test.Sdk">-->
-      <!--<Version>15.0.0-preview-20161024-02</Version>-->
-      <!--<IncludeAssets>Runtime</IncludeAssets>-->
-    <!--</PackageReference>-->
-    <PackageReference Include="MSTest.TestFramework">
-      <Version>1.0.6-preview</Version>
-    </PackageReference>
-    <PackageReference Include="MSTest.TestAdapter">
-      <Version>1.1.5-preview</Version>
-    </PackageReference>
-    <PackageReference Include="Moq">
-      <Version>4.6.38-*</Version>
-    </PackageReference>
-  </ItemGroup>
+      <!-- Test project references -->
+      <ItemGroup>
+        <!-- Test projects take a direct dependency on TestHost. Indirect dependencies must be included.
+             This is required to enable selfhost the latest testhost bits. -->
+        <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj" />
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+
+        <PackageReference Include="MSTest.TestFramework">
+          <Version>1.0.6-preview</Version>
+        </PackageReference>
+        <PackageReference Include="MSTest.TestAdapter">
+          <Version>1.1.5-preview</Version>
+        </PackageReference>
+        <PackageReference Include="Moq">
+          <Version>4.6.38-*</Version>
+        </PackageReference>
+      </ItemGroup>
+    </When>
+  </Choose>
 
   <!-- Code analysis settings -->
   <PropertyGroup>

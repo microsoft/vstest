@@ -7,8 +7,7 @@
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.ObjectModel</AssemblyName>
     <TargetFrameworks>net46;netstandard1.5</TargetFrameworks>
-    <WarningsAsErrors>true</WarningsAsErrors>
-    <!--<PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback> -->
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback> 
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <PackageReference Include="Microsoft.Internal.Dia.Interop">
