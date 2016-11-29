@@ -10,12 +10,16 @@
     <description>The cross platform Microsoft Test Platform.</description>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
-    <copyright>Copyright © Microsoft Corporation</copyright>
+    <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <contentFiles>
       <files include="**/*.*" copyToOutput="true" flatten="false" buildAction="None" />
     </contentFiles>
   </metadata>
   <files>
+    <!-- Add a thirt party notice file -->
+    <file src="ThirdPartyNotices.txt" target="" />
+    
     <file src="netcoreapp1.0\**\*.*" target="contentFiles\any\any\" />
   </files>
 </package>

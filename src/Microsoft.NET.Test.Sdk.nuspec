@@ -6,9 +6,12 @@
     <title>Microsoft.NET.Test.Sdk</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
+    <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <description>The MSbuild targets and properties for building the .Net core test projects.</description>
-    <copyright>Copyright 2015</copyright>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <dependencies>
       <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
     </dependencies>
