@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         #region RunTestsArgumentExecutorTests
 
         [TestMethod]
-        public void ExecutorExecuteForNoSourcesShouldReturnFail()
+        public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
         {
             CommandLineOptions.Instance.Reset();
 

@@ -108,11 +108,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
-                startInfo.FileName = "\"" + currentProcessPath + "\"";
+                startInfo.FileName = currentProcessPath;
             }
             else
             {
-                startInfo.FileName = "\"" + this.GetDotnetHostFullPath() + "\"";
+                startInfo.FileName = this.GetDotnetHostFullPath();
             }
 
             EqtTrace.Verbose("DotnetTestHostmanager: Full path of dotnet.exe is {0}", startInfo.FileName);

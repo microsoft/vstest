@@ -36,6 +36,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestPlatform
+        {
+            get;
+            set;
+        }
+
         public string VSTestTestCaseFilter
         {
             get;
@@ -66,8 +72,9 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
             }
-            vsTestForwardingApp.Execute();
-            return true;
+
+            int returnCode = vsTestForwardingApp.Execute();
+            return returnCode == 0 ? true : false;
         }
 
         private string AddDoubleQuotes(string x)
@@ -93,6 +100,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
                 allArgs.Add("--framework:" + this.AddDoubleQuotes(this.VSTestFramework));
+            }
+
+            // vstest.console only support x86 and x64 for argument platform
+            if (!string.IsNullOrEmpty(this.VSTestPlatform) && !this.VSTestPlatform.Contains("AnyCPU"))
+            {
+                allArgs.Add("--platform:" + this.VSTestPlatform);
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))

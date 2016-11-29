@@ -3,6 +3,9 @@
 
 namespace SampleUnitTestProject
 {
+    using System;
+    using System.IO;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
@@ -14,6 +17,7 @@ namespace SampleUnitTestProject
         /// <summary>
         /// The passing test.
         /// </summary>
+        [Priority(2)]
         [TestMethod]
         public void PassingTest()
         {
@@ -23,9 +27,15 @@ namespace SampleUnitTestProject
         /// <summary>
         /// The failing test.
         /// </summary>
+        [TestCategory("CategoryA")]
+        [Priority(3)]
         [TestMethod]
         public void FailingTest()
         {
+#if NET46
+            var appDomainFilePath = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
+            File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: " + AppDomain.CurrentDomain.FriendlyName);
+#endif
             Assert.AreEqual(2, 3);
         }
 

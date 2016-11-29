@@ -11,3 +11,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 ### Build from source
 Please refer the [Contribution Guide](https://github.com/Microsoft/vstest-docs/blob/master/docs/contribute.md) and [documentation](https://github.com/Microsoft/vstest-docs/tree/master/RFCs).
+
+### License  
+VSTest platform is licensed under the [MIT license](https://github.com/Microsoft/vstest/blob/master/LICENSE)
