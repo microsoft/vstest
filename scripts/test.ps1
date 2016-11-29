@@ -55,8 +55,7 @@ $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFrameworks =@("netcoreapp1.0", "net46")
 $Script:TPT_RunnerTargetFramework = "net46"
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjectsDotNet = @("testhost.UnitTests","Microsoft.TestPlatform.Utilities.UnitTests")
-$Script:TPT_SkipProjects = @()
+$Script:TPT_SkipProjects = @("testhost.UnitTests", "Microsoft.TestPlatform.Utilities.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
 #
