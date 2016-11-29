@@ -126,7 +126,7 @@ function Invoke-Test
             }
 
             # Tests are only built for x86 at the moment, though we don't have architecture requirement
-            $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.5-preview\build\_common"
+            $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.6-preview\build\_common"
             $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
             if($fx -eq "netcoreapp1.0")
             {
