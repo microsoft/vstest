@@ -73,6 +73,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private int totalTests, passTests, failTests;
 
+        private DateTime defaultTestRunStartTime;
+
         #endregion
 
         /// <summary>
@@ -223,7 +225,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 Guid runId = Guid.NewGuid();
 
                 this.testRun = new TestRun(runId);
-                this.testRun.Started = e.Result.StartTime.UtcDateTime;
+
+                // Handling scenario when StartTime for the first test case is default(DateTime)
+                // We should set Started to StartTime only if StartTime is valid.
+                this.testRun.Started = e.Result.StartTime.UtcDateTime.Equals(default(DateTime)) ? this.defaultTestRunStartTime : e.Result.StartTime.UtcDateTime;
 
                 // Save default test settings 
                 string runDeploymentRoot = FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
@@ -295,7 +300,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 helper.SaveSingleFields(rootElement, this.testRun, parameters);
 
                 // Save test settings
-                helper.SaveObject(this.testRun.RunConfiguration, rootElement, "TestSettings", parameters); 
+                helper.SaveObject(this.testRun.RunConfiguration, rootElement, "TestSettings", parameters);
 
                 // Save test results
                 helper.SaveIEnumerable(this.results, rootElement, "Results", ".", null, parameters);
@@ -340,8 +345,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                     this.failTests,
                     this.testRunOutcome,
                     this.runLevelErrorsAndWarnings,
-                    this.runLevelStdOut.ToString(), 
-                    resultFiles, 
+                    this.runLevelStdOut.ToString(),
+                    resultFiles,
                     collectorEntries);
 
                 helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
@@ -401,6 +406,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.passTests = 0;
             this.failTests = 0;
             this.runLevelStdOut = new StringBuilder();
+            this.defaultTestRunStartTime = DateTime.Now;
         }
 
         /// <summary>

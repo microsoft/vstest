@@ -133,6 +133,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void TestResultHandlerShouldSetStartTimeAppropriatelyIfTestResultStartTimeIsDefaultDateTime()
+        {
+            ObjectModel.TestCase testCase = new ObjectModel.TestCase("dummy string", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestResult testResult = new ObjectModel.TestResult(testCase);
+            testResult.StartTime = DateTime.SpecifyKind(default(DateTime), DateTimeKind.Utc);
+
+            Mock<TestResultEventArgs> e = new Mock<TestResultEventArgs>(testResult);
+            
+            trxLogger.TestResultHandler(new object(), e.Object);
+
+            Assert.AreNotEqual(default(DateTime), this.trxLogger.LoggerTestRun.Started);
+        }
+
+        [TestMethod]
         public void TestResultHandlerKeepingTheTrackOfPassedAndFailedTests()
         {
             ObjectModel.TestCase passTestCase1 = new ObjectModel.TestCase("Pass1", new Uri("some://uri"), "DummySourceFileName");
