@@ -163,7 +163,7 @@ function Invoke-Test
                 $testContainers |  % {
                     # Fill in the framework in test containers
                     $testContainer = [System.String]::Format($_, $fx)
-                    Write-Log ".. Container: $_"
+                    Write-Log ".. Container: $testContainer"
 
                     Set-TestEnvironment
                     Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
