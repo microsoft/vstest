@@ -23,7 +23,10 @@ Param(
     # Stop test run on first failure
     [Parameter(Mandatory=$false)]
     [Alias("ff")]
-    [Switch] $FailFast = $false
+    [Switch] $FailFast = $false,
+
+    [Parameter(Mandatory=$false)]
+    [Switch] $Parallel = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -55,9 +58,11 @@ $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFrameworks =@("netcoreapp1.0", "net46")
 $Script:TPT_RunnerTargetFramework = "net46"
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjects = @("testhost.UnitTests", "Microsoft.TestPlatform.Utilities.UnitTests")
+$Script:TPT_SkipProjects = @()
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
+$Script:TPT_Parallel = $Parallel
+
 #
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -130,27 +135,56 @@ function Invoke-Test
                 $testFrameWork = ".NETFramework,Version=v4.6"
             }
 
-            # Fill in the framework in test containers
-            $testContainerSet = $testContainers | % { [System.String]::Format($_, $fx) }
+            if ($TPT_Parallel) {
+                # Fill in the framework in test containers
+                $testContainerSet = $testContainers | % { [System.String]::Format($_, $fx) }
 
-            Set-TestEnvironment
-            Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel"
-            $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel
+                Set-TestEnvironment
+                Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel"
+                $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel
 
-            Reset-TestEnvironment
+                Reset-TestEnvironment
 
-            if ($output[-2].Contains("Test Run Successful.")) {
-                Write-Log ".. . $($output[-3])"
+                if ($output[-2].Contains("Test Run Successful.")) {
+                    Write-Log ".. . $($output[-3])"
+                } else {
+                    Write-Log ".. . $($output[-2])"
+                    Write-Log ".. . Failed tests:"
+                    Write-Log ".. .  $($output -match '^Failed')"
+
+                    Set-ScriptFailed
+
+                    if ($Script:TPT_FailFast) {
+                        Write-Log ".. Stop execution since fail fast is enabled."
+                        continue
+                    }
+                }
             } else {
-                Write-Log ".. . $($output[-2])"
-                Write-Log ".. . Failed tests:"
-                Write-Log ".. .  $($output -match '^Failed')"
+                $testContainers |  % {
+                    # Fill in the framework in test containers
+                    $testContainer = [System.String]::Format($_, $fx)
+                    Write-Log ".. Container: $_"
 
-                Set-ScriptFailed
+                    Set-TestEnvironment
+                    Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
+                    $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath"
 
-                if ($Script:TPT_FailFast) {
-                    Write-Log ".. Stop execution since fail fast is enabled."
-                    continue
+                    Reset-TestEnvironment
+
+                    if ($output[-2].Contains("Test Run Successful.")) {
+                        Write-Log ".. . $($output[-3])"
+                    } else {
+                        Write-Log ".. . $($output[-2])"
+                        Write-Log ".. . Failed tests:"
+                        Write-Log ".. .  $($output -match '^Failed')"
+
+                        Set-ScriptFailed
+
+                        if ($Script:TPT_FailFast) {
+                            Write-Log ".. Stop execution since fail fast is enabled."
+                            continue
+                        }
+                    }
                 }
             }
 

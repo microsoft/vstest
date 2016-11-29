@@ -40,6 +40,12 @@
     <!--</PackageReference>-->
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="$(TestPlatformRoot)scripts\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
+
   <Choose>
     <When Condition="$(TestProject) == 'true'"> 
       <PropertyGroup>
