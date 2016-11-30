@@ -10,8 +10,8 @@
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
 
     <WarningsAsErrors>true</WarningsAsErrors>
-    <PublicSign>true</PublicSign>
-    <!--<DelaySign>true</DelaySign>-->
+    <!--<PublicSign>true</PublicSign>-->
+    <DelaySign>true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
     <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -71,10 +71,10 @@
         </ProjectReference>
 
         <PackageReference Include="MSTest.TestFramework">
-          <Version>1.0.6-preview</Version>
+          <Version>1.0.7-preview</Version>
         </PackageReference>
         <PackageReference Include="MSTest.TestAdapter">
-          <Version>1.1.5-preview</Version>
+          <Version>1.1.6-preview</Version>
         </PackageReference>
         <PackageReference Include="Moq">
           <Version>4.6.38-*</Version>
