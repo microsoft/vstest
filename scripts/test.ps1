@@ -52,13 +52,14 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Test configuration
 #
+$TPT_TargetFrameworkFullCLR = "net46"
+$TPT_TargetFrameworkCore = "netcoreapp1.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFrameworks =@("netcoreapp1.0", "net46")
-$Script:TPT_RunnerTargetFramework = "net46"
+$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjects = @("testhost.UnitTests", "vstest.console.UnitTests")
+$Script:TPT_SkipProjects = @("testhost.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
 $Script:TPT_Parallel = $Parallel
@@ -86,6 +87,8 @@ function Write-VerboseLog([string] $message)
 function Invoke-Test
 {
     $timer = Start-Timer
+    $dotNetPath = Get-DotNetPath
+
     Write-Log "Invoke-Test: Start test."
 
     foreach ($src in $Script:TPT_SourceFolders) {
@@ -118,21 +121,27 @@ function Invoke-Test
         # path.
         foreach ($fx in $Script:TPT_TargetFrameworks) {
             Write-Log ".. Start run ($fx)"
-            #$Script:TPT_TargetFramework = $fx
-            $vstestConsolePath = Join-Path (Get-PackageDirectory) "vstest.console.exe"
-            if (!(Test-Path $vstestConsolePath)) {
-                Write-Log "Unable to find vstest.console.exe at $vstestConsolePath. Did you run build.cmd?"
-                Write-Error "Test aborted."
-            }
 
             # Tests are only built for x86 at the moment, though we don't have architecture requirement
             $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.6-preview\build\_common"
             $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
-            if($fx -eq "netcoreapp1.0")
+
+            if($fx -eq $TPT_TargetFrameworkCore)
             {
                 $testFrameWork = ".NETCoreApp,Version=v1.0"
-            } else {
+                $vstestConsoleFileName = "vstest.console.dll"
+                $targetRunTime = ""
+            } else{
+
                 $testFrameWork = ".NETFramework,Version=v4.6"
+                $vstestConsoleFileName = "vstest.console.exe"
+                $targetRunTime = $Script:TPT_TargetRuntime
+            }
+
+            $vstestConsolePath = Join-Path (Get-PackageDirectory $fx $targetRuntime) $vstestConsoleFileName
+            if (!(Test-Path $vstestConsolePath)) {
+                Write-Log "Unable to find $vstestConsoleFileName at $vstestConsolePath. Did you run build.cmd?"
+                Write-Error "Test aborted."
             }
 
             if ($TPT_Parallel) {
@@ -140,8 +149,15 @@ function Invoke-Test
                 $testContainerSet = $testContainers | % { [System.String]::Format($_, $fx) }
 
                 Set-TestEnvironment
-                Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel"
-                $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel
+                if($fx -eq $TPT_TargetFrameworkFullCLR){
+
+                    Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel"
+                    $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel
+                }else{
+
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel"
+                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel
+                }
 
                 Reset-TestEnvironment
 
@@ -166,8 +182,16 @@ function Invoke-Test
                     Write-Log ".. Container: $testContainer"
 
                     Set-TestEnvironment
-                    Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
-                    $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath"
+                    
+                    if($fx -eq $TPT_TargetFrameworkFullCLR){
+
+                        Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
+                        $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath"
+                    }else{
+
+                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
+                        $output = & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath"
+                    }
 
                     Reset-TestEnvironment
 
@@ -208,9 +232,9 @@ function Get-DotNetPath
     return $dotnetPath
 }
 
-function Get-PackageDirectory
+function Get-PackageDirectory($framework, $targetRuntime)
 {
-    return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($Script:TPT_RunnerTargetFramework)\$($Script:TPT_TargetRuntime)")
+    return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($framework)\$($targetRuntime)")
 }
 
 function Start-Timer

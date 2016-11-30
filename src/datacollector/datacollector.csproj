@@ -8,10 +8,11 @@
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
   </PropertyGroup>
-
+  <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
+    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
     <Compile Include="..\datacollector.x86\Program.cs;..\datacollector.x86\DataCollectionCoordinator.cs;..\datacollector.x86\Interfaces\IDataCollectionManager.cs;..\datacollector.x86\Friends.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />   

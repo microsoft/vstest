@@ -243,8 +243,16 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal
+    if( $framework -eq $TPB_TargetFramework){
+
+        Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal"
+        & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal
+    }else{
+
+        # TargetRuntime is not required for netcoreapp
+        Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
+        & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
+    }
 }
 
 function Create-VsixPackage
