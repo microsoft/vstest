@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private int totalTests, passTests, failTests;
 
-        private DateTime defaultTestRunStartTime;
+        private DateTime testRunStartTime;
 
         #endregion
 
@@ -128,6 +128,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         internal List<TrxLoggerObjectModel.RunInfo> GetRunLevelErrorsAndWarnings()
         {
             return this.runLevelErrorsAndWarnings;
+        }
+
+        internal DateTime TestRunStartTime
+        {
+            get { return this.testRunStartTime; }
         }
 
         internal TestRun LoggerTestRun
@@ -226,9 +231,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
                 this.testRun = new TestRun(runId);
 
-                // Handling scenario when StartTime for the first test case is default(DateTime)
-                // We should set Started to StartTime only if StartTime is valid.
-                this.testRun.Started = e.Result.StartTime.UtcDateTime.Equals(default(DateTime)) ? this.defaultTestRunStartTime : e.Result.StartTime.UtcDateTime;
+                // We cannot rely on the StartTime for the first test result
+                // In case of parallel, first test result is the fastest test and not the one which started first.
+                // Setting Started to DateTime.Now in Intialize will make sure we include the startup cost, which was being ignored earlier.
+                // This is in parity with the way we set this.testRun.Finished
+                this.testRun.Started = this.testRunStartTime;
 
                 // Save default test settings 
                 string runDeploymentRoot = FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
@@ -406,7 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.passTests = 0;
             this.failTests = 0;
             this.runLevelStdOut = new StringBuilder();
-            this.defaultTestRunStartTime = DateTime.Now;
+            this.testRunStartTime = DateTime.Now;
         }
 
         /// <summary>
