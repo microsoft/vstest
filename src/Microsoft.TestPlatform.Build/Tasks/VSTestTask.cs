@@ -9,9 +9,14 @@ namespace Microsoft.TestPlatform.Build.Tasks
     using Microsoft.Build.Utilities;
     using System;
     using System.IO;
+    using System.Diagnostics;
+    using Trace;
 
-    public class VSTestTask : Task
+    public class VSTestTask : Task, ICancelableTask
     {
+        // The process which is invoking vstest.console
+        private VSTestForwardingApp vsTestForwardingApp;
+
         public string TestFileFullPath
         {
             get;
@@ -67,14 +72,22 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
         public override bool Execute()
         {
-            var vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
+            var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
+            Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
+
+            vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
                 Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
             }
 
-            int returnCode = vsTestForwardingApp.Execute();
-            return returnCode == 0 ? true : false;
+            return vsTestForwardingApp.Execute() == 0;
+        }
+
+        public void Cancel()
+        {
+            Tracing.Trace("VSTest: Killing the process...");
+            vsTestForwardingApp.Cancel();
         }
 
         private string AddDoubleQuotes(string x)
