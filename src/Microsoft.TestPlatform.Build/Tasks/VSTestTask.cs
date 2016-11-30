@@ -88,7 +88,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
         {
             Tracing.Trace("VSTest: Killing the process...");
             vsTestForwardingApp.Cancel();
-            Process.GetCurrentProcess().Kill();
         }
 
         private string AddDoubleQuotes(string x)

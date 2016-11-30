@@ -66,7 +66,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
             catch(ArgumentException ex)
             {
-                Tracing.Trace(string.Format("VSTest: Killing process throws ArgumentException with the following message {0}. It may be that process is already died", ex.Message));
+                Tracing.Trace(string.Format("VSTest: Killing process throws ArgumentException with the following message {0}. It may be that process is not running", ex.Message));
             }
         }
 
