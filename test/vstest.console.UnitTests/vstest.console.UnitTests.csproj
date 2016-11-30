@@ -7,8 +7,7 @@
   
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
-    <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
-    <PlatformTarget>x64</PlatformTarget>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <AssemblyName>vstest.console.UnitTests</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>

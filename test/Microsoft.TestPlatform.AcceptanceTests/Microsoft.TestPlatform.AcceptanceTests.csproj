@@ -1,4 +1,4 @@
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
     <TestProject>true</TestProject>
@@ -36,6 +36,9 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
