@@ -9,7 +9,7 @@
     <Version Condition="'$(Version)' == ''">15.0.0</Version>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
 
-    <WarningsAsErrors>true</WarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <!--<PublicSign>true</PublicSign>-->
     <DelaySign>true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
@@ -55,8 +55,16 @@
       <!-- Test project references -->
       <ItemGroup>
         <!-- Test projects take a direct dependency on TestHost. Indirect dependencies must be included.
-             This is required to enable selfhost the latest testhost bits. -->
-        <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj" />
+             This is required to enable selfhost the latest testhost bits.
+
+             We don't want these references to be passed onto compiler. They are just required at runtime.
+             Mark them as content and copy to output directory.
+        -->
+        <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj">
+          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+          <OutputItemType>Content</OutputItemType>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </ProjectReference>
         <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
           <FromP2P>true</FromP2P>
         </ProjectReference>

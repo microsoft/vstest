@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
@@ -10,6 +10,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
+    <!--<PlatformTarget Condition="'$(TargetFramework)' == 'net46'">AnyCPU</PlatformTarget>-->
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
