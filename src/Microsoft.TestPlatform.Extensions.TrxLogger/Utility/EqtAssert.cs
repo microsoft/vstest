@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
     using System.Diagnostics;
     using System.Globalization;
 
-    using TrxLoggerResources = Microsoft.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
+    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// Class to be used for parameter verification.

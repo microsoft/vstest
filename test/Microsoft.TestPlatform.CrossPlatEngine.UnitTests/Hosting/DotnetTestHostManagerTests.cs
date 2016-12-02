@@ -235,13 +235,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
-#if !NET46
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
-#endif
 
             var paths = Environment.GetEnvironmentVariable("PATH").Split(separator);
 

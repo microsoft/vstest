@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+  <PropertyGroup>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
+  </PropertyGroup>
+  <PropertyGroup>
+    <!-- Versioning is defined from the build script. Use a default dev build if it's not defined. -->
+    <Version Condition="'$(Version)' == ''">15.0.0</Version>
+    <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
+
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!--<PublicSign>true</PublicSign>-->
+    <DelaySign>true</DelaySign>
+    <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+    <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/key.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Common dependencies for all projects -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Sdk">
+      <Version>1.0.0-alpha-20161104-2</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+    <!--<PackageReference Include="StyleCop.Analyzers">-->
+      <!--<Version>1.0.0</Version>-->
+      <!--<PrivateAssets>All</PrivateAssets>-->
+    <!--</PackageReference>-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(TestPlatformRoot)scripts\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
+
+  <Choose>
+    <When Condition="$(TestProject) == 'true'"> 
+      <PropertyGroup>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+      </PropertyGroup>
+
+      <!-- Test project references -->
+      <ItemGroup>
+        <!-- Test projects take a direct dependency on TestHost. Indirect dependencies must be included.
+             This is required to enable selfhost the latest testhost bits.
+
+             We don't want these references to be passed onto compiler. They are just required at runtime.
+             Mark them as content and copy to output directory.
+        -->
+        <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj">
+          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+          <OutputItemType>Content</OutputItemType>
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </ProjectReference>
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+
+        <PackageReference Include="MSTest.TestFramework">
+          <Version>1.0.7-preview</Version>
+        </PackageReference>
+        <PackageReference Include="MSTest.TestAdapter">
+          <Version>1.1.6-preview</Version>
+        </PackageReference>
+        <PackageReference Include="Moq">
+          <Version>4.6.38-*</Version>
+        </PackageReference>
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <!-- Code analysis settings -->
+  <PropertyGroup>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+</Project>

@@ -25,6 +25,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -62,6 +63,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            TestExecutorExtensionManager.Destroy();
         }
 
         #region Constructor tests
@@ -305,6 +312,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsShouldReportAWarningIfExecutorUriIsNotDefinedInExtensionAssembly()
         {
+            //System.Diagnostics.Debugger.Launch();
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
             {

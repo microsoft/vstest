@@ -18,7 +18,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    using TranslationLayerResources = Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
+    using TranslationLayerResources = Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources.Resources;
 
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
