@@ -301,11 +301,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     }
                 }
             }
-            else
+
+            if (string.IsNullOrEmpty(testHostPath))
             {
-                // *.runconfig.dev.json or *.deps.json file does not exist then it may be that user is running test from publish directory.
-                // Get testhost.dll from source directory
+                // Try resolving testhost from output directory of test project. This is required if user has published the test project
+                // and is running tests in an isolated machine. A second scenario is self test: test platform unit tests take a project
+                // dependency on testhost (instead of nuget dependency), this drops testhost to output path.
                 testHostPath = Path.Combine(sourceDirectory, "testhost.dll");
+                EqtTrace.Verbose("DotnetTestHostManager: Assume published test project, with test host path = {0}.", testHostPath);
             }
 
             return testHostPath;
