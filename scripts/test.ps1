@@ -23,7 +23,10 @@ Param(
     # Stop test run on first failure
     [Parameter(Mandatory=$false)]
     [Alias("ff")]
-    [Switch] $FailFast = $false
+    [Switch] $FailFast = $false,
+
+    [Parameter(Mandatory=$false)]
+    [Switch] $Parallel = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -49,14 +52,18 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Test configuration
 #
+$TPT_TargetFrameworkFullCLR = "net46"
+$TPT_TargetFrameworkCore = "netcoreapp1.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
-$Script:TPT_TargetFramework = "net46"
+$Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjects = @("Microsoft.TestPlatform.CoreUtilities.UnitTests")
+$Script:TPT_SkipProjects = @("testhost.UnitTests", "vstest.console.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
+$Script:TPT_Parallel = $Parallel
+
 #
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -80,42 +87,113 @@ function Write-VerboseLog([string] $message)
 function Invoke-Test
 {
     $timer = Start-Timer
+    $dotNetPath = Get-DotNetPath
+
     Write-Log "Invoke-Test: Start test."
-    $dotnetExe = Get-DotNetPath
 
     foreach ($src in $Script:TPT_SourceFolders) {
-        # Invoke test for each project.json since we want a custom output
-        # path.
-        $vstestConsolePath = Join-Path (Get-PackageDirectory) "vstest.console.exe"
-        if (!(Test-Path $vstestConsolePath)) {
-            Write-Log "Unable to find vstest.console.exe at $vstestConsolePath. Did you run build.cmd?"
-            Write-Error "Test aborted."
+        Write-Log ".. Test: Computing sources"
+        Get-ChildItem -Recurse -Path $src -Include *.csproj | Where-Object { $_.FullName -inotmatch "TestAssets" } | ForEach-Object {
+            $testContainerName = $_.Directory.Name
+            $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
+            $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
+            
+            $skip="False"
+
+            foreach ($project in $Script:TPT_SkipProjects) {
+               if($_.Name.Contains($project))
+               {
+                   $skip="True"
+                   break
+               }
+            }
+
+            if ($skip -eq "True") {
+                 Write-Log ".. . $testContainerName is in skipped test list."
+            } elseif (!($testContainerName -match $Script:TPT_Pattern)) {
+                 Write-Log ".. . $testContainerName doesn't match test container pattern '$($Script:TPT_Pattern)'. Skipped from run."
+            } else {
+                $testContainers += ,"$testContainerPath"
+            }
         }
 
-        foreach ($fx in $Script:TPT_TargetFramework) {
-            Get-ChildItem -Recurse -Path $src -Include "project.json" | ForEach-Object {
-                Write-Log ".. Test: Source: $_"
+        # Invoke test for each project.json since we want a custom output
+        # path.
+        foreach ($fx in $Script:TPT_TargetFrameworks) {
+            Write-Log ".. Start run ($fx)"
 
-                # Tests are only built for x86 at the moment, though we don't have architecture requirement
-                $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.3-preview\build\_common"
-                $testContainerName = $_.Directory.Name
-                $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/$($Script:TPT_TargetFramework)/$($Script:TPT_TargetRuntime)"
-                $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
-                $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
+            # Tests are only built for x86 at the moment, though we don't have architecture requirement
+            $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.6-preview\build\_common"
+            $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
 
-                if ($Script:TPT_SkipProjects.Contains($testContainerName)) {
-                    Write-Log ".. . $testContainerName is in skipped test list."
-                } elseif (!($testContainerName -match $Script:TPT_Pattern)) {
-                    Write-Log ".. . $testContainerName doesn't match test container pattern '$($Script:TPT_Pattern)'. Skipped from run."
+            if($fx -eq $TPT_TargetFrameworkCore)
+            {
+                $testFrameWork = ".NETCoreApp,Version=v1.0"
+                $vstestConsoleFileName = "vstest.console.dll"
+                $targetRunTime = ""
+            } else{
+
+                $testFrameWork = ".NETFramework,Version=v4.6"
+                $vstestConsoleFileName = "vstest.console.exe"
+                $targetRunTime = $Script:TPT_TargetRuntime
+            }
+
+            $vstestConsolePath = Join-Path (Get-PackageDirectory $fx $targetRuntime) $vstestConsoleFileName
+            if (!(Test-Path $vstestConsolePath)) {
+                Write-Log "Unable to find $vstestConsoleFileName at $vstestConsolePath. Did you run build.cmd?"
+                Write-Error "Test aborted."
+            }
+
+            if ($TPT_Parallel) {
+                # Fill in the framework in test containers
+                $testContainerSet = $testContainers | % { [System.String]::Format($_, $fx) }
+
+                Set-TestEnvironment
+                if($fx -eq $TPT_TargetFrameworkFullCLR){
+
+                    Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel"
+                    $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel
+                }else{
+
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel"
+                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel
+                }
+
+                Reset-TestEnvironment
+
+                if ($output[-2].Contains("Test Run Successful.")) {
+                    Write-Log ".. . $($output[-3])"
                 } else {
-                    Set-TestEnvironment
+                    Write-Log ".. . $($output[-2])"
+                    Write-Log ".. . Failed tests:"
+                    Write-Log ".. .  $($output -match '^Failed')"
 
-                    Write-Verbose "vstest.console.exe $testContainerPath /platform:$testArchitecture /testAdapterPath:$testAdapterPath"
-                    $output = & $vstestConsolePath $testContainerPath /platform:$testArchitecture /testAdapterPath:"$testAdapterPath"
+                    Set-ScriptFailed
+
+                    if ($Script:TPT_FailFast) {
+                        Write-Log ".. Stop execution since fail fast is enabled."
+                        continue
+                    }
+                }
+            } else {
+                $testContainers |  % {
+                    # Fill in the framework in test containers
+                    $testContainer = [System.String]::Format($_, $fx)
+                    Write-Log ".. Container: $testContainer"
+
+                    Set-TestEnvironment
+                    
+                    if($fx -eq $TPT_TargetFrameworkFullCLR){
+
+                        Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
+                        $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath"
+                    }else{
+
+                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath"
+                        $output = & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath"
+                    }
 
                     Reset-TestEnvironment
-                    #Write-Verbose "$dotnetExe test $_ --configuration $Configuration"
-                    #& $dotnetExe test $_ --configuration $Configuration
 
                     if ($output[-2].Contains("Test Run Successful.")) {
                         Write-Log ".. . $($output[-3])"
@@ -131,14 +209,11 @@ function Invoke-Test
                             continue
                         }
                     }
-
                 }
-
-                Write-Log ".. Test: Complete."
             }
+
+            Write-Log ".. Test: Complete ($fx)."
         }
-        #Write-Verbose "$dotnetExe test $src\**\project.json --configuration $Configuration"
-        #& $dotnetExe test $_ $src\**\project.json --configuration $Configuration
     }
 
     Write-Log "Invoke-Test: Complete. {$(Get-ElapsedTime($timer))}"
@@ -157,9 +232,9 @@ function Get-DotNetPath
     return $dotnetPath
 }
 
-function Get-PackageDirectory
+function Get-PackageDirectory($framework, $targetRuntime)
 {
-    return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($Script:TPT_TargetFramework)\$($Script:TPT_TargetRuntime)")
+    return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($framework)\$($targetRuntime)")
 }
 
 function Start-Timer
