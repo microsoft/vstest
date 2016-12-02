@@ -7,14 +7,14 @@ namespace Microsoft.TestPlatform.Build.Tasks
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using Trace;
 
     public class VSTestForwardingApp
     {
         private const string hostExe = "dotnet";
         private const string vsTestAppName = "vstest.console.dll";
         private readonly List<string> allArgs = new List<string>();
-
-        private bool traceEnabled;
+        private int activeProcessId;
 
         public VSTestForwardingApp(IEnumerable<string> argsToForward)
         {
@@ -25,9 +25,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // Arguments are already whitespace friendly.
             this.allArgs.Add("\"" + GetVSTestExePath() + "\"");
             this.allArgs.AddRange(argsToForward);
-
-            var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_TRACE_BUILD");
-            this.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
         }
 
         public int Execute()
@@ -42,35 +39,40 @@ namespace Microsoft.TestPlatform.Build.Tasks
                                       RedirectStandardOutput = true
                                   };
 
-            this.Trace("VSTest: Starting vstest.console...");
-            this.Trace("VSTest: Arguments: " + processInfo.Arguments);
+            Tracing.Trace("VSTest: Starting vstest.console...");
+            Tracing.Trace("VSTest: Arguments: " + processInfo.FileName + " " + processInfo.Arguments);
 
-            using (var process = new Process { StartInfo = processInfo })
+            using (var activeProcess = new Process { StartInfo = processInfo })
             {
-                process.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
-                process.ErrorDataReceived += (sender, args) => Console.WriteLine(args.Data);
+                activeProcess.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
+                activeProcess.ErrorDataReceived += (sender, args) => Console.WriteLine(args.Data);
 
-                process.Start();
-                process.BeginOutputReadLine();
-                process.BeginErrorReadLine();
+                activeProcess.Start();
+                this.activeProcessId = activeProcess.Id;
+                activeProcess.BeginOutputReadLine();
+                activeProcess.BeginErrorReadLine();
 
-                process.WaitForExit();
-                this.Trace("VSTest: Exit code: " + process.ExitCode);
-                return process.ExitCode;
+                activeProcess.WaitForExit();
+                Tracing.Trace("VSTest: Exit code: " + activeProcess.ExitCode);
+                return activeProcess.ExitCode;
+            }
+        }
+
+        public void Cancel()
+        {
+            try
+            {
+                Process.GetProcessById(activeProcessId).Kill();
+            }
+            catch(ArgumentException ex)
+            {
+                Tracing.Trace(string.Format("VSTest: Killing process throws ArgumentException with the following message {0}. It may be that process is not running", ex.Message));
             }
         }
 
         private static string GetVSTestExePath()
         {
             return Path.Combine(AppContext.BaseDirectory, vsTestAppName);
-        }
-
-        private void Trace(string message)
-        {
-            if (this.traceEnabled)
-            {
-                Console.WriteLine(message);
-            }
         }
     }
 }
