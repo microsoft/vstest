@@ -73,6 +73,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private int totalTests, passTests, failTests;
 
+        private DateTime testRunStartTime;
+
         #endregion
 
         /// <summary>
@@ -126,6 +128,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         internal List<TrxLoggerObjectModel.RunInfo> GetRunLevelErrorsAndWarnings()
         {
             return this.runLevelErrorsAndWarnings;
+        }
+
+        internal DateTime TestRunStartTime
+        {
+            get { return this.testRunStartTime; }
         }
 
         internal TestRun LoggerTestRun
@@ -223,7 +230,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 Guid runId = Guid.NewGuid();
 
                 this.testRun = new TestRun(runId);
-                this.testRun.Started = e.Result.StartTime.UtcDateTime;
+
+                // We cannot rely on the StartTime for the first test result
+                // In case of parallel, first test result is the fastest test and not the one which started first.
+                // Setting Started to DateTime.Now in Intialize will make sure we include the startup cost, which was being ignored earlier.
+                // This is in parity with the way we set this.testRun.Finished
+                this.testRun.Started = this.testRunStartTime;
 
                 // Save default test settings 
                 string runDeploymentRoot = FileHelper.ReplaceInvalidFileNameChars(this.testRun.Name);
@@ -295,7 +307,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 helper.SaveSingleFields(rootElement, this.testRun, parameters);
 
                 // Save test settings
-                helper.SaveObject(this.testRun.RunConfiguration, rootElement, "TestSettings", parameters); 
+                helper.SaveObject(this.testRun.RunConfiguration, rootElement, "TestSettings", parameters);
 
                 // Save test results
                 helper.SaveIEnumerable(this.results, rootElement, "Results", ".", null, parameters);
@@ -340,8 +352,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                     this.failTests,
                     this.testRunOutcome,
                     this.runLevelErrorsAndWarnings,
-                    this.runLevelStdOut.ToString(), 
-                    resultFiles, 
+                    this.runLevelStdOut.ToString(),
+                    resultFiles,
                     collectorEntries);
 
                 helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
@@ -401,6 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             this.passTests = 0;
             this.failTests = 0;
             this.runLevelStdOut = new StringBuilder();
+            this.testRunStartTime = DateTime.Now;
         }
 
         /// <summary>

@@ -115,23 +115,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
-        public void TestResultHandlerShouldCaptureStartTimeInSummaryAsTestMethodStartTime()
+        public void TestResultHandlerShouldCaptureStartTimeInSummaryWithTimeStampDuringIntialize()
         {
-            DateTime actualTime = new DateTime(2008, 6, 19, 7, 0, 0);
-            actualTime = DateTime.SpecifyKind(actualTime, DateTimeKind.Utc);
-
             ObjectModel.TestCase testCase = new ObjectModel.TestCase("dummy string", new Uri("some://uri"), "DummySourceFileName");
             ObjectModel.TestResult testResult = new ObjectModel.TestResult(testCase);
-
-            testResult.StartTime = (DateTimeOffset)actualTime;
-
             Mock<TestResultEventArgs> e = new Mock<TestResultEventArgs>(testResult);
 
             trxLogger.TestResultHandler(new object(), e.Object);
 
-            Assert.AreEqual((DateTimeOffset)actualTime, this.trxLogger.LoggerTestRun.Started);
+            Assert.AreEqual(this.trxLogger.TestRunStartTime, this.trxLogger.LoggerTestRun.Started);
         }
-
+        
         [TestMethod]
         public void TestResultHandlerKeepingTheTrackOfPassedAndFailedTests()
         {
