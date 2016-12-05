@@ -37,6 +37,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             testEnvironment.TargetRuntime = DesktopRunnerTargetRuntime;
         }
 
+        protected static void SetupRunnerCoreTargetCoreEnvironment(
+            IntegrationTestEnvironment testEnvironment)
+        {
+            testEnvironment.RunnerFramework = CoreRunnerFramework;
+            testEnvironment.TargetFramework = CoreTargetFramework;
+            testEnvironment.TargetRuntime = CoreRunnerTargetRuntime;
+        }
+
+        protected static void SetupRunnerDesktopTargetCoreEnvironment(
+            IntegrationTestEnvironment testEnvironment)
+        {
+            testEnvironment.RunnerFramework = DesktopRunnerFramework;
+            testEnvironment.TargetFramework = CoreTargetFramework;
+            testEnvironment.TargetRuntime = DesktopRunnerTargetRuntime;
+        }
+
         protected static string DeriveFrameworkArgValue(IntegrationTestEnvironment testEnvironment)
         {
             string framworkArgValue = string.Empty;
@@ -50,6 +66,31 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             return framworkArgValue;
+        }
+
+        protected bool IsDesktopTargetFramework()
+        {
+            return this.testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
+        }
+
+        protected bool IsDesktopRunner()
+        {
+            return this.testEnvironment.RunnerFramework == AcceptanceTestBase.DesktopRunnerFramework;
+        }
+
+        protected string GetTargetFramworkForRunsettings()
+        {
+            string targetFramework = string.Empty;
+            if(this.testEnvironment.TargetFramework == DesktopTargetFramework)
+            {
+                targetFramework = "Framework45";
+            }
+            else
+            {
+                targetFramework = "FrameworkCore10";
+            }
+
+            return targetFramework;
         }
     }
 }

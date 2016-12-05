@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     public abstract class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
-        [TestMethod]
+        //[TestMethod]
         public void ChutzpahRunAllTestExecution()
         {
             var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
@@ -22,6 +22,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
+        [Ignore]
         [TestMethod]
         public void CPPRunAllTestExecution()
         {
@@ -37,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 0, 0);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void NUnitRunAllTestExecution()
         {
             var arguments = PrepareArguments(
@@ -49,7 +50,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void XUnitRunAllTestExecution()
         {
             var arguments = PrepareArguments(
