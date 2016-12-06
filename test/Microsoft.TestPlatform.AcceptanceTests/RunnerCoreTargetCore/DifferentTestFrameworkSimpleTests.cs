@@ -25,6 +25,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests.RunnerCoreTargetCore
         // Not supported in dotnet core
         [Ignore]
         [TestMethod]
+        public override void CPPRunAllTestExecution()
+        {
+
+        }
+
+        // Not supported in dotnet core
+        [Ignore]
+        [TestMethod]
         public override void NUnitRunAllTestExecution()
         {
 

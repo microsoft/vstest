@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [TestMethod]
         public void RunTestExecutionWithPlatformx64()
-        { 
+        {
             var platformArg = " /Platform:x64";
             string testhostProcessName = string.Empty;
             int expectedNumOfProcessCreated = 0;
