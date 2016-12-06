@@ -13,5 +13,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests.RunnerCoreTargetCore
         {
             AcceptanceTestBase.SetupRunnerCoreTargetCoreEnvironment(this.testEnvironment);
         }
+
+        // Disable app domain doesn't support in dotnet core
+        [Ignore]
+        [TestMethod]
+        public override void RunTestExecutionWithDisableAppDomain()
+        {
+
+        }
     }
 }

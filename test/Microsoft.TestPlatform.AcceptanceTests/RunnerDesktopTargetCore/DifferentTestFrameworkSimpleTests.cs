@@ -13,5 +13,21 @@ namespace Microsoft.TestPlatform.AcceptanceTests.RunnerDesktopTargetCore
         {
             AcceptanceTestBase.SetupRunnerDesktopTargetCoreEnvironment(this.testEnvironment);
         }
+
+        // Not supported in dotnet core
+        [Ignore]
+        [TestMethod]
+        public override void ChutzpahRunAllTestExecution()
+        {
+
+        }
+
+        // Not supported in dotnet core
+        [Ignore]
+        [TestMethod]
+        public override void NUnitRunAllTestExecution()
+        {
+
+        }
     }
 }
