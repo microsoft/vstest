@@ -115,6 +115,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         {
             EqtAssert.StringNotNullOrEmpty(parentDirectoryName, "parentDirectoryName");
             EqtAssert.StringNotNullOrEmpty(originalFileName, "originalFileName");
+
+            // Replace white space with underscore from trx file name to make it command line friendly
+            originalFileName = RemoveWhiteSpaceFromFile(originalFileName);
             return GetNextIterationNameHelper(parentDirectoryName, originalFileName, new FileIterationHelper(checkMatchingDirectory));
         }
 
@@ -279,6 +282,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             while (iteration != uint.MaxValue);
 
             throw new Exception(string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_CannotGetNextIterationName, originalName, baseDirectoryName));
+        }
+
+        private static string RemoveWhiteSpaceFromFile(string fileName)
+        {
+            return fileName.Replace(' ', '_');
         }
 
         private abstract class IterationHelper
