@@ -30,8 +30,8 @@ Param(
     [System.Boolean] $Localized = $false,
 
     [Parameter(Mandatory=$false)]
-    [Alias("real")]
-    [System.Boolean] $RealBuild = $false
+    [Alias("ba")]
+    [System.String] $BuildArgs
 )
 
 $ErrorActionPreference = "Stop"
@@ -68,6 +68,7 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
+$TPB_BuildArgs = $BuildArgs
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -148,8 +149,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version $TPB_BuildArgs"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version $TPB_BuildArgs
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -243,8 +244,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal $TPB_BuildArgs"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal $TPB_BuildArgs
 }
 
 function Create-VsixPackage
