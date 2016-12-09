@@ -61,15 +61,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Timed out while waiting for Launch of custom host.
-        /// </summary>
-        internal static string CustomHostLaunchTimedOut {
-            get {
-                return ResourceManager.GetString("CustomHostLaunchTimedOut", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The test run could not be executed because the initial state was invalid..
         /// </summary>
         internal static string InvalidStateForExecution {
