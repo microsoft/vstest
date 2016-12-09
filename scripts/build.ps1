@@ -68,7 +68,7 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
-$TPB_BuildArgs = $BuildArgs -Join " "
+$TPB_BuildArgs = $BuildArgs
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
