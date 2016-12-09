@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CustomHostLaunchTimedOut" xml:space="preserve">
+    <value>Timed out while waiting for Launch of custom host</value>
+  </data>
   <data name="InvalidStateForExecution" xml:space="preserve">
     <value>The test run could not be executed because the initial state was invalid.</value>
   </data>
