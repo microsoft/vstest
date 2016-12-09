@@ -25,10 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         protected Action<Message> onAckMessageReceived;
 
-        private int clientListenTimeOut;
-
-        private int customHostLaunchTimeOut;
-
         private object ackLockObject = new object();
 
         /// <summary>
@@ -37,15 +33,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         private const int ClientListenTimeOut = 5 * 1000;
 
         /// <summary>
-        /// The timeout for the client to launch the custom host and wait for acknowledgement
-        /// </summary>
-        private const int CustomHostLaunchAckTimeout = 60 * 1000;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
         /// </summary>
         public DesignModeClient()
-            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance, ClientListenTimeOut, CustomHostLaunchAckTimeout)
+            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
         }
 
@@ -58,13 +49,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="dataSerializer">
         /// The data Serializer.
         /// </param>
-        internal DesignModeClient(ICommunicationManager communicationManager, IDataSerializer dataSerializer, int clientListenTimeOut, int customHostLaunchTimeOut)
+        internal DesignModeClient(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
         {
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
-
-            this.clientListenTimeOut = clientListenTimeOut;
-            this.customHostLaunchTimeOut = customHostLaunchTimeOut;
         }
 
         /// <summary>
@@ -95,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.communicationManager.SetupClientAsync(port);
 
             // Wait for the connection to the server and listen for requests.
-            if (this.communicationManager.WaitForServerConnection(clientListenTimeOut))
+            if (this.communicationManager.WaitForServerConnection(ClientListenTimeOut))
             {
                 this.communicationManager.SendMessage(MessageType.SessionConnected);
                 this.ProcessRequests(testRequestManager);
@@ -242,17 +230,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
 
-                var waitSuccess = waitHandle.WaitOne(this.customHostLaunchTimeOut);
+                waitHandle.WaitOne();
                 this.onAckMessageReceived = null;
 
-                if (waitSuccess)
-                {
-                    return this.dataSerializer.DeserializePayload<int>(ackMessage);
-                }
-                else
-                {
-                    throw new TestPlatformException(Resources.Resources.CustomHostLaunchTimedOut);
-                }
+                return this.dataSerializer.DeserializePayload<int>(ackMessage);
             }
         }
 

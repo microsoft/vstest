@@ -32,15 +32,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
         private readonly DesignModeClient designModeClient;
 
-        private const int ClientListenTimeOut = 5 * 1000;
-        private const int CustomHostLaunchAckTimeout = 60 * 1000;
-
         public DesignModeClientTests()
         {
             this.mockTestRequestManager = new Mock<ITestRequestManager>();
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.designModeClient = new DesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance,
-                ClientListenTimeOut, CustomHostLaunchAckTimeout);
+            this.designModeClient = new DesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
         }
 
         [TestMethod]
@@ -229,44 +225,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         }
 
         [TestMethod]
-        [ExpectedException(typeof(TestPlatformException))]
-        public void DesignModeClientLaunchCustomHostTimesOutIfNoResponseWithinExpectedTime()
+        public void DesignModeClientLaunchCustomHostMustReturnIfAckComes()
         {
-            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance,
-                ClientListenTimeOut, customHostLaunchTimeOut: 1000);
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
 
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
 
             var expectedProcessId = 1234;
             Action sendMessageAction = () =>
             {
-                // Making sure that we timeout
-                Thread.Sleep(2000);
-                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId);
-            };
-
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
-                Callback(() => Task.Run(sendMessageAction));
-
-            var info = new TestProcessStartInfo();
-            var processId = testableDesignModeClient.LaunchCustomHost(info);
-
-            Assert.AreEqual(expectedProcessId, processId);
-        }
-
-        [TestMethod]
-        public void DesignModeClientLaunchCustomHostMustSucceedIfComesWithinTimeout()
-        {
-            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance,
-                ClientListenTimeOut, customHostLaunchTimeOut: 2000);
-
-            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
-
-            var expectedProcessId = 1234;
-            Action sendMessageAction = () =>
-            {
-                // Wait for 1 sec (timeout is 2 sec)
-                Thread.Sleep(1000);
                 testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId);
             };
 
@@ -282,8 +249,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         private class TestableDesignModeClient : DesignModeClient
         {
             internal TestableDesignModeClient(ICommunicationManager communicationManager, 
-                IDataSerializer dataSerializer, int clientListenTimeOut, int customHostLaunchTimeOut)
-                : base(communicationManager, dataSerializer, clientListenTimeOut, customHostLaunchTimeOut)
+                IDataSerializer dataSerializer)
+                : base(communicationManager, dataSerializer)
             {
             }
 
