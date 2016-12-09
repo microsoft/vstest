@@ -61,9 +61,7 @@
              Mark them as content and copy to output directory.
         -->
         <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj">
-          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-          <OutputItemType>Content</OutputItemType>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <FromP2P>true</FromP2P>
         </ProjectReference>
         <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
           <FromP2P>true</FromP2P>
