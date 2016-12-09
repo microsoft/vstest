@@ -230,6 +230,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
 
+                // LifeCycle of the TP through DesignModeClient is maintained by the IDEs or user-facing-clients like LUTs, who call TestPlatform
+                // TP is handing over the control of launch to these IDEs and so, TP has to wait indefinite
+                // Even if TP has a timeout here, there is no way TP can abort or stop the thread/task that is hung in IDE or LUT
+                // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
+                // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
                 waitHandle.WaitOne();
                 this.onAckMessageReceived = null;
 
