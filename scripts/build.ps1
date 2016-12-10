@@ -30,8 +30,8 @@ Param(
     [System.Boolean] $Localized = $false,
 
     [Parameter(Mandatory=$false)]
-    [Alias("real")]
-    [System.Boolean] $RealBuild = $false
+    [Alias("ci")]
+    [Switch] $CIBuild = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -68,6 +68,7 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
+$TPB_CIBuild = $CIBuild
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -149,7 +150,7 @@ function Invoke-Build
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
