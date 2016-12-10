@@ -30,8 +30,8 @@ Param(
     [System.Boolean] $Localized = $false,
 
     [Parameter(Mandatory=$false)]
-    [Alias("real")]
-    [System.Boolean] $RealBuild = $false
+    [Alias("ci")]
+    [Switch] $CIBuild = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -68,6 +68,7 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
+$TPB_CIBuild = $CIBuild
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -149,7 +150,7 @@ function Invoke-Build
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -243,16 +244,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    if( $framework -eq $TPB_TargetFramework){
-
-        Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal"
-        & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output --runtime $TPB_TargetRuntime -v:minimal
-    }else{
-
-        # TargetRuntime is not required for netcoreapp
-        Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
-        & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
-    }
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
 }
 
 function Create-VsixPackage

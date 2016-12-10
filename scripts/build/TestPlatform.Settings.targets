@@ -10,8 +10,8 @@
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <PublicSign>true</PublicSign>
-    <!--<DelaySign>true</DelaySign>-->
+    <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
+    <DelaySign Condition="'$(CIBuild)' == 'true'">true</DelaySign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
     <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -61,9 +61,7 @@
              Mark them as content and copy to output directory.
         -->
         <ProjectReference Include="$(TestPlatformRoot)src/testhost/testhost.csproj">
-          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-          <OutputItemType>Content</OutputItemType>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <FromP2P>true</FromP2P>
         </ProjectReference>
         <ProjectReference Include="$(TestPlatformRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
           <FromP2P>true</FromP2P>
