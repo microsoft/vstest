@@ -366,20 +366,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 if (string.IsNullOrEmpty(trxFileName))
                 {
                     // save the xml to file in testResultsFolder
-                    trxFileName = this.GetTrxFileName(TrxFileDirectory, this.testRun.RunConfiguration.RunDeploymentRootDirectory);
+                    // [RunDeploymentRootDirectory] Replace white space with underscore from trx file name to make it command line friendly
+                    trxFileName = this.GetTrxFileName(TrxFileDirectory, this.testRun.RunConfiguration.RunDeploymentRootDirectory.Replace(' ', '_'));
                 }
 
-                try
-                {
-                    FileStream fs = File.OpenWrite(trxFileName);
-                    rootElement.OwnerDocument.Save(fs);
-                    String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
-                    Console.WriteLine(resultsFileMessage);
-                }
-                catch (System.UnauthorizedAccessException fileWriteException)
-                {
-                    Console.WriteLine(fileWriteException.Message);
-                }
+                this.PopulateTrxFile(trxFileName, rootElement);
+            }
+        }
+
+        /// <summary>
+        /// populate trx file from the xmlelement
+        /// </summary>
+        /// <param name="trxFileName">
+        /// Trx full path
+        /// </param>
+        /// <param name="rootElement">
+        /// XmlElement.
+        /// </param>
+        internal virtual void PopulateTrxFile(string trxFileName, XmlElement rootElement)
+        {
+            try
+            {
+                FileStream fs = File.OpenWrite(trxFileName);
+                rootElement.OwnerDocument.Save(fs);
+                String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
+                Console.WriteLine(resultsFileMessage);
+            }
+            catch (System.UnauthorizedAccessException fileWriteException)
+            {
+                Console.WriteLine(fileWriteException.Message);
             }
         }
 

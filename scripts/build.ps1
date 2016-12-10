@@ -30,6 +30,10 @@ Param(
     [System.Boolean] $Localized = $false,
 
     [Parameter(Mandatory=$false)]
+    [Alias("ci")]
+    [Switch] $CIBuild = $false,
+
+    [Parameter(Mandatory=$false)]
     [Alias("ba")]
     [System.String[]] $BuildArgs = @()
 )
@@ -68,7 +72,7 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
-$TPB_BuildArgs = $BuildArgs
+$TPB_BuildArgs = @("-p:Version=$TPB_Version", "-p:CIBuild=$CIBuild") + $BuildArgs
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -132,7 +136,7 @@ function Restore-Package
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
-    & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal
+    & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal $TPB_BuildArgs
     Write-Log ".. .. Restore-Package: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -149,8 +153,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version $TPB_BuildArgs"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version $TPB_BuildArgs
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal $TPB_BuildArgs"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal $TPB_BuildArgs
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
