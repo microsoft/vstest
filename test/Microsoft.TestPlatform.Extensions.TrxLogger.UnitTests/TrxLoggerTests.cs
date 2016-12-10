@@ -30,15 +30,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     public class TrxLoggerTests
     {
         private Mock<TestLoggerEvents> events;
-        private TestTableTrxLogger testTableTrxLogger;
+        private TestableTrxLogger testableTrxLogger;
 
         [TestInitialize]
         public void Initialize()
         {
             this.events = new Mock<TestLoggerEvents>();
 
-            this.testTableTrxLogger = new TestTableTrxLogger();
-            this.testTableTrxLogger.Initialize(this.events.Object, "dummy");
+            this.testableTrxLogger = new TestableTrxLogger();
+            this.testableTrxLogger.Initialize(this.events.Object, "dummy");
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Assert.ThrowsException<ArgumentNullException>(
                 () =>
                     {
-                        this.testTableTrxLogger.Initialize(null, "dummy");
+                        this.testableTrxLogger.Initialize(null, "dummy");
                     });
         }
 
@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void InitializeShouldNotThrowExceptionIfEventsIsNotNull()
         {
             var events = new Mock<TestLoggerEvents>();
-            this.testTableTrxLogger.Initialize(events.Object, "dummy");
+            this.testableTrxLogger.Initialize(events.Object, "dummy");
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                 () =>
                 {
                     var events = new Mock<TestLoggerEvents>();
-                    this.testTableTrxLogger.Initialize(events.Object, null);
+                    this.testableTrxLogger.Initialize(events.Object, null);
                 });
         }
 
@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void InitializeShouldNotThrowExceptionIfTestRunDirectoryIsNeitherEmptyNorNull()
         {
             var events = new Mock<TestLoggerEvents>();
-            this.testTableTrxLogger.Initialize(events.Object, "dummy");
+            this.testableTrxLogger.Initialize(events.Object, "dummy");
         }
 
         [TestMethod]
@@ -81,7 +81,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.testTableTrxLogger.TestMessageHandler(new object(), default(TestRunMessageEventArgs));
+                this.testableTrxLogger.TestMessageHandler(new object(), default(TestRunMessageEventArgs));
             });
         }
 
@@ -90,9 +90,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             string message = "The information to test";
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Informational, message);
-            this.testTableTrxLogger.TestMessageHandler(new object(), trme);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme);
 
-            Assert.IsTrue(this.testTableTrxLogger.GetRunLevelInformationalMessage().Contains(message));
+            Assert.IsTrue(this.testableTrxLogger.GetRunLevelInformationalMessage().Contains(message));
         }
 
         [TestMethod]
@@ -100,10 +100,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             string message = "The information to test";
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Warning, message);
-            this.testTableTrxLogger.TestMessageHandler(new object(), trme);
-            this.testTableTrxLogger.TestMessageHandler(new object(), trme);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme);
 
-            Assert.AreEqual(this.testTableTrxLogger.GetRunLevelErrorsAndWarnings().Count, 2);
+            Assert.AreEqual(this.testableTrxLogger.GetRunLevelErrorsAndWarnings().Count, 2);
         }
 
         [TestMethod]
@@ -111,9 +111,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             string message = "The information to test";
             TestRunMessageEventArgs trme = new TestRunMessageEventArgs(TestMessageLevel.Error, message);
-            this.testTableTrxLogger.TestMessageHandler(new object(), trme);
+            this.testableTrxLogger.TestMessageHandler(new object(), trme);
 
-            Assert.AreEqual(this.testTableTrxLogger.GetRunLevelErrorsAndWarnings().Count, 1);
+            Assert.AreEqual(this.testableTrxLogger.GetRunLevelErrorsAndWarnings().Count, 1);
         }
 
         [TestMethod]
@@ -123,9 +123,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestResult testResult = new ObjectModel.TestResult(testCase);
             Mock<TestResultEventArgs> e = new Mock<TestResultEventArgs>(testResult);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), e.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), e.Object);
 
-            Assert.AreEqual(this.testTableTrxLogger.TestRunStartTime, this.testTableTrxLogger.LoggerTestRun.Started);
+            Assert.AreEqual(this.testableTrxLogger.TestRunStartTime, this.testableTrxLogger.LoggerTestRun.Started);
         }
 
         [TestMethod]
@@ -154,14 +154,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
 
-            this.testTableTrxLogger.TestResultHandler(new object(), pass1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), pass2.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), fail1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), skip1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
 
-            Assert.AreEqual(this.testTableTrxLogger.PassedTestCount, 2, "Passed Tests");
-            Assert.AreEqual(this.testTableTrxLogger.FailedTestCount, 1, "Failed Tests");
+            Assert.AreEqual(this.testableTrxLogger.PassedTestCount, 2, "Passed Tests");
+            Assert.AreEqual(this.testableTrxLogger.FailedTestCount, 1, "Failed Tests");
         }
 
         [TestMethod]
@@ -190,13 +190,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
 
-            this.testTableTrxLogger.TestResultHandler(new object(), pass1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), pass2.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), fail1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), skip1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
 
-            Assert.AreEqual(this.testTableTrxLogger.TotalTestCount, 4, "Passed Tests");
+            Assert.AreEqual(this.testableTrxLogger.TotalTestCount, 4, "Passed Tests");
         }
 
         [TestMethod]
@@ -209,11 +209,11 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), skip1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
             string expectedMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, "Skip1");
 
-            Assert.AreEqual(String.Compare(this.testTableTrxLogger.GetRunLevelInformationalMessage(), expectedMessage, true), 0);
+            Assert.AreEqual(String.Compare(this.testableTrxLogger.GetRunLevelInformationalMessage(), expectedMessage, true), 0);
         }
 
         [TestMethod]
@@ -231,10 +231,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.testTableTrxLogger.TestResultCount, 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(this.testableTrxLogger.TestResultCount, 2, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -252,10 +252,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.testTableTrxLogger.TestEntryCount, 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(this.testableTrxLogger.TestEntryCount, 2, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -272,10 +272,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> resultEventArg1 = new Mock<TestResultEventArgs>(result1);
             Mock<TestResultEventArgs> resultEventArg2 = new Mock<TestResultEventArgs>(result2);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), resultEventArg2.Object);
 
-            Assert.AreEqual(this.testTableTrxLogger.UnitTestElementCount, 2, "TestResultHandler is not creating test result entry for each test case");
+            Assert.AreEqual(this.testableTrxLogger.UnitTestElementCount, 2, "TestResultHandler is not creating test result entry for each test case");
         }
 
         [TestMethod]
@@ -303,17 +303,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> fail1 = new Mock<TestResultEventArgs>(failResult1);
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), pass1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), pass2.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), fail1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), skip1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
 
-            TestTableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
-            this.testTableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-            Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Failed, this.testTableTrxLogger.TestResultOutcome);
+            Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Failed, this.testableTrxLogger.TestResultOutcome);
         }
 
         [TestMethod]
@@ -336,17 +336,17 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Mock<TestResultEventArgs> pass2 = new Mock<TestResultEventArgs>(passResult2);
             Mock<TestResultEventArgs> skip1 = new Mock<TestResultEventArgs>(skipResult1);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), pass1.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), pass2.Object);
-            this.testTableTrxLogger.TestResultHandler(new object(), skip1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass1.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
 
-            TestTableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
-            this.testTableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
 
-            Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Completed, this.testTableTrxLogger.TestResultOutcome);
+            Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Completed, this.testableTrxLogger.TestResultOutcome);
         }
 
         [TestMethod]
@@ -356,14 +356,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             ObjectModel.TestResult passResult = new ObjectModel.TestResult(passTestCase);
             Mock<TestResultEventArgs> pass = new Mock<TestResultEventArgs>(passResult);
 
-            this.testTableTrxLogger.TestResultHandler(new object(), pass.Object);
+            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
 
             var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
 
-            TestTableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
-            this.testTableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-            bool trxFileName = Path.GetFileName(this.testTableTrxLogger.trxFile).Contains(' ');
+            bool trxFileName = Path.GetFileName(this.testableTrxLogger.trxFile).Contains(' ');
         }
 
         /// <summary>
@@ -422,7 +422,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
     }
 
-    internal class TestTableTrxLogger : TrxLogger
+    internal class TestableTrxLogger : TrxLogger
     {
         public string trxFile;
         internal override void PopulateTrxFile(string trxFileName, XmlElement rootElement)
