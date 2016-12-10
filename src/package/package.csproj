@@ -1,9 +1,15 @@
-﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--<Target Name="WorkAroundToSkipPreprocessingBinaries" BeforeTargets="RunProduceContentAssets">
+    <ItemGroup>
+        <FileDependencies>
+         <codeLanguage Condition="'%(FileDependencies.codeLanguage)' == 'any' and '%(FileDependencies.Extension)' == '.dll'">binary</codeLanguage>
+        </FileDependencies>  
+    </ItemGroup>
+  </Target>-->
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
-  
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
     <AssemblyName>package</AssemblyName>
@@ -21,13 +27,11 @@
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
-
   <ItemGroup>
     <Content Include="[Content_Types].xml;extension.vsixmanifest;License.rtf;TestPlatform.ObjectModel.manifest;TestPlatform.ObjectModel.x86.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>    
+    </Content>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.Client\Microsoft.TestPlatform.Client.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
@@ -42,16 +46,7 @@
       <FromP2P>true</FromP2P>
     </ProjectReference>
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <!--<PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>15.0.0</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Internal.Dia">
-      <Version>14.0.0</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>-->
     <PackageReference Include="NuGet.CommandLine">
       <Version>3.4.3</Version>
       <PrivateAssets>All</PrivateAssets>
@@ -60,26 +55,20 @@
       <Version>0.1.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="MicroBuild.Core">
+      <Version>0.2.0</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="Microsoft.NETCore.App">
       <Version>1.0.0</Version>
     </PackageReference>
   </ItemGroup>
-
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
-  
-  <!--<Target Name="WorkAroundToSkipPreprocessingBinaries" BeforeTargets="RunProduceContentAssets">
-    <ItemGroup>
-        <FileDependencies>
-         <codeLanguage Condition="'%(FileDependencies.codeLanguage)' == 'any' and '%(FileDependencies.Extension)' == '.dll'">binary</codeLanguage>
-        </FileDependencies>  
-    </ItemGroup>
-  </Target>-->
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
