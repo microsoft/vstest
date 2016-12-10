@@ -55,10 +55,6 @@
       <Version>0.1.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MicroBuild.Core">
-      <Version>0.2.0</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

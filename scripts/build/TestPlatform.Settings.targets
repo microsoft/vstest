@@ -10,8 +10,7 @@
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
-    <DelaySign Condition="'$(CIBuild)' == 'true'">true</DelaySign>
+    <PublicSign Condition="'$(CIBuild)' == '' Or '$(CIBuild)' == 'false'">true</PublicSign>
     <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
     <AssemblyOriginatorKeyFile>$(TestPlatformRoot)scripts/key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -40,12 +39,7 @@
     <!--</PackageReference>-->
   </ItemGroup>
 
-  <ItemGroup>
-    <AdditionalFiles Include="$(TestPlatformRoot)scripts\stylecop.json">
-      <Link>stylecop.json</Link>
-    </AdditionalFiles>
-  </ItemGroup>
-
+  <!-- Test project -->
   <Choose>
     <When Condition="$(TestProject) == 'true'"> 
       <PropertyGroup>
@@ -90,9 +84,38 @@
   </Choose>
 
   <!-- Code analysis settings -->
+  <ItemGroup>
+    <AdditionalFiles Include="$(TestPlatformRoot)scripts\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
   <PropertyGroup>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+
+  <!-- Signing settings -->
+  <Choose>
+    <When Condition="'$(CIBuild)' == 'true'"> 
+      <PropertyGroup>
+        <PublicSign>false</PublicSign>
+        <DelaySign>true</DelaySign>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <PackageReference Include="MicroBuild.Core">
+          <Version>0.2.0</Version>
+          <PrivateAssets>All</PrivateAssets>
+        </PackageReference>
+      </ItemGroup>
+
+      <ItemGroup>
+        <FilesToSign Include="$(OutDir)\$(TargetName)$(TargetExt)">
+          <Authenticode>Microsoft</Authenticode>
+          <StrongName>StrongName</StrongName>
+        </FilesToSign>
+      </ItemGroup>
+    </When>
+  </Choose>
 </Project>
