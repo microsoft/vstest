@@ -97,7 +97,7 @@
 
   <!-- Signing settings -->
   <Choose>
-    <When Condition="'$(CIBuild)' == 'true'"> 
+    <When Condition="'$(CIBuild)' == 'true' And '$(TargetFramework)' != ''"> 
       <PropertyGroup>
         <PublicSign>false</PublicSign>
         <DelaySign>true</DelaySign>
