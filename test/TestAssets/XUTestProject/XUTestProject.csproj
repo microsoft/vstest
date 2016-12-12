@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>XUTestProject</AssemblyName>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or $(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or $(TargetFramework)' == 'netcoreapp1.1' ">Exe</OutputType>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
+    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or '$(TargetFramework)' == 'netcoreapp1.1' ">Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
