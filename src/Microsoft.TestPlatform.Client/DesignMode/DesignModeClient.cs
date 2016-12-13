@@ -238,7 +238,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 waitHandle.WaitOne();
                 this.onAckMessageReceived = null;
 
-                return this.dataSerializer.DeserializePayload<int>(ackMessage);
+                var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
+
+                if (ackPayload.HostProcessId > 0)
+                {
+                    return ackPayload.HostProcessId;
+                }
+                else
+                {
+                    throw new TestPlatformException(ackPayload.ErrorMessage);
+                }
             }
         }
 

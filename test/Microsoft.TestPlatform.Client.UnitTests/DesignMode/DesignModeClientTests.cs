@@ -234,7 +234,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             var expectedProcessId = 1234;
             Action sendMessageAction = () =>
             {
-                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId);
+                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, null);
             };
 
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
@@ -246,6 +246,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             Assert.AreEqual(expectedProcessId, processId);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(TestPlatformException))]
+        public void DesignModeClientLaunchCustomHostMustThrowIfInvalidAckComes()
+        {
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+
+            var expectedProcessId = -1;
+            Action sendMessageAction = () =>
+            {
+                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, "Dummy");
+            };
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
+                Callback(() => Task.Run(sendMessageAction));
+
+            var info = new TestProcessStartInfo();
+            var processId = testableDesignModeClient.LaunchCustomHost(info);
+        }
+
         private class TestableDesignModeClient : DesignModeClient
         {
             internal TestableDesignModeClient(ICommunicationManager communicationManager, 
@@ -254,10 +275,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             {
             }
 
-            public void InvokeCustomHostLaunchAckCallback(int processId)
+            public void InvokeCustomHostLaunchAckCallback(int processId, string errorMessage)
             {
+                var payload = new CustomHostLaunchAckPayload()
+                {
+                    HostProcessId = processId,
+                    ErrorMessage = errorMessage
+                };
                 this.onAckMessageReceived?.Invoke(
-                    new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(processId) });
+                    new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(payload) });
             }
         }
     }
