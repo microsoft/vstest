@@ -25,6 +25,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(2, 2, 2);
         }
 
+        [Ignore]
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
