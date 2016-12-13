@@ -7,11 +7,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    public abstract class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
+    [TestClass]
+    public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
-        [TestMethod]
-        public virtual void ChutzpahRunAllTestExecution()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        public void ChutzpahRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
             var arguments = PrepareArguments(
                 testJSFileAbsolutePath,
@@ -23,9 +27,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [Ignore]
-        [TestMethod]
-        public virtual void CPPRunAllTestExecution()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var assemblyRelativePath =
                 @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
@@ -38,9 +45,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 0, 0);
         }
 
-        [TestMethod]
-        public virtual void NUnitRunAllTestExecution()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        public void NUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var arguments = PrepareArguments(
                 this.GetAssetFullPath("NUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.NUnit),
@@ -50,9 +60,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        [TestMethod]
-        public void XUnitRunAllTestExecution()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void XUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
             var arguments = PrepareArguments(
                 this.GetAssetFullPath("XUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),

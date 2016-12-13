@@ -8,11 +8,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    public abstract class AppDomainTests : AcceptanceTestBase
+    [TestClass]
+    public class AppDomainTests : AcceptanceTestBase
     {
-        [TestMethod]
-        public virtual void RunTestExecutionWithDisableAppDomain()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        public void RunTestExecutionWithDisableAppDomain(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var testAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
             var dataCollectorAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
 
