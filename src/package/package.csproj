@@ -1,11 +1,4 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!--<Target Name="WorkAroundToSkipPreprocessingBinaries" BeforeTargets="RunProduceContentAssets">
-    <ItemGroup>
-        <FileDependencies>
-         <codeLanguage Condition="'%(FileDependencies.codeLanguage)' == 'any' and '%(FileDependencies.Extension)' == '.dll'">binary</codeLanguage>
-        </FileDependencies>  
-    </ItemGroup>
-  </Target>-->
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
   </PropertyGroup>
@@ -23,6 +16,12 @@
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+
+    <!-- This proj file shouldn't create outputs during build or publish -->
+    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+    <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
+    <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
@@ -47,18 +46,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <PackageReference Include="NuGet.CommandLine">
-      <Version>3.4.3</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="fmdev.xlftool">
-      <Version>0.1.2</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="MicroBuild.Core">
-      <Version>0.2.0</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
@@ -71,4 +58,6 @@
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+
+  <Target Name="CoreCompile" />                               <!-- Prevent Csc from being called -->
 </Project>
