@@ -17,13 +17,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunTestExecutionWithRunSettingsWithoutParallelAndPlatformX86()
         {
-            var testhostProcessName = "testhost.x86";
-            var expectedProcessCreated = 1;
+            string testhostProcessName;
+            int expectedProcessCreated;
+            if (this.IsDesktopTargetFramework())
+            {
+                testhostProcessName = "testhost.x86";
+                expectedProcessCreated = 1;
+            }
+            else
+            {
+                testhostProcessName = "dotnet";
+                if (this.IsDesktopRunner())
+                {
+                    expectedProcessCreated = 2;
+                }
+                else
+                {
+                    // includes launcher dotnet process
+                    expectedProcessCreated = 3;
+                }
+            }
+
             var runConfigurationDictionary = new Dictionary<string, string>
                                                  {
                                                          { "MaxCpuCount", "1" },
                                                          { "TargetPlatform", "x86" },
-                                                         { "TargetFrameworkVersion", "Framework45" },
+                                                         { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
             this.RunTestWithRunSettings(runConfigurationDictionary, testhostProcessName, expectedProcessCreated);
@@ -32,18 +51,33 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void RunTestExecutionWithRunSettingsWithParallelAndPlatformX64()
         {
-            var testhostProcessName = "testhost";
-            var expectedProcessCreated = 2;
+            string testhostProcessName;
+            int expectedProcessCreated = 2;
+            if (this.IsDesktopTargetFramework())
+            {
+                testhostProcessName = "testhost";
+            }
+            else
+            {
+                testhostProcessName = "dotnet";
+                if (!this.IsDesktopRunner())
+                {
+                    expectedProcessCreated = 3;
+                }
+            }
+
             var runConfigurationDictionary = new Dictionary<string, string>
                                                  {
                                                          { "MaxCpuCount", "2" },
                                                          { "TargetPlatform", "x64" },
-                                                         { "TargetFrameworkVersion", "Framework45" },
+                                                         { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings()},
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
             this.RunTestWithRunSettings(runConfigurationDictionary, testhostProcessName, expectedProcessCreated);
         }
 
+        // Known issue https://github.com/Microsoft/vstest/issues/135
+        [Ignore]
         [TestMethod]
         public void RunTestExecutionWithTestAdapterPathFromRunSettings()
         {
@@ -92,7 +126,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.AreEqual(
                 expectedProcessCreated,
                 numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedProcessCreated} actual: {numOfProcessCreatedTask.Result}");
+                $"Number of {testhostProcessName} process created, expected: {expectedProcessCreated} actual: {numOfProcessCreatedTask.Result} args: {arguments} runner path: {this.testEnvironment.GetConsoleRunnerPath()}");
             this.ValidateSummaryStatus(2, 2, 2);
             File.Delete(runsettingsPath);
         }

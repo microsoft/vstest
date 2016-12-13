@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestMethod]
         public void DiscoverAllTests()
         {
-            this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath());
+            this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
             this.ValidateDiscoveredTests(listOfTests);
         }

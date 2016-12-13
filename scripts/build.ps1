@@ -133,6 +133,8 @@ function Restore-Package
 
     Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
     & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal
+    Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
+    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal
     Write-Log ".. .. Restore-Package: Complete."
 
     if ($lastExitCode -ne 0) {
