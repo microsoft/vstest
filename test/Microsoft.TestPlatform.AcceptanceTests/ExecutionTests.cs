@@ -28,7 +28,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, " /Parallel");
             arguments = string.Concat(arguments, " /Platform:x86");
-            var testhostProcessName = "testhost.x86";
+            string testhostProcessName = string.Empty;
+            int expectedNumOfProcessCreated = 0;
+            if (this.IsDesktopTargetFramework())
+            {
+                testhostProcessName = "testhost.x86";
+                expectedNumOfProcessCreated = 2;
+            }
+            else
+            {
+                testhostProcessName = "dotnet";
+                if (this.IsDesktopRunner())
+                {
+                    expectedNumOfProcessCreated = 2;
+                }
+                else
+                {
+                    // Include launcher dotnet.exe
+                    expectedNumOfProcessCreated = 3;
+                }
+            }
+
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
@@ -38,9 +58,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             cts.Cancel();
 
             Assert.AreEqual(
-                2,
+                expectedNumOfProcessCreated,
                 numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {2} actual: {numOfProcessCreatedTask.Result}");
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
             this.ValidateSummaryStatus(2, 2, 2);
         }
     }

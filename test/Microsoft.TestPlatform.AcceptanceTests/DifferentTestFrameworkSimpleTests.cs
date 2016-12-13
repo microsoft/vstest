@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public abstract class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         [TestMethod]
-        public void ChutzpahRunAllTestExecution()
+        public virtual void ChutzpahRunAllTestExecution()
         {
             var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
             var arguments = PrepareArguments(
@@ -22,8 +22,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
+        [Ignore]
         [TestMethod]
-        public void CPPRunAllTestExecution()
+        public virtual void CPPRunAllTestExecution()
         {
             var assemblyRelativePath =
                 @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
@@ -38,7 +39,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
-        public void NUnitRunAllTestExecution()
+        public virtual void NUnitRunAllTestExecution()
         {
             var arguments = PrepareArguments(
                 this.GetAssetFullPath("NUTestProject.dll"),
