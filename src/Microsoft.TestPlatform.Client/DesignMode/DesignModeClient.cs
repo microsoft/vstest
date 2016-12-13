@@ -13,6 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// The design mode client.
@@ -265,12 +267,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Task.Run(
             delegate
             {
-                testRequestManager.ResetOptions();
+                try
+                {
+                    testRequestManager.ResetOptions();
 
-                var customLauncher = skipTestHostLaunch ?
-                    DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
+                    var customLauncher = skipTestHostLaunch ?
+                        DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
 
-                testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this));
+                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this));
+                }
+                catch(Exception ex)
+                {
+                    // If there is an exception during test run request creation or some time during the process
+                    // In such cases, TestPlatform will never send a TestRunComplete event and IDE need to be sent a run complete message
+                    // We need recoverability in translationlayer-designmode scenarios 
+                    var runCompletePayload = new TestRunCompletePayload()
+                    {
+                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
+                        LastRunTests = null
+                    };
+
+                    // Send run complete to translation layer
+                    this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+                }
             });
         }
 
