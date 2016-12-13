@@ -53,6 +53,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.RunTestWithRunSettings(runConfigurationDictionary, testhostProcessName, expectedProcessCreated);
         }
 
+        [Ignore]
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
