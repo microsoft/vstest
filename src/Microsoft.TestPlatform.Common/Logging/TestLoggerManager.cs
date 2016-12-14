@@ -385,8 +385,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
 
             // Add default logger parameters...
-            // todo Read Output Directory from RunSettings
-            loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = null;
+            loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = this.GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings);
             return loggerParams;
         }
 

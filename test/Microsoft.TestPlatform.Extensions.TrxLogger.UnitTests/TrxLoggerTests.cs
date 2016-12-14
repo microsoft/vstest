@@ -31,6 +31,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     {
         private Mock<TestLoggerEvents> events;
         private TestableTrxLogger testableTrxLogger;
+        private Dictionary<string, string> parameters;
+        private const string DefaultLogFileParameterValue = "logfilevalue";
 
         [TestInitialize]
         public void Initialize()
@@ -38,7 +40,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.events = new Mock<TestLoggerEvents>();
 
             this.testableTrxLogger = new TestableTrxLogger();
-            this.testableTrxLogger.Initialize(this.events.Object, "dummy");
+            this.parameters = new Dictionary<string, string>(2);
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dummy";
+            this.parameters[TrxLogger.LogFileParameterKey] = TrxLoggerTests.DefaultLogFileParameterValue;
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
 
         [TestMethod]
@@ -47,7 +52,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             Assert.ThrowsException<ArgumentNullException>(
                 () =>
                     {
-                        this.testableTrxLogger.Initialize(null, "dummy");
+                        this.testableTrxLogger.Initialize(null, this.parameters);
                     });
         }
 
@@ -55,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void InitializeShouldNotThrowExceptionIfEventsIsNotNull()
         {
             var events = new Mock<TestLoggerEvents>();
-            this.testableTrxLogger.Initialize(events.Object, "dummy");
+            this.testableTrxLogger.Initialize(events.Object, this.parameters);
         }
 
         [TestMethod]
@@ -65,7 +70,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
                 () =>
                 {
                     var events = new Mock<TestLoggerEvents>();
-                    this.testableTrxLogger.Initialize(events.Object, null);
+                    this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = null;
+                    this.testableTrxLogger.Initialize(events.Object, parameters);
                 });
         }
 
@@ -73,7 +79,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void InitializeShouldNotThrowExceptionIfTestRunDirectoryIsNeitherEmptyNorNull()
         {
             var events = new Mock<TestLoggerEvents>();
-            this.testableTrxLogger.Initialize(events.Object, "dummy");
+            this.testableTrxLogger.Initialize(events.Object, this.parameters);
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowExceptionIfParametersAreEmpty()
+        {
+            var events = new Mock<TestLoggerEvents>();
+            Assert.ThrowsException<ArgumentException>(() => this.testableTrxLogger.Initialize(events.Object, new Dictionary<string, string>()));
         }
 
         [TestMethod]
@@ -119,7 +132,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerShouldCaptureStartTimeInSummaryWithTimeStampDuringIntialize()
         {
-            ObjectModel.TestCase testCase = new ObjectModel.TestCase("dummy string", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase testCase = CreateTestCase("dummy string");
             ObjectModel.TestResult testResult = new ObjectModel.TestResult(testCase);
             Mock<TestResultEventArgs> e = new Mock<TestResultEventArgs>(testResult);
 
@@ -131,10 +144,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerKeepingTheTrackOfPassedAndFailedTests()
         {
-            ObjectModel.TestCase passTestCase1 = new ObjectModel.TestCase("Pass1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase passTestCase2 = new ObjectModel.TestCase("Pass2", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase failTestCase1 = new ObjectModel.TestCase("Fail1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase skipTestCase1 = new ObjectModel.TestCase("Skip1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
+            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass2");
+            ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
+            ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
             ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
             passResult1.Outcome = ObjectModel.TestOutcome.Passed;
@@ -167,10 +180,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerKeepingTheTrackOfTotalTests()
         {
-            ObjectModel.TestCase passTestCase1 = new ObjectModel.TestCase("Pass1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase passTestCase2 = new ObjectModel.TestCase("Pass2", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase failTestCase1 = new ObjectModel.TestCase("Fail1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase skipTestCase1 = new ObjectModel.TestCase("Skip1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
+            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass2");
+            ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
+            ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
             ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
             passResult1.Outcome = ObjectModel.TestOutcome.Passed;
@@ -202,7 +215,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerLockingAMessageForSkipTest()
         {
-            ObjectModel.TestCase skipTestCase1 = new ObjectModel.TestCase("Skip1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
             ObjectModel.TestResult skipResult1 = new ObjectModel.TestResult(skipTestCase1);
             skipResult1.Outcome = ObjectModel.TestOutcome.Skipped;
@@ -219,8 +232,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerShouldCreateOneTestResultForEachTestCase()
         {
-            ObjectModel.TestCase testCase1 = new ObjectModel.TestCase("TestCase1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase testCase2 = new ObjectModel.TestCase("TestCase2", new Uri("some://uri"), "DummySourceFileName");
+            var testCase1 = CreateTestCase("testCase1");
+            ObjectModel.TestCase testCase2 = CreateTestCase("testCase2");
 
             ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
             result1.Outcome = ObjectModel.TestOutcome.Skipped;
@@ -240,8 +253,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerShouldCreateOneTestEntryForEachTestCase()
         {
-            ObjectModel.TestCase testCase1 = new ObjectModel.TestCase("TestCase1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase testCase2 = new ObjectModel.TestCase("TestCase2", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
 
             ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
             result1.Outcome = ObjectModel.TestOutcome.Skipped;
@@ -261,8 +274,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TestResultHandlerShouldCreateOneUnitTestElementForEachTestCase()
         {
-            ObjectModel.TestCase testCase1 = new ObjectModel.TestCase("TestCase1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase testCase2 = new ObjectModel.TestCase("TestCase2", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
+            ObjectModel.TestCase testCase2 = CreateTestCase("TestCase2");
 
             ObjectModel.TestResult result1 = new ObjectModel.TestResult(testCase1);
 
@@ -281,10 +294,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void OutcomeOfRunWillBeFailIfAnyTestsFails()
         {
-            ObjectModel.TestCase passTestCase1 = new ObjectModel.TestCase("Pass1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase passTestCase2 = new ObjectModel.TestCase("Pass2", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase failTestCase1 = new ObjectModel.TestCase("Fail1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase skipTestCase1 = new ObjectModel.TestCase("Skip1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
+            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass2");
+            ObjectModel.TestCase failTestCase1 = CreateTestCase("Fail1");
+            ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
             ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
             passResult1.Outcome = ObjectModel.TestOutcome.Passed;
@@ -308,7 +321,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), fail1.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
+            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
             TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
@@ -319,9 +332,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void OutcomeOfRunWillBeCompletedIfNoTestsFails()
         {
-            ObjectModel.TestCase passTestCase1 = new ObjectModel.TestCase("Pass1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase passTestCase2 = new ObjectModel.TestCase("Pass2", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestCase skipTestCase1 = new ObjectModel.TestCase("Skip1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase passTestCase1 = CreateTestCase("Pass1");
+            ObjectModel.TestCase passTestCase2 = CreateTestCase("Pass2");
+            ObjectModel.TestCase skipTestCase1 = CreateTestCase("Skip1");
 
             ObjectModel.TestResult passResult1 = new ObjectModel.TestResult(passTestCase1);
             passResult1.Outcome = ObjectModel.TestOutcome.Passed;
@@ -340,7 +353,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger.TestResultHandler(new object(), pass2.Object);
             this.testableTrxLogger.TestResultHandler(new object(), skip1.Object);
 
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
+            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
             TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
@@ -352,18 +365,55 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void TheDefaultTrxFileNameShouldNotHaveWhiteSpace()
         {
-            ObjectModel.TestCase passTestCase = new ObjectModel.TestCase("Pass1", new Uri("some://uri"), "DummySourceFileName");
-            ObjectModel.TestResult passResult = new ObjectModel.TestResult(passTestCase);
-            Mock<TestResultEventArgs> pass = new Mock<TestResultEventArgs>(passResult);
+            // To create default trx file, log file parameter should be null.
+            this.parameters[TrxLogger.LogFileParameterKey] = null;
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            Mock<TestResultEventArgs> pass = CreatePassTestResultEventArgsMock();
 
             this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
 
-            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null, new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
+            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
             TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-            bool trxFileName = Path.GetFileName(this.testableTrxLogger.trxFile).Contains(' ');
+            bool trxFileNameContainsWhiteSpace = Path.GetFileName(this.testableTrxLogger.trxFile).Contains(' ');
+            Assert.IsFalse(trxFileNameContainsWhiteSpace, $"\"{this.testableTrxLogger.trxFile}\": Trx file name should not have white spaces");
+        }
+
+        [TestMethod]
+        public void DefaultTrxFileShouldCreateIfLogFileParameterNotPassed()
+        {
+            // To create default trx file, If log file parameter not passed
+            this.parameters.Remove(TrxLogger.LogFileParameterKey);
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            Mock<TestResultEventArgs> pass = CreatePassTestResultEventArgsMock();
+
+            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
+
+            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+
+            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(this.testableTrxLogger.trxFile));
+        }
+
+        [TestMethod]
+        public void TrxFileNameShouldConstructFromLogFileParameter()
+        {
+            var pass = CreatePassTestResultEventArgsMock();
+
+            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
+
+            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+
+            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            var expectedTrxFileName = Path.Combine(TestableTrxLogger.TrxFileDirectory, DefaultLogFileParameterValue);
+            var actualTrxFileName = this.testableTrxLogger.trxFile;
+            Assert.AreEqual(expectedTrxFileName, actualTrxFileName, "Invalid Trx file name");
         }
 
         /// <summary>
@@ -372,7 +422,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void GetCustomPropertyValueFromTestCaseShouldReadCategoyrAttributesFromTestCase()
         {
-            ObjectModel.TestCase testCase1 = new ObjectModel.TestCase("TestCase1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase testCase1 = CreateTestCase("TestCase1");
             TestProperty testProperty = TestProperty.Register("MSTestDiscoverer.TestCategory", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
 
             testCase1.SetPropertyValue(testProperty, new[] { "ClassLevel", "AsmLevel" });
@@ -392,7 +442,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void GetQToolsTestElementFromTestCaseShouldAssignTestCategoryOfUnitTestElement()
         {
-            ObjectModel.TestCase testCase = new ObjectModel.TestCase("TestCase1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
             ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
             TestProperty testProperty = TestProperty.Register("MSTestDiscoverer.TestCategory", "String array property", string.Empty, string.Empty, typeof(string[]), null, TestPropertyAttributes.Hidden, typeof(TestObject));
 
@@ -411,7 +461,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void GetQToolsTestElementFromTestCaseShouldNotFailWhenThereIsNoTestCategoreis()
         {
-            ObjectModel.TestCase testCase = new ObjectModel.TestCase("TestCase1", new Uri("some://uri"), "DummySourceFileName");
+            ObjectModel.TestCase testCase = CreateTestCase("TestCase1");
             ObjectModel.TestResult result = new ObjectModel.TestResult(testCase);
 
             TrxLoggerObjectModel.UnitTestElement unitTestElement = Converter.GetQToolsTestElementFromTestCase(result);
@@ -420,7 +470,29 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             CollectionAssert.AreEqual(expected, unitTestElement.TestCategories.ToArray());
         }
+
+        private static TestCase CreateTestCase(string testCaseName)
+        {
+            return new ObjectModel.TestCase(testCaseName, new Uri("some://uri"), "DummySourceFileName");
+        }
+
+        private static TestRunCompleteEventArgs CreateTestRunCompleteEventArgs()
+        {
+            var testRunCompleteEventArgs = new TestRunCompleteEventArgs(null, false, false, null,
+                new Collection<AttachmentSet>(), new TimeSpan(1, 0, 0, 0));
+            return testRunCompleteEventArgs;
+        }
+
+        private Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock()
+        {
+            ObjectModel.TestCase passTestCase = CreateTestCase("Pass1");
+            ObjectModel.TestResult passResult = new ObjectModel.TestResult(passTestCase);
+            Mock<TestResultEventArgs> pass = new Mock<TestResultEventArgs>(passResult);
+            return pass;
+        }
     }
+
+
 
     internal class TestableTrxLogger : TrxLogger
     {
