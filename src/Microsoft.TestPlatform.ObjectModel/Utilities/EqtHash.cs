@@ -7,9 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
 
-#if NET46
-using System.Security.Cryptography;
-#endif
+    using System.Security.Cryptography;
 
     /// <summary>
     /// Wrapper class for cryptographic hashing.
@@ -25,11 +23,13 @@ using System.Security.Cryptography;
         public static Guid GuidFromString(string data)
         {
             Debug.Assert(data != null);
-#if NET46
+            // Do NOT change the algorithm ever as this will have compat implications
+            // TC-TA team has a feature in VS where workitems are associated based on TestCase Ids
+            // If Algorithm changes, then all the bugs/workitems filed in TFS Server against a given TestCase become unassociated if IDs change
+            // Any algorithm or logic change must require a sign off from feature owners of above
+            // Also, TPV2 and TPV1 must use same Algorithm until the time TPV1 is completely deleted to be on-par
+            // If LUT or .Net core scenario uses TPV2 to discover, but if it uses TPV1 in Devenv, then there will be testcase matching issues
             using (HashAlgorithm provider = SHA1.Create())
-#else
-            using (var provider = System.Security.Cryptography.SHA256.Create())
-#endif
             {
                 byte[] hash = provider.ComputeHash(System.Text.Encoding.Unicode.GetBytes(data));
 
