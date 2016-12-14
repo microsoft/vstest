@@ -540,7 +540,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
 
-            this.requestSender.StartTestRunWithCustomHost(new List<string>() { "1.z" }, null, mockHandler.Object, mockLauncher.Object);
+            this.requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
