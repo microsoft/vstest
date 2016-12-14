@@ -492,8 +492,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
     }
 
-
-
     internal class TestableTrxLogger : TrxLogger
     {
         public string trxFile;

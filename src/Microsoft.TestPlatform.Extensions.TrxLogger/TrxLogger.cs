@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// Gets the directory under which trx file should be saved.
         /// </summary>
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        public static string TrxFileDirectory //TODO: Rename to TestResultsDirectory??
+        public static string TrxFileDirectory
         {
             get;
             internal set;
@@ -134,13 +134,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             if (parameters.Count == 0)
             {
-                throw new ArgumentException("No logger parameters added", nameof(parameters));
+                throw new ArgumentException("No default parameters added", nameof(parameters));
             }
 
             this.parametersDictionary = parameters;
             this.Initialize(events, this.parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
         }
-
         #endregion
 
         #region ForTesting
