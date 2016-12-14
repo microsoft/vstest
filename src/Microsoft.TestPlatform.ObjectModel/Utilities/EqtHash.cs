@@ -26,7 +26,7 @@ using System.Security.Cryptography;
         {
             Debug.Assert(data != null);
 #if NET46
-            using (HashAlgorithm provider = new SHA256CryptoServiceProvider())
+            using (HashAlgorithm provider = SHA1.Create())
 #else
             using (var provider = System.Security.Cryptography.SHA256.Create())
 #endif
