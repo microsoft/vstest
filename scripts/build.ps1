@@ -122,6 +122,9 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
+    # This is added to get netcoreapp1.1 shared components.
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
+    
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -133,6 +136,8 @@ function Restore-Package
 
     Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
     & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal
+    Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
+    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal
     Write-Log ".. .. Restore-Package: Complete."
 
     if ($lastExitCode -ne 0) {

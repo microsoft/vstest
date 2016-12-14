@@ -13,6 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// The design mode client.
@@ -23,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         private readonly IDataSerializer dataSerializer;
 
-        private Action<Message> onAckMessageReceived;
+        protected Action<Message> onAckMessageReceived;
 
         private object ackLockObject = new object();
 
@@ -178,11 +180,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                                 testRequestManager.AbortTestRun();
                                 break;
                             }
+
                         case MessageType.CustomTestHostLaunchCallback:
                             {
                                 this.onAckMessageReceived?.Invoke(message);
                                 break;
                             }
+
                         case MessageType.SessionEnd:
                             {
                                 EqtTrace.Info("DesignModeClient: Session End message received from server. Closing the connection.");
@@ -227,10 +231,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 };
 
                 this.communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
-                waitHandle.WaitOne(ClientListenTimeOut);
 
+                // LifeCycle of the TP through DesignModeClient is maintained by the IDEs or user-facing-clients like LUTs, who call TestPlatform
+                // TP is handing over the control of launch to these IDEs and so, TP has to wait indefinite
+                // Even if TP has a timeout here, there is no way TP can abort or stop the thread/task that is hung in IDE or LUT
+                // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
+                // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
+                waitHandle.WaitOne();
                 this.onAckMessageReceived = null;
-                return this.dataSerializer.DeserializePayload<int>(ackMessage);
+
+                var ackPayload = this.dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
+
+                if (ackPayload.HostProcessId > 0)
+                {
+                    return ackPayload.HostProcessId;
+                }
+                else
+                {
+                    throw new TestPlatformException(ackPayload.ErrorMessage);
+                }
             }
         }
 
@@ -248,12 +267,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             Task.Run(
             delegate
             {
-                testRequestManager.ResetOptions();
+                try
+                {
+                    testRequestManager.ResetOptions();
 
-                var customLauncher = skipTestHostLaunch ?
-                    DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
+                    var customLauncher = skipTestHostLaunch ?
+                        DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
 
-                testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this));
+                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this));
+                }
+                catch(Exception ex)
+                {
+                    // If there is an exception during test run request creation or some time during the process
+                    // In such cases, TestPlatform will never send a TestRunComplete event and IDE need to be sent a run complete message
+                    // We need recoverability in translationlayer-designmode scenarios 
+                    var runCompletePayload = new TestRunCompletePayload()
+                    {
+                        TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
+                        LastRunTests = null
+                    };
+
+                    // Send run complete to translation layer
+                    this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
+                }
             });
         }
 

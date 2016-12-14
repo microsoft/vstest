@@ -278,11 +278,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 result = processor.Executor.Value.Execute();
             }
-            catch (CommandLineException ex)
+            catch (Exception ex)
             {
-                EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
-                this.Output.Error(ex.Message);
-                result = ArgumentProcessorResult.Fail;
+                if (ex is CommandLineException || ex is TestPlatformException)
+                {
+                    EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
+                    this.Output.Error(ex.Message);
+                    result = ArgumentProcessorResult.Fail;
+                }
+                else
+                {
+                    // Let it throw - User must see crash and report it with stack trace!
+                    // No need for recoverability as user will start a new vstest.console anwyay
+                    throw;
+                }
             }
 
             Debug.Assert(
