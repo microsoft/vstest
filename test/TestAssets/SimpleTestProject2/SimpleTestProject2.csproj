@@ -4,7 +4,7 @@
     <TargetFrameworks>netcoreapp1.0;net46;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>SimpleTestProject2</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
+    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or '$(TargetFramework)' == 'netcoreapp1.1' ">Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />
