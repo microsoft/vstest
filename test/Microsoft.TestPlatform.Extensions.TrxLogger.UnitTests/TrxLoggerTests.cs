@@ -32,7 +32,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private Mock<TestLoggerEvents> events;
         private TestableTrxLogger testableTrxLogger;
         private Dictionary<string, string> parameters;
-        private const string DefaultLogFileParameterValue = "logfilevalue";
+        private static string DefaultTestRunDirectory = AppContext.BaseDirectory;
+        private static string DefaultLogFileParameterValue = Path.Combine(DefaultTestRunDirectory, "logfilevalue.trx");
 
         [TestInitialize]
         public void Initialize()
@@ -41,7 +42,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             this.testableTrxLogger = new TestableTrxLogger();
             this.parameters = new Dictionary<string, string>(2);
-            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = "dummy";
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
             this.parameters[TrxLogger.LogFileParameterKey] = TrxLoggerTests.DefaultLogFileParameterValue;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
@@ -323,7 +324,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
-            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
             Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Failed, this.testableTrxLogger.TestResultOutcome);
@@ -355,7 +355,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
-            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
 
@@ -375,7 +374,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
-            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
             bool trxFileNameContainsWhiteSpace = Path.GetFileName(this.testableTrxLogger.trxFile).Contains(' ');
@@ -395,7 +393,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
-            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
             Assert.IsFalse(string.IsNullOrWhiteSpace(this.testableTrxLogger.trxFile));
         }
@@ -409,11 +406,25 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
 
-            TestableTrxLogger.TrxFileDirectory = Directory.GetCurrentDirectory();
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
-            var expectedTrxFileName = Path.Combine(TestableTrxLogger.TrxFileDirectory, DefaultLogFileParameterValue);
-            var actualTrxFileName = this.testableTrxLogger.trxFile;
-            Assert.AreEqual(expectedTrxFileName, actualTrxFileName, "Invalid Trx file name");
+            Assert.AreEqual(DefaultLogFileParameterValue, this.testableTrxLogger.trxFile, "Wrong Trx file name");
+        }
+
+        [TestMethod]
+        public void TrxFilePathShouldConstructProperlyIfRelativePathPassedInLogFileParameter()
+        {
+            var trxRelativePath = @".some\relative\path\results.trx";
+            this.parameters[TrxLogger.LogFileParameterKey] = trxRelativePath;
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+            var pass = CreatePassTestResultEventArgsMock();
+
+            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
+
+            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
+
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            var expectedTrxFileName = Path.Combine(Directory.GetCurrentDirectory(), trxRelativePath);
+            Assert.AreEqual(expectedTrxFileName, this.testableTrxLogger.trxFile, "Wrong Trx file name");
         }
 
         /// <summary>
