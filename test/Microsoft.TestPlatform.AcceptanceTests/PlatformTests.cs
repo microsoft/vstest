@@ -9,14 +9,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    public abstract class PlatformTests : AcceptanceTestBase
+    [TestClass]
+    public class PlatformTests : AcceptanceTestBase
     {
         /// <summary>
         /// The run test execution with platform x64.
         /// </summary>
-        [TestMethod]
-        public void RunTestExecutionWithPlatformx64()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestExecutionWithPlatformx64(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var platformArg = " /Platform:x64";
             string testhostProcessName = string.Empty;
             int expectedNumOfProcessCreated = 0;
@@ -29,9 +34,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <summary>
         /// The run test execution with platform x86.
         /// </summary>
-        [TestMethod]
-        public void RunTestExecutionWithPlatformx86()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestExecutionWithPlatformx86(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var platformArg = " /Platform:x86";
             string testhostProcessName = string.Empty;
             int expectedNumOfProcessCreated = 0;

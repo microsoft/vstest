@@ -12,11 +12,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    public abstract class RunsettingsTests : AcceptanceTestBase
+    [TestClass]
+    public class RunsettingsTests : AcceptanceTestBase
     {
-        [TestMethod]
-        public void RunTestExecutionWithRunSettingsWithoutParallelAndPlatformX86()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestExecutionWithRunSettingsWithoutParallelAndPlatformX86(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             string testhostProcessName;
             int expectedProcessCreated;
             if (this.IsDesktopTargetFramework())
@@ -48,9 +53,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.RunTestWithRunSettings(runConfigurationDictionary, testhostProcessName, expectedProcessCreated);
         }
 
-        [TestMethod]
-        public void RunTestExecutionWithRunSettingsWithParallelAndPlatformX64()
+        [Ignore]
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestExecutionWithRunSettingsWithParallelAndPlatformX64(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             string testhostProcessName;
             int expectedProcessCreated = 2;
             if (this.IsDesktopTargetFramework())
@@ -78,9 +88,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         // Known issue https://github.com/Microsoft/vstest/issues/135
         [Ignore]
-        [TestMethod]
-        public void RunTestExecutionWithTestAdapterPathFromRunSettings()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestExecutionWithTestAdapterPathFromRunSettings(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var runConfigurationDictionary = new Dictionary<string, string>
                                                  {
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }

@@ -353,12 +353,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     }
                     else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
                     {
-                        var testProcessStartInfo = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
-
-                        var processId = customHostLauncher != null
-                                            ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
-                                            : -1;
-                        this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, processId);
+                        HandleCustomHostLaunch(customHostLauncher, message);
                     }
                 }
             }
@@ -394,6 +389,32 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
 
             return message;
+        }
+
+        private void HandleCustomHostLaunch(ITestHostLauncher customHostLauncher, Message message)
+        {
+            var ackPayload = new CustomHostLaunchAckPayload() { HostProcessId = -1, ErrorMessage = null };
+
+            try
+            {
+                var testProcessStartInfo = this.dataSerializer.DeserializePayload<TestProcessStartInfo>(message);
+
+                ackPayload.HostProcessId = customHostLauncher != null
+                                    ? customHostLauncher.LaunchTestHost(testProcessStartInfo)
+                                    : -1;
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("Error while launching custom host: {0}", ex);
+                // Vstest.console will send the abort message properly while cleaning up all the flow, so do not abort here
+                // Let the ack go through and let vstest.console handle the error
+                ackPayload.ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                // Always unblock the Vstest.console thread which is indefintitely waiting on this ACK
+                this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload);
+            }
         }
     }
 }

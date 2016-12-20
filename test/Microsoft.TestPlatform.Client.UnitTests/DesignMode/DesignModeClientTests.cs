@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
     using Moq;
 
     using Newtonsoft.Json.Linq;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class DesignModeClientTests
@@ -221,6 +222,69 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.designModeClient.HandleParentProcessExit();
 
             this.mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
+        }
+
+        [TestMethod]
+        public void DesignModeClientLaunchCustomHostMustReturnIfAckComes()
+        {
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+
+            var expectedProcessId = 1234;
+            Action sendMessageAction = () =>
+            {
+                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, null);
+            };
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
+                Callback(() => Task.Run(sendMessageAction));
+
+            var info = new TestProcessStartInfo();
+            var processId = testableDesignModeClient.LaunchCustomHost(info);
+
+            Assert.AreEqual(expectedProcessId, processId);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(TestPlatformException))]
+        public void DesignModeClientLaunchCustomHostMustThrowIfInvalidAckComes()
+        {
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+
+            var expectedProcessId = -1;
+            Action sendMessageAction = () =>
+            {
+                testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, "Dummy");
+            };
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
+                Callback(() => Task.Run(sendMessageAction));
+
+            var info = new TestProcessStartInfo();
+            var processId = testableDesignModeClient.LaunchCustomHost(info);
+        }
+
+        private class TestableDesignModeClient : DesignModeClient
+        {
+            internal TestableDesignModeClient(ICommunicationManager communicationManager, 
+                IDataSerializer dataSerializer)
+                : base(communicationManager, dataSerializer)
+            {
+            }
+
+            public void InvokeCustomHostLaunchAckCallback(int processId, string errorMessage)
+            {
+                var payload = new CustomHostLaunchAckPayload()
+                {
+                    HostProcessId = processId,
+                    ErrorMessage = errorMessage
+                };
+                this.onAckMessageReceived?.Invoke(
+                    new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(payload) });
+            }
         }
     }
 }
