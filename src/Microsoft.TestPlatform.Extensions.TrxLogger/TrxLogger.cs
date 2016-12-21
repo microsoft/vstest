@@ -50,7 +50,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <summary>
         /// Log file parameter key
         /// </summary>
-        public const string LogFileParameterKey = "logfile";
+        public const string LogFileKey = "LogFile";
+
+        /// <summary>
+        /// Overwrite parameter key, default value is true
+        /// </summary>
+        public const string OverwriteKey = "Overwrite";
 
         #endregion
 
@@ -399,6 +404,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 {
                     Directory.CreateDirectory(trxFileDirPath);
                 }
+
+                if (File.Exists(trxFilePath))
+                {
+                    Console.WriteLine(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName));
+                }
+
                 FileStream fs = File.OpenWrite(trxFileName);
                 rootElement.OwnerDocument.Save(fs);
                 String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
@@ -452,10 +463,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             if (this.parametersDictionary != null)
             {
-                var isLogFileParameterPresent = this.parametersDictionary.TryGetValue(LogFileParameterKey, out string logFileParameterValue);
-                if (isLogFileParameterPresent && !string.IsNullOrWhiteSpace(logFileParameterValue))
+                var isLogFileParameterExists = this.parametersDictionary.TryGetValue(TrxLogger.LogFileKey, out string logFileValue);
+                if (isLogFileParameterExists && !string.IsNullOrWhiteSpace(logFileValue))
                 {
-                    this.trxFilePath = Path.GetFullPath(logFileParameterValue);
+                    this.SetCustomTrxFilePath(logFileValue);
                 }
                 else
                 {
@@ -465,6 +476,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             else
             {
                 this.SetDefaultTrxFilePath();
+            }
+        }
+
+        private void SetCustomTrxFilePath(string logFileValue)
+        {
+            this.trxFilePath = Path.GetFullPath(logFileValue);
+            if (File.Exists(this.trxFilePath))
+            {
+                // Get overwrite parameter.
+                var isOverwriteParameterExists =
+                    this.parametersDictionary.TryGetValue(TrxLogger.OverwriteKey,
+                        out string overwriteParameterValue);
+
+                if (isOverwriteParameterExists &&
+                    string.Equals(overwriteParameterValue, "false", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Generate file name if overwrite is false.
+                    this.trxFilePath =
+                        FileHelper.GetNextIterationFileName(Path.GetDirectoryName(this.trxFilePath),
+                            Path.GetFileName(this.trxFilePath), false);
+                }
             }
         }
 

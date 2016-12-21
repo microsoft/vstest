@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger = new TestableTrxLogger();
             this.parameters = new Dictionary<string, string>(2);
             this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
-            this.parameters[TrxLogger.LogFileParameterKey] = TrxLoggerTests.DefaultLogFileParameterValue;
+            this.parameters[TrxLogger.LogFileKey] = TrxLoggerTests.DefaultLogFileParameterValue;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
 
@@ -357,7 +357,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
 
-
             Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Completed, this.testableTrxLogger.TestResultOutcome);
         }
 
@@ -365,16 +364,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void TheDefaultTrxFileNameShouldNotHaveWhiteSpace()
         {
             // To create default trx file, log file parameter should be null.
-            this.parameters[TrxLogger.LogFileParameterKey] = null;
+            this.parameters[TrxLogger.LogFileKey] = null;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
-            Mock<TestResultEventArgs> pass = CreatePassTestResultEventArgsMock();
-
-            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
-
-            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
-
-            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            this.MakeTestRunComplete();
 
             bool trxFileNameContainsWhiteSpace = Path.GetFileName(this.testableTrxLogger.trxFile).Contains(' ');
             Assert.IsFalse(trxFileNameContainsWhiteSpace, $"\"{this.testableTrxLogger.trxFile}\": Trx file name should not have white spaces");
@@ -384,45 +377,55 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void DefaultTrxFileShouldCreateIfLogFileParameterNotPassed()
         {
             // To create default trx file, If log file parameter not passed
-            this.parameters.Remove(TrxLogger.LogFileParameterKey);
+            this.parameters.Remove(TrxLogger.LogFileKey);
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
-            Mock<TestResultEventArgs> pass = CreatePassTestResultEventArgsMock();
+            this.MakeTestRunComplete();
 
-            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
-
-            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
-
-            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
             Assert.IsFalse(string.IsNullOrWhiteSpace(this.testableTrxLogger.trxFile));
         }
 
         [TestMethod]
-        public void TrxFileNameShouldConstructFromLogFileParameter()
+        public void CustomTrxFileNameShouldConstructFromLogFileParameter()
         {
-            var pass = CreatePassTestResultEventArgsMock();
+            this.MakeTestRunComplete();
 
-            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
-
-            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
-
-            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
             Assert.AreEqual(DefaultLogFileParameterValue, this.testableTrxLogger.trxFile, "Wrong Trx file name");
+        }
+
+        [TestMethod]
+        public void CustomTrxFileNameShouldChangeIfFileAlredyExistAndOverwriteFalse()
+        {
+            var logFilePath = Path.GetTempFileName();
+            this.parameters[TrxLogger.LogFileKey] = logFilePath;
+            this.parameters[TrxLogger.OverwriteKey] = "false";
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            Assert.AreNotEqual(logFilePath, this.testableTrxLogger.trxFile, "File should not be overwrite");
+        }
+
+        [TestMethod]
+        public void CustomTrxFileNameShouldNotChangeIfFileAlredyExistAndOverwriteTrue()
+        {
+            var logFilePath = Path.GetTempFileName();
+            this.parameters[TrxLogger.LogFileKey] = logFilePath;
+            this.parameters[TrxLogger.OverwriteKey] = "true";
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            this.MakeTestRunComplete();
+
+            Assert.AreEqual(logFilePath, this.testableTrxLogger.trxFile, "File should not be overwrite");
         }
 
         [TestMethod]
         public void TrxFilePathShouldConstructProperlyIfRelativePathPassedInLogFileParameter()
         {
             var trxRelativePath = @".some\relative\path\results.trx";
-            this.parameters[TrxLogger.LogFileParameterKey] = trxRelativePath;
+            this.parameters[TrxLogger.LogFileKey] = trxRelativePath;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
-            var pass = CreatePassTestResultEventArgsMock();
-
-            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
-
-            var testRunCompleteEventArgs = CreateTestRunCompleteEventArgs();
-
-            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
+            this.MakeTestRunComplete();
             var expectedTrxFileName = Path.Combine(Directory.GetCurrentDirectory(), trxRelativePath);
             Assert.AreEqual(expectedTrxFileName, this.testableTrxLogger.trxFile, "Wrong Trx file name");
         }
@@ -494,12 +497,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             return testRunCompleteEventArgs;
         }
 
-        private Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock()
+        private static Mock<TestResultEventArgs> CreatePassTestResultEventArgsMock()
         {
-            ObjectModel.TestCase passTestCase = CreateTestCase("Pass1");
-            ObjectModel.TestResult passResult = new ObjectModel.TestResult(passTestCase);
-            Mock<TestResultEventArgs> pass = new Mock<TestResultEventArgs>(passResult);
-            return pass;
+            TestCase passTestCase = CreateTestCase("Pass1");
+            var passResult = new ObjectModel.TestResult(passTestCase);
+            return new Mock<TestResultEventArgs>(passResult);
+        }
+
+        private void MakeTestRunComplete()
+        {
+            var pass = TrxLoggerTests.CreatePassTestResultEventArgsMock();
+            this.testableTrxLogger.TestResultHandler(new object(), pass.Object);
+            var testRunCompleteEventArgs = TrxLoggerTests.CreateTestRunCompleteEventArgs();
+            this.testableTrxLogger.TestRunCompleteHandler(new object(), testRunCompleteEventArgs);
         }
     }
 
