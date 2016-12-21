@@ -96,8 +96,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private IRunSettingsProvider runSettingsManager;
 
-        internal IFileHelper FileHelper { get; set; }
-
         internal CLIRunSettingsArgumentExecutor(IRunSettingsProvider runSettingsManager)
         {
             this.runSettingsManager = runSettingsManager;
