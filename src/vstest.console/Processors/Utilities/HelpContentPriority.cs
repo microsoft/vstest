@@ -77,12 +77,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// HelpArgumentExecutor
         /// </summary>
         HelpArgumentProcessorHelpPriority,
-                
+
         /// <summary>
         /// EnableLoggerArgumentProcessor Help
         /// </summary>
         EnableLoggerArgumentProcessorHelpPriority,
-              
+
         /// <summary>
         /// ListTestsArgumentExecutor Help
         /// </summary>
@@ -92,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// ListDiscoverersArgumentProcessor Help
         /// </summary>
         ListDiscoverersArgumentProcessorHelpPriority,
-        
+
         /// <summary>
         /// ListExecutorsArgumentProcessor Help
         /// </summary>
@@ -121,6 +121,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// EnableDiagArgumentProcessor Help
         /// </summary>
-        EnableDiagArgumentProcessorHelpPriority
+        EnableDiagArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// CLIRunSettingsArgumentProcessor Help
+        /// </summary>
+        CLIRunSettingsArgumentProcessorHelpPriority
     }
 }

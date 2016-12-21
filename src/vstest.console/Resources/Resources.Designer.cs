@@ -11,8 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -212,6 +212,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         public static string CannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("CannotBeNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RunSettings Args:
+        ///      Any runsettings parameter(s) that should be passed (in key value format).
+        /// </summary>
+        public static string CLIRunSettingsArgumentHelp {
+            get {
+                return ResourceManager.GetString("CLIRunSettingsArgumentHelp", resourceCulture);
             }
         }
         
@@ -526,7 +536,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options].
+        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings Args&gt;...]].
         /// </summary>
         public static string HelpUsageText {
             get {

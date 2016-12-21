@@ -201,7 +201,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new FrameworkArgumentProcessor(),
                 new EnableLoggerArgumentProcessor(),
                 new ParallelArgumentProcessor(),
-                new EnableDiagArgumentProcessor()
+                new EnableDiagArgumentProcessor(),
+                new CLIRunSettingsArgumentProcessor()
         };
 
         /// <summary>
