@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -63,6 +63,12 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 // Initialize Communication
                 EqtTrace.Info("DefaultEngineInvoker: Initialize communication on port number: '{0}'", portNumber);
                 requestHandler.InitializeCommunication(portNumber);
+
+                // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
+                if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+                {
+                    requestHandler.SendLog(TestMessageLevel.Informational, string.Format("Logging TestHost Diagnostics in file: {0}", EqtTrace.LogFile));
+                }
 
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
