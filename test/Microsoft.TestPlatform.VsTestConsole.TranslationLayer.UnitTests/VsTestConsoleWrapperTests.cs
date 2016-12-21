@@ -17,25 +17,30 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     [TestClass]
     public class VsTestConsoleWrapperTests
     {
-        private readonly IVsTestConsoleWrapper consoleWrapper;
+        private IVsTestConsoleWrapper consoleWrapper;
 
-        private readonly Mock<IProcessManager> mockProcessManager;
+        private Mock<IProcessManager> mockProcessManager;
 
-        private readonly Mock<ITranslationLayerRequestSender> mockRequestSender;
+        private Mock<ITranslationLayerRequestSender> mockRequestSender;
 
-        private readonly List<string> testSources = new List<string> { "Hello", "World" };
+        private List<string> testSources = new List<string> { "Hello", "World" };
 
-        private readonly List<TestCase> testCases = new List<TestCase>
+        private List<TestCase> testCases = new List<TestCase>
                                               {
                                                   new TestCase("a.b.c", new Uri("d://uri"), "a.dll"),
                                                   new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
                                               };
 
-        public VsTestConsoleWrapperTests()
+        private ConsoleParameters consoleParamters;
+
+        [TestInitialize]
+        public void TestInitialize()
         {
+            this.consoleParamters = new ConsoleParameters();
+
             this.mockRequestSender = new Mock<ITranslationLayerRequestSender>();
             this.mockProcessManager = new Mock<IProcessManager>();
-            this.consoleWrapper = new VsTestConsoleWrapper(this.mockRequestSender.Object, this.mockProcessManager.Object);
+            this.consoleWrapper = new VsTestConsoleWrapper(this.mockRequestSender.Object, this.mockProcessManager.Object, this.consoleParamters);
 
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
@@ -50,7 +55,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.consoleWrapper.StartSession();
 
-            this.mockProcessManager.Verify(pm => pm.StartProcess(new[] { $"/parentprocessid:{expectedParentProcessId}", $"/port:{inputPort}" }), Times.Once);
+            Assert.AreEqual(expectedParentProcessId, this.consoleParamters.ParentProcessId, "Parent process Id must be set");
+            Assert.AreEqual(inputPort, this.consoleParamters.PortNumber, "Port number must be set");
+
+            this.mockProcessManager.Verify(pm => pm.StartProcess(this.consoleParamters), Times.Once);
         }
 
         [TestMethod]
@@ -69,7 +77,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             // To call private method EnsureInitialize call InitializeExtensions
             this.consoleWrapper.InitializeExtensions(new[] { "path/to/adapter" });
 
-            this.mockProcessManager.Verify(pm => pm.StartProcess(It.IsAny<string[]>()));
+            this.mockProcessManager.Verify(pm => pm.StartProcess(It.IsAny<ConsoleParameters>()));
         }
 
         [TestMethod]

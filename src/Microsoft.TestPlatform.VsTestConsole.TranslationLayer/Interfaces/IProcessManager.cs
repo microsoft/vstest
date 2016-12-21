@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <summary>
         /// Starts the Process 
         /// </summary>
-        void StartProcess(string[] args);
+        void StartProcess(ConsoleParameters consoleParameters);
 
         /// <summary>
         /// Is Process Initialized
