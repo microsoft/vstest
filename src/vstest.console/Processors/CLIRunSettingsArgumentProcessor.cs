@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
+    using System.Net;
     using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.XPath;
@@ -171,6 +172,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
+        // This method is internal for supporting unit test
+        internal string[] ParseArgument(string arg)
+        {
+            var args = new List<string>();
+
+            foreach (Match match in Regex.Matches(arg, Pattern1))
+            {
+                args.Add(match.Value);
+            }
+
+            foreach (Match match in Regex.Matches(arg, Pattern2))
+            {
+                args.Add(match.Value);
+            }
+
+            foreach (Match match in Regex.Matches(arg, Pattern3))
+            {
+                args.Add(match.Value);
+            }
+
+            return args.ToArray();
+        }
+
         private void CreateOrOverwriteRunSettings(XmlDocument xmlDoc, string arg)
         {
             var args = ParseArgument(arg);
@@ -197,31 +221,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     node = CreateNode(xmlDoc, key.Split('.'));
                 }
 
-                node.InnerText = value;
+                node.InnerText = WebUtility.HtmlEncode(value);
             }
-        }
-
-        internal string[] ParseArgument(string arg)
-        {
-            var args = new List<string>();
-
-            foreach (Match match in Regex.Matches(arg, Pattern1))
-            {
-                args.Add(match.Value);
-            }
-
-            foreach (Match match in Regex.Matches(arg, Pattern2))
-            {
-                args.Add(match.Value);
-            }
-
-            foreach (Match match in Regex.Matches(arg, Pattern3))
-            {
-                args.Add(match.Value);
-            }
-
-            return args.ToArray();
-        }
+        }        
 
         private XmlNode CreateNode(XmlDocument doc, string[] xPath)
         {

@@ -40,7 +40,7 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CLIRunSettingsArgumentProcessorCapabilities();
 
             Assert.AreEqual("--", capabilities.CommandName);
-            Assert.AreEqual("RunSettings Args:\n      Any runsettings parameter(s) that should be passed (in key value format)", capabilities.HelpContentResourceName);
+            Assert.AreEqual("Args:\n      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form <n>=<v>, where <n> is the argument name, and <v> is the argument value. Use a space to separate multiple arguments.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.CLIRunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -350,10 +350,10 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual("MSTest.DeploymentEnabled=False", result[0]);
         }
 
-
         #endregion
 
         #region private
+
         private class TestableRunSettingsProvider : IRunSettingsProvider
         {
             public RunSettings ActiveRunSettings
@@ -367,6 +367,7 @@ namespace vstest.console.UnitTests.Processors
                 this.ActiveRunSettings = runSettings;
             }
         }
+
         #endregion
     }
 }

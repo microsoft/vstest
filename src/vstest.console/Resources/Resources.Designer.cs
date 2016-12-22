@@ -216,8 +216,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to RunSettings Args:
-        ///      Any runsettings parameter(s) that should be passed (in key value format).
+        ///   Looks up a localized string similar to Args:
+        ///      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments..
         /// </summary>
         public static string CLIRunSettingsArgumentHelp {
             get {
@@ -536,7 +536,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings Args&gt;...]].
+        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]].
         /// </summary>
         public static string HelpUsageText {
             get {
