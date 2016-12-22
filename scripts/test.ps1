@@ -40,6 +40,7 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 
+
 #
 # Dotnet configuration
 #
@@ -63,7 +64,8 @@ $Script:TPT_SkipProjects = @("testhost.UnitTests", "vstest.console.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
 $Script:TPT_Parallel = $Parallel
-$Script:TPT_TrxFileName = "TestResults.trx"
+$Script:TPT_TestResultsDir = Join-Path $env:TP_ROOT_DIR "TestResults"
+$Script:TPT_DefaultTrxFileName = "TrxLogResults.trx"
 $Script:TPT_ErrorMsgColor = "Red"
 
 #
@@ -88,6 +90,7 @@ function Write-VerboseLog([string] $message)
 
 function Print-FailedTests($TrxFilePath)
 {
+    Write-Log "TrxFilePath $TrxFilePath"
     $xdoc = [xml] (get-content $TrxFilePath)
     $FailedTestIds = $xdoc.TestRun.Results.UnitTestResult |?{$_.GetAttribute("outcome") -eq "Failed"} | %{$_.testId}
     if ($FailedTestIds) {
@@ -158,16 +161,16 @@ function Invoke-Test
             if ($TPT_Parallel) {
                 # Fill in the framework in test containers
                 $testContainerSet = $testContainers | % { [System.String]::Format($_, $fx) }
-                $trxLogFile  =  Join-Path $src ("Parallel_"+ $fx + "_" + $Script:TPT_TrxFileName)
+                $trxLogFileName  =  [System.String]::Format("Parallel_{0}_{1}", $fx, $Script:TPT_DefaultTrxFileName)
                 Set-TestEnvironment
                 if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
-                    Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;logfile=$trxLogFile`""
-                    $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;logfile=$trxLogFile"
+                    Write-Verbose "$vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`""
+                    $output = & $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName"
                 } else {
 
-                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;logfile=$trxLogFile`""
-                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;logfile=$trxLogFile"
+                    Write-Verbose "$dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /parallel /logger:`"trx;LogFileName=$trxLogFileName`""
+                    $output = & $dotNetPath $vstestConsolePath $testContainerSet /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /parallel /logger:"trx;LogFileName=$trxLogFileName"
                 }
 
                 Reset-TestEnvironment
@@ -177,7 +180,7 @@ function Invoke-Test
                 } else {
                     Write-Log ".. . $($output[-2])"
                     Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
-                    Print-FailedTests $trxLogFile
+                    Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
 
                     Set-ScriptFailed
 
@@ -190,29 +193,30 @@ function Invoke-Test
                 $testContainers |  % {
                     # Fill in the framework in test containers
                     $testContainer = [System.String]::Format($_, $fx)
-                    $trxLogFile =  Join-Path ($(Get-ChildItem $testContainer).Directory.FullName) $Script:TPT_TrxFileName
+                    $trxLogFileName =  [System.String]::Format("{0}_{1}_{2}", ($(Get-ChildItem $testContainer).Name), $fx, $Script:TPT_DefaultTrxFileName)
+
                     Write-Log ".. Container: $testContainer"
 
                     Set-TestEnvironment
                     
                     if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
-                        Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;logfile=$trxLogFile`""
-                        $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;logfile=$trxLogFile"
+                        Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
+                        $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
                     } else {
 
-                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;logfile=$trxLogFile`""
-                        $output = & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;logfile=$trxLogFile"
+                        Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
+                        $output = & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
                     }
 
                     Reset-TestEnvironment
-
+                    Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
                     if ($output[-2].Contains("Test Run Successful.")) {
                         Write-Log ".. . $($output[-3])"
                     } else {
                         Write-Log ".. . $($output[-2])"
                         Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
-                        Print-FailedTests $trxLogFile
+                        Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
 
                         Set-ScriptFailed
 

@@ -50,12 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// <summary>
         /// Log file parameter key
         /// </summary>
-        public const string LogFileKey = "LogFile";
-
-        /// <summary>
-        /// Overwrite parameter key, default value is true
-        /// </summary>
-        public const string OverwriteKey = "Overwrite";
+        public const string LogFileNameKey = "LogFileName";
 
         #endregion
 
@@ -86,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         private DateTime testRunStartTime;
 
         /// <summary>
-        /// Parameters dictionary for logger. Ex: {"logfile":"c:pathto/logfile.trx"}.
+        /// Parameters dictionary for logger. Ex: {"LogFileName":"TestResults.trx"}.
         /// </summary>
         private Dictionary<string, string> parametersDictionary;
 
@@ -407,13 +402,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
                 if (File.Exists(trxFilePath))
                 {
-                    Console.WriteLine(String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName));
+                    var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture,
+                        TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName);
+                    Console.WriteLine(overwriteWarningMsg);
+                    EqtTrace.Warning(overwriteWarningMsg);
                 }
 
-                FileStream fs = File.OpenWrite(trxFileName);
-                rootElement.OwnerDocument.Save(fs);
+                using (var fs = File.Open(trxFileName, FileMode.Create))
+                {
+                    rootElement.OwnerDocument.Save(fs);
+                }
                 String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
                 Console.WriteLine(resultsFileMessage);
+                EqtTrace.Info(resultsFileMessage);
             }
             catch (System.UnauthorizedAccessException fileWriteException)
             {
@@ -463,10 +464,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             if (this.parametersDictionary != null)
             {
-                var isLogFileParameterExists = this.parametersDictionary.TryGetValue(TrxLogger.LogFileKey, out string logFileValue);
-                if (isLogFileParameterExists && !string.IsNullOrWhiteSpace(logFileValue))
+                var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(TrxLogger.LogFileNameKey, out string logFileNameValue);
+                if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
                 {
-                    this.SetCustomTrxFilePath(logFileValue);
+                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
                 }
                 else
                 {
@@ -476,27 +477,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             else
             {
                 this.SetDefaultTrxFilePath();
-            }
-        }
-
-        private void SetCustomTrxFilePath(string logFileValue)
-        {
-            this.trxFilePath = Path.GetFullPath(logFileValue);
-            if (File.Exists(this.trxFilePath))
-            {
-                // Get overwrite parameter.
-                var isOverwriteParameterExists =
-                    this.parametersDictionary.TryGetValue(TrxLogger.OverwriteKey,
-                        out string overwriteParameterValue);
-
-                if (isOverwriteParameterExists &&
-                    string.Equals(overwriteParameterValue, "false", StringComparison.OrdinalIgnoreCase))
-                {
-                    // Generate file name if overwrite is false.
-                    this.trxFilePath =
-                        FileHelper.GetNextIterationFileName(Path.GetDirectoryName(this.trxFilePath),
-                            Path.GetFileName(this.trxFilePath), false);
-                }
             }
         }
 

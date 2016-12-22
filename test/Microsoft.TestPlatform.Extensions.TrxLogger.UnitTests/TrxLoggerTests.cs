@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private TestableTrxLogger testableTrxLogger;
         private Dictionary<string, string> parameters;
         private static string DefaultTestRunDirectory = AppContext.BaseDirectory;
-        private static string DefaultLogFileParameterValue = Path.Combine(DefaultTestRunDirectory, "logfilevalue.trx");
+        private static string DefaultLogFileNameParameterValue = "logfilevalue.trx";
 
         [TestInitialize]
         public void Initialize()
@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             this.testableTrxLogger = new TestableTrxLogger();
             this.parameters = new Dictionary<string, string>(2);
             this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
-            this.parameters[TrxLogger.LogFileKey] = TrxLoggerTests.DefaultLogFileParameterValue;
+            this.parameters[TrxLogger.LogFileNameKey] = TrxLoggerTests.DefaultLogFileNameParameterValue;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
         }
 
@@ -364,7 +364,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         public void TheDefaultTrxFileNameShouldNotHaveWhiteSpace()
         {
             // To create default trx file, log file parameter should be null.
-            this.parameters[TrxLogger.LogFileKey] = null;
+            this.parameters[TrxLogger.LogFileNameKey] = null;
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
             this.MakeTestRunComplete();
@@ -374,10 +374,10 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
-        public void DefaultTrxFileShouldCreateIfLogFileParameterNotPassed()
+        public void DefaultTrxFileShouldCreateIfLogFileNameParameterNotPassed()
         {
-            // To create default trx file, If log file parameter not passed
-            this.parameters.Remove(TrxLogger.LogFileKey);
+            // To create default trx file, If LogFileName parameter not passed
+            this.parameters.Remove(TrxLogger.LogFileNameKey);
             this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
 
             this.MakeTestRunComplete();
@@ -390,44 +390,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         {
             this.MakeTestRunComplete();
 
-            Assert.AreEqual(DefaultLogFileParameterValue, this.testableTrxLogger.trxFile, "Wrong Trx file name");
-        }
-
-        [TestMethod]
-        public void CustomTrxFileNameShouldChangeIfFileAlredyExistAndOverwriteFalse()
-        {
-            var logFilePath = Path.GetTempFileName();
-            this.parameters[TrxLogger.LogFileKey] = logFilePath;
-            this.parameters[TrxLogger.OverwriteKey] = "false";
-            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
-
-            this.MakeTestRunComplete();
-
-            Assert.AreNotEqual(logFilePath, this.testableTrxLogger.trxFile, "File should not be overwrite");
-        }
-
-        [TestMethod]
-        public void CustomTrxFileNameShouldNotChangeIfFileAlredyExistAndOverwriteTrue()
-        {
-            var logFilePath = Path.GetTempFileName();
-            this.parameters[TrxLogger.LogFileKey] = logFilePath;
-            this.parameters[TrxLogger.OverwriteKey] = "true";
-            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
-
-            this.MakeTestRunComplete();
-
-            Assert.AreEqual(logFilePath, this.testableTrxLogger.trxFile, "File should not be overwrite");
-        }
-
-        [TestMethod]
-        public void TrxFilePathShouldConstructProperlyIfRelativePathPassedInLogFileParameter()
-        {
-            var trxRelativePath = @".some\relative\path\results.trx";
-            this.parameters[TrxLogger.LogFileKey] = trxRelativePath;
-            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
-            this.MakeTestRunComplete();
-            var expectedTrxFileName = Path.Combine(Directory.GetCurrentDirectory(), trxRelativePath);
-            Assert.AreEqual(expectedTrxFileName, this.testableTrxLogger.trxFile, "Wrong Trx file name");
+            Assert.AreEqual(Path.Combine(TrxLoggerTests.DefaultTestRunDirectory, TrxLoggerTests.DefaultLogFileNameParameterValue), this.testableTrxLogger.trxFile, "Wrong Trx file name");
         }
 
         /// <summary>
