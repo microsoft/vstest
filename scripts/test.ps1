@@ -90,7 +90,10 @@ function Write-VerboseLog([string] $message)
 
 function Print-FailedTests($TrxFilePath)
 {
-    Write-Log "TrxFilePath $TrxFilePath"
+    if(![System.IO.File]::Exists($TrxFilePath)){
+      Write-Log "TrxFile: $TrxFilePath doesn't exists"
+      return
+    }
     $xdoc = [xml] (get-content $TrxFilePath)
     $FailedTestIds = $xdoc.TestRun.Results.UnitTestResult |?{$_.GetAttribute("outcome") -eq "Failed"} | %{$_.testId}
     if ($FailedTestIds) {
@@ -210,7 +213,6 @@ function Invoke-Test
                     }
 
                     Reset-TestEnvironment
-                    Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
                     if ($output[-2].Contains("Test Run Successful.")) {
                         Write-Log ".. . $($output[-3])"
                     } else {
