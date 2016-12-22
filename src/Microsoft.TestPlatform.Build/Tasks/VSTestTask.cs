@@ -70,6 +70,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestCLIRunSettings
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -157,6 +163,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 {
                     allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(Path.GetDirectoryName(this.TestFileFullPath)));
                 }
+            }
+
+            if (!string.IsNullOrEmpty(this.VSTestCLIRunSettings))
+            {
+                allArgs.Add("-- " + this.VSTestCLIRunSettings);
             }
 
             return allArgs;
