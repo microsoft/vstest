@@ -4,10 +4,12 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
+    using System.Text.RegularExpressions;
     using System.Xml;
     using System.Xml.XPath;
 
@@ -94,6 +96,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     internal class CLIRunSettingsArgumentExecutor : IArgumentExecutor
     {
+        // Matches key="value"
+        private const string Pattern1 = "[:_a-zA-Z][[:_\\-\\.0-9a-zA-Z]*=\"[^\\s\"][^\"]*\"";
+        // Matches key='value'
+        private const string Pattern2 = "[:_a-zA-Z][[:_\\-\\.0-9a-zA-Z]*=\'[^\\s\'][^\']*\'";
+        // Matches key=value
+        private const string Pattern3 = "[:_a-zA-Z][[:_\\-\\.0-9a-zA-Z]*=[^\'\\s\"][^\\s]*[^\\s\"']";
+
         private IRunSettingsProvider runSettingsManager;
 
         internal CLIRunSettingsArgumentExecutor(IRunSettingsProvider runSettingsManager)
@@ -164,19 +173,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private void CreateOrOverwriteRunSettings(XmlDocument xmlDoc, string arg)
         {
-            var args = arg.Split(' ');
+            var args = ParseArgument(arg);
             var length = args.Length;
 
-            // ignore last argument if it's corresponding value is not supplied.
-            if (args.Length % 2 != 0)
+            for (int index = 0; index < length; index++)
             {
-                length--;
-            }
-
-            for (int index = 0; index < length; index += 2)
-            {
-                var key = args[index];
-                var value = args[index + 1];
+                var keyValuePair = args[index];
+                var indexOfSeparator = keyValuePair.IndexOf("=");
+                var key = keyValuePair.Substring(0, indexOfSeparator);
+                var value = keyValuePair.Substring(indexOfSeparator + 1);
 
                 if (string.IsNullOrWhiteSpace(key))
                 {
@@ -194,6 +199,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 node.InnerText = value;
             }
+        }
+
+        internal string[] ParseArgument(string arg)
+        {
+            var args = new List<string>();
+
+            foreach (Match match in Regex.Matches(arg, Pattern1))
+            {
+                args.Add(match.Value);
+            }
+
+            foreach (Match match in Regex.Matches(arg, Pattern2))
+            {
+                args.Add(match.Value);
+            }
+
+            foreach (Match match in Regex.Matches(arg, Pattern3))
+            {
+                args.Add(match.Value);
+            }
+
+            return args.ToArray();
         }
 
         private XmlNode CreateNode(XmlDocument doc, string[] xPath)

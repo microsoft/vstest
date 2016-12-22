@@ -85,9 +85,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 " ",
                 new string[]
                     {
-                        "RunConfiguration.MaxCpuCount", "1", "RunConfiguration.TargetPlatform", "x86",
-                        "RunConfiguration.TargetFrameworkVersion", this.GetTargetFramworkForRunsettings(),
-                        "RunConfiguration.TestAdaptersPaths", this.GetTestAdapterPath()
+                        "RunConfiguration.MaxCpuCount=1", "RunConfiguration.TargetPlatform=x86",
+                        string.Concat("RunConfiguration.TargetFrameworkVersion=" , this.GetTargetFramworkForRunsettings()),
+                        string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
             this.RunTestWithRunSettingsParamsAsArguments(runSettingsArgs, testhostProcessName, expectedProcessCreated);
