@@ -30,20 +30,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private bool sessionStarted;
 
         /// <summary>
-        /// Port number for communicating with Vstest CLI
-        /// </summary>
-        private const string PORT_ARGUMENT = "/port:{0}";
-
-        /// <summary>
-        /// Process Id of the Current Process which is launching Vstest CLI
-        /// Helps Vstest CLI in auto-exit if current process dies without notifying it
-        /// </summary>
-        private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
-
-        /// <summary>
         /// Path to additional extensions to reinitialize vstest.console
         /// </summary>
         private IEnumerable<string> pathToAdditionalExtensions;
+
+        /// <summary>
+        /// Additional parameters for vstest.console.exe
+        /// </summary>
+        private ConsoleParameters consoleParameters;
 
         #endregion
 
@@ -56,7 +50,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// Path to the test runner <c>vstest.console.exe</c>.
         /// </param>
         public VsTestConsoleWrapper(string vstestConsolePath) : 
-            this(new VsTestConsoleRequestSender(), new VsTestConsoleProcessManager(vstestConsolePath))
+            this(new VsTestConsoleRequestSender(), new VsTestConsoleProcessManager(vstestConsolePath), ConsoleParameters.Default)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
+        /// </summary>
+        /// <param name="vstestConsolePath">
+        /// Path to the test runner <c>vstest.console.exe</c>.
+        /// </param>
+        public VsTestConsoleWrapper(string vstestConsolePath, ConsoleParameters consoleParameters) :
+            this(new VsTestConsoleRequestSender(), new VsTestConsoleProcessManager(vstestConsolePath), consoleParameters)
         {
         }
 
@@ -65,10 +70,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         /// <param name="requestSender">Sender for test messages.</param>
         /// <param name="processManager">Process manager.</param>
-        internal VsTestConsoleWrapper(ITranslationLayerRequestSender requestSender, IProcessManager processManager)
+        internal VsTestConsoleWrapper(ITranslationLayerRequestSender requestSender, IProcessManager processManager, ConsoleParameters consoleParameters)
         {
             this.requestSender = requestSender;
             this.vstestConsoleProcessManager = processManager;
+            this.consoleParameters = consoleParameters;
+
             this.vstestConsoleProcessManager.ProcessExited += (sender, args) => this.requestSender.OnProcessExited();
             this.sessionStarted = false;
         }
@@ -85,10 +92,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             if (port > 0)
             {
-                // Start Vstest.console.exe with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
-                string parentProcessIdArgs = string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, Process.GetCurrentProcess().Id);
-                string portArgs = string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, port);
-                this.vstestConsoleProcessManager.StartProcess(new string[2] { parentProcessIdArgs, portArgs });
+                // Fill the parameters
+                this.consoleParameters.ParentProcessId = Process.GetCurrentProcess().Id;
+                this.consoleParameters.PortNumber = port;
+
+                // Start vstest.console.exe process
+                this.vstestConsoleProcessManager.StartProcess(this.consoleParameters);
             }
             else
             {
