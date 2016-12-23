@@ -1,14 +1,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System.Threading;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -121,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private string GetTimestampedLogFile(string logFile)
         {
             return Path.ChangeExtension(logFile,
-                string.Format("host.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_hh-mm-ss_fffff"),
+                string.Format("host.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile)));
         }
     }
