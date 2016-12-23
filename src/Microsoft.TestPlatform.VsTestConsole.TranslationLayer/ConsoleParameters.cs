@@ -25,6 +25,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 return logFilePath;
             }
+
             set
             {
                 ValidateArg.NotNullOrEmpty(value, "LogFilePath");
