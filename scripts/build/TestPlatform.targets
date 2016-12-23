@@ -1,8 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
+    <TestPlatformPackageDir>$(TestPlatformRoot)packages\</TestPlatformPackageDir>
   </PropertyGroup>
-
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ResourceFiles Include="$(ProjectDir)Resources\*.resx" />
+    <ResxLang Include="cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant" />
+  </ItemGroup>
+
+  <Target Name="BeforeBuild" Condition="$(TestProject) =='' and $(TestProject) !='true' and @(ResourceFiles) != ''">
+    <CallTarget Targets="CreateLocalizeXLF;CreateLocalizeResx"/>
+  </Target>
+
+  <Target Name="CreateLocalizeXLF">
+    <CreateItem Include="@(ResourceFiles)" AdditionalMetadata="Language=%(ResxLang.Identity)">
+      <Output ItemName="LocResourceFile" TaskParameter="Include"/>
+    </CreateItem>
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(LocResourceFile.Identity) -Xlf $(ProjectDir)Resources\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf" />
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(ResourceFiles.Identity) -Xlf $(ProjectDir)Resources\xlf\%(ResourceFiles.Filename).xlf" />
+  </Target>
+
+  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true'">
+    <CreateItem Include="@(ResourceFiles)" AdditionalMetadata="Language=%(ResxLang.Identity)">
+      <Output ItemName="LocResourceFile" TaskParameter="Include"/>
+    </CreateItem>
+    <PropertyGroup>
+      <OutputResxDir>$(ProjectDir)obj\Resx</OutputResxDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(OutputResxDir)" Condition="!Exists($(OutputResxDir))" />
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe  writeTarget -Xlf $(ProjectDir)Resources\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ProjectDir)obj\Resx\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(ProjectDir)obj\Resx\*.resx" />
+    </ItemGroup>
+  </Target>
 </Project>
