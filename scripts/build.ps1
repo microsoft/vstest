@@ -27,7 +27,7 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("loc")]
-    [System.Boolean] $Localized = $false,
+    [Switch] $LocalizedBuild = $false,
 
     [Parameter(Mandatory=$false)]
     [Alias("ci")]
@@ -155,7 +155,7 @@ function Invoke-Build
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
