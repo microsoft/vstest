@@ -31,16 +31,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                                                   new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
                                               };
 
-        private ConsoleParameters consoleParamters;
+        private ConsoleParameters consoleParameters;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            this.consoleParamters = new ConsoleParameters();
+            this.consoleParameters = new ConsoleParameters();
 
             this.mockRequestSender = new Mock<ITranslationLayerRequestSender>();
             this.mockProcessManager = new Mock<IProcessManager>();
-            this.consoleWrapper = new VsTestConsoleWrapper(this.mockRequestSender.Object, this.mockProcessManager.Object, this.consoleParamters);
+            this.consoleWrapper = new VsTestConsoleWrapper(this.mockRequestSender.Object, this.mockProcessManager.Object, this.consoleParameters);
 
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
@@ -55,10 +55,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.consoleWrapper.StartSession();
 
-            Assert.AreEqual(expectedParentProcessId, this.consoleParamters.ParentProcessId, "Parent process Id must be set");
-            Assert.AreEqual(inputPort, this.consoleParamters.PortNumber, "Port number must be set");
+            Assert.AreEqual(expectedParentProcessId, this.consoleParameters.ParentProcessId, "Parent process Id must be set");
+            Assert.AreEqual(inputPort, this.consoleParameters.PortNumber, "Port number must be set");
 
-            this.mockProcessManager.Verify(pm => pm.StartProcess(this.consoleParamters), Times.Once);
+            this.mockProcessManager.Verify(pm => pm.StartProcess(this.consoleParameters), Times.Once);
         }
 
         [TestMethod]
