@@ -21,11 +21,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             var trxFileName = "TestResults.trx";
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
-            arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
             this.InvokeVsTest(arguments);
 
             arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
+            arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
             this.InvokeVsTest(arguments);
 
             var trxLogFilePath = Path.Combine(AppContext.BaseDirectory, "TestResults",  trxFileName);

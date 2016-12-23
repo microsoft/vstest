@@ -320,8 +320,13 @@ namespace TestPlatform.Common.UnitTests.Logging
             ValidLoggerWithParameters.Reset();
             TestLoggerManager.Instance.AddLogger(new Uri("test-logger-with-parameter://logger"), new Dictionary<string, string>());
             Assert.IsNotNull(ValidLoggerWithParameters.parameters, "parameters not getting passed");
-            Assert.IsTrue(ValidLoggerWithParameters.parameters.ContainsKey(DefaultLoggerParameterNames.TestRunDirectory), $"{DefaultLoggerParameterNames.TestRunDirectory} not added to parameters");
-            Assert.IsFalse(string.IsNullOrWhiteSpace(ValidLoggerWithParameters.parameters[DefaultLoggerParameterNames.TestRunDirectory]), $"parameter {DefaultLoggerParameterNames.TestRunDirectory} should not be null, empty or whitespace");
+            Assert.IsTrue(
+                ValidLoggerWithParameters.parameters.ContainsKey(DefaultLoggerParameterNames.TestRunDirectory),
+                $"{DefaultLoggerParameterNames.TestRunDirectory} not added to parameters");
+            Assert.IsFalse(
+                string.IsNullOrWhiteSpace(
+                    ValidLoggerWithParameters.parameters[DefaultLoggerParameterNames.TestRunDirectory]),
+                $"parameter {DefaultLoggerParameterNames.TestRunDirectory} should not be null, empty or whitespace");
         }
 
         [TestMethod]
