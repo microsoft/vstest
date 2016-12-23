@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
 
@@ -25,6 +26,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private Process process;
 
         public event EventHandler ProcessExited;
+
+        /// <summary>
+        /// Port number for communicating with Vstest CLI
+        /// </summary>
+        private const string PORT_ARGUMENT = "/port:{0}";
+
+        /// <summary>
+        /// Process Id of the Current Process which is launching Vstest CLI
+        /// Helps Vstest CLI in auto-exit if current process dies without notifying it
+        /// </summary>
+        private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
+
+        /// <summary>
+        /// Diagnostics argument for Vstest CLI
+        /// Enables Diagnostic logging for Vstest CLI and TestHost - Optional
+        /// </summary>
+        private const string DIAG_ARGUMENT = "/diag:{0}";
 
         #region Constructor
 
@@ -47,14 +65,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Call xUnit.console.exe with the parameters previously specified
         /// </summary>
-        public void StartProcess(string[] args)
+        public void StartProcess(ConsoleParameters consoleParameters)
         {
             this.process = new Process();
             process.StartInfo.FileName = vstestConsolePath;
-            if (args != null)
-            {
-                process.StartInfo.Arguments = args.Length < 2 ? args[0] : string.Join(" ", args);
-            }
+            process.StartInfo.Arguments = string.Join(" ", BuildArguments(consoleParameters));
+
             //process.StartInfo.WorkingDirectory = WorkingDirectory;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
@@ -94,6 +110,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 vstestConsoleExited = true;
                 this.ProcessExited?.Invoke(sender, e);
             }
+        }
+
+        private string[] BuildArguments(ConsoleParameters parameters)
+        {
+            var args = new List<string>();
+
+            // Start Vstest.console.exe with args: --parentProcessId|/parentprocessid:<ppid> --port|/port:<port>
+            args.Add(string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, parameters.ParentProcessId));
+            args.Add(string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, parameters.PortNumber));
+
+            if(!string.IsNullOrEmpty(parameters.LogFilePath))
+            {
+                // Extra args: --diag|/diag:<PathToLogFile>
+                args.Add(string.Format(CultureInfo.InvariantCulture, DIAG_ARGUMENT, parameters.LogFilePath));
+            }
+
+            return args.ToArray();
         }
     }
 }
