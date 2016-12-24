@@ -95,15 +95,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public override HelpContentPriority HelpPriority => HelpContentPriority.CLIRunSettingsArgumentProcessorHelpPriority;
     }
 
-    internal class CLIRunSettingsArgumentExecutor : IArgumentExecutor
+    internal class CLIRunSettingsArgumentExecutor : IArgumentsExecutor
     {
-        // Matches key="value"
-        private const string Pattern1 = "[:_a-zA-Z][[:_\\-\\.0-9a-zA-Z]*=\"[^\\s\"][^\"]*\"";
-        // Matches key='value'
-        private const string Pattern2 = "[:_a-zA-Z][[:_\\-\\.0-9a-zA-Z]*=\'[^\\s\'][^\']*\'";
-        // Matches key=value
-        private const string Pattern3 = "[:_a-zA-Z][[:_\\-\\.0-9a-zA-Z]*=[^\'\\s\"][^\\s]*[^\\s\"']";
-
         private IRunSettingsProvider runSettingsManager;
 
         internal CLIRunSettingsArgumentExecutor(IRunSettingsProvider runSettingsManager)
@@ -113,8 +106,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public void Initialize(string argument)
         {
+            throw new NotImplementedException();
+        }
+
+        public void Initialize(string[] arguments)
+        {
             // if argument is null or white space, don't do anything.
-            if (string.IsNullOrWhiteSpace(argument))
+            if (arguments == null || arguments.Length == 0)
             {
                 return;
             }
@@ -153,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
 
                 // Append / Override run settings supplied in CLI
-                CreateOrOverwriteRunSettings(doc, argument);
+                CreateOrOverwriteRunSettings(doc, arguments);
 
                 // Set Active Run Settings.
                 var runSettings = new RunSettings();
@@ -172,38 +170,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        // This method is internal for supporting unit test
-        internal string[] ParseArgument(string arg)
+        private void CreateOrOverwriteRunSettings(XmlDocument xmlDoc, string[] args)
         {
-            var args = new List<string>();
-
-            foreach (Match match in Regex.Matches(arg, Pattern1))
-            {
-                args.Add(match.Value);
-            }
-
-            foreach (Match match in Regex.Matches(arg, Pattern2))
-            {
-                args.Add(match.Value);
-            }
-
-            foreach (Match match in Regex.Matches(arg, Pattern3))
-            {
-                args.Add(match.Value);
-            }
-
-            return args.ToArray();
-        }
-
-        private void CreateOrOverwriteRunSettings(XmlDocument xmlDoc, string arg)
-        {
-            var args = ParseArgument(arg);
             var length = args.Length;
 
             for (int index = 0; index < length; index++)
             {
                 var keyValuePair = args[index];
                 var indexOfSeparator = keyValuePair.IndexOf("=");
+                if (indexOfSeparator <= 0|| indexOfSeparator>=keyValuePair.Length-1)
+                {
+                    continue;
+                }
                 var key = keyValuePair.Substring(0, indexOfSeparator);
                 var value = keyValuePair.Substring(indexOfSeparator + 1);
 
@@ -223,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 node.InnerText = WebUtility.HtmlEncode(value);
             }
-        }        
+        }
 
         private XmlNode CreateNode(XmlDocument doc, string[] xPath)
         {

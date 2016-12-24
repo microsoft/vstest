@@ -159,7 +159,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 // If argument is '--', following arguments are key value pairs for run settings, combine all of them into one single argument.
                 if (arg.Equals("--"))
                 {
-                    arg =String.Concat(arg,":",String.Join(" ", args, index + 1, args.Length - index-1));
+                    var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(args[index], args.Skip(index + 1).ToArray());
+                    processors.Add(cliRunSettingsProcessor);
+                    break;
                 }
 
                 var processor = processorFactory.CreateArgumentProcessor(arg);
@@ -167,12 +169,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 if (processor != null)
                 {
                     processors.Add(processor);
-
-                    // -- If argument is '--', further arguments should not be processed. 
-                    if (args[index].Equals("--"))
-                    {
-                        break;
-                    }
                 }
                 else
                 {

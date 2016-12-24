@@ -63,6 +63,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         }
 
         [TestMethod]
+        public void CreateArgumentProcessorShouldReturnThrowExceptionIfArgumentsIsNull()
+        {
+            var command = "--";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+            Action action = () => factory.CreateArgumentProcessor(command, null);
+
+            ExceptionUtilities.ThrowsException<ArgumentException>(
+           action,
+                "Cannot be null or empty", "argument");
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorShouldReturnNullIfInvalidCommandIsPassed()
+        {
+            System.Diagnostics.Debugger.Launch();
+            var command = "/-";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(command, new string[] { "" });
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
+        public void CreateArgumentProcessorShouldReturnCLIRunSettingsArgumentProcessorIfCommandIsGiven()
+        {
+            var command = "--";
+
+            ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
+
+            IArgumentProcessor result = factory.CreateArgumentProcessor(command, new string[] { "" });
+
+            Assert.AreEqual(typeof(CLIRunSettingsArgumentProcessor), result.GetType());
+        }
+
+        [TestMethod]
         public void BuildCommadMapsForProcessorWithIsSpecialCommandSetAddsProcessorToSpecialMap()
         {
             var specialCommands = GetArgumentProcessors(specialCommandFilter: true)

@@ -70,7 +70,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
-        public string VSTestCLIRunSettings
+        public string[] VSTestCLIRunSettings
         {
             get;
             set;
@@ -165,9 +165,10 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
-            if (!string.IsNullOrEmpty(this.VSTestCLIRunSettings))
+            if (this.VSTestCLIRunSettings!=null && this.VSTestCLIRunSettings.Length>0)
             {
-                allArgs.Add("-- " + this.VSTestCLIRunSettings);
+                allArgs.Add("--");
+                allArgs.AddRange(this.VSTestCLIRunSettings);
             }
 
             return allArgs;
