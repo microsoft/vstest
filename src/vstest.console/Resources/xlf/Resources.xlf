@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
@@ -574,10 +574,6 @@
         <source>Standard Output Messages:</source>
         <note></note>
       </trans-unit>
-      <trans-unit id="TestMessageFormattingPrefix">
-        <source> </source>
-        <note></note>
-      </trans-unit>
       <trans-unit id="AttachmentsBanner">
         <source>Attachments:</source>
         <note></note>
@@ -631,6 +627,11 @@
       </trans-unit>
       <trans-unit id="LoggerFileIsReadOnly">
         <source>The file {0} provided is read only</source>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DesignModeClientTimeoutError">
+        <source>Timeout to connect or process request for DesignModeClient on port: {0}</source>
+        <target state="new">Timeout to connect or process request for DesignModeClient on port: {0}</target>
         <note></note>
       </trans-unit>
     </body>

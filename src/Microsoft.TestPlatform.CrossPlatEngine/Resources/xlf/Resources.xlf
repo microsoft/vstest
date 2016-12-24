@@ -66,6 +66,16 @@
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoDotnetExeFound">
+        <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
+        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NoTestHostFileExist">
+        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
+        <target state="new">Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
