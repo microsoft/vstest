@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// The Lazy that is returned will initialize the underlying argument processor when it is first accessed.
         /// </summary>
         /// <param name="command">Command name of the argument processor.</param>
-        /// <param name="argument">Command line arguments to create the argument processor for.</param>
+        /// <param name="arguments">Command line arguments to create the argument processor for.</param>
         /// <returns>The argument processor or null if one was not found.</returns>
         public IArgumentProcessor CreateArgumentProcessor(string command, string[] arguments)
         {

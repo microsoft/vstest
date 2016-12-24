@@ -156,10 +156,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 var arg = args[index];
 
-                // If argument is '--', following arguments are key value pairs for run settings, combine all of them into one single argument.
+                // If argument is '--', following arguments are key=value pairs for run settings.
                 if (arg.Equals("--"))
                 {
-                    var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(args[index], args.Skip(index + 1).ToArray());
+                    var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(arg, args.Skip(index + 1).ToArray());
                     processors.Add(cliRunSettingsProcessor);
                     break;
                 }

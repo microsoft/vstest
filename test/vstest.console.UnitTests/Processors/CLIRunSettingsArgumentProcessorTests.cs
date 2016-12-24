@@ -18,6 +18,10 @@ namespace vstest.console.UnitTests.Processors
     [TestClass]
     public class CLIRunSettingsArgumentProcessorTests
     {
+        private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
+        private const string RunSettingsWithDeploymentDisabled = "<?xml version =\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
+        private const string RunSettingsWithDeploymentEnabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>"
+
         [TestMethod]
         public void GetMetadataShouldReturnRunSettingsArgumentProcessorCapabilities()
         {
@@ -60,6 +64,7 @@ namespace vstest.console.UnitTests.Processors
         {
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(null);
+
             executor.Initialize((string[])null);
 
             Assert.IsNull(settingsProvider.ActiveRunSettings);
@@ -70,19 +75,21 @@ namespace vstest.console.UnitTests.Processors
         {
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+
             executor.Initialize(new string[0]);
 
             Assert.IsNull(settingsProvider.ActiveRunSettings);
         }
 
         [TestMethod]
-        public void InitializeShouldCreateDefaultRunSettingsIfArgumentHasWhiteSpace()
+        public void InitializeShouldCreateDefaultRunSettingsIfArgumentsHasOnlyWhiteSpace()
         {
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
-            executor.Initialize(new string[] { "" });
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            executor.Initialize(new string[] { " " });
+
+            Assert.AreEqual(DefaultRunSettings, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -94,7 +101,7 @@ namespace vstest.console.UnitTests.Processors
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -108,7 +115,7 @@ namespace vstest.console.UnitTests.Processors
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -122,25 +129,7 @@ namespace vstest.console.UnitTests.Processors
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
-        }
-
-        [TestMethod]
-        public void InitializeShouldAddNodeIfNotPresent()
-        {
-            var settingsProvider = new TestableRunSettingsProvider();
-            var runSettings = new RunSettings();
-            var defaultSettingsXml = ((XmlDocument)XmlRunSettingsUtilities.CreateDefaultRunSettings()).OuterXml;
-            runSettings.LoadSettingsXml(defaultSettingsXml);
-            settingsProvider.SetActiveRunSettings(runSettings);
-
-            var args = new string[] { "MSTest.DeploymentEnabled=False" };
-
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
-            executor.Initialize(args);
-
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -148,8 +137,7 @@ namespace vstest.console.UnitTests.Processors
         {
             var settingsProvider = new TestableRunSettingsProvider();
             var runSettings = new RunSettings();
-            var defaultSettingsXml = ((XmlDocument)XmlRunSettingsUtilities.CreateDefaultRunSettings()).OuterXml;
-            runSettings.LoadSettingsXml(defaultSettingsXml);
+            runSettings.LoadSettingsXml(DefaultSettingsXml);
             settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=" };
@@ -157,16 +145,15 @@ namespace vstest.console.UnitTests.Processors
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(DefaultRunSettings, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldOverwriteValueIfNodeAlreadyExists()
         {
             var settingsProvider = new TestableRunSettingsProvider();
-            var defaultSettingsXml = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(defaultSettingsXml);
+            runSettings.LoadSettingsXml(DefaultSettingsXml);
             settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=True" };
@@ -174,7 +161,7 @@ namespace vstest.console.UnitTests.Processors
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(RunSettingsWithDeploymentEnabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
 
@@ -182,10 +169,8 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldOverwriteValueIfWhitSpaceIsPassedAndNodeAlreadyExists()
         {
             var settingsProvider = new TestableRunSettingsProvider();
-            var defaultSettingsXml = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
-
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(defaultSettingsXml);
+            runSettings.LoadSettingsXml(DefaultRunSettings);
             settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled= " };

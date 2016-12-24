@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes the Argument Processor with the arguments that was provided with the command.
         /// </summary>
-        /// <param name="arguments">Argument that was provided with the command.</param>
+        /// <param name="arguments">Arguments that are provided with the command.</param>
         void Initialize(string[] arguments);
     }
 }
