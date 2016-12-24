@@ -1,23 +1,20 @@
-﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../</TestPlatformRoot>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
-  
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.Build</AssemblyName>
     <TargetFrameworks>netstandard1.3;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
   </PropertyGroup>
-
   <ItemGroup>
-    <Compile Include="**\*.cs" />    
+    <Compile Include="**\*.cs" />
     <Content Include="Microsoft.TestPlatform.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="NETStandard.Library">
       <Version>1.6.0</Version>
@@ -35,7 +32,6 @@
       <Version>4.0.0</Version>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
