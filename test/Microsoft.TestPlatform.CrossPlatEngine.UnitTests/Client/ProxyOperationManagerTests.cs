@@ -7,6 +7,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -57,7 +58,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
             EqtTrace.InitializeVerboseTrace("log.txt");
-            
+
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.mockTestHostManager.Verify(
@@ -65,7 +66,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                     th.GetTestHostProcessStartInfo(
                         It.IsAny<IEnumerable<string>>(),
                         null,
-                        It.Is<TestRunnerConnectionInfo>(t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yyMMdd")))));
+                        It.Is<TestRunnerConnectionInfo>(
+                            t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
+                                 && t.LogFile.Contains("_" + Thread.CurrentThread.ManagedThreadId + ".txt"))));
             EqtTrace.TraceLevel = TraceLevel.Off;
         }
 
