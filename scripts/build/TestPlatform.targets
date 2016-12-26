@@ -14,7 +14,7 @@
     <CallTarget Targets="CreateLocalizeXLF;CreateLocalizeResx"/>
   </Target>
 
-  <Target Name="CreateLocalizeXLF" Condition="'$(UpdateXlf)' == 'true'">
+  <Target Name="CreateLocalizeXLF" Condition="'$(SyncXlf)' == 'true'">
     <CreateItem Include="@(ResourceFiles)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>

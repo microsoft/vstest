@@ -26,8 +26,8 @@ Param(
     [System.Boolean] $FailFast = $true,
 
 	[Parameter(Mandatory=$false)]
-    [Alias("loc")]
-    [Switch] $UpdateXlf = $false,
+    [Alias("xlf")]
+    [Switch] $SyncXlf = $false,
 
     [Parameter(Mandatory=$false)]
     [Alias("loc")]
@@ -159,7 +159,7 @@ function Invoke-Build
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
     Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$LocalizedBuild -p:UpdateXlf=$UpdateXlf
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$LocalizedBuild -p:SyncXlf=$SyncXlf
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
