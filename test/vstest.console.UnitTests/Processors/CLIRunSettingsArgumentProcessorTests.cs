@@ -107,9 +107,19 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldIgnoreKeyIfValueIsNotPassed()
         {
-            var args = new string[]
-                { "MSTest.DeploymentEnabled=False", "MSTest1"
-                };
+            var args = new string[] { "MSTest.DeploymentEnabled=False", "MSTest1" };
+            var settingsProvider = new TestableRunSettingsProvider();
+            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+            executor.Initialize(args);
+
+            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldIgnoreWhiteSpaceInBeginningOrEndOfKey()
+        {
+            var args = new string[] { " MSTest.DeploymentEnabled =False" };
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
             executor.Initialize(args);
@@ -121,9 +131,7 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldIgnoreIfKeyIsNotPassed()
         {
-            var args = new string[]
-                { "MSTest.DeploymentEnabled=False", "=value"
-                };
+            var args = new string[] { "MSTest.DeploymentEnabled=False", "=value" };
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
             executor.Initialize(args);

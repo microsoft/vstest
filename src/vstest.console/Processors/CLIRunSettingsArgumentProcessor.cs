@@ -4,23 +4,15 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics.Contracts;
-    using System.Globalization;
     using System.IO;
     using System.Net;
-    using System.Text.RegularExpressions;
     using System.Xml;
-    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -111,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public void Initialize(string[] arguments)
         {
-            // if argument is null or white space, don't do anything.
+            // if argument is null or doesn't contain any element, don't do anything.
             if (arguments == null || arguments.Length == 0)
             {
                 return;
@@ -182,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     continue;
                 }
-                var key = keyValuePair.Substring(0, indexOfSeparator);
+                var key = keyValuePair.Substring(0, indexOfSeparator).Trim();
                 var value = keyValuePair.Substring(indexOfSeparator + 1);
 
                 if (string.IsNullOrWhiteSpace(key))
