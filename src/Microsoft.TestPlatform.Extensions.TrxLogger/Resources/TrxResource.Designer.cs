@@ -331,5 +331,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources {
                 return ResourceManager.GetString("TS_UncategorizedResults", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to WARNING: Overwriting results file: {0}.
+        /// </summary>
+        internal static string TrxLoggerResultsFileOverwriteWarning
+        {
+            get
+            {
+                return ResourceManager.GetString("TrxLoggerResultsFileOverwriteWarning", resourceCulture);
+            }
+        }
     }
 }
