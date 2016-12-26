@@ -235,6 +235,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(e.Message, e);
             }
         }
+
         #endregion
     }
 }
