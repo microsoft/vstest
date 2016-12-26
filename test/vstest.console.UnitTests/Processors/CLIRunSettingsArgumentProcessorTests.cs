@@ -19,8 +19,8 @@ namespace vstest.console.UnitTests.Processors
     public class CLIRunSettingsArgumentProcessorTests
     {
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
-        private const string RunSettingsWithDeploymentDisabled = "<?xml version =\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
-        private const string RunSettingsWithDeploymentEnabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>"
+        private const string RunSettingsWithDeploymentDisabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
+        private const string RunSettingsWithDeploymentEnabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
 
         [TestMethod]
         public void GetMetadataShouldReturnRunSettingsArgumentProcessorCapabilities()
@@ -137,7 +137,7 @@ namespace vstest.console.UnitTests.Processors
         {
             var settingsProvider = new TestableRunSettingsProvider();
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultSettingsXml);
+            runSettings.LoadSettingsXml(DefaultRunSettings);
             settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=" };
@@ -153,7 +153,7 @@ namespace vstest.console.UnitTests.Processors
         {
             var settingsProvider = new TestableRunSettingsProvider();
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(DefaultSettingsXml);
+            runSettings.LoadSettingsXml(DefaultRunSettings);
             settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=True" };

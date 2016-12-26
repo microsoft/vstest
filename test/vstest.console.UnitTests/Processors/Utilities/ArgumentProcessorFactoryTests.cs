@@ -78,7 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         [TestMethod]
         public void CreateArgumentProcessorShouldReturnNullIfInvalidCommandIsPassed()
         {
-            System.Diagnostics.Debugger.Launch();
             var command = "/-";
 
             ArgumentProcessorFactory factory = ArgumentProcessorFactory.Create();
