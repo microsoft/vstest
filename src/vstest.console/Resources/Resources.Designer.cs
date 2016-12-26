@@ -391,12 +391,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("EnableDiagUsage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
-        ///      Visual Studio Test Results File (TRX) use  /logger:trx.
-        ///      To publish test results to Team Foundation Server, use TfsPublisher as shown below
+        ///      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+        ///      Creates file in TestResults directory with given LogFileName.
+        ///
         ///      Example: /logger:TfsPublisher;
         ///                Collection=&lt;team project collection url&gt;;
         ///                BuildName=&lt;build name&gt;;
