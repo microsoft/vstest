@@ -43,6 +43,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         RunSettings = 5,
 
         /// <summary>
+        /// Priority of processors related to CLI Run Settings.
+        /// </summary>
+        CLIRunSettings = 6,
+
+        /// <summary>
         /// Priority of processors related to logging.
         /// </summary>
         Logging = 10,

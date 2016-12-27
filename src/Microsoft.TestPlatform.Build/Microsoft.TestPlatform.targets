@@ -39,6 +39,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestLogger="$(VSTestLogger)"
       VSTestListTests="$(VSTestListTests)"
       VSTestDiag="$(VSTestDiag)"
+      VSTestCLIRunSettings="$(VSTestCLIRunSettings)"
     />
   </Target>
 
@@ -72,6 +73,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestLogger = $(VSTestLogger)" Importance="low" />
     <Message Text="VSTestListTests = $(VSTestListTests)" Importance="low" />
     <Message Text="VSTestDiag = $(VSTestDiag)" Importance="low" />
+    <Message Text="VSTestCLIRunSettings = $(VSTestCLIRunSettings)" Importance="low" />
   </Target>
 
 </Project>
