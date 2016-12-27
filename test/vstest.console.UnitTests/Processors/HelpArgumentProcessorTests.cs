@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var output = new DummyConsoleOutput();
             executor.Output = output;
             var result = executor.Execute();
-            Assert.IsTrue(output.Lines.Contains("Usage: vstest.console.exe [Arguments] [Options]"));
+            Assert.IsTrue(output.Lines.Contains("Usage: vstest.console.exe [Arguments] [Options] [[--] <args>...]]"));
             Assert.IsTrue(output.Lines.Contains("Arguments:"));
             Assert.IsTrue(output.Lines.Contains("Options:"));
             Assert.IsTrue(output.Lines.Contains("Description: Runs tests from the specified files."));

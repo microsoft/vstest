@@ -11,8 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -212,6 +212,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         public static string CannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("CannotBeNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Args:
+        ///      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments..
+        /// </summary>
+        public static string CLIRunSettingsArgumentHelp {
+            get {
+                return ResourceManager.GetString("CLIRunSettingsArgumentHelp", resourceCulture);
             }
         }
         
@@ -527,7 +537,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options].
+        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]].
         /// </summary>
         public static string HelpUsageText {
             get {
@@ -774,6 +784,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         public static string MalformedRunSettingsFile {
             get {
                 return ResourceManager.GetString("MalformedRunSettingsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One or more runsettings provided contain invalid token.
+        /// </summary>
+        public static string MalformedRunSettingsKey {
+            get {
+                return ResourceManager.GetString("MalformedRunSettingsKey", resourceCulture);
             }
         }
         
