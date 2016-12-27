@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.IO;
     using System.Net;
     using System.Xml;
+    using System.Xml.XPath;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -150,6 +151,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 runSettings.LoadSettingsXml(doc.OuterXml);
                 this.runSettingsManager.SetActiveRunSettings(runSettings);
             }
+            catch (XPathException exception)
+            {
+                throw new CommandLineException(CommandLineResources.MalformedRunSettingsKey, exception);
+            }
             catch (SettingsException exception)
             {
                 throw new CommandLineException(exception.Message, exception);
@@ -170,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 var keyValuePair = args[index];
                 var indexOfSeparator = keyValuePair.IndexOf("=");
-                if (indexOfSeparator <= 0|| indexOfSeparator>=keyValuePair.Length-1)
+                if (indexOfSeparator <= 0 || indexOfSeparator >= keyValuePair.Length - 1)
                 {
                     continue;
                 }
@@ -191,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     node = CreateNode(xmlDoc, key.Split('.'));
                 }
 
-                node.InnerText = WebUtility.HtmlEncode(value);
+                node.InnerText = value;
             }
         }
 

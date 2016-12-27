@@ -620,4 +620,7 @@
     <value>Args:
       Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</value>
   </data>
+  <data name="MalformedRunSettingsKey" xml:space="preserve">
+    <value>One or more runsettings provided contain invalid token</value>
+  </data>
 </root>

@@ -10,6 +10,7 @@ namespace vstest.console.UnitTests.Processors
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -110,6 +111,7 @@ namespace vstest.console.UnitTests.Processors
             var args = new string[] { "MSTest.DeploymentEnabled=False", "MSTest1" };
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
@@ -122,10 +124,38 @@ namespace vstest.console.UnitTests.Processors
             var args = new string[] { " MSTest.DeploymentEnabled =False" };
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void InitializeShouldIgnoreThrowExceptionIfKeyHasWhiteSpace()
+        {
+            var args = new string[] { "MST est.DeploymentEnabled=False" };
+            var settingsProvider = new TestableRunSettingsProvider();
+            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+
+            Action action = () => executor.Initialize(args);
+
+            ExceptionUtilities.ThrowsException<CommandLineException>(
+                action,
+                "One or more runsettings provided contain invalid token");
+        }
+
+        [TestMethod]
+        public void InitializeShouldEncodeXMLIfInvalidXMLCharsArePresent()
+        {
+            var args = new string[] { "MSTest.DeploymentEnabled=F>a><l<se" };
+            var settingsProvider = new TestableRunSettingsProvider();
+            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+
+            executor.Initialize(args);
+
+            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>F&gt;a&gt;&lt;l&lt;se</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -134,6 +164,7 @@ namespace vstest.console.UnitTests.Processors
             var args = new string[] { "MSTest.DeploymentEnabled=False", "=value" };
             var settingsProvider = new TestableRunSettingsProvider();
             var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+
             executor.Initialize(args);
 
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);

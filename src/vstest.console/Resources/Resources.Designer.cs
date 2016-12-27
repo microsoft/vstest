@@ -788,6 +788,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One or more runsettings provided contain invalid token.
+        /// </summary>
+        public static string MalformedRunSettingsKey {
+            get {
+                return ResourceManager.GetString("MalformedRunSettingsKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Microsoft (R) Test Execution Command Line Tool Version {0}.
         /// </summary>
         public static string MicrosoftCommandLineTitle {
