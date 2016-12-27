@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.IO;
-    using System.Net;
     using System.Xml;
     using System.Xml.XPath;
 
