@@ -100,23 +100,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     var typesDict = asm.GetTypes().ToDictionary(type => type.FullName);
                     foreach (var typeEntry in typesDict)
                     {
-                        // Get method infos for all types in assembly
-                        var methodInfoDict = typeEntry.Value.GetMethods().ToDictionary(methodInfo => methodInfo.Name);
+                        // Get declared method infos
+                        var methodInfoList = ((TypeInfo)typeEntry.Value.GetTypeInfo()).DeclaredMethods;
+                        var methodInfoDict = new Dictionary<string, MethodInfo>();
+                        foreach (var methodInfo in methodInfoList)
+                        {
+                            methodInfoDict[methodInfo.Name] = methodInfo;
+                        }
                         var methodsNavigationData = new Dictionary<string, DiaNavigationData>();
-                        this.methodsNavigationDataForType.Add(typeEntry.Key, methodsNavigationData);
+                        this.methodsNavigationDataForType[typeEntry.Key] = methodsNavigationData;
 
                         foreach (var methodEntry in methodInfoDict)
                         {
-                            if (string.CompareOrdinal(methodEntry.Value.Module.FullyQualifiedName, binaryPath) != 0)
-                            {
-                                // Ignore inherent methods
-                                continue;
-                            }
-
                             var diaNavigationData = pdbReader.GetDiaNavigationData(methodEntry.Value);
                             if (diaNavigationData != null)
                             {
-                                methodsNavigationData.Add(methodEntry.Key, diaNavigationData);
+                                methodsNavigationData[methodEntry.Key] = diaNavigationData;
                             }
                             else
                             {
