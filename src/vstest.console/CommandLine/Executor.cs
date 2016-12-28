@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public Executor(IOutput output): this(output, TestPlatformEventSource.Instance)
+        public Executor(IOutput output) : this(output, TestPlatformEventSource.Instance)
         {
         }
 
@@ -152,8 +152,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             int result = 0;
             var processorFactory = ArgumentProcessorFactory.Create();
 
-            foreach (string arg in args)
+            for (var index = 0; index < args.Length; index++)
             {
+                var arg = args[index];
+
+                // If argument is '--', following arguments are key=value pairs for run settings.
+                if (arg.Equals("--"))
+                {
+                    var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(arg, args.Skip(index + 1).ToArray());
+                    processors.Add(cliRunSettingsProcessor);
+                    break;
+                }
+
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)

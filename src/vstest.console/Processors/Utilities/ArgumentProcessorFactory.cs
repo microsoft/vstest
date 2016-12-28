@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #endregion
 
         #region Static Methods
-        
+
         /// <summary>
         /// Creates ArgumentProcessorFactory.
         /// </summary>
@@ -161,6 +161,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
+        /// Creates the argument processor associated with the provided command line argument.
+        /// The Lazy that is returned will initialize the underlying argument processor when it is first accessed.
+        /// </summary>
+        /// <param name="command">Command name of the argument processor.</param>
+        /// <param name="arguments">Command line arguments to create the argument processor for.</param>
+        /// <returns>The argument processor or null if one was not found.</returns>
+        public IArgumentProcessor CreateArgumentProcessor(string command, string[] arguments)
+        {
+            if (arguments == null || arguments.Length == 0)
+            {
+                throw new ArgumentException("Cannot be null or empty", "argument");
+            }
+            Contract.EndContractBlock();
+
+            // Find the associated argument processor.
+            IArgumentProcessor argumentProcessor;
+            CommandToProcessorMap.TryGetValue(command, out argumentProcessor);
+
+            if (argumentProcessor != null)
+            {
+                argumentProcessor = WrapLazyProcessorToInitializeOnInstantiation(argumentProcessor, arguments);
+            }
+
+            return argumentProcessor;
+        }
+
+        /// <summary>
         /// Creates the default action argument processor.
         /// The Lazy that is returned will initialize the underlying argument processor when it is first accessed.
         /// </summary>
@@ -168,7 +195,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public IArgumentProcessor CreateDefaultActionArgumentProcessor()
         {
             var argumentProcessor = SpecialCommandToProcessorMap[RunTestsArgumentProcessor.CommandName];
-            return WrapLazyProcessorToInitializeOnInstantiation(argumentProcessor, null);
+            return WrapLazyProcessorToInitializeOnInstantiation(argumentProcessor);
         }
 
         /// <summary>
@@ -201,7 +228,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new FrameworkArgumentProcessor(),
                 new EnableLoggerArgumentProcessor(),
                 new ParallelArgumentProcessor(),
-                new EnableDiagArgumentProcessor()
+                new EnableDiagArgumentProcessor(),
+                new CLIRunSettingsArgumentProcessor()
         };
 
         /// <summary>
@@ -246,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>The decorated lazy processor.</returns>
         private static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(
             IArgumentProcessor processor,
-            string initArg)
+            string initArg = null)
         {
             var processorExecutor = processor.Executor;
             var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
@@ -270,6 +298,56 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     try
                     {
                         instance.Initialize(initArg);
+                    }
+                    catch (Exception e)
+                    {
+                        if (EqtTrace.IsErrorEnabled)
+                        {
+                            EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception initializing argument processor: {0}", e);
+                        }
+                        throw;
+                    }
+                }
+
+                return instance;
+            }, System.Threading.LazyThreadSafetyMode.PublicationOnly);
+            processor.Executor = lazyArgumentProcessor;
+
+            return processor;
+        }
+
+        /// <summary>
+        /// Decorates a lazy argument processor so that the real processor is initialized when the lazy value is obtained.
+        /// </summary>
+        /// <param name="processor">The lazy processor.</param>
+        /// <param name="initArg">The argument with which the real processor should be initialized.</param>
+        /// <returns>The decorated lazy processor.</returns>
+        private static IArgumentProcessor WrapLazyProcessorToInitializeOnInstantiation(
+            IArgumentProcessor processor,
+            string[] initArgs)
+        {
+            var processorExecutor = processor.Executor;
+            var lazyArgumentProcessor = new Lazy<IArgumentExecutor>(() =>
+            {
+                IArgumentsExecutor instance = null;
+                try
+                {
+                    instance = (IArgumentsExecutor)processorExecutor.Value;
+                }
+                catch (Exception e)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("ArgumentProcessorFactory.WrapLazyProcessorToInitializeOnInstantiation: Exception creating argument processor: {0}", e);
+                    }
+                    throw;
+                }
+
+                if (instance != null)
+                {
+                    try
+                    {
+                        instance.Initialize(initArgs);
                     }
                     catch (Exception e)
                     {
