@@ -19,10 +19,12 @@
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
     <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(LocResourceFile.Identity) -Xlf $(ProjectDir)Resources\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf" />
-    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(ResourceFiles.Identity) -Xlf $(ProjectDir)Resources\xlf\%(ResourceFiles.Filename).xlf" />
+    <!-- Due to bug (https://github.com/fmuecke/XliffParser/issues/4) in xlftool we are not updating nuteral xlf file -->
+    <!--<Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(ResourceFiles.Identity) -Xlf $(ProjectDir)Resources\xlf\%(ResourceFiles.Filename).xlf" />-->
   </Target>
 
-  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true'">
+  <!-- Due to bug(https://github.com/dotnet/sdk/issues/518) in msbuild, excluding localization for net46-->
+  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true' and $(TargetFramework) != 'net46'">
     <CreateItem Include="@(ResourceFiles)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
