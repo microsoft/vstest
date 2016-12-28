@@ -97,10 +97,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             out int startLineNumber,
             out int endLineNumber)
         {
-            var startPoint = methodDebugDefinition.GetSequencePoints().OrderBy(s => s.StartLine).FirstOrDefault();
+            var startPoint = methodDebugDefinition.GetSequencePoints().OrderBy(s => s.StartLine).FirstOrDefault(s => s.IsHidden == false);
             startLineNumber = startPoint.StartLine;
             var endPoint =
-                methodDebugDefinition.GetSequencePoints().OrderByDescending(s => s.StartLine).FirstOrDefault();
+                methodDebugDefinition.GetSequencePoints().OrderByDescending(s => s.StartLine).FirstOrDefault(s => s.IsHidden == false);
             endLineNumber = endPoint.StartLine;
         }
 
