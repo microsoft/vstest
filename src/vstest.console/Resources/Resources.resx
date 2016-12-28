@@ -234,7 +234,9 @@
   <data name="EnableLoggersArgumentHelp" xml:space="preserve">
     <value>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use  /logger:trx.
+      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Creates file in TestResults directory with given LogFileName.
+
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
                 Collection=&lt;team project collection url&gt;;
@@ -295,7 +297,7 @@
     <comment>Section Header for subsequent command help listing</comment>
   </data>
   <data name="HelpUsageText" xml:space="preserve">
-    <value>Usage: vstest.console.exe [Arguments] [Options]</value>
+    <value>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]]</value>
   </data>
   <data name="Hours" xml:space="preserve">
     <value>Hours</value>
@@ -613,5 +615,12 @@
   </data>
   <data name="UseVsixExtensionsValueRequired" xml:space="preserve">
     <value>The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</value>
+  </data>
+  <data name="CLIRunSettingsArgumentHelp" xml:space="preserve">
+    <value>Args:
+      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</value>
+  </data>
+  <data name="MalformedRunSettingsKey" xml:space="preserve">
+    <value>One or more runsettings provided contain invalid token</value>
   </data>
 </root>

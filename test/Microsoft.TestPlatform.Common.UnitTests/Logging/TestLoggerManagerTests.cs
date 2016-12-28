@@ -315,6 +315,21 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
+        public void AddLoggerShouldAddDefaultLoggerParameterForTestLoggerWithParameters()
+        {
+            ValidLoggerWithParameters.Reset();
+            TestLoggerManager.Instance.AddLogger(new Uri("test-logger-with-parameter://logger"), new Dictionary<string, string>());
+            Assert.IsNotNull(ValidLoggerWithParameters.parameters, "parameters not getting passed");
+            Assert.IsTrue(
+                ValidLoggerWithParameters.parameters.ContainsKey(DefaultLoggerParameterNames.TestRunDirectory),
+                $"{DefaultLoggerParameterNames.TestRunDirectory} not added to parameters");
+            Assert.IsFalse(
+                string.IsNullOrWhiteSpace(
+                    ValidLoggerWithParameters.parameters[DefaultLoggerParameterNames.TestRunDirectory]),
+                $"parameter {DefaultLoggerParameterNames.TestRunDirectory} should not be null, empty or whitespace");
+        }
+
+        [TestMethod]
         public void DisposeShouldNotThrowExceptionIfCalledMultipleTimes()
         {
             // Dispose the logger manager multiple times and verify that no exception is thrown.
@@ -391,6 +406,27 @@ namespace TestPlatform.Common.UnitTests.Logging
                 }
             }
 
+        }
+
+        [ExtensionUri("test-logger-with-parameter://logger")]
+        [FriendlyName("TestLoggerWithParameterExtension")]
+        private class ValidLoggerWithParameters : ITestLoggerWithParameters
+        {
+            public static Dictionary<string, string> parameters;
+            public void Initialize(TestLoggerEvents events, string testRunDirectory)
+            {
+
+            }
+
+            public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+            {
+                ValidLoggerWithParameters.parameters = parameters;
+            }
+
+            public static void Reset()
+            {
+                ValidLoggerWithParameters.parameters = null;
+            }
         }
 
         internal class DummyTestLoggerManager : TestLoggerManager

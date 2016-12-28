@@ -11,8 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -216,6 +216,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Args:
+        ///      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments..
+        /// </summary>
+        public static string CLIRunSettingsArgumentHelp {
+            get {
+                return ResourceManager.GetString("CLIRunSettingsArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: {0}.
         /// </summary>
         public static string CommandLineError {
@@ -381,12 +391,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("EnableDiagUsage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
-        ///      Visual Studio Test Results File (TRX) use  /logger:trx.
-        ///      To publish test results to Team Foundation Server, use TfsPublisher as shown below
+        ///      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+        ///      Creates file in TestResults directory with given LogFileName.
+        ///
         ///      Example: /logger:TfsPublisher;
         ///                Collection=&lt;team project collection url&gt;;
         ///                BuildName=&lt;build name&gt;;
@@ -526,7 +537,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options].
+        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]].
         /// </summary>
         public static string HelpUsageText {
             get {
@@ -773,6 +784,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         public static string MalformedRunSettingsFile {
             get {
                 return ResourceManager.GetString("MalformedRunSettingsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One or more runsettings provided contain invalid token.
+        /// </summary>
+        public static string MalformedRunSettingsKey {
+            get {
+                return ResourceManager.GetString("MalformedRunSettingsKey", resourceCulture);
             }
         }
         
