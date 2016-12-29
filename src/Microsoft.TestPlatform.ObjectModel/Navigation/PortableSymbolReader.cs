@@ -96,35 +96,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     // Load assembly
                     var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(binaryPath);
 
-                    // Get all types to dict, fullname as key
-                    var typesDict = asm.GetTypes().ToDictionary(type => type.FullName);
-                    foreach (var typeEntry in typesDict)
+                    foreach (var type in asm.GetTypes())
                     {
                         // Get declared method infos
-                        var methodInfoList = ((TypeInfo)typeEntry.Value.GetTypeInfo()).DeclaredMethods;
-                        var methodInfoDict = new Dictionary<string, MethodInfo>();
+                        var methodInfoList = ((TypeInfo)type.GetTypeInfo()).DeclaredMethods;
+                        var methodsNavigationData = new Dictionary<string, DiaNavigationData>();
+
                         foreach (var methodInfo in methodInfoList)
                         {
-                            methodInfoDict[methodInfo.Name] = methodInfo;
-                        }
-                        var methodsNavigationData = new Dictionary<string, DiaNavigationData>();
-                        this.methodsNavigationDataForType[typeEntry.Key] = methodsNavigationData;
-
-                        foreach (var methodEntry in methodInfoDict)
-                        {
-                            var diaNavigationData = pdbReader.GetDiaNavigationData(methodEntry.Value);
+                            var diaNavigationData = pdbReader.GetDiaNavigationData(methodInfo);
                             if (diaNavigationData != null)
                             {
-                                methodsNavigationData[methodEntry.Key] = diaNavigationData;
+                                methodsNavigationData[methodInfo.Name] = diaNavigationData;
                             }
                             else
                             {
                                 EqtTrace.Error(
                                     string.Format(
                                         "Unable to find source information for method: {0} type: {1}",
-                                        methodEntry.Key,
-                                        typeEntry.Key));
+                                        methodInfo.Name,
+                                        type.FullName));
                             }
+                        }
+
+                        if (methodsNavigationData.Count != 0)
+                        {
+                            this.methodsNavigationDataForType[type.FullName] = methodsNavigationData;
                         }
                     }
                 }

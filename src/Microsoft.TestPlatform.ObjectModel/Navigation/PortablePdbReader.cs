@@ -92,16 +92,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return handle;
         }
 
-        private static void GetMethodStartAndEndLineNumber(
+        private static void GetMethodMinAndMaxLineNumber(
             MethodDebugInformation methodDebugDefinition,
-            out int startLineNumber,
-            out int endLineNumber)
+            out int minLineNumber,
+            out int maxLineNumber)
         {
-            var startPoint = methodDebugDefinition.GetSequencePoints().OrderBy(s => s.StartLine).FirstOrDefault(s => s.IsHidden == false);
-            startLineNumber = startPoint.StartLine;
-            var endPoint =
-                methodDebugDefinition.GetSequencePoints().OrderByDescending(s => s.StartLine).FirstOrDefault(s => s.IsHidden == false);
-            endLineNumber = endPoint.StartLine;
+            minLineNumber = int.MaxValue;
+            maxLineNumber = int.MinValue;
+            var orderedSequencePoints = methodDebugDefinition.GetSequencePoints();
+            foreach (var sequencePoint in orderedSequencePoints)
+            {
+                if (sequencePoint.IsHidden)
+                {
+                    // Special sequence point with startLine is Magic number 0xFEEFEE
+                    // Magic number comes from Potable CodeGen source code
+                    continue;
+                }
+                minLineNumber = Math.Min(minLineNumber, sequencePoint.StartLine);
+                maxLineNumber = Math.Max(maxLineNumber, sequencePoint.StartLine);
+            }
         }
 
         /// <summary>
@@ -134,10 +143,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             {
                 var methodDebugDefinition = this.reader.GetMethodDebugInformation(handle);
                 var fileName = this.GetMethodFileName(methodDebugDefinition);
-                int startLineNumber, endLineNumber;
-                GetMethodStartAndEndLineNumber(methodDebugDefinition, out startLineNumber, out endLineNumber);
+                int minLineNumber, maxLineNumber;
+                GetMethodMinAndMaxLineNumber(methodDebugDefinition, out minLineNumber, out maxLineNumber);
 
-                diaNavigationData = new DiaNavigationData(fileName, startLineNumber, endLineNumber);
+                diaNavigationData = new DiaNavigationData(fileName, minLineNumber, maxLineNumber);
             }
             catch (BadImageFormatException exception)
             {
