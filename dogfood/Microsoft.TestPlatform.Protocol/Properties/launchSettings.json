@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Microsoft.TestPlatform.Protocol": {
-      "commandName": "Project",
-      "commandLineArgs": "--rl:\"E:\\git\\singh\\vstest\\artifacts\\Debug\\netcoreapp1.0\\vstest.console.dll\" --ap:\"E:\\git\\singh\\vstest\\dogfood\\Microsoft.TestPlatform.Protocol\\Adapter\\NetCore\\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll\" --ta:\"E:\\git\\singh\\vstest\\dogfood\\UnitTestProject\\bin\\Debug\\netcoreapp1.0\\UnitTestProject.dll\" --o:\"RunAll\""
+      "commandName": "Project"
     }
   }
 }

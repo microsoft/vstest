@@ -12,8 +12,6 @@ namespace Microsoft.TestPlatform.Protocol
     /// </summary>
     internal class RunnerProcessManager
     {
-        private string vstestConsolePath;
-
         private object syncObject = new object();
 
         private bool vstestConsoleStarted = false;
@@ -26,9 +24,8 @@ namespace Microsoft.TestPlatform.Protocol
 
         #region Constructor
 
-        public RunnerProcessManager(string vstestConsolePath)
+        public RunnerProcessManager()
         {
-            this.vstestConsolePath = vstestConsolePath;
         }
 
         #endregion Constructor
@@ -54,15 +51,11 @@ namespace Microsoft.TestPlatform.Protocol
             {
                 process.StartInfo.Arguments = args.Length < 2 ? args[0] : string.Join(" ", args);
             }
-            process.StartInfo.Arguments = vstestConsolePath + " " + process.StartInfo.Arguments;
+            process.StartInfo.Arguments = "vstest" + " " + process.StartInfo.Arguments;
 
-            //process.StartInfo.WorkingDirectory = WorkingDirectory;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
-
-            //process.StartInfo.RedirectStandardOutput = true;
-            //process.StartInfo.RedirectStandardError = true;
-            
+       
             process.Start();
             process.EnableRaisingEvents = true;
             process.Exited += Process_Exited;

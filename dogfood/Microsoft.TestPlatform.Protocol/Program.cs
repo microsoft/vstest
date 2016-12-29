@@ -20,40 +20,41 @@ namespace Microsoft.TestPlatform.Protocol
 
         public static void Main(string[] args)
         {
+            if(args == null || args.Length < 1)
+            {
+                Console.WriteLine("Please provide appropriate arguments. Arguments can be passed as following:");
+                Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery]\" --testadapterpath:\"[path]\"");
+                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery]\" -p:\"[path]\" \n");
+            }
+
             var executingLocation = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
             // Default values
-            var runnerLocation = Path.Combine(executingLocation, "vstest.console.dll");
-            var testadapterPath = Path.Combine(executingLocation, "Adapter\\NetCore");
             var testAssembly = Path.Combine(executingLocation, "UnitTestProject.dll");
-            string operation = "RunAll";
-
+            string testadapterPath = null;
+            string operation = "Discovery";
+            var separator = new char[] { ':' };
             foreach (var arg in args)
             {
-                if(arg.Contains("--rl:"))
+                if (arg.StartsWith("-p:") || arg.StartsWith("--testadapterpath:"))
                 {
-                    runnerLocation = arg.Substring(5);
+                    testadapterPath = arg.Split(separator, 2)[1];
                 }
-                else if(arg.Contains("--ap:"))
+                else if (arg.StartsWith("-a:") || arg.StartsWith("--testassembly:"))
                 {
-                    testadapterPath = arg.Substring(5);
+                    testAssembly = arg.Split(separator,2)[1];
                 }
-                else if(arg.Contains("--ta:"))
+                else if (arg.StartsWith("-o:") || arg.StartsWith("--operation:"))
                 {
-                    testAssembly = arg.Substring(5);
-                }
-                else if(arg.Contains("--o:"))
-                {
-                    operation = arg.Substring(4).ToLower();
+                    operation = arg.Split(separator, 2)[1];
                 }
             }
 
-            Console.WriteLine("Runner location : {0}", runnerLocation);
             Console.WriteLine("TestAdapter Path : {0}", testadapterPath);
             Console.WriteLine("TestAssembly Path : {0}", testAssembly);
             Console.WriteLine("Operation : {0}", operation);
 
-            var processManager = new RunnerProcessManager(runnerLocation);
+            var processManager = new RunnerProcessManager();
             communicationManager = new SocketCommunicationManager();
 
             // Start the server
@@ -114,7 +115,10 @@ namespace Microsoft.TestPlatform.Protocol
             Console.WriteLine("Starting Operation : Discovery");
 
             // Intialize the extensions
-            communicationManager.SendMessage(MessageType.ExtensionsInitialize, new List<string>() { testadapterPath });
+            if (testadapterPath != null)
+            {
+                communicationManager.SendMessage(MessageType.ExtensionsInitialize, new List<string>() { testadapterPath });
+            }
 
             // Start Discovery
             communicationManager.SendMessage(
