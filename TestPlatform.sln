@@ -73,13 +73,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vstest.console.UnitTests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests", "test\Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests\Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests.csproj", "{BFF7714C-E5A3-4EEB-B04B-5FA47F29AD03}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dogfood", "dogfood", "{B9AB7A3D-4F63-48D2-86C0-70F52F6509AB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{B9AB7A3D-4F63-48D2-86C0-70F52F6509AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.E2ETest", "dogfood\Microsoft.TestPlatform.E2ETest\Microsoft.TestPlatform.E2ETest.csproj", "{B2C2FFD5-3C7D-42A3-B9B6-DEF63DE969AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.E2ETest", "samples\Microsoft.TestPlatform.E2ETest\Microsoft.TestPlatform.E2ETest.csproj", "{B2C2FFD5-3C7D-42A3-B9B6-DEF63DE969AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.TranslationLayer.E2ETest", "dogfood\Microsoft.TestPlatform.TranslationLayer.E2ETest\Microsoft.TestPlatform.TranslationLayer.E2ETest.csproj", "{0DD55440-38DC-4580-879C-70B043F77B1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.TranslationLayer.E2ETest", "samples\Microsoft.TestPlatform.TranslationLayer.E2ETest\Microsoft.TestPlatform.TranslationLayer.E2ETest.csproj", "{0DD55440-38DC-4580-879C-70B043F77B1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "dogfood\UnitTestProject\UnitTestProject.csproj", "{4514113D-07C0-4062-A673-04F188A79B7D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "samples\UnitTestProject\UnitTestProject.csproj", "{4514113D-07C0-4062-A673-04F188A79B7D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{EE49F5DC-5835-4AE3-B3BA-8BDE0AD56330}"
 	ProjectSection(SolutionItems) = preProject
