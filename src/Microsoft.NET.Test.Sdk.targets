@@ -12,6 +12,13 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <PropertyGroup >
+    <!-- Output type for full clr test project shoudl be library-->
+    <OutputType Condition=" !$(TargetFramework.ToLower().StartsWith('netcoreapp')) ">Library</OutputType>	
+    <!-- Output type for dotnet core test project should be exe. -->
+    <OutputType Condition=" $(TargetFramework.ToLower().StartsWith('netcoreapp')) ">Exe</OutputType>		
+  </PropertyGroup>
+
   <!--
      ============================================================
      GenerateProgramFile
