@@ -15,6 +15,107 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class RunsettingsTests : AcceptanceTestBase
     {
+        #region Runsettings precedence tests
+        /// <summary>
+        /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
+        /// </summary>
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void CommandLineRunSettingsShouldWinAmongAllOptions(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var targetPlatform = "x86";
+            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
+            var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+
+            // passing parallel
+            var runConfigurationDictionary = new Dictionary<string, string>
+                                                 {
+                                                         { "MaxCpuCount", "0" },
+                                                         { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
+                                                         { "TestAdaptersPaths", this.GetTestAdapterPath() }
+                                                 };
+            // passing different platform
+            var additionalArgs = "/Platform:x64";
+
+            var runSettingsArgs = String.Join(
+                " ",
+                new string[]
+                    {
+                        "RunConfiguration.MaxCpuCount=1",
+                        string.Concat("RunConfiguration.TargetPlatform=",targetPlatform),
+                        string.Concat("RunConfiguration.TargetFrameworkVersion=" , this.GetTargetFramworkForRunsettings()),
+                        string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
+                    });
+
+            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
+        }
+
+        /// <summary>
+        /// Command line run settings should have high precedence btween cli runsettings and cli switches.
+        /// </summary>
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var targetPlatform = "x86";
+            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
+            var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+
+            // Pass parallel
+            var additionalArgs = "/Parallel";
+
+            // Pass non parallel
+            var runSettingsArgs = String.Join(
+                " ",
+                new string[]
+                    {
+                        "RunConfiguration.MaxCpuCount=1",
+                        string.Concat("RunConfiguration.TargetPlatform=",targetPlatform),
+                        string.Concat("RunConfiguration.TargetFrameworkVersion=" , this.GetTargetFramworkForRunsettings()),
+                        string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
+                    });
+
+            this.RunTestWithRunSettings(null, runSettingsArgs, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
+        }
+
+        /// <summary>
+        /// Command line switches should have high precedence if runsetting file and commandline switch specified
+        /// </summary>
+        /// <param name="runnerFramework"></param>
+        /// <param name="targetFramework"></param>
+        /// <param name="targetRuntime"></param>
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var targetPlatform = "x86";
+            var testhostProcessName = this.GetTestHostProcessName(targetPlatform);
+            var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
+
+            // passing different platform
+            var runConfigurationDictionary = new Dictionary<string, string>
+                                                 {
+                                                         { "MaxCpuCount", "1" },
+                                                          { "TargetPlatform", "x64" },
+                                                         { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
+                                                         { "TestAdaptersPaths", this.GetTestAdapterPath() }
+                                                 };
+            var additionalArgs = "/Platform:x86";
+
+            this.RunTestWithRunSettings(runConfigurationDictionary, null, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
+        }
+
+        #endregion
+
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
@@ -33,7 +134,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            this.RunTestWithRunSettings(runConfigurationDictionary, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [CustomDataTestMethod]
@@ -57,7 +158,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettingsAndRunSettingsParamsAsArguments(null, runSettingsArgs, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestWithRunSettings(null, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [CustomDataTestMethod]
@@ -88,21 +189,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettingsAndRunSettingsParamsAsArguments(runConfigurationDictionary, runSettingsArgs, testhostProcessName, expectedNumOfProcessCreated);
-        }
-
-        private int GetExpectedNumOfProcessCreatedForWithoutParallel()
-        {
-            int expectedNumOfProcessCreated;
-            if (this.IsDesktopTargetFramework())
-            {
-                expectedNumOfProcessCreated = 1;
-            }
-            else
-            {
-                expectedNumOfProcessCreated = this.IsDesktopRunner() ? 2 : 3;
-            }
-            return expectedNumOfProcessCreated;
+            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [CustomDataTestMethod]
@@ -127,7 +214,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings()},
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            this.RunTestWithRunSettings(runConfigurationDictionary, testhostProcessName, expectedProcessCreated);
+            this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedProcessCreated);
         }
 
         // Known issue https://github.com/Microsoft/vstest/issues/135
@@ -163,39 +250,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             return runsettingsPath;
         }
 
-        private void RunTestWithRunSettings(
-            Dictionary<string, string> runConfigurationDictionary,
-            string testhostProcessName,
-            int expectedNumOfProcessCreated)
+        private void RunTestWithRunSettings(Dictionary<string, string> runConfigurationDictionary,
+            string runSettingsArgs, string additionalArgs, string testhostProcessName, int expectedNumOfProcessCreated)
         {
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
-            var runsettingsPath = this.GetRunsettingsFilePath(runConfigurationDictionary);
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue);
-            var cts = new CancellationTokenSource();
-            var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts,
-                testhostProcessName);
 
-            this.InvokeVsTest(arguments);
-            cts.Cancel();
-
-            Assert.AreEqual(
-                expectedNumOfProcessCreated,
-                numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result} args: {arguments} runner path: {this.testEnvironment.GetConsoleRunnerPath()}");
-            this.ValidateSummaryStatus(2, 2, 2);
-            File.Delete(runsettingsPath);
-        }
-
-        private void RunTestWithRunSettingsAndRunSettingsParamsAsArguments(
-            Dictionary<string, string> runConfigurationDictionary,
-            string runSettingsArgs,
-            string testhostProcessName,
-            int expectedNumOfProcessCreated)
-        {
-            var assemblyPaths =
-                this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');
             var runsettingsPath = string.Empty;
 
             if (runConfigurationDictionary != null)
@@ -204,7 +264,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " -- ", runSettingsArgs);
+
+            if (!string.IsNullOrWhiteSpace(runSettingsArgs))
+            {
+                arguments = string.Concat(arguments, " -- ", runSettingsArgs);
+            }
+
+            if (!string.IsNullOrWhiteSpace(additionalArgs))
+            {
+                arguments = string.Concat(arguments, " ", additionalArgs);
+            }
+
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
@@ -213,13 +283,32 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
             cts.Cancel();
 
+            // assert
             Assert.AreEqual(
                 expectedNumOfProcessCreated,
                 numOfProcessCreatedTask.Result,
                 $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result} args: {arguments} runner path: {this.testEnvironment.GetConsoleRunnerPath()}");
             this.ValidateSummaryStatus(2, 2, 2);
+
+            //cleanup
+            if (!string.IsNullOrWhiteSpace(runsettingsPath))
+            {
+                File.Delete(runsettingsPath);
+            }
         }
 
-        // runsetting with framework
+        private int GetExpectedNumOfProcessCreatedForWithoutParallel()
+        {
+            int expectedNumOfProcessCreated;
+            if (this.IsDesktopTargetFramework())
+            {
+                expectedNumOfProcessCreated = 1;
+            }
+            else
+            {
+                expectedNumOfProcessCreated = this.IsDesktopRunner() ? 2 : 3;
+            }
+            return expectedNumOfProcessCreated;
+        }
     }
 }
