@@ -7,6 +7,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
 
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
@@ -49,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new ParallelArgumentExecutor(CommandLineOptions.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new ParallelArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -89,6 +93,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private CommandLineOptions commandLineOptions;
 
+        private IRunSettingsProvider runSettingsManager;
+
+        private const string RunSettingsPath = "RunConfiguration.MaxCpuCount";
+
         #endregion
 
         #region Constructor
@@ -96,14 +104,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Default constructor.
         /// </summary>
-        /// <param name="options">
-        /// The options.
-        /// </param>
-        public ParallelArgumentExecutor(CommandLineOptions options)
+        /// <param name="options"> The options. </param>
+        /// <param name="runSettingsManager"> The runsettings manager. </param>
+        public ParallelArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
             Contract.Requires(options != null);
+            Contract.Requires(runSettingsManager != null);
             this.commandLineOptions = options;
+            this.runSettingsManager = runSettingsManager;
         }
+
         #endregion
 
         #region IArgumentExecutor
@@ -122,6 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             commandLineOptions.Parallel = true;
+            RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, ParallelArgumentExecutor.RunSettingsPath, "0");
         }
 
         /// <summary>

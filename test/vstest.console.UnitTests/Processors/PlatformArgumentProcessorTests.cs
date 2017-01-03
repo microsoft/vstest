@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     [TestClass]
     public class PlatformArgumentProcessorTests
@@ -54,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsNull()
         {
-            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize(null),
@@ -64,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsEmpty()
         {
-            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize("  "),
@@ -74,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsNotAnArchitecture()
         {
-            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize("foo"),
@@ -85,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsNotASupportedArchitecture()
         {
-            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize("AnyCPU"),
@@ -96,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsArchitecture()
         {
-            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             executor.Initialize("x64");
             Assert.AreEqual(ObjectModel.Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
@@ -105,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldNotConsiderCaseSensitivityOfTheArgumentPassed()
         {
-            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             executor.Initialize("ArM");
             Assert.AreEqual(ObjectModel.Architecture.ARM, CommandLineOptions.Instance.TargetArchitecture);
@@ -118,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }

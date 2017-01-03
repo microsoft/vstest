@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
@@ -54,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new PlatformArgumentExecutor(CommandLineOptions.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -94,6 +98,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private CommandLineOptions commandLineOptions;
 
+        private IRunSettingsProvider runSettingsManager;
+
+        private const string RunSettingsPath = "RunConfiguration.TargetPlatform";
+
         #endregion
 
         #region Constructor
@@ -101,14 +109,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Default constructor.
         /// </summary>
-        /// <param name="options">
-        /// The options.
-        /// </param>
-        public PlatformArgumentExecutor(CommandLineOptions options)
+        /// <param name="options"> The options. </param>
+        /// <param name="runSettingsManager"> The runsettings manager. </param>
+        public PlatformArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
             Contract.Requires(options != null);
+            Contract.Requires(runSettingsManager != null);
             this.commandLineOptions = options;
+            this.runSettingsManager = runSettingsManager;
         }
+
         #endregion
 
         #region IArgumentExecutor
@@ -134,6 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (validPlatform)
             {
                 this.commandLineOptions.TargetArchitecture = platform;
+                RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
             }
             else
             {

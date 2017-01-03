@@ -221,11 +221,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 this.FrameworkVersionSpecified = true;
             }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether /Framework has been specified on command line or not.
         /// </summary>
         internal bool FrameworkVersionSpecified { get; private set; }
+
+        internal string ResultsDirectory { get; set; }
 
         #endregion
 

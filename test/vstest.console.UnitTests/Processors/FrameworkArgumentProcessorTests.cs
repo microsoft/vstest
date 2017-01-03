@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
 
@@ -54,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsNull()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize(null),
@@ -64,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsEmpty()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize("  "),
@@ -74,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsInvalid()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize("foo"),
@@ -85,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsFramework()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             executor.Initialize(".NETCoreApp,Version=v1.0");
             Assert.AreEqual(".NETCoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
@@ -94,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsFrameworkForOlderFrameworks()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             executor.Initialize("Framework35");
             Assert.AreEqual(".NETFramework,Version=v3.5", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
@@ -103,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsFrameworkForCaseInsensitiveFramework()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             executor.Initialize(".netcoreApp,Version=v1.0");
             Assert.AreEqual(".netcoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
@@ -116,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }

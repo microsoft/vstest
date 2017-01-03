@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -114,41 +115,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Load up the run settings and set it as the active run settings.
             try
             {
-                var doc = new XmlDocument();
-
-                if (this.runSettingsManager.ActiveRunSettings != null && !string.IsNullOrEmpty(this.runSettingsManager.ActiveRunSettings.SettingsXml))
-                {
-                    var settingsXml = this.runSettingsManager.ActiveRunSettings.SettingsXml;
-
-#if net46
-                    using (var reader = XmlReader.Create(new StringReader(settingsXml), new XmlReaderSettings() { XmlResolver = null, CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                    {
-#else
-                    using (var reader = XmlReader.Create(new StringReader(settingsXml), new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                    {
-#endif
-                        doc.Load(reader);
-                    }
-                }
-                else
-                {
-#if net46
-                    doc = (XmlDocument)XmlRunSettingsUtilities.CreateDefaultRunSettings();
-#else
-                    using (var reader = XmlReader.Create(new StringReader(XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator().OuterXml), new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
-                    {
-                        doc.Load(reader);
-                    }
-#endif
-                }
+                var doc = RunSettingsUtilities.GetRunSettingXmlDocument(this.runSettingsManager);
 
                 // Append / Override run settings supplied in CLI
                 CreateOrOverwriteRunSettings(doc, arguments);
 
                 // Set Active Run Settings.
-                var runSettings = new RunSettings();
-                runSettings.LoadSettingsXml(doc.OuterXml);
-                this.runSettingsManager.SetActiveRunSettings(runSettings);
+                RunSettingsUtilities.SetRunSettingXmlDocument(this.runSettingsManager, doc);
             }
             catch (XPathException exception)
             {
@@ -186,37 +159,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     continue;
                 }
 
-                // Check if the key exists. 
-                var xPath = key.Replace('.', '/');
-                var node = xmlDoc.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
-
-                if (node == null)
-                {
-                    node = CreateNode(xmlDoc, key.Split('.'));
-                }
-
-                node.InnerText = value;
+                RunSettingsUtilities.UpdateRunSettingsXmlDocument(xmlDoc, key, value);
             }
-        }
-
-        private XmlNode CreateNode(XmlDocument doc, string[] xPath)
-        {
-            XmlNode node = null;
-            XmlNode parent = doc.DocumentElement;
-
-            for (int i = 0; i < xPath.Length; i++)
-            {
-                node = parent.SelectSingleNode(xPath[i]);
-
-                if (node == null)
-                {
-                    node = parent.AppendChild(doc.CreateElement(xPath[i]));
-                }
-
-                parent = node;
-            }
-
-            return node;
         }
     }
 }

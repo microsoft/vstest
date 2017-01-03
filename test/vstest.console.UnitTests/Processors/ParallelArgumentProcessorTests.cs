@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     [TestClass]
     public class ParallelArgumentProcessorTests
@@ -54,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsNonNull()
         {
-            var executor = new ParallelArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new ParallelArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             // Parallel should not have any values or arguments
             ExceptionUtilities.ThrowsException<CommandLineException>(
@@ -65,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetParallelValue()
         {
-            var executor = new ParallelArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new ParallelArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
             executor.Initialize(null);
             Assert.IsTrue(CommandLineOptions.Instance.Parallel, "Parallel option must be set to true.");
         }
@@ -77,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            var executor = new ParallelArgumentExecutor(CommandLineOptions.Instance);
+            var executor = new ParallelArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }

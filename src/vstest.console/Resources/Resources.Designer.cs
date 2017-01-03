@@ -1001,7 +1001,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("ProjectPathNotFound", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to --ResultsDirectory|/ResultsDirectory
+        ///      This makes vstest.console.exe process use custom test results directory
+        ///      from a given path (if any) in the test run. 
+        ///      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;.
+        /// </summary>
+        public static string ResultsDirectoryArgumentHelp
+        {
+            get
+            {
+                return ResourceManager.GetString("ResultsDirectoryArgumentHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The /ResultsDirectory parameter requires a value, which is path of a location test results directory. Example:  /ResultsDirectory:&quot;c:\path\to\TestResults&quot;.
+        /// </summary>
+        public static string ResultsDirectoryValueRequired
+        {
+            get
+            {
+                return ResourceManager.GetString("ResultsDirectoryValueRequired", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to --Settings|/Settings:&lt;Settings File&gt;
         ///      Settings to use when running tests..

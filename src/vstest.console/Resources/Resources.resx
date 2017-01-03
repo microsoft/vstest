@@ -623,4 +623,13 @@
   <data name="MalformedRunSettingsKey" xml:space="preserve">
     <value>One or more runsettings provided contain invalid token</value>
   </data>
+  <data name="ResultsDirectoryArgumentHelp" xml:space="preserve">
+    <value>--ResultsDirectory|/ResultsDirectory
+      This makes vstest.console.exe process use custom test results directory
+      from a given path (if any) in the test run. 
+      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</value>
+  </data>
+  <data name="ResultsDirectoryValueRequired" xml:space="preserve">
+    <value>The /ResultsDirectory parameter requires a value, which is path of a location test results directory. Example:  /ResultsDirectory:"c:\path\to\TestResults"</value>
+  </data>
 </root>
