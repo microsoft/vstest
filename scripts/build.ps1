@@ -253,8 +253,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$LocalizedBuild"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$LocalizedBuild
 }
 
 function Create-VsixPackage

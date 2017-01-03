@@ -123,6 +123,11 @@ Error Details: {1}:{2}</source>
         <source>(null)</source>
         <note></note>
       </trans-unit>
+      <trans-unit id="TrxLoggerResultsFileOverwriteWarning">
+        <source>WARNING: Overwriting results file: {0}</source>
+        <target state="new">WARNING: Overwriting results file: {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
