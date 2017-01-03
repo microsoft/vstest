@@ -165,10 +165,13 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
-            if (this.VSTestCLIRunSettings!=null && this.VSTestCLIRunSettings.Length>0)
+            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
             {
                 allArgs.Add("--");
-                allArgs.AddRange(this.VSTestCLIRunSettings);
+                foreach (var arg in this.VSTestCLIRunSettings)
+                {
+                    allArgs.Add(this.AddDoubleQuotes(arg));
+                }
             }
 
             return allArgs;
