@@ -40,8 +40,44 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleTestProject\UnitTest1.cs");
 
-            Assert.AreEqual(diaNavigationData.MinLineNumber, 23);
-            Assert.AreEqual(diaNavigationData.MaxLineNumber, 25);
+            Assert.AreEqual(23, diaNavigationData.MinLineNumber, "Incorrect min line number");
+            Assert.AreEqual(25, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+
+            this.testEnvironment.TargetFramework = currentTargetFrameWork;
+        }
+
+        [TestMethod]
+        public void GetNavigationDataShouldReturnCorrectDataForAsyncMethod()
+        {
+            var currentTargetFrameWork = GetAndSetTargetFrameWork(this.testEnvironment);
+            var assemblyPath = this.GetAssetFullPath("SimpleTestProject3.dll");
+
+            DiaSession diaSession = new DiaSession(assemblyPath);
+            DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SampleUnitTestProject3.UnitTest1+<AsyncTestMethod>d__1", "MoveNext");
+
+            Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
+            StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleTestProject3\UnitTest1.cs");
+
+            Assert.AreEqual(20, diaNavigationData.MinLineNumber, "Incorrect min line number");
+            Assert.AreEqual(22, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+
+            this.testEnvironment.TargetFramework = currentTargetFrameWork;
+        }
+
+        [TestMethod]
+        public void GetNavigationDataShouldReturnCorrectDataForOverLoadedMethod()
+        {
+            var currentTargetFrameWork = GetAndSetTargetFrameWork(this.testEnvironment);
+            var assemblyPath = this.GetAssetFullPath("SimpleTestProject3.dll");
+
+            DiaSession diaSession = new DiaSession(assemblyPath);
+            DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SampleUnitTestProject3.Class1", "OverLoadededMethod");
+
+            Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
+            StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleTestProject3\UnitTest1.cs");
+
+            Assert.AreEqual(32, diaNavigationData.MinLineNumber, "Incorrect min line number");
+            Assert.AreEqual(33, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
         }
