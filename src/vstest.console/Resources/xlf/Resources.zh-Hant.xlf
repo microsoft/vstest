@@ -215,7 +215,9 @@
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use  /logger:trx.
+      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Creates file in TestResults directory with given LogFileName.
+
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
                 Collection=&lt;team project collection url&gt;;
@@ -224,7 +226,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       指定測試結果的記錄器。例如，若要將結果記錄至 
       Visual Studio 測試結果檔案 (TRX)，請使用 /logger:trx。
       若要將測試結果發行到 Team Foundation Server，請依下列方式使用 TfsPublisher
@@ -269,8 +271,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="HelpUsageText">
-        <source>Usage: vstest.console.exe [Arguments] [Options]</source>
-        <target state="translated">用法: vstest.console.exe [Arguments] [Options]</target>
+        <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]]</source>
+        <target state="new">用法: vstest.console.exe [Arguments] [Options]</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">用法︰ vstest.console.exe [参数] [选项]</target>
@@ -1479,6 +1481,18 @@
       <trans-unit id="DesignModeClientTimeoutError">
         <source>Timeout to connect or process request for DesignModeClient on port: {0}</source>
         <target state="new">Timeout to connect or process request for DesignModeClient on port: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CLIRunSettingsArgumentHelp">
+        <source>Args:
+      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</source>
+        <target state="new">Args:
+      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="MalformedRunSettingsKey">
+        <source>One or more runsettings provided contain invalid token</source>
+        <target state="new">One or more runsettings provided contain invalid token</target>
         <note></note>
       </trans-unit>
     </body>
