@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private IRunSettingsProvider runSettingsManager;
 
-        private const string RunSettingsPath = "RunConfiguration.TargetPlatform";
+        public const string RunSettingsPath = "RunConfiguration.TargetPlatform";
 
         #endregion
 
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (validPlatform)
             {
                 this.commandLineOptions.TargetArchitecture = platform;
-                RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
+                RunSettingsUtilities.UpdateRunSettingsNode(this.runSettingsManager, PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
             }
             else
             {

@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         {
             CommandLineOptions.Instance.Reset();
         }
-
+        /*
         [TestMethod]
         public void GetRunSettingsShouldReturnDefaultRunSettingsIfProviderIsNull()
         {
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
             var parallelValue = Environment.ProcessorCount;
             StringAssert.Contains(runSettings, "<MaxCpuCount>2</MaxCpuCount>", "RunSettings Parallel value should take precendence over parallel switch.");
         }
-
+        */
 
         #region Testable Implementations
 

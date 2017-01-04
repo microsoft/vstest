@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     [TestClass]
     public class FrameworkArgumentProcessorTests
@@ -14,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void TestCleanup()
         {
             CommandLineOptions.Instance.Reset();
+            RunSettingsManager.Instance.Reset();
         }
 
         [TestMethod]
@@ -24,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void GetExecuterShouldReturnFrameworkArgumentProcessorCapabilities()
+        public void GetExecuterShouldReturnFrameworkArgumentExecutor()
         {
             var processor = new FrameworkArgumentProcessor();
             Assert.IsTrue(processor.Executor.Value is FrameworkArgumentExecutor);
@@ -82,14 +84,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 "Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.",
                 "foo");
         }
-        
+
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsFramework()
+        public void InitializeShouldSetCommandLineOptionsAndRunSettingsFramework()
         {
             var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
             executor.Initialize(".NETCoreApp,Version=v1.0");
             Assert.AreEqual(".NETCoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(".NETCoreApp,Version=v1.0", RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
@@ -99,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize("Framework35");
             Assert.AreEqual(".NETFramework,Version=v3.5", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(".NETFramework,Version=v3.5", RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
@@ -108,6 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize(".netcoreApp,Version=v1.0");
             Assert.AreEqual(".netcoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(".netcoreApp,Version=v1.0", RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         #endregion

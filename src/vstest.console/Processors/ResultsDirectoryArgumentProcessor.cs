@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private IRunSettingsProvider runSettingsManager;
 
-        private const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
+        public const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
 
         #endregion
 
@@ -145,10 +145,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(CommandLineResources.ResultsDirectoryValueRequired);
             }
 
-            //TODO validate TestResults Path
-            this.commandLineOptions.ResultsDirectory = argument;
+            try
+            {
+                // to check valid directory path
+                var di = new DirectoryInfo(argument);
 
-            RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, ResultsDirectoryArgumentExecutor.RunSettingsPath, argument);
+                if (!Path.IsPathRooted(argument))
+                {
+                    argument = Path.GetFullPath(argument);
+                }
+            }
+            catch (Exception)
+            {
+                throw new CommandLineException(CommandLineResources.ResultsDirectoryValueRequired);
+            }
+
+            this.commandLineOptions.ResultsDirectory = argument;
+            RunSettingsUtilities.UpdateRunSettingsNode(this.runSettingsManager, ResultsDirectoryArgumentExecutor.RunSettingsPath, argument);
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     [TestClass]
     public class ParallelArgumentProcessorTests
@@ -14,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void TestCleanup()
         {
             CommandLineOptions.Instance.Reset();
+            RunSettingsManager.Instance.Reset();
         }
 
         [TestMethod]
@@ -24,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void GetExecuterShouldReturnPlatformArgumentProcessorCapabilities()
+        public void GetExecuterShouldReturnParallelArgumentExecutor()
         {
             var processor = new ParallelArgumentProcessor();
             Assert.IsTrue(processor.Executor.Value is ParallelArgumentExecutor);
@@ -69,6 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = new ParallelArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
             executor.Initialize(null);
             Assert.IsTrue(CommandLineOptions.Instance.Parallel, "Parallel option must be set to true.");
+            Assert.AreEqual("0", RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, ParallelArgumentExecutor.RunSettingsPath));
         }
 
         #endregion

@@ -1,6 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common;
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
@@ -28,6 +32,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         private string dummyTestFilePath = "DummyTest.dll";
 
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
+
+        [TestInitialize]
+        public void Init()
+        {
+            RunSettingsUtilities.AddDefaultRunSettings(RunSettingsManager.Instance);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            RunSettingsUtilities.AddDefaultRunSettings(RunSettingsManager.Instance);
+        }
+
 
         public RunSpecificTestsArgumentProcessorTests()
         {

@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private IRunSettingsProvider runSettingsManager;
 
-        private const string RunSettingsPath = "RunConfiguration.MaxCpuCount";
+        public const string RunSettingsPath = "RunConfiguration.MaxCpuCount";
 
         #endregion
 
@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             commandLineOptions.Parallel = true;
-            RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, ParallelArgumentExecutor.RunSettingsPath, "0");
+            RunSettingsUtilities.UpdateRunSettingsNode(this.runSettingsManager, ParallelArgumentExecutor.RunSettingsPath, "0");
         }
 
         /// <summary>

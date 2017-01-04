@@ -35,6 +35,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -189,6 +191,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // should always be executed.
             var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
             processors.AddRange(processorsToAlwaysExecute);
+
+            // Initialize Runsettings with defaults
+            RunSettingsUtilities.AddDefaultRunSettings(RunSettingsManager.Instance);
 
             // Ensure we have an action argument.
             this.EnsureActionArgumentIsPresent(processors, processorFactory);

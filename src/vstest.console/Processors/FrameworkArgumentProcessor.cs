@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private IRunSettingsProvider runSettingsManager;
 
-        private const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
+        public const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
 
         #endregion
 
@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
             }
             this.commandLineOptions.TargetFrameworkVersion = validFramework;
-            RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, FrameworkArgumentExecutor.RunSettingsPath, validFramework.ToString());
+            RunSettingsUtilities.UpdateRunSettingsNode(this.runSettingsManager, FrameworkArgumentExecutor.RunSettingsPath, validFramework.ToString());
 
             if (EqtTrace.IsInfoEnabled)
             {

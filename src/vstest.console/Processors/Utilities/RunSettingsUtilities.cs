@@ -21,93 +21,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     {
         private const string EmptyRunSettings = @"<RunSettings></RunSettings>";
 
-        /// <summary>
-        /// Gets the run settings to be used for the session.
-        /// </summary>
-        /// <param name="runSettingsProvider"> The current provider of run settings.</param>
-        /// <param name="commandlineOptions"> The command line options specified. </param>
-        /// <returns></returns>
-        internal static string GetRunSettings(IRunSettingsProvider runSettingsProvider, CommandLineOptions commandlineOptions)
+        public static void AddDefaultRunSettings(IRunSettingsProvider runSettingsProvider)
         {
-            var runSettings = runSettingsProvider?.ActiveRunSettings?.SettingsXml;
+            var runSettingsXml = runSettingsProvider?.ActiveRunSettings?.SettingsXml;
 
-            if (string.IsNullOrWhiteSpace(runSettings))
+            if (string.IsNullOrWhiteSpace(runSettingsXml))
             {
-                runSettings = EmptyRunSettings;
+                runSettingsXml = EmptyRunSettings;
             }
 
-            //runSettings = GetEffectiveRunSettings(runSettings, commandlineOptions);
-
-            return runSettings;
-        }
-
-        /// <summary>
-        /// Gets the effective run settings adding the commandline options to the run settings if not already present.
-        /// </summary>
-        /// <param name="runSettings"> The run settings XML. </param>
-        /// <param name="commandLineOptions"> The command line options. </param>
-        /// <returns> Effective run settings. </returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        private static string GetEffectiveRunSettings(string runSettings, CommandLineOptions commandLineOptions)
-        {
-            var architecture = Constants.DefaultPlatform;
-
-            if (commandLineOptions != null && commandLineOptions.ArchitectureSpecified)
-            {
-                architecture = commandLineOptions.TargetArchitecture;
-            }
-
-            var framework = Framework.DefaultFramework;
-
-            if (commandLineOptions != null && commandLineOptions.FrameworkVersionSpecified)
-            {
-                framework = commandLineOptions.TargetFrameworkVersion;
-            }
-            var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), Constants.ResultsDirectoryName);
-
-            if (commandLineOptions != null && !string.IsNullOrEmpty(commandLineOptions.ResultsDirectory))
-            {
-                resultsDirectory = commandLineOptions.ResultsDirectory;
-            }
-
-            using (var stream = new StringReader(runSettings))
-            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
-            {
-                var document = new XmlDocument();
-                document.Load(reader);
-
-                var navigator = document.CreateNavigator();
-
-                InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, architecture, framework, resultsDirectory);
-
-                if (commandLineOptions != null && commandLineOptions.Parallel)
-                {
-                    ParallelRunSettingsUtilities.UpdateRunSettingsWithParallelSettingIfNotConfigured(navigator);
-                }
-
-                return navigator.OuterXml;
-            }
-        }
-
-        public static XmlNode CreateNode(XmlDocument doc, string[] xPath)
-        {
-            XmlNode node = null;
-            XmlNode parent = doc.DocumentElement;
-
-            for (int i = 0; i < xPath.Length; i++)
-            {
-                node = parent.SelectSingleNode(xPath[i]);
-
-                if (node == null)
-                {
-                    node = parent.AppendChild(doc.CreateElement(xPath[i]));
-                }
-
-                parent = node;
-            }
-
-            return node;
+            runSettingsXml = AddDefaultRunSettings(runSettingsXml);
+            RunSettingsUtilities.UpdateRunSettings(runSettingsProvider, runSettingsXml);
         }
 
         public static XmlDocument GetRunSettingXmlDocument(IRunSettingsProvider runSettingsManager)
@@ -149,31 +73,84 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return doc;
         }
 
-        public static void SetRunSettingXmlDocument(IRunSettingsProvider runSettingsManager, XmlDocument xmlDocument)
+        public static void UpdateRunSettings(IRunSettingsProvider runSettingsManager, string runsettingsXml)
         {
             var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(xmlDocument.OuterXml);
+            runSettings.LoadSettingsXml(runsettingsXml);
             runSettingsManager.SetActiveRunSettings(runSettings);
         }
 
         public static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string value)
         {
-            var xPath = key.Replace('.', '/');
-            var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
-
-            if (node == null)
-            {
-                node = RunSettingsUtilities.CreateNode(xmlDocument, key.Split('.'));
-            }
-
+            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsUtilities.CreateNode(xmlDocument, key.Split('.'));
             node.InnerText = value;
         }
 
-        public static void UpdateRunSettings(IRunSettingsProvider runSettingsManager, string key, string value)
+        public static void UpdateRunSettingsNode(IRunSettingsProvider runSettingsManager, string key, string value)
         {
             var xmlDocument = RunSettingsUtilities.GetRunSettingXmlDocument(runSettingsManager);
             RunSettingsUtilities.UpdateRunSettingsXmlDocument(xmlDocument, key, value);
-            RunSettingsUtilities.SetRunSettingXmlDocument(runSettingsManager, xmlDocument);
+            RunSettingsUtilities.UpdateRunSettings(runSettingsManager, xmlDocument.OuterXml);
+        }
+
+        public static string QueryRunSettingsNode(IRunSettingsProvider runSettingsManager, string key)
+        {
+            var xmlDocument = RunSettingsUtilities.GetRunSettingXmlDocument(runSettingsManager);
+            var node = GetXmlNode(xmlDocument, key);
+            return node?.InnerText;
+        }
+
+        /// <summary>
+        /// Gets the effective run settings adding the default run settings if not already present.
+        /// </summary>
+        /// <param name="runSettings"> The run settings XML. </param>
+        /// <returns> Effective run settings. </returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
+        private static string AddDefaultRunSettings(string runSettings)
+        {
+            var architecture = Constants.DefaultPlatform;
+            var framework = Framework.DefaultFramework;
+            var defaultResultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), Constants.ResultsDirectoryName);
+
+            using (var stream = new StringReader(runSettings))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            {
+                var document = new XmlDocument();
+                document.Load(reader);
+
+                var navigator = document.CreateNavigator();
+
+                InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, architecture, framework, defaultResultsDirectory);
+                return navigator.OuterXml;
+            }
+        }
+
+        private static XmlNode CreateNode(XmlDocument doc, string[] xPath)
+        {
+            XmlNode node = null;
+            XmlNode parent = doc.DocumentElement;
+
+            for (int i = 0; i < xPath.Length; i++)
+            {
+                node = parent.SelectSingleNode(xPath[i]);
+
+                if (node == null)
+                {
+                    node = parent.AppendChild(doc.CreateElement(xPath[i]));
+                }
+
+                parent = node;
+            }
+
+            return node;
+        }
+
+        private static XmlNode GetXmlNode(XmlDocument xmlDocument, string key)
+        {
+            var xPath = key.Replace('.', '/');
+            var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
+            return node;
         }
     }
 }

@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 CreateOrOverwriteRunSettings(doc, arguments);
 
                 // Set Active Run Settings.
-                RunSettingsUtilities.SetRunSettingXmlDocument(this.runSettingsManager, doc);
+                RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, doc.OuterXml);
             }
             catch (XPathException exception)
             {

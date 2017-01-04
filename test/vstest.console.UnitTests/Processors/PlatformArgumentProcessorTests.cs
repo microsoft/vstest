@@ -3,9 +3,11 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     [TestClass]
     public class PlatformArgumentProcessorTests
@@ -14,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void TestCleanup()
         {
             CommandLineOptions.Instance.Reset();
+            RunSettingsManager.Instance.Reset();
         }
 
         [TestMethod]
@@ -24,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void GetExecuterShouldReturnPlatformArgumentProcessorCapabilities()
+        public void GetExecuterShouldReturnPlatformArgumentExecutor()
         {
             var processor = new PlatformArgumentProcessor();
             Assert.IsTrue(processor.Executor.Value is PlatformArgumentExecutor);
@@ -37,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new PlatformArgumentProcessorCapabilities();
             Assert.AreEqual("/Platform", capabilities.CommandName);
-            Assert.AreEqual("--Platform|/Platform:<Platform type>\n      Target platform architecture to be used for test execution. \n      Valid values are x86, x64 and ARM.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Platform|/Platform:<Platform type>" + Environment.NewLine + "      Target platform architecture to be used for test execution. " + Environment.NewLine + "      Valid values are x86, x64 and ARM.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.PlatformArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -101,6 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize("x64");
             Assert.AreEqual(ObjectModel.Architecture.X64, CommandLineOptions.Instance.TargetArchitecture);
+            Assert.AreEqual(ObjectModel.Architecture.X64.ToString(), RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, PlatformArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
@@ -110,6 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize("ArM");
             Assert.AreEqual(ObjectModel.Architecture.ARM, CommandLineOptions.Instance.TargetArchitecture);
+            Assert.AreEqual(ObjectModel.Architecture.ARM.ToString(), RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, PlatformArgumentExecutor.RunSettingsPath));
         }
 
         #endregion

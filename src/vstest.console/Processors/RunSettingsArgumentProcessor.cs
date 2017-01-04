@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -119,18 +120,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             Contract.EndContractBlock();
-            
+
             // Load up the run settings and set it as the active run settings.
             try
             {
                 IXPathNavigable document = this.GetRunSettingsDocument(argument);
-                
-                var runSettings = new RunSettings();
+                RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, document.CreateNavigator().OuterXml);
 
-                // Currently do not see the need to load the settings providers in the console process.
-                runSettings.LoadSettingsXml(document.CreateNavigator().OuterXml);
-
-                this.runSettingsManager.SetActiveRunSettings(runSettings);
+                //Add default runsettings values if not exists in given runsettings file.
+                RunSettingsUtilities.AddDefaultRunSettings(this.runSettingsManager);
             }
             catch (XmlException exception)
             {
