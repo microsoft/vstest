@@ -3,13 +3,14 @@
 
 namespace Microsoft.TestPlatform.Build.Tasks
 {
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
 
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-    using System;
-    using System.IO;
-    using System.Diagnostics;
+
     using Trace;
 
     public class VSTestTask : Task, ICancelableTask
@@ -96,12 +97,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             vsTestForwardingApp.Cancel();
         }
 
-        private string AddDoubleQuotes(string x)
-        {
-            return "\"" + x + "\"";
-        }
-
-        private IEnumerable<string> CreateArgument()
+        internal IEnumerable<string> CreateArgument()
         {
             var allArgs = new List<string>();
 
@@ -175,6 +171,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
 
             return allArgs;
+        }
+
+        private string AddDoubleQuotes(string x)
+        {
+            return "\"" + x + "\"";
         }
     }
 }
