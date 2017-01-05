@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26014.0
+VisualStudioVersion = 15.0.26102.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED0C35EB-7F31-4841-A24F-8EB708FFA959}"
 EndProject
@@ -83,8 +83,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "samples\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{EE49F5DC-5835-4AE3-B3BA-8BDE0AD56330}"
 	ProjectSection(SolutionItems) = preProject
-		scripts\DisableUnitTesting.bat = scripts\DisableUnitTesting.bat
-		scripts\EnableUnitTesting.bat = scripts\EnableUnitTesting.bat
+		scripts\build.ps1 = scripts\build.ps1
+		scripts\stylecop.json = scripts\stylecop.json
+		scripts\stylecop.ruleset = scripts\stylecop.ruleset
+		scripts\stylecop.test.ruleset = scripts\stylecop.test.ruleset
+		scripts\test.ps1 = scripts\test.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E344E0A2-7715-4C7F-BAF7-D64EA94CB19B}"
@@ -121,6 +124,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Protocol", "samples\Microsoft.TestPlatform.Protocol\Microsoft.TestPlatform.Protocol.csproj", "{97DD9467-B011-4736-AAC4-2C21BF554349}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTestProject3", "test\TestAssets\SimpleTestProject3\SimpleTestProject3.csproj", "{82E75225-FA92-4F87-909D-039D62F96BFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{C4420F1F-09D6-49D0-8C43-2A10AD5B7AD5}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\build\TestPlatform.Settings.targets = scripts\build\TestPlatform.Settings.targets
+		scripts\build\TestPlatform.targets = scripts\build\TestPlatform.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -728,5 +737,6 @@ Global
 		{D62D754C-8F0A-406F-8BA7-E96C6FFA7C7C} = {8DA7CBD9-F17E-41B6-90C4-CFF55848A25A}
 		{97DD9467-B011-4736-AAC4-2C21BF554349} = {B9AB7A3D-4F63-48D2-86C0-70F52F6509AB}
 		{82E75225-FA92-4F87-909D-039D62F96BFF} = {8DA7CBD9-F17E-41B6-90C4-CFF55848A25A}
+		{C4420F1F-09D6-49D0-8C43-2A10AD5B7AD5} = {EE49F5DC-5835-4AE3-B3BA-8BDE0AD56330}
 	EndGlobalSection
 EndGlobal
