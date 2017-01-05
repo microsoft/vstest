@@ -268,6 +268,8 @@ function Create-VsixPackage
     $vsixManifests = @("*Content_Types*.xml",
         "extension.vsixmanifest",
         "License.rtf",
+		"catalog.json",
+		"manifest.json",
         "TestPlatform.ObjectModel.manifest",
         "TestPlatform.ObjectModel.x86.manifest")
     foreach ($file in $vsixManifests) {

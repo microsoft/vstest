@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.VSIXCreator
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.IO.Compression;
     using System.Linq;
     using System.Threading.Tasks;
@@ -13,9 +14,9 @@ namespace Microsoft.TestPlatform.VSIXCreator
     {
         public static void Main(string[] args)
         {
-            var inputDirectory = "win7-x64";
+            var inputDirectory = "win7 -x64";
             var outputDirectory = System.Environment.CurrentDirectory;
-            if(args.Length > 0 && !String.IsNullOrEmpty(args[0]))
+            if (args.Length > 0 && !String.IsNullOrEmpty(args[0]))
             {
                 inputDirectory = args[0];
             }
@@ -31,10 +32,24 @@ namespace Microsoft.TestPlatform.VSIXCreator
                 System.IO.File.Delete(vsixFilePath);
             }
 
-            if(System.IO.Directory.Exists(inputDirectory))
+            if (System.IO.Directory.Exists(inputDirectory))
             {
-                ZipFile.CreateFromDirectory(inputDirectory, vsixFilePath, CompressionLevel.Fastest, false);
-            }      
+                // Get all files to put in vsix
+                IEnumerable<string> files = Directory.EnumerateFiles(inputDirectory, "*.*", SearchOption.AllDirectories);
+                int inputDirectoryLength = inputDirectory.Length;
+
+                using (ZipArchive vsixFile = ZipFile.Open(vsixFilePath, ZipArchiveMode.Create))
+                {
+                    foreach (var file in files)
+                    {
+                        if (!file.EndsWith(".pdb"))
+                        {
+                            string addFile = file.Substring(inputDirectoryLength + 1).Replace(@"\", @"/");
+                            vsixFile.CreateEntryFromFile(file, addFile, CompressionLevel.Optimal);
+                        }
+                    }
+                }
+            }
         }
     }
 }
