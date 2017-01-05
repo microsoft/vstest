@@ -18,13 +18,15 @@ namespace Microsoft.TestPlatform.Protocol
         private static SocketCommunicationManager communicationManager;
         private static JsonDataSerializer dataSerializer = JsonDataSerializer.Instance;
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             if(args == null || args.Length < 1)
             {
                 Console.WriteLine("Please provide appropriate arguments. Arguments can be passed as following:");
                 Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery]\" --testadapterpath:\"[path]\"");
                 Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery]\" -p:\"[path]\" \n");
+
+                return 1;
             }
 
             var executingLocation = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
@@ -42,7 +44,7 @@ namespace Microsoft.TestPlatform.Protocol
                 }
                 else if (arg.StartsWith("-a:") || arg.StartsWith("--testassembly:"))
                 {
-                    testAssembly = arg.Split(separator,2)[1];
+                    testAssembly = arg.Split(separator, 2)[1];
                 }
                 else if (arg.StartsWith("-o:") || arg.StartsWith("--operation:"))
                 {
@@ -65,11 +67,11 @@ namespace Microsoft.TestPlatform.Protocol
             string portArgs = string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, port);
             processManager.StartProcess(new string[2] { parentProcessIdArgs, portArgs });
 
-            communicationManager.AcceptClientAsync();
+            communicationManager.AcceptClientAsync().Wait();
             communicationManager.WaitForClientConnection(Timeout.Infinite);
             HandShakeWithVsTestConsole();
 
-            //Actual operation
+            // Actual operation
             dynamic discoveredTestCases;
             switch (operation.ToLower())
             {
@@ -87,16 +89,18 @@ namespace Microsoft.TestPlatform.Protocol
                     RunAllTests(new List<string>() { testAssembly });
                     break;
             }
+
+            return 0;
         }
 
         static void HandShakeWithVsTestConsole()
         {
-            //HandShake with vstest.console
+            // HandShake with vstest.console
             Console.WriteLine("=========== HandShake with vstest.console ==========");
             var message = communicationManager.ReceiveMessage();
             if (message.MessageType == MessageType.SessionConnected)
             {
-                //Version Check
+                // Version Check
                 communicationManager.SendMessage(MessageType.VersionCheck);
                 message = communicationManager.ReceiveMessage();
 
@@ -142,13 +146,13 @@ namespace Microsoft.TestPlatform.Protocol
                     dynamic discoveryCompletePayload =
                         JsonDataSerializer.Instance.DeserializePayload<dynamic>(message);
                     
-                    //Handle discovery complete here
+                    // Handle discovery complete here
                     isDiscoveryComplete = true;
                 }
                 else if (string.Equals(MessageType.TestMessage, message.MessageType))
                 {
                     var testMessagePayload = dataSerializer.DeserializePayload<dynamic>(message);
-                    // Handle messages here.
+                    // TODO: Handle messages here.
                 }
             }
 
@@ -193,7 +197,7 @@ namespace Microsoft.TestPlatform.Protocol
                 else if (string.Equals(MessageType.TestMessage, message.MessageType))
                 {
                     var testMessagePayload = dataSerializer.DeserializePayload<dynamic>(message);
-                    // Handle log messages here
+                    // TODO: Handle log messages here
                 }
             }
         }
