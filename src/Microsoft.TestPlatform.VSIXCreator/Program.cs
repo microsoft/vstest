@@ -44,6 +44,8 @@ namespace Microsoft.TestPlatform.VSIXCreator
                     {
                         if (!file.EndsWith(".pdb"))
                         {
+                            // Creating same directory structure as of inputDirectory and replacing \ with / to make compatible with V3 format.
+                            // because if we create vsix with \ then at time of installation sub folder does not get copied.
                             string addFile = file.Substring(inputDirectoryLength + 1).Replace(@"\", @"/");
                             vsixFile.CreateEntryFromFile(file, addFile, CompressionLevel.Optimal);
                         }
