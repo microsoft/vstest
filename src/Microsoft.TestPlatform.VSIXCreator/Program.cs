@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.VSIXCreator
     {
         public static void Main(string[] args)
         {
-            var inputDirectory = "win7 -x64";
+            var inputDirectory = "win7-x64";
             var outputDirectory = System.Environment.CurrentDirectory;
             if (args.Length > 0 && !String.IsNullOrEmpty(args[0]))
             {
