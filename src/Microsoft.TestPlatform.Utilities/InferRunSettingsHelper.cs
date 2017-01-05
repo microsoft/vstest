@@ -211,8 +211,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 {
                     if (Framework.FromString(xml) != null)
                     {
-                        // Allow values like .NETFramework,Version=v4.5, ".NETCoreApp,Version=v1.0
-                        return false;
+                        // Allow TargetFrameworkMoniker values like .NETFramework,Version=v4.5, ".NETCoreApp,Version=v1.0
+                        return true;
                     }
 
                     var value = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), xml, true);

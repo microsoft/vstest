@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void TestCleanup()
         {
             CommandLineOptions.Instance.Reset();
-            RunSettingsManager.Instance.Reset();
+            RunSettingsManager.Instance = null;
         }
 
         [TestMethod]

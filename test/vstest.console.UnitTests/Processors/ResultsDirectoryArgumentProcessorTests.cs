@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void TestCleanup()
         {
             CommandLineOptions.Instance.Reset();
-            RunSettingsManager.Instance.Reset();
+            RunSettingsManager.Instance = null;
         }
 
         [TestMethod]
@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ResultsDirectoryArgumentProcessorCapabilities();
             Assert.AreEqual("/ResultsDirectory", capabilities.CommandName);
-            //StringAssert.Contains(capabilities.HelpContentResourceName, "Test results directory will be created from a given path");
+            Assert.AreEqual("--ResultsDirectory|/ResultsDirectory\n      Test results directory will be created from a given path \n      Example:  /ResultsDirectory:<pathToResultsDirectory>", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ResultsDirectoryArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -62,8 +62,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
-            /*var message =
-                @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";*/
+            var message =
+                @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
 
             var isExceptionThrown = false;
 
@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             {
                 isExceptionThrown = true;
                 Assert.IsTrue(ex is CommandLineException);
-                //Assert.AreEqual(message, ex.Message);
+                Assert.AreEqual(message, ex.Message);
             }
 
             Assert.IsTrue(isExceptionThrown);
@@ -86,8 +86,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
 
-            /*var message =
-                @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";*/
+            var message =
+                @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
 
             var isExceptionThrown = false;
 
@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             {
                 isExceptionThrown = true;
                 Assert.IsTrue(ex is CommandLineException);
-                //Assert.AreEqual(message, ex.Message);
+                Assert.AreEqual(message, ex.Message);
             }
 
             Assert.IsTrue(isExceptionThrown);
@@ -112,10 +112,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var folder = @".\path\to\in:valid";
 
-            /*var message = string.Format(
+            var message = string.Format(
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
-                "Please provide valid path");*/
+                "The given path's format is not supported.");
 
             var isExceptionThrown = false;
 
@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             {
                 isExceptionThrown = true;
                 Assert.IsTrue(ex is CommandLineException);
-                //Assert.AreEqual(message, ex.Message);
+                Assert.AreEqual(message, ex.Message);
             }
 
             Assert.IsTrue(isExceptionThrown);
@@ -140,10 +140,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             var folder = @"c:\path\to\in:valid";
 
-            /*var message = string.Format(
+            var message = string.Format(
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
-                "Please provide valid path");*/
+                "The given path's format is not supported.");
 
             var isExceptionThrown = false;
 
@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             {
                 isExceptionThrown = true;
                 Assert.IsTrue(ex is CommandLineException);
-                //Assert.AreEqual(message, ex.Message);
+                Assert.AreEqual(message, ex.Message);
             }
 
             Assert.IsTrue(isExceptionThrown);

@@ -122,6 +122,21 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             StringAssert.Contains(xml, "<TargetFrameworkVersion>.NETFramework,Version=v4.0</TargetFrameworkVersion>");
         }
+        //TargetFrameworkMoniker
+
+        [TestMethod]
+        public void UpdateRunSettingsShouldAllowTargetFrameworkMonikerValue()
+        {
+
+            var settings = @"<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.0</TargetFrameworkVersion></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X64, Framework.DefaultFramework, "temp");
+
+            var xml = navigator.OuterXml;
+
+            StringAssert.Contains(xml, "<TargetFrameworkVersion>.NETFramework,Version=v4.0</TargetFrameworkVersion>");
+        }
 
         [TestMethod]
         public void UpdateRunSettingsShouldNotUpdateResultsDirectoryIfRunSettingsAlreadyHasIt()

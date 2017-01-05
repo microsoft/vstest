@@ -630,6 +630,9 @@
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</value>
   </data>
   <data name="ResultsDirectoryValueRequired" xml:space="preserve">
-    <value>The /ResultsDirectory parameter requires a value, which is path of a location test results directory. Example:  /ResultsDirectory:"c:\path\to\TestResults"</value>
+    <value>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</value>
+  </data>
+  <data name="InvalidResultsDirectoryPathCommand" xml:space="preserve">
+    <value>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</value>
   </data>
 </root>

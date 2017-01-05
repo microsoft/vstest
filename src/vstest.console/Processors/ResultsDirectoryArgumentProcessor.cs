@@ -155,9 +155,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     argument = Path.GetFullPath(argument);
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new CommandLineException(CommandLineResources.ResultsDirectoryValueRequired);
+                throw new CommandLineException( String.Format(CommandLineResources.InvalidResultsDirectoryPathCommand, argument, ex.Message));
             }
 
             this.commandLineOptions.ResultsDirectory = argument;

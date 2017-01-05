@@ -152,6 +152,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             // Assert.
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(fileName, CommandLineOptions.Instance.SettingsFile);
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetSettingsFileForCommandLineOptions()
+        {
+            // Arrange.
+            var fileName = "C:\\temp\\r.runsettings";
+            var settingsXml = "<RunSettings></RunSettings>";
+
+            var settingsProvider = new TestableRunSettingsProvider();
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                settingsProvider,
+                settingsXml);
+
+            // Setup mocks.
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
+
+            // Act.
+            executor.Initialize(fileName);
+
+            // Assert.
+            Assert.AreEqual(fileName, CommandLineOptions.Instance.SettingsFile);
         }
 
         [TestMethod]

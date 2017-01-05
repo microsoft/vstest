@@ -646,7 +646,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("InvalidPortArgument", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;ResultsDirectory&apos; is invalid. Error: {1}.
+        /// </summary>
+        public static string InvalidResultsDirectoryPathCommand
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidResultsDirectoryPathCommand", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;TestAdapterPath&apos; is invalid. Error: {1}.
         /// </summary>
@@ -1017,7 +1028,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to The /ResultsDirectory parameter requires a value, which is path of a location test results directory. Example:  /ResultsDirectory:&quot;c:\path\to\TestResults&quot;.
+        ///   Looks up a localized string similar to The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory.
         /// </summary>
         public static string ResultsDirectoryValueRequired
         {

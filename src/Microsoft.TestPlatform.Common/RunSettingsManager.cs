@@ -78,11 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
             this.ActiveRunSettings = runSettings;
         }
 
-        public void Reset()
-        {
-            RunSettingsManager.runSettingsManagerInstance = null;
-        }
-
         #endregion
     }
 }
