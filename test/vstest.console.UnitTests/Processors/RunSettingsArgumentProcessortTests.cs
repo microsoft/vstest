@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using System;
@@ -14,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     using Moq;
 
@@ -34,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void GetExecuterShouldReturnRunSettingsArgumentProcessorCapabilities()
+        public void GetExecuterShouldReturnRunSettingsArgumentExecutor()
         {
             var processor = new RunSettingsArgumentProcessor();
             Assert.IsTrue(processor.Executor.Value is RunSettingsArgumentExecutor);
@@ -150,7 +152,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             // Assert.
             Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            StringAssert.Contains(settingsProvider.ActiveRunSettings.SettingsXml, "<RunSettings>\r\n</RunSettings>");
+        }
+
+        [TestMethod]
+        public void InitializeShouldAddDefaultSettingsIfNotPresent()
+        {
+            // Arrange.
+            var fileName = "C:\\temp\\r.runsettings";
+            var settingsXml = "<RunSettings></RunSettings>";
+
+            var settingsProvider = new TestableRunSettingsProvider();
+
+            var executor = new TestableRunSettingsArgumentExecutor(
+                CommandLineOptions.Instance,
+                settingsProvider,
+                settingsXml);
+
+            // Setup mocks.
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+            executor.FileHelper = mockFileHelper.Object;
+
+            // Act.
+            executor.Initialize(fileName);
+
+            // Assert.
+            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            RunConfiguration runConfiguration =
+                XmlRunSettingsUtilities.GetRunConfigurationNode(settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
+            Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
+
         }
 
         [TestMethod]
@@ -180,6 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             StringAssert.Contains(settingsProvider.ActiveRunSettings.SettingsXml, "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>\r\n  </RunConfiguration>\r\n  <MSTest>\r\n    <SettingsFile>C:\\temp\\r.testsettings</SettingsFile>\r\n    <ForcedLegacyMode>true</ForcedLegacyMode>\r\n  </MSTest>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>");
         }
 
+        [Ignore] // Code coverage yet to add
         [TestMethod]
         public void InitializeShouldSetActiveRunSettingsWithCodeCoverageData()
         {

@@ -209,6 +209,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             Func<string, bool> validator = (string xml) =>
                 {
+                    if (Framework.FromString(xml) != null)
+                    {
+                        // Allow values like .NETFramework,Version=v4.5, ".NETCoreApp,Version=v1.0
+                        return false;
+                    }
+
                     var value = (FrameworkVersion)Enum.Parse(typeof(FrameworkVersion), xml, true);
 
                     if (!Enum.IsDefined(typeof(FrameworkVersion), value) || value == FrameworkVersion.None)

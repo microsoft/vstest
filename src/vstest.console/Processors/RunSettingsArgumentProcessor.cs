@@ -129,6 +129,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 //Add default runsettings values if not exists in given runsettings file.
                 RunSettingsUtilities.AddDefaultRunSettings(this.runSettingsManager);
+
+                this.commandLineOptions.SettingsFile = argument;
             }
             catch (XmlException exception)
             {
@@ -171,19 +173,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
 
+#if NET46
                 FrameworkVersion frameworkVersion = FrameworkVersion.Framework45;
-
-                if (this.commandLineOptions.FrameworkVersionSpecified && this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework)
-                {
-                    IOutput output = ConsoleOutput.Instance;
-                    output.Warning(CommandLineResources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
-                }
-
-                var architecture = this.commandLineOptions.ArchitectureSpecified
-                                       ? this.commandLineOptions.TargetArchitecture
-                                       : Architecture.X86;
-
-                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, architecture, frameworkVersion);
+#else
+                FrameworkVersion frameworkVersion = FrameworkVersion.FrameworkCore10;
+#endif
+                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, frameworkVersion);
             }
 
             if (this.commandLineOptions.EnableCodeCoverage == true)

@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             Contract.Assert(this.output != null);
             Contract.Assert(this.commandLineOptions != null);
-            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager.ActiveRunSettings.SettingsXml));
+            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
             if (this.commandLineOptions.Sources.Count() <= 0)
             {

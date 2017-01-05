@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ArgumentProcessorResult Execute()
         {
             Contract.Assert(this.commandLineOptions != null);
-            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager.ActiveRunSettings.SettingsXml));
+            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
             // Ensure a test source file was provided
             var anySource = this.commandLineOptions.Sources.FirstOrDefault();

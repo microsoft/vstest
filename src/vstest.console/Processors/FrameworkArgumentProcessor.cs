@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -136,7 +137,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             
             var validFramework = Framework.FromString(argument);
             if (validFramework == null)
-            { 
+            {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
             }
@@ -146,6 +147,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("Using .Net Framework version:{0}", commandLineOptions.TargetFrameworkVersion);
+            }
+
+            if (this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
+                && !string.IsNullOrWhiteSpace(this.commandLineOptions.SettingsFile)
+                && MSTestSettingsUtilities.IsLegacyTestSettingsFile(this.commandLineOptions.SettingsFile))
+            {
+                IOutput output = ConsoleOutput.Instance;
+                output.Warning(CommandLineResources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
             }
         }
 
