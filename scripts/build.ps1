@@ -263,6 +263,10 @@ function Create-VsixPackage
 
     Write-Log "Create-VsixPackage: Started."
     $packageDir = Get-FullCLRPackageDirectory
+	$tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
+
+	# Copy json file required by V3 format vsix file
+    Copy-Item $tpSrcDir\package\"Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" $env:TP_OUT_DIR\$TPB_Configuration -Force
 
     # Copy vsix manifests
     $vsixManifests = @("*Content_Types*.xml",
