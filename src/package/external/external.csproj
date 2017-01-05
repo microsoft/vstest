@@ -37,6 +37,10 @@
       <Version>0.2.0</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Sdk.BuildTasks.14.0">
+      <Version>14.0.12-pre</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
