@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsAndRunSettingsFrameworkForRelativePathValue()
+        public void InitializeShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
         {
             var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
             var relativePath = @".\relative\path";
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsAndRunSettingsFrameworkForAbsolutePathValue()
+        public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
         {
             var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
             var absolutePath = @"c:\Users\someone\testresults";

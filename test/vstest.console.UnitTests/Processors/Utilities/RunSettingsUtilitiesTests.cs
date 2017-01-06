@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using ObjectModel;
 
     [TestClass]
@@ -22,115 +23,63 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         public void TestCleanup()
         {
             CommandLineOptions.Instance.Reset();
-        }
-        /*
-        [TestMethod]
-        public void GetRunSettingsShouldReturnDefaultRunSettingsIfProviderIsNull()
-        {
-            var runSettings = RunSettingsUtilities.GetRunSettings(null, null);
-
-            Assert.AreEqual(this.GetDefaultRunSettings(), runSettings);
+            RunSettingsManager.Instance = null;
         }
 
         [TestMethod]
-        public void GetRunSettingsShouldReturnDefaultRunSettingsIfActiveRunSettingsIsNull()
+        public void UpdateRunSettingsShouldUpdateGivenSettingsXml()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
-            settingsProvider.SetActiveRunSettings(runSettings: null);
+            var runSettingsManager = RunSettingsManager.Instance;
+            const string runSettingsXml = "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>";
 
-            var runSettings = RunSettingsUtilities.GetRunSettings(settingsProvider, null);
+            RunSettingsUtilities.UpdateRunSettings(runSettingsManager, runSettingsXml);
 
-            Assert.AreEqual(this.GetDefaultRunSettings(), runSettings);
+            StringAssert.Contains(runSettingsManager.ActiveRunSettings.SettingsXml, runSettingsXml);
         }
 
         [TestMethod]
-        public void GetRunSettingsShouldReturnRunSettingsFromTheProvider()
+        public void AddDefaultRunSettingsShouldSetDefaultSettingsForEmptySettings()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
+            var runSettingsManager = RunSettingsManager.Instance;
 
-            var settings = "<RunSettings>\r\n  <RunConfiguration>\r\n    <RandomNumer>432423</RandomNumer>\r\n  </RunConfiguration>\r\n</RunSettings>";
-            settingsProvider.SetActiveRunSettings(settings);
+            RunSettingsUtilities.AddDefaultRunSettings(runSettingsManager);
 
-            var receivedRunSettings = RunSettingsUtilities.GetRunSettings(settingsProvider, null);
-
-            StringAssert.Contains(receivedRunSettings, "<RandomNumer>432423</RandomNumer>");
+            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
+            Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
         }
 
         [TestMethod]
-        public void GetRunSettingsShouldReturnSettingsWithPlatformSpecifiedInCommandLineOptions()
+        public void AddDefaultRunSettingsShouldAddUnspecifiedSettings()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
-            settingsProvider.SetActiveRunSettings(runSettings: null);
+            var runSettingsManager = RunSettingsManager.Instance;
+            RunSettingsUtilities.UpdateRunSettings(runSettingsManager, "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X86</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>");
 
-            CommandLineOptions.Instance.TargetArchitecture = ObjectModel.Architecture.X64;
+            RunSettingsUtilities.AddDefaultRunSettings(runSettingsManager);
 
-            var runSettings = RunSettingsUtilities.GetRunSettings(settingsProvider, CommandLineOptions.Instance);
-
-            var defaultRunSettings = this.GetDefaultRunSettings();
-            //Replace with the platform specified.
-            var expectedSettings = defaultRunSettings.Replace("X86", "X64");
-            Assert.AreEqual(expectedSettings, runSettings);
+            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
+            Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
         }
 
         [TestMethod]
-        public void GetRunSettingsShouldReturnSettingsWithFrameworkSpecifiedInCommandLineOptions()
+        public void AddDefaultRunSettingsShouldNotChangeSpecifiedSettings()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
-            settingsProvider.SetActiveRunSettings(runSettings: null);
+            var runSettingsManager = RunSettingsManager.Instance;
+            RunSettingsUtilities.UpdateRunSettings(runSettingsManager, "<RunSettings>\r\n  <RunConfiguration>\r\n    <TargetPlatform>X64</TargetPlatform>\r\n  </RunConfiguration>\r\n</RunSettings>");
 
-            CommandLineOptions.Instance.TargetFrameworkVersion = Framework.FromString(".NETFramework,Version=v3.5");
+            RunSettingsUtilities.AddDefaultRunSettings(runSettingsManager);
 
-            var runSettings = RunSettingsUtilities.GetRunSettings(settingsProvider, CommandLineOptions.Instance);
-
-            var defaultRunSettings = this.GetDefaultRunSettings();
-            
-            //Replace with the framework specified.
-            var expectedSettings = defaultRunSettings.Replace(Framework.DefaultFramework.Name, ".NETFramework,Version=v3.5");
-            Assert.AreEqual(expectedSettings, runSettings);
+            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(runConfiguration.TargetPlatform, Architecture.X64);
         }
 
         [TestMethod]
-        public void GetRunSettingsShouldReturnSettingsWithoutParallelOptionWhenParallelIsOff()
+        public void AddDefaultRunSettingsShouldThrowExceptionIfArgumentIsNull()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
-            settingsProvider.SetActiveRunSettings(runSettings: null);
-
-            // Do not have to explicitly set - but for readability
-            CommandLineOptions.Instance.Parallel = false;
-
-            var runSettings = RunSettingsUtilities.GetRunSettings(settingsProvider, CommandLineOptions.Instance);
-
-            Assert.IsTrue(!runSettings.Contains("MaxCpuCount"), "MaxCpuCount must not be set if parallel setting is false.");
+            Assert.ThrowsException<ArgumentNullException>(() => RunSettingsUtilities.AddDefaultRunSettings(null));
         }
-
-
-        [TestMethod]
-        public void GetRunSettingsShouldReturnSettingsWithParallelOptionWhenParallelIsOn()
-        {
-            var settingsProvider = new TestableRunSettingsProvider();
-            settingsProvider.SetActiveRunSettings(runSettings: null);
-
-            CommandLineOptions.Instance.Parallel = true;
-
-            var runSettings = RunSettingsUtilities.GetRunSettings(settingsProvider, CommandLineOptions.Instance);
-            StringAssert.Contains(runSettings, "<MaxCpuCount>0</MaxCpuCount>", "MaxCpuCount must be set to 0 if Parallel Enabled.");
-        }
-
-        [TestMethod]
-        public void GetRunSettingsShouldReturnWithoutChangeIfUserProvidesBothParallelSwitchAndSettings()
-        {
-            string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration></RunSettings>";
-            var settingsProvider = new TestableRunSettingsProvider();
-            settingsProvider.SetActiveRunSettings(settingXml);
-
-            CommandLineOptions.Instance.Parallel = true;
-
-            var runSettings = RunSettingsUtilities.GetRunSettings(settingsProvider, CommandLineOptions.Instance);
-
-            var parallelValue = Environment.ProcessorCount;
-            StringAssert.Contains(runSettings, "<MaxCpuCount>2</MaxCpuCount>", "RunSettings Parallel value should take precendence over parallel switch.");
-        }
-        */
 
         #region Testable Implementations
 

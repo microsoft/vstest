@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 {
     using System.Diagnostics.CodeAnalysis;
@@ -13,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     /// <summary>
     /// Utilities to get the run settings from the provider and the commandline options specified.
@@ -21,8 +20,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
     {
         private const string EmptyRunSettings = @"<RunSettings></RunSettings>";
 
+        public static void UpdateRunSettings(IRunSettingsProvider runSettingsManager, string runsettingsXml)
+        {
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(runsettingsXml);
+            runSettingsManager.SetActiveRunSettings(runSettings);
+        }
+
         public static void AddDefaultRunSettings(IRunSettingsProvider runSettingsProvider)
         {
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+
             var runSettingsXml = runSettingsProvider?.ActiveRunSettings?.SettingsXml;
 
             if (string.IsNullOrWhiteSpace(runSettingsXml))
@@ -34,14 +42,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             RunSettingsUtilities.UpdateRunSettings(runSettingsProvider, runSettingsXml);
         }
 
-        public static XmlDocument GetRunSettingXmlDocument(IRunSettingsProvider runSettingsManager)
+        public static XmlDocument GetRunSettingXmlDocument(IRunSettingsProvider runSettingsProvider)
         {
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+
             var doc = new XmlDocument();
 
-            if (runSettingsManager.ActiveRunSettings != null &&
-                !string.IsNullOrEmpty(runSettingsManager.ActiveRunSettings.SettingsXml))
+            if (runSettingsProvider.ActiveRunSettings != null &&
+                !string.IsNullOrEmpty(runSettingsProvider.ActiveRunSettings.SettingsXml))
             {
-                var settingsXml = runSettingsManager.ActiveRunSettings.SettingsXml;
+                var settingsXml = runSettingsProvider.ActiveRunSettings.SettingsXml;
 
 #if net46
                     using (var reader = XmlReader.Create(new StringReader(settingsXml), new XmlReaderSettings() { XmlResolver = null, CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
@@ -73,29 +83,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return doc;
         }
 
-        public static void UpdateRunSettings(IRunSettingsProvider runSettingsManager, string runsettingsXml)
-        {
-            var runSettings = new RunSettings();
-            runSettings.LoadSettingsXml(runsettingsXml);
-            runSettingsManager.SetActiveRunSettings(runSettings);
-        }
-
         public static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string value)
         {
             var node = GetXmlNode(xmlDocument, key) ?? RunSettingsUtilities.CreateNode(xmlDocument, key.Split('.'));
             node.InnerText = value;
         }
 
-        public static void UpdateRunSettingsNode(IRunSettingsProvider runSettingsManager, string key, string value)
+        public static void UpdateRunSettingsNode(IRunSettingsProvider runSettingsProvider, string key, string value)
         {
-            var xmlDocument = RunSettingsUtilities.GetRunSettingXmlDocument(runSettingsManager);
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+            var xmlDocument = RunSettingsUtilities.GetRunSettingXmlDocument(runSettingsProvider);
             RunSettingsUtilities.UpdateRunSettingsXmlDocument(xmlDocument, key, value);
-            RunSettingsUtilities.UpdateRunSettings(runSettingsManager, xmlDocument.OuterXml);
+            RunSettingsUtilities.UpdateRunSettings(runSettingsProvider, xmlDocument.OuterXml);
         }
 
-        public static string QueryRunSettingsNode(IRunSettingsProvider runSettingsManager, string key)
+        public static string QueryRunSettingsNode(IRunSettingsProvider runSettingsProvider, string key)
         {
-            var xmlDocument = RunSettingsUtilities.GetRunSettingXmlDocument(runSettingsManager);
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+            var xmlDocument = RunSettingsUtilities.GetRunSettingXmlDocument(runSettingsProvider);
             var node = GetXmlNode(xmlDocument, key);
             return node?.InnerText;
         }
