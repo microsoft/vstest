@@ -1,0 +1,19 @@
+{
+  "id": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
+  "version": "1.0.2",
+  "type": "Vsix",
+  "vsixId": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
+  "extensionDir": "[installdir]\\Common7\\IDE\\Extensions\\qgyll0uu.4m0",
+  "files": [
+    {
+      "fileName": "/extension.vsixmanifest",
+      "sha256": "439E8D9C90642193F7D2DEA7C40DEFBE8254F63F1926CC385BDA20A3CAC9B476"
+    },
+    {
+      "fileName": "/License.rtf",
+      "sha256": "F451AB5C77BB7B9DC19733D5C9585E0F4A86D8BFB447349C5F6F3D1BEA862630"
+    }
+  ],
+  "installSize": 8348725,
+  "dependencies": { "Microsoft.VisualStudio.Component.CoreEditor": "[15.0,16.0)" }
+}

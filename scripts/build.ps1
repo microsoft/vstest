@@ -264,16 +264,6 @@ function Create-VsixPackage
     Write-Log "Create-VsixPackage: Started."
     $packageDir = Get-FullCLRPackageDirectory
 
-    # Copy vsix manifests
-    $vsixManifests = @("*Content_Types*.xml",
-        "extension.vsixmanifest",
-        "License.rtf",
-        "TestPlatform.ObjectModel.manifest",
-        "TestPlatform.ObjectModel.x86.manifest")
-    foreach ($file in $vsixManifests) {
-        Copy-Item $env:TP_PACKAGE_PROJ_DIR\$file $packageDir -Force
-    }
-
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
