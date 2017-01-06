@@ -4,7 +4,7 @@
   "packages": [
     {
       "id": "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI",
-      "version": "1.0.3",
+      "version": "1.0.2",
       "type": "Vsix",
       "payloads": [
         {
