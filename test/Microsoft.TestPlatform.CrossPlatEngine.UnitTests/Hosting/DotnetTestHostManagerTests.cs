@@ -257,14 +257,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void GetTestHostProcessStartInfoShouldIncludeSourceDirectoryAsWorkingDirectory()
+        public void GetTestHostProcessStartInfoShouldIncludeCurrentDirectoryAsWorkingDirectory()
         {
             // Absolute path to the source directory
             var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
             this.mockFileHelper.Setup(ph => ph.Exists(@"\tmp\testhost.dll")).Returns(true);
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
-            
-            Assert.AreEqual($"{Path.DirectorySeparatorChar}tmp", startInfo.WorkingDirectory);
+
+            Assert.AreEqual(Directory.GetCurrentDirectory(), startInfo.WorkingDirectory);
         }
 
         [TestMethod]
