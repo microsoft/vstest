@@ -309,11 +309,8 @@ function Create-NugetPackages
         Copy-Item $tpSrcDir\$file $stagingDir -Force
     }
 
-    # Copy files to Sdk folder that will be packed in Microsoft.NET.Test.sdk nuget package.    
-    New-Item -ItemType directory -Path  $stagingDir\"Sdk" -Force | Out-Null
-    Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk_props" $stagingDir\"Sdk\Microsoft.Net.Test.Sdk.props" -Force
-    Copy-Item $tpSrcDir\"Sdk_props" $stagingDir\"Sdk\Sdk.props" -Force
-    Copy-Item $tpSrcDir\"Sdk.targets" $stagingDir\"Sdk\Sdk.targets" -Force
+    # Copy and rename props file.
+    Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk_props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
 
     # Copy over empty and third patry notice file
     Copy-Item $tpSrcDir\package\"_._" $stagingDir -Force
