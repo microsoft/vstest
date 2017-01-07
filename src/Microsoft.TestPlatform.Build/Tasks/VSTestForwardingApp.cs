@@ -12,18 +12,17 @@ namespace Microsoft.TestPlatform.Build.Tasks
     public class VSTestForwardingApp
     {
         private const string hostExe = "dotnet";
-        private const string vsTestAppName = "vstest.console.dll";
         private readonly List<string> allArgs = new List<string>();
         private int activeProcessId;
 
-        public VSTestForwardingApp(IEnumerable<string> argsToForward)
+        public VSTestForwardingApp(string vsTestExePath, IEnumerable<string> argsToForward)
         {
             this.allArgs.Add("exec");
 
             // Ensure that path to vstest.console is whitespace friendly. User may install
             // dotnet-cli to any folder containing whitespace (e.g. VS installs to program files).
             // Arguments are already whitespace friendly.
-            this.allArgs.Add("\"" + GetVSTestExePath() + "\"");
+            this.allArgs.Add("\"" + vsTestExePath + "\"");
             this.allArgs.AddRange(argsToForward);
         }
 
@@ -68,11 +67,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 Tracing.Trace(string.Format("VSTest: Killing process throws ArgumentException with the following message {0}. It may be that process is not running", ex.Message));
             }
-        }
-
-        private static string GetVSTestExePath()
-        {
-            return Path.Combine(AppContext.BaseDirectory, vsTestAppName);
         }
     }
 }

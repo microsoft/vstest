@@ -18,6 +18,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
         // The process which is invoking vstest.console
         private VSTestForwardingApp vsTestForwardingApp;
 
+        private const string vsTestAppName = "vstest.console.dll";
+
         public string TestFileFullPath
         {
             get;
@@ -77,12 +79,19 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        [Required]
+        public string VSTestConsolePath
+        {
+            get; 
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
             Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
 
-            vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
+            vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
                 Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
