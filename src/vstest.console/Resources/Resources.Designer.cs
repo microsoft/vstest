@@ -1015,11 +1015,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
 
         /// <summary>
         ///   Looks up a localized string similar to --ResultsDirectory|/ResultsDirectory
-        ///      This makes vstest.console.exe process use custom test results directory
-        ///      from a given path (if any) in the test run. 
+        ///      Test results directory will be created from a given path.
         ///      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;.
         /// </summary>
-        public static string ResultsDirectoryArgumentHelp
+        internal static string ResultsDirectoryArgumentHelp
         {
             get
             {

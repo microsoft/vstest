@@ -115,13 +115,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Load up the run settings and set it as the active run settings.
             try
             {
-                var doc = RunSettingsUtilities.GetRunSettingXmlDocument(this.runSettingsManager);
-
                 // Append / Override run settings supplied in CLI
-                CreateOrOverwriteRunSettings(doc, arguments);
-
-                // Set Active Run Settings.
-                RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, doc.OuterXml);
+                CreateOrOverwriteRunSettings(this.runSettingsManager, arguments);
             }
             catch (XPathException exception)
             {
@@ -139,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        private void CreateOrOverwriteRunSettings(XmlDocument xmlDoc, string[] args)
+        private void CreateOrOverwriteRunSettings(IRunSettingsProvider runSettingsProvider, string[] args)
         {
             var length = args.Length;
 
@@ -159,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     continue;
                 }
 
-                RunSettingsUtilities.UpdateRunSettingsXmlDocument(xmlDoc, key, value);
+                runSettingsProvider.UpdateRunSettingsNode(key, value);
             }
         }
     }

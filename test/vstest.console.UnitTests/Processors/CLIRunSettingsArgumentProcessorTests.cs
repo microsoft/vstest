@@ -12,16 +12,23 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
     using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class CLIRunSettingsArgumentProcessorTests
     {
+        private TestableRunSettingsProvider settingsProvider;
+        private CLIRunSettingsArgumentExecutor executor;
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
         private const string RunSettingsWithDeploymentDisabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>False</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
         private const string RunSettingsWithDeploymentEnabled = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>True</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>";
+
+        [TestInitialize]
+        public void Init()
+        {
+            this.settingsProvider = new TestableRunSettingsProvider();
+            this.executor = new CLIRunSettingsArgumentExecutor(this.settingsProvider);
+        }
 
         [TestMethod]
         public void GetMetadataShouldReturnRunSettingsArgumentProcessorCapabilities()
@@ -63,45 +70,35 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldNotThrowExceptionIfArgumentIsNull()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(null);
+            this.executor.Initialize((string[])null);
 
-            executor.Initialize((string[])null);
-
-            Assert.IsNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowExceptionIfArgumentIsEmpty()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+            this.executor.Initialize(new string[0]);
 
-            executor.Initialize(new string[0]);
-
-            Assert.IsNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
         }
 
         [TestMethod]
-        public void InitializeShouldCreateDefaultRunSettingsIfArgumentsHasOnlyWhiteSpace()
+        public void InitializeShouldCreateEmptyRunSettingsIfArgumentsHasOnlyWhiteSpace()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
+            this.executor.Initialize(new string[] { " " });
 
-            executor.Initialize(new string[] { " " });
-
-            Assert.AreEqual(DefaultRunSettings, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
         }
 
         [TestMethod]
         public void InitializeShouldSetValueInRunSettings()
         {
             var args = new string[] { "MSTest.DeploymentEnabled=False" };
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
-            executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            this.executor.Initialize(args);
+
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
@@ -109,12 +106,10 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldIgnoreKeyIfValueIsNotPassed()
         {
             var args = new string[] { "MSTest.DeploymentEnabled=False", "MSTest1" };
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
 
-            executor.Initialize(args);
+            this.executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
@@ -122,12 +117,10 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldIgnoreWhiteSpaceInBeginningOrEndOfKey()
         {
             var args = new string[] { " MSTest.DeploymentEnabled =False" };
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
 
-            executor.Initialize(args);
+            this.executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
@@ -135,10 +128,8 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldIgnoreThrowExceptionIfKeyHasWhiteSpace()
         {
             var args = new string[] { "MST est.DeploymentEnabled=False" };
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
 
-            Action action = () => executor.Initialize(args);
+            Action action = () => this.executor.Initialize(args);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 action,
@@ -149,12 +140,10 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldEncodeXMLIfInvalidXMLCharsArePresent()
         {
             var args = new string[] { "MSTest.DeploymentEnabled=F>a><l<se" };
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
 
-            executor.Initialize(args);
+            this.executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>F&gt;a&gt;&lt;l&lt;se</DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
@@ -162,44 +151,40 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeShouldIgnoreIfKeyIsNotPassed()
         {
             var args = new string[] { "MSTest.DeploymentEnabled=False", "=value" };
-            var settingsProvider = new TestableRunSettingsProvider();
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
 
-            executor.Initialize(args);
+            this.executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(RunSettingsWithDeploymentDisabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldIgnoreIfEmptyValueIsPassed()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
+
             var runSettings = new RunSettings();
             runSettings.LoadSettingsXml(DefaultRunSettings);
-            settingsProvider.SetActiveRunSettings(runSettings);
+            this.settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=" };
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
-            executor.Initialize(args);
+            this.executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
-            Assert.AreEqual(DefaultRunSettings, settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
+            Assert.AreEqual(DefaultRunSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
         public void InitializeShouldOverwriteValueIfNodeAlreadyExists()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
+
             var runSettings = new RunSettings();
             runSettings.LoadSettingsXml(DefaultRunSettings);
             settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled=True" };
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
-            executor.Initialize(args);
+            this.executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual(RunSettingsWithDeploymentEnabled, settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
@@ -207,35 +192,16 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldOverwriteValueIfWhitSpaceIsPassedAndNodeAlreadyExists()
         {
-            var settingsProvider = new TestableRunSettingsProvider();
+
             var runSettings = new RunSettings();
             runSettings.LoadSettingsXml(DefaultRunSettings);
             settingsProvider.SetActiveRunSettings(runSettings);
 
             var args = new string[] { "MSTest.DeploymentEnabled= " };
-            var executor = new CLIRunSettingsArgumentExecutor(settingsProvider);
-            executor.Initialize(args);
+            this.executor.Initialize(args);
 
-            Assert.IsNotNull(settingsProvider.ActiveRunSettings);
+            Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors />\r\n  </DataCollectionRunSettings>\r\n  <MSTest>\r\n    <DeploymentEnabled>\r\n    </DeploymentEnabled>\r\n  </MSTest>\r\n</RunSettings>", settingsProvider.ActiveRunSettings.SettingsXml);
-        }
-
-        #endregion
-
-        #region private
-
-        private class TestableRunSettingsProvider : IRunSettingsProvider
-        {
-            public RunSettings ActiveRunSettings
-            {
-                get;
-                set;
-            }
-
-            public void SetActiveRunSettings(RunSettings runSettings)
-            {
-                this.ActiveRunSettings = runSettings;
-            }
         }
 
         #endregion

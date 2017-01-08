@@ -42,8 +42,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Running in VS/IDE. Use artifacts directory as root.
                 this.runningInCli = false;
-                this.testPlatformRootDirectory = Path.GetFullPath(@"..\..\..");
-                this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"artifacts\test\TestAssets");
+                this.testPlatformRootDirectory = "C:/Users/samadala/src/vstest"; //Path.GetFullPath(@"..\..\..");
+                this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"test\TestAssets");
             }
             else
             {
@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             get
             {
                 string value = string.Empty;
-                if (this.runningInCli)
+                if (this.runningInCli || true)
                 {
                     value = Path.Combine(
                         this.testPlatformRootDirectory,

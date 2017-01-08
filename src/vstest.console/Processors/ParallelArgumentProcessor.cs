@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             commandLineOptions.Parallel = true;
-            RunSettingsUtilities.UpdateRunSettingsNode(this.runSettingsManager, ParallelArgumentExecutor.RunSettingsPath, "0");
+            this.runSettingsManager.UpdateRunSettingsNode(ParallelArgumentExecutor.RunSettingsPath, "0");
         }
 
         /// <summary>

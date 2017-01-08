@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.output = ConsoleOutput.Instance;
 
-            this.runSettingsManager = RunSettingsManager.Instance;
+            this.runSettingsManager = runSettingsProvider;
             this.testRequestManager = testRequestManager;
             this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar();
         }

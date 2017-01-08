@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.commandLineOptions = options;
             this.testRequestManager = testRequestManager;
 
-            this.runSettingsManager = RunSettingsManager.Instance;
+            this.runSettingsManager = runSettingsProvider;
             this.output = ConsoleOutput.Instance;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
         }

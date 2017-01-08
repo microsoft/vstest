@@ -625,8 +625,7 @@
   </data>
   <data name="ResultsDirectoryArgumentHelp" xml:space="preserve">
     <value>--ResultsDirectory|/ResultsDirectory
-      This makes vstest.console.exe process use custom test results directory
-      from a given path (if any) in the test run. 
+      Test results directory will be created from a given path.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</value>
   </data>
   <data name="ResultsDirectoryValueRequired" xml:space="preserve">

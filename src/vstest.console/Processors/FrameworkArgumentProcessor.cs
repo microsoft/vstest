@@ -141,20 +141,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
             }
-            this.commandLineOptions.TargetFrameworkVersion = validFramework;
-            RunSettingsUtilities.UpdateRunSettingsNode(this.runSettingsManager, FrameworkArgumentExecutor.RunSettingsPath, validFramework.ToString());
 
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Using .Net Framework version:{0}", commandLineOptions.TargetFrameworkVersion);
-            }
+            this.commandLineOptions.TargetFrameworkVersion = validFramework;
 
             if (this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
                 && !string.IsNullOrWhiteSpace(this.commandLineOptions.SettingsFile)
                 && MSTestSettingsUtilities.IsLegacyTestSettingsFile(this.commandLineOptions.SettingsFile))
             {
+                // Legacy testsettings file support only default target framework.
                 IOutput output = ConsoleOutput.Instance;
-                output.Warning(CommandLineResources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+                output.Warning(CommandLineResources.TestSettingsFrameworkMismatch,
+                    this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            }
+            else
+            {
+                this.runSettingsManager.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath,
+                    validFramework.ToString());
+            }
+
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Using .Net Framework version:{0}", commandLineOptions.TargetFrameworkVersion);
             }
         }
 

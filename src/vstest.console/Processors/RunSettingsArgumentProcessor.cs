@@ -125,10 +125,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             try
             {
                 IXPathNavigable document = this.GetRunSettingsDocument(argument);
-                RunSettingsUtilities.UpdateRunSettings(this.runSettingsManager, document.CreateNavigator().OuterXml);
+                this.runSettingsManager.UpdateRunSettings(document.CreateNavigator().OuterXml);
 
                 //Add default runsettings values if not exists in given runsettings file.
-                RunSettingsUtilities.AddDefaultRunSettings(this.runSettingsManager);
+                this.runSettingsManager.AddDefaultRunSettings();
 
                 this.commandLineOptions.SettingsFile = argument;
             }
@@ -172,13 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
-
-#if NET46
-                FrameworkVersion frameworkVersion = FrameworkVersion.Framework45;
-#else
-                FrameworkVersion frameworkVersion = FrameworkVersion.FrameworkCore10;
-#endif
-                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, frameworkVersion);
+                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, FrameworkVersion.Framework45);
             }
 
             if (this.commandLineOptions.EnableCodeCoverage == true)

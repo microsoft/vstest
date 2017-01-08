@@ -1,24 +1,32 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
     using System;
     using System.IO;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using vstest.console.UnitTests.Processors;
 
     [TestClass]
     public class ResultsDirectoryArgumentProcessorTests
     {
+        private ResultsDirectoryArgumentExecutor executor;
+        private TestableRunSettingsProvider runSettingsProvider;
+
+        [TestInitialize]
+        public void Init()
+        {
+            this.runSettingsProvider = new TestableRunSettingsProvider();
+            this.executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, this.runSettingsProvider);
+        }
+
         [TestCleanup]
         public void TestCleanup()
         {
             CommandLineOptions.Instance.Reset();
-            RunSettingsManager.Instance = null;
         }
 
         [TestMethod]
@@ -60,83 +68,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsNull()
         {
-            var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
-
+            string folder = null;
             var message =
                 @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
-
-            var isExceptionThrown = false;
-
-            try
-            {
-                executor.Initialize(null);
-            }
-            catch (Exception ex)
-            {
-                isExceptionThrown = true;
-                Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual(message, ex.Message);
-            }
-
-            Assert.IsTrue(isExceptionThrown);
+            this.InitializeExceptionTestTemplate(folder, message);
         }
 
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsAWhiteSpace()
         {
-            var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
-
+            var folder = " ";
             var message =
                 @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
-
-            var isExceptionThrown = false;
-
-            try
-            {
-                executor.Initialize("  ");
-            }
-            catch (Exception ex)
-            {
-                isExceptionThrown = true;
-                Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual(message, ex.Message);
-            }
-
-            Assert.IsTrue(isExceptionThrown);
+            this.InitializeExceptionTestTemplate(folder, message);
         }
 
         [TestMethod]
-        public void InitializeShouldThrowIfRelativePathIsInvalid()
+        public void InitializeShouldThrowIfRelativePathIsTooLong()
         {
-            var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
-
-            var folder = @".\path\to\in:valid";
-
+            var folder = @".\this\path\is\too\longgggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggg";
             var message = string.Format(
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
-                "The given path's format is not supported.");
-
-            var isExceptionThrown = false;
-
-            try
-            {
-                executor.Initialize(folder);
-            }
-            catch (Exception ex)
-            {
-                isExceptionThrown = true;
-                Assert.IsTrue(ex is CommandLineException);
-                Assert.AreEqual(message, ex.Message);
-            }
-
-            Assert.IsTrue(isExceptionThrown);
+                "The specified file name or path is too long, or a component of the specified path is too long.");
+            this.InitializeExceptionTestTemplate(folder, message);
         }
 
         [TestMethod]
-        public void InitializeShouldThrowIfPathIsInvalid()
+        public void InitializeShouldThrowIfGivenPathisIllegal()
         {
-            var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
+            var folder = @"c:\som<\illegal\path\";
+            var message = string.Format(
+                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
+                folder,
+                "Illegal characters in path.");
+            this.InitializeExceptionTestTemplate(folder, message);
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowIfPathIsNotSupported()
+        {
 
             var folder = @"c:\path\to\in:valid";
 
@@ -144,12 +115,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
                 folder,
                 "The given path's format is not supported.");
+            this.InitializeExceptionTestTemplate(folder, message);
+        }
 
+        private void InitializeExceptionTestTemplate(string folder, string message)
+        {
             var isExceptionThrown = false;
 
             try
             {
-                executor.Initialize(folder);
+                this.executor.Initialize(folder);
             }
             catch (Exception ex)
             {
@@ -164,22 +139,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsAndRunSettingsForRelativePathValue()
         {
-            var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
             var relativePath = @".\relative\path";
             var absolutePath = Path.GetFullPath(relativePath);
-            executor.Initialize(relativePath);
+            this.executor.Initialize(relativePath);
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
-            Assert.AreEqual(absolutePath, RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, ResultsDirectoryArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsAndRunSettingsForAbsolutePathValue()
         {
-            var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
             var absolutePath = @"c:\Users\someone\testresults";
-            executor.Initialize(absolutePath);
+            this.executor.Initialize(absolutePath);
             Assert.AreEqual(absolutePath, CommandLineOptions.Instance.ResultsDirectory);
-            Assert.AreEqual(absolutePath, RunSettingsUtilities.QueryRunSettingsNode(RunSettingsManager.Instance, ResultsDirectoryArgumentExecutor.RunSettingsPath));
+            Assert.AreEqual(absolutePath, this.runSettingsProvider.QueryRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath));
         }
 
         #endregion
@@ -189,8 +162,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            var executor = new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance);
-
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }
 

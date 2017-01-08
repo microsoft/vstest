@@ -193,7 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             processors.AddRange(processorsToAlwaysExecute);
 
             // Initialize Runsettings with defaults
-            RunSettingsUtilities.AddDefaultRunSettings(RunSettingsManager.Instance);
+            RunSettingsManager.Instance.AddDefaultRunSettings();
 
             // Ensure we have an action argument.
             this.EnsureActionArgumentIsPresent(processors, processorFactory);

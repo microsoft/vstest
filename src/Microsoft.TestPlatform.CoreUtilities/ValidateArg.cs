@@ -75,6 +75,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Validate a string is not null, empty or consists only of white-space characters.
+        /// </summary>
+        /// <param name="arg">
+        /// Input string.
+        /// </param>
+        /// <param name="parameterName">
+        /// Name of the parameter to validate.
+        /// </param>
+        /// <returns>
+        /// Validated string.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if the input string is null null, empty or consists only of white-space characters.
+        /// </exception>
+        [DebuggerStepThrough]
+        public static string NotNullOrWhiteSpace([ValidatedNotNull]string arg, string parameterName)
+        {
+            if (string.IsNullOrWhiteSpace(arg))
+            {
+                throw new ArgumentNullException(parameterName);
+            }
+
+            return arg;
+        }
+
+        /// <summary>
         /// Throws ArgumentOutOfRangeException if the argument is less than zero.
         /// </summary>
         /// <param name="arg">The argument to check.</param>
