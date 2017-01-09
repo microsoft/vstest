@@ -6,7 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -54,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new FrameworkArgumentExecutor(CommandLineOptions.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new FrameworkArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -94,6 +99,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private CommandLineOptions commandLineOptions;
 
+        private IRunSettingsProvider runSettingsManager;
+
+        public const string RunSettingsPath = "RunConfiguration.TargetFrameworkVersion";
+
         #endregion
 
         #region Constructor
@@ -101,14 +110,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Default constructor.
         /// </summary>
-        /// <param name="options">
-        /// The options.
-        /// </param>
-        public FrameworkArgumentExecutor(CommandLineOptions options)
+        /// <param name="options"> The options. </param>
+        /// <param name="runSettingsManager"> The runsettings manager. </param>
+        public FrameworkArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
             Contract.Requires(options != null);
+            Contract.Requires(runSettingsManager != null);
             this.commandLineOptions = options;
+            this.runSettingsManager = runSettingsManager;
         }
+
         #endregion
 
         #region IArgumentExecutor
@@ -126,11 +137,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             
             var validFramework = Framework.FromString(argument);
             if (validFramework == null)
-            { 
+            {
                 throw new CommandLineException(
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidFrameworkVersion, argument));
             }
-            commandLineOptions.TargetFrameworkVersion = validFramework;
+
+            this.commandLineOptions.TargetFrameworkVersion = validFramework;
+
+            if (this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework
+                && !string.IsNullOrWhiteSpace(this.commandLineOptions.SettingsFile)
+                && MSTestSettingsUtilities.IsLegacyTestSettingsFile(this.commandLineOptions.SettingsFile))
+            {
+                // Legacy testsettings file support only default target framework.
+                IOutput output = ConsoleOutput.Instance;
+                output.Warning(CommandLineResources.TestSettingsFrameworkMismatch,
+                    this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            }
+            else
+            {
+                this.runSettingsManager.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath,
+                    validFramework.ToString());
+            }
 
             if (EqtTrace.IsInfoEnabled)
             {

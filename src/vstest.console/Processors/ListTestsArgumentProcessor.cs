@@ -199,6 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             Contract.Assert(this.output != null);
             Contract.Assert(this.commandLineOptions != null);
+            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
             if (this.commandLineOptions.Sources.Count() <= 0)
             {
@@ -207,7 +208,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
 
-            var runSettings = RunSettingsUtilities.GetRunSettings(this.runSettingsManager, this.commandLineOptions);
+            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             var success = this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
