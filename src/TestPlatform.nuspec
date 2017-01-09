@@ -14,7 +14,7 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
   </metadata>
   <files>
-    <!-- Add a thirt party notice file -->
+    <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     
     <file src="net46\$Runtime$\**\*.*" target="tools\net46\" />

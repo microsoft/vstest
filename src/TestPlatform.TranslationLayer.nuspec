@@ -18,7 +18,7 @@
     </dependencies>
   </metadata>
   <files>
-    <!-- Add a thirt party notice file -->
+    <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     
     <file src="net46\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net46\" />
