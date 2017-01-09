@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new ResultsDirectoryArgumentProcessorCapabilities();
             Assert.AreEqual("/ResultsDirectory", capabilities.CommandName);
-            Assert.AreEqual("--ResultsDirectory|/ResultsDirectory\n      Test results directory will be created from a given path \n      Example:  /ResultsDirectory:<pathToResultsDirectory>", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--ResultsDirectory|/ResultsDirectory\n      Test results directory will be created in specified path if not exists. \n      Example:  /ResultsDirectory:<pathToResultsDirectory>", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.ResultsDirectoryArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -80,24 +80,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var folder = " ";
             var message =
                 @"The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory";
-            this.InitializeExceptionTestTemplate(folder, message);
-        }
-
-        [TestMethod]
-        public void InitializeShouldThrowIfRelativePathIsTooLong()
-        {
-#if NET46
-            var errorMessage =
-                "The specified path, file name, or both are too long. The fully qualified file name must be less than 260 characters, and the directory name must be less than 248 characters";
-#else
-            var errorMessage = "The specified file name or path is too long, or a component of the specified path is too long.";
-#endif
-
-            var folder = @".\this\path\is\too\longgggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggglonggggggggggggggggggggggggggggggggggggggggggggggggggggg";
-            var message = string.Format(
-                @"The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}",
-                folder,
-                errorMessage);
             this.InitializeExceptionTestTemplate(folder, message);
         }
 

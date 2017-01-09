@@ -1015,7 +1015,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
 
         /// <summary>
         ///   Looks up a localized string similar to --ResultsDirectory|/ResultsDirectory
-        ///      Test results directory will be created from a given path.
+        ///      Test results directory will be created in specified path if not exists.
         ///      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;.
         /// </summary>
         internal static string ResultsDirectoryArgumentHelp

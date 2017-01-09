@@ -625,7 +625,7 @@
   </data>
   <data name="ResultsDirectoryArgumentHelp" xml:space="preserve">
     <value>--ResultsDirectory|/ResultsDirectory
-      Test results directory will be created from a given path.
+      Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</value>
   </data>
   <data name="ResultsDirectoryValueRequired" xml:space="preserve">
