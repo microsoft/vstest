@@ -152,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.commandLineOptions = options;
             this.testRequestManager = testRequestManager;
 
-            this.runSettingsManager = RunSettingsManager.Instance;
+            this.runSettingsManager = runSettingsProvider;
             this.output = ConsoleOutput.Instance;
             this.discoveryEventsRegistrar = new DiscoveryEventsRegistrar(this.discoveryRequest_OnDiscoveredTests);
         }
@@ -190,6 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Assert(this.output != null);
             Contract.Assert(this.commandLineOptions != null);
             Contract.Assert(this.testRequestManager != null);
+            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager.ActiveRunSettings.SettingsXml));
 
             if (this.commandLineOptions.Sources.Count() <= 0)
             {
@@ -203,7 +204,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             bool result = false;
 
-            this.effectiveRunSettings = RunSettingsUtilities.GetRunSettings(this.runSettingsManager, this.commandLineOptions);
+            this.effectiveRunSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             // Discover tests from sources and filter on every discovery reported.
             result = this.DiscoverTestsAndSelectSpecified(this.commandLineOptions.Sources);

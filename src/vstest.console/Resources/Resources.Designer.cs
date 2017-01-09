@@ -646,7 +646,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("InvalidPortArgument", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;ResultsDirectory&apos; is invalid. Error: {1}.
+        /// </summary>
+        public static string InvalidResultsDirectoryPathCommand
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidResultsDirectoryPathCommand", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;TestAdapterPath&apos; is invalid. Error: {1}.
         /// </summary>
@@ -1001,7 +1012,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("ProjectPathNotFound", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to --ResultsDirectory|/ResultsDirectory
+        ///      Test results directory will be created in specified path if not exists.
+        ///      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;.
+        /// </summary>
+        internal static string ResultsDirectoryArgumentHelp
+        {
+            get
+            {
+                return ResourceManager.GetString("ResultsDirectoryArgumentHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory.
+        /// </summary>
+        public static string ResultsDirectoryValueRequired
+        {
+            get
+            {
+                return ResourceManager.GetString("ResultsDirectoryValueRequired", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to --Settings|/Settings:&lt;Settings File&gt;
         ///      Settings to use when running tests..

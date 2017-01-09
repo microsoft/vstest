@@ -5,27 +5,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
     using System.Diagnostics.Contracts;
-    using System.Globalization;
+    using System.IO;
+    using System.Security;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
-    ///  An argument processor that allows the user to specify the target platform architecture
-    ///  for test run.
+    /// Allows the user to specify a path to save test results.
     /// </summary>
-    internal class PlatformArgumentProcessor : IArgumentProcessor
+    internal class ResultsDirectoryArgumentProcessor : IArgumentProcessor
     {
         #region Constants
 
         /// <summary>
-        /// The name of the command line argument that the OutputArgumentExecutor handles.
+        /// The name of the command line argument that the ListTestsArgumentExecutor handles.
         /// </summary>
-        public const string CommandName = "/Platform";
+        public const string CommandName = "/ResultsDirectory";
 
+        private const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
         #endregion
 
         private Lazy<IArgumentProcessorCapabilities> metadata;
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.metadata == null)
                 {
-                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new PlatformArgumentProcessorCapabilities());
+                    this.metadata = new Lazy<IArgumentProcessorCapabilities>(() => new ResultsDirectoryArgumentProcessorCapabilities());
                 }
 
                 return this.metadata;
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new ResultsDirectoryArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -70,25 +70,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
     }
 
-    internal class PlatformArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
+    /// <summary>
+    /// The argument capabilities.
+    /// </summary>
+    internal class ResultsDirectoryArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
-        public override string CommandName => PlatformArgumentProcessor.CommandName;
-        
+        public override string CommandName => ResultsDirectoryArgumentProcessor.CommandName;
+
         public override bool AllowMultiple => false;
 
         public override bool IsAction => false;
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
-        public override string HelpContentResourceName => CommandLineResources.PlatformArgumentHelp;
+        public override string HelpContentResourceName => CommandLineResources.ResultsDirectoryArgumentHelp;
 
-        public override HelpContentPriority HelpPriority => HelpContentPriority.PlatformArgumentProcessorHelpPriority;
+        public override HelpContentPriority HelpPriority => HelpContentPriority.ResultsDirectoryArgumentProcessorHelpPriority;
     }
 
     /// <summary>
-    /// Argument Executor for the "/Platform" command line argument.
+    /// The argument executor.
     /// </summary>
-    internal class PlatformArgumentExecutor : IArgumentExecutor
+    internal class ResultsDirectoryArgumentExecutor : IArgumentExecutor
     {
         #region Fields
 
@@ -99,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private IRunSettingsProvider runSettingsManager;
 
-        public const string RunSettingsPath = "RunConfiguration.TargetPlatform";
+        public const string RunSettingsPath = "RunConfiguration.ResultsDirectory";
 
         #endregion
 
@@ -109,11 +112,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// Default constructor.
         /// </summary>
         /// <param name="options"> The options. </param>
-        /// <param name="runSettingsManager"> The runsettings manager. </param>
-        public PlatformArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
+        /// <param name="testPlatform">The test platform</param>
+        public ResultsDirectoryArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
             Contract.Requires(options != null);
             Contract.Requires(runSettingsManager != null);
+
             this.commandLineOptions = options;
             this.runSettingsManager = runSettingsManager;
         }
@@ -130,39 +134,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         {
             if (string.IsNullOrWhiteSpace(argument))
             {
-                throw new CommandLineException(CommandLineResources.PlatformTypeRequired);
+                throw new CommandLineException(CommandLineResources.ResultsDirectoryValueRequired);
             }
 
-            Architecture platform;
-            var validPlatform = Enum.TryParse(argument, true, out platform);
-            if (validPlatform)
+            try
             {
-                validPlatform = platform == Architecture.X86 || platform == Architecture.X64 || platform == Architecture.ARM;
+                // to check valid directory path
+                var di = new DirectoryInfo(argument);
+
+                if (!Path.IsPathRooted(argument))
+                {
+                    argument = Path.GetFullPath(argument);
+                }
+            }
+            catch (Exception ex) when( ex is NotSupportedException || ex is SecurityException || ex is ArgumentException || ex is PathTooLongException)
+            {
+                throw new CommandLineException(string.Format(CommandLineResources.InvalidResultsDirectoryPathCommand, argument, ex.Message));
             }
 
-            if (validPlatform)
-            {
-                this.commandLineOptions.TargetArchitecture = platform;
-                this.runSettingsManager.UpdateRunSettingsNode(PlatformArgumentExecutor.RunSettingsPath, platform.ToString());
-            }
-            else
-            {
-                throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidPlatformType, argument));
-            }
-
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("Using platform:{0}", this.commandLineOptions.TargetArchitecture);
-            }
+            this.commandLineOptions.ResultsDirectory = argument;
+            this.runSettingsManager.UpdateRunSettingsNode(ResultsDirectoryArgumentExecutor.RunSettingsPath, argument);
         }
 
         /// <summary>
-        /// The output path is already set, return success.
+        /// Executes the argument processor.
         /// </summary>
-        /// <returns> The <see cref="ArgumentProcessorResult"/> Success </returns>
+        /// <returns> The <see cref="ArgumentProcessorResult"/>. </returns>
         public ArgumentProcessorResult Execute()
         {
+            // Nothing to do since we updated the parameter during initialize parameter
             return ArgumentProcessorResult.Success;
         }
 
