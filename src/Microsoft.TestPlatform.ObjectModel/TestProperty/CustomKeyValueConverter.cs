@@ -43,14 +43,29 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(data)))
                 {
-                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(Dictionary<string, string>));
-                    var dict = serializer.ReadObject(stream) as Dictionary<string, string>;
+                    List<KeyValuePair<string, string>> listOfKvps = new List<KeyValuePair<string, string>>();
 
-                    return dict?.ToArray();
+                    // Converting Json data to array of KeyValuePairs with duplicate keys.
+                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<TraitObject>));
+
+                    var listOfTratiObjects = serializer.ReadObject(stream) as List<TraitObject>;
+                    listOfTratiObjects.ForEach(o=>listOfKvps.Add(new KeyValuePair<string, string>(o.Key, o.Value)));                    
+
+                    return listOfKvps?.ToArray();
                 }
             }
 
             return base.ConvertFrom(context, culture, value);
+        }
+
+        [System.Runtime.Serialization.DataContract]
+        private class TraitObject
+        {
+            [System.Runtime.Serialization.DataMember(Name = "Key")]
+            public string Key { get; set; }
+
+            [System.Runtime.Serialization.DataMember(Name = "Value")]
+            public string Value { get; set; }
         }
     }
 }
