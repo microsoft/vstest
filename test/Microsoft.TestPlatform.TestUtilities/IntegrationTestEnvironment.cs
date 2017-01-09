@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             get
             {
                 string value = string.Empty;
-                if (this.runningInCli || true)
+                if (this.runningInCli)
                 {
                     value = Path.Combine(
                         this.testPlatformRootDirectory,
