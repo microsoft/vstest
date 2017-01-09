@@ -10,13 +10,17 @@
     <description>The entry point to Microsoft Test Platform. This is a csharp layer that can drive the test platform confirming to its protocol</description>
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
-    <copyright>Copyright © Microsoft Corporation</copyright>
+    <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <dependencies>
       <!-- VS has a dependency on 8.0.3 version of NewtonSoft.Json. -->
       <dependency id="Newtonsoft.Json" version="8.0.3"/>
     </dependencies>
   </metadata>
   <files>
+    <!-- Add a third party notice file -->
+    <file src="ThirdPartyNotices.txt" target="" />
+    
     <file src="net46\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net46\" />
     <file src="net46\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\net46\" />
     <file src="net46\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net46\" />    
