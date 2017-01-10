@@ -44,8 +44,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(data)))
                 {
                     // Converting Json data to array of KeyValuePairs with duplicate keys.
-                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(List<TraitObject>));
-                    var listOfTraitObjects = serializer.ReadObject(stream) as List<TraitObject>;                                        
+                    var serializer = new System.Runtime.Serialization.Json.DataContractJsonSerializer(typeof(TraitObject[]));
+                    var listOfTraitObjects = serializer.ReadObject(stream) as TraitObject[];                                        
 
                     return listOfTraitObjects.Select(i => new KeyValuePair<string, string>(i.Key, i.Value)).ToArray();;
                 }
