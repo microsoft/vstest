@@ -60,16 +60,6 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         }
 
         [TestMethod]
-        public void CustomKeyValueConverterShouldThrowOnDeserializeNullKeyOrValue()
-        {
-            var json = "[{ \"Key\": null, \"Value\": \"\" }]";
-
-            var action = new Action(() => this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json));
-
-            Assert.ThrowsException<ArgumentNullException>(action);
-        }
-
-        [TestMethod]
         public void CustomKeyValueConverterShouldDeserializeEmptyKeyOrValue()
         {
             var json = "[{ \"Key\": \"\", \"Value\": \"\" }]";
@@ -79,6 +69,21 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(1, data.Length);
             Assert.AreEqual(string.Empty, data[0].Key);
             Assert.AreEqual(string.Empty, data[0].Value);
+        }
+
+        [TestMethod]
+        public void CustomKeyValueConverterShouldDeserializeDuplicateKeysKvps()
+        {
+            var json = "[{ \"Key\": \"key1\", \"Value\": \"val1\" }, { \"Key\": \"key1\", \"Value\": \"val2\" }]";
+
+            var data = this.customKeyValueConverter.ConvertFrom(null, CultureInfo.InvariantCulture, json) as KeyValuePair<string, string>[];
+
+            Assert.IsNotNull(data);
+            Assert.AreEqual(2, data.Length);
+            Assert.AreEqual("key1", data[0].Key);
+            Assert.AreEqual("val1", data[0].Value);
+            Assert.AreEqual("key1", data[1].Key);
+            Assert.AreEqual("val2", data[1].Value);
         }
     }
 }
