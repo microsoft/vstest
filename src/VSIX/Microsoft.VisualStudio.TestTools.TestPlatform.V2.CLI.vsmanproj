@@ -20,7 +20,7 @@
   <Import Project="..\..\packages\MicroBuild.Core\0.2.0\build\MicroBuild.Core.targets" />
   <Import Project="..\..\packages\MicroBuild.Core\0.2.0\build\MicroBuild.Core.props" />
   <ItemGroup>
-    <VsixFileToCopy Include="Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" />
+    <VsixFileToCopy Include="$(TestPlatformRoot)artifacts\$(Configuration)\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" />
     <VsixFileToCopy Include="$(TestPlatformRoot)artifacts\$(Configuration)\TestPlatform.vsix" />
   </ItemGroup>
   <Target Name="BeforeBuild"> 

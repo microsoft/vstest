@@ -26,7 +26,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="[Content_Types].xml;extension.vsixmanifest;License.rtf;manifest.json;catalog.json;TestPlatform.ObjectModel.manifest;TestPlatform.ObjectModel.x86.manifest">
+    <Content Include="TestPlatform.ObjectModel.manifest;TestPlatform.ObjectModel.x86.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

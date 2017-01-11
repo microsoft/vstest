@@ -13,6 +13,8 @@ Param(
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
+    # Versioning scheme = Major(15).Minor(RTW, Updates).SubUpdates(preview4, preview5, RC etc)
+    # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
     [System.String] $Version = "15.0.0",
@@ -73,6 +75,7 @@ $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
+$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -272,6 +275,15 @@ function Create-VsixPackage
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
+    #Copy [Content_Types].xml and License.rtf
+    Copy-Item $TPB_VSIX_DIR\*.xml $packageDir -Force
+
+    $fileToCopy = Join-Path $TPB_VSIX_DIR "License.rtf"
+    Copy-Item $fileToCopy $packageDir -Force
+
+    #update version of VSIX
+    Update-VsixVersion
+
     # Zip the folder
     # TODO remove vsix creator
     $dotnetExe = Get-DotNetPath
@@ -280,6 +292,34 @@ function Create-VsixPackage
     & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net46\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Update-VsixVersion
+{
+    Write-Log "Update-VsixVersion: Started."
+
+    $packageDir = Get-FullCLRPackageDirectory
+    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
+
+    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
+    # So Version of the vsix will be 15.0.3.2017011101
+    $vsixVersionSuffix = $VersionSuffix.Split("-");
+    if($vsixVersionSuffix.Length -ige 2) {
+        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
+    }
+
+    $filesToUpdate = @("extension.vsixmanifest",
+        "manifest.json",
+        "catalog.json")
+
+    foreach ($file in $filesToUpdate) {
+        Get-Content "$TPB_VSIX_DIR\$file" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content "$packageDir\$file"
+    }
+
+    $fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
+    Get-Content "$TPB_VSIX_DIR\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content $fileToUpdate
+
+    Write-Log "Update-VsixVersion: Completed."
 }
 
 function Create-NugetPackages
