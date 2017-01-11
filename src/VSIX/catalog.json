@@ -8,7 +8,7 @@
       "type": "Component",
       "extension": true,
       "dependencies": {
-        "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf": "[15.0,16.0)",
+        "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf": "$version$",
         "Microsoft.VisualStudio.Component.CoreEditor": "[15.0,16.0)"
       },
       "localizedResources": [
