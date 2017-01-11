@@ -13,11 +13,11 @@ Param(
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
-    # version = Major(15).Minor(RTW, Updates).SubUpdates(preview4, preview5, RC etc)
-    # RC and RTW will have subUpdates version =3
+    # Versioning scheme = Major(15).Minor(RTW, Updates).SubUpdates(preview4, preview5, RC etc)
+    # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.0.3",
+    [System.String] $Version = "15.0.0",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -299,12 +299,12 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Started."
 
     $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = $Version
+    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
 
     # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
     # So Version of the vsix will be 15.0.3.2017011101
     $vsixVersionSuffix = $VersionSuffix.Split("-");
-    if($vsixVersionSuffix.Length -ige 2){
+    if($vsixVersionSuffix.Length -ige 2) {
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
     }
 
