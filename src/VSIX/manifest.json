@@ -1,6 +1,6 @@
 {
   "id": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
-  "version": "15.0.3",
+  "version": "$version$",
   "type": "Vsix",
   "vsixId": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
   "extensionDir": "[installdir]\\Common7\\IDE\\Extensions\\qgyll0uu.4m0",

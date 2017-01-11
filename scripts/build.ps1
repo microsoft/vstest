@@ -13,9 +13,11 @@ Param(
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
+    # version = Major(15).Minor(RTW, Updates).SubUpdates(preview4, preview5, RC etc)
+    # RC and RTW will have subUpdates version =3
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.1",
+    [System.String] $Version = "15.0.3",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -49,7 +51,6 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
-$env:TP_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
 
 #
 # Dotnet configuration
@@ -74,6 +75,7 @@ $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
+$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -264,7 +266,7 @@ function Create-VsixPackage
 
     Write-Log "Create-VsixPackage: Started."
     $packageDir = Get-FullCLRPackageDirectory
-	
+
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
@@ -274,13 +276,13 @@ function Create-VsixPackage
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
     #Copy [Content_Types].xml and License.rtf
-    Copy-Item $env:TP_VSIX_DIR\*.xml $packageDir -Force
+    Copy-Item $TPB_VSIX_DIR\*.xml $packageDir -Force
 
-    $fileToCopy = Join-Path $env:TP_VSIX_DIR "License.rtf"
+    $fileToCopy = Join-Path $TPB_VSIX_DIR "License.rtf"
     Copy-Item $fileToCopy $packageDir -Force
 
     #update version of VSIX
-    Update-Version-Of-Vsix
+    Update-VsixVersion
 
     # Zip the folder
     # TODO remove vsix creator
@@ -292,47 +294,32 @@ function Create-VsixPackage
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
-function Update-Version-Of-Vsix
+function Update-VsixVersion
 {
-    $packageDir = Get-FullCLRPackageDirectory
-	$vsixVersion = $Version
+    Write-Log "Update-VsixVersion: Started."
 
+    $packageDir = Get-FullCLRPackageDirectory
+    $vsixVersion = $Version
+
+    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
+    # So Version of the vsix will be 15.0.3.2017011101
     $vsixVersionSuffix = $VersionSuffix.Split("-");
-    if($vsixVersionSuffix.Length -ige 2)
-    {
-       $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1]).$($vsixVersionSuffix[2])"
+    if($vsixVersionSuffix.Length -ige 2){
+        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
     }
 
-    # change version in json and vsixmanifest files
-	$fileToUpdate = Join-Path $env:TP_VSIX_DIR "extension.vsixmanifest"
-	[xml]$xmlContent = Get-Content $fileToUpdate
-	$xmlContent.PackageManifest.Metadata.Identity.Version = $vsixVersion
-	$fileToUpdate = Join-Path $packageDir "extension.vsixmanifest"
-	$xmlContent.Save($fileToUpdate)
-	
-	$fileToUpdate = Join-Path $env:TP_VSIX_DIR "manifest.json"
-	$jsonContent = Get-Content $fileToUpdate -raw | ConvertFrom-Json
-	$jsonContent.version = $vsixVersion
-	$fileToUpdate = Join-Path $packageDir "manifest.json"
-	$jsonContent |ConvertTo-Json | set-content $fileToUpdate
-	
-	$fileToUpdate = Join-Path $env:TP_VSIX_DIR "catalog.json"
-	$jsonContent = Get-Content $fileToUpdate -raw | ConvertFrom-Json
-	$id = $jsonContent.info.id
-    $id = $id.Replace("15.0.3", $vsixVersion)
-    $jsonContent.info.id = $id
-	$jsonContent.packages | % {$_.version = $vsixVersion}
-	$fileToUpdate = Join-Path $packageDir "catalog.json"
-	$jsonContent |ConvertTo-Json -Depth 5 | set-content $fileToUpdate
+    $filesToUpdate = @("extension.vsixmanifest",
+        "manifest.json",
+        "catalog.json")
 
-    $fileToUpdate = Join-Path $env:TP_VSIX_DIR "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
-	$jsonContent = Get-Content $fileToUpdate -raw | ConvertFrom-Json
-    $id = $jsonContent.info.id
-    $id = $id.Replace("15.0.3", $vsixVersion)
-    $jsonContent.info.id = $id
-	$jsonContent.packages | % {$_.version = $vsixVersion}
-	$fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
-	$jsonContent |ConvertTo-Json -Depth 5 | set-content $fileToUpdate
+    foreach ($file in $filesToUpdate) {
+        Get-Content "$TPB_VSIX_DIR\$file" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content "$packageDir\$file"
+    }
+
+    $fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
+    Get-Content "$TPB_VSIX_DIR\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content $fileToUpdate
+
+    Write-Log "Update-VsixVersion: Started."
 }
 
 function Create-NugetPackages
@@ -467,13 +454,13 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-Install-DotNetCli
-Restore-Package
+#Install-DotNetCli
+#Restore-Package
 #Update-LocalizedResources
-Invoke-Build
-Publish-Package
+#Invoke-Build
+#Publish-Package
 Create-VsixPackage
-Create-NugetPackages
+#Create-NugetPackages
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 
