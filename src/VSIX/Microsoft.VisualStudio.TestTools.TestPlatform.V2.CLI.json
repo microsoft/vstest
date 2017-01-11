@@ -1,10 +1,10 @@
 {
   "manifestVersion": "1.1",
-  "info": { "id": "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI,version=1.0.2" },
+  "info": { "id": "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI,version=15.0.3" },
   "packages": [
     {
       "id": "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI",
-      "version": "1.0.2",
+      "version": "15.0.3",
       "type": "Vsix",
       "payloads": [
         {

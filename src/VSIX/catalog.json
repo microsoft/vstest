@@ -1,14 +1,14 @@
 {
   "manifestVersion": "1.1",
-  "info": { "id": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf,version=1.0.2" },
+  "info": { "id": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf,version=15.0.3" },
   "packages": [
     {
       "id": "Component.Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
-      "version": "1.0.2",
+      "version": "15.0.3",
       "type": "Component",
       "extension": true,
       "dependencies": {
-        "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf": "1.0.2",
+        "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf": "[15.0,16.0)",
         "Microsoft.VisualStudio.Component.CoreEditor": "[15.0,16.0)"
       },
       "localizedResources": [
@@ -21,7 +21,7 @@
     },
     {
       "id": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
-      "version": "1.0.2",
+      "version": "15.0.3",
       "type": "Vsix",
       "payloads": [
         {

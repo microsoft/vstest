@@ -15,7 +15,7 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.0.0",
+    [System.String] $Version = "15.0.3",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -49,6 +49,7 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
+$env:TP_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
 
 #
 # Dotnet configuration
@@ -263,7 +264,7 @@ function Create-VsixPackage
 
     Write-Log "Create-VsixPackage: Started."
     $packageDir = Get-FullCLRPackageDirectory
-
+	
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
@@ -271,6 +272,15 @@ function Create-VsixPackage
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+
+    #Copy [Content_Types].xml and License.rtf
+    Copy-Item $env:TP_VSIX_DIR\*.xml $packageDir -Force
+
+    $fileToCopy = Join-Path $env:TP_VSIX_DIR "License.rtf"
+    Copy-Item $fileToCopy $packageDir -Force
+
+    #update version of VSIX
+    Update-Version-Of-Vsix
 
     # Zip the folder
     # TODO remove vsix creator
@@ -280,6 +290,49 @@ function Create-VsixPackage
     & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net46\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Update-Version-Of-Vsix
+{
+    $packageDir = Get-FullCLRPackageDirectory
+	$vsixVersion = $Version
+
+    $vsixVersionSuffix = $VersionSuffix.Split("-");
+    if($vsixVersionSuffix.Length -ige 2)
+    {
+       $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1]).$($vsixVersionSuffix[2])"
+    }
+
+    # change version in json and vsixmanifest files
+	$fileToUpdate = Join-Path $env:TP_VSIX_DIR "extension.vsixmanifest"
+	[xml]$xmlContent = Get-Content $fileToUpdate
+	$xmlContent.PackageManifest.Metadata.Identity.Version = $vsixVersion
+	$fileToUpdate = Join-Path $packageDir "extension.vsixmanifest"
+	$xmlContent.Save($fileToUpdate)
+	
+	$fileToUpdate = Join-Path $env:TP_VSIX_DIR "manifest.json"
+	$jsonContent = Get-Content $fileToUpdate | ConvertFrom-Json
+	$jsonContent.version = $vsixVersion
+	$fileToUpdate = Join-Path $packageDir "manifest.json"
+	$jsonContent |ConvertTo-Json | set-content $fileToUpdate
+	
+	$fileToUpdate = Join-Path $env:TP_VSIX_DIR "catalog.json"
+	$jsonContent = Get-Content $fileToUpdate -raw | ConvertFrom-Json
+	$id = $jsonContent.info.id
+    $id = $id.Replace("15.0.3", $vsixVersion)
+    $jsonContent.info.id = $id
+	$jsonContent.packages | % {$_.version = $vsixVersion}
+	$fileToUpdate = Join-Path $packageDir "catalog.json"
+	$jsonContent |ConvertTo-Json -Depth 5 | set-content $fileToUpdate
+
+    $fileToUpdate = Join-Path $env:TP_VSIX_DIR "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
+	$jsonContent = Get-Content $fileToUpdate | ConvertFrom-Json
+    $id = $jsonContent.info.id
+    $id = $id.Replace("15.0.3", $vsixVersion)
+    $jsonContent.info.id = $id
+	$jsonContent.packages | % {$_.version = $vsixVersion}
+	$fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
+	$jsonContent |ConvertTo-Json -Depth 5 | set-content $fileToUpdate
 }
 
 function Create-NugetPackages
