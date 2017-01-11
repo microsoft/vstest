@@ -454,13 +454,13 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-#Install-DotNetCli
-#Restore-Package
+Install-DotNetCli
+Restore-Package
 #Update-LocalizedResources
-#Invoke-Build
-#Publish-Package
+Invoke-Build
+Publish-Package
 Create-VsixPackage
-#Create-NugetPackages
+Create-NugetPackages
 
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 
