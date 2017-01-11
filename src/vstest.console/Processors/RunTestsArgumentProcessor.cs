@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.output = ConsoleOutput.Instance;
 
-            this.runSettingsManager = RunSettingsManager.Instance;
+            this.runSettingsManager = runSettingsProvider;
             this.testRequestManager = testRequestManager;
             this.testRunEventsRegistrar = new TestRunRequestEventsRegistrar();
         }
@@ -146,6 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public ArgumentProcessorResult Execute()
         {
             Contract.Assert(this.commandLineOptions != null);
+            Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
             // Ensure a test source file was provided
             var anySource = this.commandLineOptions.Sources.FirstOrDefault();
@@ -173,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 EqtTrace.Info("RunTestsArgumentProcessor:Execute: Test run is starting.");
             }
 
-            var runSettings = RunSettingsUtilities.GetRunSettings(this.runSettingsManager, this.commandLineOptions);
+            var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             if (EqtTrace.IsVerboseEnabled)
             {

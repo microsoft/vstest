@@ -5,10 +5,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using vstest.console.UnitTests.Processors;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     [TestClass]
     public class FrameworkArgumentProcessorTests
     {
+        private FrameworkArgumentExecutor executor;
+        private TestableRunSettingsProvider runSettingsProvider;
+
+        [TestInitialize]
+        public void Init()
+        {
+            this.runSettingsProvider = new TestableRunSettingsProvider();
+            this.executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider);
+        }
         [TestCleanup]
         public void TestCleanup()
         {
@@ -23,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void GetExecuterShouldReturnFrameworkArgumentProcessorCapabilities()
+        public void GetExecuterShouldReturnFrameworkArgumentExecutor()
         {
             var processor = new FrameworkArgumentProcessor();
             Assert.IsTrue(processor.Executor.Value is FrameworkArgumentExecutor);
@@ -54,18 +66,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsNull()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
 
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => executor.Initialize(null),
+                () => this.executor.Initialize(null),
                 "The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:\".NETFramework,Version=v4.6\"");
         }
 
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsEmpty()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
-
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => executor.Initialize("  "),
                 "The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:\".NETFramework,Version=v4.6\"");
@@ -74,39 +83,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldThrowIfArgumentIsInvalid()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
-
             ExceptionUtilities.ThrowsException<CommandLineException>(
-                () => executor.Initialize("foo"),
+                () => this.executor.Initialize("foo"),
                 "Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.",
                 "foo");
         }
-        
-        [TestMethod]
-        public void InitializeShouldSetCommandLineOptionsFramework()
-        {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
 
-            executor.Initialize(".NETCoreApp,Version=v1.0");
+        [TestMethod]
+        public void InitializeShouldSetCommandLineOptionsAndRunSettingsFramework()
+        {
+            this.executor.Initialize(".NETCoreApp,Version=v1.0");
             Assert.AreEqual(".NETCoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(".NETCoreApp,Version=v1.0", this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsFrameworkForOlderFrameworks()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
-
-            executor.Initialize("Framework35");
+            this.executor.Initialize("Framework35");
             Assert.AreEqual(".NETFramework,Version=v3.5", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(".NETFramework,Version=v3.5", this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
         public void InitializeShouldSetCommandLineOptionsFrameworkForCaseInsensitiveFramework()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
-
-            executor.Initialize(".netcoreApp,Version=v1.0");
+            this.executor.Initialize(".netcoreApp,Version=v1.0");
             Assert.AreEqual(".netcoreApp,Version=v1.0", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(".netcoreApp,Version=v1.0", this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
+        }
+
+        [TestMethod]
+        public void InitializeShouldNotSetFrameworkIfSettingsFileIsLegacy()
+        {
+            this.runSettingsProvider.UpdateRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath, FrameworkVersion.Framework45.ToString());
+            CommandLineOptions.Instance.SettingsFile = @"c:\tmp\settings.testsettings";
+            this.executor.Initialize(".NETFramework,Version=v3.5");
+            Assert.AreEqual(".NETFramework,Version=v3.5", CommandLineOptions.Instance.TargetFrameworkVersion.Name);
+            Assert.AreEqual(FrameworkVersion.Framework45.ToString(), this.runSettingsProvider.QueryRunSettingsNode(FrameworkArgumentExecutor.RunSettingsPath));
         }
 
         #endregion
@@ -116,11 +130,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecuteShouldReturnSuccess()
         {
-            var executor = new FrameworkArgumentExecutor(CommandLineOptions.Instance);
-
-            Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
+            Assert.AreEqual(ArgumentProcessorResult.Success, this.executor.Execute());
         }
 
         #endregion
+
     }
 }

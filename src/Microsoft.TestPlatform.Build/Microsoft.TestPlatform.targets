@@ -13,6 +13,7 @@ Copyright (c) .NET Foundation. All rights reserved.
   <!-- Load Microsoft.TestPlatform.Build.Tasks.dll, this can be overridden to use a different version with $(VSTestTaskAssemblyFile) -->
   <PropertyGroup>
     <VSTestTaskAssemblyFile Condition="$(VSTestTaskAssemblyFile) == ''">Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
+    <VSTestConsoleFile Condition="$(VSTestConsoleFile) == ''">vstest.console.dll</VSTestConsoleFile>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
@@ -40,6 +41,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestListTests="$(VSTestListTests)"
       VSTestDiag="$(VSTestDiag)"
       VSTestCLIRunSettings="$(VSTestCLIRunSettings)"
+      VSTestConsolePath="$(VSTestConsoleFile)"
     />
   </Target>
 
