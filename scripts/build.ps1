@@ -319,7 +319,7 @@ function Update-VsixVersion
     $fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
     Get-Content "$TPB_VSIX_DIR\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content $fileToUpdate
 
-    Write-Log "Update-VsixVersion: Started."
+    Write-Log "Update-VsixVersion: Completed."
 }
 
 function Create-NugetPackages
