@@ -15,7 +15,7 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.0.3",
+    [System.String] $Version = "15.1",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
