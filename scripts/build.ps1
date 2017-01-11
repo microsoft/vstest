@@ -311,7 +311,7 @@ function Update-Version-Of-Vsix
 	$xmlContent.Save($fileToUpdate)
 	
 	$fileToUpdate = Join-Path $env:TP_VSIX_DIR "manifest.json"
-	$jsonContent = Get-Content $fileToUpdate | ConvertFrom-Json
+	$jsonContent = Get-Content $fileToUpdate -raw | ConvertFrom-Json
 	$jsonContent.version = $vsixVersion
 	$fileToUpdate = Join-Path $packageDir "manifest.json"
 	$jsonContent |ConvertTo-Json | set-content $fileToUpdate
@@ -326,7 +326,7 @@ function Update-Version-Of-Vsix
 	$jsonContent |ConvertTo-Json -Depth 5 | set-content $fileToUpdate
 
     $fileToUpdate = Join-Path $env:TP_VSIX_DIR "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
-	$jsonContent = Get-Content $fileToUpdate | ConvertFrom-Json
+	$jsonContent = Get-Content $fileToUpdate -raw | ConvertFrom-Json
     $id = $jsonContent.info.id
     $id = $id.Replace("15.0.3", $vsixVersion)
     $jsonContent.info.id = $id
