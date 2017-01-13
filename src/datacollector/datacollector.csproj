@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
-    <Compile Include="..\datacollector.x86\Program.cs;..\datacollector.x86\DataCollectionCoordinator.cs;..\datacollector.x86\Interfaces\IDataCollectionManager.cs;..\datacollector.x86\Friends.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
+    <Compile Include="..\datacollector.x86\Program.cs;..\datacollector.x86\Interfaces\IDataCollectionManager.cs;..\datacollector.x86\Friends.cs;..\datacollector.x86\Interfaces\IMessageSink.cs;..\datacollector.x86\Resources\Resources.Designer.cs;..\datacollector.x86\Resources\Resources.resx;..\datacollector.x86\DataCollectorConfig.cs;..\datacollector.x86\DataCollectionManager.cs" Exclude="bin\**;obj\**;**\*.xproj;packages\**" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
