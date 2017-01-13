@@ -52,5 +52,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return new FileInfo(path).Attributes;
         }
+
+        /// <inheritdoc/>
+        public bool IsRootedPath(string path)
+        {
+            return Path.IsPathRooted(path);
+        }
+
+        /// <inheritdoc/>
+        public string CombinePath(string source)
+        {
+            return Path.Combine(Directory.GetCurrentDirectory(), source);
+        }
     }
 }

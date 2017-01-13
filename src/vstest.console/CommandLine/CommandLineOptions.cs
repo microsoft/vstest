@@ -253,6 +253,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             source = source.Trim();
+
+            if(!FileHelper.IsRootedPath(source))
+            {
+                source = FileHelper.CombinePath(source);
+            }
+
             if (!FileHelper.Exists(source))
             {
                 throw new CommandLineException(
