@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
     using System;
     using System.Reflection;
     
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -61,6 +62,24 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while retrieving the attributes for the diagnostic data adapter of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string AttributeRetrievalError {
+            get {
+                return ResourceManager.GetString("AttributeRetrievalError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter type URI cannot be null or empty. The type URI for the diagnostic data adapter of type &apos;{0}&apos; is null or empty..
+        /// </summary>
+        internal static string DataCollector_TypeIsNull {
+            get {
+                return ResourceManager.GetString("DataCollector_TypeIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find diagnostic data adapter &apos;{0}&apos;.  Make sure diagnostic data adapter is installed and try again..
         /// </summary>
         internal static string DataCollectorAssemblyNotFound {
@@ -88,11 +107,29 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The required diagnostic data adapter attribute &apos;{0}&apos; is missing for the diagnostic data adapter of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DataCollectorRequiredAttributeMissing {
+            get {
+                return ResourceManager.GetString("DataCollectorRequiredAttributeMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to get type for diagnostic data adapter &apos;{0}&apos;. Error: {1}..
         /// </summary>
         internal static string DataCollectorTypeNotFound {
             get {
                 return ResourceManager.GetString("DataCollectorTypeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid URI format. The URI &apos;{0}&apos; provided for the diagnostic data adapter of type &apos;{1}&apos; is not a valid URI..
+        /// </summary>
+        internal static string DataCollectorTypeUriFormatInvalid {
+            get {
+                return ResourceManager.GetString("DataCollectorTypeUriFormatInvalid", resourceCulture);
             }
         }
         

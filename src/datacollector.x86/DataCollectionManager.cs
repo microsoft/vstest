@@ -3,36 +3,57 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using System;
     using System.Collections.Generic;
-    using System.Text;
+    using System.Collections.ObjectModel;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
+    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using System.Collections.ObjectModel;
-    using DCResources = Microsoft.VisualStudio.TestPlatform.DataCollector.Resources.Resources;
-    using System.Globalization;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using System.Linq;
+
 #if !NET46
     using System.Runtime.Loader;
 #endif
 
+    /// <summary>
+    /// The data collection manager.
+    /// </summary>
     internal class DataCollectionManager : IDataCollectionManager
     {
+        /// <summary>
+        /// The default extensions folder.
+        /// </summary>
+        private const string DefaultExtensionsFolder = "Extensions";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
+        /// </summary>
+        /// <param name="sources">
+        /// The sources.
+        /// </param>
+        internal DataCollectionManager(IList<string> sources)
+        {
+            this.RunDataCollectors = new Dictionary<Type, TestPlatformDataCollector>();
+            SourceDirectory = Path.GetDirectoryName(sources.First());
+        }
+
+        /// <summary>
+        /// Gets or sets the source directory.
+        /// </summary>
+        internal static string SourceDirectory { get; set; }
+
         /// <summary>
         /// Gets cache of data collectors associated with the run.
         /// </summary>
         internal Dictionary<Type, TestPlatformDataCollector> RunDataCollectors { get; private set; }
 
-        internal DataCollectionManager()
-        {
-            this.RunDataCollectors = new Dictionary<Type, TestPlatformDataCollector>();
-        }
-
+        /// <inheritdoc/>
         public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
         {
             ValidateArg.NotNull(settingsXml, "settingsXml");
@@ -63,155 +84,34 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             return executionEnvironmentVariables;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public Collection<AttachmentSet> SessionEnded(bool isCancelled)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public bool SessionStarted()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public Collection<AttachmentSet> TestCaseEnded(TestCase testCase, TestOutcome testOutcome)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public void TestCaseStarted(TestCaseStartEventArgs testCaseStartEventArgs)
         {
             throw new NotImplementedException();
-        }
-
-        private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
-        {
-            // Supporting codebase enables the user to specify the DataCollector in case DataCollector is not present under Extensions folder.
-            var codeBase = dataCollectorSettings.CodeBase;
-            var collectorTypeName = dataCollectorSettings.AssemblyQualifiedName;
-            var collectorDisplayName = string.IsNullOrWhiteSpace(dataCollectorSettings.FriendlyName) ? collectorTypeName : dataCollectorSettings.FriendlyName;
-            TestPlatformDataCollector testplatformDataCollector;
-            DataCollectorConfig dataCollectorConfig;
-
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(codeBase))
-                {
-                    var fullyQualifiedAssemblyName = this.GetFullyQualifiedAssemblyNameFromFullTypeName(dataCollectorSettings.AssemblyQualifiedName); // assemblyQualifiedname will have type name also. Get assemblyname only
-                    var name = new AssemblyName(fullyQualifiedAssemblyName);
-
-                    // Eg codebase="file://c:/TestImpact/Microsoft.VisualStudio.TraceCollector.dll"
-
-                    // Check if file is there. There can be a case data collector was loaded from some other path. If user has given a codebase we should ensure it is there
-                    if (!File.Exists(new Uri(codeBase).LocalPath))
-                    {
-                        throw new FileNotFoundException(codeBase);
-                    }
-
-                    Assembly.Load(name); // This will do check for publicKeyToken etc
-                }
-
-                dataCollectorConfig = GetDataCollectorConfig(collectorTypeName);
-            }
-            catch (FileNotFoundException)
-            {
-                this.LogWarning(string.Format(CultureInfo.CurrentCulture, DCResources.DataCollectorAssemblyNotFound, collectorDisplayName));
-                return;
-            }
-            catch (Exception ex)
-            {
-                this.LogWarning(string.Format(CultureInfo.CurrentCulture, DCResources.DataCollectorTypeNotFound, collectorDisplayName, ex.Message));
-                return;
-            }
-
-            lock (this.RunDataCollectors)
-            {
-                if (this.RunDataCollectors.ContainsKey(dataCollectorConfig.DataCollectorType))
-                {
-                    // Collector is already loaded (may be configured twice). Ignore duplicates and return.
-                    return;
-                }
-            }
-
-            Debug.Assert(null != dataCollectorConfig.DataCollectorType, string.Format(CultureInfo.CurrentCulture, "Could not find collector type '{0}'", collectorTypeName));
-
-            try
-            {
-                var dataCollector = CreateDataCollector(dataCollectorConfig.DataCollectorType);
-
-                // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
-                testplatformDataCollector = dataCollectorConfig == null ? null : new TestPlatformDataCollector(
-                dataCollector,
-                dataCollectorSettings.Configuration,
-                null,
-                dataCollectorConfig);
-
-                if (testplatformDataCollector == null || !testplatformDataCollector.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
-                {
-                    // If the data collector was not found, send an error.
-                    this.LogWarning(string.Format(CultureInfo.CurrentCulture, DCResources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.Uri));
-                    return;
-                }
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitDataCollectors: exception while creating data collector {0}: " + ex, collectorTypeName);
-                }
-
-                // No data collector info, so send the error with no direct association to the collector.
-                this.LogWarning(string.Format(CultureInfo.CurrentUICulture, DCResources.DataCollectorInitializationError, collectorTypeName, ex.Message));
-                return;
-            }
-
-            try
-            {
-                lock (this.RunDataCollectors)
-                {
-                    // Add data collectors to run cache.
-                    this.RunDataCollectors[dataCollectorConfig.DataCollectorType] = testplatformDataCollector;
-                }
-            }
-            catch (Exception)
-            {
-                // data collector failed to initialize. Dispose it and mark it failed.
-                //dataCollectorInfo.Logger.LogError(
-                //    this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
-                //    string.Format(CultureInfo.CurrentCulture, DCResources.DataCollectorInitializationError, dataCollectorInfo.DataCollectorConfig.FriendlyName, ex.Message));
-                return;
-            }
-        }
-
-        /// <summary>
-        /// Finds data collector enabled for the run in data collection settings.
-        /// </summary>
-        /// <param name="dataCollectionSettings">data collection settings</param>
-        /// <returns>List of enabled data collectors</returns>
-        private List<DataCollectorSettings> GetDataCollectorsEnabledForRun(DataCollectionRunSettings dataCollectionSettings)
-        {
-            var runEnabledDataCollectors = new List<DataCollectorSettings>();
-            foreach (DataCollectorSettings settings in dataCollectionSettings.DataCollectorSettingsList)
-            {
-                if (settings.IsEnabled)
-                {
-                    if (runEnabledDataCollectors.Any(dcSettings => dcSettings.Uri.Equals(settings.Uri)
-                        || string.Equals(dcSettings.AssemblyQualifiedName, settings.AssemblyQualifiedName, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        // If Uri or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
-                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, DCResources.IgnoredDuplicateConfiguration, settings.AssemblyQualifiedName, settings.Uri));
-                        continue;
-                    }
-
-                    runEnabledDataCollectors.Add(settings);
-                }
-            }
-
-            return runEnabledDataCollectors;
         }
 
         /// <summary>
@@ -219,9 +119,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         /// <param name="collectorTypeName">
         /// Type name of the collector
-        /// </param>
-        /// <param name="dataCollectorConfig">
-        /// The data Collector Information.
         /// </param>
         /// <returns>
         /// Type of the collector type name
@@ -231,23 +128,24 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             try
             {
                 DataCollectorConfig dataCollectorConfig = null;
-                //var pluginDirectoryPath = DataCollectorDiscoveryHelper.DataCollectorsDirectory;
-                var pluginDirectoryPath = Directory.GetCurrentDirectory();
-
+                var pluginDirectoryPath = Path.Combine(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location), DefaultExtensionsFolder);
                 var basePath = Path.Combine(pluginDirectoryPath, collectorTypeName.Split(',')[1].Trim());
+                var dataCollectorType = GetDataCollectorType(basePath, collectorTypeName, out var assembly);
 
-                Assembly assembly;
-
-                Type dataCollectorType = GetDataCollectorType(basePath, collectorTypeName, out assembly);
-
-                // Not able to locate data collector binary.
+                // Not able to locate data collector binary in extensions folder
                 if (dataCollectorType == null)
                 {
-                    return null;
+                    // Try to find the data collector in the source directory
+                    basePath = Path.Combine(SourceDirectory, collectorTypeName.Split(',')[1].Trim());
+                    dataCollectorType = GetDataCollectorType(basePath, collectorTypeName, out assembly);
+                    if (dataCollectorType == null)
+                    {
+                        return null;
+                    }
                 }
 
-                //todo : get the config file.
-                //var configuration = DataCollectorDiscoveryHelper.GetConfigurationForAssembly(assembly);
+                // todo : get the config file.
+                // var configuration = DataCollectorDiscoveryHelper.GetConfigurationForAssembly(assembly);
                 var configuration = string.Empty;
 
                 dataCollectorConfig = new DataCollectorConfig(dataCollectorType, configuration);
@@ -263,34 +161,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
                 throw;
             }
-        }
-
-        /// <summary>
-        /// Sends a warning message against the session which is not associated with a data collector.
-        /// </summary>
-        /// <remarks>
-        /// This should only be used when we do not have the data collector info yet.  After we have the data
-        /// collector info we can use the data collectors logger for errors.
-        /// </remarks>
-        /// <param name="warningMessage">The message to be logged.</param>
-        private void LogWarning(string warningMessage)
-        {
-            // todo: implement this functionality
-        }
-
-        /// <summary>
-        /// Given assemblyQualifiedName of type get the fully qualified name of assembly.
-        /// </summary>
-        /// <param name="assemblyQualifiedName">The assembly qualified name.</param>
-        /// <returns>The fully qualified assembly name.</returns>
-        private string GetFullyQualifiedAssemblyNameFromFullTypeName(string assemblyQualifiedName)
-        {
-            // Below is assemblyQualifiedName
-            // Microsoft.VisualStudio.TraceCollector.TestImpactDataCollector, Microsoft.VisualStudio.TraceCollector, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-            // FullyQualifiedAssemblyName will be
-            // Microsoft.VisualStudio.TraceCollector, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
-            var firstIndex = assemblyQualifiedName.IndexOf(",", StringComparison.Ordinal);
-            return assemblyQualifiedName.Substring(firstIndex + 1);
         }
 
         /// <summary>
@@ -332,13 +202,21 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             return dctype;
         }
 
+        /// <summary>
+        /// The load assembly from path.
+        /// </summary>
+        /// <param name="assemblyPath">
+        /// The assembly path.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Assembly"/>.
+        /// </returns>
         private static Assembly LoadAssemblyFromPath(string assemblyPath)
         {
-            Assembly assembly;
 #if NET46
-            return assembly = Assembly.LoadFrom(assemblyPath);
+            return Assembly.LoadFrom(assemblyPath);
 #else
-            return assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
 #endif
         }
 
@@ -371,6 +249,133 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
                 throw;
             }
+        }
+
+        /// <summary>
+        /// The load and initialize.
+        /// </summary>
+        /// <param name="dataCollectorSettings">
+        /// The data collector settings.
+        /// </param>
+        private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
+        {
+            var collectorTypeName = dataCollectorSettings.AssemblyQualifiedName;
+            var collectorDisplayName = string.IsNullOrWhiteSpace(dataCollectorSettings.FriendlyName) ? collectorTypeName : dataCollectorSettings.FriendlyName;
+            TestPlatformDataCollector testplatformDataCollector;
+            DataCollectorConfig dataCollectorConfig;
+
+            try
+            {
+                dataCollectorConfig = GetDataCollectorConfig(collectorTypeName);
+            }
+            catch (FileNotFoundException)
+            {
+                this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorAssemblyNotFound, collectorDisplayName));
+                return;
+            }
+            catch (Exception ex)
+            {
+                this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorTypeNotFound, collectorDisplayName, ex.Message));
+                return;
+            }
+
+            lock (this.RunDataCollectors)
+            {
+                if (this.RunDataCollectors.ContainsKey(dataCollectorConfig.DataCollectorType))
+                {
+                    // Collector is already loaded (may be configured twice). Ignore duplicates and return.
+                    return;
+                }
+            }
+
+            Debug.Assert(dataCollectorConfig.DataCollectorType != null, string.Format(CultureInfo.CurrentCulture, "Could not find collector type '{0}'", collectorTypeName));
+
+            try
+            {
+                var dataCollector = CreateDataCollector(dataCollectorConfig.DataCollectorType);
+
+                // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
+                testplatformDataCollector = dataCollectorConfig == null ? null : new TestPlatformDataCollector(
+                dataCollector,
+                dataCollectorSettings.Configuration,
+                null,
+                dataCollectorConfig);
+
+                if (testplatformDataCollector == null || !testplatformDataCollector.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
+                {
+                    // If the data collector was not found, send an error.
+                    this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.Uri));
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitDataCollectors: exception while creating data collector {0}: " + ex, collectorTypeName);
+                }
+
+                // No data collector info, so send the error with no direct association to the collector.
+                this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, collectorTypeName, ex.Message));
+                return;
+            }
+
+            try
+            {
+                lock (this.RunDataCollectors)
+                {
+                    // Add data collectors to run cache.
+                    this.RunDataCollectors[dataCollectorConfig.DataCollectorType] = testplatformDataCollector;
+                }
+            }
+            catch (Exception)
+            {
+                // data collector failed to initialize. Dispose it and mark it failed.
+                //dataCollectorInfo.Logger.LogError(
+                //    this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                //    string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorInfo.DataCollectorConfig.FriendlyName, ex.Message));
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Finds data collector enabled for the run in data collection settings.
+        /// </summary>
+        /// <param name="dataCollectionSettings">data collection settings</param>
+        /// <returns>List of enabled data collectors</returns>
+        private List<DataCollectorSettings> GetDataCollectorsEnabledForRun(DataCollectionRunSettings dataCollectionSettings)
+        {
+            var runEnabledDataCollectors = new List<DataCollectorSettings>();
+            foreach (var settings in dataCollectionSettings.DataCollectorSettingsList)
+            {
+                if (settings.IsEnabled)
+                {
+                    if (runEnabledDataCollectors.Any(dcSettings => dcSettings.Uri.Equals(settings.Uri)
+                        || string.Equals(dcSettings.AssemblyQualifiedName, settings.AssemblyQualifiedName, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        // If Uri or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
+                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.AssemblyQualifiedName, settings.Uri));
+                        continue;
+                    }
+
+                    runEnabledDataCollectors.Add(settings);
+                }
+            }
+
+            return runEnabledDataCollectors;
+        }
+
+        /// <summary>
+        /// Sends a warning message against the session which is not associated with a data collector.
+        /// </summary>
+        /// <remarks>
+        /// This should only be used when we do not have the data collector info yet.  After we have the data
+        /// collector info we can use the data collectors logger for errors.
+        /// </remarks>
+        /// <param name="warningMessage">The message to be logged.</param>
+        private void LogWarning(string warningMessage)
+        {
+            // todo: implement this functionality
         }
     }
 }
