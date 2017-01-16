@@ -167,7 +167,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 this.Log.LogError("Test file path cannot be empty or null.");
             }
-
             else
             {
                 allArgs.Add(this.AddDoubleQuotes(this.TestFileFullPath));
