@@ -86,6 +86,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestResultsDirectory
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -142,6 +148,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--logger:" + this.VSTestLogger);
             }
 
+            if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
+            {
+                allArgs.Add("--resultsDirectory:" + this.AddDoubleQuotes(this.VSTestResultsDirectory));
+            }
+
             if (!string.IsNullOrEmpty(this.VSTestListTests))
             {
                 allArgs.Add("--listTests");
@@ -156,6 +167,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 this.Log.LogError("Test file path cannot be empty or null.");
             }
+
             else
             {
                 allArgs.Add(this.AddDoubleQuotes(this.TestFileFullPath));
