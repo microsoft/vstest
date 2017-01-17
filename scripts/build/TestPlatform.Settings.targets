@@ -30,10 +30,6 @@
 
   <!-- Common dependencies for all projects -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk">
-      <Version>1.0.0-alpha-20161104-2</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <!--<PackageReference Include="StyleCop.Analyzers">-->
       <!--<Version>1.0.0</Version>-->
       <!--<PrivateAssets>All</PrivateAssets>-->
