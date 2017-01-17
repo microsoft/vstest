@@ -150,5 +150,23 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
                 return ResourceManager.GetString("IgnoredDuplicateConfiguration", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter caught an exception of type &apos;{0}&apos;: &apos;{1}&apos;. More details: {2}..
+        /// </summary>
+        internal static string ReportDataCollectorException {
+            get {
+                return ResourceManager.GetString("ReportDataCollectorException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector..
+        /// </summary>
+        internal static string WrongDataCollectionContextType {
+            get {
+                return ResourceManager.GetString("WrongDataCollectionContextType", resourceCulture);
+            }
+        }
     }
 }

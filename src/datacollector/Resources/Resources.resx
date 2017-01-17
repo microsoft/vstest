@@ -147,4 +147,10 @@
   <data name="IgnoredDuplicateConfiguration" xml:space="preserve">
     <value>There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</value>
   </data>
+  <data name="ReportDataCollectorException" xml:space="preserve">
+    <value>Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</value>
+  </data>
+  <data name="WrongDataCollectionContextType" xml:space="preserve">
+    <value>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</value>
+  </data>
 </root>
