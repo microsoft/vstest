@@ -1,49 +1,21 @@
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" />
+﻿<?xml version="1.0" encoding="utf-16"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.0;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>XUTestProject</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or '$(TargetFramework)' == 'netcoreapp1.1' ">Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" />
-    <EmbeddedResource Include="**\*.resx" />
-    <EmbeddedResource Include="compiler\resources\**\*" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk">
-      <Version>1.0.0-alpha-20161104-2</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="NETStandard.Library">
-      <Version>1.6.0</Version>
-    </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.2.0-beta3-build3402</Version>
     </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio">
       <Version>2.2.0-beta4-build1188</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <PackageReference Include="Microsoft.NETCore.App">
-      <Version>1.0.0</Version>
-    </PackageReference>
-	<PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20161123-03</Version>
-    </PackageReference>    
-  </ItemGroup>
-
-   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.1' ">
-    <PackageReference Include="Microsoft.NETCore.App">
-      <Version>1.1.0</Version>
-    </PackageReference>
-	<PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20161123-03</Version>
+    <PackageReference Include="Microsoft.NET.Test.Sdk">
+      <Version>15.0.0-preview-20170106-08</Version>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Runtime" />
     <Reference Include="System" />
@@ -52,5 +24,4 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

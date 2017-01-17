@@ -4,7 +4,6 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
     <TestPlatformPackageDir>$(TestPlatformRoot)packages\</TestPlatformPackageDir>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <ResourceFiles Include="$(ProjectDir)Resources\*.resx" />
     <ResxLang Include="cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant" />
@@ -24,7 +23,7 @@
   </Target>
 
   <!-- Due to bug(https://github.com/dotnet/sdk/issues/518) in msbuild, excluding localization for net46-->
-  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true' and $(TargetFramework) != 'net46'">
+  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true'" >
     <CreateItem Include="@(ResourceFiles)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
