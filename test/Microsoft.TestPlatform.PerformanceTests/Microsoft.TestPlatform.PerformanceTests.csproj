@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk" >
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
-	<TestProject>true</TestProject>
+    <TestProject>true</TestProject>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
