@@ -134,6 +134,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sending message of Message Type &apos;{0}&apos; is not supported..
+        /// </summary>
+        internal static string DataCollectorUnsupportedMessageType {
+            get {
+                return ResourceManager.GetString("DataCollectorUnsupportedMessageType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There are multiple configurations that have diagnostic data adapter  type &apos;{0}&apos; or Uri &apos;{1}&apos;. Duplicate configurations will be ignored in the test run..
         /// </summary>
         internal static string IgnoredDuplicateConfiguration {

@@ -138,6 +138,9 @@
   <data name="DataCollectorTypeUriFormatInvalid" xml:space="preserve">
     <value>Invalid URI format. The URI '{0}' provided for the diagnostic data adapter of type '{1}' is not a valid URI.</value>
   </data>
+  <data name="DataCollectorUnsupportedMessageType" xml:space="preserve">
+    <value>Sending message of Message Type '{0}' is not supported.</value>
+  </data>
   <data name="DataCollector_TypeIsNull" xml:space="preserve">
     <value>Diagnostic data adapter type URI cannot be null or empty. The type URI for the diagnostic data adapter of type '{0}' is null or empty.</value>
   </data>

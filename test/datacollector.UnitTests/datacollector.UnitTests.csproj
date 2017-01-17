@@ -10,9 +10,8 @@
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
-    <AssemblyName>datacollector.x86.UnitTests</AssemblyName>
+    <AssemblyName>datacollector.UnitTests</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <PlatformTarget Condition="'$(TargetFramework)' == 'net46'">x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="**\*.cs" />

@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="sources">
         /// The sources.
         /// </param>
-        internal DataCollectionManager(IList<string> sources)
+        internal DataCollectionManager(IEnumerable<string> sources)
         {
             this.RunDataCollectors = new Dictionary<Type, TestPlatformDataCollector>();
             SourceDirectory = Path.GetDirectoryName(sources.First());
@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             foreach (var dataCollectorSettings in enabledDataCollectorsSettings)
             {
-                LoadAndInitialize(dataCollectorSettings);
+                this.LoadAndInitialize(dataCollectorSettings);
             }
 
             // todo : populate environment variables from loaded datacollectors.
@@ -113,6 +113,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             throw new NotImplementedException();
         }
+
+        #region Load and Initialize DataCollectors
 
         /// <summary>
         /// Helper method that gets the Type from type name string specified.
@@ -298,7 +300,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 testplatformDataCollector = dataCollectorConfig == null ? null : new TestPlatformDataCollector(
                 dataCollector,
                 dataCollectorSettings.Configuration,
-                null,
                 dataCollectorConfig);
 
                 if (testplatformDataCollector == null || !testplatformDataCollector.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
@@ -330,10 +331,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
             catch (Exception)
             {
-                // data collector failed to initialize. Dispose it and mark it failed.
-                //dataCollectorInfo.Logger.LogError(
-                //    this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
-                //    string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorInfo.DataCollectorConfig.FriendlyName, ex.Message));
+                // todo : add logging.
                 return;
             }
         }
@@ -364,6 +362,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             return runEnabledDataCollectors;
         }
+
+        #endregion
 
         /// <summary>
         /// Sends a warning message against the session which is not associated with a data collector.

@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Resources;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.Atrributes;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
 
     /// <summary>
     /// The data collector config.

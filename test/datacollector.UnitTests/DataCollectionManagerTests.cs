@@ -12,13 +12,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
     using Microsoft.VisualStudio.TestPlatform.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.Atrributes;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class DataCollectionManagerTests
     {
-        DataCollectionManager dataCollectorManager;
+        private DataCollectionManager dataCollectorManager;
 
         [TestInitialize]
         public void Init()
@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorsShouldLoadDataCollector()
         {
-            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.x86.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
+            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
 
             var result = this.dataCollectorManager.InitializeDataCollectors(RunSettings);
             Assert.IsNotNull(result);
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorsShouldNotLoadDataCollectorIfUriIsNotCorrect()
         {
-            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom1/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.x86.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
+            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom1/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
 
             var result = this.dataCollectorManager.InitializeDataCollectors(RunSettings);
             Assert.IsNotNull(result);
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
         public void InitializeDataCollectorShouldNotAddSameDataCollectorMoreThanOnce()
         {
-            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.x86.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.x86.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
+            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollector, datacollector.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
 
             var result = this.dataCollectorManager.InitializeDataCollectors(RunSettings);
             Assert.IsNotNull(result);
@@ -86,9 +86,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void InitializeDataCollectorShouldNotAddDataCollectorIfUriIsNotSpecified()
+        public void InitializeDataCollectorShouldNotAddDataCollectorIfUriIsNotSpecifiedByDataCollector()
         {
-            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollectorWithoutUri, datacollector.x86.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
+            const string RunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors><DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests.CustomDataCollectorWithoutUri, datacollector.UnitTests, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a\" /></DataCollectors>  </DataCollectionRunSettings>\r\n</RunSettings>";
 
             var result = this.dataCollectorManager.InitializeDataCollectors(RunSettings);
             Assert.IsNotNull(result);
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         // todo : add tests for verifying logger after implementing logger functionality.
     }
 
-    [DataCollecetorFriendlyName("CustomDataCollector")]
+    [DataCollectorFriendlyName("CustomDataCollector")]
     [DataCollectorTypeUri("my://custom/datacollector")]
     public class CustomDataCollector : DataCollector
     {
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
     }
 
-    [DataCollecetorFriendlyName("CustomDataCollector")]
+    [DataCollectorFriendlyName("CustomDataCollector")]
     public class CustomDataCollectorWithoutUri : DataCollector
     {
         public static bool IsInitialized = false;
