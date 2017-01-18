@@ -56,5 +56,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="path">Full path of the file.</param>
         /// <returns>Attributes of the file.</returns>
         FileAttributes GetFileAttributes(string path);
+
+        /// <summary>
+        /// Check if file path is rooted.
+        /// </summary>
+        /// <param name="path">Full path of the file.</param>
+        /// <returns>Is file path rooted.</returns>
+        bool IsRootedPath(string path);
+
+        /// <summary>
+        /// Create full file path.
+        /// </summary>
+        /// <param name="path">relative path of the file.</param>
+        /// <returns>Full file path, based on current working directory.</returns>
+        string CombinePath(string source);
     }
 }
