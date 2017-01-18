@@ -56,7 +56,7 @@ namespace Microsoft.TestPlatform.Protocol
 
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
-       
+
             process.Start();
             process.EnableRaisingEvents = true;
             process.Exited += Process_Exited;
@@ -107,7 +107,7 @@ namespace Microsoft.TestPlatform.Protocol
                 }
             }
 
-            string errorMessage = String.Format("Unable to find dotnet.exe");
+            string errorMessage = String.Format("Unable to find dotnet executable. Please ensure it is available on PATH.");
             Console.WriteLine("Error : {0}", errorMessage);
             throw new FileNotFoundException(errorMessage);
         }

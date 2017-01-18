@@ -81,6 +81,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         public override string CommandName => EnableLoggerArgumentProcessor.CommandName;
 
+        public override bool AlwaysExecute => true;
+
+        public override bool IsSpecialCommand => true;
+
         /// <summary>
         /// Gets a value indicating whether allow multiple.
         /// </summary>
@@ -115,6 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #region Fields
 
         private readonly TestLoggerManager loggerManager;
+        private string loggerName;
 
         #endregion
 
@@ -148,38 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             else
             {
-                string loggerIdentifier = null;
-                Dictionary<string, string> parameters = null;
-                var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
-
-                if (parseSucceeded)
-                {
-                    // First assume the logger is specified by URI. If that fails try with friendly name.
-                    try
-                    {
-                        this.AddLoggerByUri(loggerIdentifier, parameters);
-                    }
-                    catch (CommandLineException)
-                    {
-                        string loggerUri;
-                        if (this.loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
-                        {
-                            this.AddLoggerByUri(loggerUri, parameters);
-                        }
-                        else
-                        {
-                            throw new CommandLineException(
-                            String.Format(
-                            CultureInfo.CurrentUICulture,
-                            CommandLineResources.LoggerNotFound,
-                            argument));
-                        }
-                    }
-                }
-                else
-                {
-                    HandleInvalidArgument(argument);
-                }
+                this.loggerName = argument;
             }
         }
 
@@ -191,7 +165,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </returns>
         public ArgumentProcessorResult Execute()
         {
-            // Nothing to do since we enabled the logger in the initialize method.
+            if (string.IsNullOrEmpty(this.loggerName) && !CommandLineOptions.Instance.IsDesignMode)
+            {
+                // Add console logger as a listener to logger events.
+                this.loggerName = "console";
+                //var consoleLogger = new ConsoleLogger();
+                //consoleLogger.Initialize(this.loggerManager.LoggerEvents, null);
+            }
+
+            string loggerIdentifier = null;
+            Dictionary<string, string> parameters = null;
+            var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(this.loggerName, out loggerIdentifier, out parameters);
+
+            if (parseSucceeded)
+            {
+                // First assume the logger is specified by URI. If that fails try with friendly name.
+                try
+                {
+                    this.AddLoggerByUri(loggerIdentifier, parameters);
+                }
+                catch (CommandLineException)
+                {
+                    string loggerUri;
+                    if (this.loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
+                    {
+                        this.AddLoggerByUri(loggerUri, parameters);
+                    }
+                    else
+                    {
+                        throw new CommandLineException(
+                        String.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommandLineResources.LoggerNotFound,
+                        this.loggerName));
+                    }
+                }
+            }
+            else
+            {
+                HandleInvalidArgument(this.loggerName);
+            }
+
             return ArgumentProcessorResult.Success;
         }
 

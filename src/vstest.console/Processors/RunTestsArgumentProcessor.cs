@@ -148,6 +148,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Assert(this.commandLineOptions != null);
             Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
+            if (this.commandLineOptions.IsDesignMode)
+            {
+                // Do not attempt execution in case of design mode. Expect execution to happen
+                // via the design mode client.
+                return ArgumentProcessorResult.Success;
+            }
+
             // Ensure a test source file was provided
             var anySource = this.commandLineOptions.Sources.FirstOrDefault();
             if (anySource == null)

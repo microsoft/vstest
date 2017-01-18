@@ -65,7 +65,7 @@ namespace Microsoft.TestPlatform.Protocol
             // Start runner exe and wait for the connection
             string parentProcessIdArgs = string.Format(CultureInfo.InvariantCulture, PARENT_PROCESSID_ARGUMENT, Process.GetCurrentProcess().Id);
             string portArgs = string.Format(CultureInfo.InvariantCulture, PORT_ARGUMENT, port);
-            processManager.StartProcess(new string[2] { parentProcessIdArgs, portArgs });
+            processManager.StartProcess(new string[] { parentProcessIdArgs, portArgs });
 
             communicationManager.AcceptClientAsync().Wait();
             communicationManager.WaitForClientConnection(Timeout.Infinite);

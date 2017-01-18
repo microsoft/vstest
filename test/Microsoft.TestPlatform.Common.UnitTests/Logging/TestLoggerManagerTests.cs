@@ -431,9 +431,8 @@ namespace TestPlatform.Common.UnitTests.Logging
 
         internal class DummyTestLoggerManager : TestLoggerManager
         {
-            public DummyTestLoggerManager()
+            public DummyTestLoggerManager() : base(TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
             {
-
             }
 
             public void Cleanup()
