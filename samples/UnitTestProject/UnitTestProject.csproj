@@ -21,9 +21,9 @@
     <PackageReference Include="MSTest.TestAdapter">
       <Version>1.1.8-rc</Version>
     </PackageReference>
-	<PackageReference Include="Microsoft.NET.Test.Sdk">
-	  <Version>15.0.0-preview-20170106-08</Version>
-	</PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk">
+      <Version>15.0.0-preview-20170106-08</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="Microsoft.NETCore.App">
