@@ -128,8 +128,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                EqtTrace.Error("PortableSymbolReader: Failed to load symbols for binary: {0}", binaryPath);
+                EqtTrace.Error(ex);
                 this.Dispose();
                 throw;
             }
