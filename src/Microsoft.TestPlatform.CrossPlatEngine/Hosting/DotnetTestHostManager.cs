@@ -177,7 +177,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             // G:\tmp\netcore-test\bin\Debug\netcoreapp1.0\netcore-test.dll
             startInfo.Arguments = args;
             startInfo.EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>();
-            startInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+            startInfo.WorkingDirectory = sourceDirectory;
 
             return startInfo;
         }
