@@ -14,15 +14,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes with the information required for sending the contents of a file.
+        /// Initializes a new instance of the <see cref="FileTransferInformation"/> class. 
         /// </summary>
-        /// <param name="context">The context in which the file is being sent.  Cannot be null.</param>
-        /// <param name="path">The path to the file on the local file system</param>
-        /// <param name="deleteFile">True to automatically have the file removed after sending it.</param>
+        /// <param name="context">
+        /// The context in which the file is being sent.  Cannot be null.
+        /// </param>
+        /// <param name="path">
+        /// The path to the file on the local file system
+        /// </param>
+        /// <param name="deleteFile">
+        /// True to automatically have the file removed after sending it.
+        /// </param>
         public FileTransferInformation(DataCollectionContext context, string path, bool deleteFile)
             : base(context)
         {
-            //EqtAssert.StringNotNullOrEmpty(path, "path");
+            // EqtAssert.StringNotNullOrEmpty(path, "path");
 
             // Expand environment variables in the path
             path = Environment.ExpandEnvironmentVariables(path);
@@ -34,9 +40,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             }
 
             // Make sure the path we have is a full path (not relative).
-            Path = System.IO.Path.GetFullPath(path);
+            this.Path = System.IO.Path.GetFullPath(path);
 
-            PerformCleanup = deleteFile;
+            this.PerformCleanup = deleteFile;
         }
 
         #endregion
@@ -44,10 +50,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region  Required Parameters.
 
         /// <summary>
-        /// The path to the file on the local file system.
+        /// Gets the path to the file on the local file system.
         /// </summary>
         public string Path { get; private set; }
-
 
         /// <summary>
         /// Indicates if cleanup should be performed after transferring the resource.
@@ -57,10 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// The name of the file to use on the client machine.
         /// </summary>
-        protected internal override string ClientFileName
-        {
-            get { return Path; }
-        }
+        protected internal override string FileName => this.Path;
 
         #endregion
     }
