@@ -9,6 +9,10 @@
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="**\*.cs" />
+    <EmbeddedResource Include="Resources\Resources.resx"/>
+  </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Configuration" />
@@ -24,7 +28,7 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="System.Runtime.Loader">
-      <Version>4.0.0</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

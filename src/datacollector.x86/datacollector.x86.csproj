@@ -16,6 +16,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="**\*.cs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>

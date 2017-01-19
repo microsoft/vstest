@@ -11,6 +11,10 @@
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="**\*.cs" />
+    <EmbeddedResource Include="Resources\Resources.resx"/>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
@@ -25,7 +29,7 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
     <PackageReference Include="System.Diagnostics.Process">
-      <Version>4.1.0</Version>
+      <Version>4.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
