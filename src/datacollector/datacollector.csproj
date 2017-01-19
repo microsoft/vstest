@@ -15,6 +15,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="**\*.cs" />
     <Compile Include="..\datacollector.x86\Program.cs;..\datacollector.x86\DataCollectionCoordinator.cs;..\datacollector.x86\Interfaces\IDataCollectionManager.cs;..\datacollector.x86\Friends.cs" />
     <None Include="app.config" />
   </ItemGroup>
