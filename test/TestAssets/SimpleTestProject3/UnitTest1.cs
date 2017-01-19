@@ -5,31 +5,16 @@ using System.Threading.Tasks;
 namespace SampleUnitTestProject3
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System.IO;
+    using System.Reflection;
 
     [TestClass]
     public class UnitTest1
     {
         [TestMethod]
-        public void PassingTest()
+        public void WorkingDirectoryTest()
         {
-            Assert.AreEqual(2, 2);
-        }
-
-        [TestMethod]
-        public async Task AsyncTestMethod()
-        {
-            await Task.CompletedTask;
-        }
-    }
-
-    public class Class1
-    {
-        public void OverLoadededMethod()
-        {
-        }
-
-        public void OverLoadededMethod(string name)
-        {
+            Assert.AreEqual(Path.GetDirectoryName(typeof(UnitTest1).GetTypeInfo().Assembly.Location), Directory.GetCurrentDirectory());
         }
     }
 }
