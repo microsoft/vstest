@@ -23,6 +23,16 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+
+    <PackageReference Include="Microsoft.Internal.Dia" Version="14.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\src\package\TestPlatform.ObjectModel.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src\package\TestPlatform.ObjectModel.x86.manifest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
