@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     using System;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -68,22 +69,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         public void CommandLineOptionsAddSourceShouldAddSourceThrowExceptionIfDuplicateSource()
         {
             var testFilePath = "DummyTestFile.txt";
-            this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+            this.fileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
             var ex = Assert.ThrowsException<CommandLineException>(() => CommandLineOptions.Instance.AddSource(testFilePath));
-            Assert.AreEqual("Duplicate source " + testFilePath + " specified.", ex.Message);
+            Assert.AreEqual("Duplicate source " + Path.Combine(Directory.GetCurrentDirectory(), testFilePath) + " specified.", ex.Message);
         }
 
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldAddSourceForValidSource()
         {
-            string testFilePath = "DummyTestFile.txt";
-            this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
-            
+            //rooted sources are only valid sources
+            string testFilePath = @"C:\Test\DummyTestFile.txt";
+            this.fileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+           
             CommandLineOptions.Instance.AddSource(testFilePath);
             
             Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(testFilePath));
+        }
+
+        [TestMethod]
+        public void CommandLineOptionsAddSourceShouldAddFullPathBasedOnCurrentDirForRelativeValidSource()
+        {
+            string testFilePath = "DummyTestFile.txt";
+            this.fileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(true);
+
+            CommandLineOptions.Instance.AddSource(testFilePath);
+
+            Assert.IsTrue(Path.IsPathRooted(CommandLineOptions.Instance.Sources.First()));
         }
     }
 }

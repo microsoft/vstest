@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -253,6 +254,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             source = source.Trim();
+
+            if(!Path.IsPathRooted(source))
+            {
+                source = Path.Combine(Directory.GetCurrentDirectory(), source);
+            }
+
             if (!FileHelper.Exists(source))
             {
                 throw new CommandLineException(
