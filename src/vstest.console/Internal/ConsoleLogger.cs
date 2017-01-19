@@ -175,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 hasData = true;
                 Output.WriteLine(CommandLineResources.ErrorMessageBanner, OutputLevel.Error);
                 string errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, result.ErrorMessage);
-                Output.WriteLine(errorMessage, OutputLevel.Error);
+                Output.WriteLine(errorMessage, OutputLevel.Information);
             }
 
             if (!String.IsNullOrEmpty(result.ErrorStackTrace))
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 hasData = true;
                 Output.WriteLine(CommandLineResources.StacktraceBanner, OutputLevel.Error);
                 string stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}", result.ErrorStackTrace);
-                Output.Write(stackTrace, OutputLevel.Error);
+                Output.Write(stackTrace, OutputLevel.Information);
             }
 
             Collection<TestResultMessage> stdOutMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardOutCategory);
