@@ -82,7 +82,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 default:
                     this.standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
                     break;
-
             }
         }
     }
