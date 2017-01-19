@@ -1495,6 +1495,25 @@ Standardeinstellungen werden verwendet, wenn die Verwendung der Einstellungsdate
         <target state="new">One or more runsettings provided contain invalid token</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ResultsDirectoryArgumentHelp">
+        <source>--ResultsDirectory|/ResultsDirectory
+      Test results directory will be created in specified path if not exists.
+      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
+        <target state="new">--ResultsDirectory|/ResultsDirectory
+      Test results directory will be created in specified path if not exists.
+      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ResultsDirectoryValueRequired">
+        <source>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</source>
+        <target state="new">The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="InvalidResultsDirectoryPathCommand">
+        <source>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</source>
+        <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

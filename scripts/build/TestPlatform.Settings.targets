@@ -17,6 +17,8 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+	<!-- Disable default inclusion of .cs and .resx file -->
+	<EnableDefaultItems>false</EnableDefaultItems>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -25,7 +27,7 @@
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
-  </PropertyGroup>
+  </PropertyGroup> 
 
   <!-- Common dependencies for all projects -->
   <ItemGroup>
