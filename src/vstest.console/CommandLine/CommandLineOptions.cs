@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System.IO;
 
     /// <summary>
     /// Provides access to the command-line options.
@@ -243,6 +244,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             source = source.Trim();
+
+            // Convert the relative path to absolute path
+            if(!Path.IsPathRooted(source))
+            {
+                source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
+            }
+
             if (!FileHelper.Exists(source))
             {
                 throw new CommandLineException(
