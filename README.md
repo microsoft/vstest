@@ -6,7 +6,7 @@ The Test Platform currently ships as part Visual Studio 2017, and in the .NET Co
 ### Build status
 |            |Debug |Release |
 |:----------:|:----------------:|:------------------:|
-|**master**  |[![Build Status](https://ci.dot.net/buildStatus/icon?job=Private/Microsoft_vstest/master/Microsoft_vstest_Debug)](https://ci.dot.net/job/Private/job/Microsoft_vstest/job/master/job/Microsoft_vstest_Debug/)|[![Build Status](https://ci.dot.net/buildStatus/icon?job=Private/Microsoft_vstest/master/Microsoft_vstest_Release)](https://ci.dot.net/job/Private/job/Microsoft_vstest/job/master/job/Microsoft_vstest_Release/)|
+|**master**  |[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Debug)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Debug/)|[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Release)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Release/)|
 
 ### Contributing
 There are many ways to contribute to VSTest
