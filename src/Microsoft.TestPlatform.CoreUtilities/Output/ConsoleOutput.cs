@@ -72,13 +72,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             {
                 case OutputLevel.Information:
                 case OutputLevel.Warning:
+                case OutputLevel.Error:
                     this.standardOutput.Write(message);
                     break;
-
-                case OutputLevel.Error:
-                    this.standardError.Write(message);
-                    break;
-
                 default:
                     this.standardOutput.Write("ConsoleOutput.WriteLine: The output level is unrecognized: {0}", level);
                     break;
