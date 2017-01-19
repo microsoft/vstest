@@ -6,10 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -23,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
         /// </summary>
         /// <param name="settingsXml">Run Settings which has DataCollector configuration.</param>
         /// <returns>Environment variables.</returns>
-        Dictionary<string, string> LoadDataCollectors(RunSettings settingsXml);
+        IDictionary<string, string> InitializeDataCollectors(string settingsXml);
 
         /// <summary>
         /// Raises TestCaseStart event to all data collectors configured for run.
