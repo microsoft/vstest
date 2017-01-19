@@ -10,17 +10,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using System.IO;
 
     [TestClass]
     public class CommandLineOptionsTests
     {
         private readonly Mock<IFileHelper> fileHelper;
+        private readonly string currentDirectory = @"C:\\Temp";
 
         public CommandLineOptionsTests()
         {
             this.fileHelper = new Mock<IFileHelper>();
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.FileHelper = this.fileHelper.Object;
+            this.fileHelper.Setup(fh => fh.GetCurrentDirectory()).Returns(currentDirectory);
         }
 
         [TestMethod]
@@ -57,6 +60,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         {
             Assert.ThrowsException<CommandLineException>(() => CommandLineOptions.Instance.AddSource(null));
         }
+
+        [TestMethod]
+        public void CommandLineOptionsAddSourceShouldConvertRelativePathToAbsolutePath()
+        {
+            string relativeTestFilePath = "DummyTestFile.txt";
+            var absolutePath = Path.Combine(currentDirectory, relativeTestFilePath);
+            this.fileHelper.Setup(fh => fh.Exists(absolutePath)).Returns(true);
+
+            // Pass relative path
+            CommandLineOptions.Instance.AddSource(relativeTestFilePath);
+            Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(absolutePath));
+        }
         
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldThrowCommandLineExceptionForInvalidSource()
@@ -67,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldAddSourceThrowExceptionIfDuplicateSource()
         {
-            var testFilePath = "DummyTestFile.txt";
+            var testFilePath = "C:\\DummyTestFile.txt";
             this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
@@ -78,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         [TestMethod]
         public void CommandLineOptionsAddSourceShouldAddSourceForValidSource()
         {
-            string testFilePath = "DummyTestFile.txt";
+            string testFilePath = "C:\\DummyTestFile.txt";
             this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
             
             CommandLineOptions.Instance.AddSource(testFilePath);

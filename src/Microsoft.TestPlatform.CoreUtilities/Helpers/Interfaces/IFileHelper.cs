@@ -19,6 +19,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         DirectoryInfo CreateDirectory(string path);
 
         /// <summary>
+        /// Gets the current directory
+        /// </summary>
+        /// <returns>Current directory</returns>
+        string GetCurrentDirectory();
+
+        /// <summary>
         /// Exists utility to check if file exists (case sensitive).
         /// </summary>
         /// <param name="path"> The path of file. </param>
