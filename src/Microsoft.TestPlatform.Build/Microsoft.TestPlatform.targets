@@ -12,8 +12,8 @@ Copyright (c) .NET Foundation. All rights reserved.
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Load Microsoft.TestPlatform.Build.Tasks.dll, this can be overridden to use a different version with $(VSTestTaskAssemblyFile) -->
   <PropertyGroup>
-    <VSTestTaskAssemblyFile Condition="$(VSTestTaskAssemblyFile) == ''">Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
-    <VSTestConsolePath Condition="$(VSTestConsoleFile) == ''">$([System.IO.Path]::Combine($(MSBuildThisFileDirectory),"vstest.console.dll"))</VSTestConsolePath>
+    <VSTestTaskAssemblyFile Condition="$(VSTestTaskAssemblyFile) == ''">$(MSBuildThisFileDirectory)\Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
+    <VSTestConsoleFile Condition="$(VSTestConsoleFile) == ''">$(MSBuildThisFileDirectory)\vstest.console.dll</VSTestConsoleFile>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
@@ -41,7 +41,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestListTests="$(VSTestListTests)"
       VSTestDiag="$(VSTestDiag)"
       VSTestCLIRunSettings="$(VSTestCLIRunSettings)"
-      VSTestConsolePath="$(VSTestConsolePath)"
+      VSTestConsolePath="$(VSTestConsoleFile)"
       VSTestResultsDirectory="$(VSTestResultsDirectory)"
     />
   </Target>
@@ -78,7 +78,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestDiag = $(VSTestDiag)" Importance="low" />
     <Message Text="VSTestCLIRunSettings = $(VSTestCLIRunSettings)" Importance="low" />
     <Message Text="VSTestResultsDirectory = $(VSTestResultsDirectory)" Importance="low" />
-    <Message Text="VSTestConsolePath = $(VSTestConsolePath)" Importance="low" />
+    <Message Text="VSTestConsolePath = $(VSTestConsoleFile)" Importance="low" />
   </Target>
 
 </Project>
