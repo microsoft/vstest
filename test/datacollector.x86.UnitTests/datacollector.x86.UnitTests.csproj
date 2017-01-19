@@ -13,9 +13,6 @@
     <PlatformTarget Condition="'$(TargetFramework)' == 'net46'">x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj">
       <FromP2P>true</FromP2P>
