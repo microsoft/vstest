@@ -28,7 +28,7 @@
     <!--<Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" />-->
   </Target>
 
-  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true'" >
+  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true' and '$(TargetFramework)' == 'net46'" >
     <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
