@@ -195,7 +195,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
                 // Verify stack information as well.
-                Assert.IsTrue(this.standardTestError.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
+                Assert.IsTrue(this.standardTestOutput.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
             }
         }
 
