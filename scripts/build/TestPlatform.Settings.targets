@@ -17,8 +17,10 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-	<!-- Disable default inclusion of .cs and .resx file -->
-	<EnableDefaultItems>false</EnableDefaultItems>
+
+    <!-- Disable default inclusion of .resx file. We generate files in the Resources directory only
+         if localization is enabled, default inclusion ends up including the generated files by default. -->
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
