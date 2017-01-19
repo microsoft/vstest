@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         private bool isBoundsOnLoggerEventQueueEnabled;
 
         private TestSessionMessageLogger testSessionMessageLogger;
-#endregion
+        #endregion
 
         #region Constructor
 
@@ -56,7 +56,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         public InternalTestLoggerEvents(TestSessionMessageLogger testSessionMessageLogger)
         {
-
             // Initialize the queue and pause it.
             // Note: The queue will be resumed when events are enabled.  This is done so all
             //       loggers receive all messages.
@@ -76,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.testSessionMessageLogger.TestRunMessage += this.TestRunMessageHandler;
         }
 
-#endregion
+        #endregion
 
         #region Events
 
@@ -95,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// </summary>
         public override event EventHandler<TestRunCompleteEventArgs> TestRunComplete;
 
-#endregion
+        #endregion
 
         #region IDisposable
 
@@ -118,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.loggerEventQueue.Dispose();
         }
 
-#endregion
+        #endregion
 
         #region Internal Methods
 
@@ -204,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.loggerEventQueue.Flush();
         }
 
-#endregion
+        #endregion
 
         #region Private Members
 

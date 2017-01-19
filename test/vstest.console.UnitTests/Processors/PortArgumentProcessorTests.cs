@@ -8,7 +8,6 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
-using System.Threading;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
@@ -36,11 +35,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new PortArgumentProcessorCapabilities();
             Assert.AreEqual("/Port", capabilities.CommandName);
-            Assert.AreEqual("--Port|/Port:<Port>\n      The Port for socket connection and receiving the event messages.", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Port|/Port:<Port>\r\n      The Port for socket connection and receiving the event messages.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.PortArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
-            Assert.AreEqual(ArgumentProcessorPriority.Normal, capabilities.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.DesignMode, capabilities.Priority);
 
             Assert.AreEqual(false, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
@@ -80,13 +79,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorInitializeWithValidPortShouldAddPortToCommandLineOptionsAndInitializeDesignModeManger()
+        public void ExecutorInitializeWithValidPortShouldAddPortToCommandLineOptionsAndInitializeDesignModeManager()
         {
             var executor = new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance);
             int port = 2345;
+            CommandLineOptions.Instance.ParentProcessId = 0;
+
             executor.Initialize(port.ToString());
+
             Assert.AreEqual(port, CommandLineOptions.Instance.Port);
             Assert.IsNotNull(DesignModeClient.Instance);
+        }
+
+        [TestMethod]
+        public void ExecutorInitializeShouldSetDesignMode()
+        {
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance);
+            int port = 2345;
+            CommandLineOptions.Instance.ParentProcessId = 0;
+
+            executor.Initialize(port.ToString());
+
+            Assert.IsTrue(CommandLineOptions.Instance.IsDesignMode);
         }
 
         [TestMethod]

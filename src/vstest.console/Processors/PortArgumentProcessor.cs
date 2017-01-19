@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.DesignMode;
 
         public override string HelpContentResourceName => CommandLineResources.PortArgumentHelp;
 
@@ -152,20 +152,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            int portNumber;
-            if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out portNumber))
+            if (string.IsNullOrWhiteSpace(argument) || !int.TryParse(argument, out int portNumber))
             {
                 throw new CommandLineException(CommandLineResources.InvalidPortArgument);
             }
 
             this.commandLineOptions.Port = portNumber;
+            this.commandLineOptions.IsDesignMode = true;
             this.designModeClient = this.designModeInitializer?.Invoke(this.commandLineOptions.ParentProcessId);
         }
 
         /// <summary>
-        /// The port is already set, return success.
+        /// Initialize the design mode client.
         /// </summary>
-        /// <returns> The <see cref="ArgumentProcessorResult"/> Success </returns>
+        /// <returns><see cref="ArgumentProcessorResult.Success"/> if initialization is successful.</returns>
         public ArgumentProcessorResult Execute()
         {
             try

@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.Protocol
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// dotnet.exe process manager
@@ -55,7 +56,7 @@ namespace Microsoft.TestPlatform.Protocol
 
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.CreateNoWindow = true;
-       
+
             process.Start();
             process.EnableRaisingEvents = true;
             process.Exited += Process_Exited;
@@ -88,7 +89,6 @@ namespace Microsoft.TestPlatform.Protocol
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
 
-#if !NET46
             // Use semicolon(;) as path separator for windows
             // colon(:) for Linux and OSX
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -96,7 +96,6 @@ namespace Microsoft.TestPlatform.Protocol
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
-#endif
 
             var pathString = Environment.GetEnvironmentVariable("PATH");
             foreach (string path in pathString.Split(separator))
@@ -108,7 +107,7 @@ namespace Microsoft.TestPlatform.Protocol
                 }
             }
 
-            string errorMessage = String.Format("Unable to find dotnet.exe");
+            string errorMessage = String.Format("Unable to find dotnet executable. Please ensure it is available on PATH.");
             Console.WriteLine("Error : {0}", errorMessage);
             throw new FileNotFoundException(errorMessage);
         }
