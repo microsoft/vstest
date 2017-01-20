@@ -1,4 +1,4 @@
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
@@ -10,7 +10,6 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="**\*.cs" />
     <Contents Include="[Content_Types].xml;extension.vsixmanifest;License.rtf;testhost.x86.exe.config;testhost.exe.config;TestPlatform.ObjectModel.manifest;TestPlatform.ObjectModel.x86.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Contents>
