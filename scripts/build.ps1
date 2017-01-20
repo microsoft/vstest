@@ -281,8 +281,8 @@ function Create-VsixPackage
     $fileToCopy = Join-Path $TPB_VSIX_DIR "License.rtf"
     Copy-Item $fileToCopy $packageDir -Force
 
-    $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
-    Copy-Item $tpSrcDir\package\"ThirdPartyNotices.txt" $packageDir -Force
+    $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
+    Copy-Item $fileToCopy $packageDir -Force
 
     #update version of VSIX
     Update-VsixVersion
