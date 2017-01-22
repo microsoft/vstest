@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Linq;
     using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Resources;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
 
     /// <summary>
@@ -23,11 +23,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="type">
         /// The type.
         /// </param>
-        /// <param name="dataCollectorConfig">
-        /// The data collector config.
-        /// </param>
         public DataCollectorConfig(Type type)
         {
+            ValidateArg.NotNull(type, nameof(type));
+
             this.DataCollectorType = type;
             this.TypeUri = GetTypeUri(type);
             this.FriendlyName = GetFriendlyName(type);
@@ -55,8 +54,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <returns>Type Uri of the data collector.</returns>
         private static Uri GetTypeUri(Type dataCollectorType)
         {
-            Debug.Assert(dataCollectorType != null, "null dataCollectorType");
-
             var typeUri = default(Uri);
             var typeUriAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorTypeUriAttribute), true);
 

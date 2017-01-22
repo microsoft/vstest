@@ -18,24 +18,23 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
-    /// The data collection manager.
+    /// Manages data collection.
     /// </summary>
     internal class DataCollectionManager : IDataCollectionManager
     {
         /// <summary>
-        /// Gets the source directory.
+        /// The source directory.
         /// </summary>
-        private static string SourceDirectory;
-
-
+        private static string sourceDirectory;
 
         /// <summary>
-        /// Gets a value indicating whether data collection currently enabled.
+        /// Value indicating whether data collection is currently enabled.
         /// </summary>
-        private bool IsDataCollectionEnabled;
+        private bool isDataCollectionEnabled;
 
         /// <summary>
         /// Data collection environment context.
@@ -43,13 +42,19 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private DataCollectionEnvironmentContext dataCollectionEnvironmentContext;
 
         /// <summary>
-        /// File manager for performing file transfer from data collector.
+        /// Attachment manager for performing file transfer from datacollector.
         /// </summary>
         private IDataCollectionAttachmentManager attachmentManager;
 
-        private IMessageSink MessageSink;
+        /// <summary>
+        /// Message sink for sending data collection messages to client..
+        /// </summary>
+        private IMessageSink messageSink;
 
-        private TestPlatformDataCollectionEvents Events;
+        /// <summary>
+        /// Events that can be subscribed by datacollectors.
+        /// </summary>
+        private TestPlatformDataCollectionEvents events;
 
         /// <summary>
         /// Specifies whether the object is disposed or not. 
@@ -75,17 +80,16 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         internal DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink)
         {
             this.attachmentManager = datacollectionAttachmentManager;
-            this.MessageSink = messageSink;
-            this.Events = new TestPlatformDataCollectionEvents();
+            this.messageSink = messageSink;
+            this.events = new TestPlatformDataCollectionEvents();
 
-            this.RunDataCollectors = new Dictionary<Type, TestPlatformDataCollector>();
+            this.RunDataCollectors = new Dictionary<Type, DataCollectorWrapper>();
         }
 
         /// <summary>
         /// Gets cache of data collectors associated with the run.
         /// </summary>
-        internal Dictionary<Type, TestPlatformDataCollector> RunDataCollectors { get; private set; }
-
+        internal Dictionary<Type, DataCollectorWrapper> RunDataCollectors { get; private set; }
 
         /// <inheritdoc/>
         public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
@@ -96,18 +100,18 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var dataCollectionContext = new DataCollectionContext(sessionId);
             this.dataCollectionEnvironmentContext = DataCollectionEnvironmentContext.CreateForLocalEnvironment(dataCollectionContext);
 
-            this.attachmentManager.Initialize(sessionId, SourceDirectory, this.MessageSink);
+            this.attachmentManager.Initialize(sessionId, sourceDirectory, this.messageSink);
 
             var executionEnvironmentVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
-            SourceDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+            sourceDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
 
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
 
-            this.IsDataCollectionEnabled = dataCollectionRunSettings.IsCollectionEnabled;
+            this.isDataCollectionEnabled = dataCollectionRunSettings.IsCollectionEnabled;
 
-            // If dataCollectionRunSettings is null, that means data collectors are not configured.
+            // If dataCollectionRunSettings is null, that means datacollectors are not configured.
             if (dataCollectionRunSettings == null || !dataCollectionRunSettings.IsCollectionEnabled)
             {
                 return executionEnvironmentVariables;
@@ -125,7 +129,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 this.LoadAndInitialize(dataCollectorSettings);
             }
 
-            // todo : populate environment variables from loaded datacollectors.
+            // Once all data collectors have been initialized, query for environment variables
+            bool unloadedAnyCollector;
+            var dataCollectorEnvironmentVariables = this.GetEnvironmentVariables(out unloadedAnyCollector);
+
+            foreach (var variable in dataCollectorEnvironmentVariables.Values)
+            {
+                executionEnvironmentVariables.Add(variable.Name, variable.Value);
+            }
+
             return executionEnvironmentVariables;
         }
 
@@ -140,9 +152,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <inheritdoc/>
-        public Collection<AttachmentSet> SessionEnded(bool isCancelled)
+        public Collection<AttachmentSet> SessionEnded()
         {
-            if (!this.IsDataCollectionEnabled)
+            // Return null if datacollection is not enabled.
+            if (!this.isDataCollectionEnabled)
             {
                 return null;
             }
@@ -150,7 +163,20 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var endEvent = new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext);
             this.SendEvent(endEvent);
 
-            var result = this.attachmentManager.GetAttachments(endEvent.Context);
+            List<AttachmentSet> result = null;
+            try
+            {
+                result = this.attachmentManager.GetAttachments(endEvent.Context);
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex.Message);
+                }
+
+                return null;
+            }
 
             foreach (var entry in result)
             {
@@ -177,9 +203,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <inheritdoc/>
         public bool SessionStarted()
         {
-            if (this.RunDataCollectors.Count == 0)
+            // If datacollectors are not configured or datacollection is not enabled, return false.
+            if (!this.isDataCollectionEnabled || this.RunDataCollectors.Count == 0)
             {
-                // No TestCase level events are needed if data collection is disabled or no data collectors are loaded.
                 return false;
             }
 
@@ -222,10 +248,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         #region Load and Initialize DataCollectors
 
         /// <summary>
-        /// Helper method that gets the Type from type name string specified.
+        /// Helper method that gets the datacollector config.
         /// </summary>
         /// <param name="collectorTypeName">
         /// Type name of the collector
+        /// </param>
+        /// <param name="codebase">
+        /// The codebase.
         /// </param>
         /// <returns>
         /// Type of the collector type name
@@ -245,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.GetCollectorType: Failed to get type for Collector '{0}': {1}", collectorTypeName, ex);
+                    EqtTrace.Error("DataCollectionManager.GetDataCollectorConfig: Failed to get type for Collector '{0}': {1}", collectorTypeName, ex);
                 }
 
                 throw;
@@ -253,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// The get data collector information from binary.
+        /// Helper method that gets the Type and Assembly from datacollector type name and binary path.
         /// </summary>
         /// <param name="binaryPath">
         /// The binary path.
@@ -282,7 +311,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// The load assembly from path.
+        /// Helper method to load assembly from path.
         /// </summary>
         /// <param name="assemblyPath">
         /// The assembly path.
@@ -300,7 +329,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// Creates an instance of collector plugin of given type.
+        /// Creates an instance of datacollector of given type.
         /// </summary>
         /// <param name="dataCollectorType">type of collector plugin to instantiate.</param>
         /// <returns>The dataCollector.</returns>
@@ -331,23 +360,21 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// The load and initialize.
+        /// Loads and initializes datacollector using datacollector settings.
         /// </summary>
         /// <param name="dataCollectorSettings">
         /// The data collector settings.
         /// </param>
         private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
         {
-            var codebase = dataCollectorSettings.CodeBase;
-
             var collectorTypeName = dataCollectorSettings.AssemblyQualifiedName;
             var collectorDisplayName = string.IsNullOrWhiteSpace(dataCollectorSettings.FriendlyName) ? collectorTypeName : dataCollectorSettings.FriendlyName;
-            TestPlatformDataCollector testplatformDataCollector;
+            DataCollectorWrapper dataCollectorWrapper;
             DataCollectorConfig dataCollectorConfig;
 
             try
             {
-                dataCollectorConfig = GetDataCollectorConfig(collectorTypeName, codebase);
+                dataCollectorConfig = GetDataCollectorConfig(collectorTypeName, dataCollectorSettings.CodeBase);
             }
             catch (FileNotFoundException)
             {
@@ -360,34 +387,29 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 return;
             }
 
-            lock (this.RunDataCollectors)
+            if (this.RunDataCollectors.ContainsKey(dataCollectorConfig.DataCollectorType))
             {
-                if (this.RunDataCollectors.ContainsKey(dataCollectorConfig.DataCollectorType))
-                {
-                    // Collector is already loaded (may be configured twice). Ignore duplicates and return.
-                    return;
-                }
+                // Collector is already loaded (may be configured twice). Ignore duplicates and return.
+                return;
             }
-
-            Debug.Assert(dataCollectorConfig.DataCollectorType != null, string.Format(CultureInfo.CurrentCulture, "Could not find collector type '{0}'", collectorTypeName));
 
             try
             {
                 var dataCollector = CreateDataCollector(dataCollectorConfig.DataCollectorType);
 
                 // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
-                testplatformDataCollector = dataCollectorConfig == null
+                dataCollectorWrapper = dataCollectorConfig == null
                                                 ? null
-                                                : new TestPlatformDataCollector(
+                                                : new DataCollectorWrapper(
                                                     dataCollector,
                                                     dataCollectorSettings.Configuration,
                                                     dataCollectorConfig,
                                                     this.dataCollectionEnvironmentContext,
                                                     this.attachmentManager,
-                                                    this.Events,
-                                                    this.MessageSink);
+                                                    this.events,
+                                                    this.messageSink);
 
-                if (testplatformDataCollector == null || !testplatformDataCollector.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
+                if (dataCollectorWrapper == null || !dataCollectorWrapper.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
                 {
                     // If the data collector was not found, send an error.
                     this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.Uri));
@@ -398,7 +420,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitDataCollectors: exception while creating data collector {0}: " + ex, collectorTypeName);
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", collectorTypeName, ex);
                 }
 
                 // No data collector info, so send the error with no direct association to the collector.
@@ -408,17 +430,25 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             try
             {
-                testplatformDataCollector.InitializeDataCollector();
+                dataCollectorWrapper.InitializeDataCollector();
                 lock (this.RunDataCollectors)
                 {
                     // Add data collectors to run cache.
-                    this.RunDataCollectors[dataCollectorConfig.DataCollectorType] = testplatformDataCollector;
+                    this.RunDataCollectors[dataCollectorConfig.DataCollectorType] = dataCollectorWrapper;
                 }
             }
             catch (Exception ex)
             {
-                EqtTrace.Error(ex.Message);
-                // todo : add logging.
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0}: " + ex, collectorTypeName);
+                }
+
+                // Log error.
+                dataCollectorWrapper.Logger.LogError(this.dataCollectionEnvironmentContext.SessionDataCollectionContext, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorInitializationError, dataCollectorConfig.FriendlyName, ex.Message));
+
+                // Dispose datacollector.
+                dataCollectorWrapper.DisposeDataCollector();
                 return;
             }
         }
@@ -462,7 +492,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="warningMessage">The message to be logged.</param>
         private void LogWarning(string warningMessage)
         {
-            // todo: implement this functionality
+            this.messageSink.SendMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Warning, warningMessage));
         }
 
         /// <summary>
@@ -472,65 +502,164 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="args">The context information for the event</param>
         private void SendEvent(DataCollectionEventArgs args)
         {
-            Debug.Assert(args != null, "'args' is null");
+            ValidateArg.NotNull(args, nameof(args));
 
-            if (!this.IsDataCollectionEnabled)
+            if (!this.isDataCollectionEnabled)
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("RaiseEvent called when no collection is enabled.");
+                    EqtTrace.Error("DataCollectionManger:SendEvent: SendEvent called when no collection is enabled.");
                 }
 
-                Debug.Assert(false, "RaiseEvent called when no collection is enabled.");
                 return;
             }
 
-            foreach (var dataCollectorInfo in this.GetDataCollectorsSnapshot())
+            foreach (var dataCollectorWrapper in this.RunDataCollectors.Values)
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("DataCollectionManger:SendEvent: Raising event {0} to collector {1}", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName);
+                    EqtTrace.Verbose("DataCollectionManger:SendEvent: Raising event {0} to collector {1}", args.GetType(), dataCollectorWrapper.DataCollectorConfig.FriendlyName);
                 }
 
-                dataCollectorInfo.Events.RaiseEvent(args);
+                try
+                {
+                    dataCollectorWrapper.Events.RaiseEvent(args);
+                }
+                catch (Exception ex)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector {1} : {2}.", args.GetType(), dataCollectorWrapper.DataCollectorConfig.FriendlyName, ex.Message);
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Gets a snapshot of current data collectors.
+        /// The get environment variables.
         /// </summary>
+        /// <param name="unloadedAnyCollector">
+        /// The unloaded any collector.
+        /// </param>
         /// <returns>
-        /// Collection of TestPlatformDataCollectorInfo.
+        /// Dictionary of variable name as key and collector requested environment variable as value.
         /// </returns>
-        private List<TestPlatformDataCollector> GetDataCollectorsSnapshot()
+        private Dictionary<string, DataCollectionEnvironmentVariable> GetEnvironmentVariables(out bool unloadedAnyCollector)
         {
-            var datacollectorInfoList = new List<TestPlatformDataCollector>();
-            lock (this.RunDataCollectors)
+            var failedCollectors = new List<DataCollectorWrapper>();
+            unloadedAnyCollector = false;
+            var dataCollectorEnvironmentVariable = new Dictionary<string, DataCollectionEnvironmentVariable>(StringComparer.OrdinalIgnoreCase);
+            foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
             {
-                foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
+                try
                 {
-                    if (dataCollectorInfo != null)
-                    {
-                        if (EqtTrace.IsVerboseEnabled)
-                        {
-                            EqtTrace.Verbose(
-                                "DataCollectionManager.GetDataCollectorsSnapshot: DataCollector:{0}",
-                                dataCollectorInfo.DataCollectorConfig.FriendlyName);
-                        }
+                    this.AddCollectorEnvironmentVariables(dataCollectorInfo, dataCollectorEnvironmentVariable);
+                }
+                catch (Exception ex)
+                {
+                    unloadedAnyCollector = true;
 
-                        datacollectorInfoList.Add(dataCollectorInfo);
-                    }
-                    else
+                    var dataCollectorType = dataCollectorInfo.DataCollector.GetType();
+                    failedCollectors.Add(dataCollectorInfo);
+                    dataCollectorInfo.Logger.LogError(
+                        this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                        string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorErrorOnGetVariable, dataCollectorType, ex.ToString()));
+
+                    if (EqtTrace.IsErrorEnabled)
                     {
-                        if (EqtTrace.IsErrorEnabled)
-                        {
-                            EqtTrace.Error("DataCollectionManager.GetDataCollectorsSnapshot: got null data collector info from the data collector info collection (ignored).");
-                        }
+                        EqtTrace.Error("DataCollectionManager.GetEnvironmentVariables: Failed to get variable for Collector '{0}': {1}", dataCollectorType, ex);
                     }
                 }
             }
 
-            return datacollectorInfoList;
+            this.RemoveDataCollectors(failedCollectors);
+            return dataCollectorEnvironmentVariable;
+        }
+
+        /// <summary>
+        /// Collects environment variable to be set in test process by avoiding duplicates
+        /// and detecting override of variable value by multiple adapters.
+        /// </summary>
+        /// <param name="dataCollectionWrapper">
+        /// The data Collection Wrapper.
+        /// </param>
+        /// <param name="dataCollectorEnvironmentVariables">
+        /// Environment variables required for already loaded plugin.
+        /// </param>
+        private void AddCollectorEnvironmentVariables(
+            DataCollectorWrapper dataCollectionWrapper,
+            Dictionary<string, DataCollectionEnvironmentVariable> dataCollectorEnvironmentVariables)
+        {
+            if (dataCollectionWrapper.TestExecutionEnvironmentVariables != null)
+            {
+                var collectorFriendlyName = dataCollectionWrapper.DataCollectorConfig.FriendlyName;
+                foreach (var namevaluepair in dataCollectionWrapper.TestExecutionEnvironmentVariables)
+                {
+                    DataCollectionEnvironmentVariable alreadyRequestedVariable;
+                    if (dataCollectorEnvironmentVariables.TryGetValue(namevaluepair.Key, out alreadyRequestedVariable))
+                    {
+                        // Dev10 behavior is to consider environment variables values as case sensitive.
+                        if (string.Equals(namevaluepair.Value, alreadyRequestedVariable.Value, StringComparison.Ordinal))
+                        {
+                            alreadyRequestedVariable.AddRequestingDataCollector(collectorFriendlyName);
+                        }
+                        else
+                        {
+                            // Data collector is overriding an already requested variable, possibly an error.                            
+                            dataCollectionWrapper.Logger.LogError(
+                                this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
+                                string.Format(
+                                    CultureInfo.CurrentUICulture,
+                                    Resources.Resources.DataCollectorRequestedDuplicateEnvironmentVariable,
+                                    collectorFriendlyName,
+                                    namevaluepair.Key,
+                                    namevaluepair.Value,
+                                    alreadyRequestedVariable.FirstDataCollectorThatRequested,
+                                    alreadyRequestedVariable.Value));
+                        }
+                    }
+                    else
+                    {
+                        if (EqtTrace.IsVerboseEnabled)
+                        {
+                            // new variable, add to the list.
+                            EqtTrace.Verbose("DataCollectionManager.AddCollectionEnvironmentVariables: Adding Environment variable '{0}' value '{1}'", namevaluepair.Key, namevaluepair.Value);
+                        }
+
+                        dataCollectorEnvironmentVariables.Add(
+                            namevaluepair.Key,
+                            new DataCollectionEnvironmentVariable(namevaluepair, collectorFriendlyName));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The remove data collectors.
+        /// </summary>
+        /// <param name="dataCollectorsToRemove">
+        /// The data collectors to remove.
+        /// </param>
+        private void RemoveDataCollectors(IReadOnlyCollection<DataCollectorWrapper> dataCollectorsToRemove)
+        {
+            if (dataCollectorsToRemove == null || !dataCollectorsToRemove.Any())
+            {
+                return;
+            }
+
+            lock (this.RunDataCollectors)
+            {
+                foreach (var dataCollectorToRemove in dataCollectorsToRemove)
+                {
+                    dataCollectorToRemove.DisposeDataCollector();
+                    this.RunDataCollectors.Remove(dataCollectorToRemove.DataCollector.GetType());
+                }
+
+                if (this.RunDataCollectors.Count == 0)
+                {
+                    this.isDataCollectionEnabled = false;
+                }
+            }
         }
     }
 }

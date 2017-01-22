@@ -6,8 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System;
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -73,6 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             ValidateArg.NotNull<DataCollectionEventArgs>(e, "DataCollectionEventArgs");
 
             EventInvoker onEvent;
+
             if (this.eventArgsToEventInvokerMap.TryGetValue(e.GetType(), out onEvent))
             {
                 onEvent(e);

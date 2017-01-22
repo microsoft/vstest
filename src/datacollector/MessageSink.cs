@@ -3,10 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -22,6 +18,5 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             DataCollectionRequestHandler.Instance.SendDataCollectionMessage(args);
         }
-
     }
 }

@@ -156,4 +156,10 @@
   <data name="FriendlyNameIsNullOrEmpty" xml:space="preserve">
     <value>Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type '{0}' is null or empty.</value>
   </data>
+  <data name="DataCollectorErrorOnGetVariable" xml:space="preserve">
+    <value>Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</value>
+  </data>
+  <data name="DataCollectorRequestedDuplicateEnvironmentVariable" xml:space="preserve">
+    <value>The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</value>
+  </data>
 </root>

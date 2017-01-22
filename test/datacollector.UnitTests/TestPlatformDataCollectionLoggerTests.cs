@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestInitialize]
         public void Init()
         {
-            messageSink = new Mock<IMessageSink>();
+            this.messageSink = new Mock<IMessageSink>();
             this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
             this.logger = new TestPlatformDataCollectionLogger(this.messageSink.Object, this.dataCollectorConfig);
 

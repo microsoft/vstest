@@ -45,8 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
         /// <summary>
         /// Raises SessionEnd event to all data collectors configured for run.
         /// </summary>
-        /// <param name="isCancelled">Specified whether the run is cancelled or not.</param>
         /// <returns>Collection of session attachmentSet.</returns>
-        Collection<AttachmentSet> SessionEnded(bool isCancelled);
+        Collection<AttachmentSet> SessionEnded();
     }
 }

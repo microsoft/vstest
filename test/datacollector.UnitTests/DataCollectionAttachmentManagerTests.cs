@@ -16,11 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
     using Moq;
 
     [TestClass]
-    public class DataCollectionFileManagerTests
+    public class DataCollectionAttachmentManagerTests
     {
-        DataCollectionAttachmentManager attachmentManager;
-        Mock<IMessageSink> messageSink;
-        SessionId sessionId;
+        private DataCollectionAttachmentManager attachmentManager;
+        private Mock<IMessageSink> messageSink;
+        private SessionId sessionId;
 
 
         [TestInitialize]
@@ -30,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             this.messageSink = new Mock<IMessageSink>();
             var guid = Guid.NewGuid();
             this.sessionId = new SessionId(guid);
-
         }
 
         [TestCleanup]
@@ -71,8 +70,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             this.attachmentManager.Initialize(this.sessionId, System.AppContext.BaseDirectory, this.messageSink.Object);
 
-            Assert.IsNotNull(this.attachmentManager.AttachmentRequests);
-            Assert.AreEqual(0, this.attachmentManager.AttachmentRequests.Count);
             Assert.AreEqual(Path.Combine(System.AppContext.BaseDirectory, this.sessionId.Id.ToString()), this.attachmentManager.SessionOutputDirectory);
         }
 
@@ -100,9 +97,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
 
 
-            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, messageSink.Object);
+            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
 
-            var datacollectioncontext = new DataCollectionContext(sessionId);
+            var datacollectioncontext = new DataCollectionContext(this.sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
@@ -116,6 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             waitHandle.WaitOne();
 
             Assert.IsTrue(File.Exists(Path.Combine(System.AppContext.BaseDirectory, filename)));
+            Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
             Assert.AreEqual(this.attachmentManager.AttachmentRequests.Count, 1);
         }
 
@@ -132,8 +130,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
-            EventWaitHandle waitHandle = new AutoResetEvent(false);
-            AsyncCompletedEventHandler handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
+            var waitHandle = new AutoResetEvent(false);
+            var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
             var dataCollectorDataMessage = new FileTransferInformationExtension(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), "description", true, new object(), handler, uri, friendlyName);
 
             this.attachmentManager.AddAttachment(dataCollectorDataMessage);
@@ -143,14 +141,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             Assert.AreEqual(this.attachmentManager.AttachmentRequests.Count, 1);
             Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
-            Assert.IsFalse(File.Exists(filename));
-
+            Assert.IsFalse(File.Exists(Path.Combine(AppContext.BaseDirectory, filename)));
         }
 
         [TestMethod]
         public void AddAttachmentShouldNotAddNewFileTransferIfNullIsPassed()
         {
-            Assert.ThrowsException<ArgumentNullException>(()=>
+            Assert.ThrowsException<ArgumentNullException>(() =>
             {
                 this.attachmentManager.AddAttachment(null);
             });
@@ -185,9 +182,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void GetAttachmentsShouldNotReutrnAnyDataWhenActiveFileTransferAreNotPresent()
         {
-            var filename = "filename1.txt";
-            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
-
             this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
 
             var datacollectioncontext = new DataCollectionContext(this.sessionId);

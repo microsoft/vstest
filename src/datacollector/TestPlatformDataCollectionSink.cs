@@ -3,14 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
+    using System.ComponentModel;
+    using System.Diagnostics;
+
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Text;
 
     /// <summary>
     /// The test platform data collection sink.

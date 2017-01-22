@@ -33,14 +33,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="sink">
         /// The underlying raw IMessageSink.  Cannot be null.
         /// </param>
-        /// <param name="dataCollectorInformation">
+        /// <param name="dataCollectorConfig">
         /// The data Collector Information.
         /// </param>
-        internal TestPlatformDataCollectionLogger(IMessageSink sink, DataCollectorConfig dataCollectorInformation)
+        internal TestPlatformDataCollectionLogger(IMessageSink sink, DataCollectorConfig dataCollectorConfig)
         {
-            ValidateArg.NotNull(dataCollectorInformation, "dataCollectorInformation");
+            ValidateArg.NotNull(dataCollectorConfig, "dataCollectorInformation");
             ValidateArg.NotNull(sink, "sink");
-            this.dataCollectorConfig = dataCollectorInformation;
+            this.dataCollectorConfig = dataCollectorConfig;
             this.sink = sink;
         }
 

@@ -89,6 +89,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter &apos;{0}&apos; failed to provide intialization information. Error: {1}.
+        /// </summary>
+        internal static string DataCollectorErrorOnGetVariable {
+            get {
+                return ResourceManager.GetString("DataCollectorErrorOnGetVariable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The diagnostic data adapter &apos;{0}&apos;  threw an exception during type loading, construction, or initialization: {1}..
         /// </summary>
         internal static string DataCollectorInitializationError {
@@ -103,6 +112,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         internal static string DataCollectorNotFound {
             get {
                 return ResourceManager.GetString("DataCollectorNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The diagnostic data adapter &apos;{0}&apos; requested environment variable &apos;{1}&apos; with value &apos;{2}&apos; to be set in test execution environment, but another diagnostic data adapter &apos;{3}&apos; has already requested same environment variable with different value &apos;{4}&apos;..
+        /// </summary>
+        internal static string DataCollectorRequestedDuplicateEnvironmentVariable {
+            get {
+                return ResourceManager.GetString("DataCollectorRequestedDuplicateEnvironmentVariable", resourceCulture);
             }
         }
         
@@ -143,6 +161,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type &apos;{0}&apos; is null or empty..
+        /// </summary>
+        internal static string FriendlyNameIsNullOrEmpty {
+            get {
+                return ResourceManager.GetString("FriendlyNameIsNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There are multiple configurations that have diagnostic data adapter  type &apos;{0}&apos; or Uri &apos;{1}&apos;. Duplicate configurations will be ignored in the test run..
         /// </summary>
         internal static string IgnoredDuplicateConfiguration {
@@ -166,17 +193,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Resources {
         internal static string WrongDataCollectionContextType {
             get {
                 return ResourceManager.GetString("WrongDataCollectionContextType", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector..
-        /// </summary>
-        internal static string FriendlyNameIsNullOrEmpty
-        {
-            get
-            {
-                return ResourceManager.GetString("FriendlyNameIsNullOrEmpty", resourceCulture);
             }
         }
     }

@@ -24,7 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         public void Init()
         {
             events = new TestPlatformDataCollectionEvents();
-
         }
 
         [TestMethod]
@@ -43,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var testCase = new TestCase();
             this.context = new DataCollectionContext(testCase);
 
-            events.SessionStart += this.SessionStartMessageHandler;
+            this.events.SessionStart += this.SessionStartMessageHandler;
             var eventArgs = new SessionStartEventArgs(this.context);
             this.events.RaiseEvent(eventArgs);
 
@@ -70,8 +69,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var testCase = new TestCase();
             this.context = new DataCollectionContext(testCase);
 
-            events.SessionStart += this.SessionStartMessageHandler;
-            events.SessionStart -= this.SessionStartMessageHandler;
+            this.events.SessionStart += this.SessionStartMessageHandler;
+            this.events.SessionStart -= this.SessionStartMessageHandler;
             var eventArgs = new SessionStartEventArgs(this.context);
             this.events.RaiseEvent(eventArgs);
 
@@ -85,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var testCase = new TestCase();
             this.context = new DataCollectionContext(testCase);
 
-            events.SessionEnd += this.SessionEndMessageHandler;
+            this.events.SessionEnd += this.SessionEndMessageHandler;
             var eventArgs = new SessionEndEventArgs(this.context);
             this.events.RaiseEvent(eventArgs);
 
@@ -99,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var testCase = new TestCase();
             this.context = new DataCollectionContext(testCase);
 
-            events.TestCaseStart += this.TestCaseStartMessageHandler;
+            this.events.TestCaseStart += this.TestCaseStartMessageHandler;
             var eventArgs = new TestCaseStartEventArgs(this.context, testCase);
             this.events.RaiseEvent(eventArgs);
 
@@ -113,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var testCase = new TestCase();
             this.context = new DataCollectionContext(testCase);
 
-            events.TestCaseEnd += this.TestCaseEndMessageHandler;
+            this.events.TestCaseEnd += this.TestCaseEndMessageHandler;
             var eventArgs = new TestCaseEndEventArgs(this.context, testCase, TestOutcome.Passed);
             this.events.RaiseEvent(eventArgs);
 

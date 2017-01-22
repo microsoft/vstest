@@ -3,14 +3,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 {
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
-    using Microsoft.VisualStudio.TestPlatform.DataCollector;
     using System;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using System.IO;
     using System.ComponentModel;
+    using System.IO;
+
+    using Microsoft.VisualStudio.TestPlatform.DataCollector;
+    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
 
     [TestClass]
     public class TestPlatformDataCollectionSinkTests
@@ -53,11 +55,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
-            Guid guid = Guid.NewGuid();
+            var guid = Guid.NewGuid();
             var sessionId = new SessionId(guid);
             var context = new DataCollectionContext(sessionId);
 
-            FileTransferInformation fileTransferInfo = new FileTransferInformation(context, filename, false);
+            var fileTransferInfo = new FileTransferInformation(context, filename, false);
 
             this.dataCollectionSink.SendFileAsync(fileTransferInfo);
 
@@ -70,11 +72,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
-            Guid guid = Guid.NewGuid();
+            var guid = Guid.NewGuid();
             var sessionId = new SessionId(guid);
             var context = new DataCollectionContext(sessionId);
 
-            FileTransferInformation fileTransferInfo = new FileTransferInformation(context, filename, false);
+            var fileTransferInfo = new FileTransferInformation(context, filename, false);
 
             var attachmentManager = new DataCollectionAttachmentManager();
             attachmentManager.Initialize(sessionId, AppContext.BaseDirectory, new Mock<IMessageSink>().Object);
@@ -86,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var result = attachmentManager.GetAttachments(context);
 
             Assert.IsNotNull(result);
-            Assert.IsTrue(isEventHandlerInvoked);
+            Assert.IsTrue(this.isEventHandlerInvoked);
         }
 
         [TestMethod]
@@ -95,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
-            Guid guid = Guid.NewGuid();
+            var guid = Guid.NewGuid();
             var sessionId = new SessionId(guid);
             var context = new DataCollectionContext(sessionId);
 
@@ -110,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
-            Guid guid = Guid.NewGuid();
+            var guid = Guid.NewGuid();
             var sessionId = new SessionId(guid);
             var context = new DataCollectionContext(sessionId);
 
@@ -123,7 +125,5 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             this.isEventHandlerInvoked = true;
         }
-
-
     }
 }

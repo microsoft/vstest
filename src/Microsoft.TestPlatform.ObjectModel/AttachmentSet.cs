@@ -5,8 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Runtime.Serialization;
 
     /// <summary>
@@ -17,10 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
         /// <summary>
         /// URI of the sender. 
-        /// 
         /// If a data-collector is sending this set, then it should be uri of the data collector. Also if an 
         /// executor is sending this attachment, then it should be uri of executor. 
-        /// 
         /// </summary>
         [DataMember]
         public Uri Uri {get; private set;}
@@ -33,7 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         /// <summary>
         /// List of data attachments. 
-        /// 
         /// These attachments can be things such as files that the collector/adapter wants to make available to the publishers.
         /// </summary>
         [DataMember]

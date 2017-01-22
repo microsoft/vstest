@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         internal string SessionOutputDirectory { get; private set; }
 
         /// <summary>
-        /// Gets the attachment requests.
+        /// Gets the list of attachment requests.
         /// </summary>
         internal List<AttachmentRequest> AttachmentRequests { get; private set; }
 
@@ -440,7 +440,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </param>
         private void LogError(string errorMessage, Uri collectorUri, string collectorFriendlyName, Guid testCaseId)
         {
-            //Debug.Assert(this.messageSink != null, "DataCollectionLog cannot be null");
             var args = new DataCollectionMessageEventArgs(TestMessageLevel.Error, errorMessage)
             {
                 Uri = collectorUri,

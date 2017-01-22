@@ -121,6 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             this.Error = error;
             this.requestCompleted.Set();
         }
+
         #endregion
 
         #region IDisposable
@@ -143,6 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 this.disposed = true;
             }
         }
+
         #endregion
     }
 }
