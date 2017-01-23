@@ -3,10 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>

@@ -101,6 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         #region internal methods
+
         /// <summary>
         /// Wait for file transfer to complete.
         /// </summary>

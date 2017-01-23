@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
         List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext);
 
         /// <summary>
-        /// Adds attachment.
+        /// Adds new attachment to current context
         /// </summary>
         /// <param name="fileTransferInfo">
         /// The file Transfer Info.

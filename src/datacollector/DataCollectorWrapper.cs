@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
 
     /// <summary>
-    /// Encapsulates datacollector instance and other objects required to facilitate datacollection.
+    /// Encapsulates datacollector object and other objects required to facilitate datacollection.
     /// </summary>
     internal class DataCollectorWrapper
     {
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         public TestPlatformDataCollectionEvents Events { get; private set; }
 
         /// <summary>
-        /// Gets the data sink
+        /// Gets the datacollection sink.
         /// </summary>
         public TestPlatformDataCollectionSink DataCollectionSink { get; private set; }
 
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// Initializes data collectors.
+        /// Initializes datacollectors.
         /// </summary>
         internal void InitializeDataCollector()
         {

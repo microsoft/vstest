@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// The send file completed.
+        /// Event handler for handling file transfer completed event.
         /// </summary>
         public override event AsyncCompletedEventHandler SendFileCompleted;
 

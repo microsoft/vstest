@@ -18,12 +18,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     internal class TestPlatformDataCollectionLogger : DataCollectionLogger
     {
         /// <summary>
-        /// The data collector information.
+        /// DataCollector's config info.
         /// </summary>
         private readonly DataCollectorConfig dataCollectorConfig;
 
         /// <summary>
-        /// The sink.
+        /// Message sink.
         /// </summary>
         private readonly IMessageSink sink;
 
@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// The send text message.
+        /// Sends text to message sink.
         /// </summary>
         /// <param name="context">
         /// The context.
