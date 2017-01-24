@@ -29,5 +29,20 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             Assert.AreEqual($"\"{arg1}\"", result[3]);
             Assert.AreEqual($"\"{arg2}\"", result[4]);
         }
+
+        [TestMethod]
+        public void CreateArgumentShouldPassResultsDirectoryCorrectly()
+        {
+            const string resultsDirectoryValue = @"C:\tmp\ResultsDirectory";
+            var vstestTask = new VSTestTask {  VSTestResultsDirectory = resultsDirectoryValue };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var result = vstestTask.CreateArgument().ToArray();
+
+            Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue}\"", result[1]);
+        }
     }
 }

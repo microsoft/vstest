@@ -28,6 +28,10 @@
     <Import Project="$(PackagesDirectory)Microbuild.Core\$(MicrobuildVersion)\build\Microbuild.Core.targets" />
   </ImportGroup>
 
+  <ItemGroup>
+    <ResxLang Include="cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant" />
+  </ItemGroup>
+  
   <Target Name="SignAssemblies">
     <!-- Sign all files if IncludeLegacyComponents is set to true -->
     <ItemGroup Condition="'$(IncludeLegacyComponents)' == 'true'">
@@ -68,6 +72,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET Core -->
@@ -93,6 +98,10 @@
 
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
+
+      <!-- Localized resources -->
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)%(ResxLang.Identity)\*.*" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.Build -->
@@ -116,6 +125,10 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\testhost.exe" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\testhost.x86.exe" />
+
+      <!-- Localized resources -->
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\%(ResxLang.Identity)\*.*" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <ItemGroup>

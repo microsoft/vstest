@@ -93,8 +93,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
                 using (var pdbReader = new PortablePdbReader(new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read)))
                 {
-                    // Load assembly
-                    var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(binaryPath);
+                    // At this point, the assembly should be already loaded into the load context. We query for a reference to
+                    // find the types and cache the symbol information. Let the loader follow default lookup order instead of
+                    // forcing load from a specific path.
+                    var asm = Assembly.Load(AssemblyLoadContext.GetAssemblyName(binaryPath));
 
                     foreach (var type in asm.GetTypes())
                     {
@@ -126,8 +128,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                EqtTrace.Error("PortableSymbolReader: Failed to load symbols for binary: {0}", binaryPath);
+                EqtTrace.Error(ex);
                 this.Dispose();
                 throw;
             }

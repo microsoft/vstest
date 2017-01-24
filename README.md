@@ -6,7 +6,7 @@ The Test Platform currently ships as part Visual Studio 2017, and in the .NET Co
 ### Build status
 |            |Debug |Release |
 |:----------:|:----------------:|:------------------:|
-|**master**  |[![Build Status](https://ci.dot.net/buildStatus/icon?job=Private/Microsoft_vstest/master/Microsoft_vstest_Debug)](https://ci.dot.net/job/Private/job/Microsoft_vstest/job/master/job/Microsoft_vstest_Debug/)|[![Build Status](https://ci.dot.net/buildStatus/icon?job=Private/Microsoft_vstest/master/Microsoft_vstest_Release)](https://ci.dot.net/job/Private/job/Microsoft_vstest/job/master/job/Microsoft_vstest_Release/)|
+|**master**  |[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Debug)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Debug/)|[![Build Status](https://ci.dot.net/buildStatus/icon?job=Microsoft_vstest/master/Release)](https://ci.dot.net/job/Microsoft_vstest/job/master/job/Release/)|
 
 ### Contributing
 There are many ways to contribute to VSTest
@@ -21,6 +21,8 @@ There are many ways to contribute to VSTest
 - [Test Execution Protocol](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0003-Test-Execution-Protocol.md)
 - [Adapter Extensibility](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0004-Adapter-Extensibility.md)
 - [Test Platform SDK](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0005-Test-Platform-SDK.md)
+- [Editors API Specification](https://github.com/Microsoft/vstest-docs/blob/master/RFCs/0007-Editors-API-Specification.md)
+
 
 ### Building
 VSTest can be built from within Visual Studio or from the CLI.
@@ -33,5 +35,5 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 ### License
 VSTest platform is licensed under the [MIT license](https://github.com/Microsoft/vstest/blob/master/LICENSE)
 
-<!--### Roadmap
-For details on our planned features and future direction please refer to our roadmap.-->
+### Roadmap
+For details on our planned features and future direction please refer to our [roadmap](https://github.com/Microsoft/vstest-docs/blob/master/roadmap.md).

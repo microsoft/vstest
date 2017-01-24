@@ -23,6 +23,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
+        public string GetCurrentDirectory()
+        {
+            return Directory.GetCurrentDirectory();
+        }
+
+        /// <inheritdoc/>
         public bool Exists(string path)
         {
             return File.Exists(path);
@@ -52,5 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return new FileInfo(path).Attributes;
         }
+
+
     }
 }

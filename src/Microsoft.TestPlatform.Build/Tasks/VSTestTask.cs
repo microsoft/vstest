@@ -86,6 +86,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestResultsDirectory
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -140,6 +146,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
             if (!string.IsNullOrEmpty(this.VSTestLogger))
             {
                 allArgs.Add("--logger:" + this.VSTestLogger);
+            }
+
+            if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
+            {
+                allArgs.Add("--resultsDirectory:" + this.AddDoubleQuotes(this.VSTestResultsDirectory));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestListTests))
