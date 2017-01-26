@@ -15,10 +15,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     /// <summary>
     /// Encapsulates datacollector object and other objects required to facilitate datacollection.
     /// </summary>
-    internal class DataCollectorWrapper
+    internal class DataCollectorInformation
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectorWrapper"/> class.
+        /// Initializes a new instance of the <see cref="DataCollectorInformation"/> class.
         /// </summary>
         /// <param name="dataCollector">
         /// The data collector.
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectorWrapper(DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink)
+        internal DataCollectorInformation(DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink)
         {
             this.DataCollector = dataCollector;
             this.ConfigurationElement = configurationElement;
@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("DataCollectorWrapper.DisposeDataCollector: calling Dispose() on {0}", this.DataCollector.GetType());
+                    EqtTrace.Verbose("dataCollectorInfo.DisposeDataCollector: calling Dispose() on {0}", this.DataCollector.GetType());
                 }
 
                 this.DataCollector.Dispose();

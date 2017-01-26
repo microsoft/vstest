@@ -83,11 +83,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
-            var dataCollectorDataMessage = new FileTransferInformationExtension(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), "description", false, new object(), null, uri, friendlyName);
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), false);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage);
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(this.attachmentManager.AttachmentRequests.Count, 0);
+            Assert.AreEqual(this.attachmentManager.AttachmentSets.Count, 0);
         }
 
         [TestMethod]
@@ -105,16 +105,17 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             EventWaitHandle waitHandle = new AutoResetEvent(false);
             var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
-            var dataCollectorDataMessage = new FileTransferInformationExtension(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), "description", false, new object(), handler, uri, friendlyName);
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), false);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage);
+
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne();
 
             Assert.IsTrue(File.Exists(Path.Combine(System.AppContext.BaseDirectory, filename)));
             Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
-            Assert.AreEqual(this.attachmentManager.AttachmentRequests.Count, 1);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[uri].Attachments.Count);
         }
 
         [TestMethod]
@@ -132,14 +133,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             var waitHandle = new AutoResetEvent(false);
             var handler = new AsyncCompletedEventHandler((a, e) => { waitHandle.Set(); });
-            var dataCollectorDataMessage = new FileTransferInformationExtension(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), "description", true, new object(), handler, uri, friendlyName);
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), true);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage);
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
             waitHandle.WaitOne();
 
-            Assert.AreEqual(this.attachmentManager.AttachmentRequests.Count, 1);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[uri].Attachments.Count);
             Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
             Assert.IsFalse(File.Exists(Path.Combine(AppContext.BaseDirectory, filename)));
         }
@@ -149,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.attachmentManager.AddAttachment(null);
+                this.attachmentManager.AddAttachment(null, null, null, null);
             });
         }
 
@@ -165,14 +166,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
-            var dataCollectorDataMessage = new FileTransferInformationExtension(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), "description", true, new object(), null, uri, friendlyName);
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), true);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage);
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentRequests.Count);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
             var result = this.attachmentManager.GetAttachments(datacollectioncontext);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentRequests.Count);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(friendlyName, result[0].DisplayName);
             Assert.AreEqual(uri, result[0].Uri);
@@ -202,14 +203,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
 
-            var dataCollectorDataMessage = new FileTransferInformationExtension(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), "description", true, new object(), null, uri, friendlyName);
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), true);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage);
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentRequests.Count);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
 
             this.attachmentManager.Dispose();
-            Assert.AreEqual(0, this.attachmentManager.AttachmentRequests.Count);
+            Assert.AreEqual(0, this.attachmentManager.AttachmentSets.Count);
             Assert.IsNull(this.attachmentManager.SessionOutputDirectory);
         }
     }

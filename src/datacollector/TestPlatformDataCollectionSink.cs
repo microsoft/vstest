@@ -65,9 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             Debug.Assert(System.IO.File.Exists(fileTransferInformation.Path), "DataCollector file '" + fileTransferInformation.Path + "' does not exist!");
 
-            var fileTransferInformationExtension = new FileTransferInformationExtension(fileTransferInformation, this.DataCollectorConfig.TypeUri, this.DataCollectorConfig.FriendlyName, this.SendFileCompleted);
-
-            this.AttachmentManager.AddAttachment(fileTransferInformationExtension);
+            this.AttachmentManager.AddAttachment(fileTransferInformation, this.SendFileCompleted, this.DataCollectorConfig.TypeUri, this.DataCollectorConfig.FriendlyName);
         }
     }
 }

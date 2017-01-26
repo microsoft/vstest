@@ -54,10 +54,16 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <returns>Type Uri of the data collector.</returns>
         private static Uri GetTypeUri(Type dataCollectorType)
         {
-            var typeUri = default(Uri);
-            var typeUriAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorTypeUriAttribute), true);
-
-            var typeUriAttribute = (DataCollectorTypeUriAttribute)typeUriAttributes[0];
+            DataCollectorTypeUriAttribute typeUriAttribute = null;
+            try
+            {
+                var typeUriAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorTypeUriAttribute));
+                typeUriAttribute = (DataCollectorTypeUriAttribute)typeUriAttributes[0];
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollector_TypeIsNull, dataCollectorType.FullName));
+            }
 
             // The type uri can not be null or empty.
             if (string.IsNullOrEmpty(typeUriAttribute.TypeUri))
@@ -65,18 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollector_TypeIsNull, dataCollectorType.FullName));
             }
 
-            // Ensure the format of the URI is valid.
-            try
-            {
-                typeUri = new Uri(typeUriAttribute.TypeUri);
-            }
-            catch (UriFormatException e)
-            {
-                // The type uri is not a valid URI.
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorTypeUriFormatInvalid, typeUriAttribute.TypeUri, dataCollectorType.FullName), e);
-            }
-
-            return typeUri;
+            return new Uri(typeUriAttribute.TypeUri);
         }
 
         /// <summary>
@@ -88,13 +83,18 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             Debug.Assert(dataCollectorType != null, "null dataCollectorType");
 
-            // Get the friendly name from the attribute.
-            var friendlyNameAttributes = GetAttributes(
-                dataCollectorType,
-                typeof(DataCollectorFriendlyNameAttribute),
-                true);
+            DataCollectorFriendlyNameAttribute friendlyNameAttribute = null;
 
-            var friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
+            // Get the friendly name from the attribute.
+            try
+            {
+                var friendlyNameAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorFriendlyNameAttribute));
+                friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
+            }
+            catch (Exception)
+            {
+                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FriendlyNameIsNullOrEmpty, dataCollectorType.FullName));
+            }
 
             // Verify that the friendly name provided is not null or empty.
             if (string.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
@@ -108,40 +108,23 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <summary>
         /// Gets the attributes of the specified type from the data collector type.
         /// </summary>
-        /// <param name="dataCollectorType">Data collector type to get attribute from.</param>
-        /// <param name="attributeType">The type of attribute to look for.</param>
-        /// <param name="isRequired">Indicates if the attribute is required.</param>
-        /// <returns>Array of attributes matching the type provided.  Will be an empty array if none were found.</returns>
-        private static object[] GetAttributes(Type dataCollectorType, Type attributeType, bool isRequired)
+        /// <param name="dataCollectorType">
+        /// Data collector type to get attribute from.
+        /// </param>
+        /// <param name="attributeType">
+        /// The type of attribute to look for.
+        /// </param>
+        /// <returns>
+        /// Array of attributes matching the type provided.  Will be an empty array if none were found.
+        /// </returns>
+        private static object[] GetAttributes(Type dataCollectorType, Type attributeType)
         {
             Debug.Assert(dataCollectorType != null, "null dataCollectorType");
             Debug.Assert(attributeType != null, "null attributeType");
 
-            var attributes = default(object[]);
-
             // If any attribute constructor on the type throws, the exception will bubble up through
             // the "GetCustomAttributes" method.
-            try
-            {
-                attributes = dataCollectorType.GetTypeInfo().GetCustomAttributes(attributeType, false).ToArray<object>();
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.AttributeRetrievalError, dataCollectorType.AssemblyQualifiedName), e);
-            }
-
-            // If the attribute is required and was not found, then throw.
-            if (isRequired && (attributes.Length < 1))
-            {
-                throw new ArgumentException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        Resources.Resources.DataCollectorRequiredAttributeMissing,
-                        attributeType.FullName,
-                        dataCollectorType.AssemblyQualifiedName));
-            }
-
-            return attributes;
+            return dataCollectorType.GetTypeInfo().GetCustomAttributes(attributeType, false).ToArray<object>();
         }
     }
 }

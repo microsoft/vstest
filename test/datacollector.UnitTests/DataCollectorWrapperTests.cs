@@ -12,21 +12,22 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
     using Moq;
 
     [TestClass]
-    public class DataCollectorWrapperTests
+    public class dataCollectorInfoTests
     {
-        private DataCollectorWrapper dataCollectorWrapper;
+        private DataCollectorInformation dataCollectorInfo;
 
         [TestInitialize]
         public void Init()
         {
-            this.dataCollectorWrapper = new DataCollectorWrapper(
+            var mockMessageSink = new Mock<IMessageSink>();
+            this.dataCollectorInfo = new DataCollectorInformation(
                 new CustomDataCollector(),
                 null,
                 new DataCollectorConfig(typeof(CustomDataCollector)),
                 null,
                 new Mock<IDataCollectionAttachmentManager>().Object,
                 new TestPlatformDataCollectionEvents(),
-                new DummyMessageSink());
+                mockMessageSink.Object);
         }
 
         [TestMethod]
@@ -35,17 +36,17 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var envVarList = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("key", "value") };
             CustomDataCollector.EnvVarList = envVarList;
 
-            this.dataCollectorWrapper.InitializeDataCollector();
+            this.dataCollectorInfo.InitializeDataCollector();
 
             Assert.IsTrue(CustomDataCollector.IsInitialized);
-            Assert.AreEqual(envVarList.First().Key, this.dataCollectorWrapper.TestExecutionEnvironmentVariables.First().Key);
+            Assert.AreEqual(envVarList.First().Key, this.dataCollectorInfo.TestExecutionEnvironmentVariables.First().Key);
         }
 
         [TestMethod]
         public void DisposeShouldInvokeDisposeOfDatacollector()
         {
-            this.dataCollectorWrapper.InitializeDataCollector();
-            this.dataCollectorWrapper.DisposeDataCollector();
+            this.dataCollectorInfo.InitializeDataCollector();
+            this.dataCollectorInfo.DisposeDataCollector();
 
             Assert.IsTrue(CustomDataCollector.IsDisposeInvoked);
         }

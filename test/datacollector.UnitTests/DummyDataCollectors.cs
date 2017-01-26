@@ -8,12 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
     using System.IO;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
+    
     [DataCollectorFriendlyName("CustomDataCollector")]
     [DataCollectorTypeUri("my://custom/datacollector")]
     public class CustomDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
@@ -129,21 +126,30 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
     }
 
-    internal class DummyMessageSink : IMessageSink
+    [DataCollectorTypeUri("my://custom/datacollector")]
+    public class CustomDataCollectorWithoutFriendlyName : DataCollector
     {
-        public static bool IsSendMessageInvoked;
-        public static string EventMessage;
-
-        public static void Reset()
+        public override void Initialize(
+            XmlElement configurationElement,
+            DataCollectionEvents events,
+            DataCollectionSink dataSink,
+            DataCollectionLogger logger,
+            DataCollectionEnvironmentContext environmentContext)
         {
-            IsSendMessageInvoked = false;
-            EventMessage = string.Empty;
         }
+    }
 
-        public void SendMessage(DataCollectionMessageEventArgs args)
+    [DataCollectorFriendlyName("")]
+    [DataCollectorTypeUri("my://custom/datacollector")]
+    public class CustomDataCollectorWithEmptyFriendlyName : DataCollector
+    {
+        public override void Initialize(
+            XmlElement configurationElement,
+            DataCollectionEvents events,
+            DataCollectionSink dataSink,
+            DataCollectionLogger logger,
+            DataCollectionEnvironmentContext environmentContext)
         {
-            EventMessage = args.Message;
-            IsSendMessageInvoked = true;
         }
     }
 }

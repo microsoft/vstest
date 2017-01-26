@@ -10,12 +10,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// Manages file transfer from data collector to test runner service.
@@ -40,19 +40,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private const string DefaultOutputDirectoryName = "TestResults";
 
         /// <summary>
-        /// Specifies whether the object is disposed or not. 
-        /// </summary>
-        private bool disposed;
-
-        /// <summary>
-        /// Job queue for moving file from source to destination.
-        /// </summary>
-        private JobQueue<AttachmentRequest> fileCopierJobQueue;
-
-        /// <summary>
         /// Logger for data collection messages
         /// </summary>
         private IMessageSink messageSink;
+
+        /// <summary>
+        /// Attachment transfer tasks.
+        /// </summary>
+        private List<Task> attachmentTasks;
 
         #endregion
 
@@ -63,15 +58,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         public DataCollectionAttachmentManager()
         {
-            this.AttachmentRequests = new List<AttachmentRequest>();
-
-            this.fileCopierJobQueue = new JobQueue<AttachmentRequest>(
-                this.OnAttachmentRequest,
-                "DataCollectionAttachmentManagerQueue",
-                MaxQueueLength,
-                MaxQueueSize,
-                true,
-                message => EqtTrace.Error(message));
+            this.attachmentTasks = new List<Task>();
+            this.AttachmentSets = new Dictionary<Uri, AttachmentSet>();
         }
 
         #endregion
@@ -84,10 +72,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         internal string SessionOutputDirectory { get; private set; }
 
         /// <summary>
-        /// Gets the list of attachment requests.
+        /// Gets the attachment sets for the session.
         /// </summary>
-        internal List<AttachmentRequest> AttachmentRequests { get; private set; }
-
+        internal Dictionary<Uri, AttachmentSet> AttachmentSets
+        {
+            get; private set;
+        }
         #endregion
 
         #region public methods
@@ -96,7 +86,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         public void Initialize(SessionId id, string outputDirectory, IMessageSink messageSink)
         {
             ValidateArg.NotNull(id, nameof(id));
-
             ValidateArg.NotNull(messageSink, nameof(messageSink));
 
             this.messageSink = messageSink;
@@ -124,51 +113,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <inheritdoc/>
         public List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext)
         {
-            var entries = new List<AttachmentSet>();
-
-            foreach (var attachmentRequest in this.AttachmentRequests)
-            {
-                attachmentRequest.WaitForCopyComplete();
-                if (attachmentRequest.Error != null)
-                {
-                    // If there was error in processing the request, lets log it.
-                    var testCaseId = dataCollectionContext.HasTestCase
-                                         ? dataCollectionContext.TestExecId.Id
-                                         : Guid.Empty;
-                    this.LogError(
-                        attachmentRequest.Error.Message,
-                        attachmentRequest.FileTransferInfo.Uri,
-                        attachmentRequest.FileTransferInfo.FriendlyName,
-                        testCaseId);
-                }
-                else
-                {
-                    // Create collectorDataEntry for each collected log.
-                    var entry =
-                        entries.FirstOrDefault(
-                            e => Uri.Equals(e.Uri, attachmentRequest.FileTransferInfo.Uri));
-                    if (entry == null)
-                    {
-                        entry = new AttachmentSet(
-                            attachmentRequest.FileTransferInfo.Uri,
-                            attachmentRequest.FileTransferInfo.FriendlyName);
-                        entries.Add(entry);
-                    }
-
-                    entry.Attachments.Add(
-                        new UriDataAttachment(
-                            new Uri(attachmentRequest.LocalFilePath),
-                            attachmentRequest.FileTransferInfo.Description));
-                }
-
-                attachmentRequest.Dispose();
-            }
-
-            return entries;
+            Task.WhenAll(this.attachmentTasks.ToArray()).Wait();
+            return this.AttachmentSets.Values.ToList();
         }
 
         /// <inheritdoc/>
-        public void AddAttachment(FileTransferInformationExtension fileTransferInfo)
+        public void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
         {
             ValidateArg.NotNull(fileTransferInfo, nameof(fileTransferInfo));
 
@@ -183,9 +133,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 return;
             }
 
+            if (!this.AttachmentSets.ContainsKey(uri))
+            {
+                this.AttachmentSets.Add(uri, new AttachmentSet(uri, friendlyName));
+            }
+
             if (fileTransferInfo != null)
             {
-                this.AddNewFileTransfer(fileTransferInfo);
+                this.AddNewFileTransfer(fileTransferInfo, sendFileCompletedCallback, uri, friendlyName);
             }
             else
             {
@@ -196,86 +151,47 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
         }
 
-        /// <summary>
-        /// Dispose event object
-        /// </summary>
+        /// <inheritdoc/>
         public void Dispose()
         {
-            // Dispose all attachment requests..
-            this.AttachmentRequests.ForEach(request => request.Dispose());
-            this.AttachmentRequests.Clear();
             this.SessionOutputDirectory = null;
-
-            this.Dispose(true);
-
-            // Use SupressFinalize in case a subclass
-            // of this type implements a finalizer.
-            GC.SuppressFinalize(this);
+            this.AttachmentSets.Clear();
+            this.attachmentTasks.Clear();
         }
 
         #endregion
 
-        /// <summary>
-        /// The dispose.
-        /// </summary>
-        /// <param name="disposing">
-        /// The disposing.
-        /// </param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.disposed)
-            {
-                if (disposing)
-                {
-                    this.fileCopierJobQueue?.Dispose();
-                }
-
-                this.disposed = true;
-            }
-        }
-
         #region private methods
-
-        /// <summary>
-        /// Mark the request as processed/completed. 
-        /// If any error occurred during processing, error information is also sent to copy request.
-        /// </summary>
-        /// <param name="attachmentRequest">
-        /// The file copy request.
-        /// </param>
-        /// <param name="e">
-        /// The e.
-        /// </param>
-        private static void CompleteFileTransfer(AttachmentRequest attachmentRequest, Exception e)
-        {
-            attachmentRequest.CompleteRequest(e);
-        }
 
         /// <summary>
         /// Sanity checks on CopyRequestData 
         /// </summary>
-        /// <param name="attachmentRequest">
-        /// The copy Request.
+        /// <param name="fileTransferInfo">
+        /// The file Transfer Info.
         /// </param>
-        private static void Validate(AttachmentRequest attachmentRequest)
+        /// <param name="localFilePath">
+        /// The local File Path.
+        /// </param>
+        private static void Validate(FileTransferInformation fileTransferInfo, string localFilePath)
         {
-            if (!File.Exists(attachmentRequest.FileTransferInfo.FileName))
+            if (!File.Exists(fileTransferInfo.FileName))
             {
                 throw new FileNotFoundException(
                     string.Format(
                         CultureInfo.CurrentCulture,
                         "Could not find source file '{0}'.",
-                        attachmentRequest.FileTransferInfo.FileName));
+                        fileTransferInfo.FileName));
             }
 
-            var directoryName = Path.GetDirectoryName(attachmentRequest.LocalFilePath);
+            var directoryName = Path.GetDirectoryName(localFilePath);
+
             if (!Directory.Exists(directoryName))
             {
                 Directory.CreateDirectory(directoryName);
             }
-            else if (File.Exists(attachmentRequest.LocalFilePath))
+            else if (File.Exists(localFilePath))
             {
-                File.Delete(attachmentRequest.LocalFilePath);
+                File.Delete(localFilePath);
             }
         }
 
@@ -285,141 +201,83 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="fileTransferInfo">
         /// The file Transfer Info.
         /// </param>
-        private void AddNewFileTransfer(FileTransferInformationExtension fileTransferInfo)
+        /// <param name="sendFileCompletedCallback">
+        /// The send File Completed Callback.
+        /// </param>
+        /// <param name="uri">
+        /// The uri.
+        /// </param>
+        /// <param name="friendlyName">
+        /// The friendly Name.
+        /// </param>
+        private void AddNewFileTransfer(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri uri, string friendlyName)
         {
             var context = fileTransferInfo.Context;
             Debug.Assert(
                 context != null,
                 "DataCollectionManager.AddNewFileTransfer: FileDataHeaderMessage with null context.");
 
-            AttachmentRequest requestCopy;
-            lock (this.AttachmentRequests)
-            {
-                requestCopy = new AttachmentRequest(this.SessionOutputDirectory, fileTransferInfo);
-                this.AttachmentRequests.Add(requestCopy);
-            }
+            var testCaseId = fileTransferInfo.Context.HasTestCase
+                                 ? fileTransferInfo.Context.TestExecId.Id.ToString()
+                                 : string.Empty;
 
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("DataCollectionAttachmentManager.AddNewFileTransfer: Enqueing for transfer.");
-            }
+            var directoryPath = Path.Combine(
+                this.SessionOutputDirectory,
+                testCaseId.ToString());
+            var localFilePath = Path.Combine(directoryPath, Path.GetFileName(fileTransferInfo.FileName));
 
-            this.fileCopierJobQueue.QueueJob(requestCopy, 0);
-        }
+            var task = new Task(() =>
+             {
+                 Validate(fileTransferInfo, localFilePath);
 
-        /// <summary>
-        /// Background job processor.
-        /// </summary>
-        /// <param name="attachmentReqeust">Copy request data.
-        /// </param>
-        private void OnAttachmentRequest(AttachmentRequest attachmentReqeust)
-        {
-            if (attachmentReqeust.FileTransferInfo.PerformCleanup)
-            {
-                this.MoveAttachment(attachmentReqeust);
-            }
-            else
-            {
-                this.CopyAttachment(attachmentReqeust);
-            }
-        }
+                 try
+                 {
+                     if (fileTransferInfo.PerformCleanup)
+                     {
+                         File.Move(fileTransferInfo.FileName, localFilePath);
+                     }
+                     else
+                     {
+                         File.Copy(fileTransferInfo.FileName, localFilePath);
+                     }
+                 }
+                 catch (Exception ex)
+                 {
+                     this.LogError(
+                        ex.Message,
+                        uri,
+                        friendlyName,
+                        Guid.Parse(testCaseId));
 
-        /// <summary>
-        /// Copy attachment.
-        /// </summary>
-        /// <param name="attachmentRequest">Copy request data.</param>
-        private void CopyAttachment(AttachmentRequest attachmentRequest)
-        {
-            Exception error = null;
-            try
-            {
-                Validate(attachmentRequest);
-                File.Copy(attachmentRequest.FileTransferInfo.FileName, attachmentRequest.LocalFilePath);
-            }
-            catch (Exception ex)
-            {
-                error = ex;
-            }
-            finally
-            {
-                // Let collector know of transfer completed if it has registered transferCompletedHandler.
-                this.TriggerCallback(
-                    attachmentRequest.FileTransferInfo.FileTransferCompletedHandler,
-                    attachmentRequest.FileTransferInfo.UserToken,
-                    error,
-                    attachmentRequest.FileTransferInfo.FileName);
-                CompleteFileTransfer(attachmentRequest, error);
-            }
-        }
+                     throw;
+                 }
+             });
 
-        /// <summary>
-        /// Make a callback indicating the file transfer is complete.
-        /// Needed when file copy is requested (as data collector might use requested file after transfer is complete).
-        /// </summary>
-        /// <param name="transferCompletedCallback">
-        /// The transfer completed callback.
-        /// </param>
-        /// <param name="userToken">
-        /// The user token.
-        /// </param>
-        /// <param name="exception">
-        /// The exception.
-        /// </param>
-        /// <param name="path">
-        /// The path.
-        /// </param>
-        private void TriggerCallback(
-            AsyncCompletedEventHandler transferCompletedCallback,
-            object userToken,
-            Exception exception,
-            string path)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(path), "null or empty path");
-            if (transferCompletedCallback != null)
-            {
-                try
-                {
-                    transferCompletedCallback(this, new AsyncCompletedEventArgs(exception, false, userToken));
-                }
-                catch (Exception e)
-                {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error(
-                            "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
-                            path,
-                            e.ToString());
-                    }
-                }
-            }
-        }
+            var continuationTask = task.ContinueWith((t) =>
+             {
+                 try
+                 {
+                     if (t.Exception == null)
+                     {
+                         this.AttachmentSets[uri].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
+                     }
 
-        /// <summary>
-        /// Move attachment.
-        /// </summary>
-        /// <param name="attachmentRequest">Attachment request</param>
-        private void MoveAttachment(AttachmentRequest attachmentRequest)
-        {
-            Exception error = null;
-            try
-            {
-                Validate(attachmentRequest);
-                File.Move(attachmentRequest.FileTransferInfo.FileName, attachmentRequest.LocalFilePath);
-            }
-            catch (Exception ex)
-            {
-                error = ex;
-            }
-            finally
-            {
-                // Let collector know of transfer completed if it has registered transferCompletedHandler.
-                this.TriggerCallback(
-                    attachmentRequest.FileTransferInfo.FileTransferCompletedHandler,
-                    attachmentRequest.FileTransferInfo.UserToken,
-                    error,
-                    attachmentRequest.FileTransferInfo.FileName);
-                CompleteFileTransfer(attachmentRequest, error);
-            }
+                     sendFileCompletedCallback(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
+                 }
+                 catch (Exception e)
+                 {
+                     if (EqtTrace.IsErrorEnabled)
+                     {
+                         EqtTrace.Error(
+                             "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
+                             localFilePath,
+                             e.ToString());
+                     }
+                 }
+             });
+
+            this.attachmentTasks.Add(task);
+            task.Start();
         }
 
         /// <summary>

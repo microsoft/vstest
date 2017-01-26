@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             this.dataCollectionSink.SendFileAsync(fileTransferInfo);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformationExtension>()), Times.Once());
+            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
         }
 
         [TestMethod]
@@ -103,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             this.dataCollectionSink.SendFileAsync(context, filename, false);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformationExtension>()), Times.Once());
+            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
         }
 
         [TestMethod]
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             this.dataCollectionSink.SendFileAsync(context, filename, string.Empty, false);
 
-            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformationExtension>()), Times.Once());
+            this.attachmentManager.Verify(x => x.AddAttachment(It.IsAny<FileTransferInformation>(), It.IsAny<AsyncCompletedEventHandler>(), It.IsAny<Uri>(), It.IsAny<string>()), Times.Once());
         }
 
         void SendFileCompleted_Handler(object sender, AsyncCompletedEventArgs e)
