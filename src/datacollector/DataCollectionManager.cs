@@ -194,9 +194,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 }
             }
 
-            // Dispose attachment manager.
-            this.attachmentManager.Dispose();
-
             return new Collection<AttachmentSet>(result);
         }
 
@@ -238,7 +235,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 if (disposing)
                 {
-                    this.attachmentManager.Dispose();
                 }
 
                 this.disposed = true;

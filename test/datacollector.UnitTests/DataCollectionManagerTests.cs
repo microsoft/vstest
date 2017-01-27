@@ -259,23 +259,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void SessionEndedShouldNotReturnAttachmentsIfInvokedTwice()
-        {
-            var runSettings = string.Format(defaultRunSettings, dataCollectorSettings);
-            CustomDataCollector.Attachfile = true;
-
-            this.dataCollectionManager.InitializeDataCollectors(runSettings);
-            this.dataCollectionManager.SessionStarted();
-
-            var result = this.dataCollectionManager.SessionEnded();
-
-            Assert.AreEqual(1, result.Count);
-
-            result = this.dataCollectionManager.SessionEnded();
-            Assert.AreEqual(0, result.Count);
-        }
-
-        [TestMethod]
         public void SessionEndedShouldNotReturnAttachmentsIfExceptionIsThrownWhileGettingAttachments()
         {
             string runSettings = string.Format(defaultRunSettings, dataCollectorSettings);

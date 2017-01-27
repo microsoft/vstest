@@ -151,14 +151,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
         }
 
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            this.SessionOutputDirectory = null;
-            this.AttachmentSets.Clear();
-            this.attachmentTasks.Clear();
-        }
-
         #endregion
 
         #region private methods
@@ -277,6 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
              });
 
             this.attachmentTasks.Add(task);
+            this.attachmentTasks.Add(continuationTask);
             task.Start();
         }
 

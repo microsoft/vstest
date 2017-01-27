@@ -190,28 +190,5 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             var result = this.attachmentManager.GetAttachments(datacollectioncontext);
             Assert.AreEqual(0, result.Count);
         }
-
-        [TestMethod]
-        public void DisposeShouldDisposeAllResources()
-        {
-            var filename = "filename1.txt";
-            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
-
-            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
-
-            var datacollectioncontext = new DataCollectionContext(this.sessionId);
-            var friendlyName = "TestDataCollector";
-            var uri = new Uri("datacollector://Company/Product/Version");
-
-            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), true);
-
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
-
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
-
-            this.attachmentManager.Dispose();
-            Assert.AreEqual(0, this.attachmentManager.AttachmentSets.Count);
-            Assert.IsNull(this.attachmentManager.SessionOutputDirectory);
-        }
     }
 }

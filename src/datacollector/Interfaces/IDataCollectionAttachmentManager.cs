@@ -55,10 +55,5 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
         /// The friendly Name.
         /// </param>
         void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri typeUri, string friendlyName);
-
-        /// <summary>
-        /// Dispose the resources.
-        /// </summary>
-        void Dispose();
     }
 }
