@@ -3,13 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
-    using System.Collections.Generic;
-    using System.Text;
+
     using Microsoft.VisualStudio.TestPlatform.DataCollector;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class TestPlatformDataCollectionEventsTests
@@ -20,10 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
         private bool isEventRaised;
 
-        [TestInitialize]
-        public void Init()
+        public TestPlatformDataCollectionEventsTests()
         {
-            events = new TestPlatformDataCollectionEvents();
+            this.events = new TestPlatformDataCollectionEvents();
         }
 
         [TestMethod]

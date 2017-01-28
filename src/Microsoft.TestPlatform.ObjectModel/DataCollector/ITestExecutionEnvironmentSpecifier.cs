@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector
     /// Interface for data collectors add-ins that choose to specify some information about how the test execution environment
     /// should be set up
     /// </summary>
-    internal interface ITestExecutionEnvironmentSpecifier
+    public interface ITestExecutionEnvironmentSpecifier
     {
         /// <summary>
         /// Gets environment variables that should be set in the test execution environment

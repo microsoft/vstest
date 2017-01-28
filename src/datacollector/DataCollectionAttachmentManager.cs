@@ -25,16 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         #region Fields
 
         /// <summary>
-        /// Max number of file transfer jobs.
-        /// </summary>
-        private const int MaxQueueLength = 500;
-
-        /// <summary>
-        /// Max queue size
-        /// </summary>
-        private const int MaxQueueSize = 25000000;
-
-        /// <summary>
         /// Default results directory to be used when user didn't specify.
         /// </summary>
         private const string DefaultOutputDirectoryName = "TestResults";
@@ -92,8 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             if (string.IsNullOrEmpty(outputDirectory))
             {
-                this.SessionOutputDirectory = Path.Combine(Path.GetTempPath(), DefaultOutputDirectoryName);
-                this.SessionOutputDirectory = Path.Combine(this.SessionOutputDirectory, id.Id.ToString());
+                this.SessionOutputDirectory = Path.Combine(Path.GetTempPath(), DefaultOutputDirectoryName, id.Id.ToString());
             }
             else
             {
@@ -215,9 +204,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             var directoryPath = Path.Combine(
                 this.SessionOutputDirectory,
-                testCaseId.ToString());
+                testCaseId);
             var localFilePath = Path.Combine(directoryPath, Path.GetFileName(fileTransferInfo.FileName));
 
+            // todo : add cancellation token.
             var task = new Task(() =>
              {
                  Validate(fileTransferInfo, localFilePath);
@@ -226,11 +216,31 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                  {
                      if (fileTransferInfo.PerformCleanup)
                      {
+                         if (EqtTrace.IsInfoEnabled)
+                         {
+                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                         }
+
                          File.Move(fileTransferInfo.FileName, localFilePath);
+
+                         if (EqtTrace.IsInfoEnabled)
+                         {
+                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moved file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                         }
                      }
                      else
                      {
+                         if (EqtTrace.IsInfoEnabled)
+                         {
+                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                         }
+
                          File.Copy(fileTransferInfo.FileName, localFilePath);
+
+                         if (EqtTrace.IsInfoEnabled)
+                         {
+                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copied file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                         }
                      }
                  }
                  catch (Exception ex)

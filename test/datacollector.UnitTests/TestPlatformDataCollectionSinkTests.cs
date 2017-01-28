@@ -25,8 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
         private bool isEventHandlerInvoked = false;
 
-        [TestInitialize]
-        public void Init()
+        public TestPlatformDataCollectionSinkTests()
         {
             this.attachmentManager = new Mock<IDataCollectionAttachmentManager>();
             this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));

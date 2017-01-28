@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             // If any attribute constructor on the type throws, the exception will bubble up through
             // the "GetCustomAttributes" method.
-            return dataCollectorType.GetTypeInfo().GetCustomAttributes(attributeType, false).ToArray<object>();
+            return dataCollectorType.GetTypeInfo().GetCustomAttributes(attributeType, true).ToArray<object>();
         }
     }
 }

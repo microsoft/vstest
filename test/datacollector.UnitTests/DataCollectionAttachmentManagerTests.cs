@@ -22,9 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         private Mock<IMessageSink> messageSink;
         private SessionId sessionId;
 
-
-        [TestInitialize]
-        public void Init()
+        public DataCollectionAttachmentManagerTests()
         {
             this.attachmentManager = new DataCollectionAttachmentManager();
             this.messageSink = new Mock<IMessageSink>();

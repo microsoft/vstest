@@ -20,14 +20,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         private DataCollectorConfig dataCollectorConfig;
         private DataCollectionContext context;
 
-        [TestInitialize]
-        public void Init()
+        public TestPlatformDataCollectionLoggerTests()
         {
             this.messageSink = new Mock<IMessageSink>();
             this.dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollector));
             this.logger = new TestPlatformDataCollectionLogger(this.messageSink.Object, this.dataCollectorConfig);
 
-            Guid guid = Guid.NewGuid();
+            var guid = Guid.NewGuid();
             var sessionId = new SessionId(guid);
             this.context = new DataCollectionContext(sessionId);
         }

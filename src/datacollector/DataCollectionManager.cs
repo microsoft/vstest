@@ -11,9 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.IO;
     using System.Linq;
     using System.Reflection;
-#if !NET46
-    using System.Runtime.Loader;
-#endif
+
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -62,9 +60,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private bool disposed;
 
         /// <summary>
+        /// Loads datacollector.
+        /// </summary>
+        private IDataCollectorLoader dataCollectorLoader;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
-        internal DataCollectionManager() : this(new DataCollectionAttachmentManager(), new MessageSink())
+        internal DataCollectionManager() : this(new DataCollectionAttachmentManager(), new MessageSink(), new DataCollectorLoader())
         {
         }
 
@@ -77,10 +80,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink)
+        /// <param name="dataCollectorLoader">
+        /// The data Collector Loader.
+        /// </param>
+        internal DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader)
         {
             this.attachmentManager = datacollectionAttachmentManager;
             this.messageSink = messageSink;
+            this.dataCollectorLoader = dataCollectorLoader;
             this.events = new TestPlatformDataCollectionEvents();
 
             this.RunDataCollectors = new Dictionary<Type, DataCollectorInformation>();
@@ -244,118 +251,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         #region Load and Initialize DataCollectors
 
         /// <summary>
-        /// Helper method that gets the datacollector config.
-        /// </summary>
-        /// <param name="collectorTypeName">
-        /// Type name of the collector
-        /// </param>
-        /// <param name="codebase">
-        /// The codebase.
-        /// </param>
-        /// <returns>
-        /// Type of the collector type name
-        /// </returns>
-        private static DataCollectorConfig GetDataCollectorConfig(string collectorTypeName, string codebase)
-        {
-            try
-            {
-                DataCollectorConfig dataCollectorConfig = null;
-                var dataCollectorType = GetDataCollectorType(codebase, collectorTypeName, out var assembly);
-
-                dataCollectorConfig = new DataCollectorConfig(dataCollectorType);
-
-                return dataCollectorConfig;
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("DataCollectionManager.GetDataCollectorConfig: Failed to get type for Collector '{0}': {1}", collectorTypeName, ex);
-                }
-
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Helper method that gets the Type and Assembly from datacollector type name and binary path.
-        /// </summary>
-        /// <param name="binaryPath">
-        /// The binary path.
-        /// </param>
-        /// <param name="dataCollectorTypeName">
-        /// The collector type name.
-        /// </param>
-        /// <param name="assembly">
-        /// The assembly.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Type"/>.
-        /// </returns>
-        private static Type GetDataCollectorType(string binaryPath, string dataCollectorTypeName, out Assembly assembly)
-        {
-            assembly = null;
-            Type dctype = null;
-            if (File.Exists(binaryPath))
-            {
-                assembly = LoadAssemblyFromPath(binaryPath);
-            }
-
-            dctype = assembly?.GetTypes().FirstOrDefault(type => type.AssemblyQualifiedName != null && type.AssemblyQualifiedName.Equals(dataCollectorTypeName));
-
-            return dctype;
-        }
-
-        /// <summary>
-        /// Helper method to load assembly from path.
-        /// </summary>
-        /// <param name="assemblyPath">
-        /// The assembly path.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Assembly"/>.
-        /// </returns>
-        private static Assembly LoadAssemblyFromPath(string assemblyPath)
-        {
-#if NET46
-            return Assembly.LoadFrom(assemblyPath);
-#else
-            return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
-        }
-
-        /// <summary>
-        /// Creates an instance of datacollector of given type.
-        /// </summary>
-        /// <param name="dataCollectorType">type of collector plugin to instantiate.</param>
-        /// <returns>The dataCollector.</returns>
-        private static DataCollector CreateDataCollector(Type dataCollectorType)
-        {
-            if (EqtTrace.IsInfoEnabled)
-            {
-                EqtTrace.Info("DataCollectionManager.CreateDataCollector: Attempting to load data collector: " + dataCollectorType);
-            }
-
-            try
-            {
-                var rawPlugin = Activator.CreateInstance(dataCollectorType);
-
-                // Check if this is a data collector.
-                var dataCollector = rawPlugin as DataCollector;
-                return dataCollector;
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("DataCollectionManager.CreateDataCollector: Could not create instance of type: " + dataCollectorType + "  Exception: " + ex.Message);
-                }
-
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Loads and initializes datacollector using datacollector settings.
         /// </summary>
         /// <param name="dataCollectorSettings">
@@ -364,39 +259,29 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
         {
             var collectorTypeName = dataCollectorSettings.AssemblyQualifiedName;
-            var collectorDisplayName = string.IsNullOrWhiteSpace(dataCollectorSettings.FriendlyName) ? collectorTypeName : dataCollectorSettings.FriendlyName;
             DataCollectorInformation dataCollectorInfo;
             DataCollectorConfig dataCollectorConfig;
 
             try
             {
-                dataCollectorConfig = GetDataCollectorConfig(collectorTypeName, dataCollectorSettings.CodeBase);
-            }
-            catch (FileNotFoundException)
-            {
-                this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorAssemblyNotFound, collectorDisplayName));
-                return;
-            }
-            catch (Exception ex)
-            {
-                this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorTypeNotFound, collectorDisplayName, ex.Message));
-                return;
-            }
+                var dataCollector = this.dataCollectorLoader.Load(dataCollectorSettings.CodeBase, dataCollectorSettings.AssemblyQualifiedName);
 
-            if (this.RunDataCollectors.ContainsKey(dataCollectorConfig.DataCollectorType))
-            {
-                // Collector is already loaded (may be configured twice). Ignore duplicates and return.
-                return;
-            }
+                if (dataCollector == null)
+                {
+                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, collectorTypeName, string.Empty));
+                    return;
+                }
 
-            try
-            {
-                var dataCollector = CreateDataCollector(dataCollectorConfig.DataCollectorType);
+                if (this.RunDataCollectors.ContainsKey(dataCollector.GetType()))
+                {
+                    // Collector is already loaded (may be configured twice). Ignore duplicates and return.
+                    return;
+                }
+
+                dataCollectorConfig = new DataCollectorConfig(dataCollector.GetType());
 
                 // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
-                dataCollectorInfo = dataCollectorConfig == null
-                                                ? null
-                                                : new DataCollectorInformation(
+                dataCollectorInfo = new DataCollectorInformation(
                                                     dataCollector,
                                                     dataCollectorSettings.Configuration,
                                                     dataCollectorConfig,
@@ -405,7 +290,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                                                     this.events,
                                                     this.messageSink);
 
-                if (dataCollectorInfo == null || !dataCollectorInfo.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
+                if (!dataCollectorInfo.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
                 {
                     // If the data collector was not found, send an error.
                     this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.Uri));
@@ -445,7 +330,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
                 // Dispose datacollector.
                 dataCollectorInfo.DisposeDataCollector();
-                return;
             }
         }
 

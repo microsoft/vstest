@@ -3,25 +3,35 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using Moq.Protected;
 
     [TestClass]
-    public class dataCollectorInfoTests
+    public class DataCollectorInformationTests
     {
         private DataCollectorInformation dataCollectorInfo;
 
-        [TestInitialize]
-        public void Init()
+        private List<KeyValuePair<string, string>> envVarList;
+
+        private Mock<DataCollector2> mockDataCollector;
+
+        public DataCollectorInformationTests()
         {
+            this.envVarList = new List<KeyValuePair<string, string>>();
+            this.mockDataCollector = new Mock<DataCollector2>();
+            this.mockDataCollector.As<ITestExecutionEnvironmentSpecifier>().Setup(x => x.GetTestExecutionEnvironmentVariables()).Returns(this.envVarList);
+            this.mockDataCollector.Protected().Setup("Dispose", true);
             var mockMessageSink = new Mock<IMessageSink>();
             this.dataCollectorInfo = new DataCollectorInformation(
-                new CustomDataCollector(),
+                this.mockDataCollector.Object,
                 null,
                 new DataCollectorConfig(typeof(CustomDataCollector)),
                 null,
@@ -33,13 +43,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorShouldInitializeDataCollector()
         {
-            var envVarList = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("key", "value") };
-            CustomDataCollector.EnvVarList = envVarList;
+            this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
 
             this.dataCollectorInfo.InitializeDataCollector();
 
-            Assert.IsTrue(CustomDataCollector.IsInitialized);
-            Assert.AreEqual(envVarList.First().Key, this.dataCollectorInfo.TestExecutionEnvironmentVariables.First().Key);
+            CollectionAssert.AreEqual(this.envVarList, this.dataCollectorInfo.TestExecutionEnvironmentVariables.ToList());
         }
 
         [TestMethod]
@@ -48,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             this.dataCollectorInfo.InitializeDataCollector();
             this.dataCollectorInfo.DisposeDataCollector();
 
-            Assert.IsTrue(CustomDataCollector.IsDisposeInvoked);
+            this.mockDataCollector.Protected().Verify("Dispose", Times.Once(), true);
         }
     }
 }
