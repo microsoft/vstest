@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 testCaseId);
             var localFilePath = Path.Combine(directoryPath, Path.GetFileName(fileTransferInfo.FileName));
 
-            // todo : add cancellation token.
+            // todo : add cancellation token for cancelling file operations test run is cancelled or there is a crash.
             var task = new Task(() =>
              {
                  Validate(fileTransferInfo, localFilePath);

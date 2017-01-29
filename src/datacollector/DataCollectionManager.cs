@@ -109,6 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
             this.attachmentManager.Initialize(sessionId, sourceDirectory, this.messageSink);
 
+            // Enviornment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
+            // Therefore, using StringComparer.OrdinalIgnoreCase so that same keys with different cases are treated as same.
             var executionEnvironmentVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
@@ -164,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             // Return null if datacollection is not enabled.
             if (!this.isDataCollectionEnabled)
             {
-                return null;
+                return new Collection<AttachmentSet>();
             }
 
             var endEvent = new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext);

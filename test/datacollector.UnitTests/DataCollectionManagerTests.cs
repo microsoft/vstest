@@ -251,14 +251,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void SessionEndedShouldReturnNullIfDataCollectionIsNotEnabled()
+        public void SessionEndedShouldReturnEmptyCollectionIfDataCollectionIsNotEnabled()
         {
             var runSettings = string.Format(this.defaultRunSettings, string.Empty);
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 
             var result = this.dataCollectionManager.SessionEnded();
 
-            Assert.IsNull(result);
+            Assert.AreEqual(0, result.Count);
         }
 
         [TestMethod]
