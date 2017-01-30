@@ -4,7 +4,7 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
     <TestPlatformPackageDir>$(TestPlatformRoot)packages\</TestPlatformPackageDir>
   </PropertyGroup>
-  <!-- hack for bug https://github.com/Microsoft/msbuild/issues/1400#issuecomment-268179321 -->		
+  <!-- hack for bug https://github.com/Microsoft/msbuild/issues/1400#issuecomment-268179321 -->
   <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.SDK\Sdk\Sdk.targets" />
   
   <ItemGroup>
