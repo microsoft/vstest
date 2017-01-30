@@ -101,6 +101,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <inheritdoc/>
         public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
         {
+            if (string.IsNullOrEmpty(settingsXml) && EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("DataCollectionManager.InitializeDataCollectors : Runsettings is null or empty.");
+            }
+
             ValidateArg.NotNull(settingsXml, "settingsXml");
 
             var sessionId = new SessionId(Guid.NewGuid());
