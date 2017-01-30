@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Defines contract to send test platform requests to test host
@@ -36,12 +37,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary> 
         /// <param name="settingXml"></param>
         /// <returns>BeforeTestRunStartResult containing environment variables</returns>
-        BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml);
+        BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, ITestMessageEventHandler runEventsHandler);
 
         /// <summary>
         /// Sends the AfterTestRunStart event and waits for result
         /// </summary>
         /// <returns>DataCollector attachments</returns>
-        Collection<AttachmentSet> SendAfterTestRunStartAndGetResult();
+        Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler runEventsHandler);
     }
 }

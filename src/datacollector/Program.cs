@@ -32,6 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </param>
         public static void Main(string[] args)
         {
+            System.Diagnostics.Debugger.Launch();
             try
             {
                 ParseArgs(args);
@@ -72,7 +73,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         private static void Run()
         {
-            var requestHandler = new DataCollectionRequestHandler();
+            var requestHandler = new DataCollectionRequestHandler(new MessageSink());
+            DataCollectionRequestHandler.RequestHandler = requestHandler;
+
             requestHandler.InitializeCommunication(port);
 
             // Wait for the connection to the sender and start processing requests from sender

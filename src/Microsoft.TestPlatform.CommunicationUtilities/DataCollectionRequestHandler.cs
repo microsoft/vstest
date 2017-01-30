@@ -13,6 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 
     /// <summary>
     /// The data collection request handler interface.
@@ -21,13 +23,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     {
         private readonly ICommunicationManager communicationManager;
         private IDataSerializer dataSerializer;
+        private IMessageSink messageSink;
+        private IDataCollectionManager dataCollectionManager;
 
-        private static DataCollectionRequestHandler RequestHandler;
+        internal static DataCollectionRequestHandler RequestHandler;
         private static readonly object obj = new object();
 
-        internal DataCollectionRequestHandler()
+        internal DataCollectionRequestHandler(IMessageSink messageSink)
             : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
+            this.messageSink = messageSink;
         }
 
         /// <summary>
@@ -54,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 {
                     if (RequestHandler == null)
                     {
-                        RequestHandler = new DataCollectionRequestHandler();
+                        RequestHandler = new DataCollectionRequestHandler(null);
                     }
                     return RequestHandler;
                 }
@@ -104,13 +109,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 {
                     case MessageType.BeforeTestRunStart:
                         // TODO: Send actual BeforeTestRunStartResult
-                        // string settingXml = message.Payload.ToObject<string>();
-                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(null, true, 0));
+                        string settingXml = message.Payload.ToObject<string>();
+                        this.dataCollectionManager = new DataCollectionManager(this.messageSink);
+                        var envVariables = this.dataCollectionManager.InitializeDataCollectors(settingXml);
+                        this.dataCollectionManager.SessionStarted();
+
+                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, true, 0));
                         break;
 
                     case MessageType.AfterTestRunEnd:
-                        // TODO: Send actual collection of AttachmentSet
-                        this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, new Collection<AttachmentSet>());
+                        var attachments = this.dataCollectionManager.SessionEnded();
+
+                        this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachments);
                         EqtTrace.Info("Session End message received from server. Closing the connection.");
 
                         // TODO: Check if we need a separate message for closing the session.

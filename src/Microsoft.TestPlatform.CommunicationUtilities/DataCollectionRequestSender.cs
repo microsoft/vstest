@@ -11,6 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// Utility class that facilitates the IPC comunication. Acts as server.
@@ -81,32 +83,62 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// Sends the BeforeTestRunStart event and waits for result
         /// </summary>
         /// <returns>BeforeTestRunStartResult containing environment variables</returns>
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml)
+        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler)
         {
+            bool isDataCollectionStarted = false;
+            BeforeTestRunStartResult result = null;
+
             this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, settingsXml);
-            var message = this.communicationManager.ReceiveMessage();
-            if (message.MessageType == MessageType.BeforeTestRunStartResult)
+
+            while (!isDataCollectionStarted)
             {
-                return dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
+                var message = this.communicationManager.ReceiveMessage();
+
+                if (message.MessageType == MessageType.DataCollectionMessage)
+                {
+                    var msg = dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    runEventsHandler.HandleLogMessage(msg.Level, msg.Message);
+                }
+                else if (message.MessageType == MessageType.BeforeTestRunStartResult)
+                {
+                    isDataCollectionStarted = true;
+                    result = dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
+                }
             }
 
-            return null;
+            return result;
         }
 
         /// <summary>
         /// Sends the AfterTestRunStart event and waits for result
         /// </summary>
         /// <returns>DataCollector attachments</returns>
-        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult()
+        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler runEventsHandler)
         {
-            this.communicationManager.SendMessage(MessageType.BeforeTestRunStart);
-            var message = this.communicationManager.ReceiveMessage();
-            if (message.MessageType == MessageType.BeforeTestRunStartResult)
+            var isDataCollectionComplete = false;
+            Collection<AttachmentSet> attachmentSets = null;
+
+            this.communicationManager.SendMessage(MessageType.AfterTestRunEnd);
+
+            // Cycle through the messages that the datacollector sends. 
+            // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
+            while (!isDataCollectionComplete)
             {
-                return dataSerializer.DeserializePayload<Collection<AttachmentSet>>(message);
+                var message = this.communicationManager.ReceiveMessage();
+
+                if (message.MessageType == MessageType.DataCollectionMessage)
+                {
+                    var msg = dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    runEventsHandler.HandleLogMessage(msg.Level, msg.Message);
+                }
+                else if (message.MessageType == MessageType.AfterTestRunEndResult)
+                {
+                    attachmentSets = dataSerializer.DeserializePayload<Collection<AttachmentSet>>(message);
+                    isDataCollectionComplete = true;
+                }
             }
 
-            return null;
+            return attachmentSets;
         }
     }
 }

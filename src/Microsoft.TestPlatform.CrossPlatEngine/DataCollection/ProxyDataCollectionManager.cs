@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.InvokeDataCollectionServiceAction(
            () =>
            {
-               attachmentSet = this.dataCollectionRequestSender.SendAfterTestRunStartAndGetResult();
+               attachmentSet = this.dataCollectionRequestSender.SendAfterTestRunStartAndGetResult(runEventsHandler);
            },
                 runEventsHandler);
             return attachmentSet;
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.InvokeDataCollectionServiceAction(
             () =>
             {
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(settingsXml);
+                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(settingsXml, runEventsHandler);
                 areTestCaseLevelEventsRequired = result.AreTestCaseLevelEventsRequired;
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;

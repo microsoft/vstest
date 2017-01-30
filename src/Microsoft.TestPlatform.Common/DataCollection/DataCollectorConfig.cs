@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System;
     using System.Diagnostics;
@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// The data collector config.

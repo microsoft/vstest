@@ -1,6 +1,6 @@
 ﻿
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
 {
     using System;
     using System.Collections.Generic;
