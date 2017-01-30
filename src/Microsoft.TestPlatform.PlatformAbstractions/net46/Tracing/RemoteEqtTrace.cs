@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-#if NET46
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -20,12 +19,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return EqtTrace.TraceLevel;
+                return PlatformEqtTrace.TraceLevel;
             }
 
             set
             {
-                EqtTrace.TraceLevel = value;
+                PlatformEqtTrace.TraceLevel = value;
             }
         }
 
@@ -36,8 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Used in remote objects.")]
         internal void SetupRemoteListeners(TraceListener listener)
         {
-            EqtTrace.SetupRemoteListeners(listener);
+            PlatformEqtTrace.SetupRemoteListeners(listener);
         }
     }
-#endif
 }

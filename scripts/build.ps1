@@ -252,6 +252,22 @@ function Publish-Package
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Patch-Publish-Package
+{
+    $timer = Start-Timer
+    Write-Log "Publish-Package: Started."
+    $dotnetExe = Get-DotNetPath
+    $fullCLRPackageDir = Get-FullCLRPackageDirectory
+    $coreCLRPackageDir = Get-CoreCLRPackageDirectory
+	
+	$platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
+	$platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
+	$platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
+	
+	Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
+	Copy-Item $platformAbstractionNetCore\* $coreCLRPackageDir -Force
+}
+
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
@@ -461,6 +477,7 @@ Restore-Package
 #Update-LocalizedResources
 Invoke-Build
 Publish-Package
+Patch-Publish-Package
 Create-VsixPackage
 Create-NugetPackages
 
