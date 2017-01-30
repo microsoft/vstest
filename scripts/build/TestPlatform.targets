@@ -6,7 +6,7 @@
   </PropertyGroup>
   <!-- hack for bug https://github.com/Microsoft/msbuild/issues/1400#issuecomment-268179321 -->
   <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets" /> 
-
+  
   <ItemGroup>
     <ResxLang Include="cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant" />
   </ItemGroup>
