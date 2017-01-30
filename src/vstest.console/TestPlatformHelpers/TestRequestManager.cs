@@ -225,8 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             lock (syncobject)
             {
                 bool success = true;
-                ITestRunRequest testRunRequest = null;
-                using (testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria))
+                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria))
                 {
                     this.currentTestRunRequest = testRunRequest;
                     this.runRequestCreatedEventHandle.Set();
