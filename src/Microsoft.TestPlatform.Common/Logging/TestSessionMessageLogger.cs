@@ -67,8 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 throw new ArgumentException(ObjectModelCommonResources.CannotBeNullOrEmpty, "message");
             }
 
-            if (this.TreatTestAdapterErrorsAsWarnings
-                    && testMessageLevel == TestMessageLevel.Error)
+            if (this.TreatTestAdapterErrorsAsWarnings && testMessageLevel == TestMessageLevel.Error)
             {
                 // Downgrade the message severity to Warning...
                 testMessageLevel = TestMessageLevel.Warning;
