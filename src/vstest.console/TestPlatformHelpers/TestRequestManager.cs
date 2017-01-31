@@ -69,10 +69,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
 
-            // TODO: Is this required for design mode
-            // Add console logger as a listener to logger events.
-            var consoleLogger = new ConsoleLogger();
-            consoleLogger.Initialize(this.testLoggerManager.LoggerEvents, null);
+            if (!this.commandLineOptions.IsDesignMode)
+            {
+                var consoleLogger = new ConsoleLogger();
+                consoleLogger.Initialize(this.testLoggerManager.LoggerEvents, null);
+            }
         }
 
         #endregion
