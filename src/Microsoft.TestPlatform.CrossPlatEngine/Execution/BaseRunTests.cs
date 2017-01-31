@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
@@ -30,8 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using System.Reflection;
 #if NET46
     using System.Configuration;
 #endif
@@ -499,24 +498,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
 #if NET46
         /// <summary>
-        /// Gets the apartmentState and sets the same on the thread that could execute tests.
+        /// Gets the apartmentState and sets the same on the thread that executes tests.
         /// </summary>
-        /// <param name="executionThread"></param>
         private static ApartmentState GetApartmentStateAppSetting()
         {
             // Tests must be STA by default as customers who run UI tests, OLE tests are impacted otherwise - compat
-            ApartmentState apartmentState = ApartmentState.STA;
-            string userConfigureApartmentState = ConfigurationManager.AppSettings[ExecutionThreadApartmentStateKey];
-            Type apartmentStateType = typeof(ApartmentState);
-            if (userConfigureApartmentState != null)
-            {
-                FieldInfo fInfo = apartmentStateType.GetField(userConfigureApartmentState);
-                if (fInfo != null)
-                {
-                    apartmentState = (ApartmentState)fInfo.GetValue(apartmentStateType);
-                }
-            }
-            return apartmentState;
+            ApartmentState userApartmentState;
+            string userConfiguredApartmentState = ConfigurationManager.AppSettings[ExecutionThreadApartmentStateKey];
+
+            return  !string.IsNullOrWhiteSpace(userConfiguredApartmentState) && Enum.TryParse(userConfiguredApartmentState, out userApartmentState)
+                ? userApartmentState : ApartmentState.STA;
         }
 #endif
 
