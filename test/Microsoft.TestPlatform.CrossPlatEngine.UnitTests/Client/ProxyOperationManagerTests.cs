@@ -39,6 +39,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
         }
 
+        [TestInitialize]
+        public void Init()
+        {
+            this.mockTestHostManager.Setup(m =>
+                            m.GetTestHostProcessStartInfo(It.IsAny<IEnumerable<string>>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<TestRunnerConnectionInfo>()))
+                .Returns(new TestProcessStartInfo());
+        }
+
         [TestMethod]
         public void SetupChannelShouldLaunchTestHost()
         {
@@ -127,6 +137,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(false);
 
             Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(Enumerable.Empty<string>()));
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldAddExitCallbackToTestHostStartInfo()
+        {
+            TestProcessStartInfo startInfo = null;
+            this.mockTestHostManager.Setup(m => m.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
+                .Callback<TestProcessStartInfo>(
+                    (s) => { startInfo = s; });
+
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            Assert.IsNotNull(startInfo);
         }
 
         [TestMethod]
