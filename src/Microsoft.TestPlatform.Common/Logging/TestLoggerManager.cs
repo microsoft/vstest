@@ -129,6 +129,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         #region Public Methods
 
+        public void AddLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
+        {
+            this.CheckDisposed();
+
+            // If the logger has already been initialized just return.
+            if (this.initializedLoggers.Contains(extensionUri, StringComparer.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            this.initializedLoggers.Add(extensionUri);
+            InitializeLogger(logger, extensionUri, parameters);
+        }
+
         /// <summary>
         /// Adds the logger with the specified URI and parameters.
         /// For ex. TfsPublisher takes parameters such as  Platform, Flavor etc.
@@ -153,37 +166,40 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             var extensionManager = this.testLoggerExtensionManager;
             var logger = extensionManager.TryGetTestExtension(uri.AbsoluteUri);
 
-            if (logger != null)
-            {
-                try
-                {
-                    if (logger.Value is ITestLoggerWithParameters)
-                    {
-                        ((ITestLoggerWithParameters)logger.Value).Initialize(this.loggerEvents, this.UpdateLoggerParamters(parameters));
-                    }
-                    else
-                    {
-                        ((ITestLogger)logger.Value).Initialize(this.loggerEvents, this.GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
-                    }
-                }
-                catch (Exception e)
-                {
-                    this.messageLogger.SendMessage(
-                        TestMessageLevel.Error,
-                        string.Format(
-                            CultureInfo.CurrentUICulture,
-                            CommonResources.LoggerInitializationError,
-                            logger.Metadata.ExtensionUri,
-                            e));
-                }
-            }
-            else
+            if (logger == null)
             {
                 throw new InvalidOperationException(
                     String.Format(
                         CultureInfo.CurrentUICulture,
                         CommonResources.LoggerNotFound,
                         uri.OriginalString));
+            }
+
+            InitializeLogger(logger.Value, logger.Metadata.ExtensionUri, parameters);
+        }
+
+        private void InitializeLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
+        {
+            try
+            {
+                if (logger is ITestLoggerWithParameters)
+                {
+                    ((ITestLoggerWithParameters)logger).Initialize(this.loggerEvents, this.UpdateLoggerParameters(parameters));
+                }
+                else
+                {
+                    ((ITestLogger)logger).Initialize(this.loggerEvents, this.GetResultsDirectory(RunSettingsManager.Instance.ActiveRunSettings));
+                }
+            }
+            catch (Exception e)
+            {
+                this.messageLogger.SendMessage(
+                    TestMessageLevel.Error,
+                    string.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommonResources.LoggerInitializationError,
+                        extensionUri,
+                        e));
             }
         }
 

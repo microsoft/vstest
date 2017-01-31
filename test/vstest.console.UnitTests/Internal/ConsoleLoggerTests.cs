@@ -51,14 +51,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                this.consoleLogger.Initialize(null, null);
+                this.consoleLogger.Initialize(null, string.Empty);
             });
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowExceptionIfEventsIsNotNull()
         {
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, null);
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, string.Empty);
         }
 
         [TestMethod]
@@ -252,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput = new Mock<IOutput>();
 
             this.consoleLogger = new ConsoleLogger(this.mockOutput.Object);
-            this.consoleLogger.Initialize(this.events.Object, null);
+            this.consoleLogger.Initialize(this.events.Object, string.Empty);
 
             DummyTestLoggerManager.Cleanup();
 
