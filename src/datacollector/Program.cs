@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -32,7 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </param>
         public static void Main(string[] args)
         {
-            System.Diagnostics.Debugger.Launch();
             try
             {
                 ParseArgs(args);

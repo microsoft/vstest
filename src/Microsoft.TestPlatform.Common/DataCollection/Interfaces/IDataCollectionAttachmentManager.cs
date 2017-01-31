@@ -1,4 +1,5 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
 {
@@ -34,10 +35,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <param name="dataCollectionContext">
         /// The data collection context.
         /// </param>
+        /// <param name="isCancelled">
+        /// Value specifying whether the test run is cancelled or not.
+        /// </param>
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
-        List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext);
+        List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext, bool isCancelled = false);
 
         /// <summary>
         /// Adds new attachment to current context

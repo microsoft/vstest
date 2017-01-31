@@ -133,7 +133,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             return 1;
         }
 
-        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult()
+        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler handler, bool isCancelled)
         {
             if (sendAfterTestRunStartAndGetResultThrowException)
             {
@@ -144,7 +144,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             return Attachments;
         }
 
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml)
+        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, ITestMessageEventHandler handler)
         {
             if (this.sendBeforeTestRunStartAndGetResultThrowException)
             {

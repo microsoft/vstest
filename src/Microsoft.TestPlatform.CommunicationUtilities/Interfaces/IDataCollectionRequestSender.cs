@@ -5,8 +5,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 {
     using System.Collections.ObjectModel;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
@@ -34,15 +34,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
         /// <summary>
         /// Sends the BeforeTestRunStart event and waits for result
-        /// </summary> 
-        /// <param name="settingXml"></param>
-        /// <returns>BeforeTestRunStartResult containing environment variables</returns>
+        /// </summary>
+        /// <param name="settingXml">
+        /// Run settings for test run.
+        /// </param>
+        /// <param name="runEventsHandler">
+        /// Test message event handler for handling messages.
+        /// </param>
+        /// <returns>
+        /// BeforeTestRunStartResult containing environment variables
+        /// </returns>
         BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, ITestMessageEventHandler runEventsHandler);
 
         /// <summary>
         /// Sends the AfterTestRunStart event and waits for result
         /// </summary>
-        /// <returns>DataCollector attachments</returns>
-        Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler runEventsHandler);
+        /// <param name="runEventsHandler">
+        /// Test message event handler for handling messages.
+        /// </param>
+        /// <param name="isCancelled">
+        /// The value to specify whether the test run is cancelled or not.
+        /// </param>
+        /// <returns>
+        /// DataCollector attachments
+        /// </returns>
+        Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled);
     }
 }

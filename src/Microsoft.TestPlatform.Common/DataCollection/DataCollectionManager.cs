@@ -6,14 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -67,6 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
+        /// <param name="messageSink">
+        /// The message Sink.
+        /// </param>
         internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectorLoader())
         {
         }
@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public Collection<AttachmentSet> SessionEnded()
+        public Collection<AttachmentSet> SessionEnded(bool isCancelled = false)
         {
             // Return null if datacollection is not enabled.
             if (!this.isDataCollectionEnabled)
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             List<AttachmentSet> result = new List<AttachmentSet>();
             try
             {
-                result = this.attachmentManager.GetAttachments(endEvent.Context);
+                result = this.attachmentManager.GetAttachments(endEvent.Context, isCancelled);
             }
             catch (Exception ex)
             {

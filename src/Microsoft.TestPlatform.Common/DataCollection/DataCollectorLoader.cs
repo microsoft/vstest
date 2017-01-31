@@ -11,15 +11,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using System.Linq;
 
     /// <inheritdoc/>
     internal class DataCollectorLoader : IDataCollectorLoader
     {
         /// <inheritdoc/>
-        public DataCollector Load(string location,
-            string assemblyQualifiedName)
+        public DataCollector Load(string location, string assemblyQualifiedName)
         {
-            var dataCollectorType = Type.GetType(assemblyQualifiedName);
             DataCollector dataCollectorInstance = null;
             Assembly assembly = null;
 
@@ -30,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 #else
                 assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(location);
 #endif
+                var dataCollectorType = assembly.GetTypes().ToList().Where(t => t.AssemblyQualifiedName.Equals(assemblyQualifiedName)).FirstOrDefault();
                 dataCollectorInstance = Activator.CreateInstance(dataCollectorType) as DataCollector;
             }
             catch (Exception ex)

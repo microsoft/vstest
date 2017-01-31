@@ -188,5 +188,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var result = this.attachmentManager.GetAttachments(datacollectioncontext);
             Assert.AreEqual(0, result.Count);
         }
+
+        [TestMethod]
+        public void GetAttachmentsShouldReturnTheAlreadyCompletedAttachmentsAfterCancelled()
+        {
+            var filename = "filename1.txt";
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
+
+            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
+
+            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var friendlyName = "TestDataCollector";
+            var uri = new Uri("datacollector://Company/Product/Version");
+
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), true);
+
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
+
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
+            var result = this.attachmentManager.GetAttachments(datacollectioncontext);
+
+            Assert.AreEqual(friendlyName, result[0].DisplayName);
+            Assert.AreEqual(uri, result[0].Uri);
+            Assert.AreEqual(1, result[0].Attachments.Count);
+
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "filename2.txt"), string.Empty);
+            dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, "filename2.txt"), true);
+
+            this.attachmentManager.GetAttachments(datacollectioncontext, true);
+
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
+
+            result = this.attachmentManager.GetAttachments(datacollectioncontext);
+
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
+
+        }
     }
 }
