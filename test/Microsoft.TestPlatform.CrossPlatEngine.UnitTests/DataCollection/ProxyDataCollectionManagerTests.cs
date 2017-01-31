@@ -38,7 +38,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             this.proxyDataCollectionManager.InitializeSocketCommunication(Architecture.X86);
 
-            Assert.IsTrue(this.mockDataCollectionLauncher.isInitialized);
             Assert.IsTrue(this.mockDataCollectionLauncher.dataCollectorLaunched);
             Assert.IsTrue(this.mockDataCollectionRequestSender.waitForRequestHandlerConnection);
             Assert.AreEqual(5000, this.mockDataCollectionRequestSender.connectionTimeout);
@@ -166,12 +165,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
     internal class DummyDataCollectionLauncher : IDataCollectionLauncher
     {
-        public bool isInitialized;
         public bool dataCollectorLaunched;
-        public void Initialize(Architecture architecture)
-        {
-            this.isInitialized = true;
-        }
 
         public int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
