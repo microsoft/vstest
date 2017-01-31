@@ -33,7 +33,7 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("loc")]
-    [Switch] $LocalizedBuild = $false,
+    [Switch] $DisableLocalizedBuild = $false,
 
     [Parameter(Mandatory=$false)]
     [Alias("ci")]
@@ -75,6 +75,7 @@ $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
+$TPB_LocalizedBuild = !$DisableLocalizedBuild
 $TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
 
 # Capture error state in any step globally to modify return code
@@ -161,8 +162,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$LocalizedBuild -p:SyncXlf=$SyncXlf
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -186,7 +187,6 @@ function Publish-Package
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
-    $dataCollectorx86Project = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
 	
@@ -203,7 +203,6 @@ function Publish-Package
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
-    Write-Log "Package: Publish src\datacollector.x86\datacollector.x86.csproj"
     Publish-Package-Internal $dataCollectorx86Project $TPB_TargetFramework $fullCLRPackageDir
 
     # Publish testhost
@@ -256,8 +255,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$LocalizedBuild
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild
 }
 
 function Create-VsixPackage

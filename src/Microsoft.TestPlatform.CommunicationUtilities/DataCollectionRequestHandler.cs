@@ -4,28 +4,61 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
     using System;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Collections.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
+    /// <summary>
+    /// The data collection request handler interface.
+    /// </summary>
     internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDisposable
     {
         private readonly ICommunicationManager communicationManager;
         private IDataSerializer dataSerializer;
 
-        public DataCollectionRequestHandler()
+        private static DataCollectionRequestHandler RequestHandler;
+        private static readonly object obj = new object();
+
+        internal DataCollectionRequestHandler()
             : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataCollectionRequestHandler"/> class. 
+        /// </summary>
+        /// <param name="communicationManager">
+        /// </param>
+        /// <param name="dataSerializer">
+        /// </param>
         internal DataCollectionRequestHandler(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
         {
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
+        }
+
+        /// <summary>
+        /// Gets singleton instance of DataCollectionRequestHandler.
+        /// </summary>
+        public static DataCollectionRequestHandler Instance
+        {
+            get
+            {
+                lock (obj)
+                {
+                    if (RequestHandler == null)
+                    {
+                        RequestHandler = new DataCollectionRequestHandler();
+                    }
+                    return RequestHandler;
+                }
+            }
         }
 
         /// <summary>
@@ -45,15 +78,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             EqtTrace.Info("Closing the connection !");
         }
 
-        /// <summary>
-        /// Setups client based on port
-        /// </summary>
-        /// <param name="port">port number to connect</param>
+        /// <inheritdoc />
         public void InitializeCommunication(int port)
         {
             this.communicationManager.SetupClientAsync(port);
         }
 
+        /// <inheritdoc />
         public bool WaitForRequestSenderConnection(int connectionTimeout)
         {
             return this.communicationManager.WaitForServerConnection(connectionTimeout);
@@ -92,6 +123,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 }
             }
             while (!isSessionEnd);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="args"></param>
+        public void SendDataCollectionMessage(DataCollectionMessageEventArgs args)
+        {
+            this.communicationManager.SendMessage(MessageType.DataCollectionMessage, args);
         }
     }
 }

@@ -1,31 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
-    <AssemblyName>Microsoft.TestPlatform.Protocol</AssemblyName>
-	<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
-    <PackageReference Include="System.Runtime.Serialization.Primitives">
-      <Version>4.1.1</Version>
-    </PackageReference>
-  </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
     <PackageReference Include="Newtonsoft.Json">
-      <Version>8.0.3</Version>
+      <Version>9.0.1</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Runtime.Serialization" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
 </Project>
