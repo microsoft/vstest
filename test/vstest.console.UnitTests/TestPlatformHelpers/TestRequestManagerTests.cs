@@ -1,24 +1,27 @@
-﻿using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.CommandLine;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Diagnostics;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using System.Threading.Tasks;
+    using System.Threading;
+    using System.Diagnostics;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
     [TestClass]
     public class TestRequestManagerTests
     {
@@ -95,6 +98,90 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             mockTestPlatformEventSource.Verify(mt => mt.DiscoveryRequestStart(), Times.Once);
             mockTestPlatformEventSource.Verify(mt => mt.DiscoveryRequestStop(), Times.Once);
+        }
+
+        [TestMethod]
+        public void CancelTestRunShouldWaitForCreateTestRunRequest()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" }
+            };
+
+            TestRunCriteria observedCriteria = null;
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            long createRunRequestTime = 0;
+            long cancelRequestTime = 0;
+
+            var mockRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
+                (runCriteria) =>
+                {
+                    Thread.Sleep(1);
+                    createRunRequestTime = sw.ElapsedMilliseconds;
+                    observedCriteria = runCriteria;
+                }).Returns(mockRunRequest.Object);
+
+            mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
+            {
+                Thread.Sleep(1);
+                cancelRequestTime = sw.ElapsedMilliseconds;
+            });
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            var cancelTask = Task.Run(() => this.testRequestManager.CancelTestRun());
+            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object));
+
+            Task.WaitAll(cancelTask, runTask);
+
+            Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
+        }
+
+        [TestMethod]
+        public void AbortTestRunShouldWaitForCreateTestRunRequest()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a", "b" }
+            };
+
+            TestRunCriteria observedCriteria = null;
+
+            var sw = new Stopwatch();
+            sw.Start();
+
+            long createRunRequestTime = 0;
+            long cancelRequestTime = 0;
+
+            var mockRunRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
+                (runCriteria) =>
+                {
+                    Thread.Sleep(1);
+                    createRunRequestTime = sw.ElapsedMilliseconds;
+                    observedCriteria = runCriteria;
+                }).Returns(mockRunRequest.Object);
+
+            mockRunRequest.Setup(mr => mr.Abort()).Callback(() =>
+            {
+                Thread.Sleep(1);
+                cancelRequestTime = sw.ElapsedMilliseconds;
+            });
+
+            var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
+            var mockCustomlauncher = new Mock<ITestHostLauncher>();
+
+            var cancelTask = Task.Run(() => this.testRequestManager.AbortTestRun());
+            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object));
+
+            Task.WaitAll(cancelTask, runTask);
+
+            Assert.IsTrue(cancelRequestTime > createRunRequestTime, "CancelRequest must execute after create run request");
         }
 
         [TestMethod]

@@ -222,6 +222,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
+            // Make sure to run the run request inside a lock as the below section is not thread-safe
+            // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
+            // below logic needs to deserialize and do some cleanup
+            // While this section is cleaning up, TranslationLayer can trigger run causing multiple threads to run the below section at the same time
             lock (syncobject)
             {
                 bool success = true;
