@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// The discovery started.
         /// </summary>
         public const string StartDiscovery = "TestDiscovery.Start";
-       
+
         /// <summary>
         /// The test cases found.
         /// </summary>
@@ -137,6 +137,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Launch Adapter Process With DebuggerAttached
         /// </summary>
         public const string LaunchAdapterProcessWithDebuggerAttachedCallback = "TestExecution.LaunchAdapterProcessWithDebuggerAttachedCallback";
+
+        /// <summary>
+        /// Data Collection Message
+        /// </summary>
+        public const string DataCollectionMessage = "DataCollection.SendMessage";
 
         #region DataCollector messages
 

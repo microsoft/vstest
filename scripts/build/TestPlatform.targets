@@ -5,8 +5,8 @@
     <TestPlatformPackageDir>$(TestPlatformRoot)packages\</TestPlatformPackageDir>
   </PropertyGroup>
   <!-- hack for bug https://github.com/Microsoft/msbuild/issues/1400#issuecomment-268179321 -->
-  <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.SDK\Sdk\Sdk.targets" /> 
-
+  <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets" /> 
+  
   <ItemGroup>
     <ResxLang Include="cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant" />
   </ItemGroup>
@@ -28,7 +28,7 @@
     <!--<Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" />-->
   </Target>
 
-  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true' and '$(TargetFramework)' == 'net46'" >
+  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true'">
     <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
