@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Globalization;
@@ -22,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     /// </summary>
     [FriendlyName(ConsoleLogger.FriendlyName)]
     [ExtensionUri(ConsoleLogger.ExtensionUri)]
-    internal class ConsoleLogger : ITestLogger
+    internal class ConsoleLogger : ITestLoggerWithParameters
     {
         #region Constants
         private const string TestMessageFormattingPrefix = " ";
@@ -37,9 +38,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public const string FriendlyName = "Console";
 
+        /// <summary>
+        /// Parameter for Verbosity
+        /// </summary>
+        public const string VerbosityParam = "verbosity";
+
         #endregion
 
+        public class Verbosity
+        {
+            public static Verbosity Minimal = new Verbosity("minimal");
+            public static Verbosity Normal = new Verbosity("normal");
+
+            public string level;
+
+            Verbosity(string level)
+            {
+                this.level = level;
+            }
+        }
+
         #region Fields
+
+        /// <summary>
+        /// Level of verbosity
+        /// </summary>
+        private Verbosity verbosityLevel = Verbosity.Normal;
 
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
@@ -80,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             private set;
         }
         #endregion
-        
+
         #region ITestLogger
 
         /// <summary>
@@ -106,6 +130,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             events.TestRunComplete += this.TestRunCompleteHandler;
         }
 
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            if (parameters.Count == 0)
+            {
+                throw new ArgumentException("No default parameters added", nameof(parameters));
+            }
+
+            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosityLevel);
+            if (verbosityExists && verbosityLevel.Equals(Verbosity.Minimal.level))
+            {
+                this.verbosityLevel = Verbosity.Minimal;
+            }
+
+            this.Initialize(events, String.Empty);
+        }
         #endregion
 
         #region Private Methods
@@ -282,7 +326,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             else if (e.Result.Outcome == TestOutcome.Passed)
             {
                 string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
-                Output.WriteLine(output, OutputLevel.Information);
+                if (!this.verbosityLevel.Equals(Verbosity.Minimal))
+                {
+                    Output.WriteLine(output, OutputLevel.Information);
+                }
                 this.testsPassed++;
             }
         }

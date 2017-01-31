@@ -72,8 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             if (!this.commandLineOptions.IsDesignMode)
             {
                 var consoleLogger = new ConsoleLogger();
-                consoleLogger.Initialize(this.testLoggerManager.LoggerEvents, null);
-            }
+                this.testLoggerManager.AddLogger(consoleLogger, ConsoleLogger.ExtensionUri, null);
+             }
         }
 
         #endregion

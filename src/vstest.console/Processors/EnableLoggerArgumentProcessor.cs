@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 
     /// <summary>
     /// An argument processor that allows the user to enable a specific logger
@@ -154,25 +155,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 if (parseSucceeded)
                 {
-                    // First assume the logger is specified by URI. If that fails try with friendly name.
-                    try
+                    if (loggerIdentifier == "console")
                     {
-                        this.AddLoggerByUri(loggerIdentifier, parameters);
+                        this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
                     }
-                    catch (CommandLineException)
+                    else
                     {
-                        string loggerUri;
-                        if (this.loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
+                        // First assume the logger is specified by URI. If that fails try with friendly name.
+                        try
                         {
-                            this.AddLoggerByUri(loggerUri, parameters);
+                            this.AddLoggerByUri(loggerIdentifier, parameters);
                         }
-                        else
+                        catch (CommandLineException)
                         {
-                            throw new CommandLineException(
-                            String.Format(
-                            CultureInfo.CurrentUICulture,
-                            CommandLineResources.LoggerNotFound,
-                            argument));
+                            string loggerUri;
+                            if (this.loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
+                            {
+                                this.AddLoggerByUri(loggerUri, parameters);
+                            }
+                            else
+                            {
+                                throw new CommandLineException(
+                                String.Format(
+                                CultureInfo.CurrentUICulture,
+                                CommandLineResources.LoggerNotFound,
+                                argument));
+                            }
                         }
                     }
                 }
