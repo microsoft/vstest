@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     /// </summary>
     internal abstract class BaseRunTests
     {
-#region private fields
+        #region private fields
 
         private string runSettings;
         private TestExecutionContext testExecutionContext;
@@ -129,9 +129,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.executorUrisThatRanTests = new List<string>();
         }
 
-#endregion
+        #endregion
 
-#region Properties
+        #region Properties
 
         /// <summary>
         /// Gets the run settings.
@@ -161,9 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected ICollection<string> ExecutorUrisThatRanTests => this.executorUrisThatRanTests;
 
-#endregion
+        #endregion
 
-#region Public methods
+        #region Public methods
 
         public void RunTests()
         {
@@ -257,9 +257,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
-#endregion
+        #endregion
 
-#region Abstract methods
+        #region Abstract methods
 
         protected abstract void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests);
 
@@ -267,9 +267,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected abstract void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle);
 
-#endregion
+        #endregion
 
-#region Private methods
+        #region Private methods
 
         private TimeSpan RunTestsInternal()
         {
@@ -329,7 +329,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
+#if NET46
                         RunInSTAThread(() => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle));
+#else
+                        this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
+#endif
 
                         this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
 
@@ -479,6 +483,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
+#if NET46
         private static void RunInSTAThread(Action func)
         {
             Exception exThrown = null;
@@ -493,10 +498,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     exThrown = e;
                 }
             });
-#if NET46
+
             // .NetStandard 1.5 lib does not have ApartmentState - hence ifdef
             thread.SetApartmentState(GetApartmentStateAppSetting());
-#endif
             thread.Start();
             thread.Join();
 
@@ -506,7 +510,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
-#if NET46
         /// <summary>
         /// Gets the apartmentState and sets the same on the thread that executes tests.
         /// </summary>
@@ -521,6 +524,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 #endif
 
-#endregion
+        #endregion
     }
 }
