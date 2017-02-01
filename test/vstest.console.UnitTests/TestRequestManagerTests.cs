@@ -1,8 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using vstest.console.UnitTests.TestDoubles;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 {
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
@@ -12,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
+    using vstest.console.UnitTests.TestDoubles;
 
     [TestClass]
     public class TestRequestManagerTests

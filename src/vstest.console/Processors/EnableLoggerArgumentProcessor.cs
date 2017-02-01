@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 if (parseSucceeded)
                 {
-                    if (loggerIdentifier == "console")
+                    if (loggerIdentifier.Equals(ConsoleLogger.FriendlyName, StringComparison.OrdinalIgnoreCase))
                     {
                         this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
                     }

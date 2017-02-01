@@ -73,6 +73,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        public void ExecutorInitializeWithValidArgumentsShouldAddConsoleloggerToTestLoggerManager()
+        {
+            RunTestsArgumentProcessorTests.SetupMockExtensions();
+            var testloggerManager = new DummyTestLoggerManager();
+            var executor = new EnableLoggerArgumentExecutor(testloggerManager);
+
+            executor.Initialize("console;verbosity=minimal");
+            Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/ConsoleLogger/v2"));
+        }
+
+        [TestMethod]
         public void ExectorInitializeShouldThrowExceptionIfInvalidArgumentIsPassed()
         {
             var executor = new EnableLoggerArgumentExecutor(TestLoggerManager.Instance);

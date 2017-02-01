@@ -130,6 +130,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         #region Public Methods
 
+        /// <summary>
+        /// Add and initialize the logger with the given parameters
+        /// </summary>
+        /// <param name="logger">The logger that needs to be initialized</param>
+        /// <param name="extensionUri">URI of the logger</param>
+        /// <param name="parameters">Logger parameters</param>
         public void AddLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
         {
             this.CheckDisposed();
