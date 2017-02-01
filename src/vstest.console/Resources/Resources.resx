@@ -634,4 +634,7 @@
   <data name="InvalidResultsDirectoryPathCommand" xml:space="preserve">
     <value>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</value>
   </data>
+  <data name="InIsolationDeprecated" xml:space="preserve">
+    <value>The /InIsolation flag is deprecated. The tests are always run in a separate process</value>
+  </data>
 </root>
