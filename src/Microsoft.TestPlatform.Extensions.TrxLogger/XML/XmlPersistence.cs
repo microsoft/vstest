@@ -14,11 +14,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using System.Xml;
 
     using VisualStudio.TestPlatform.ObjectModel;
 
     using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// The xml persistence class.
@@ -673,6 +675,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 }
             }
 
+            // Remove invalid char if any
+            valueToSave = RemoveInvalidXmlChar(valueToSave);
             XmlElement elementToSaveAt = nodeToSaveAt as XmlElement;
             if (elementToSaveAt != null)
             {
@@ -687,6 +691,15 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         public XmlNode EnsureLocationExists(XmlElement xml, string location)
         {
             return this.EnsureLocationExists(xml, location, this.namespaceUri);
+        }
+
+        private string RemoveInvalidXmlChar(string str)
+        {
+            // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
+            // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
+
+            string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]";
+            return Regex.Replace(str, invalidChar, TrxLoggerResources.PlaceHolderForInvalidChar);
         }
 
         private XmlNode EnsureLocationExists(XmlElement xml, string location, string nameSpaceUri)
