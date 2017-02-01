@@ -271,7 +271,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected abstract void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle);
 
-#endregion
+        #endregion
 
         #region Private methods
 
