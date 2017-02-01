@@ -230,7 +230,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new ParallelArgumentProcessor(),
                 new EnableDiagArgumentProcessor(),
                 new CLIRunSettingsArgumentProcessor(),
-                new ResultsDirectoryArgumentProcessor()
+                new ResultsDirectoryArgumentProcessor(),
+                new InIsolationArgumentProcessor()
         };
 
         /// <summary>
