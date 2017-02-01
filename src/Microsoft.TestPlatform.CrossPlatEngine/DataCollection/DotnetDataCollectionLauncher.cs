@@ -91,7 +91,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 currentProcessFileName = this.GetDotnetHostFullPath();
             }
 
-            EqtTrace.Verbose("DotnetTestHostmanager: Full path of dotnet.exe is {0}", currentProcessFileName);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DotnetDataCollectionLauncher: Full path of dotnet.exe is {0}", currentProcessFileName);
+            }
 
             var dataCollectorAssemblyPath = Path.Combine(currentWorkingDirectory, DataCollectorProcessName);
             commandLineArguments.Insert(0, dataCollectorAssemblyPath);
@@ -103,15 +106,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             // Probe for runtimeconfig and deps file for the test source
             var runtimeConfigPath = Path.Combine(currentWorkingDirectory, string.Concat(dataCollectorFileName, ".runtimeconfig.json"));
+
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
                 var argsToAdd = " --runtimeconfig \"" + runtimeConfigPath + "\"";
                 args += argsToAdd;
-                EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("DotnetDataCollectionLauncher: Adding {0} in args", argsToAdd);
+                }
             }
             else
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", runtimeConfigPath);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, doesnot exist", runtimeConfigPath);
+                }
             }
 
             // Use the deps.json for test source
@@ -120,11 +130,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 var argsToAdd = " --depsfile \"" + depsFilePath + "\"";
                 args += argsToAdd;
-                EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("DotnetDataCollectionLauncher: Adding {0} in args", argsToAdd);
+                }
             }
             else
             {
-                EqtTrace.Verbose("DotnetTestHostmanager: File {0}, doesnot exist", depsFilePath);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("DotnetDataCollectionLauncher: File {0}, doesnot exist", depsFilePath);
+                }
             }
 
             commandLineArguments.Insert(0, args);
