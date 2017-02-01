@@ -203,8 +203,6 @@ function Publish-Package
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
-    Publish-Package-Internal $dataCollectorx86Project $TPB_TargetFramework $fullCLRPackageDir
-
     # Publish testhost
     
     Write-Log "Package: Publish testhost\testhost.csproj"
