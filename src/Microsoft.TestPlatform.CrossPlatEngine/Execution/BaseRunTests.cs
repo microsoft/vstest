@@ -241,7 +241,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             isCancellationRequested = true;
             if (activeExecutor != null)
             {
+#if NET46
+                RunInSTAThread(() => CancelTestRunInternal(this.activeExecutor), false);
+#else
                 Task.Run(() => CancelTestRunInternal(this.activeExecutor));
+#endif
             }
         }
 
@@ -330,7 +334,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                         // Run the tests.
 #if NET46
-                        RunInSTAThread(() => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle));
+                        RunInSTAThread(() => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle), true);
 #else
                         this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
 #endif
@@ -484,7 +488,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         }
 
 #if NET46
-        private static void RunInSTAThread(Action func)
+        private static void RunInSTAThread(Action func, bool waitForThreadCompletion)
         {
             Exception exThrown = null;
             var thread = new Thread(() =>
@@ -501,12 +505,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             // .NetStandard 1.5 lib does not have ApartmentState - hence ifdef
             thread.SetApartmentState(GetApartmentStateAppSetting());
+            thread.IsBackground = true;
             thread.Start();
-            thread.Join();
 
-            if (exThrown != null)
+            if (waitForThreadCompletion)
             {
-                throw exThrown;
+                thread.Join();
+                if (exThrown != null)
+                {
+                    throw exThrown;
+                }
             }
         }
 
