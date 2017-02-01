@@ -501,6 +501,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             // .NetStandard 1.5 lib does not have ApartmentState - hence ifdef
             thread.SetApartmentState(GetApartmentStateAppSetting());
+            thread.IsBackground = true;
             thread.Start();
             thread.Join();
 
