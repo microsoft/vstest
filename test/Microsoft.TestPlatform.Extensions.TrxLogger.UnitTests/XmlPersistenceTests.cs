@@ -23,5 +23,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             string expectedResult = "This string has these ? ? invalid characters";
             Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
         }
+
+        [TestMethod]
+        public void SaveObjectShouldDoesNotRemoveValidCharacter()
+        {
+            XmlPersistence xmlPersistence = new XmlPersistence();
+            var node = xmlPersistence.CreateRootElement("TestRun");
+
+            string strWithInvalidCharForXml = "This string has these \\0 \v invalid characters";
+
+            xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
+
+            string expectedResult = "This string has these \\0 ? invalid characters";
+            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
+        }
     }
 }

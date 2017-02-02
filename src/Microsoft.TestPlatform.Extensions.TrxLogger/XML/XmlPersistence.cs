@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
     using System.Text.RegularExpressions;
     using System.Xml;
 
-    using VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
@@ -676,7 +676,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             }
 
             // Remove invalid char if any
-            valueToSave = RemoveInvalidXmlChar(valueToSave);
+            valueToSave = XmlPersistence.RemoveInvalidXmlChar(valueToSave);
             XmlElement elementToSaveAt = nodeToSaveAt as XmlElement;
             if (elementToSaveAt != null)
             {
@@ -693,7 +693,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
             return this.EnsureLocationExists(xml, location, this.namespaceUri);
         }
 
-        private string RemoveInvalidXmlChar(string str)
+        private static string RemoveInvalidXmlChar(string str)
         {
             // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
             // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
