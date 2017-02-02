@@ -21,8 +21,8 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">Активный тестовый запуск прерван.</target>
+        <source>The active Test Run was aborted. Due to {0}</source>
+        <target state="new">Активный тестовый запуск прерван.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Прервано активного тестового запуска.</target>
@@ -39,8 +39,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">Активное обнаружение тестов прервано.</target>
+        <source>The active Test Discovery was aborted. Due to {0}</source>
+        <target state="new">Активное обнаружение тестов прервано.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Активного обнаружения тест был прерван.</target>
