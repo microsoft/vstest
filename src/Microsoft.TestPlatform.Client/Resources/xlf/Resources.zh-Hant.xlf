@@ -23,7 +23,7 @@
       <trans-unit id="InvalidStateForExecution">
         <source>The test run could not be executed because the initial state was invalid.</source>
         <target state="translated">因為初始狀態無效，所以無法執行測試回合。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">由于初始状态无效，无法执行测试运行。</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive">
         <source>Wait for completion operation is not allowed when there is no active test run. </source>
         <target state="translated">沒有使用中的測試回合時，不允許等候完成作業。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">没有活动的测试运行时不允许完成操作等待。</target>
         </alt-trans>

@@ -23,7 +23,7 @@
       <trans-unit id="AbortedTestRun">
         <source>The active Test Run was aborted.</source>
         <target state="translated">La série de tests active a été abandonnée.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La série de tests active a été abandonnée.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
         <target state="translated">Une connexion existante a été fermée de force par l'hôte distant.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Une connexion a été fermée par l’hôte distant.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="AbortedTestDiscovery">
         <source>The active Test Discovery was aborted.</source>
         <target state="translated">La découverte de tests active a été abandonnée.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La découverte active de Test a été abandonnée.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test execution process.</source>
         <target state="translated">Impossible de communiquer avec le processus d'exécution de tests.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossible de communiquer avec le processus d’exécution de test.</target>
         </alt-trans>

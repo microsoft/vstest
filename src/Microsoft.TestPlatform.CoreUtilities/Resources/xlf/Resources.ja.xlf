@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">パラメーターを null または空にすることはできません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">パラメーターは、null または空にすることはできません。</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
         <target state="translated">エラー: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">エラー: {0}</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
         <target state="translated">情報: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">情報: {0}</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
         <target state="translated">警告: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">警告: {0}</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="Error_ArgumentIsEmpty">
         <source>The specified argument cannot be empty.</source>
         <target state="translated">指定した引数を空にすることはできません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定した引数を空にすることはできません。</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="Error_ArgumentIsNegative">
         <source>The specified argument cannot be negative.</source>
         <target state="translated">指定した引数を負の値にすることはできません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定した引数を負の値にすることはできません。</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="Error_ArgumentNotTypeOf">
         <source>The specified argument must have the following type: {0}.</source>
         <target state="translated">指定された引数は次の型でなければなりません: {0}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定した引数は、次の型を持つ必要があります: {0}。</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="Error_ArgumentPropertyIsEmpty">
         <source>The specified argument has the following property, which cannot be an empty string: {0}.</source>
         <target state="translated">指定された引数には次のプロパティがあり、これを空の文字列にすることはできません: {0}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定した引数には次のプロパティは、空の文字列にすることはできません: {0}。</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="Error_ArgumentPropertyIsNegative">
         <source>The specified argument has the following property, which cannot be negative: {0}.</source>
         <target state="translated">指定した引数には次のプロパティがあります。このプロパティを負の値にすることはできません: {0}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定した引数には次のプロパティは、負の値にすることはできません: {0}。</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="Error_ArgumentPropertyIsNull">
         <source>The specified argument has the following property, which cannot be null: {0}.</source>
         <target state="translated">指定した引数には次のプロパティがあります。このプロパティを null にすることはできません: {0}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定した引数には次のプロパティは、null にすることはできません: {0}。</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="Error_ArgumentPropertyNotTypeOf">
         <source>The specified argument has the following property: {0}. This property must have the following type: {1}.</source>
         <target state="translated">指定された引数には次のプロパティがあります: {0}。このプロパティは次の型でなければなりません: {1}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定した引数には、次のプロパティ: {0}. このプロパティは、次の型を持つ必要があります: {1}。</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="ExceptionFromJobProcessor">
         <source>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</source>
         <target state="translated">'{0}' キューからジョブを処理中にハンドルされない例外が発生しました: {1}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' のキューからジョブを処理中にハンドルされていない例外が発生しました: {1}</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="QueueAlreadyDisposed">
         <source>The {0} queue has already been disposed.</source>
         <target state="translated">{0} キューは既に破棄されています。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">キュー {0} は既に破棄されています。</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="QueuePausedDisposeError">
         <source>The {0} queue cannot be disposed while paused.</source>
         <target state="translated">{0} キューは一時停止中に破棄できません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">一時停止中に、{0} のキューを破棄することはできません。</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="Utility_ProcessNameWhenCannotGetIt">
         <source>Error getting process name.</source>
         <target state="translated">プロセス名の取得エラーです。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">プロセス名の取得中にエラーです。</target>
         </alt-trans>

@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="TestOutcomeFailed">
         <source>Failed</source>
-        <target state="translated" state-qualifier="mt-suggestion">Başarısız</target>
+        <target state="translated">Başarısız</target>
         <note>Test result for failed test</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Başarısız oldu</target>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="TestOutcomeNone">
         <source>None</source>
-        <target state="translated" state-qualifier="mt-suggestion">Yok</target>
-        <note></note>
+        <target state="translated">Yok</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hiçbiri</target>
         </alt-trans>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="TestOutcomePassed">
         <source>Passed</source>
-        <target state="translated" state-qualifier="mt-suggestion">Başarılı</target>
+        <target state="translated">Başarılı</target>
         <note>Test result for passed test</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçirilen</target>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="BasicTestResultFormat">
         <source>{0,-10}  {1}</source>
-        <target state="translated" state-qualifier="mt-suggestion">{0,-10}  {1}</target>
-        <note></note>
+        <target state="translated">{0,-10}  {1}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0, -10}  {1}</target>
         </alt-trans>
@@ -59,9 +59,9 @@
       <trans-unit id="TestResultMessageFormat">
         <source>  {0}:
 {1}</source>
-        <target state="translated" state-qualifier="mt-suggestion">  {0}:
+        <target state="translated">  {0}:
 {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}:
 {1}</target>
@@ -71,9 +71,9 @@
       <trans-unit id="TestResultTextMessagesFormat">
         <source>  Test Messages:
 {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">  Test İletileri:
+        <target state="translated">  Test İletileri:
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sınama iletileri:
 {0}</target>
@@ -82,8 +82,8 @@
       </trans-unit>
       <trans-unit id="TestFailureMessageFormat">
         <source>  Message: {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">  İleti: {0}</target>
-        <note></note>
+        <target state="translated">  İleti: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">İleti: {0}</target>
         </alt-trans>
@@ -92,9 +92,9 @@
       <trans-unit id="TestFailureStackTraceFormat">
         <source>  StackTrace:
 {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">  StackTrace:
+        <target state="translated">  StackTrace:
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">StackTrace:
 {0}</target>
@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="NullString">
         <source>(null)</source>
-        <target state="translated" state-qualifier="mt-suggestion">(null)</target>
-        <note></note>
+        <target state="translated">(null)</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(boş)</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="Exception_RegisteredTestPropertyHasDifferentValueType">
         <source>Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' özelliği daha önce '{2}' olarak kaydedildiğinden '{1}' değer türü olarak kaydedilemiyor.</target>
-        <note></note>
+        <target state="translated">'{0}' özelliği daha önce '{2}' olarak kaydedildiğinden '{1}' değer türü olarak kaydedilemiyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bunu zaten '{2}' kayıtlı olmadığı için değer türü olarak '{1}' özelliği '{0}' kaydedilemiyor.</target>
         </alt-trans>
@@ -121,7 +121,7 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyColumnNumberLabel">
         <source>Column Number</source>
-        <target state="translated" state-qualifier="mt-suggestion">Sütun Numarası</target>
+        <target state="translated">Sütun Numarası</target>
         <note>The label of the test property ColumnNumber for test case.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sütun numarası</target>
@@ -130,7 +130,7 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyExecutorUriLabel">
         <source>Executor Uri</source>
-        <target state="translated" state-qualifier="mt-suggestion">Yürütücü URI’si</target>
+        <target state="translated">Yürütücü URI’si</target>
         <note>The label of the test property ExecutorUri for test case.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Gerçekleştirme uygulaması URI'si</target>
@@ -139,7 +139,7 @@
       </trans-unit>
       <trans-unit id="TestCasePropertySourceLabel">
         <source>Source</source>
-        <target state="translated" state-qualifier="mt-suggestion">Kaynak</target>
+        <target state="translated">Kaynak</target>
         <note>The label of the test property Source for test case.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Kaynak</target>
@@ -148,7 +148,7 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyLineNumberLabel">
         <source>Line Number</source>
-        <target state="translated" state-qualifier="mt-suggestion">Satır Numarası</target>
+        <target state="translated">Satır Numarası</target>
         <note>The label of the test property LineNumber for test case.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Satır numarası</target>
@@ -157,7 +157,7 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyNameLabel">
         <source>Name</source>
-        <target state="translated" state-qualifier="mt-suggestion">Ad</target>
+        <target state="translated">Ad</target>
         <note>The label of the test property Name for test case.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Adı</target>
@@ -166,7 +166,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyComputerNameLabel">
         <source>Computer Name</source>
-        <target state="translated" state-qualifier="mt-suggestion">Bilgisayar Adı</target>
+        <target state="translated">Bilgisayar Adı</target>
         <note>The label of the test property ComputerName for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bilgisayar adı</target>
@@ -175,7 +175,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyDisplayNameLabel">
         <source>TestResult Display Name</source>
-        <target state="translated" state-qualifier="mt-suggestion">TestResult Görünen Adı</target>
+        <target state="translated">TestResult Görünen Adı</target>
         <note>The label of TestResult.DisplayName, mainly used for parameterized data tests</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">TestResult görünen adı</target>
@@ -184,7 +184,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyDurationLabel">
         <source>Duration</source>
-        <target state="translated" state-qualifier="mt-suggestion">Süre</target>
+        <target state="translated">Süre</target>
         <note>The label of the test property Duration for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Süre</target>
@@ -193,7 +193,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyEndTimeLabel">
         <source>End Time</source>
-        <target state="translated" state-qualifier="mt-suggestion">Bitiş Saati</target>
+        <target state="translated">Bitiş Saati</target>
         <note>The label of the test property EndTime for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bitiş saati</target>
@@ -202,7 +202,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyErrorColumnNumberLabel">
         <source>Error Column Number</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata Sütun Numarası</target>
+        <target state="translated">Hata Sütun Numarası</target>
         <note>The label of the test property ErrorColumnNumber for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata sütun numarası</target>
@@ -211,7 +211,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyErrorMessageLabel">
         <source>Error Message</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata İletisi</target>
+        <target state="translated">Hata İletisi</target>
         <note>The label of the test property ErrorMessage for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata iletisi</target>
@@ -220,7 +220,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyErrorStackTraceLabel">
         <source>Error Stack Trace</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata Yığın İzlemesi</target>
+        <target state="translated">Hata Yığın İzlemesi</target>
         <note>The label of the test property ErrorStackTrace for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata yığını izlemesi</target>
@@ -229,7 +229,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyOutcomeLabel">
         <source>Outcome</source>
-        <target state="translated" state-qualifier="mt-suggestion">Sonuç</target>
+        <target state="translated">Sonuç</target>
         <note>The label of the test property Outcome for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sonucu</target>
@@ -238,7 +238,7 @@
       </trans-unit>
       <trans-unit id="TestResultPropertyStartTimeLabel">
         <source>Start Time</source>
-        <target state="translated" state-qualifier="mt-suggestion">Başlangıç Saati</target>
+        <target state="translated">Başlangıç Saati</target>
         <note>The label of the test property StartTime for test result.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Başlangıç saati</target>
@@ -247,8 +247,8 @@
       </trans-unit>
       <trans-unit id="ConverterNotSupported">
         <source>Cannot find TypeConverter for type {0}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">{0} türü için TypeConverter bulunamıyor.</target>
-        <note></note>
+        <target state="translated">{0} türü için TypeConverter bulunamıyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">TypeConverter için {0} türü bulunamıyor.</target>
         </alt-trans>
@@ -256,7 +256,7 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyFilePathLabel">
         <source>File Path</source>
-        <target state="translated" state-qualifier="mt-suggestion">Dosya Yolu</target>
+        <target state="translated">Dosya Yolu</target>
         <note>The label of the test property FilePath for test case.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Dosya yolu</target>
@@ -265,7 +265,7 @@
       </trans-unit>
       <trans-unit id="NotificationFrequencyIsNotPositive">
         <source>Notification frequency need to be a positive value.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Bildirim sıklığı pozitif bir değer olmalıdır.</target>
+        <target state="translated">Bildirim sıklığı pozitif bir değer olmalıdır.</target>
         <note>frequency for DiscoveryCriteria/TestRunCriteria needs to be a positive value</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bildirim sıklığı, pozitif bir değer olması gerekir.</target>
@@ -274,8 +274,8 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyIdLabel">
         <source>Id</source>
-        <target state="translated" state-qualifier="mt-suggestion">Kimlik</target>
-        <note></note>
+        <target state="translated">Kimlik</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Kimliği</target>
         </alt-trans>
@@ -283,8 +283,8 @@
       </trans-unit>
       <trans-unit id="InvalidSettingsXmlAttribute">
         <source>Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' ayarları geçersiz. Beklenmeyen XmlAttribute: '{1}'.</target>
-        <note></note>
+        <target state="translated">'{0}' ayarları geçersiz. Beklenmeyen XmlAttribute: '{1}'.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçersiz '{0}' ayarlar. Beklenmeyen XmlAttribute: '{1}'.</target>
         </alt-trans>
@@ -292,8 +292,8 @@
       </trans-unit>
       <trans-unit id="InvalidSettingsXmlElement">
         <source>Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' ayarları geçersiz. Beklenmeyen XmlElement: '{1}'.</target>
-        <note></note>
+        <target state="translated">'{0}' ayarları geçersiz. Beklenmeyen XmlElement: '{1}'.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçersiz '{0}' ayarlar. Beklenmeyen XmlElement: '{1}'.</target>
         </alt-trans>
@@ -301,8 +301,8 @@
       </trans-unit>
       <trans-unit id="MissingDataCollectorAttributes">
         <source>Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Geçersiz veri toplayıcı ayarları. Beklenen '{0}' özniteliği eksik. Normal bir veri toplayıcı ayarı şu şekilde görünür: &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</target>
-        <note></note>
+        <target state="translated">Geçersiz veri toplayıcı ayarları. Beklenen '{0}' özniteliği eksik. Normal bir veri toplayıcı ayarı şu şekilde görünür: &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçersiz veri toplayıcı ayarları. 'Beklenen {0}' özniteliği eksik.  Ayarlama tipik veri toplayıcı gibidir &lt; DataCollector URI = "dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, sürüm 1.0.0.0, Culture = bağımsız, PublicKeyToken = 1111111111111111 =" friendlyName = "sampleCollector" &gt;.</target>
         </alt-trans>
@@ -310,7 +310,7 @@
       </trans-unit>
       <trans-unit id="TestOutcomeNotFound">
         <source>NotFound</source>
-        <target state="translated" state-qualifier="mt-suggestion">NotFound</target>
+        <target state="translated">NotFound</target>
         <note>Test result for not found test</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">NotFound</target>
@@ -319,7 +319,7 @@
       </trans-unit>
       <trans-unit id="TestOutcomeSkipped">
         <source>Skipped</source>
-        <target state="translated" state-qualifier="mt-suggestion">Atlandı</target>
+        <target state="translated">Atlandı</target>
         <note>Test result for skipped test </note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Atlandı</target>
@@ -328,7 +328,7 @@
       </trans-unit>
       <trans-unit id="NotificationTimeoutIsZero">
         <source>Notification timeout must be greater than zero.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Bildirim zaman aşımı sıfırdan büyük olmalıdır.</target>
+        <target state="translated">Bildirim zaman aşımı sıfırdan büyük olmalıdır.</target>
         <note>Timeout used during test discovery and execution must be greater than zero.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bildirim zaman aşımı sıfırdan büyük olmalıdır.</target>
@@ -337,8 +337,8 @@
       </trans-unit>
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' ayarları geçersiz. '{2}' için geçersiz '{1}' değeri belirtildi.</target>
-        <note></note>
+        <target state="translated">'{0}' ayarları geçersiz. '{2}' için geçersiz '{1}' değeri belirtildi.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçersiz '{0}' ayarlar.  '{1}' '{2}' için belirtilen değer geçersiz.</target>
         </alt-trans>
@@ -346,8 +346,8 @@
       </trans-unit>
       <trans-unit id="InvalidRunSettingsRootNode">
         <source>The root node of the run settings must be named 'RunSettings'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Çalıştırma ayarlarının kök düğümü 'RunSettings' olarak adlandırılmalıdır.</target>
-        <note></note>
+        <target state="translated">Çalıştırma ayarlarının kök düğümü 'RunSettings' olarak adlandırılmalıdır.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Çalışma ayarları kök düğümü 'RunSettings' olarak adlandırılmalıdır.</target>
         </alt-trans>
@@ -355,8 +355,8 @@
       </trans-unit>
       <trans-unit id="NoTestCaseFilterForSpecificTests">
         <source>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirli bir test çalıştırması için TestCaseFilter belirtilemiyor. FilterCriteria yalnızca kaynakları olan bir çalıştırma içindir.</target>
-        <note></note>
+        <target state="translated">Belirli bir test çalıştırması için TestCaseFilter belirtilemiyor. FilterCriteria yalnızca kaynakları olan bir çalıştırma içindir.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">TestCaseFilter belirli testleri çalıştırmak için belirtilemez. Yalnızca çalışma kaynakları ile FilterCriteria aranır.</target>
         </alt-trans>
@@ -364,8 +364,8 @@
       </trans-unit>
       <trans-unit id="UnexpectedTypeOfProperty">
         <source>The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </source>
-        <target state="translated" state-qualifier="mt-suggestion">'{1}' özelliğinin '{0}' test özelliği türü desteklenmiyor. Desteklenen özellik türlerinden birini (temel türler, uri, string, string[]) seçin ve yeniden deneyin. </target>
-        <note></note>
+        <target state="translated">'{1}' özelliğinin '{0}' test özelliği türü desteklenmiyor. Desteklenen özellik türlerinden birini (temel türler, uri, string, string[]) seçin ve yeniden deneyin. </target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test özellik türü '{0}' özelliği '{1}' desteklenmiyor. Birini desteklenen özellik türü (ilkel türler, URI, string, string[]) ve yeniden deneyin.</target>
         </alt-trans>
@@ -373,7 +373,7 @@
       </trans-unit>
       <trans-unit id="CouldNotFindXmlNode">
         <source>Could not find '{0}' node</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' düğümü bulunamadı</target>
+        <target state="translated">'{0}' düğümü bulunamadı</target>
         <note>Error message when the specified {0}  xml node can not be found in the run settings xml document</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' düğümü bulunamadı</target>
@@ -382,8 +382,8 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyFullyQualifiedNameLabel">
         <source>FullyQualifiedName</source>
-        <target state="translated" state-qualifier="mt-suggestion">FullyQualifiedName</target>
-        <note></note>
+        <target state="translated">FullyQualifiedName</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">FullyQualifiedName</target>
         </alt-trans>
@@ -391,7 +391,7 @@
       </trans-unit>
       <trans-unit id="TestCasePropertyTraitsLabel">
         <source>Traits</source>
-        <target state="translated" state-qualifier="mt-suggestion">Nitelikler</target>
+        <target state="translated">Nitelikler</target>
         <note>The label of the test property Traits for test case.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nitelikler</target>
@@ -400,8 +400,8 @@
       </trans-unit>
       <trans-unit id="SolutionDirectoryNotExists">
         <source>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' çözüm dizini yok. Lütfen çalıştırma ayarlarında belirtilen çözüm dizininin mevcut olduğundan ve dizin için okuma izinlerine sahip olduğundan emin olun.</target>
-        <note></note>
+        <target state="translated">'{0}' çözüm dizini yok. Lütfen çalıştırma ayarlarında belirtilen çözüm dizininin mevcut olduğundan ve dizin için okuma izinlerine sahip olduğundan emin olun.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' çözümü dizin yok. Runsettings içinde belirtilen çözüm dizinin varolduğundan ve dizin izinlerini okumuş emin olun.</target>
         </alt-trans>
@@ -409,8 +409,8 @@
       </trans-unit>
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
-        <note></note>
+        <target state="translated">Parametre null veya boş olamaz.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
         </alt-trans>
@@ -418,8 +418,8 @@
       </trans-unit>
       <trans-unit id="Common_FileNotExist">
         <source>File {0} does not exist.</source>
-        <target state="translated" state-qualifier="mt-suggestion">{0} dosyası yok.</target>
-        <note></note>
+        <target state="translated">{0} dosyası yok.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} dosyası yok.</target>
         </alt-trans>
@@ -427,8 +427,8 @@
       </trans-unit>
       <trans-unit id="Common_ObjectMustBeOfType">
         <source>Object must be of type {0}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Nesne {0} türünde olmalıdır.</target>
-        <note></note>
+        <target state="translated">Nesne {0} türünde olmalıdır.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nesne {0} türünde olmalıdır.</target>
         </alt-trans>
@@ -436,8 +436,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeAborted">
         <source>Aborted</source>
-        <target state="translated" state-qualifier="mt-suggestion">İptal edildi</target>
-        <note></note>
+        <target state="translated">İptal edildi</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">İptal edildi</target>
         </alt-trans>
@@ -445,8 +445,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeCompleted">
         <source>Completed</source>
-        <target state="translated" state-qualifier="mt-suggestion">Tamamlandı</target>
-        <note></note>
+        <target state="translated">Tamamlandı</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Tamamlandı</target>
         </alt-trans>
@@ -454,8 +454,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeDisconnected">
         <source>Disconnected</source>
-        <target state="translated" state-qualifier="mt-suggestion">Bağlantı kesildi</target>
-        <note></note>
+        <target state="translated">Bağlantı kesildi</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bağlantı kesildi</target>
         </alt-trans>
@@ -463,8 +463,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeError">
         <source>Error</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata</target>
-        <note></note>
+        <target state="translated">Hata</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata</target>
         </alt-trans>
@@ -472,8 +472,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeFailed">
         <source>Failed</source>
-        <target state="translated" state-qualifier="mt-suggestion">Başarısız</target>
-        <note></note>
+        <target state="translated">Başarısız</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Başarısız oldu</target>
         </alt-trans>
@@ -481,8 +481,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeInconclusive">
         <source>Inconclusive</source>
-        <target state="translated" state-qualifier="mt-suggestion">Sonuçsuz</target>
-        <note></note>
+        <target state="translated">Sonuçsuz</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Yetersiz</target>
         </alt-trans>
@@ -490,8 +490,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeInProgress">
         <source>In Progress</source>
-        <target state="translated" state-qualifier="mt-suggestion">Sürüyor</target>
-        <note></note>
+        <target state="translated">Sürüyor</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sürüyor</target>
         </alt-trans>
@@ -499,8 +499,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeNotExecuted">
         <source>Not Executed</source>
-        <target state="translated" state-qualifier="mt-suggestion">Yürütülmedi</target>
-        <note></note>
+        <target state="translated">Yürütülmedi</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Yürütülmeyen</target>
         </alt-trans>
@@ -508,8 +508,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeNotRunnable">
         <source>Not Runnable</source>
-        <target state="translated" state-qualifier="mt-suggestion">Çalıştırılamıyor</target>
-        <note></note>
+        <target state="translated">Çalıştırılamıyor</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Yürütülemedi</target>
         </alt-trans>
@@ -517,8 +517,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomePassed">
         <source>Passed</source>
-        <target state="translated" state-qualifier="mt-suggestion">Başarılı</target>
-        <note></note>
+        <target state="translated">Başarılı</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Geçirilen</target>
         </alt-trans>
@@ -526,8 +526,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
-        <target state="translated" state-qualifier="mt-suggestion">Başarılı (çalıştırma iptal edildi)</target>
-        <note></note>
+        <target state="translated">Başarılı (çalıştırma iptal edildi)</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(Geçirilen Çalıştır'ı iptal edildi)</target>
         </alt-trans>
@@ -535,8 +535,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomePending">
         <source>Pending</source>
-        <target state="translated" state-qualifier="mt-suggestion">Bekliyor</target>
-        <note></note>
+        <target state="translated">Bekliyor</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bekleyen</target>
         </alt-trans>
@@ -544,8 +544,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeTimeout">
         <source>Timeout</source>
-        <target state="translated" state-qualifier="mt-suggestion">Zaman aşımı</target>
-        <note></note>
+        <target state="translated">Zaman aşımı</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Zaman aşımı</target>
         </alt-trans>
@@ -553,8 +553,8 @@
       </trans-unit>
       <trans-unit id="Common_TestOutcomeWarning">
         <source>Warning</source>
-        <target state="translated" state-qualifier="mt-suggestion">Uyarı</target>
-        <note></note>
+        <target state="translated">Uyarı</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uyarı</target>
         </alt-trans>
@@ -562,8 +562,8 @@
       </trans-unit>
       <trans-unit id="DataCollectionSink_CanNotReadStream">
         <source>Unable to read from the provided stream.  Data from a stream cannot be sent unless the stream supports reading.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen akıştan okunamadı. Bir akış okumayı desteklemiyorsa, akıştaki veriler gönderilemez.</target>
-        <note></note>
+        <target state="translated">Belirtilen akıştan okunamadı. Bir akış okumayı desteklemiyorsa, akıştaki veriler gönderilemez.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sağlanan akıştan okunamadı.  Akıştan veri akışı okuma destekler sürece gönderilemez.</target>
         </alt-trans>
@@ -571,8 +571,8 @@
       </trans-unit>
       <trans-unit id="DataCollectionSink_InvalidFileNameCharacters">
         <source>The provided file name '{0}' contains the following invalid characters: '{1}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen '{0}' dosya adı şu geçersiz karakterleri içeriyor: '{1}'.</target>
-        <note></note>
+        <target state="translated">Belirtilen '{0}' dosya adı şu geçersiz karakterleri içeriyor: '{1}'.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sağlanan dosya adı '{0}' geçersiz karakterler içeriyor: '{1}'.</target>
         </alt-trans>
@@ -580,8 +580,8 @@
       </trans-unit>
       <trans-unit id="DataCollectionSink_ReservedFilenameUsed">
         <source>The provided file name '{0}' is reserved.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen '{0}' dosya adı ayrılmış.</target>
-        <note></note>
+        <target state="translated">Belirtilen '{0}' dosya adı ayrılmış.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sağlanan dosya adı '{0}' ayrılmış.</target>
         </alt-trans>

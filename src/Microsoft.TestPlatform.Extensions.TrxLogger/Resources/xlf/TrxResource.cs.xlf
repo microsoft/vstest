@@ -23,7 +23,7 @@
       <trans-unit id="TestOutcomeAborted">
         <source>Aborted</source>
         <target state="translated">Přerušené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Přerušeno</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="TestOutcomeCompleted">
         <source>Completed</source>
         <target state="translated">Dokončené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Byla dokončena</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="TestOutcomeDisconnected">
         <source>Disconnected</source>
         <target state="translated">Odpojené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Odpojení</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="TestOutcomeError">
         <source>Error</source>
         <target state="translated">Chyba</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Chyba</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="TestOutcomeFailed">
         <source>Failed</source>
         <target state="translated">Neúspěšné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Se nezdařilo</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="TestOutcomeInconclusive">
         <source>Inconclusive</source>
         <target state="translated">Neprůkazné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neprůkazné</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="TestOutcomeInProgress">
         <source>In Progress</source>
         <target state="translated">Probíhá</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">V průběhu</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="TestOutcomeNotExecuted">
         <source>Not Executed</source>
         <target state="translated">Neprovedené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nebyly provedeny</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="TestOutcomeNotRunnable">
         <source>Not Runnable</source>
         <target state="translated">Nejde spustit</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Není spustitelného</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="TestOutcomePassed">
         <source>Passed</source>
         <target state="translated">Úspěšné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Předáno</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
         <target state="translated">Úspěšné (běh se přerušil)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Předané (spuštění přerušeno)</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="TestOutcomePending">
         <source>Pending</source>
         <target state="translated">Čekající</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Čekající na vyřízení</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="TestOutcomeTimeout">
         <source>Timeout</source>
         <target state="translated">Časový limit</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Časový limit</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="TestOutcomeWarning">
         <source>Warning</source>
         <target state="translated">Upozornění</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Upozornění</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="Common_CannotBeLessThanZero">
         <source>The parameter cannot be less than 0.</source>
         <target state="translated">Parametr nemůže být menší než 0.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametr nemůže být menší než 0.</target>
         </alt-trans>
@@ -158,7 +158,7 @@
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">Parametr nemůže být null nebo prázdný.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametr nemůže být null nebo prázdný.</target>
         </alt-trans>
@@ -167,7 +167,7 @@
       <trans-unit id="Common_CannotGetNextIterationName">
         <source>Cannot get free name for {0}(1),(2),... in directory {1}. Please clean up this directory.</source>
         <target state="translated">Nejde získat volný název pro {0}(1),(2),... v adresáři {1}. Vyčistěte prosím tento adresář.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nelze získat název zdarma {0}(1),(2)... v adresáři {1}. Prosím vyčistěte tento adresář.</target>
         </alt-trans>
@@ -176,7 +176,7 @@
       <trans-unit id="Common_MissingRunConfigInRun">
         <source>Test Settings are not specified.</source>
         <target state="translated">Nezadala se nastavení testu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test nastavení nejsou zadány.</target>
         </alt-trans>
@@ -185,7 +185,7 @@
       <trans-unit id="Common_MissingRunDeploymentRootInRunConfig">
         <source>The active Test Settings do not define the Run Deployment Directory.</source>
         <target state="translated">Aktivní nastavení testu nedefinují adresář nasazení běhu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aktivní Test nastavení spuštění adresáře nasazení nedefinuje.</target>
         </alt-trans>
@@ -194,7 +194,7 @@
       <trans-unit id="Common_MissingRunInResult">
         <source>The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</source>
         <target state="translated">Výsledek není přidružený k testovacímu běhu. Použijte výsledek, který se získal z probíhajícího nebo dokončeného testovacího běhu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Výsledek není spojené s testovací běh. Výsledek, který byl získán z testu v průběhu nebo dokončené spustit pomocí.</target>
         </alt-trans>
@@ -203,7 +203,7 @@
       <trans-unit id="Common_NothingLeftAfterReplaciingBadCharsInName">
         <source>The specified file/directory name '{0}' is not valid.</source>
         <target state="translated">Zadaný název souboru nebo adresáře {0} není platný.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Název zadaný adresář {0}' není platný.</target>
         </alt-trans>
@@ -212,7 +212,7 @@
       <trans-unit id="Common_TestRunName">
         <source>{0}@{1} {2}</source>
         <target state="translated">{0}@{1} {2}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}@{1}, {2}</target>
         </alt-trans>
@@ -223,7 +223,7 @@
 Error Details: {1}:{2}</source>
         <target state="translated">Nepovedlo se připojit soubory z {0}.
 Podrobnosti o chybě: {1}:{2}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Soubory připojení se nezdařilo: {0}
 Podrobnosti o chybě: {1}: {2}</target>
@@ -233,7 +233,7 @@ Podrobnosti o chybě: {1}: {2}</target>
       <trans-unit id="MessageForSkippedTests">
         <source>Test '{0}' was skipped in the test run.</source>
         <target state="translated">V testovacím běhu se přeskočil test {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test '{0}' byl vynechán do testovacího běhu.</target>
         </alt-trans>
@@ -242,7 +242,7 @@ Podrobnosti o chybě: {1}: {2}</target>
       <trans-unit id="TrxLoggerResultsFile">
         <source>Results File: {0}</source>
         <target state="translated">Soubor výsledků: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Výsledky souboru: {0}</target>
         </alt-trans>
@@ -251,7 +251,7 @@ Podrobnosti o chybě: {1}: {2}</target>
       <trans-unit id="TS_AllResults">
         <source>All Loaded Results</source>
         <target state="translated">Všechny načtené výsledky</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Všechny načíst výsledky</target>
         </alt-trans>
@@ -260,7 +260,7 @@ Podrobnosti o chybě: {1}: {2}</target>
       <trans-unit id="TS_UncategorizedResults">
         <source>Results Not in a List</source>
         <target state="translated">Výsledky neuvedené v seznamu</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Seznam výsledků</target>
         </alt-trans>
@@ -269,7 +269,7 @@ Podrobnosti o chybě: {1}: {2}</target>
       <trans-unit id="Common_DeploymentItem">
         <source>deployment item '{0}'</source>
         <target state="translated">položka nasazení {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">nasazení položky {0}.</target>
         </alt-trans>
@@ -278,7 +278,7 @@ Podrobnosti o chybě: {1}: {2}</target>
       <trans-unit id="Common_DeploymentItemWithOutputDirectory">
         <source>deployment item '{0}' (output directory '{1}')</source>
         <target state="translated">položka nasazení {0} (výstupní adresář {1})</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">nasazení položky '{0}' (výstupní adresář: {1})</target>
         </alt-trans>
@@ -287,7 +287,7 @@ Podrobnosti o chybě: {1}: {2}</target>
       <trans-unit id="Common_NullInMessages">
         <source>(null)</source>
         <target state="translated">(null)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(null)</target>
         </alt-trans>
@@ -295,8 +295,8 @@ Podrobnosti o chybě: {1}: {2}</target>
       </trans-unit>
       <trans-unit id="TrxLoggerResultsFileOverwriteWarning">
         <source>WARNING: Overwriting results file: {0}</source>
-        <target state="new">WARNING: Overwriting results file: {0}</target>
-        <note></note>
+        <target state="translated">UPOZORNĚNÍ: Přepíše se soubor výsledků: {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>

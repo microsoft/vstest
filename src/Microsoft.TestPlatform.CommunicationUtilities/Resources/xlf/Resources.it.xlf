@@ -23,7 +23,7 @@
       <trans-unit id="AbortedTestRun">
         <source>The active Test Run was aborted.</source>
         <target state="translated">L'esecuzione dei test attiva è stata interrotta.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Esecuzione dei Test attiva è stata interrotta.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
         <target state="translated">Una connessione esistente è stata chiusa forzatamente dall'host remoto.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Una connessione esistente è stata chiusa forzatamente dall'host remoto.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="AbortedTestDiscovery">
         <source>The active Test Discovery was aborted.</source>
         <target state="translated">L'individuazione dei test attiva è stata interrotta.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">L'individuazione dei Test attiva è stata interrotta.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test execution process.</source>
         <target state="translated">Non è possibile comunicare con il processo di esecuzione dei test.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossibile comunicare con il processo di esecuzione di test.</target>
         </alt-trans>
