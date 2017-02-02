@@ -98,7 +98,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " /tests:SleepForSomeTimeTest");
+            arguments = string.Concat(arguments, " /tests:ExitWithStdErrorMessageTest");
             this.InvokeVsTest(arguments);
             this.StdErrorContains("The active Test Run was aborted.");
         }

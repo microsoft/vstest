@@ -149,7 +149,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            Assert.IsNotNull(startInfo);
+            Assert.IsNotNull(startInfo.ExitCallback);
         }
 
         [TestMethod]

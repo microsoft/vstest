@@ -80,16 +80,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // TODO: Fix the environment variables usage
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
 
-                // Monitor testhost exit.
-                testHostStartInfo.ExitCallback = (process) =>
+                if (testHostStartInfo != null)
                 {
-                    if (process.ExitCode != 0)
+                    // Monitor testhost exit.
+                    testHostStartInfo.ExitCallback = (process) =>
                     {
-                        testHostProcessStdError = process.StandardError.ReadToEnd();
-                    }
+                        if (process.ExitCode != 0)
+                        {
+                            testHostProcessStdError = process.StandardError.ReadToEnd();
+                        }
 
-                    this.RequestSender.OnClientProcessExit(testHostProcessStdError);
-                };
+                        this.RequestSender.OnClientProcessExit(testHostProcessStdError);
+                    };
+                }
 
                 // Warn the user that execution will wait for debugger attach.
                 var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");

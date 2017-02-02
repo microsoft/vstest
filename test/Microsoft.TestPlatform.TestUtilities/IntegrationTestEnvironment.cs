@@ -42,6 +42,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Running in VS/IDE. Use artifacts directory as root.
                 this.runningInCli = false;
+
+                // Get root directory from test assembly output directory
                 this.testPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
                 this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"test\TestAssets");
             }

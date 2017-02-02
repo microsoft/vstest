@@ -17,7 +17,7 @@ namespace SampleUnitTestProject3
         }
 
         [TestMethod]
-        public void SleepForSomeTimeTest()
+        public void ExitWithStdErrorMessageTest()
         {
             Console.Error.WriteLine("Std Error Message");
             Environment.Exit(1);
