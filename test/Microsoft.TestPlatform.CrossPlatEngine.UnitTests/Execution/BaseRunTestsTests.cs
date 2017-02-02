@@ -26,6 +26,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
     using Moq;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using System.Threading;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -231,10 +232,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             LazyExtension<ITestExecutor, ITestExecutorCapabilities> receivedExecutor = null;
 
             // Setup mocks.
+#if NET46
+            var apartmentState = ApartmentState.Unknown;
+#endif
+
             this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriExtensionTuple, runContext, frameworkHandle) =>
                 {
+#if NET46
+                    apartmentState = Thread.CurrentThread.GetApartmentState();
+#endif
                     receivedExecutor = executor;
                 };
             
@@ -242,6 +250,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             Assert.IsNotNull(receivedExecutor);
             Assert.AreEqual(BaseRunTestsExecutorUri, receivedExecutor.Metadata.ExtensionUri);
+#if NET46
+            // Verify STA is used by default
+            Assert.AreEqual(ApartmentState.STA, apartmentState);
+#endif
         }
 
         [TestMethod]
@@ -569,9 +581,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.IsTrue(isExceptionThrown.HasValue && isExceptionThrown.Value);
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods
+#region Private Methods
 
         private void SetupExecutorUriMock()
         {
@@ -592,9 +604,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location },
                 () => { });
         }
-        #endregion
+#endregion
 
-        #region Testable Implementation
+#region Testable Implementation
 
         private class TestableBaseRunTests : BaseRunTests
         {
@@ -699,7 +711,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             }
         }
 
-        #endregion
+#endregion
 
     }
 }

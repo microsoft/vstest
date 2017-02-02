@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
@@ -29,13 +30,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using System.Threading;
+#if NET46
+    using System.Configuration;
+#endif
 
     /// <summary>
     /// The base run tests.
     /// </summary>
     internal abstract class BaseRunTests
     {
-        #region private fields
+#region private fields
 
         private string runSettings;
         private TestExecutionContext testExecutionContext;
@@ -59,9 +64,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ICollection<string> executorUrisThatRanTests;
         private ITestPlatformEventSource testPlatformEventSource;
 
-        #endregion
+        /// <summary>
+        /// Key in AppSettings section. Corresponding value used for setting tests execution thread apartment state.
+        /// </summary>
+        private const string ExecutionThreadApartmentStateKey = "ExecutionThreadApartmentState";
 
-        #region Constructor
+#endregion
+
+#region Constructor
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
@@ -119,9 +129,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.executorUrisThatRanTests = new List<string>();
         }
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Gets the run settings.
@@ -151,9 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected ICollection<string> ExecutorUrisThatRanTests => this.executorUrisThatRanTests;
 
-        #endregion
+#endregion
 
-        #region Public methods
+#region Public methods
 
         public void RunTests()
         {
@@ -247,9 +257,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
-        #endregion
+#endregion
 
-        #region Abstract methods
+#region Abstract methods
 
         protected abstract void BeforeRaisingTestRunComplete(bool exceptionsHitDuringRunTests);
 
@@ -257,9 +267,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         protected abstract void InvokeExecutor(LazyExtension<ITestExecutor, ITestExecutorCapabilities> executor, Tuple<Uri, string> executorUriExtensionTuple, RunContext runContext, IFrameworkHandle frameworkHandle);
 
-        #endregion
+#endregion
 
-        #region Private methods
+#region Private methods
 
         private TimeSpan RunTestsInternal()
         {
@@ -319,7 +329,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
-                        this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
+                        RunInSTAThread(() => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle));
 
                         this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
 
@@ -332,9 +342,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                         if (EqtTrace.IsVerboseEnabled)
                         {
-                            EqtTrace.Verbose(
-                                "TestExecutionManager.RunTestInternalWithExecutors: Completed running tests for {0}",
-                                executor.Metadata.ExtensionUri);
+                            EqtTrace.Verbose("TestExecutionManager.RunTestInternalWithExecutors: Completed running tests for {0}", executor.Metadata.ExtensionUri);
                         }
                     }
                     catch (Exception e)
@@ -381,8 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
-                if (string.IsNullOrEmpty(extensionAssembly)
-                    || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
+                if (string.IsNullOrEmpty(extensionAssembly) || string.Equals(extensionAssembly, ObjectModel.Constants.UnspecifiedAdapterPath))
                 {
                     // full execution. Since the extension manager is cached this can be created multiple times without harming performance.
                     return TestExecutorExtensionManager.Create();
@@ -394,25 +401,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
             catch (Exception ex)
             {
-                EqtTrace.Error(
-                    "BaseRunTests: GetExecutorExtensionManager: Exception occured while loading extensions {0}",
-                    ex);
-
+                EqtTrace.Error("BaseRunTests: GetExecutorExtensionManager: Exception occured while loading extensions {0}", ex);
                 return null;
             }
         }
 
         private void SetAdapterLoggingSettings()
         {
-            // TODO: enable the below once runsettings is in.
-            //var sessionMessageLogger = testExecutorFrameworkHandle as TestSessionMessageLogger;
-            //if (sessionMessageLogger != null
-            //        && testExecutionContext != null
-            //        && testExecutionContext.TestRunConfiguration != null)
-            //{
-            //    sessionMessageLogger.TreatTestAdapterErrorsAsWarnings
-            //        = testExecutionContext.TestRunConfiguration.TreatTestAdapterErrorsAsWarnings;
-            //}
+            var sessionMessageLogger = frameworkHandle as TestSessionMessageLogger;
+            if (sessionMessageLogger != null && testExecutionContext != null && testExecutionContext.TestRunConfiguration != null)
+            {
+                sessionMessageLogger.TreatTestAdapterErrorsAsWarnings = testExecutionContext.TestRunConfiguration.TreatTestAdapterErrorsAsWarnings;
+            }
         }
 
         /// <summary>
@@ -469,6 +469,48 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
         }
 
-        #endregion
+        private static void RunInSTAThread(Action func)
+        {
+            Exception exThrown = null;
+            Thread thread = new Thread(() =>
+            {
+                try
+                {
+                    func();
+                }
+                catch (Exception e)
+                {
+                    exThrown = e;
+                }
+            });
+#if NET46
+            // .NetStandard 1.5 lib does not have ApartmentState - hence ifdef
+            thread.SetApartmentState(GetApartmentStateAppSetting());
+#endif
+            thread.Start();
+            thread.Join();
+
+            if(exThrown != null)
+            {
+                throw exThrown;
+            }
+        }
+
+#if NET46
+        /// <summary>
+        /// Gets the apartmentState and sets the same on the thread that executes tests.
+        /// </summary>
+        private static ApartmentState GetApartmentStateAppSetting()
+        {
+            // Tests must be STA by default as customers who run UI tests, OLE tests are impacted otherwise - compat
+            ApartmentState userApartmentState;
+            string userConfiguredApartmentState = ConfigurationManager.AppSettings[ExecutionThreadApartmentStateKey];
+
+            return  !string.IsNullOrWhiteSpace(userConfiguredApartmentState) && Enum.TryParse(userConfiguredApartmentState, out userApartmentState)
+                ? userApartmentState : ApartmentState.STA;
+        }
+#endif
+
+#endregion
     }
 }
