@@ -298,6 +298,11 @@ Dettagli errore: {1}: {2}</target>
         <target state="new">WARNING: Overwriting results file: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="PlaceHolderForInvalidChar">
+        <source>?</source>
+        <target state="new">?</target>
+        <note>Place holder for invalid xml character in trx file</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
