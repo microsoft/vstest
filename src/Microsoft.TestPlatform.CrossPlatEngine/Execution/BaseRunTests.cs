@@ -29,11 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using System.Threading;
-
-#if NET46
-    using System.Configuration;
-#endif
 
     /// <summary>
     /// The base run tests.
@@ -63,11 +58,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private ICollection<string> executorUrisThatRanTests;
         private ITestPlatformEventSource testPlatformEventSource;
-
-        /// <summary>
-        /// Key in AppSettings section. Corresponding value used for setting tests execution thread apartment state.
-        /// </summary>
-        private const string ExecutionThreadApartmentStateKey = "ExecutionThreadApartmentState";
 
         #endregion
 
@@ -329,11 +319,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
-#if NET46
-                        RunInSTAThread(() => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle));
-#else
                         this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
-#endif
 
                         this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
 
@@ -482,47 +468,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
             }
         }
-
-#if NET46
-        private static void RunInSTAThread(Action func)
-        {
-            Exception exThrown = null;
-            var thread = new Thread(() =>
-            {
-                try
-                {
-                    func();
-                }
-                catch (Exception e)
-                {
-                    exThrown = e;
-                }
-            });
-
-            // .NetStandard 1.5 lib does not have ApartmentState - hence ifdef
-            thread.SetApartmentState(GetApartmentStateAppSetting());
-            thread.Start();
-            thread.Join();
-
-            if (exThrown != null)
-            {
-                throw exThrown;
-            }
-        }
-
-        /// <summary>
-        /// Gets the apartmentState and sets the same on the thread that executes tests.
-        /// </summary>
-        private static ApartmentState GetApartmentStateAppSetting()
-        {
-            // Tests must be STA by default as customers who run UI tests, OLE tests are impacted otherwise - compat
-            ApartmentState userApartmentState;
-            string userConfiguredApartmentState = ConfigurationManager.AppSettings[ExecutionThreadApartmentStateKey];
-
-            return  !string.IsNullOrWhiteSpace(userConfiguredApartmentState) && Enum.TryParse(userConfiguredApartmentState, out userApartmentState)
-                ? userApartmentState : ApartmentState.STA;
-        }
-#endif
 
         #endregion
     }
