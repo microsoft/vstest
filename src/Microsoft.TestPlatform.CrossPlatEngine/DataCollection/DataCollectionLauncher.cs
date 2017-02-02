@@ -19,8 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     /// </summary>
     internal class DataCollectionLauncher : IDataCollectionLauncher
     {
-        private const string X64DataCollectorProcessName = "datacollector.exe";
-        private const string X86DataCollectorProcessName = "datacollector.x86.exe";
+        private const string DataCollectorProcessName = "datacollector.exe";
         private const string DotnetProcessName = "dotnet.exe";
         private const string DotnetProcessNameXPlat = "dotnet";
 
@@ -54,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="architecture">architecture for the host</param>
         public void Initialize(Architecture architecture)
         {
-            this.dataCollectorProcessName = (architecture == Architecture.X86) ? X86DataCollectorProcessName : X64DataCollectorProcessName;
+            this.dataCollectorProcessName = DataCollectorProcessName;
         }
 
         /// <summary>

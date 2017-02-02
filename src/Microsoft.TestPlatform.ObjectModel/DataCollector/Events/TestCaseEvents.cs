@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Base class for all test case event arguments.
     /// </summary>
-#if NET451
+#if NET46
         [Serializable] 
 #endif
     public abstract class TestCaseEventArgs : DataCollectionEventArgs
@@ -17,46 +17,44 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes the instance by storing the given information.
+        /// Initializes a new instance of the <see cref="TestCaseEventArgs"/> class. 
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
         /// </param>
-        /// <param name="testCaseName">The test case name</param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
         /// <param name="isChildTestCase">
         /// True if this is a child test case, false if this is a top-level test case.
         /// </param>
         protected TestCaseEventArgs(
             DataCollectionContext context,
             Guid testCaseId,
-            //TcmInformation tcmInformation,
             string testCaseName,
             bool isChildTestCase)
             : base(context)
         {
-            TestCaseId = testCaseId;
-            //TcmInformation = tcmInformation;
-            TestCaseName = testCaseName == null ? string.Empty : testCaseName;
-            IsChildTestCase = isChildTestCase;
+            this.TestCaseId = testCaseId;
+            this.TestCaseName = testCaseName == null ? string.Empty : testCaseName;
+            this.IsChildTestCase = isChildTestCase;
         }
 
         /// <summary>
-        /// Initializes the instance by storing the given information.
+        /// Initializes a new instance of the <see cref="TestCaseEventArgs"/> class. 
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testElement">The test element of the test that this event is for.</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testElement">
+        /// The test element of the test that this event is for.
         /// </param>
         protected TestCaseEventArgs(
             DataCollectionContext context,
-            TestCase testElement
-            //TcmInformation tcmInformation
-            )
+            TestCase testElement)
             : this(context, Guid.Empty, null, false)
         {
             // NOTE: ONLY USE FOR UNIT TESTING!
@@ -66,14 +64,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
 
-            //todo
-            //EqtAssert.ParameterNotNull(testElement, "testElement");
+            // todo
+            // EqtAssert.ParameterNotNull(testElement, "testElement");
 
-            TestElement = testElement;
-            TestCaseId = testElement.Id;
-            TestCaseName = testElement.DisplayName;
-            //IsChildTestCase = testElement != null &&
-            //                  !testElement.ParentExecId.Equals(TestExecId.Empty);
+            this.TestElement = testElement;
+            this.TestCaseId = testElement.Id;
+            this.TestCaseName = testElement.DisplayName;
+            // IsChildTestCase = testElement != null &&
+            // !testElement.ParentExecId.Equals(TestExecId.Empty);
         }
 
         #endregion
@@ -90,16 +88,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
-        /// </summary>
-        //public TcmInformation TcmInformation
-        //{
-        //    get;
-        //    private set;
-        //}
-
-        /// <summary>
         /// Gets the test case name
         /// </summary>
         public string TestCaseName
@@ -109,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// True if this is a child test case, false if this is a top-level test case
+        /// Gets a value indicating whether this is a child test case, false if this is a top-level test case
         /// </summary>
         public bool IsChildTestCase
         {
@@ -118,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         }
 
         /// <summary>
-        /// Test element of the test this event is for.
+        /// Gets test element of the test this event is for.
         /// </summary>
         public TestCase TestElement
         {
@@ -132,50 +120,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case Start event arguments.
     /// </summary>
-#if NET451
+#if NET46
         [Serializable]
 #endif
     public sealed class TestCaseStartEventArgs : TestCaseEventArgs
     {
-        #region Constructor
+        #region Constructor       
 
         /// <summary>
-        /// Initializes the instance by storing the given information
-        /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
-        /// </param>
-        /// <param name="testCaseName">The test case name</param>
-        /// <param name="isChildTestCase">
-        /// True if this is a child test case, false if this is a top-level test case
-        /// </param>
-        internal TestCaseStartEventArgs(
-            DataCollectionContext context,
-            Guid testCaseId,
-            //TcmInformation tcmInformation,
-            string testCaseName,
-            bool isChildTestCase)
-            : base(context, testCaseId, testCaseName, isChildTestCase)
-        {
-            Debug.Assert(context.HasTestCase, "Context is not for a test case");
-        }
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class. 
         /// Initializes the instance by storing the given information.
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testElement">The test element of the test that this event is for.</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testElement">
+        /// The test element of the test that this event is for.
         /// </param>
         public TestCaseStartEventArgs(
             DataCollectionContext context,
             TestCase testElement)
-            //TcmInformation tcmInformation)
             : base(context, testElement)
         {
             // NOTE: ONLY USE FOR UNIT TESTING!
@@ -184,6 +148,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  around in the events as this is extra information that needs to be seralized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class. 
+        /// Initializes the instance by storing the given information
+        /// </summary>
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
+        internal TestCaseStartEventArgs(
+            DataCollectionContext context,
+            Guid testCaseId,
+            string testCaseName,
+            bool isChildTestCase)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
+        {
+            Debug.Assert(context.HasTestCase, "Context is not for a test case");
         }
 
         #endregion
@@ -192,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case End event arguments.
     /// </summary>
-#if NET451
+#if NET46
         [Serializable] 
 #endif
     public sealed class TestCaseEndEventArgs : TestCaseEventArgs
@@ -200,69 +190,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes the instance by storing the given information
-        /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
-        /// </param>
-        /// <param name="testCaseName">The test case name</param>
-        /// <param name="isChildTestCase">
-        /// True if this is a child test case, false if this is a top-level test case
-        /// </param>
-        internal TestCaseEndEventArgs(
-            DataCollectionContext context,
-            Guid testCaseId,
-            //TcmInformation tcmInformation,
-            string testCaseName,
-            bool isChildTestCase)
-            : this(context, testCaseId, testCaseName, isChildTestCase, TestOutcome.Failed)
-        {
-        }
-
-        /// <summary>
-        /// Initializes the instance by storing the given information
-        /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
-        /// </param>
-        /// <param name="testCaseName">The test case name</param>
-        /// <param name="isChildTestCase">
-        /// True if this is a child test case, false if this is a top-level test case
-        /// </param>
-        /// <param name="testOutcome">The outcome of the test case.</param>
-        internal TestCaseEndEventArgs(
-            DataCollectionContext context,
-            Guid testCaseId,
-            //TcmInformation tcmInformation,
-            string testCaseName,
-            bool isChildTestCase,
-            TestOutcome testOutcome)
-            : base(context, testCaseId, testCaseName, isChildTestCase)
-        {
-            Debug.Assert(context.HasTestCase, "Context is not for a test case");
-            this.TestOutcome = testOutcome;
-        }
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class. 
         /// Initializes the instance by storing the given information.
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testElement">The test element of the test that this event is for.</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
         /// </param>
-        /// <param name="testOutcome">The outcome of the test case.</param>
+        /// <param name="testElement">
+        /// The test element of the test that this event is for.
+        /// </param>
+        /// <param name="testOutcome">
+        /// The outcome of the test case.
+        /// </param>
         public TestCaseEndEventArgs(
             DataCollectionContext context,
             TestCase testElement,
-            //TcmInformation tcmInformation,
             TestOutcome testOutcome)
             : base(context, testElement)
         {
@@ -272,16 +214,70 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  around in the events as this is extra information that needs to be seralized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
-
             this.TestOutcome = testOutcome;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class. 
+        /// </summary>
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
+        internal TestCaseEndEventArgs(
+            DataCollectionContext context,
+            Guid testCaseId,
+            string testCaseName,
+            bool isChildTestCase)
+            : this(context, testCaseId, testCaseName, isChildTestCase, TestOutcome.Failed)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class. 
+        /// Initializes the instance by storing the given information
+        /// </summary>
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
+        /// <param name="testOutcome">
+        /// The outcome of the test case.
+        /// </param>
+        internal TestCaseEndEventArgs(
+            DataCollectionContext context,
+            Guid testCaseId,
+            string testCaseName,
+            bool isChildTestCase,
+            TestOutcome testOutcome)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
+        {
+            Debug.Assert(context.HasTestCase, "Context is not for a test case");
+            this.TestOutcome = testOutcome;
+        }        
 
         #endregion
 
         #region Properties
 
         /// <summary>
-        /// The outcome of the test.
+        /// Gets the outcome of the test.
         /// </summary>
         public TestOutcome TestOutcome
         {
@@ -294,7 +290,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case Pause Event arguments.
     /// </summary>
-#if NET451
+#if NET46
     [Serializable]
 #endif
     public sealed class TestCasePauseEventArgs : TestCaseEventArgs
@@ -302,42 +298,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes the instance by storing the given information
+        /// Initializes a new instance of the <see cref="TestCasePauseEventArgs"/> class. 
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
         /// </param>
-        /// <param name="testCaseName">The test case name</param>
-        /// <param name="isChildTestCase">
-        /// True if this is a child test case, false if this is a top-level test case
-        /// </param>
-        internal TestCasePauseEventArgs(
-            DataCollectionContext context,
-            Guid testCaseId,
-            //TcmInformation tcmInformation,
-            string testCaseName,
-            bool isChildTestCase)
-            : base(context, testCaseId, testCaseName, isChildTestCase)
-        {
-            Debug.Assert(context.HasTestCase, "Context is not for a test case");
-        }
-
-        /// <summary>
-        /// Initializes the instance by storing the given information.
-        /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testElement">The test element of the test that this event is for.</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="testElement">
+        /// The test element of the test that this event is for.
         /// </param>
         public TestCasePauseEventArgs(
             DataCollectionContext context,
             TestCase testElement)
-            //TcmInformation tcmInformation)
             : base(context, testElement)
         {
             // NOTE: ONLY USE FOR UNIT TESTING!
@@ -346,6 +317,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  around in the events as this is extra information that needs to be seralized
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCasePauseEventArgs"/> class. 
+        /// Initializes the instance by storing the given information
+        /// </summary>
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
+        internal TestCasePauseEventArgs(
+            DataCollectionContext context,
+            Guid testCaseId,
+            string testCaseName,
+            bool isChildTestCase)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
+        {
+            Debug.Assert(context.HasTestCase, "Context is not for a test case");
         }
 
         #endregion
@@ -354,7 +351,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case Resume Event arguments.
     /// </summary>
-#if NET451
+#if NET46
     [Serializable]
 #endif
     public sealed class TestCaseResumeEventArgs : TestCaseEventArgs
@@ -362,42 +359,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes the instance by storing the given information
-        /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
-        /// </param>
-        /// <param name="testCaseName">The test case name</param>
-        /// <param name="isChildTestCase">
-        /// True if this is a child test case, false if this is a top-level test case
-        /// </param>
-        internal TestCaseResumeEventArgs(
-            DataCollectionContext context,
-            Guid testCaseId,
-            //TcmInformation tcmInformation,
-            string testCaseName,
-            bool isChildTestCase)
-            : base(context, testCaseId, testCaseName, isChildTestCase)
-        {
-            Debug.Assert(context.HasTestCase, "Context is not for a test case");
-        }
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseResumeEventArgs"/> class. 
         /// Initializes the instance by storing the given information.
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testElement">The test element of the test that this event is for.</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testElement">
+        /// The test element of the test that this event is for.
         /// </param>
         public TestCaseResumeEventArgs(
             DataCollectionContext context,
             TestCase testElement)
-            //TcmInformation tcmInformation)
             : base(context, testElement)
         {
             // NOTE: ONLY USE FOR UNIT TESTING!
@@ -407,6 +380,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  and the Execution Plugin Manager will fill this in for us before the event
             //  is sent to the data collector when running in a production environment.
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseResumeEventArgs"/> class. 
+        /// Initializes the instance by storing the given information
+        /// </summary>
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
+        internal TestCaseResumeEventArgs(
+            DataCollectionContext context,
+            Guid testCaseId,
+            string testCaseName,
+            bool isChildTestCase)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
+        {
+            Debug.Assert(context.HasTestCase, "Context is not for a test case");
+        }       
 
         #endregion
     }
@@ -414,7 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case Reset Event arguments.
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public sealed class TestCaseResetEventArgs : TestCaseEventArgs
@@ -422,42 +421,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes the instance by storing the given information
-        /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
-        /// </param>
-        /// <param name="testCaseName">The test case name</param>
-        /// <param name="isChildTestCase">
-        /// True if this is a child test case, false if this is a top-level test case
-        /// </param>
-        internal TestCaseResetEventArgs(
-            DataCollectionContext context,
-            Guid testCaseId,
-            //TcmInformation tcmInformation,
-            string testCaseName,
-            bool isChildTestCase)
-            : base(context, testCaseId, testCaseName, isChildTestCase)
-        {
-            Debug.Assert(context.HasTestCase, "Context is not for a test case");
-        }
-
-        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseResetEventArgs"/> class. 
         /// Initializes the instance by storing the given information.
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testElement">The test element of the test that this event is for.</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testElement">
+        /// The test element of the test that this event is for.
         /// </param>
         public TestCaseResetEventArgs(
             DataCollectionContext context,
             TestCase testElement)
-            //TcmInformation tcmInformation)
             : base(context, testElement)
         {
             // NOTE: ONLY USE FOR UNIT TESTING!
@@ -468,13 +443,39 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             //  is sent to the data collector when running in a production environment.
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseResetEventArgs"/> class. 
+        /// Initializes the instance by storing the given information
+        /// </summary>
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
+        /// <param name="isChildTestCase">
+        /// True if this is a child test case, false if this is a top-level test case
+        /// </param>
+        internal TestCaseResetEventArgs(
+            DataCollectionContext context,
+            Guid testCaseId,
+            string testCaseName,
+            bool isChildTestCase)
+            : base(context, testCaseId, testCaseName, isChildTestCase)
+        {
+            Debug.Assert(context.HasTestCase, "Context is not for a test case");
+        }       
+
         #endregion
     }
 
     /// <summary>
     /// Test Case Failed Event arguments.
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public sealed class TestCaseFailedEventArgs : TestCaseEventArgs
@@ -482,23 +483,54 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
-        /// Initializes the instance by storing the given information
+        /// Initializes a new instance of the <see cref="TestCaseFailedEventArgs"/> class. 
+        /// Initializes the instance by storing the given information.
         /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testCaseId">The test case ID</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
+        /// <param name="context">
+        /// Context information for the test case
         /// </param>
-        /// <param name="testCaseName">The test case name</param>
+        /// <param name="testElement">
+        /// The test element of the test that this event is for.
+        /// </param>
+        /// <param name="failureType">
+        /// The type of failure which has occurred.
+        /// </param>
+        public TestCaseFailedEventArgs(
+            DataCollectionContext context,
+            TestCase testElement,
+            TestCaseFailureType failureType)
+            : base(context, testElement)
+        {
+            // NOTE: ONLY USE FOR UNIT TESTING!
+            //  This overload is only here for 3rd parties to use for unit testing
+            //  their data collectors.  Internally we should not be passing the test element
+            //  around in the events as this is extra information that needs to be seralized
+            //  and the Execution Plugin Manager will fill this in for us before the event
+            //  is sent to the data collector when running in a production environment.
+            this.FailureType = failureType;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseFailedEventArgs"/> class. 
+        /// </summary>
+        /// <param name="context">
+        /// Context information for the test case
+        /// </param>
+        /// <param name="testCaseId">
+        /// The test case ID
+        /// </param>
+        /// <param name="testCaseName">
+        /// The test case name
+        /// </param>
         /// <param name="isChildTestCase">
         /// True if this is a child test case, false if this is a top-level test case
         /// </param>
-        /// <param name="failureType">The type of failure which has occured.</param>
+        /// <param name="failureType">
+        /// The type of failure which has occurred.
+        /// </param>
         internal TestCaseFailedEventArgs(
             DataCollectionContext context,
             Guid testCaseId,
-            //TcmInformation tcmInformation,
             string testCaseName,
             bool isChildTestCase,
             TestCaseFailureType failureType)
@@ -508,37 +540,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 
             if (failureType < TestCaseFailureType.None || failureType > TestCaseFailureType.Other)
             {
-                throw new ArgumentOutOfRangeException("failureType");
+                throw new ArgumentOutOfRangeException(nameof(failureType));
             }
 
-            FailureType = failureType;
-        }
-
-        /// <summary>
-        /// Initializes the instance by storing the given information.
-        /// </summary>
-        /// <param name="context">Context information for the test case</param>
-        /// <param name="testElement">The test element of the test that this event is for.</param>
-        /// <param name="tcmInformation">
-        /// Information used to obtain further data about the test from the Test Case Management (TCM) server,
-        /// or null if the test did not originate from TCM.
-        /// </param>
-        /// <param name="failureType">The type of failure which has occured.</param>
-        public TestCaseFailedEventArgs(
-            DataCollectionContext context,
-            TestCase testElement,
-            //TcmInformation tcmInformation,
-            TestCaseFailureType failureType)
-            : base(context, testElement)
-        {
-            // NOTE: ONLY USE FOR UNIT TESTING!
-            //  This overload is only here for 3rd parties to use for unit testing
-            //  their data collectors.  Internally we should not be passing the test element
-            //  around in the events as this is extra information that needs to be seralized
-            //  and the Execution Plugin Manager will fill this in for us before the event
-            //  is sent to the data collector when running in a production environment.
-
-            FailureType = failureType;
+            this.FailureType = failureType;
         }
 
         #endregion
@@ -546,7 +551,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Properties
 
         /// <summary>
-        /// The type of failure which occured.
+        /// Gets the type of failure which occurred.
         /// </summary>
         public TestCaseFailureType FailureType { get; private set; }
 
