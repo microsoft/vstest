@@ -147,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var cliArgs = string.Join(" ", commandLineArguments);
             var argumentsString = string.Format("{0} {1} {2} ", args, dataCollectorAssemblyPath, cliArgs);
 
-            this.DataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory);
+            this.DataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory, null);
             return this.DataCollectorProcess.Id;
         }
     }
