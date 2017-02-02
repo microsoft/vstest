@@ -6,10 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Collections.Generic;
-
-    using Castle.DynamicProxy.Contributors;
+    using vstest.console.UnitTests.TestDoubles;
 
     [TestClass]
     public class EnableLoggersArgumentProcessorTests
@@ -50,7 +47,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(false, capabilities.IsSpecialCommand);
         }
 
-
         [TestMethod]
         public void ExecutorInitializeWithNullOrEmptyArgumentsShouldThrowException()
         {
@@ -77,6 +73,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        public void ExecutorInitializeWithValidArgumentsShouldAddConsoleloggerToTestLoggerManager()
+        {
+            RunTestsArgumentProcessorTests.SetupMockExtensions();
+            var testloggerManager = new DummyTestLoggerManager();
+            var executor = new EnableLoggerArgumentExecutor(testloggerManager);
+
+            executor.Initialize("console;verbosity=minimal");
+            Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/ConsoleLogger/v2"));
+        }
+
+        [TestMethod]
         public void ExectorInitializeShouldThrowExceptionIfInvalidArgumentIsPassed()
         {
             var executor = new EnableLoggerArgumentExecutor(TestLoggerManager.Instance);
@@ -92,27 +99,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var executor = new EnableLoggerArgumentExecutor(null);
             var result = executor.Execute();
             Assert.AreEqual(ArgumentProcessorResult.Success, result);
-        }
-    }
-
-    internal class DummyTestLoggerManager : TestLoggerManager
-    {
-        public DummyTestLoggerManager()
-        {
-
-        }
-
-        public HashSet<String> GetInitializedLoggers
-        {
-            get
-            {
-                return InitializedLoggers;
-            }
-        }
-
-        public static void Cleanup()
-        {
-            Instance = null;
         }
     }
 }
