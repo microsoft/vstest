@@ -695,11 +695,16 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         private static string RemoveInvalidXmlChar(string str)
         {
-            // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
-            // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
+            if (str != null)
+            {
+                // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
+                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
 
-            string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]";
-            return Regex.Replace(str, invalidChar, TrxLoggerResources.PlaceHolderForInvalidChar);
+                string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]";
+                return Regex.Replace(str, invalidChar, TrxLoggerResources.PlaceHolderForInvalidChar);
+            }
+
+            return str;
         }
 
         private XmlNode EnsureLocationExists(XmlElement xml, string location, string nameSpaceUri)
