@@ -204,7 +204,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("StringSeperator", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Testhost process exited with error: {0}.
+        /// </summary>
+        internal static string TestHostExitedWithError
+        {
+            get
+            {
+                return ResourceManager.GetString("TestHostExitedWithError", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again..
         /// </summary>
