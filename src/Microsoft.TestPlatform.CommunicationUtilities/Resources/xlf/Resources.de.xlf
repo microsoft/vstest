@@ -21,9 +21,9 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">Der aktive Testlauf wurde abgebrochen.</target>
-        <note />
+        <source>The active Test Run was aborted. Due to {0}</source>
+        <target state="new">Der aktive Testlauf wurde abgebrochen.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aktive Testlauf wurde abgebrochen.</target>
         </alt-trans>
@@ -39,9 +39,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">Die aktive Testermittlung wurde abgebrochen.</target>
-        <note />
+        <source>The active Test Discovery was aborted. Due to {0}</source>
+        <target state="new">Die aktive Testermittlung wurde abgebrochen.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Der aktive Test wurde abgebrochen.</target>
         </alt-trans>

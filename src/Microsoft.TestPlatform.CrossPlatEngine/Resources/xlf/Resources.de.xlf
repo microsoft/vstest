@@ -175,6 +175,11 @@
         <target state="translated">{0} wurde nicht gefunden. Stellen Sie sicher, dass das dotnet auf dem Computer installiert ist.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostExitedWithError">
+        <source>Testhost process exited with error: {0}</source>
+        <target state="new">Testhost process exited with error: {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

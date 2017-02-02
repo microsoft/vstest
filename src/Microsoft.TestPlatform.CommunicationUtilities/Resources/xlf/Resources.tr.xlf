@@ -21,9 +21,9 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">Etkin Test Çalıştırması iptal edildi.</target>
-        <note />
+        <source>The active Test Run was aborted. Due to {0}</source>
+        <target state="new" state-qualifier="mt-suggestion">Etkin Test Çalıştırması iptal edildi.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Etkin Test çalışmasını iptal edildi.</target>
         </alt-trans>
@@ -39,9 +39,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">Etkin Test Bulma iptal edildi.</target>
-        <note />
+        <source>The active Test Discovery was aborted. Due to {0}</source>
+        <target state="new" state-qualifier="mt-suggestion">Etkin Test Bulma iptal edildi.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Etkin Test keşfi iptal edildi.</target>
         </alt-trans>
