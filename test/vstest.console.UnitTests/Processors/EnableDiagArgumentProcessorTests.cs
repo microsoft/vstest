@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     [TestClass]
     public class EnableDiagArgumentProcessorTests
     {
-        private string dummyFilePath = Path.Combine(Path.DirectorySeparatorChar.ToString(), "tmp", "foo.txt");
+        private string dummyFilePath = Path.Combine(Path.GetTempPath(), "tmp", "foo.txt");
 
         private readonly EnableDiagArgumentProcessor diagProcessor;
 
@@ -69,6 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void EnableDiagArgumentProcessorExecutorShouldCreateDirectoryOfLogFileIfNotExists()
         {
+            this.mockFileHelper.Setup(x => x.CreateDirectory(Path.GetDirectoryName(this.dummyFilePath))).Callback<string>((path) => { Directory.CreateDirectory(path); });
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(false);
             
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
