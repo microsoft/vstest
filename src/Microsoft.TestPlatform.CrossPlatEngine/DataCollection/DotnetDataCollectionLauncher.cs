@@ -32,11 +32,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IFileHelper fileHelper;
 
+        private IDotnetHostHelper dotnetHostHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetDataCollectionLauncher"/> class. 
         /// </summary>
         public DotnetDataCollectionLauncher()
-            : this(new ProcessHelper(), new FileHelper())
+            : this(new ProcessHelper(), new FileHelper(), new DotnetHostHelper())
         {
         }
 
@@ -46,11 +48,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="processHelper">
         /// The process helper. 
         /// </param>
-        internal DotnetDataCollectionLauncher(IProcessHelper processHelper, IFileHelper fileHelper)
+        internal DotnetDataCollectionLauncher(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetHostHelper)
         {
             this.processHelper = processHelper;
             this.DataCollectorProcess = null;
             this.fileHelper = fileHelper;
+            this.dotnetHostHelper = dotnetHostHelper;
         }
 
         /// <summary>
@@ -70,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public virtual int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
             string dataCollectorFileName = null;
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DataCollectionLauncher).GetTypeInfo().Assembly.Location);
+            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
             // TODO: DRY: Move this code to a common place
@@ -88,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
             else
             {
-                currentProcessFileName = this.GetDotnetHostFullPath();
+                currentProcessFileName = this.dotnetHostHelper.GetDotnetHostFullPath();
             }
 
             if (EqtTrace.IsVerboseEnabled)
@@ -97,11 +100,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
 
             var dataCollectorAssemblyPath = Path.Combine(currentWorkingDirectory, DataCollectorProcessName);
-            commandLineArguments.Insert(0, dataCollectorAssemblyPath);
 
             dataCollectorFileName = Path.GetFileNameWithoutExtension(dataCollectorAssemblyPath);
 
-            // .NET core host manager is not a shared host. It will expect a single test source to be provided.
             var args = "exec";
 
             // Probe for runtimeconfig and deps file for the test source
@@ -143,51 +144,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 }
             }
 
-            commandLineArguments.Insert(0, args);
-
-            var argumentsString = string.Join(" ", commandLineArguments);
+            var cliArgs = string.Join(" ", commandLineArguments);
+            var argumentsString = string.Format("{0} {1} {2} ", args, dataCollectorAssemblyPath, cliArgs);
 
             this.DataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory);
             return this.DataCollectorProcess.Id;
-        }
-
-        /// <summary>
-        /// Get full path for the .net host
-        /// </summary>
-        /// <returns>Full path to <c>dotnet</c> executable</returns>
-        /// <remarks>Debuggers require the full path of executable to launch it.</remarks>
-        private string GetDotnetHostFullPath()
-        {
-            var separator = ';';
-            var dotnetExeName = "dotnet.exe";
-
-#if !NET46
-            // Use semicolon(;) as path separator for windows
-            // colon(:) for Linux and OSX
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                separator = ':';
-                dotnetExeName = "dotnet";
-            }
-#endif
-
-            var pathString = Environment.GetEnvironmentVariable("PATH");
-            foreach (string path in pathString.Split(separator))
-            {
-                var exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
-                if (File.Exists(exeFullPath))
-                {
-                    return exeFullPath;
-                }
-            }
-
-            var errorMessage = string.Format(Resources.NoDotnetExeFound, dotnetExeName);
-            if (EqtTrace.IsErrorEnabled)
-            {
-                EqtTrace.Error(errorMessage);
-            }
-
-            throw new FileNotFoundException(errorMessage);
         }
     }
 }

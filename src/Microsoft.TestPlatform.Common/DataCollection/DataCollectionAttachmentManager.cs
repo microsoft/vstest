@@ -310,7 +310,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     },
                 this.cancellationTokenSource.Token);
 
-            this.attachmentTasks.Add(task);
             this.attachmentTasks.Add(continuationTask);
         }
 
