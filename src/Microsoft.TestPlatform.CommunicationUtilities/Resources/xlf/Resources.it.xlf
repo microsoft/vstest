@@ -21,8 +21,8 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">L'esecuzione dei test attiva è stata interrotta.</target>
+        <source>The active Test Run was aborted. Due to {0}</source>
+        <target state="new">L'esecuzione dei test attiva è stata interrotta.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Esecuzione dei Test attiva è stata interrotta.</target>
@@ -39,8 +39,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">L'individuazione dei test attiva è stata interrotta.</target>
+        <source>The active Test Discovery was aborted. Due to {0}</source>
+        <target state="new">L'individuazione dei test attiva è stata interrotta.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">L'individuazione dei Test attiva è stata interrotta.</target>

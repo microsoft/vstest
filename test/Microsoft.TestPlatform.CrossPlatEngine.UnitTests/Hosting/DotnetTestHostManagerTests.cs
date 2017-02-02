@@ -441,14 +441,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = new TestProcessStartInfo { FileName = "testhost.exe", Arguments = "a1", WorkingDirectory = "w" };
             var currentProcess = Process.GetCurrentProcess();
             var mockProcessHelper = new Mock<IProcessHelper>();
-            mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null))
                 .Returns(currentProcess);
             var hostLauncher = new DefaultTestHostLauncher(mockProcessHelper.Object);
 
             var processId = hostLauncher.LaunchTestHost(startInfo);
 
             Assert.AreEqual(currentProcess.Id, processId);
-            mockProcessHelper.Verify(ph => ph.LaunchProcess("testhost.exe", "a1", "w"), Times.Once);
+            mockProcessHelper.Verify(ph => ph.LaunchProcess("testhost.exe", "a1", "w", null), Times.Once);
         }
     }
 }

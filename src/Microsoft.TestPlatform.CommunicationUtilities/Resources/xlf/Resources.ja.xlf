@@ -21,8 +21,8 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">アクティブなテストの実行が中止されました。</target>
+        <source>The active Test Run was aborted. Due to {0}</source>
+        <target state="new">アクティブなテストの実行が中止されました。</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの実行は中止されました。</target>
@@ -39,8 +39,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">アクティブなテスト探索が中止されました。</target>
+        <source>The active Test Discovery was aborted. Due to {0}</source>
+        <target state="new">アクティブなテスト探索が中止されました。</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの探索は中止されました。</target>
