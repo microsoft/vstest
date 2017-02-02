@@ -220,17 +220,31 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldHandleExceptionOnReceiveMessage()
+        public void DiscoverTestsShouldHandleDiscoveryCompleteOnCommunicationFailure()
+        {
+            this.DiscoverTestsErrorScenarioTestTemplates(CommunicationUtilitiesResources.UnableToCommunicateToTestHost,(s) => { });
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldHandleDiscoveryCompleteOnProcessExit()
+        {
+            this.DiscoverTestsErrorScenarioTestTemplates("Error Message", (s) => this.testRequestSender.OnClientProcessExit(s));
+        }
+
+        public void DiscoverTestsErrorScenarioTestTemplates(string errorMessage, Action<string> exitCallback)
         {
             var sources = new List<string>() { "Hello", "World" };
             string settingsXml = "SettingsXml";
             var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
             var discoveryCriteria = new DiscoveryCriteria(sources, 100, settingsXml);
-            this.mockCommunicationManager.Setup(cm => cm.ReceiveRawMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult((string)null));
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveRawMessageAsync(It.IsAny<CancellationToken>())).
+                Returns(Task.FromResult((string)null)).Callback(() => exitCallback(errorMessage));
+
+            this.testRequestSender.InitializeCommunication();
             this.testRequestSender.DiscoverTests(discoveryCriteria, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleDiscoveryComplete(-1, null, true), Times.Once);
-            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(CommunicationUtilitiesResources.AbortedTestDiscovery, errorMessage)), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(It.IsAny<string>()), Times.Exactly(2));
         }
 
@@ -433,10 +447,21 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void StartTestRunShouldCallHandleTestRunCompleteAndHandleLogMessageOnConnectionBreak()
         {
+            this.StartTestRunErrorTestsTemplate(CommunicationUtilitiesResources.UnableToCommunicateToTestHost, (s) => { });
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCallHandleTestRunCompleteAndHandleLogMessageOnProcessExit()
+        {
+            this.StartTestRunErrorTestsTemplate("Error Message", (s) => this.testRequestSender.OnClientProcessExit(s));
+        }
+
+        private void StartTestRunErrorTestsTemplate(string errorMessage, Action<string> onClientProcessExitCallback)
+        {
             var mockHandler = new Mock<ITestRunEventsHandler>();
             var runCriteria = new TestRunCriteriaWithSources(null, null, null);
             this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessageAsync(It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult((string)null));
+                .Callback(() => onClientProcessExitCallback(errorMessage)).Returns(Task.FromResult((string)null));
             string testCompleteRawMessage =
                 "{\"MessageType\":\"TestExecution.Completed\",\"Payload\":{\"TestRunCompleteArgs\":{\"TestRunStatistics\":null,\"IsCanceled\":false,\"IsAborted\":true,\"Error\":{\"ClassName\":\"System.IO.IOException\",\"Message\":\"Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host.\",\"Data\":null,\"InnerException\":null},\"AttachmentSets\":null,\"ElapsedTimeInRunningTests\":\"00:00:00\"},\"LastRunTests\":null,\"RunAttachments\":null,\"ExecutorUris\":null}}";
             this.mockDataSerializer.Setup(
@@ -452,11 +477,10 @@ namespace TestPlatform.CommunicationUtilities.UnitTests
             waitHandle.WaitOne();
             this.testRequestSender.EndSession();
 
-            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(CommunicationUtilitiesResources.AbortedTestRun, CommunicationUtilitiesResources.ConnectionClosed)), Times.Once);
+            mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(CommunicationUtilitiesResources.AbortedTestRun, errorMessage)), Times.Once);
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(testCompleteRawMessage), Times.Once);
             mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.SessionEnd), Times.Never);
-
         }
 
         [TestMethod]

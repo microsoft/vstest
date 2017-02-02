@@ -87,5 +87,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
         }
+
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void ShouldGetErrorMessageOnTesthostExitWithError(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " /tests:ExitWithStdErrorMessageTest");
+            this.InvokeVsTest(arguments);
+            this.StdErrorContains("The active Test Run was aborted.");
+        }
     }
 }

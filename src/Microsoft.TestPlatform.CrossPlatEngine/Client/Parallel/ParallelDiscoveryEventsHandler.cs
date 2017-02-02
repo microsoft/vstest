@@ -117,7 +117,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             this.actualDiscoveryEventsHandler.HandleLogMessage(level, message);
         }
-        
+
+        /// <summary>
+        /// To send message to IDE output window use HandleRawMessage
+        /// </summary>
+        /// <param name="messageType"></param>
+        /// <param name="payload"></param>
         private void ConvertToRawMessageAndSend(string messageType, object payload)
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
