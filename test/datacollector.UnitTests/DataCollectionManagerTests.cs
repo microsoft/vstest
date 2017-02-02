@@ -295,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         {
             var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
             var mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>(), It.IsAny<bool>())).Throws<Exception>();
+            mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
             this.dataCollectionManager = new DataCollectionManager(mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, new Mock<IDataCollectorLoader>().Object);
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 
@@ -319,7 +319,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                 (a, b, c, d, e) =>
                     {
                         b.SessionEnd += (sender, ev) =>
-                            { throw new Exception(); };
+                            {
+                                var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+                                File.WriteAllText(filename, string.Empty);
+                                c.SendFileAsync(e.SessionDataCollectionContext, filename, true);
+                                throw new Exception();
+                            };
                     });
 
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
@@ -327,7 +332,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             var result = this.dataCollectionManager.SessionEnded();
 
-            Assert.AreEqual(0, result.Count);
+            Assert.AreEqual(1, result.Count);
+        }
+
+        [TestMethod]
+        public void SessionEndedShouldCancelProcessingAttachmentRequestsIfSessionIsCancelled()
+        {
+            var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
+            var mockAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
+            this.dataCollectionManager = new DataCollectionManager(mockAttachmentManager.Object, this.mockMessageSink.Object, this.dataCollectorLoader.Object);
+
+            this.dataCollectionManager.InitializeDataCollectors(runSettings);
+            this.dataCollectionManager.SessionStarted();
+
+            var result = this.dataCollectionManager.SessionEnded(true);
+
+            mockAttachmentManager.Verify(x => x.Cancel(), Times.Once);
         }
     }
 

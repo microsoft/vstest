@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 #else
                 assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(location);
 #endif
-                var dataCollectorType = assembly.GetTypes().ToList().Where(t => t.AssemblyQualifiedName.Equals(assemblyQualifiedName)).FirstOrDefault();
+                var dataCollectorType = assembly.GetTypes().Where(t => t.AssemblyQualifiedName.Equals(assemblyQualifiedName)).FirstOrDefault();
                 dataCollectorInstance = Activator.CreateInstance(dataCollectorType) as DataCollector;
             }
             catch (Exception ex)

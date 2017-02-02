@@ -107,13 +107,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <inheritdoc/>
-        public List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext, bool isCancelled = false)
+        public List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext)
         {
-            if (isCancelled)
-            {
-                this.cancellationTokenSource.Cancel();
-            }
-
             try
             {
                 Task.WhenAll(this.attachmentTasks.ToArray()).Wait();
@@ -123,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 EqtTrace.Error(ex.Message);
             }
 
-            return this.AttachmentSets?.Values.ToList();
+            return this.AttachmentSets.Values.ToList();
         }
 
         /// <inheritdoc/>
@@ -158,6 +153,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Got unexpected message of type FileTransferInformationExtension.");
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public void Cancel()
+        {
+            this.cancellationTokenSource.Cancel();
         }
 
         #endregion
