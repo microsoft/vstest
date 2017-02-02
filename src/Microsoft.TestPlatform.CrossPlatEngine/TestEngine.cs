@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     public class TestEngine : ITestEngine
     {
         #region Private Fields
-        
+
         private ITestExtensionManager testExtensionManager;
 
         #endregion
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             Func<IProxyExecutionManager> proxyExecutionManagerCreator =
                 () =>
                     isDataCollectorEnabled
-                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings))
+                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings, runconfiguration.TargetFrameworkVersion.Name))
                         : new ProxyExecutionManager(testHostManager);
 
             // parallelLevel = 1 for desktop should go via else route.
@@ -117,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         }
 
         #endregion
- 
+
         private static int GetDistinctNumberOfSources(TestRunCriteria testRunCriteria)
         {
             // No point in creating more processes if number of sources is less than what user configured for
@@ -179,11 +179,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return parallelLevelToUse;
         }
 
-        private IProxyDataCollectionManager GetDataCollectionManager(Architecture architecture, string settingsXml)
+        private IProxyDataCollectionManager GetDataCollectionManager(Architecture architecture, string settingsXml, string targetFramework)
         {
             try
             {
-                return new ProxyDataCollectionManager(architecture, settingsXml);
+                return new ProxyDataCollectionManager(architecture, settingsXml, targetFramework);
             }
             catch (Exception ex)
             {

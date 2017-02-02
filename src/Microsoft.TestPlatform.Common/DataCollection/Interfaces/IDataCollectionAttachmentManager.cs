@@ -1,6 +1,7 @@
-﻿
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
 {
     using System;
     using System.Collections.Generic;
@@ -55,5 +56,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
         /// The friendly Name.
         /// </param>
         void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri typeUri, string friendlyName);
+
+        /// <summary>
+        /// Stops processing further transfer requests as test run is cancelled.
+        /// </summary>
+        void Cancel();
     }
 }

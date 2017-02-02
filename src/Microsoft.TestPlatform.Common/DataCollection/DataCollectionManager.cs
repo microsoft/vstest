@@ -1,19 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -67,7 +64,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
-        internal DataCollectionManager() : this(new DataCollectionAttachmentManager(), new MessageSink(), new DataCollectorLoader())
+        /// <param name="messageSink">
+        /// The message Sink.
+        /// </param>
+        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectorLoader())
         {
         }
 
@@ -166,11 +166,17 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <inheritdoc/>
-        public Collection<AttachmentSet> SessionEnded()
+        public Collection<AttachmentSet> SessionEnded(bool isCancelled = false)
         {
             // Return null if datacollection is not enabled.
             if (!this.isDataCollectionEnabled)
             {
+                return new Collection<AttachmentSet>();
+            }
+
+            if (isCancelled)
+            {
+                this.attachmentManager.Cancel();
                 return new Collection<AttachmentSet>();
             }
 

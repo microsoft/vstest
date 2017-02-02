@@ -62,6 +62,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while retrieving the attributes for the diagnostic data adapter of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string AttributeRetrievalError {
+            get {
+                return ResourceManager.GetString("AttributeRetrievalError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Diagnostic data adapter message: {0}.
         /// </summary>
         internal static string DataCollectionMessageFormat {
@@ -71,11 +80,101 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter type URI cannot be null or empty. The type URI for the diagnostic data adapter of type &apos;{0}&apos; is null or empty..
+        /// </summary>
+        internal static string DataCollector_TypeIsNull {
+            get {
+                return ResourceManager.GetString("DataCollector_TypeIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find diagnostic data adapter &apos;{0}&apos;.  Make sure diagnostic data adapter is installed and try again..
+        /// </summary>
+        internal static string DataCollectorAssemblyNotFound {
+            get {
+                return ResourceManager.GetString("DataCollectorAssemblyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter &apos;{0}&apos; failed to provide intialization information. Error: {1}.
+        /// </summary>
+        internal static string DataCollectorErrorOnGetVariable {
+            get {
+                return ResourceManager.GetString("DataCollectorErrorOnGetVariable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The diagnostic data adapter &apos;{0}&apos;  threw an exception during type loading, construction, or initialization: {1}..
+        /// </summary>
+        internal static string DataCollectorInitializationError {
+            get {
+                return ResourceManager.GetString("DataCollectorInitializationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Diagnostic data adapter (&apos;{0}&apos;) message: {1}..
         /// </summary>
         internal static string DataCollectorMessageFormat {
             get {
                 return ResourceManager.GetString("DataCollectorMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find diagnostic data adapter of type &apos;{0}&apos; and Uri &apos;{1}&apos;.
+        /// </summary>
+        internal static string DataCollectorNotFound {
+            get {
+                return ResourceManager.GetString("DataCollectorNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The diagnostic data adapter &apos;{0}&apos; requested environment variable &apos;{1}&apos; with value &apos;{2}&apos; to be set in test execution environment, but another diagnostic data adapter &apos;{3}&apos; has already requested same environment variable with different value &apos;{4}&apos;..
+        /// </summary>
+        internal static string DataCollectorRequestedDuplicateEnvironmentVariable {
+            get {
+                return ResourceManager.GetString("DataCollectorRequestedDuplicateEnvironmentVariable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The required diagnostic data adapter attribute &apos;{0}&apos; is missing for the diagnostic data adapter of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DataCollectorRequiredAttributeMissing {
+            get {
+                return ResourceManager.GetString("DataCollectorRequiredAttributeMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to get type for diagnostic data adapter &apos;{0}&apos;. Error: {1}..
+        /// </summary>
+        internal static string DataCollectorTypeNotFound {
+            get {
+                return ResourceManager.GetString("DataCollectorTypeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid URI format. The URI &apos;{0}&apos; provided for the diagnostic data adapter of type &apos;{1}&apos; is not a valid URI..
+        /// </summary>
+        internal static string DataCollectorTypeUriFormatInvalid {
+            get {
+                return ResourceManager.GetString("DataCollectorTypeUriFormatInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sending message of Message Type &apos;{0}&apos; is not supported..
+        /// </summary>
+        internal static string DataCollectorUnsupportedMessageType {
+            get {
+                return ResourceManager.GetString("DataCollectorUnsupportedMessageType", resourceCulture);
             }
         }
         
@@ -112,6 +211,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static string EmptyParenthesis {
             get {
                 return ResourceManager.GetString("EmptyParenthesis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type &apos;{0}&apos; is null or empty..
+        /// </summary>
+        internal static string FriendlyNameIsNullOrEmpty {
+            get {
+                return ResourceManager.GetString("FriendlyNameIsNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are multiple configurations that have diagnostic data adapter  type &apos;{0}&apos; or Uri &apos;{1}&apos;. Duplicate configurations will be ignored in the test run..
+        /// </summary>
+        internal static string IgnoredDuplicateConfiguration {
+            get {
+                return ResourceManager.GetString("IgnoredDuplicateConfiguration", resourceCulture);
             }
         }
         
@@ -197,6 +314,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Diagnostic data adapter caught an exception of type &apos;{0}&apos;: &apos;{1}&apos;. More details: {2}..
+        /// </summary>
+        internal static string ReportDataCollectorException {
+            get {
+                return ResourceManager.GetString("ReportDataCollectorException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The Run Settings have already been loaded..
         /// </summary>
         internal static string RunSettingsAlreadyLoaded {
@@ -247,6 +373,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         internal static string TestCaseFilterFormatException {
             get {
                 return ResourceManager.GetString("TestCaseFilterFormatException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector..
+        /// </summary>
+        internal static string WrongDataCollectionContextType {
+            get {
+                return ResourceManager.GetString("WrongDataCollectionContextType", resourceCulture);
             }
         }
     }

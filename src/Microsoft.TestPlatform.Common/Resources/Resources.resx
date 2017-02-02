@@ -117,11 +117,44 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AttributeRetrievalError" xml:space="preserve">
+    <value>An error occurred while retrieving the attributes for the diagnostic data adapter of type '{0}'.</value>
+  </data>
   <data name="DataCollectionMessageFormat" xml:space="preserve">
     <value>Diagnostic data adapter message: {0}</value>
   </data>
+  <data name="DataCollectorAssemblyNotFound" xml:space="preserve">
+    <value>Could not find diagnostic data adapter '{0}'.  Make sure diagnostic data adapter is installed and try again.</value>
+  </data>
+  <data name="DataCollectorErrorOnGetVariable" xml:space="preserve">
+    <value>Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</value>
+  </data>
+  <data name="DataCollectorInitializationError" xml:space="preserve">
+    <value>The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</value>
+  </data>
   <data name="DataCollectorMessageFormat" xml:space="preserve">
     <value>Diagnostic data adapter ('{0}') message: {1}.</value>
+  </data>
+  <data name="DataCollectorNotFound" xml:space="preserve">
+    <value>Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</value>
+  </data>
+  <data name="DataCollectorRequestedDuplicateEnvironmentVariable" xml:space="preserve">
+    <value>The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</value>
+  </data>
+  <data name="DataCollectorRequiredAttributeMissing" xml:space="preserve">
+    <value>The required diagnostic data adapter attribute '{0}' is missing for the diagnostic data adapter of type '{1}'.</value>
+  </data>
+  <data name="DataCollectorTypeNotFound" xml:space="preserve">
+    <value>Failed to get type for diagnostic data adapter '{0}'. Error: {1}.</value>
+  </data>
+  <data name="DataCollectorTypeUriFormatInvalid" xml:space="preserve">
+    <value>Invalid URI format. The URI '{0}' provided for the diagnostic data adapter of type '{1}' is not a valid URI.</value>
+  </data>
+  <data name="DataCollectorUnsupportedMessageType" xml:space="preserve">
+    <value>Sending message of Message Type '{0}' is not supported.</value>
+  </data>
+  <data name="DataCollector_TypeIsNull" xml:space="preserve">
+    <value>Diagnostic data adapter type URI cannot be null or empty. The type URI for the diagnostic data adapter of type '{0}' is null or empty.</value>
   </data>
   <data name="DuplicateExtensionUri" xml:space="preserve">
     <value>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</value>
@@ -134,6 +167,12 @@
   </data>
   <data name="EmptyParenthesis" xml:space="preserve">
     <value>Error: Empty parenthesis ( )</value>
+  </data>
+  <data name="FriendlyNameIsNullOrEmpty" xml:space="preserve">
+    <value>Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type '{0}' is null or empty.</value>
+  </data>
+  <data name="IgnoredDuplicateConfiguration" xml:space="preserve">
+    <value>There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</value>
   </data>
   <data name="InvalidCondition" xml:space="preserve">
     <value>Error: Invalid Condition '{0}'</value>
@@ -162,6 +201,9 @@
   <data name="MissingOperator" xml:space="preserve">
     <value>Missing Operator '|' or '&amp;'</value>
   </data>
+  <data name="ReportDataCollectorException" xml:space="preserve">
+    <value>Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</value>
+  </data>
   <data name="RunSettingsAlreadyLoaded" xml:space="preserve">
     <value>The Run Settings have already been loaded.</value>
   </data>
@@ -179,5 +221,8 @@
   </data>
   <data name="TestCaseFilterFormatException" xml:space="preserve">
     <value>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</value>
+  </data>
+  <data name="WrongDataCollectionContextType" xml:space="preserve">
+    <value>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</value>
   </data>
 </root>

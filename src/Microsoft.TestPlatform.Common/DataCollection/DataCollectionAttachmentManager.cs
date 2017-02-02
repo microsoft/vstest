@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System;
     using System.Collections.Generic;
@@ -10,9 +10,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -39,6 +40,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         private List<Task> attachmentTasks;
 
+        /// <summary>
+        /// Use to cancel data collection if test run is cancelled.
+        /// </summary>
+        private CancellationTokenSource cancellationTokenSource;
+
         #endregion
 
         #region Constructor
@@ -48,6 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         public DataCollectionAttachmentManager()
         {
+            this.cancellationTokenSource = new CancellationTokenSource();
             this.attachmentTasks = new List<Task>();
             this.AttachmentSets = new Dictionary<Uri, AttachmentSet>();
         }
@@ -102,7 +109,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <inheritdoc/>
         public List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext)
         {
-            Task.WhenAll(this.attachmentTasks.ToArray()).Wait();
+            try
+            {
+                Task.WhenAll(this.attachmentTasks.ToArray()).Wait();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex.Message);
+            }
+
             return this.AttachmentSets.Values.ToList();
         }
 
@@ -138,6 +153,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                     EqtTrace.Error("DataCollectionAttachmentManager.AddAttachment: Got unexpected message of type FileTransferInformationExtension.");
                 }
             }
+        }
+
+        /// <inheritdoc/>
+        public void Cancel()
+        {
+            this.cancellationTokenSource.Cancel();
         }
 
         #endregion
@@ -207,80 +228,89 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 testCaseId);
             var localFilePath = Path.Combine(directoryPath, Path.GetFileName(fileTransferInfo.FileName));
 
-            // todo : add cancellation token for cancelling file operations test run is cancelled or there is a crash.
-            var task = new Task(() =>
-             {
-                 Validate(fileTransferInfo, localFilePath);
+            var task = Task.Factory.StartNew(
+                () =>
+                    {
+                        Validate(fileTransferInfo, localFilePath);
 
-                 try
-                 {
-                     if (fileTransferInfo.PerformCleanup)
-                     {
-                         if (EqtTrace.IsInfoEnabled)
-                         {
-                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                         }
+                        if (this.cancellationTokenSource.Token.IsCancellationRequested)
+                        {
+                            this.cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                        }
 
-                         File.Move(fileTransferInfo.FileName, localFilePath);
+                        try
+                        {
+                            if (fileTransferInfo.PerformCleanup)
+                            {
+                                if (EqtTrace.IsInfoEnabled)
+                                {
+                                    EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                                }
 
-                         if (EqtTrace.IsInfoEnabled)
-                         {
-                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moved file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                         }
-                     }
-                     else
-                     {
-                         if (EqtTrace.IsInfoEnabled)
-                         {
-                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                         }
+                                File.Move(fileTransferInfo.FileName, localFilePath);
 
-                         File.Copy(fileTransferInfo.FileName, localFilePath);
+                                if (EqtTrace.IsInfoEnabled)
+                                {
+                                    EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moved file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                                }
+                            }
+                            else
+                            {
+                                if (EqtTrace.IsInfoEnabled)
+                                {
+                                    EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                                }
 
-                         if (EqtTrace.IsInfoEnabled)
-                         {
-                             EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copied file {0} to {1}", fileTransferInfo.FileName, localFilePath);
-                         }
-                     }
-                 }
-                 catch (Exception ex)
-                 {
-                     this.LogError(
-                        ex.Message,
-                        uri,
-                        friendlyName,
-                        Guid.Parse(testCaseId));
+                                File.Copy(fileTransferInfo.FileName, localFilePath);
 
-                     throw;
-                 }
-             });
+                                if (EqtTrace.IsInfoEnabled)
+                                {
+                                    EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copied file {0} to {1}", fileTransferInfo.FileName, localFilePath);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            this.LogError(
+                               ex.Message,
+                               uri,
+                               friendlyName,
+                               Guid.Parse(testCaseId));
 
-            var continuationTask = task.ContinueWith((t) =>
-             {
-                 try
-                 {
-                     if (t.Exception == null)
-                     {
-                         this.AttachmentSets[uri].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
-                     }
+                            throw;
+                        }
+                    },
+                this.cancellationTokenSource.Token);
 
-                     sendFileCompletedCallback(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
-                 }
-                 catch (Exception e)
-                 {
-                     if (EqtTrace.IsErrorEnabled)
-                     {
-                         EqtTrace.Error(
-                             "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
-                             localFilePath,
-                             e.ToString());
-                     }
-                 }
-             });
+            var continuationTask = task.ContinueWith(
+                (t) =>
+                    {
+                        try
+                        {
+                            if (t.Exception == null)
+                            {
+                                this.AttachmentSets[uri].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
+                            }
 
-            this.attachmentTasks.Add(task);
+                            if (sendFileCompletedCallback != null)
+                            {
+                                sendFileCompletedCallback(this, new AsyncCompletedEventArgs(t.Exception, false, fileTransferInfo.UserToken));
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            if (EqtTrace.IsErrorEnabled)
+                            {
+                                EqtTrace.Error(
+                                    "DataCollectionAttachmentManager.TriggerCallBack: Error occurred while raising the file transfer completed callback for {0}. Error: {1}",
+                                    localFilePath,
+                                    e.ToString());
+                            }
+                        }
+                    },
+                this.cancellationTokenSource.Token);
+
             this.attachmentTasks.Add(continuationTask);
-            task.Start();
         }
 
         /// <summary>
