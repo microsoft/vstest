@@ -142,9 +142,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
 
             var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosity);
-            if (verbosityExists && Enum.Parse(typeof(Verbosity), verbosity, ignoreCase:true).Equals(Verbosity.Minimal))
+            if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
             {
-                this.verbosityLevel = Verbosity.Minimal;
+                this.verbosityLevel = verbosityLevel;
             }
 
             this.Initialize(events, String.Empty);

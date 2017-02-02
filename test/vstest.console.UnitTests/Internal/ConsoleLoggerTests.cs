@@ -101,6 +101,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void InitializeWithParametersShouldDefaultToNormalVerbosityLevelForInvalidVerbosity()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "random");
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.AreEqual(ConsoleLogger.Verbosity.Normal, this.consoleLogger.VerbosityLevel);
+        }
+
+        [TestMethod]
         public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
             // Raise an event on mock object
@@ -160,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             parameters.Add("verbosity", "minimal");
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            var eventArgs = new T estRunChangedEventArgs(null, this.GetTestResultsObject(), null);
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultsObject(), null);
 
             // Raise an event on mock object
             this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
