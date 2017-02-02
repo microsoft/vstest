@@ -13,6 +13,8 @@ Param(
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
+    # Versioning scheme = Major(15).Minor(RTW, Updates).SubUpdates(preview4, preview5, RC etc)
+    # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
     [System.String] $Version = "15.0.0",
@@ -26,8 +28,12 @@ Param(
     [System.Boolean] $FailFast = $true,
 
     [Parameter(Mandatory=$false)]
+    [Alias("xlf")]
+    [Switch] $SyncXlf = $false,
+
+    [Parameter(Mandatory=$false)]
     [Alias("loc")]
-    [System.Boolean] $Localized = $false,
+    [Switch] $DisableLocalizedBuild = $false,
 
     [Parameter(Mandatory=$false)]
     [Alias("ci")]
@@ -69,6 +75,8 @@ $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
+$TPB_LocalizedBuild = !$DisableLocalizedBuild
+$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -122,6 +130,9 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
+    # This is added to get netcoreapp1.1 shared components.
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
+    
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
@@ -133,6 +144,8 @@ function Restore-Package
 
     Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
     & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal
+    Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
+    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal
     Write-Log ".. .. Restore-Package: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -149,8 +162,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -174,7 +187,6 @@ function Publish-Package
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
-    $dataCollectorx86Project = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
 	
@@ -190,9 +202,6 @@ function Publish-Package
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
-
-    Write-Log "Package: Publish src\datacollector.x86\datacollector.x86.csproj"
-    Publish-Package-Internal $dataCollectorx86Project $TPB_TargetFramework $fullCLRPackageDir
 
     # Publish testhost
     
@@ -244,8 +253,8 @@ function Publish-Package
 
 function Publish-Package-Internal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild
 }
 
 function Create-VsixPackage
@@ -255,16 +264,6 @@ function Create-VsixPackage
     Write-Log "Create-VsixPackage: Started."
     $packageDir = Get-FullCLRPackageDirectory
 
-    # Copy vsix manifests
-    $vsixManifests = @("*Content_Types*.xml",
-        "extension.vsixmanifest",
-        "License.rtf",
-        "TestPlatform.ObjectModel.manifest",
-        "TestPlatform.ObjectModel.x86.manifest")
-    foreach ($file in $vsixManifests) {
-        Copy-Item $env:TP_PACKAGE_PROJ_DIR\$file $packageDir -Force
-    }
-
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
@@ -272,6 +271,18 @@ function Create-VsixPackage
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+
+    #Copy [Content_Types].xml and License.rtf
+    Copy-Item $TPB_VSIX_DIR\*.xml $packageDir -Force
+
+    $fileToCopy = Join-Path $TPB_VSIX_DIR "License.rtf"
+    Copy-Item $fileToCopy $packageDir -Force
+
+    $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
+    Copy-Item $fileToCopy $packageDir -Force
+
+    #update version of VSIX
+    Update-VsixVersion
 
     # Zip the folder
     # TODO remove vsix creator
@@ -281,6 +292,34 @@ function Create-VsixPackage
     & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net46\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Update-VsixVersion
+{
+    Write-Log "Update-VsixVersion: Started."
+
+    $packageDir = Get-FullCLRPackageDirectory
+    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
+
+    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
+    # So Version of the vsix will be 15.0.3.2017011101
+    $vsixVersionSuffix = $VersionSuffix.Split("-");
+    if($vsixVersionSuffix.Length -ige 2) {
+        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
+    }
+
+    $filesToUpdate = @("extension.vsixmanifest",
+        "manifest.json",
+        "catalog.json")
+
+    foreach ($file in $filesToUpdate) {
+        Get-Content "$TPB_VSIX_DIR\$file" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content "$packageDir\$file"
+    }
+
+    $fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
+    Get-Content "$TPB_VSIX_DIR\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content $fileToUpdate
+
+    Write-Log "Update-VsixVersion: Completed."
 }
 
 function Create-NugetPackages
@@ -299,6 +338,9 @@ function Create-NugetPackages
     foreach ($file in $nuspecFiles + $targetFiles) {
         Copy-Item $tpSrcDir\$file $stagingDir -Force
     }
+
+    # Copy and rename props file.
+    Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk_props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
 
     # Copy over empty and third patry notice file
     Copy-Item $tpSrcDir\package\"_._" $stagingDir -Force

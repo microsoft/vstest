@@ -11,8 +11,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -216,6 +216,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Args:
+        ///      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments..
+        /// </summary>
+        public static string CLIRunSettingsArgumentHelp {
+            get {
+                return ResourceManager.GetString("CLIRunSettingsArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: {0}.
         /// </summary>
         public static string CommandLineError {
@@ -381,12 +391,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("EnableDiagUsage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
-        ///      Visual Studio Test Results File (TRX) use  /logger:trx.
-        ///      To publish test results to Team Foundation Server, use TfsPublisher as shown below
+        ///      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+        ///      Creates file in TestResults directory with given LogFileName.
+        ///
         ///      Example: /logger:TfsPublisher;
         ///                Collection=&lt;team project collection url&gt;;
         ///                BuildName=&lt;build name&gt;;
@@ -526,7 +537,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options].
+        ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]].
         /// </summary>
         public static string HelpUsageText {
             get {
@@ -635,7 +646,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("InvalidPortArgument", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;ResultsDirectory&apos; is invalid. Error: {1}.
+        /// </summary>
+        public static string InvalidResultsDirectoryPathCommand
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidResultsDirectoryPathCommand", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;TestAdapterPath&apos; is invalid. Error: {1}.
         /// </summary>
@@ -773,6 +795,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         public static string MalformedRunSettingsFile {
             get {
                 return ResourceManager.GetString("MalformedRunSettingsFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One or more runsettings provided contain invalid token.
+        /// </summary>
+        public static string MalformedRunSettingsKey {
+            get {
+                return ResourceManager.GetString("MalformedRunSettingsKey", resourceCulture);
             }
         }
         
@@ -981,7 +1012,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("ProjectPathNotFound", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to --ResultsDirectory|/ResultsDirectory
+        ///      Test results directory will be created in specified path if not exists.
+        ///      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;.
+        /// </summary>
+        internal static string ResultsDirectoryArgumentHelp
+        {
+            get
+            {
+                return ResourceManager.GetString("ResultsDirectoryArgumentHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory.
+        /// </summary>
+        public static string ResultsDirectoryValueRequired
+        {
+            get
+            {
+                return ResourceManager.GetString("ResultsDirectoryValueRequired", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to --Settings|/Settings:&lt;Settings File&gt;
         ///      Settings to use when running tests..
@@ -1392,6 +1447,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         public static string UseVsixExtensionsValueRequired {
             get {
                 return ResourceManager.GetString("UseVsixExtensionsValueRequired", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The /InIsolation flag is deprecated. The test are always run in a separate process
+        /// </summary>
+        public static string InIsolationDeprecated
+        {
+            get
+            {
+                return ResourceManager.GetString("InIsolationDeprecated", resourceCulture);
             }
         }
     }

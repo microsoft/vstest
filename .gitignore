@@ -102,9 +102,26 @@ ehthumbs.db
 # ===========================
 packages
 artifacts
-Tools
+[tT]ools
 
 *.nupkg
 *.zip
 *.props
 src/package/sign/sign.nuget.targets
+
+# ===========================
+# Localized resx files
+# ===========================
+*.cs.resx
+*.de.resx
+*.es.resx
+*.fr.resx
+*.it.resx
+*.ja.resx
+*.ko.resx
+*.pl.resx
+*.pt-BR.resx
+*.ru.resx
+*.tr.resx
+*.zh-Hans.resx
+*.zh-Hant.resx

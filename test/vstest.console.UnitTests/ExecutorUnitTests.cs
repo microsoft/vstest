@@ -10,6 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using CoreUtilities.Tracing.Interfaces;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using Moq;
 
@@ -71,6 +74,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             //Assert.IsTrue(mockOutput.Messages.First().Message.Contains(
             //    Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.MicrosoftCommandLineTitle.Substring(0, 20)),
             //    "First Printed message must be Microsoft Copyright");
+        }
+
+        /// <summary>
+        /// Executor should set default runsettings value even there is no processor
+        /// </summary>
+        [TestMethod]
+        public void ExecuteShouldInitializeDefaultRunsettings()
+        {
+            var mockOutput = new MockOutput();
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
+            RunConfiguration runConfiguration =  XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
+            Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
+            Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
         }
 
         [TestMethod]

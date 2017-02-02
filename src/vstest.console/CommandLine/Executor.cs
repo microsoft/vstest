@@ -35,6 +35,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -50,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public Executor(IOutput output): this(output, TestPlatformEventSource.Instance)
+        public Executor(IOutput output) : this(output, TestPlatformEventSource.Instance)
         {
         }
 
@@ -152,8 +154,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             int result = 0;
             var processorFactory = ArgumentProcessorFactory.Create();
 
-            foreach (string arg in args)
+            for (var index = 0; index < args.Length; index++)
             {
+                var arg = args[index];
+
+                // If argument is '--', following arguments are key=value pairs for run settings.
+                if (arg.Equals("--"))
+                {
+                    var cliRunSettingsProcessor = processorFactory.CreateArgumentProcessor(arg, args.Skip(index + 1).ToArray());
+                    processors.Add(cliRunSettingsProcessor);
+                    break;
+                }
+
                 var processor = processorFactory.CreateArgumentProcessor(arg);
 
                 if (processor != null)
@@ -179,6 +191,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // should always be executed.
             var processorsToAlwaysExecute = processorFactory.GetArgumentProcessorsToAlwaysExecute();
             processors.AddRange(processorsToAlwaysExecute);
+
+            // Initialize Runsettings with defaults
+            RunSettingsManager.Instance.AddDefaultRunSettings();
 
             // Ensure we have an action argument.
             this.EnsureActionArgumentIsPresent(processors, processorFactory);
@@ -278,11 +293,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             {
                 result = processor.Executor.Value.Execute();
             }
-            catch (CommandLineException ex)
+            catch (Exception ex)
             {
-                EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
-                this.Output.Error(ex.Message);
-                result = ArgumentProcessorResult.Fail;
+                if (ex is CommandLineException || ex is TestPlatformException)
+                {
+                    EqtTrace.Error("ExecuteArgumentProcessor: failed to execute argument process: {0}", ex);
+                    this.Output.Error(ex.Message);
+                    result = ArgumentProcessorResult.Fail;
+                }
+                else
+                {
+                    // Let it throw - User must see crash and report it with stack trace!
+                    // No need for recoverability as user will start a new vstest.console anwyay
+                    throw;
+                }
             }
 
             Debug.Assert(

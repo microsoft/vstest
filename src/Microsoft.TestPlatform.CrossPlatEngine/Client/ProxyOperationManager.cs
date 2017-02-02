@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -67,6 +68,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="sources">List of test sources.</param>
         public virtual void SetupChannel(IEnumerable<string> sources)
         {
+            string testHostProcessStdError = string.Empty;
+
             if (!this.initialized)
             {
                 var portNumber = this.RequestSender.InitializeCommunication();
@@ -77,6 +80,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // TODO: Fix the environment variables usage
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
 
+                if (testHostStartInfo != null)
+                {
+                    // Monitor testhost exit.
+                    testHostStartInfo.ExitCallback = (process) =>
+                    {
+                        if (process.ExitCode != 0)
+                        {
+                            testHostProcessStdError = process.StandardError.ReadToEnd();
+                        }
+
+                        this.RequestSender.OnClientProcessExit(testHostProcessStdError);
+                    };
+                }
+
                 // Warn the user that execution will wait for debugger attach.
                 var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
                 if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
@@ -84,17 +101,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
                 }
 
-                // Launch the test host and monitor exit.
+                // Launch the test host.
                 this.testHostManager.LaunchTestHost(testHostStartInfo);
-                this.testHostManager.RegisterForExitNotification(() => this.RequestSender.OnClientProcessExit());
-
                 this.initialized = true;
             }
 
             // Wait for a timeout for the client to connect.
             if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
             {
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.InitializationFailed));
+                var errorMsg = CrossPlatEngineResources.InitializationFailed;
+
+                if (!string.IsNullOrWhiteSpace(testHostProcessStdError))
+                {
+                    // Testhost failed with error
+                    errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, testHostProcessStdError);
+                }
+
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
             }
         }
 
@@ -118,7 +141,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private string GetTimestampedLogFile(string logFile)
         {
-            return Path.ChangeExtension(logFile, "host." + DateTime.Now.ToString("yyMMddhhmmss") + Path.GetExtension(logFile));
+            return Path.ChangeExtension(logFile,
+                string.Format("host.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                    Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile)));
         }
     }
 }

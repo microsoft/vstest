@@ -173,17 +173,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (!String.IsNullOrEmpty(result.ErrorMessage))
             {
                 hasData = true;
-                Output.WriteLine(CommandLineResources.ErrorMessageBanner, OutputLevel.Error);
+                Output.WriteLine(CommandLineResources.ErrorMessageBanner, OutputLevel.Information);
                 string errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, result.ErrorMessage);
-                Output.WriteLine(errorMessage, OutputLevel.Error);
+                Output.WriteLine(errorMessage, OutputLevel.Information);
             }
 
             if (!String.IsNullOrEmpty(result.ErrorStackTrace))
             {
                 hasData = true;
-                Output.WriteLine(CommandLineResources.StacktraceBanner, OutputLevel.Error);
+                Output.WriteLine(CommandLineResources.StacktraceBanner, OutputLevel.Information);
                 string stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}", result.ErrorStackTrace);
-                Output.Write(stackTrace, OutputLevel.Error);
+                Output.Write(stackTrace, OutputLevel.Information);
             }
 
             Collection<TestResultMessage> stdOutMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardOutCategory);

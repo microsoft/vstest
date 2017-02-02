@@ -33,6 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         private CancellationTokenSource clientExitCancellationSource;
 
+        private string clientExitErrorMessage;
+
         public TestRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
         }
@@ -50,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public int InitializeCommunication()
         {
             this.clientExitCancellationSource = new CancellationTokenSource();
+            this.clientExitErrorMessage = string.Empty;
             var port = this.communicationManager.HostServer();
             this.communicationManager.AcceptClientAsync();
             return port;
@@ -141,9 +144,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                this.OnDiscoveryAbort(discoveryEventsHandler);
+                this.OnDiscoveryAbort(discoveryEventsHandler, ex);
             }
         }
 
@@ -253,7 +256,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 catch (IOException exception)
                 {
-                    // To avoid furthur communication with remote host
+                    // To avoid further communication with remote host
                     this.sendMessagesToRemoteHost = false;
 
                     this.OnTestRunAbort(testRunEventsHandler, exception);
@@ -279,11 +282,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
 
+            var reason = string.Format(CommonResources.AbortedTestRun, exception?.Message);
             // log console message to vstest console
-            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, CommonResources.AbortedTestRun);
+            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, reason);
 
             // log console message to vstest console wrapper
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = CommonResources.AbortedTestRun };
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
             testRunEventsHandler.HandleRawMessage(rawMessage);
 
@@ -299,13 +303,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.CleanupCommunicationIfProcessExit();
         }
 
-        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler)
+        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception)
         {
-            // Log to vstest console 
-            eventHandler.HandleLogMessage(TestMessageLevel.Error, CommonResources.AbortedTestDiscovery);
+            EqtTrace.Error("Server: TestExecution: Aborting test discovery because {0}", exception);
+
+            var reason = string.Format(CommonResources.AbortedTestDiscovery, exception?.Message);
+
+            // Log to vstest console
+            eventHandler.HandleLogMessage(TestMessageLevel.Error, reason);
 
             // Log to vs ide test output
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = CommonResources.AbortedTestDiscovery };
+            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
             eventHandler.HandleRawMessage(rawMessage);
 
@@ -338,8 +346,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.AbortTestRun);
         }
 
-        public void OnClientProcessExit()
+        public void OnClientProcessExit(string stdError)
         {
+            this.clientExitErrorMessage = stdError;
             this.clientExitCancellationSource.Cancel();
         }
 
@@ -352,8 +361,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             if (message == null)
             {
-                EqtTrace.Error("Unable to receive message from testhost");
-                throw new IOException(CommonResources.UnableToCommunicateToTestHost);
+                var reason = string.IsNullOrWhiteSpace(this.clientExitErrorMessage)
+                    ? CommonResources.UnableToCommunicateToTestHost
+                    : clientExitErrorMessage;
+                EqtTrace.Error("Unable to receive message from testhost: {0}", reason);
+                throw new IOException(reason);
             }
 
             return message;

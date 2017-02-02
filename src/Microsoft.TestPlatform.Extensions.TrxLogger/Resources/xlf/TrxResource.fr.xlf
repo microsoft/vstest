@@ -293,6 +293,16 @@ Détails de l’erreur : {1} : {2}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
+      <trans-unit id="TrxLoggerResultsFileOverwriteWarning">
+        <source>WARNING: Overwriting results file: {0}</source>
+        <target state="new">WARNING: Overwriting results file: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="PlaceHolderForInvalidChar">
+        <source>?</source>
+        <target state="new">?</target>
+        <note>Place holder for invalid xml character in trx file</note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -8,12 +8,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    public abstract class AppDomainTests : AcceptanceTestBase
+    [TestClass]
+    public class AppDomainTests : AcceptanceTestBase
     {
-#if NET46
-        [TestMethod]
-        public void RunTestExecutionWithDisableAppDomain()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        public void RunTestExecutionWithDisableAppDomain(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var testAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
             var dataCollectorAppDomainDetailFileName = Path.Combine(Path.GetTempPath(), "appdomain_datacollector.txt");
 
@@ -33,7 +36,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 1);
             File.Delete(runsettingsFilePath);
         }
-#endif
 
         private static bool IsFilesContentEqual(string filePath1, string filePath2)
         {

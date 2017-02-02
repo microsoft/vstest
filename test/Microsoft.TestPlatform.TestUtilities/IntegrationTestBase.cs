@@ -30,7 +30,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.6-preview\build\_common";
         private const string NUnitTestAdapterRelativePath = @"nunittestadapter\1.2.0\lib";
-        private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\2.1.0\build\_common";
+        private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\2.2.0-beta4-build1188\build\_common";
         private const string ChutzpahTestAdapterRelativePath = @"chutzpah\4.2.4\tools";
 
         public enum UnitTestFramework
@@ -109,9 +109,9 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="testAssembly">A test assembly.</param>
         /// <param name="testAdapterPath">Path to test adapters.</param>
         /// <param name="runSettings">Run settings for execution.</param>
-        public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "")
+        public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework);
             arguments = string.Concat(arguments, " /listtests");
             this.InvokeVsTest(arguments);
         }
@@ -163,6 +163,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
         }
 
+        public void StdErrorContains(string substring)
+        {
+            Assert.IsTrue(this.standardTestError.Contains(substring));
+        }
+
         /// <summary>
         /// Validates if the test results have the specified set of passed tests.
         /// </summary>
@@ -195,7 +200,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
 
                 // Verify stack information as well.
-                Assert.IsTrue(this.standardTestError.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
+                Assert.IsTrue(this.standardTestOutput.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
             }
         }
 

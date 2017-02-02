@@ -208,4 +208,11 @@ Error Details: {1}:{2}</value>
   <data name="TS_UncategorizedResults" xml:space="preserve">
     <value>Results Not in a List</value>
   </data>
+  <data name="TrxLoggerResultsFileOverwriteWarning" xml:space="preserve">
+    <value>WARNING: Overwriting results file: {0}</value>
+  </data>
+  <data name="PlaceHolderForInvalidChar" xml:space="preserve">
+    <value>?</value>
+    <comment>Place holder for invalid xml character in trx file</comment>
+  </data>
 </root>

@@ -3,19 +3,22 @@
 
 namespace Microsoft.TestPlatform.Build.Tasks
 {
+    using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
 
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-    using System;
-    using System.IO;
-    using System.Diagnostics;
+
     using Trace;
 
     public class VSTestTask : Task, ICancelableTask
     {
         // The process which is invoking vstest.console
         private VSTestForwardingApp vsTestForwardingApp;
+
+        private const string vsTestAppName = "vstest.console.dll";
 
         public string TestFileFullPath
         {
@@ -70,12 +73,31 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string[] VSTestCLIRunSettings
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public string VSTestConsolePath
+        {
+            get; 
+            set;
+        }
+
+        public string VSTestResultsDirectory
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
             Tracing.traceEnabled = !string.IsNullOrEmpty(traceEnabledValue) && traceEnabledValue.Equals("1", StringComparison.OrdinalIgnoreCase);
 
-            vsTestForwardingApp = new VSTestForwardingApp(this.CreateArgument());
+            vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
                 Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
@@ -90,12 +112,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             vsTestForwardingApp.Cancel();
         }
 
-        private string AddDoubleQuotes(string x)
-        {
-            return "\"" + x + "\"";
-        }
-
-        private IEnumerable<string> CreateArgument()
+        internal IEnumerable<string> CreateArgument()
         {
             var allArgs = new List<string>();
 
@@ -131,6 +148,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--logger:" + this.VSTestLogger);
             }
 
+            if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
+            {
+                allArgs.Add("--resultsDirectory:" + this.AddDoubleQuotes(this.VSTestResultsDirectory));
+            }
+
             if (!string.IsNullOrEmpty(this.VSTestListTests))
             {
                 allArgs.Add("--listTests");
@@ -159,7 +181,21 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 }
             }
 
+            if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)
+            {
+                allArgs.Add("--");
+                foreach (var arg in this.VSTestCLIRunSettings)
+                {
+                    allArgs.Add(this.AddDoubleQuotes(arg));
+                }
+            }
+
             return allArgs;
+        }
+
+        private string AddDoubleQuotes(string x)
+        {
+            return "\"" + x + "\"";
         }
     }
 }

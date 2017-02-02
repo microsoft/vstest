@@ -33,14 +33,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         TestAdapterPath = 1,
 
         /// <summary>
-        /// Priority of processors that needs to update runsettings.
-        /// </summary>
-        AutoUpdateRunSettings = 3,
-
-        /// <summary>
         /// Priority of processors related to Run Settings.
         /// </summary>
-        RunSettings = 5,
+        RunSettings = 3,
+
+        /// <summary>
+        /// Priority of processors that needs to update runsettings.
+        /// </summary>
+        AutoUpdateRunSettings = 5,
+
+        /// <summary>
+        /// Priority of processors related to CLI Run Settings.
+        /// </summary>
+        CLIRunSettings = 6,
 
         /// <summary>
         /// Priority of processors related to logging.

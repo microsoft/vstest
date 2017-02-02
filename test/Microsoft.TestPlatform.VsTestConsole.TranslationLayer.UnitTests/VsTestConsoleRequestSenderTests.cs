@@ -493,7 +493,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mockHandler = new Mock<ITestRunEventsHandler>();
 
             var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
+            var testResult = new TestResult(testCase);
             testResult.Outcome = TestOutcome.Passed;
 
             var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
@@ -547,6 +547,59 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once, "Custom TestHostLauncher must be called");
+        }
+
+        [TestMethod]
+        public void StartTestRunWithCustomHostShouldNotAbortAndSendErrorToVstestConsoleInErrorScenario()
+        {
+            this.InitializeCommunication();
+
+            var mockHandler = new Mock<ITestRunEventsHandler>();
+
+            var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+            var testResult = new TestResult(testCase);
+            testResult.Outcome = TestOutcome.Passed;
+
+            var dummyCompleteArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.FromMilliseconds(1));
+            var dummyLastRunArgs = new TestRunChangedEventArgs(null, null, null);
+
+            var testsChangedArgs = new TestRunChangedEventArgs(null, new List<TestResult>() { testResult }, null);
+            var testsPayload = CreateMessage(MessageType.TestRunStatsChange, testsChangedArgs);
+
+            var payload = new TestRunCompletePayload()
+            {
+                ExecutorUris = null,
+                LastRunTests = dummyLastRunArgs,
+                RunAttachments = null,
+                TestRunCompleteArgs = dummyCompleteArgs
+            };
+            var runComplete = CreateMessage(MessageType.ExecutionComplete, payload);
+
+            var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
+            var message = CreateMessage(MessageType.TestMessage, mpayload);
+
+            var runprocessInfoPayload = new Message()
+            {
+                MessageType = MessageType.CustomTestHostLaunch,
+                Payload = JToken.FromObject(new TestProcessStartInfo())
+            };
+
+            var mockLauncher = new Mock<ITestHostLauncher>();
+            mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
+                (() =>
+                {
+                    throw new Exception("BadError");
+                });
+
+            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
+
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).
+                Callback(() => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
+
+            this.requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
+
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
         }
 
         [TestMethod]

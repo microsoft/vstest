@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System.IO;
 
     /// <summary>
     /// Provides access to the command-line options.
@@ -221,11 +222,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 this.FrameworkVersionSpecified = true;
             }
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether /Framework has been specified on command line or not.
         /// </summary>
         internal bool FrameworkVersionSpecified { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the results directory for test run.
+        /// </summary>
+        internal string ResultsDirectory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the /setting switch value. i.e path to settings file.
+        /// </summary>
+        internal string SettingsFile { get; set; }
 
         #endregion
 
@@ -243,6 +254,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
 
             source = source.Trim();
+
+            // Convert the relative path to absolute path
+            if(!Path.IsPathRooted(source))
+            {
+                source = Path.Combine(FileHelper.GetCurrentDirectory(), source);
+            }
+
             if (!FileHelper.Exists(source))
             {
                 throw new CommandLineException(

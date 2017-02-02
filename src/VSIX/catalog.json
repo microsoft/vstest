@@ -1,0 +1,36 @@
+{
+  "manifestVersion": "1.1",
+  "info": { "id": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf,version=$version$" },
+  "packages": [
+    {
+      "id": "Component.Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
+      "version": "$version$",
+      "type": "Component",
+      "extension": true,
+      "dependencies": {
+        "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf": "$version$",
+        "Microsoft.VisualStudio.Component.CoreEditor": "[15.0,16.0)"
+      },
+      "localizedResources": [
+        {
+          "language": "en-US",
+          "title": "Microsoft Visual Studio Test Platform",
+          "description": "Extensible Test Platform that allows developers to discover, execute and analyze automated tests."
+        }
+      ]
+    },
+    {
+      "id": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
+      "version": "$version$",
+      "type": "Vsix",
+      "payloads": [
+        {
+          "fileName": "TestPlatform.vsix",
+          "size": 3083061
+        }
+      ],
+      "vsixId": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
+      "extensionDir": "[installdir]\\Common7\\IDE\\Extensions\\qgyll0uu.4m0"
+    }
+  ]
+}

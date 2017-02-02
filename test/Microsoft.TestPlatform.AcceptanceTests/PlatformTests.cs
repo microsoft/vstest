@@ -9,31 +9,69 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-    public abstract class PlatformTests : AcceptanceTestBase
+    [TestClass]
+    public class PlatformTests : AcceptanceTestBase
     {
         /// <summary>
         /// The run test execution with platform x64.
         /// </summary>
-        [TestMethod]
-        public void RunTestExecutionWithPlatformx64()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestExecutionWithPlatformx64(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var platformArg = " /Platform:x64";
-            var testhostProcessName = "testhost";
-            this.RunTestExecutionWithPlatform(platformArg, testhostProcessName);
+            string testhostProcessName = string.Empty;
+            int expectedNumOfProcessCreated = 0;
+            string desktopHostProcessName = "testhost";
+
+            SetExpectedParams(ref expectedNumOfProcessCreated, ref testhostProcessName, desktopHostProcessName);
+            this.RunTestExecutionWithPlatform(platformArg, testhostProcessName, expectedNumOfProcessCreated);
         }
 
         /// <summary>
         /// The run test execution with platform x86.
         /// </summary>
-        [TestMethod]
-        public void RunTestExecutionWithPlatformx86()
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void RunTestExecutionWithPlatformx86(string runnerFramework, string targetFramework, string targetRuntime)
         {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
             var platformArg = " /Platform:x86";
-            var testhostProcessName = "testhost.x86";
-            this.RunTestExecutionWithPlatform(platformArg, testhostProcessName);
+            string testhostProcessName = string.Empty;
+            int expectedNumOfProcessCreated = 0;
+            string desktopHostProcessName = "testhost.x86";
+
+            SetExpectedParams(ref expectedNumOfProcessCreated, ref testhostProcessName, desktopHostProcessName);
+            this.RunTestExecutionWithPlatform(platformArg, testhostProcessName, expectedNumOfProcessCreated);
         }
 
-        private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName)
+        private void SetExpectedParams(ref int expectedNumOfProcessCreated, ref string testhostProcessName, string desktopHostProcessName)
+        {
+            if (this.IsDesktopTargetFramework())
+            {
+                testhostProcessName = desktopHostProcessName;
+                expectedNumOfProcessCreated = 1;
+            }
+            else
+            {
+                testhostProcessName = "dotnet";
+                if (this.IsDesktopRunner())
+                {
+                    expectedNumOfProcessCreated = 1;
+                }
+                else
+                {
+                    expectedNumOfProcessCreated = 2;
+                }
+            }
+        }
+
+        private void RunTestExecutionWithPlatform(string platformArg, string testhostProcessName, int expectedNumOfProcessCreated)
         {
             var arguments = PrepareArguments(
                 this.GetSampleTestAssembly(),
@@ -52,9 +90,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             cts.Cancel();
 
             Assert.AreEqual(
-                1,
+                expectedNumOfProcessCreated,
                 numOfProcessCreatedTask.Result,
-                $"Number of {testhostProcessName} process created, expected: {1} actual: {numOfProcessCreatedTask.Result}");
+                $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result} args: {arguments} runner path: {this.testEnvironment.GetConsoleRunnerPath()}");
             this.ValidateSummaryStatus(1, 1, 1);
         }
     }

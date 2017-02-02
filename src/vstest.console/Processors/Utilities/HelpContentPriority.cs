@@ -5,6 +5,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     /// <summary>
     /// Attribute to be used for displaying the help content in required order.
+    ///
+    /// Order of settings display (based on lifecycle at https://blogs.msdn.microsoft.com/visualstudioalm/2016/07/25/evolving-the-visual-studio-test-platform-part-1/).
+    ///
+    /// Selection
+    /// --Tests
+    /// --TestCaseFilter
+    ///
+    /// Configure
+    /// --Framework
+    /// --Platform
+    /// --Settings
+    /// --CLI runsettings
+    ///
+    /// Run/Discover
+    /// --ListTests
+    /// --Parallel
+    /// --TestAdapterPath
+    ///
+    /// Diagnose/Report
+    /// --Diag
+    /// --Logger
+    /// --ResultsDirectory
+    ///
+    /// IDE Automation
+    /// --ParentProcessId
+    /// --Port
+    ///
+    /// Help
+    /// -–Help
     /// </summary>
     internal enum HelpContentPriority
     {
@@ -19,14 +48,79 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         RunTestsArgumentProcessorHelpPriority,
 
         /// <summary>
+        /// RunSpecificTestsArgumentProcessor Help
+        /// </summary>
+        RunSpecificTestsArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// TestCaseFilterArgumentProcessor Help
+        /// </summary>
+        TestCaseFilterArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// FrameworkArgumentProcessor Help
+        /// </summary>
+        FrameworkArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// PlatformArgumentProcessor Help
+        /// </summary>
+        PlatformArgumentProcessorHelpPriority,
+
+        /// <summary>
         /// RunSettingsArgumentProcessor Help
         /// </summary>
         RunSettingsArgumentProcessorHelpPriority,
 
         /// <summary>
-        /// RunSpecificTestsArgumentProcessor Help
+        /// CLIRunSettingsArgumentProcessor Help
         /// </summary>
-        RunSpecificTestsArgumentProcessorHelpPriority,
+        CLIRunSettingsArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// ListTestsArgumentExecutor Help
+        /// </summary>
+        ListTestsArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// ParallelArgumentProcessor Help
+        /// </summary>
+        ParallelArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// TestAdapterPathArgumentProcessor Help
+        /// </summary>
+        TestAdapterPathArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// EnableDiagArgumentProcessor Help
+        /// </summary>
+        EnableDiagArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// EnableLoggerArgumentProcessor Help
+        /// </summary>
+        EnableLoggerArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// ResultsDirectoryArgumentProcessor Help
+        /// </summary>
+        ResultsDirectoryArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// PortArgumentProcessor Help
+        /// </summary>
+        ParentProcessIdArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// PortArgumentProcessor Help
+        /// </summary>
+        PortArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// HelpArgumentExecutor
+        /// </summary>
+        HelpArgumentProcessorHelpPriority,
 
         /// <summary>
         /// EnableCodeCoverageArgumentProcessor Help
@@ -49,50 +143,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         UseVsixArgumentProcessorHelpPriority,
 
         /// <summary>
-        /// TestAdapterPathArgumentProcessor Help
-        /// </summary>
-        TestAdapterPathArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// PlatformArgumentProcessor Help
-        /// </summary>
-        PlatformArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// FrameworkArgumentProcessor Help
-        /// </summary>
-        FrameworkArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// ParallelArgumentProcessor Help
-        /// </summary>
-        ParallelArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// TestCaseFilterArgumentProcessor Help
-        /// </summary>
-        TestCaseFilterArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// HelpArgumentExecutor
-        /// </summary>
-        HelpArgumentProcessorHelpPriority,
-                
-        /// <summary>
-        /// EnableLoggerArgumentProcessor Help
-        /// </summary>
-        EnableLoggerArgumentProcessorHelpPriority,
-              
-        /// <summary>
-        /// ListTestsArgumentExecutor Help
-        /// </summary>
-        ListTestsArgumentProcessorHelpPriority,
-
-        /// <summary>
         /// ListDiscoverersArgumentProcessor Help
         /// </summary>
         ListDiscoverersArgumentProcessorHelpPriority,
-        
+
         /// <summary>
         /// ListExecutorsArgumentProcessor Help
         /// </summary>
@@ -106,21 +160,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// ListSettingProviderArgumentProcessor Help
         /// </summary>
-        ListSettingsProvidersArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// PortArgumentProcessor Help
-        /// </summary>
-        ParentProcessIdArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// PortArgumentProcessor Help
-        /// </summary>
-        PortArgumentProcessorHelpPriority,
-
-        /// <summary>
-        /// EnableDiagArgumentProcessor Help
-        /// </summary>
-        EnableDiagArgumentProcessorHelpPriority
+        ListSettingsProvidersArgumentProcessorHelpPriority
     }
 }

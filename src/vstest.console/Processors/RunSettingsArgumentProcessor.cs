@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -119,18 +120,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             Contract.EndContractBlock();
-            
+
             // Load up the run settings and set it as the active run settings.
             try
             {
                 IXPathNavigable document = this.GetRunSettingsDocument(argument);
-                
-                var runSettings = new RunSettings();
+                this.runSettingsManager.UpdateRunSettings(document.CreateNavigator().OuterXml);
 
-                // Currently do not see the need to load the settings providers in the console process.
-                runSettings.LoadSettingsXml(document.CreateNavigator().OuterXml);
+                //Add default runsettings values if not exists in given runsettings file.
+                this.runSettingsManager.AddDefaultRunSettings();
 
-                this.runSettingsManager.SetActiveRunSettings(runSettings);
+                this.commandLineOptions.SettingsFile = argument;
             }
             catch (XmlException exception)
             {
@@ -172,20 +172,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 runSettingsDocument = XmlRunSettingsUtilities.CreateDefaultRunSettings();
-
-                FrameworkVersion frameworkVersion = FrameworkVersion.Framework45;
-
-                if (this.commandLineOptions.FrameworkVersionSpecified && this.commandLineOptions.TargetFrameworkVersion != Framework.DefaultFramework)
-                {
-                    IOutput output = ConsoleOutput.Instance;
-                    output.Warning(CommandLineResources.TestSettingsFrameworkMismatch, this.commandLineOptions.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
-                }
-
-                var architecture = this.commandLineOptions.ArchitectureSpecified
-                                       ? this.commandLineOptions.TargetArchitecture
-                                       : Architecture.X86;
-
-                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, architecture, frameworkVersion);
+                runSettingsDocument = MSTestSettingsUtilities.Import(runSettingsFile, runSettingsDocument, Architecture.X86, FrameworkVersion.Framework45);
             }
 
             if (this.commandLineOptions.EnableCodeCoverage == true)

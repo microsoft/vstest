@@ -1,8 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
+    <TestPlatformPackageDir>$(TestPlatformRoot)packages\</TestPlatformPackageDir>
+  </PropertyGroup>
+  <!-- hack for bug https://github.com/Microsoft/msbuild/issues/1400#issuecomment-268179321 -->
+  <Import Project="$(MSBuildSDKsPath)\Microsoft.NET.Sdk\Sdk\Sdk.targets" /> 
+  
+  <ItemGroup>
+    <ResxLang Include="cs;de;es;fr;it;ja;ko;pl;pt-BR;ru;tr;zh-Hans;zh-Hant" />
+  </ItemGroup>
+  
+  <PropertyGroup>
+    <ResourceDirectory>$(ProjectDir)Resources</ResourceDirectory>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="BeforeBuild" Condition="$(TestProject) =='' and $(TestProject) !='true' and @(EmbeddedResource) != ''">  
+    <CallTarget Targets="CreateLocalizeXLF;CreateLocalizeResx"/>
+  </Target>
+
+  <Target Name="CreateLocalizeXLF" Condition="'$(SyncXlf)' == 'true'">
+    <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
+      <Output ItemName="LocResourceFile" TaskParameter="Include"/>
+    </CreateItem>
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(LocResourceFile.Identity) -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf" />
+    <!-- Due to bug (https://github.com/fmuecke/XliffParser/issues/4) in xlftool we are not updating nuteral xlf file -->
+    <!--<Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" />-->
+  </Target>
+
+  <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true'">
+    <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
+      <Output ItemName="LocResourceFile" TaskParameter="Include"/>
+    </CreateItem>
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe  writeTarget -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" />
+    <ItemGroup>
+      <EmbeddedResource Include="$(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx" />
+    </ItemGroup>
+  </Target>
 </Project>

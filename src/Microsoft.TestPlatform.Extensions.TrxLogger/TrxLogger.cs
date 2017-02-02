@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     /// </summary>
     [FriendlyName(TrxLogger.FriendlyName)]
     [ExtensionUri(TrxLogger.ExtensionUri)]
-    internal class TrxLogger : ITestLogger
+    internal class TrxLogger : ITestLoggerWithParameters
     {
         #region Constants
 
@@ -47,14 +47,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </summary>
         public const string DataCollectorUriPrefix = "dataCollector://";
 
+        /// <summary>
+        /// Log file parameter key
+        /// </summary>
+        public const string LogFileNameKey = "LogFileName";
+
         #endregion
 
         #region Fields
 
         /// <summary>
-        /// Cache the TRX filename
+        /// Cache the TRX file path
         /// </summary>
-        private static string trxFileName;
+        private string trxFilePath;
 
         private TrxLoggerObjectModel.TestRun testRun;
         private List<TrxLoggerObjectModel.UnitTestResult> results;
@@ -75,35 +80,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
         private DateTime testRunStartTime;
 
-        #endregion
+        /// <summary>
+        /// Parameters dictionary for logger. Ex: {"LogFileName":"TestResults.trx"}.
+        /// </summary>
+        private Dictionary<string, string> parametersDictionary;
 
         /// <summary>
-        /// Gets the directory under which trx file should be saved.
+        /// Gets the directory under which default trx file and test results attachements should be saved.
         /// </summary>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        public static string TrxFileDirectory
-        {
-            get;
-            internal set;
-        }
+        private string testResultsDirPath;
+
+        #endregion
 
         #region ITestLogger
 
-        /// <summary>
-        /// Initializes the Test Logger.
-        /// </summary>
-        /// <param name="events">Events that can be registered for.</param>
-        /// <param name="testRunDirectory">Test Run Directory</param>
-        public void Initialize(TestLoggerEvents events, string testRunDirectory)
+        /// <inheritdoc/>
+        public void Initialize(TestLoggerEvents events, string testResultsDirPath)
         {
             if (events == null)
             {
                 throw new ArgumentNullException(nameof(events));
             }
 
-            if (string.IsNullOrEmpty(testRunDirectory))
+            if (string.IsNullOrEmpty(testResultsDirPath))
             {
-                throw new ArgumentNullException(nameof(testRunDirectory));
+                throw new ArgumentNullException(nameof(testResultsDirPath));
             }
 
             // Register for the events.
@@ -111,11 +112,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             events.TestResult += this.TestResultHandler;
             events.TestRunComplete += this.TestRunCompleteHandler;
 
-            TrxFileDirectory = testRunDirectory;
+            this.testResultsDirPath = testResultsDirPath;
 
             this.InitializeInternal();
         }
 
+        /// <inheritdoc/>
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            if (parameters.Count == 0)
+            {
+                throw new ArgumentException("No default parameters added", nameof(parameters));
+            }
+
+            this.parametersDictionary = parameters;
+            this.Initialize(events, this.parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
+        }
         #endregion
 
         #region ForTesting
@@ -257,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
             // Conver the rocksteady result to MSTest result
             TrxLoggerObjectModel.TestOutcome testOutcome = Converter.ToOutcome(e.Result.Outcome);
-            TrxLoggerObjectModel.UnitTestResult testResult = Converter.ToUnitTestResult(e.Result, testElement, testOutcome, this.testRun, TrxFileDirectory);
+            TrxLoggerObjectModel.UnitTestResult testResult = Converter.ToUnitTestResult(e.Result, testElement, testOutcome, this.testRun, this.testResultsDirPath);
 
             // Set various counts (passtests, failed tests, total tests)
             this.totalTests++;
@@ -331,8 +348,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 }
 
                 List<string> errorMessages = new List<string>();
-                List<CollectorDataEntry> collectorEntries = Converter.ToCollectionEntries(e.AttachmentSets, this.testRun, TrxFileDirectory);
-                IList<String> resultFiles = Converter.ToResultFiles(e.AttachmentSets, this.testRun, TrxFileDirectory, errorMessages);
+                List<CollectorDataEntry> collectorEntries = Converter.ToCollectionEntries(e.AttachmentSets, this.testRun, this.testResultsDirPath);
+                IList<String> resultFiles = Converter.ToResultFiles(e.AttachmentSets, this.testRun, this.testResultsDirPath, errorMessages);
 
                 if (errorMessages.Count > 0)
                 {
@@ -358,19 +375,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
 
                 helper.SaveObject(runSummary, rootElement, "ResultSummary", parameters);
 
-                if (Directory.Exists(TrxFileDirectory) == false)
-                {
-                    Directory.CreateDirectory(TrxFileDirectory);
-                }
-
-                if (string.IsNullOrEmpty(trxFileName))
-                {
-                    // save the xml to file in testResultsFolder
-                    // [RunDeploymentRootDirectory] Replace white space with underscore from trx file name to make it command line friendly
-                    trxFileName = this.GetTrxFileName(TrxFileDirectory, this.testRun.RunConfiguration.RunDeploymentRootDirectory.Replace(' ', '_'));
-                }
-
-                this.PopulateTrxFile(trxFileName, rootElement);
+                //Save results to Trx file
+                this.DeriveTrxFilePath();
+                this.PopulateTrxFile(this.trxFilePath, rootElement);
             }
         }
 
@@ -387,33 +394,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         {
             try
             {
-                FileStream fs = File.OpenWrite(trxFileName);
-                rootElement.OwnerDocument.Save(fs);
+                var trxFileDirPath = Path.GetDirectoryName(trxFilePath);
+                if (Directory.Exists(trxFileDirPath) == false)
+                {
+                    Directory.CreateDirectory(trxFileDirPath);
+                }
+
+                if (File.Exists(trxFilePath))
+                {
+                    var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture,
+                        TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName);
+                    Console.WriteLine(overwriteWarningMsg);
+                    EqtTrace.Warning(overwriteWarningMsg);
+                }
+
+                using (var fs = File.Open(trxFileName, FileMode.Create))
+                {
+                    rootElement.OwnerDocument.Save(fs);
+                }
                 String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
                 Console.WriteLine(resultsFileMessage);
+                EqtTrace.Info(resultsFileMessage);
             }
             catch (System.UnauthorizedAccessException fileWriteException)
             {
                 Console.WriteLine(fileWriteException.Message);
             }
-        }
-
-        /// <summary>
-        /// Get full path to trx file
-        /// </summary>
-        /// <param name="baseDirectory">
-        /// The base Directory.
-        /// </param>
-        /// <param name="trxFileName">
-        /// The trx File Name.
-        /// </param>
-        /// <returns>
-        /// trx file name.
-        /// </returns>
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed. Suppression is OK here.")]
-        private string GetTrxFileName(string baseDirectory, string trxFileName)
-        {
-            return FileHelper.GetNextIterationFileName(baseDirectory, trxFileName + ".trx", false);
         }
 
         // Initializes trx logger cache.
@@ -452,6 +458,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             string testCaseName = !string.IsNullOrEmpty(testCase.DisplayName) ? testCase.DisplayName : testCase.FullyQualifiedName;
             string message = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.MessageForSkippedTests, testCaseName);
             this.AddRunLevelInformationalMessage(message);
+        }
+
+        private void DeriveTrxFilePath()
+        {
+            if (this.parametersDictionary != null)
+            {
+                var isLogFileNameParameterExists = this.parametersDictionary.TryGetValue(TrxLogger.LogFileNameKey, out string logFileNameValue);
+                if (isLogFileNameParameterExists && !string.IsNullOrWhiteSpace(logFileNameValue))
+                {
+                    this.trxFilePath = Path.Combine(this.testResultsDirPath, logFileNameValue);
+                }
+                else
+                {
+                    this.SetDefaultTrxFilePath();
+                }
+            }
+            else
+            {
+                this.SetDefaultTrxFilePath();
+            }
+        }
+
+        /// <summary>
+        /// Sets auto generated Trx file name under test results directory.
+        /// </summary>
+        private void SetDefaultTrxFilePath()
+        {
+            // [RunDeploymentRootDirectory] Replace white space with underscore from trx file name to make it command line friendly
+            var defaultTrxFileName = this.testRun.RunConfiguration.RunDeploymentRootDirectory.Replace(' ', '_') + ".trx";
+            this.trxFilePath = FileHelper.GetNextIterationFileName(this.testResultsDirPath, defaultTrxFileName, false);
         }
 
         #endregion
