@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Specifies whether the trace is initialized or not
         /// </summary>
-        private static bool isInitialized = false;
+        private static bool isListenerInitialized = false;
 
         /// <summary>
         /// Lock over initialization
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="customLogFile">A custom log file for trace messages.</param>
         public static void InitializeVerboseTrace(string customLogFile)
         {
-            isInitialized = false;
+            isListenerInitialized = false;
 
             LogFile = customLogFile;
             TraceLevel = TraceLevel.Verbose;
@@ -242,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Source.Listeners.Add(listener);
                 }
 
-                isInitialized = true;
+                isListenerInitialized = true;
             }
         }
 
@@ -836,7 +836,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Source.Listeners.Add(listener);
                 }
 
-                isInitialized = true;
+                isListenerInitialized = true;
             }
         }
 
@@ -845,14 +845,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private static void EnsureTraceIsInitialized()
         {
-            if (isInitialized)
+            if (isListenerInitialized)
             {
                 return;
             }
 
             lock (isInitializationLock)
             {
-                if (isInitialized)
+                if (isListenerInitialized)
                 {
                     return;
                 }
@@ -876,7 +876,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 traceFileSize = defaultTraceFileSize;
                 Source.Listeners.Add(new RollingFileTraceListener(LogFile, ListenerName, traceFileSize));
 
-                isInitialized = true;
+                isListenerInitialized = true;
             }
         }
 
