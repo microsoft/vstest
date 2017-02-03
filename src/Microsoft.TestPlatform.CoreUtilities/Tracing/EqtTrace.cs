@@ -242,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Source.Listeners.Add(listener);
                 }
 
-                isInitialized = true;
+                isListenerInitialized = true;
             }
         }
 
@@ -836,7 +836,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Source.Listeners.Add(listener);
                 }
 
-                isInitialized = true;
+                isListenerInitialized = true;
             }
         }
 
@@ -845,14 +845,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private static void EnsureTraceIsInitialized()
         {
-            if (isInitialized)
+            if (isListenerInitialized)
             {
                 return;
             }
 
             lock (isInitializationLock)
             {
-                if (isInitialized)
+                if (isListenerInitialized)
                 {
                     return;
                 }
@@ -876,7 +876,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 traceFileSize = defaultTraceFileSize;
                 Source.Listeners.Add(new RollingFileTraceListener(LogFile, ListenerName, traceFileSize));
 
-                isInitialized = true;
+                isListenerInitialized = true;
             }
         }
 
