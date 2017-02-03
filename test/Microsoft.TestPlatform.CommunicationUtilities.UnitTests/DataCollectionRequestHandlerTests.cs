@@ -35,7 +35,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void CreateInstanceShouldThrowExceptinIfInstanceCommunicationManagerIsNull()
+        public void CreateInstanceShouldThrowExceptionIfInstanceCommunicationManagerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {

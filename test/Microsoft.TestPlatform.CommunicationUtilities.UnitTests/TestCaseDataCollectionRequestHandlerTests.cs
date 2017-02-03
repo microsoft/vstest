@@ -111,7 +111,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void DisposehouldThrowExceptionIfThrownByCommunicationManager()
+        public void DisposeShouldThrowExceptionIfThrownByCommunicationManager()
         {
             this.mockCommunicationManager.Setup(x => x.StopServer()).Throws<Exception>();
             var requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object);

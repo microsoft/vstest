@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using System.Threading;
 
     /// <summary>
     /// Handles test session events received from vstest console process.
@@ -25,6 +26,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         private IMessageSink messageSink;
         private IDataCollectionManager dataCollectionManager;
         private IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler;
+        private Task testCaseEventMonitorTask;
+
+        /// <summary>
+        /// Use to cancel data collection test case evets monitoring if test run is cancelled.
+        /// </summary>
+        private CancellationTokenSource cancellationTokenSource;
 
         private static readonly object obj = new object();
 
@@ -47,6 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             this.messageSink = messageSink;
             this.dataCollectionManager = dataCollectionManager;
             this.dataCollectionTestCaseEventHandler = dataCollectionTestCaseEventHandler;
+            this.cancellationTokenSource = new CancellationTokenSource();
         }
 
         /// <summary>
@@ -112,11 +120,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         {
                             testCaseEventsPort = this.dataCollectionTestCaseEventHandler.InitializeCommunication();
 
-                            Task.Factory.StartNew(() =>
-                            {
-                                this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(0);
-                                this.dataCollectionTestCaseEventHandler.ProcessRequests();
-                            });
+                            this.testCaseEventMonitorTask = Task.Factory.StartNew(() =>
+                             {
+                                 // todo : decide the time out for this wait as it has to wait till test execution process get created.
+                                 this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(0);
+                                 this.dataCollectionTestCaseEventHandler.ProcessRequests();
+                             }, this.cancellationTokenSource.Token);
                         }
 
                         this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, areTestCaseLevelEventsRequired, testCaseEventsPort));
@@ -127,6 +136,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     case MessageType.AfterTestRunEnd:
                         EqtTrace.Info("DataCollection completing.");
                         var isCancelled = message.Payload.ToObject<bool>();
+
+                        if (isCancelled)
+                        {
+                            this.cancellationTokenSource.Cancel();
+                        }
+
+                        try
+                        {
+                            this.testCaseEventMonitorTask.Wait();
+                        }
+                        catch (Exception ex)
+                        {
+                            EqtTrace.Error("DataCollectionRequestHandler.ProcessRequests : {0}", ex.Message);
+                        }
 
                         var attachments = this.dataCollectionManager.SessionEnded(isCancelled);
 
