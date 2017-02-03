@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var portCapabilities = new PortArgumentProcessorCapabilities();
 
             // Less the number, high the priority
-            Assert.IsTrue(parentProcessIdCapabilities.Priority < portCapabilities.Priority, "ParentProcessId must have higher priority than Port.");
+            Assert.IsTrue(parentProcessIdCapabilities.Priority == portCapabilities.Priority, "ParentProcessId must have higher priority than Port.");
         }
 
         [TestMethod]

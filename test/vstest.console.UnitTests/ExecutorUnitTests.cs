@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             var mockOutput = new MockOutput();
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("/?");
 
-            Assert.AreEqual(0, exitCode, "Exit code must be One for bad arguments");
+            Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
 
             // Verify that messages exist
             Assert.IsTrue(mockOutput.Messages.Count > 0, "Executor must print atleast copyright info");
@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         {
             var mockOutput = new MockOutput();
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(null);
-            RunConfiguration runConfiguration =  XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+            RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
             Assert.AreEqual(runConfiguration.ResultsDirectory, Constants.DefaultResultsDirectory);
             Assert.AreEqual(runConfiguration.TargetFrameworkVersion.ToString(), Framework.DefaultFramework.ToString());
             Assert.AreEqual(runConfiguration.TargetPlatform, Constants.DefaultPlatform);
