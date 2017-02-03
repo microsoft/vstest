@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
     using System.ComponentModel;
     using System.IO;
     using System.Threading;
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollector;
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -187,6 +187,41 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             var result = this.attachmentManager.GetAttachments(datacollectioncontext);
             Assert.AreEqual(0, result.Count);
+        }
+
+        [TestMethod]
+        public void GetAttachmentsShouldReturnTheAlreadyCompletedAttachmentsAfterCancelled()
+        {
+            var filename = "filename1.txt";
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
+
+            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
+
+            var datacollectioncontext = new DataCollectionContext(this.sessionId);
+            var friendlyName = "TestDataCollector";
+            var uri = new Uri("datacollector://Company/Product/Version");
+
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), true);
+
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
+
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
+            var result = this.attachmentManager.GetAttachments(datacollectioncontext);
+
+            Assert.AreEqual(friendlyName, result[0].DisplayName);
+            Assert.AreEqual(uri, result[0].Uri);
+            Assert.AreEqual(1, result[0].Attachments.Count);
+
+            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "filename2.txt"), string.Empty);
+            dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, "filename2.txt"), true);
+
+            this.attachmentManager.Cancel();
+
+            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
+
+            result = this.attachmentManager.GetAttachments(datacollectioncontext);
+
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
         }
     }
 }
