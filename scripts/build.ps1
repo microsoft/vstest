@@ -480,7 +480,6 @@ Restore-Package
 #Update-LocalizedResources
 Invoke-Build
 Publish-Package
-Patch-Publish-Package
 Create-VsixPackage
 Create-NugetPackages
 

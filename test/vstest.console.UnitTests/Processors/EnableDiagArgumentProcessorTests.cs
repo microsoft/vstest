@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
             
             Assert.IsTrue(EqtTrace.IsVerboseEnabled);
-            EqtTrace.TraceLevel = CustomTraceLevel.Off;
+            EqtTrace.TraceLevel = TraceLevel.Off;
         }
 
         private class TestableEnableDiagArgumentProcessor : EnableDiagArgumentProcessor
