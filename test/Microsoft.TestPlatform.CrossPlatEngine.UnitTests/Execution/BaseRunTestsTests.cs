@@ -312,7 +312,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsShouldReportAWarningIfExecutorUriIsNotDefinedInExtensionAssembly()
         {
-            //System.Diagnostics.Debugger.Launch();
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
             {
@@ -567,6 +566,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.RunTests();
 
             Assert.IsTrue(isExceptionThrown.HasValue && isExceptionThrown.Value);
+        }
+
+        [TestMethod]
+        public void RunTestsShouldReportLogMessagesFromExecutors()
+        {
+            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+            var executorUriExtensionMap = new List<Tuple<Uri, string>>
+            {
+                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
+            };
+            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => executorUriExtensionMap;
+            this.runTestsInstance.InvokeExecutorCallback =
+                (executor, executorUriTuple, runcontext, frameworkHandle) =>
+                {
+                    frameworkHandle.SendMessage(TestMessageLevel.Error, "DummyMessage");
+                };
+
+            this.runTestsInstance.RunTests();
+
+            this.mockTestRunEventsHandler.Verify(re => re.HandleLogMessage(TestMessageLevel.Error, "DummyMessage"));
         }
 
         #endregion

@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -72,7 +71,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         private static void Run()
         {
-            var requestHandler = new DataCollectionRequestHandler();
+            var requestHandler = new DataCollectionRequestHandler(new MessageSink());
+            DataCollectionRequestHandler.RequestHandler = requestHandler;
+
             requestHandler.InitializeCommunication(port);
 
             // Wait for the connection to the sender and start processing requests from sender

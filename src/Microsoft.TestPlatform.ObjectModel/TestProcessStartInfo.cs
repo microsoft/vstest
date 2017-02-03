@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using System;
+    using System.Diagnostics;
     using System.Collections.Generic;
 
     /// <summary>
@@ -35,5 +37,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// For example - emulator ID, remote machine details etc.
         /// </summary>
         public IDictionary<string, string> CustomProperties { get; set; }
+
+        /// <summary>
+        /// Callback on process exit
+        /// </summary>
+        public Action<Process> ExitCallback { get; set; }
     }
 }

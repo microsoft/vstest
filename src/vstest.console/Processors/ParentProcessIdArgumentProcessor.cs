@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.ParentProcessId;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.DesignMode;
 
         public override string HelpContentResourceName => CommandLineResources.ParentProcessIdArgumentHelp;
 

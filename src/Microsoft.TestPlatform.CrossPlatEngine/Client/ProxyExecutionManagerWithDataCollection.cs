@@ -122,6 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public override void Cancel()
         {
+            this.ProxyDataCollectionManager?.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
             base.Cancel();
         }
 
