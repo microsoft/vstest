@@ -700,11 +700,21 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
                 // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
 
-                string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]";
-                return Regex.Replace(str, invalidChar, TrxLoggerResources.PlaceHolderForInvalidChar);
+                // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+                // because C# support unicode character in range \u0000 to \uFFFF
+                MatchEvaluator evaluator = new MatchEvaluator(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
+                string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
+                return Regex.Replace(str, invalidChar, evaluator);
             }
 
             return str;
+        }
+
+        private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
+        {
+            char x = match.Value.ToArray()[0];
+            return String.Format(@"\u{0:x4}", (ushort)x);
+
         }
 
         private XmlNode EnsureLocationExists(XmlElement xml, string location, string nameSpaceUri)

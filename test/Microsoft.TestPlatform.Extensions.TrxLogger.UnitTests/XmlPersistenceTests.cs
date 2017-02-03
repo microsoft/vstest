@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         [TestMethod]
         public void SaveObjectShouldRemoveInvalidCharacter()
         {
+            System.Diagnostics.Debugger.Launch();
             XmlPersistence xmlPersistence = new XmlPersistence();
             var node = xmlPersistence.CreateRootElement("TestRun");
 
@@ -20,7 +21,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
-            string expectedResult = "This string has these ? ? invalid characters";
+            string expectedResult = "This string has these \\u0000 \\u000b invalid characters";
             Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
         }
 
@@ -34,7 +35,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
-            string expectedResult = "This string has these \\0 ? invalid characters";
+            string expectedResult = "This string has these \\0 \\u000b invalid characters";
             Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
         }
     }
