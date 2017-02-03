@@ -174,6 +174,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return new Collection<AttachmentSet>();
             }
 
+            if (isCancelled)
+            {
+                this.attachmentManager.Cancel();
+                return new Collection<AttachmentSet>();
+            }
+
             var endEvent = new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext);
             this.SendEvent(endEvent);
 

@@ -22,9 +22,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <param name="processPath">The path to the process.</param>
         /// <param name="arguments">Process arguments.</param>
         /// <param name="workingDirectory">Working directory of the process.</param>
+        /// <param name="exitCallback"></param>
         /// <returns>The process spawned.</returns>
         /// <exception cref="Exception">Throws any exception that could result as part of the launch.</exception>
-        public Process LaunchProcess(string processPath, string arguments, string workingDirectory)
+        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process> exitCallback)
         {
             var process = new Process();
             try
@@ -35,7 +36,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
                 process.StartInfo.FileName = processPath;
                 process.StartInfo.Arguments = arguments;
+                process.StartInfo.RedirectStandardError = true;
                 process.EnableRaisingEvents = true;
+
+                if (exitCallback != null)
+                {
+                    process.Exited += (sender, args) => exitCallback(sender as Process);
+                }
 
                 EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
                 process.Start();

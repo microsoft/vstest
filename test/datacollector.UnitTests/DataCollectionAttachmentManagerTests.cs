@@ -215,14 +215,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "filename2.txt"), string.Empty);
             dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, "filename2.txt"), true);
 
-            this.attachmentManager.GetAttachments(datacollectioncontext, true);
+            this.attachmentManager.Cancel();
 
             this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
             result = this.attachmentManager.GetAttachments(datacollectioncontext);
 
             Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
-
         }
     }
 }

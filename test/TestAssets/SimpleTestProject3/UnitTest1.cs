@@ -1,10 +1,9 @@
 // Copyright (c) Microsoft. All rights reserved.
 
-using System.Threading.Tasks;
-
 namespace SampleUnitTestProject3
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
     using System.IO;
     using System.Reflection;
 
@@ -15,6 +14,13 @@ namespace SampleUnitTestProject3
         public void WorkingDirectoryTest()
         {
             Assert.AreEqual(Path.GetDirectoryName(typeof(UnitTest1).GetTypeInfo().Assembly.Location), Directory.GetCurrentDirectory());
+        }
+
+        [TestMethod]
+        public void ExitWithStdErrorMessageTest()
+        {
+            Console.Error.WriteLine("Std Error Message");
+            Environment.Exit(1);
         }
     }
 }

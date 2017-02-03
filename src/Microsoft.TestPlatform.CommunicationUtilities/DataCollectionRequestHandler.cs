@@ -35,6 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         internal DataCollectionRequestHandler(IMessageSink messageSink)
             : this(new SocketCommunicationManager(), messageSink, new DataCollectionManagerFactory(), new DataCollectionTestCaseEventManagerFactory())
         {
+            this.messageSink = messageSink;
         }
 
         /// <summary>

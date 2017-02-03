@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
-    /// The test data collection client.
+    /// Managed datacollector interaction from runner process.
     /// </summary>
     internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     {
@@ -28,10 +28,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
         /// <param name="arch">
-        /// The arch.
+        /// Architecture for datacollection process.
         /// </param>
         /// <param name="settingsXml">
-        /// The settings Xml.
+        /// Runsettings that contains the datacollector related configuration.
         /// </param>
         public ProxyDataCollectionManager(Architecture arch, string settingsXml, string targetFramework)
             : this(arch, settingsXml, new DataCollectionRequestSender(), DataCollectionLauncherFactory.GetDataCollectorLauncher(targetFramework))
@@ -42,16 +42,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
         /// <param name="arch">
-        /// The arch.
+        /// Architecture for datacollection process.
         /// </param>
         /// <param name="settingsXml">
-        /// The settings Xml.
+        /// Runsettings that contains the datacollector related configuration.
         /// </param>
         /// <param name="dataCollectionRequestSender">
-        /// The data collection request sender.
+        /// Handles communication with datacollector process.
         /// </param>
         /// <param name="dataCollectionLauncher">
-        /// The data collection launcher.
+        /// Launches datacollector process.
         /// </param>
         internal ProxyDataCollectionManager(Architecture arch, string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IDataCollectionLauncher dataCollectionLauncher)
         {

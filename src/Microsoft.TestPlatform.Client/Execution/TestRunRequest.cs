@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
-                            new Collection<AttachmentSet>(new List<AttachmentSet>(runContextAttachments)),
+                            runContextAttachments as Collection<AttachmentSet>,
                             this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
@@ -364,7 +364,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 EqtTrace.Info("TestRunRequest:SendTestRunStatsChange: Completed.");
             }
         }
-
 
         /// <summary>
         /// Invoked when log messages are received
@@ -460,7 +459,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// The run completion event which will be signalled on completion of test run. 
         /// </summary>
         private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
-
 
         /// <summary>
         /// Tracks the time taken by each run request

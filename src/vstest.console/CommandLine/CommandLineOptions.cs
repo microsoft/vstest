@@ -129,6 +129,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public string TestAdapterPath { get; set; }
 
         /// <summary>
+        /// True if console runner is running in design mode. 
+        /// </summary>
+        public bool IsDesignMode { get; set; }
+
+        /// <summary>
         /// Process Id of the process which launched vstest runner
         /// </summary>
         public int ParentProcessId { get; set; }

@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
 {
     using System.Diagnostics;
     using System.Reflection;
-    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
@@ -30,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             this.dataCollectorSettings = string.Format("<DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"{0}\" codebase=\"{1}\" />", typeof(CustomDataCollector).AssemblyQualifiedName, typeof(CustomDataCollector).GetTypeInfo().Assembly.Location);
             this.runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
 #if NET46
-            this.dataCollectionLauncher = new DataCollectionLauncher();
+            this.dataCollectionLauncher = new DefaultDataCollectionLauncher();
 #else
             this.dataCollectionLauncher = new DotnetDataCollectionLauncher();
 #endif
@@ -40,30 +39,30 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         public void BeforeTestRunStartShouldGetEnviornmentVariables()
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
-            var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher);
 
-            var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
+            {
+                var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
-            Assert.AreEqual(1, result.EnvironmentVariables.Count);
-
-            proxyDataCollectionManager.Dispose();
+                Assert.AreEqual(1, result.EnvironmentVariables.Count);
+            }
         }
 
         [TestMethod]
         public void AfterTestRunShouldSendGetAttachments()
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
-            var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher);
 
-            proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
+            {
+                proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
-            var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
+                var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
 
-            Assert.AreEqual("CustomDataCollector", attachments[0].DisplayName);
-            Assert.AreEqual("my://custom/datacollector", attachments[0].Uri.ToString());
-            Assert.IsTrue(attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
-
-            proxyDataCollectionManager.Dispose();
+                Assert.AreEqual("CustomDataCollector", attachments[0].DisplayName);
+                Assert.AreEqual("my://custom/datacollector", attachments[0].Uri.ToString());
+                Assert.IsTrue(attachments[0].Attachments[0].Uri.ToString().Contains("filename.txt"));
+            }
         }
 
         [TestMethod]
@@ -72,31 +71,26 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             var socketCommManager = new SocketCommunicationManager();
             var dataCollectionRequestSender = new DataCollectionRequestSender(socketCommManager, JsonDataSerializer.Instance);
 #if NET46
-            var dataCollectionLauncher = new DataCollectionLauncher();
+            var dataCollectionLauncher = new DefaultDataCollectionLauncher();
 #else
             var dataCollectionLauncher = new DotnetDataCollectionLauncher();
 #endif
-            var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, dataCollectionLauncher);
-
-            proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
-
-            var result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcess.Id);
-            Assert.IsNotNull(result);
-
-            socketCommManager.StopClient();
-
-            var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
-
-            Assert.IsNull(attachments);
-
-            // Give time to datacollector process to exit.
-            Thread.Sleep(500);
-
-            // Throws argument exception because process with the given id is not running.
-            Assert.ThrowsException<ArgumentException>(() =>
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, dataCollectionLauncher))
             {
-                result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcess.Id);
-            });
+                proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
+
+                var result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcess.Id);
+                Assert.IsNotNull(result);
+
+                socketCommManager.StopClient();
+
+                var attachments = proxyDataCollectionManager.AfterTestRunEnd(false, this.mockTestMessageEventHandler.Object);
+
+                Assert.IsNull(attachments);
+
+                // Give time to datacollector process to exit.
+                Assert.IsTrue(result.WaitForExit(500));
+            }
         }
     }
 }
