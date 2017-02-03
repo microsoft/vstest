@@ -24,10 +24,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         private readonly Mock<IFileHelper> mockFileHelper;
 
+        private TraceLevel traceLevel;
+        private string traceFileName;
+
         public EnableDiagArgumentProcessorTests()
         {
             this.mockFileHelper = new Mock<IFileHelper>();
             this.diagProcessor = new TestableEnableDiagArgumentProcessor(this.mockFileHelper.Object);
+
+            // Saving the EqtTrace state
+            traceLevel = EqtTrace.TraceLevel;
+            EqtTrace.TraceLevel = TraceLevel.Off;
+            traceFileName = EqtTrace.LogFile;
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            // Restoring to initial state for EqtTrace
+            EqtTrace.TraceLevel = traceLevel;
+            EqtTrace.InitializeVerboseTrace(traceFileName);
+
+            // Delete any file created as part of running tests.
+            File.Delete(Path.Combine(Path.GetTempPath(), "tmp", "foo.txt"));
         }
 
         [TestMethod]
@@ -69,9 +88,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void EnableDiagArgumentProcessorExecutorShouldCreateDirectoryOfLogFileIfNotExists()
         {
-            this.mockFileHelper.Setup(x => x.CreateDirectory(Path.GetDirectoryName(this.dummyFilePath))).Callback<string>((path) => { Directory.CreateDirectory(path); });
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(false);
-            
+
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
 
             this.mockFileHelper.Verify(fh => fh.CreateDirectory(Path.GetDirectoryName(this.dummyFilePath)), Times.Once);
@@ -89,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void EnableDiagArgumentProcessorExecutorShouldEnableVerboseLogging()
         {
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
-            
+
             Assert.IsTrue(EqtTrace.IsVerboseEnabled);
             EqtTrace.TraceLevel = TraceLevel.Off;
         }
