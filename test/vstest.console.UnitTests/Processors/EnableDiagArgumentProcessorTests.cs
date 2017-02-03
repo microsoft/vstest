@@ -42,8 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void Cleanup()
         {
             // Restoring to initial state for EqtTrace
-            EqtTrace.TraceLevel = traceLevel;
             EqtTrace.InitializeVerboseTrace(traceFileName);
+            EqtTrace.TraceLevel = traceLevel;
         }
 
         [TestMethod]
