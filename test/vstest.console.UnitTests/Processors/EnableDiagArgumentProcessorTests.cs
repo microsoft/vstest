@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     [TestClass]
     public class EnableDiagArgumentProcessorTests
     {
-        private string dummyFilePath = Path.Combine(Path.GetTempPath(), "tmp", "foo.txt");
+        private string dummyFilePath = Path.Combine(Path.DirectorySeparatorChar.ToString(), "tmp", "foo.txt");
 
         private readonly EnableDiagArgumentProcessor diagProcessor;
 
@@ -44,9 +44,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Restoring to initial state for EqtTrace
             EqtTrace.TraceLevel = traceLevel;
             EqtTrace.InitializeVerboseTrace(traceFileName);
-
-            // Delete any file created as part of running tests.
-            File.Delete(Path.Combine(Path.GetTempPath(), "tmp", "foo.txt"));
         }
 
         [TestMethod]
