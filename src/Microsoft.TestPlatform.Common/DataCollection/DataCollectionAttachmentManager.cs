@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private List<Task> attachmentTasks;
 
         /// <summary>
-        /// Use to cancel data collection if test run is cancelled.
+        /// Use to cancel attachment transfers if test run is cancelled.
         /// </summary>
         private CancellationTokenSource cancellationTokenSource;
 
