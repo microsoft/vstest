@@ -8,6 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
     /// </summary>
     internal interface IDataCollectionTestCaseEventHandler
     {
+        // todo : Similar interfaces exist, need redesign.
+
         /// <summary>
         /// Initializes the communication for sending requests
         /// </summary>

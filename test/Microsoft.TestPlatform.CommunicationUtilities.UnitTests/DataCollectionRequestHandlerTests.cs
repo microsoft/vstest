@@ -23,23 +23,32 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     {
         private Mock<ICommunicationManager> mockCommunicationManager;
         private Mock<IMessageSink> mockMessageSink;
-        private Mock<IDataCollectionManagerFactory> mockDataCollectionManagerFactory;
-        private Mock<IDataCollectionTestCaseEventManagerFactory> mockTestCaseDataCollectionCommunicationFactory;
+        private Mock<IDataCollectionManager> mockDataCollectionManager;
+        private Mock<IDataCollectionTestCaseEventHandler> mockDataCollectionTestCaseEventHandler;
 
         public DataCollectionRequestHandlerTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
             this.mockMessageSink = new Mock<IMessageSink>();
-            this.mockDataCollectionManagerFactory = new Mock<IDataCollectionManagerFactory>();
-            this.mockTestCaseDataCollectionCommunicationFactory = new Mock<IDataCollectionTestCaseEventManagerFactory>();
+            this.mockDataCollectionManager = new Mock<IDataCollectionManager>();
+            this.mockDataCollectionTestCaseEventHandler = new Mock<IDataCollectionTestCaseEventHandler>();
         }
 
         [TestMethod]
-        public void CreateInstanceShouldThrowExceptinIfInstanceIsNullAndNullIsPassed()
+        public void CreateInstanceShouldThrowExceptinIfInstanceCommunicationManagerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                DataCollectionRequestHandler.CreateInstance(null, null);
+                DataCollectionRequestHandler.CreateInstance(null, this.mockMessageSink.Object);
+            });
+        }
+
+        [TestMethod]
+        public void CreateInstanceShouldThrowExceptinIfInstanceMessageSinkIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                DataCollectionRequestHandler.CreateInstance(this.mockCommunicationManager.Object, null);
             });
         }
 
@@ -54,7 +63,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void InitializeCommunicationShouldInitializeCommunication()
         {
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             requestHandler.InitializeCommunication(123);
 
@@ -65,7 +74,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void InitializeCommunicationShouldThrowExceptionIfThrownByCommunicationManager()
         {
             this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<int>())).Throws<Exception>();
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             Assert.ThrowsException<Exception>(() =>
             {
@@ -76,7 +85,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void WaitForRequestSenderConnectionShouldInvokeCommunicationManager()
         {
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             requestHandler.WaitForRequestSenderConnection(0);
 
@@ -87,7 +96,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void WaitForRequestSenderConnectionShouldThrowExceptionIfThrownByCommunicationManager()
         {
             this.mockCommunicationManager.Setup(x => x.WaitForServerConnection(It.IsAny<int>())).Throws<Exception>();
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             Assert.ThrowsException<Exception>(() =>
             {
@@ -98,7 +107,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendDataCollectionMessageShouldSendMessageToCommunicationManager()
         {
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
             var message = new DataCollectionMessageEventArgs(TestMessageLevel.Error, "message");
 
             requestHandler.SendDataCollectionMessage(message);
@@ -110,7 +119,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void SendDataCollectionMessageShouldThrowExceptionIfThrownByCommunicationManager()
         {
             this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionMessage, It.IsAny<DataCollectionMessageEventArgs>())).Throws<Exception>();
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
             var message = new DataCollectionMessageEventArgs(TestMessageLevel.Error, "message");
 
             Assert.ThrowsException<Exception>(() =>
@@ -122,7 +131,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void CloseShouldCloseCommunicationChannel()
         {
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             requestHandler.Close();
 
@@ -133,7 +142,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void CloseShouldThrowExceptionIfThrownByCommunicationManager()
         {
             this.mockCommunicationManager.Setup(x => x.StopClient()).Throws<Exception>();
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             Assert.ThrowsException<Exception>(() =>
             {
@@ -144,7 +153,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void DisposeShouldCloseCommunicationChannel()
         {
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             requestHandler.Dispose();
 
@@ -160,27 +169,22 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.AfterTestRunEnd, Payload = "false" });
 
-            var mockDataCollectorManager = new Mock<IDataCollectionManager>();
-            mockDataCollectorManager.Setup(x => x.SessionStarted()).Returns(true);
-            this.mockDataCollectionManagerFactory.Setup(x => x.Create(this.mockMessageSink.Object)).Returns(mockDataCollectorManager.Object);
+            this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
 
-            var mockTestCaseDataCollectionRequestHandler = new Mock<IDataCollectionTestCaseEventHandler>();
-            this.mockTestCaseDataCollectionCommunicationFactory.Setup(x => x.GetTestCaseDataCollectionRequestHandler()).Returns(mockTestCaseDataCollectionRequestHandler.Object);
-
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             requestHandler.ProcessRequests();
 
-            mockTestCaseDataCollectionRequestHandler.Verify(x => x.InitializeCommunication(), Times.Once);
-            mockTestCaseDataCollectionRequestHandler.Verify(x => x.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
-            mockTestCaseDataCollectionRequestHandler.Verify(x => x.ProcessRequests(), Times.Once);
+            mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Once);
+            mockDataCollectionTestCaseEventHandler.Verify(x => x.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
+            mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Once);
 
-            mockDataCollectorManager.Verify(x => x.SessionStarted(), Times.Once);
+            mockDataCollectionManager.Verify(x => x.SessionStarted(), Times.Once);
 
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
 
             // Verify AfterTestRun events.
-            mockDataCollectorManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
+            mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<Collection<AttachmentSet>>()), Times.Once);
         }
 
@@ -189,7 +193,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Throws<Exception>();
 
-            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManagerFactory.Object, this.mockTestCaseDataCollectionCommunicationFactory.Object);
+            var requestHandler = new DataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
 
             Assert.ThrowsException<Exception>(() => { requestHandler.ProcessRequests(); });
         }

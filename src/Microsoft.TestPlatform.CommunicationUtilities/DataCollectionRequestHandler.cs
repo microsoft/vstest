@@ -24,16 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         private readonly ICommunicationManager communicationManager;
         private IMessageSink messageSink;
         private IDataCollectionManager dataCollectionManager;
-        private IDataCollectionTestCaseEventHandler testCaseDataCollectionRequestHandler;
-        private IDataCollectionManagerFactory dataCollectionManagerFactory;
-        private IDataCollectionTestCaseEventManagerFactory testCaseDataCollectionCommunicationFactory;
+        private IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler;
 
         private static readonly object obj = new object();
 
         internal static DataCollectionRequestHandler Instance;
 
         internal DataCollectionRequestHandler(IMessageSink messageSink)
-            : this(new SocketCommunicationManager(), messageSink, new DataCollectionManagerFactory(), new DataCollectionTestCaseEventManagerFactory())
+            : this(new SocketCommunicationManager(), messageSink, new DataCollectionManager(messageSink), new DataCollectionTestCaseEventHandler())
         {
             this.messageSink = messageSink;
         }
@@ -43,12 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary>
         /// <param name="communicationManager">
         /// </param>
-        internal DataCollectionRequestHandler(ICommunicationManager communicationManager, IMessageSink messageSink, IDataCollectionManagerFactory dataCollectionManagerFactory, IDataCollectionTestCaseEventManagerFactory testCaseDataCollectionCommunicationFactory)
+        internal DataCollectionRequestHandler(ICommunicationManager communicationManager, IMessageSink messageSink, IDataCollectionManager dataCollectionManager, IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler)
         {
             this.communicationManager = communicationManager;
             this.messageSink = messageSink;
-            this.dataCollectionManagerFactory = dataCollectionManagerFactory;
-            this.testCaseDataCollectionCommunicationFactory = testCaseDataCollectionCommunicationFactory;
+            this.dataCollectionManager = dataCollectionManager;
+            this.dataCollectionTestCaseEventHandler = dataCollectionTestCaseEventHandler;
         }
 
         /// <summary>
@@ -65,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 {
                     if (Instance == null)
                     {
-                        Instance = new DataCollectionRequestHandler(messageSink);
+                        Instance = new DataCollectionRequestHandler(communicationManager, messageSink, new DataCollectionManager(messageSink), new DataCollectionTestCaseEventHandler());
                     }
                 }
             }
@@ -105,7 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         // Initialize datacollectors and get enviornment variables.
                         var settingXml = message.Payload.ToObject<string>();
-                        this.dataCollectionManager = this.dataCollectionManagerFactory.Create(this.messageSink);
                         var envVariables = this.dataCollectionManager.InitializeDataCollectors(settingXml);
                         var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted();
 
@@ -113,13 +110,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         int testCaseEventsPort = -1;
                         if (areTestCaseLevelEventsRequired)
                         {
-                            this.testCaseDataCollectionRequestHandler = this.testCaseDataCollectionCommunicationFactory.GetTestCaseDataCollectionRequestHandler();
-                            testCaseEventsPort = this.testCaseDataCollectionRequestHandler.InitializeCommunication();
+                            testCaseEventsPort = this.dataCollectionTestCaseEventHandler.InitializeCommunication();
 
                             Task.Factory.StartNew(() =>
                             {
-                                this.testCaseDataCollectionRequestHandler.WaitForRequestHandlerConnection(0);
-                                this.testCaseDataCollectionRequestHandler.ProcessRequests();
+                                this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(0);
+                                this.dataCollectionTestCaseEventHandler.ProcessRequests();
                             });
                         }
 
