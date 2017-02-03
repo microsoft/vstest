@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var processor = new TestAdapterPathArgumentProcessor();
             Assert.IsTrue(processor.Metadata.Value is TestAdapterPathArgumentProcessorCapabilities);
         }
-        
+
         [TestMethod]
         public void GetExecuterShouldReturnTestAdapterPathArgumentProcessorCapabilities()
         {
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new TestAdapterPathArgumentProcessorCapabilities();
             Assert.AreEqual("/TestAdapterPath", capabilities.CommandName);
-            Assert.AreEqual("--TestAdapterPath|/TestAdapterPath\n      This makes vstest.console.exe process use custom test adapters\n      from a given path (if any) in the test run. \n      Example  /TestAdapterPath:<pathToCustomAdapters>", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--TestAdapterPath|/TestAdapterPath" + Environment.NewLine + "      This makes vstest.console.exe process use custom test adapters" + Environment.NewLine + "      from a given path (if any) in the test run. " + Environment.NewLine + "      Example  /TestAdapterPath:<pathToCustomAdapters>", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.TestAdapterPathArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             try
             {
-                executor.Initialize("\"" +folder + "\"");
+                executor.Initialize("\"" + folder + "\"");
             }
             catch (Exception ex)
             {
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
                     return new List<string> { };
                 };
-            
+
 
             executor.Initialize(currentFolder);
 
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             {
                 return new List<string> { };
             };
-            
+
             executor.Initialize(currentFolder);
 
             mockOutput.Verify(
