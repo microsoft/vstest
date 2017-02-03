@@ -58,7 +58,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return new FileInfo(path).Attributes;
         }
-
-
     }
 }

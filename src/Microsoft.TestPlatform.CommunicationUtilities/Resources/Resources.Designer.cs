@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
-    using System;       
+    using System;
     using System.Reflection;
     
     
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active Test Discovery was aborted..
+        ///   Looks up a localized string similar to The active Test Discovery was aborted. Due to {0}.
         /// </summary>
         internal static string AbortedTestDiscovery {
             get {
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The active Test Run was aborted..
+        ///   Looks up a localized string similar to The active Test Run was aborted. Due to {0}.
         /// </summary>
         internal static string AbortedTestRun {
             get {

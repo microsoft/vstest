@@ -36,6 +36,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             traceImpl.SetupListener(listener);
         }
 
+        public static TraceLevel TraceLevel
+        {
+            set
+            {
+                traceImpl.SetTraceLevel((PlatformTraceLevel)value);
+            }
+        }
+
+#endif
+
+#if NETSTANDARD1_4
+        public static object TraceLevel
+        {
+            set
+            {
+                traceImpl.SetTraceLevel((PlatformTraceLevel)value);
+            }
+        }
 #endif
 
         public static string LogFile
@@ -46,14 +64,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        public static CustomTraceLevel TraceLevel
-        {
-            set
-            {
-                traceImpl.SetTraceLevel(value);
-            }
-        }
-
         /// <summary>
         /// Gets a value indicating whether tracing error statements is enabled.
         /// </summary>
@@ -61,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return traceImpl.ShouldTrace(CustomTraceLevel.Error);
+                return traceImpl.ShouldTrace(PlatformTraceLevel.Error);
             }
         }
 
@@ -72,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return traceImpl.ShouldTrace(CustomTraceLevel.Info);
+                return traceImpl.ShouldTrace(PlatformTraceLevel.Info);
             }
         }
 
@@ -83,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return traceImpl.ShouldTrace(CustomTraceLevel.Verbose);
+                return traceImpl.ShouldTrace(PlatformTraceLevel.Verbose);
             }
         }
 
@@ -94,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return traceImpl.ShouldTrace(CustomTraceLevel.Warning);
+                return traceImpl.ShouldTrace(PlatformTraceLevel.Warning);
             }
         }
 
@@ -143,9 +153,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [Conditional("TRACE")]
         public static void Error(string message)
         {
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Error))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Error))
             {
-                traceImpl.WriteLine(CustomTraceLevel.Error, message);
+                traceImpl.WriteLine(PlatformTraceLevel.Error, message);
             }
         }
 
@@ -182,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="bumpLevel">Level for trace.</param>
         /// <param name="message">Trace message.</param>
         [Conditional("TRACE")]
-        public static void ErrorUnlessAlterTrace(bool condition, CustomTraceLevel bumpLevel, string message)
+        public static void ErrorUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string message)
         {
             if (condition)
             {
@@ -205,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(format != null, "format != null");
 
             // Check level before doing string.Format to avoid string creation if tracing is off.
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Error))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Error))
             {
                 Error(string.Format(CultureInfo.InvariantCulture, format, args));
             }
@@ -232,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="format">Message format.</param>
         /// <param name="args">Trace message format arguments.</param>
         [Conditional("TRACE")]
-        public static void ErrorUnlessAlterTrace(bool condition, CustomTraceLevel bumpLevel, string format, params object[] args)
+        public static void ErrorUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object[] args)
         {
             if (condition)
             {
@@ -284,10 +294,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             // Write only if tracing for error is enabled.
             // Done upfront to avoid perf hit.
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Error))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Error))
             {
                 // Write at error level
-                traceImpl.WriteLine(CustomTraceLevel.Error, FormatException(exceptionToTrace));
+                traceImpl.WriteLine(PlatformTraceLevel.Error, FormatException(exceptionToTrace));
             }
         }
 
@@ -298,9 +308,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [Conditional("TRACE")]
         public static void Warning(string message)
         {
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Warning))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Warning))
             {
-                traceImpl.WriteLine(CustomTraceLevel.Warning, message);
+                traceImpl.WriteLine(PlatformTraceLevel.Warning, message);
             }
         }
 
@@ -337,7 +347,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="bumpLevel">Trace message level.</param>
         /// <param name="message">Message to trace.</param>
         [Conditional("TRACE")]
-        public static void WarningUnlessAlterTrace(bool condition, CustomTraceLevel bumpLevel, string message)
+        public static void WarningUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string message)
         {
             if (condition)
             {
@@ -360,7 +370,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(format != null, "format != null");
 
             // Check level before doing string.Format to avoid string creation if tracing is off.
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Warning))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Warning))
             {
                 Warning(string.Format(CultureInfo.InvariantCulture, format, args));
             }
@@ -402,7 +412,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="format">Format of the trace message.</param>
         /// <param name="args">Arguments for trace message.</param>
         [Conditional("TRACE")]
-        public static void WarningUnlessAlterTrace(bool condition, CustomTraceLevel bumpLevel, string format, params object[] args)
+        public static void WarningUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object[] args)
         {
             if (condition)
             {
@@ -421,9 +431,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [Conditional("TRACE")]
         public static void Info(string message)
         {
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Info))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Info))
             {
-                traceImpl.WriteLine(CustomTraceLevel.Info, message);
+                traceImpl.WriteLine(PlatformTraceLevel.Info, message);
             }
         }
 
@@ -460,7 +470,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="bumpLevel">Trace message level.</param>
         /// <param name="message">Trace message.</param>
         [Conditional("TRACE")]
-        public static void InfoUnlessAlterTrace(bool condition, CustomTraceLevel bumpLevel, string message)
+        public static void InfoUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string message)
         {
             if (condition)
             {
@@ -483,7 +493,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(format != null, "format != null");
 
             // Check level before doing string.Format to avoid string creation if tracing is off.
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Info))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Info))
             {
                 Info(string.Format(CultureInfo.InvariantCulture, format, args));
             }
@@ -525,7 +535,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="format">Trace message format.</param>
         /// <param name="args">Trace message arguments.</param>
         [Conditional("TRACE")]
-        public static void InfoUnlessAlterTrace(bool condition, CustomTraceLevel bumpLevel, string format, params object[] args)
+        public static void InfoUnlessAlterTrace(bool condition, PlatformTraceLevel bumpLevel, string format, params object[] args)
         {
             if (condition)
             {
@@ -544,9 +554,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [Conditional("TRACE")]
         public static void Verbose(string message)
         {
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Verbose))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Verbose))
             {
-                traceImpl.WriteLine(CustomTraceLevel.Verbose, message);
+                traceImpl.WriteLine(PlatformTraceLevel.Verbose, message);
             }
         }
 
@@ -583,7 +593,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="level">Trace message level.</param>
         /// <param name="message">Trace message.</param>
         [Conditional("TRACE")]
-        public static void VerboseUnlessAlterTrace(bool condition, CustomTraceLevel level, string message)
+        public static void VerboseUnlessAlterTrace(bool condition, PlatformTraceLevel level, string message)
         {
             if (condition)
             {
@@ -606,7 +616,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(format != null, "format != null");
 
             // Check level before doing string.Format to avoid string creation if tracing is off.
-            if (traceImpl.ShouldTrace(CustomTraceLevel.Verbose))
+            if (traceImpl.ShouldTrace(PlatformTraceLevel.Verbose))
             {
                 Verbose(string.Format(CultureInfo.InvariantCulture, format, args));
             }
@@ -648,7 +658,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="format">Format of the trace message.</param>
         /// <param name="args">Arguments for the trace message format.</param>
         [Conditional("TRACE")]
-        public static void VerboseUnlessAlterTrace(bool condition, CustomTraceLevel level, string format, params object[] args)
+        public static void VerboseUnlessAlterTrace(bool condition, PlatformTraceLevel level, string format, params object[] args)
         {
             if (condition)
             {
@@ -729,22 +739,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return message.ToString();
         }
 
-        private static void WriteAtLevel(CustomTraceLevel level, string message)
+        private static void WriteAtLevel(PlatformTraceLevel level, string message)
         {
             switch (level)
             {
-                case CustomTraceLevel.Off:
+                case PlatformTraceLevel.Off:
                     return;
-                case CustomTraceLevel.Error:
+                case PlatformTraceLevel.Error:
                     Error(message);
                     break;
-                case CustomTraceLevel.Warning:
+                case PlatformTraceLevel.Warning:
                     Warning(message);
                     break;
-                case CustomTraceLevel.Info:
+                case PlatformTraceLevel.Info:
                     Info(message);
                     break;
-                case CustomTraceLevel.Verbose:
+                case PlatformTraceLevel.Verbose:
                     Verbose(message);
                     break;
                 default:
@@ -753,7 +763,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        private static void WriteAtLevel(CustomTraceLevel level, string format, params object[] args)
+        private static void WriteAtLevel(PlatformTraceLevel level, string format, params object[] args)
         {
             Debug.Assert(format != null, "format != null");
             WriteAtLevel(level, string.Format(CultureInfo.InvariantCulture, format, args));

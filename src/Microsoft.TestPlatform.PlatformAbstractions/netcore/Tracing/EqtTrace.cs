@@ -143,11 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <summary>
-        /// Initializes the verbose tracing with custom log file
-        /// And overrides if any trace is set before
-        /// </summary>
-        /// <param name="customLogFile">A custom log file for trace messages.</param>
+        /// <inheritdoc/>
         public void InitializeVerboseTrace(string customLogFile)
         {
             isInitialized = false;
@@ -157,24 +153,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Source.Switch.Level = SourceLevels.All;
         }
 
-        /// <summary>
-        /// Gets a value indicating if tracing is enabled for a trace level.
-        /// </summary>
-        /// <param name="traceLevel">Trace level.</param>
-        /// <returns>True if tracing is enabled.</returns>
-        public bool ShouldTrace(CustomTraceLevel traceLevel)
+        /// <inheritdoc/>
+        public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
             switch (traceLevel)
             {
-                case CustomTraceLevel.Off:
+                case PlatformTraceLevel.Off:
                     return false;
-                case CustomTraceLevel.Error:
+                case PlatformTraceLevel.Error:
                     return Source.Switch.ShouldTrace(TraceEventType.Error);
-                case CustomTraceLevel.Warning:
+                case PlatformTraceLevel.Warning:
                     return Source.Switch.ShouldTrace(TraceEventType.Warning);
-                case CustomTraceLevel.Info:
+                case PlatformTraceLevel.Info:
                     return Source.Switch.ShouldTrace(TraceEventType.Information);
-                case CustomTraceLevel.Verbose:
+                case PlatformTraceLevel.Verbose:
                     return Source.Switch.ShouldTrace(TraceEventType.Verbose);
                 default:
                     Debug.Fail("Should never get here!");
@@ -182,6 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        /// <inheritdoc/>
         public string GetLogFile()
         {
             return LogFile;
@@ -286,14 +279,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
 
-        /// <summary>
-        /// Adds the message to the trace log.
-        /// The line becomes:
-        ///     [I, PID, ThreadID, 2003/06/11 11:56:07.445] CallingAssemblyName: message.
-        /// </summary>
-        /// <param name="level">Trace level.</param>
-        /// <param name="message">The message to add to trace.</param>
-        public void WriteLine(CustomTraceLevel level, string message)
+        /// <inheritdoc/>
+        public void WriteLine(PlatformTraceLevel level, string message)
         {
             Debug.Assert(message != null, "message != null");
             Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
@@ -315,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             try
             {
-                Source.TraceEvent(TraceLevelEventTypeMap[MapCustomTraceToTrace(level)], 0, log);
+                Source.TraceEvent(TraceLevelEventTypeMap[MapPlatformTraceToTrace(level)], 0, log);
                 Source.Flush();
             }
             catch (Exception e)
@@ -347,9 +334,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        public void SetTraceLevel(CustomTraceLevel value)
+        /// <inheritdoc/>
+        public void SetTraceLevel(PlatformTraceLevel value)
         {
-            Source.Switch.Level = TraceSourceLevelsMap[MapCustomTraceToTrace(value)];
+            Source.Switch.Level = TraceSourceLevelsMap[MapPlatformTraceToTrace(value)];
         }
 
         public TraceLevel GetTraceLevel()
@@ -357,19 +345,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return SourceTraceLevelsMap[Source.Switch.Level];
         }
 
-        public TraceLevel MapCustomTraceToTrace(CustomTraceLevel traceLevel)
+        public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
         {
             switch (traceLevel)
             {
-                case CustomTraceLevel.Off:
+                case PlatformTraceLevel.Off:
                     return TraceLevel.Off;
-                case CustomTraceLevel.Error:
+                case PlatformTraceLevel.Error:
                     return TraceLevel.Error;
-                case CustomTraceLevel.Warning:
+                case PlatformTraceLevel.Warning:
                     return TraceLevel.Warning;
-                case CustomTraceLevel.Info:
+                case PlatformTraceLevel.Info:
                     return TraceLevel.Info;
-                case CustomTraceLevel.Verbose:
+                case PlatformTraceLevel.Verbose:
                     return TraceLevel.Verbose;
                 default:
                     Debug.Fail("Should never get here!");

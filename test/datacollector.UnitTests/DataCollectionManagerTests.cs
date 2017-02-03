@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
@@ -10,8 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
     using System.Xml;
 
 
-    using Microsoft.VisualStudio.TestPlatform.DataCollector;
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
@@ -319,7 +319,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
                 (a, b, c, d, e) =>
                     {
                         b.SessionEnd += (sender, ev) =>
-                            { throw new Exception(); };
+                            {
+                                var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+                                File.WriteAllText(filename, string.Empty);
+                                c.SendFileAsync(e.SessionDataCollectionContext, filename, true);
+                                throw new Exception();
+                            };
                     });
 
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
@@ -327,7 +332,22 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 
             var result = this.dataCollectionManager.SessionEnded();
 
-            Assert.AreEqual(0, result.Count);
+            Assert.AreEqual(1, result.Count);
+        }
+
+        [TestMethod]
+        public void SessionEndedShouldCancelProcessingAttachmentRequestsIfSessionIsCancelled()
+        {
+            var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
+            var mockAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
+            this.dataCollectionManager = new DataCollectionManager(mockAttachmentManager.Object, this.mockMessageSink.Object, this.dataCollectorLoader.Object);
+
+            this.dataCollectionManager.InitializeDataCollectors(runSettings);
+            this.dataCollectionManager.SessionStarted();
+
+            var result = this.dataCollectionManager.SessionEnded(true);
+
+            mockAttachmentManager.Verify(x => x.Cancel(), Times.Once);
         }
     }
 

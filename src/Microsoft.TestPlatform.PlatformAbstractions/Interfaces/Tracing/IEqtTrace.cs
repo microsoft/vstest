@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     // Summary:
     //     Specifies what messages to output for the System.Diagnostics.Debug, System.Diagnostics.Trace
     //     and System.Diagnostics.TraceSwitch classes.
-    public enum CustomTraceLevel
+    public enum PlatformTraceLevel
     {
         //
         // Summary:
@@ -34,19 +34,56 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
     public interface IPlatformEqtTrace
     {
-        void WriteLine(CustomTraceLevel level, string message);
+        /// <summary>
+        /// Adds the message to the trace log.
+        /// The line becomes:
+        ///     [I, PID, ThreadID, 2003/06/11 11:56:07.445] CallingAssemblyName: message.
+        /// </summary>
+        /// <param name="level">Trace level.</param>
+        /// <param name="message">The message to add to trace.</param>
+        void WriteLine(PlatformTraceLevel level, string message);
 
+        /// <summary>
+        /// Initializes the verbose tracing with custom log file
+        /// And overrides if any trace is set before
+        /// </summary>
+        /// <param name="customLogFile">A custom log file for trace messages.</param>
         void InitializeVerboseTrace(string customLogFile);
 
-        bool ShouldTrace(CustomTraceLevel traceLevel);
+        /// <summary>
+        /// Gets a value indicating if tracing is enabled for a trace level.
+        /// </summary>
+        /// <param name="traceLevel">Trace level.</param>
+        /// <returns>True if tracing is enabled.</returns>
+        bool ShouldTrace(PlatformTraceLevel traceLevel);
 
+        /// <summary>
+        /// Gets file path for trace log file.
+        /// </summary>
+        /// <returns>True if tracing is enabled.</returns>
         string GetLogFile();
 
-        void SetTraceLevel(CustomTraceLevel value);
+        /// <summary>
+        /// Sets platfrom specific trace value for tracing verbosity.
+        /// </summary>
+        /// <param name="traceLevel">PlatformTraceLevel.</param>
+        void SetTraceLevel(PlatformTraceLevel value);
 
 #if NET46
+        /// <summary>
+        /// Setup remote trace listener in the child domain.
+        /// If calling domain, doesn't have tracing enabled nothing is done.
+        /// </summary>
+        /// <param name="childDomain">Child <c>AppDomain</c>.</param>
         void SetupRemoteEqtTraceListeners(AppDomain childDomain);
 
+        /// <summary>
+        /// Setup a custom trace listener instead of default trace listener created by test platform.
+        /// This is needed by DTA Agent where it needs to listen test platform traces but doesn't use test platform listener.
+        /// </summary>
+        /// <param name="listener">
+        /// The listener.
+        /// </param>
         void SetupListener(TraceListener listener);
 #endif
 

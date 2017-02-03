@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class PlatformEqtTrace : IPlatformEqtTrace
     {
-        public void WriteLine(CustomTraceLevel level, string message)
+        public void WriteLine(PlatformTraceLevel level, string message)
         {
             throw new NotImplementedException();
         }
@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             throw new NotImplementedException();
         }
 
-        public bool ShouldTrace(CustomTraceLevel traceLevel)
+        public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
             throw new NotImplementedException();
         }
@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             throw new NotImplementedException();
         }
 
-        public void SetTraceLevel(CustomTraceLevel value)
+        public void SetTraceLevel(PlatformTraceLevel value)
         {
             throw new NotImplementedException();
         }

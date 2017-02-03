@@ -115,6 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 this.testRunCache,
                 this.testExecutionContext,
                 this.testRunEventsHandler);
+            this.frameworkHandle.TestRunMessage += OnTestRunMessage;
 
             this.executorUrisThatRanTests = new List<string>();
         }
@@ -227,9 +228,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// </summary>
         internal void Cancel()
         {
-            ITestExecutor activeExecutor = this.activeExecutor;
             isCancellationRequested = true;
-            if (activeExecutor != null)
+            if (this.activeExecutor != null)
             {
                 Task.Run(() => CancelTestRunInternal(this.activeExecutor));
             }
@@ -239,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             try
             {
-                activeExecutor.Cancel();
+                executor.Cancel();
             }
             catch (Exception e)
             {
@@ -260,6 +260,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         #endregion
 
         #region Private methods
+
+        private void OnTestRunMessage(object sender, TestRunMessageEventArgs e)
+        {
+            this.testRunEventsHandler.HandleLogMessage(e.Level, e.Message);
+        }
 
         private TimeSpan RunTestsInternal()
         {

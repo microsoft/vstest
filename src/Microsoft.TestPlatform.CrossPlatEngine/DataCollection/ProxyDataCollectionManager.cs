@@ -7,14 +7,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 
     /// <summary>
-    /// The test data collection client.
+    /// Managed datacollector interaction from runner process.
     /// </summary>
     internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     {
@@ -28,24 +28,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
         /// <param name="arch">
-        /// The arch.
+        /// Architecture for datacollection process.
         /// </param>
         /// <param name="settingsXml">
-        /// The settings Xml.
+        /// Runsettings that contains the datacollector related configuration.
         /// </param>
-        public ProxyDataCollectionManager(Architecture arch, string settingsXml)
-            : this(arch, settingsXml, new DataCollectionRequestSender(), new DataCollectionLauncher())
+        public ProxyDataCollectionManager(Architecture arch, string settingsXml, string targetFramework)
+            : this(arch, settingsXml, new DataCollectionRequestSender(), DataCollectionLauncherFactory.GetDataCollectorLauncher(targetFramework))
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
+        /// <param name="arch">
+        /// Architecture for datacollection process.
+        /// </param>
+        /// <param name="settingsXml">
+        /// Runsettings that contains the datacollector related configuration.
+        /// </param>
         /// <param name="dataCollectionRequestSender">
-        /// The data collection request sender.
+        /// Handles communication with datacollector process.
         /// </param>
         /// <param name="dataCollectionLauncher">
-        /// The data collection launcher.
+        /// Launches datacollector process.
         /// </param>
         internal ProxyDataCollectionManager(Architecture arch, string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IDataCollectionLauncher dataCollectionLauncher)
         {
@@ -54,7 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionLauncher = dataCollectionLauncher;
             this.InitializeSocketCommunication(arch);
         }
-
 
         /// <summary>
         /// Invoked after ending of test run
@@ -74,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.InvokeDataCollectionServiceAction(
            () =>
            {
-               attachmentSet = this.dataCollectionRequestSender.SendAfterTestRunStartAndGetResult();
+               attachmentSet = this.dataCollectionRequestSender.SendAfterTestRunStartAndGetResult(runEventsHandler, isCanceled);
            },
                 runEventsHandler);
             return attachmentSet;
@@ -100,15 +105,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             bool isRunStartingNow,
             ITestMessageEventHandler runEventsHandler)
         {
-            bool areTestCaseLevelEventsRequired = false;
-            bool isDataCollectionStarted = false;
+            var areTestCaseLevelEventsRequired = false;
+            var isDataCollectionStarted = false;
             IDictionary<string, string> environmentVariables = null;
 
             var dataCollectionEventsPort = 0;
             this.InvokeDataCollectionServiceAction(
             () =>
             {
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(settingsXml);
+                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler);
                 areTestCaseLevelEventsRequired = result.AreTestCaseLevelEventsRequired;
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
@@ -139,7 +144,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             var port = this.dataCollectionRequestSender.InitializeCommunication();
 
-            this.dataCollectionLauncher.Initialize(arch);
             this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
             this.dataCollectionRequestSender.WaitForRequestHandlerConnection(connectionTimeout: 5000);
         }

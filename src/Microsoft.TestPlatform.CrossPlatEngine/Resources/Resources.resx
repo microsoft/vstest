@@ -168,6 +168,9 @@
   <data name="StringSeperator" xml:space="preserve">
     <value>, </value>
   </data>
+  <data name="TestHostExitedWithError" xml:space="preserve">
+    <value>Testhost process exited with error: {0}</value>
+  </data>
   <data name="TestRunFailed_NoTestsAreAvailableInTheSources" xml:space="preserve">
     <value>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</value>
   </data>

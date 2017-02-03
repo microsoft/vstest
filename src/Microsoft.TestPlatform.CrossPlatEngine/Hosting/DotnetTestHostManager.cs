@@ -8,8 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Runtime.InteropServices;
 
+    using Microsoft.Extensions.DependencyModel;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -18,11 +19,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    using Microsoft.Extensions.DependencyModel;
-    using Common.Logging;
-    using ObjectModel.Logging;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -43,13 +42,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private EventHandler registeredExitHandler;
 
+        private IDotnetHostHelper dotnetHostHelper;
+
         private TestSessionMessageLogger logger = TestSessionMessageLogger.Instance;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
         public DotnetTestHostManager()
-            : this(new DefaultTestHostLauncher(), new ProcessHelper(), new FileHelper())
+            : this(new DefaultTestHostLauncher(), new ProcessHelper(), new FileHelper(), new DotnetHostHelper())
         {
         }
 
@@ -62,11 +63,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         internal DotnetTestHostManager(
             ITestHostLauncher testHostLauncher,
             IProcessHelper processHelper,
-            IFileHelper fileHelper)
+            IFileHelper fileHelper, IDotnetHostHelper dotnetHostHelper)
         {
             this.testHostLauncher = testHostLauncher;
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
+            this.dotnetHostHelper = dotnetHostHelper;
         }
 
         /// <summary>
@@ -112,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                startInfo.FileName = this.GetDotnetHostFullPath();
+                startInfo.FileName = this.dotnetHostHelper.GetDotnetHostFullPath();
             }
 
             EqtTrace.Verbose("DotnetTestHostmanager: Full path of dotnet.exe is {0}", startInfo.FileName);
@@ -214,41 +216,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
-        /// <summary>
-        /// Get full path for the .net host
-        /// </summary>
-        /// <returns>Full path to <c>dotnet</c> executable</returns>
-        /// <remarks>Debuggers require the full path of executable to launch it.</remarks>
-        private string GetDotnetHostFullPath()
-        {
-            char separator = ';';
-            var dotnetExeName = "dotnet.exe";
-
-#if !NET46
-            // Use semicolon(;) as path separator for windows
-            // colon(:) for Linux and OSX
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                separator = ':';
-                dotnetExeName = "dotnet";
-            }
-#endif
-
-            var pathString = Environment.GetEnvironmentVariable("PATH");
-            foreach (string path in pathString.Split(separator))
-            {
-                string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
-                if (this.fileHelper.Exists(exeFullPath))
-                {
-                    return exeFullPath;
-                }
-            }
-
-            string errorMessage = String.Format(Resources.NoDotnetExeFound, dotnetExeName);
-            EqtTrace.Error(errorMessage);
-            throw new FileNotFoundException(errorMessage);
-        }
-
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)
         {
             string testHostPackageName = "microsoft.testplatform.testhost";
@@ -344,7 +311,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return this.processHelper.LaunchProcess(
                     defaultTestHostStartInfo.FileName,
                     defaultTestHostStartInfo.Arguments,
-                    defaultTestHostStartInfo.WorkingDirectory).Id;
+                    defaultTestHostStartInfo.WorkingDirectory,
+                    defaultTestHostStartInfo.ExitCallback).Id;
         }
     }
 }

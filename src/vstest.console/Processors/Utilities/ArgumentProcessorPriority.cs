@@ -19,53 +19,54 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         Help = Maximum,
 
         /// <summary>
+        /// Priority of the Diag processor.
+        /// </summary>
+        Diag = 1,
+
+        /// <summary>
+        /// Priority of processors related to design mode. This needs to be higher priority
+        /// since some of the functionalities (like logger) depend on this.
+        /// </summary>
+        DesignMode = 2,
+
+        /// <summary>
         /// Priority of UseVsixArgumentProcessor.
-        /// The priority of useVsix processor is more than the logger because logger’s initialization 
+        /// The priority of useVsix processor is more than the logger because logger initialization 
         /// loads the extensions which are incomplete if vsix processor is enabled
         /// </summary>
-        VsixExtensions = 1,
+        VsixExtensions = 5,
 
         /// <summary>
         /// Priority of TestAdapterPathArgumentProcessor.
-        /// The priority of TestAdapterPath processor is more than the logger because logger’s initialization 
+        /// The priority of TestAdapterPath processor is more than the logger because logger initialization 
         /// loads the extensions which are incomplete if custom test adapter is enabled
         /// </summary>
-        TestAdapterPath = 1,
+        TestAdapterPath = 6,
 
         /// <summary>
         /// Priority of processors related to Run Settings.
         /// </summary>
-        RunSettings = 3,
+        RunSettings = 10,
 
         /// <summary>
         /// Priority of processors that needs to update runsettings.
         /// </summary>
-        AutoUpdateRunSettings = 5,
+        AutoUpdateRunSettings = 11,
 
         /// <summary>
         /// Priority of processors related to CLI Run Settings.
         /// </summary>
-        CLIRunSettings = 6,
+        CLIRunSettings = 12,
 
         /// <summary>
         /// Priority of processors related to logging.
         /// </summary>
-        Logging = 10,
+        Logging = 20,
 
         /// <summary>
         /// Priority of the StartLogging processor.
         /// </summary>
-        StartLogging = 11,
-
-        /// <summary>
-        /// Priority of the Diag processor.
-        /// </summary>
-        Diag = 12,
-
-        /// <summary>
-        /// Priority of a ParentProcessId processor.
-        /// </summary>
-        ParentProcessId = 45,
+        StartLogging = 21,
 
         /// <summary>
         /// Priority of a typical processor.
