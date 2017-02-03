@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
     using System;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
@@ -16,68 +17,59 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// The data collection request handler interface.
+    /// Handles test session events received from vstest console process.
     /// </summary>
     internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDisposable
     {
         private readonly ICommunicationManager communicationManager;
         private IMessageSink messageSink;
         private IDataCollectionManager dataCollectionManager;
+        private IDataCollectionTestCaseEventHandler testCaseDataCollectionRequestHandler;
+        private IDataCollectionManagerFactory dataCollectionManagerFactory;
+        private IDataCollectionTestCaseEventManagerFactory testCaseDataCollectionCommunicationFactory;
+
         private static readonly object obj = new object();
 
-        internal static DataCollectionRequestHandler RequestHandler;
+        internal static DataCollectionRequestHandler Instance;
 
         internal DataCollectionRequestHandler(IMessageSink messageSink)
-            : this(new SocketCommunicationManager())
+            : this(new SocketCommunicationManager(), messageSink, new DataCollectionManagerFactory(), new DataCollectionTestCaseEventManagerFactory())
         {
-            this.messageSink = messageSink;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionRequestHandler"/> class. 
+        /// Initializes a new instance of the <see cref="TestCaseEventHandler"/> class. 
         /// </summary>
         /// <param name="communicationManager">
         /// </param>
-        internal DataCollectionRequestHandler(ICommunicationManager communicationManager)
+        internal DataCollectionRequestHandler(ICommunicationManager communicationManager, IMessageSink messageSink, IDataCollectionManagerFactory dataCollectionManagerFactory, IDataCollectionTestCaseEventManagerFactory testCaseDataCollectionCommunicationFactory)
         {
             this.communicationManager = communicationManager;
+            this.messageSink = messageSink;
+            this.dataCollectionManagerFactory = dataCollectionManagerFactory;
+            this.testCaseDataCollectionCommunicationFactory = testCaseDataCollectionCommunicationFactory;
         }
 
         /// <summary>
         /// Gets singleton instance of DataCollectionRequestHandler.
         /// </summary>
-        public static DataCollectionRequestHandler Instance
+        public static DataCollectionRequestHandler CreateInstance(ICommunicationManager communicationManager, IMessageSink messageSink)
         {
-            get
+            if (Instance == null)
             {
+                ValidateArg.NotNull(communicationManager, nameof(communicationManager));
+                ValidateArg.NotNull(messageSink, nameof(messageSink));
+
                 lock (obj)
                 {
-                    if (RequestHandler == null)
+                    if (Instance == null)
                     {
-                        RequestHandler = new DataCollectionRequestHandler(default(IMessageSink));
+                        Instance = new DataCollectionRequestHandler(messageSink);
                     }
-
-                    return RequestHandler;
                 }
             }
-        }
 
-        /// <summary>
-        /// The dispose.
-        /// </summary>
-        public void Dispose()
-        {
-            this.communicationManager?.StopClient();
-            this.dataCollectionManager?.Dispose();
-        }
-
-        /// <summary>
-        /// Closes the connection
-        /// </summary>
-        public void Close()
-        {
-            this.Dispose();
-            EqtTrace.Info("Closing the connection !");
+            return Instance;
         }
 
         /// <inheritdoc />
@@ -97,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary>
         public void ProcessRequests()
         {
-            bool isSessionEnd = false;
+            var isSessionEnd = false;
 
             do
             {
@@ -105,14 +97,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 switch (message.MessageType)
                 {
                     case MessageType.BeforeTestRunStart:
-                        EqtTrace.Info("DataCollection starting.");
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollection starting.");
+                        }
 
+                        // Initialize datacollectors and get enviornment variables.
                         var settingXml = message.Payload.ToObject<string>();
-                        this.dataCollectionManager = new DataCollectionManager(this.messageSink);
+                        this.dataCollectionManager = this.dataCollectionManagerFactory.Create(this.messageSink);
                         var envVariables = this.dataCollectionManager.InitializeDataCollectors(settingXml);
-                        this.dataCollectionManager.SessionStarted();
+                        var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted();
 
-                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, true, 0));
+                        // Open a socket communication port for test level events.
+                        int testCaseEventsPort = -1;
+                        if (areTestCaseLevelEventsRequired)
+                        {
+                            this.testCaseDataCollectionRequestHandler = this.testCaseDataCollectionCommunicationFactory.GetTestCaseDataCollectionRequestHandler();
+                            testCaseEventsPort = this.testCaseDataCollectionRequestHandler.InitializeCommunication();
+
+                            Task.Factory.StartNew(() =>
+                            {
+                                this.testCaseDataCollectionRequestHandler.WaitForRequestHandlerConnection(0);
+                                this.testCaseDataCollectionRequestHandler.ProcessRequests();
+                            });
+                        }
+
+                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, areTestCaseLevelEventsRequired, testCaseEventsPort));
 
                         EqtTrace.Info("DataCollection started.");
                         break;
@@ -148,6 +158,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         public void SendDataCollectionMessage(DataCollectionMessageEventArgs args)
         {
             this.communicationManager.SendMessage(MessageType.DataCollectionMessage, args);
+        }
+
+        /// <summary>
+        /// The dispose.
+        /// </summary>
+        public void Dispose()
+        {
+            this.communicationManager?.StopClient();
+            this.dataCollectionManager?.Dispose();
+        }
+
+        /// <summary>
+        /// Closes the connection
+        /// </summary>
+        public void Close()
+        {
+            this.Dispose();
+            EqtTrace.Info("Closing the connection !");
         }
     }
 }
