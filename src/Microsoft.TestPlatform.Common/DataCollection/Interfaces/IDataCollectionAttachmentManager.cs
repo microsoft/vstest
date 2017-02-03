@@ -35,13 +35,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <param name="dataCollectionContext">
         /// The data collection context.
         /// </param>
-        /// <param name="isCancelled">
-        /// Value specifying whether the test run is cancelled or not.
-        /// </param>
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
-        List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext, bool isCancelled = false);
+        List<AttachmentSet> GetAttachments(DataCollectionContext dataCollectionContext);
 
         /// <summary>
         /// Adds new attachment to current context

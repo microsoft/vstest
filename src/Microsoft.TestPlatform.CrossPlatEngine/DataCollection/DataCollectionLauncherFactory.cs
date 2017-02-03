@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 return new DotnetDataCollectionLauncher();
             }
 
-            return new DataCollectionLauncher();
+            return new DefaultDataCollectionLauncher();
         }
     }
 }

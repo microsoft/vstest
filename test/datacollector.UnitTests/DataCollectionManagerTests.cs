@@ -295,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         {
             var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
             var mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>(), It.IsAny<bool>())).Throws<Exception>();
+            mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
             this.dataCollectionManager = new DataCollectionManager(mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, new Mock<IDataCollectorLoader>().Object);
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 

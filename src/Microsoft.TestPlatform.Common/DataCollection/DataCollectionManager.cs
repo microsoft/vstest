@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             List<AttachmentSet> result = new List<AttachmentSet>();
             try
             {
-                result = this.attachmentManager.GetAttachments(endEvent.Context, isCancelled);
+                result = this.attachmentManager.GetAttachments(endEvent.Context);
             }
             catch (Exception ex)
             {
