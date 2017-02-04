@@ -52,7 +52,7 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CLIRunSettingsArgumentProcessorCapabilities();
 
             Assert.AreEqual("--", capabilities.CommandName);
-            Assert.AreEqual(("Args:" + Environment.NewLine + "      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form <n>=<v>, where <n> is the argument name, and <v> is the argument value. Use a space to separate multiple arguments.").Replace("\r", string.Empty), capabilities.HelpContentResourceName);
+            Assert.AreEqual(("Args:" + Environment.NewLine + "      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form <n>=<v>, where <n> is the argument name, and <v> is the argument value. Use a space to separate multiple arguments.").Replace("\r", string.Empty), capabilities.HelpContentResourceName.Replace("\r", string.Empty));
 
             Assert.AreEqual(HelpContentPriority.CLIRunSettingsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

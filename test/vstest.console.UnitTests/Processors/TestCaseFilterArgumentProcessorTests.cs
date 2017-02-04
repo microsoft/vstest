@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             TestCaseFilterArgumentProcessorCapabilities capabilities = new TestCaseFilterArgumentProcessorCapabilities();
             Assert.AreEqual("/TestCaseFilter", capabilities.CommandName);
-            StringAssert.Contains(capabilities.HelpContentResourceName, ("/TestCaseFilter:<Expression>" + Environment.NewLine + "      Run tests that match the given expression." + Environment.NewLine + "      <Expression> is of the format <property>Operator<value>[|&<Expression>]").Replace("\r", string.Empty));
+            StringAssert.Contains(capabilities.HelpContentResourceName.Replace("\r", string.Empty), ("/TestCaseFilter:<Expression>" + Environment.NewLine + "      Run tests that match the given expression." + Environment.NewLine + "      <Expression> is of the format <property>Operator<value>[|&<Expression>]").Replace("\r", string.Empty));
 
             Assert.AreEqual(HelpContentPriority.TestCaseFilterArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);

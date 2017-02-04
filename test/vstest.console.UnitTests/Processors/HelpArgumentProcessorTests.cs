@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             HelpArgumentProcessorCapabilities capabilities = new HelpArgumentProcessorCapabilities();
             Assert.AreEqual("/Help", capabilities.CommandName);
-            Assert.AreEqual(("-?|--Help|/?|/Help" + Environment.NewLine + "      Display this usage message.").Replace("\r", string.Empty), capabilities.HelpContentResourceName);
+            Assert.AreEqual(("-?|--Help|/?|/Help" + Environment.NewLine + "      Display this usage message.").Replace("\r", string.Empty), capabilities.HelpContentResourceName.Replace("\r", string.Empty));
 
             Assert.AreEqual(HelpContentPriority.HelpArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsTrue(output.Lines.Contains("Arguments:"));
             Assert.IsTrue(output.Lines.Contains("Options:"));
             Assert.IsTrue(output.Lines.Contains("Description: Runs tests from the specified files."));
-            Assert.IsTrue(output.Lines.Contains(("  To run tests in the same process:" + Environment.NewLine + "    >vstest.console.exe tests.dll " + Environment.NewLine + "  To run tests in a separate process:" + Environment.NewLine + "    >vstest.console.exe /inIsolation tests.dll" + Environment.NewLine + "  To run tests with additional settings such as  data collectors:" + Environment.NewLine + "    >vstest.console.exe  tests.dll /Settings:Local.RunSettings").Replace("\r", string.Empty)));
+            Assert.IsTrue(output.Lines.Contains(("  To run tests in the same process:" + Environment.NewLine + "    >vstest.console.exe tests.dll " + Environment.NewLine + "  To run tests in a separate process:" + Environment.NewLine + "    >vstest.console.exe /inIsolation tests.dll" + Environment.NewLine + "  To run tests with additional settings such as  data collectors:" + Environment.NewLine + "    >vstest.console.exe  tests.dll /Settings:Local.RunSettings")));
         }
     }
 
