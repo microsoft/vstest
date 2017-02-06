@@ -3,7 +3,6 @@
 
 namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 {
-    using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -11,9 +10,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     public class XmlPersistenceTests
     {
         [TestMethod]
-        public void SaveObjectShouldReplaceInvalidCharacterIfEscapeInvalidCharArgumentIsTrue()
+        public void SaveObjectShouldReplaceInvalidCharacter()
         {
-            TrxLogger.escapeInvalidChar = true;
             XmlPersistence xmlPersistence = new XmlPersistence();
             var node = xmlPersistence.CreateRootElement("TestRun");
 
@@ -23,35 +21,20 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             invalidXmlCharacterArray[1] = (char)0xb;
             invalidXmlCharacterArray[2] = (char)0xf;
             invalidXmlCharacterArray[3] = (char)0xd800;
-            invalidXmlCharacterArray[4] = (char)0xdc00;
+            invalidXmlCharacterArray[4] = (char)0xda12;
             invalidXmlCharacterArray[5] = (char)0xfffe;
             invalidXmlCharacterArray[6] = (char)0x0;
 
             string strWithInvalidCharForXml = new string(invalidXmlCharacterArray);
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
-            string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\udc00\\ufffe\\u0000";
-            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
-        }
-
-        [TestMethod]
-        public void SaveObjectShouldNotReplaceInValidCharacterIfEscapeInvalidCharArgumentIsFalse()
-        {
-            TrxLogger.escapeInvalidChar = false;
-            XmlPersistence xmlPersistence = new XmlPersistence();
-            var node = xmlPersistence.CreateRootElement("TestRun");
-
-            string strWithInvalidCharForXml = "This string has these \0 \v invalid characters";
-            xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
-
-            string expectedResult = "This string has these &#x0; &#xB; invalid characters";
+            string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\uda12\\ufffe\\u0000";
             Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
         }
 
         [TestMethod]
         public void SaveObjectShouldNotReplaceValidCharacter()
         {
-            TrxLogger.escapeInvalidChar = true;
             XmlPersistence xmlPersistence = new XmlPersistence();
             var node = xmlPersistence.CreateRootElement("TestRun");
 

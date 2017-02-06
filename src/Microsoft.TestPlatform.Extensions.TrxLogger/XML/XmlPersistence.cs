@@ -17,7 +17,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
     using System.Text.RegularExpressions;
     using System.Xml;
 
-    using Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
@@ -676,12 +675,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 }
             }
 
-            if (TrxLogger.escapeInvalidChar)
-            {
-                // Remove invalid char if any
-                valueToSave = XmlPersistence.RemoveInvalidXmlChar(valueToSave);
-            }
-
+            // Remove invalid char if any
+            valueToSave = XmlPersistence.RemoveInvalidXmlChar(valueToSave);
             XmlElement elementToSaveAt = nodeToSaveAt as XmlElement;
             if (elementToSaveAt != null)
             {
