@@ -83,6 +83,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         #region RunTestsArgumentExecutorTests
 
         [TestMethod]
+        public void ExecutorExecuteShouldReturnSuccessWithoutExecutionInDesignMode()
+        {
+            CommandLineOptions.Instance.Reset();
+            CommandLineOptions.Instance.IsDesignMode = true;
+            var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
+            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
+
+            Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
+        }
+
+        [TestMethod]
         public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
         {
             CommandLineOptions.Instance.Reset();

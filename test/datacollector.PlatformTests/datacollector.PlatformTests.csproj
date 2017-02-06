@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
+    <TestProject>true</TestProject>
+  </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+  <PropertyGroup Label="Configuration">
+    <RootNamespace>Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
+    <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
+    <AssemblyName>Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests</AssemblyName>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System.Runtime" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Xml.XmlDocument">
+      <Version>4.0.1</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
+
+  <Target Name="AfterBuild" Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <Copy
+        SourceFiles="$(TestPlatformRoot)src/datacollector/bin/$(Configuration)/$(TargetFramework)/datacollector.deps.json"
+        DestinationFolder="$(TestPlatformRoot)test/datacollector.PlatformTests/bin/$(Configuration)/$(TargetFramework)/"
+    />
+    <Copy
+          SourceFiles="$(TestPlatformRoot)src/datacollector/bin/$(Configuration)/$(TargetFramework)/datacollector.runtimeconfig.json"
+          DestinationFolder="$(TestPlatformRoot)test/datacollector.PlatformTests/bin/$(Configuration)/$(TargetFramework)/"
+    />
+    <Copy
+           SourceFiles="$(TestPlatformRoot)src/datacollector/bin/$(Configuration)/$(TargetFramework)/datacollector.runtimeconfig.dev.json"
+           DestinationFolder="$(TestPlatformRoot)test/datacollector.PlatformTests/bin/$(Configuration)/$(TargetFramework)/"
+    />
+  </Target>
+</Project>

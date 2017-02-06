@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.Protocol
     using System;
     using System.Diagnostics;
     using System.IO;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// dotnet.exe process manager
@@ -88,7 +89,6 @@ namespace Microsoft.TestPlatform.Protocol
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
 
-#if !NET46
             // Use semicolon(;) as path separator for windows
             // colon(:) for Linux and OSX
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -96,7 +96,6 @@ namespace Microsoft.TestPlatform.Protocol
                 separator = ':';
                 dotnetExeName = "dotnet";
             }
-#endif
 
             var pathString = Environment.GetEnvironmentVariable("PATH");
             foreach (string path in pathString.Split(separator))

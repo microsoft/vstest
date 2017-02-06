@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+    using System.Collections.ObjectModel;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -26,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Creating test run request.");
             this.testRunCriteria = testRunCriteria;
             this.ExecutionManager = executionManager;
-            
+
             this.State = TestRunState.Pending;
         }
 
@@ -39,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         public int ExecuteAsync()
         {
             EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Starting.");
-            
+
             lock (this.syncObject)
             {
                 if (this.disposed)
@@ -53,17 +54,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
 
                 EqtTrace.Info("TestRunRequest.ExecuteAsync: Starting run with settings:{0}", this.testRunCriteria);
-                
+
                 // Waiting for warm up to be over.
                 EqtTrace.Verbose("TestRunRequest.ExecuteAsync: Wait for the first run request is over.");
-            
+
                 this.State = TestRunState.InProgress;
 
                 // Reset the run completion event 
                 // (This needs to be done before queuing the test run because if the test run finishes fast then runCompletion event can 
                 // remain in non-signaled state even though run is actually complete.
                 this.runCompletionEvent.Reset();
-                
+
                 try
                 {
                     this.runRequestTimeTracker = new Stopwatch();
@@ -72,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     this.runRequestTimeTracker.Start();
                     int processId = this.ExecutionManager.StartTestRun(this.testRunCriteria, this);
                     EqtTrace.Info("TestRunRequest.ExecuteAsync: Started.");
-                    
+
                     return processId;
                 }
                 catch
@@ -88,8 +89,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// </summary>
         public bool WaitForCompletion(int timeout)
         {
-          EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
-            
+            EqtTrace.Verbose("TestRunRequest.WaitForCompletion: Waiting with timeout {0}.", timeout);
+
             if (this.disposed)
             {
                 throw new ObjectDisposedException("testRunRequest");
@@ -122,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         public void CancelAsync()
         {
             EqtTrace.Verbose("TestRunRequest.CancelAsync: Canceling.");
-            
+
             lock (this.syncObject)
             {
                 if (this.disposed)
@@ -132,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                 if (this.State != TestRunState.InProgress)
                 {
-                     EqtTrace.Info("Ignoring TestRunRequest.CancelAsync(). No test run in progress.");
+                    EqtTrace.Info("Ignoring TestRunRequest.CancelAsync(). No test run in progress.");
                 }
                 else
                 {
@@ -170,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             EqtTrace.Info("TestRunRequest.Abort: Aborted.");
         }
-        
+
 
         /// <summary>
         /// Specifies the test run criteria
@@ -194,13 +195,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// Raised when the test message is received.
         /// </summary>
         public event EventHandler<TestRunMessageEventArgs> TestRunMessage;
-        
+
 
         /// <summary>
         /// Raised when the test run completes.
         /// </summary>
         public event EventHandler<TestRunCompleteEventArgs> OnRunCompletion;
-        
+
 
         /// <summary>
         /// Raised when data collection message is received.
@@ -291,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
-                            null,
+                            runContextAttachments as Collection<AttachmentSet>,
                             this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
@@ -363,7 +364,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 EqtTrace.Info("TestRunRequest:SendTestRunStatsChange: Completed.");
             }
         }
-        
 
         /// <summary>
         /// Invoked when log messages are received
@@ -410,7 +410,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
             {
                 processId = this.testRunCriteria.TestHostLauncher.LaunchTestHost(testProcessStartInfo);
             }
-            
+
             return processId;
         }
 
@@ -459,7 +459,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// The run completion event which will be signalled on completion of test run. 
         /// </summary>
         private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
-        
 
         /// <summary>
         /// Tracks the time taken by each run request

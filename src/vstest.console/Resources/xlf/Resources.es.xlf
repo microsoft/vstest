@@ -1526,6 +1526,11 @@
         <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="InIsolationDeprecated">
+        <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
+        <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -163,6 +163,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
         }
 
+        public void StdErrorContains(string substring)
+        {
+            Assert.IsTrue(this.standardTestError.Contains(substring));
+        }
+
         /// <summary>
         /// Validates if the test results have the specified set of passed tests.
         /// </summary>

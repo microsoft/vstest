@@ -148,6 +148,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             Contract.Assert(this.commandLineOptions != null);
             Contract.Assert(!string.IsNullOrWhiteSpace(this.runSettingsManager?.ActiveRunSettings?.SettingsXml));
 
+            if (this.commandLineOptions.IsDesignMode)
+            {
+                // Do not attempt execution in case of design mode. Expect execution to happen
+                // via the design mode client.
+                return ArgumentProcessorResult.Success;
+            }
+
             // Ensure a test source file was provided
             var anySource = this.commandLineOptions.Sources.FirstOrDefault();
             if (anySource == null)
@@ -184,7 +191,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // for command line keep alive is always false.
             // for Windows Store apps it should be false, as Windows Store apps executor should terminate after finishing the test execution.
             var keepAlive = false;
-            
+
             var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive };
             var result = this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar);
 
