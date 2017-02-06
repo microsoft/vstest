@@ -7,6 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using System.Net.Sockets;
 
     /// <summary>
     /// The program.
@@ -35,6 +37,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             {
                 ParseArgs(args);
                 Run();
+            }
+            catch (SocketException ex)
+            {
+                EqtTrace.Error("DataCollector: Socket exception is thrown : {0}", ex);
             }
             catch (Exception ex)
             {
@@ -71,8 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         private static void Run()
         {
-            var requestHandler = new DataCollectionRequestHandler(new MessageSink());
-            DataCollectionRequestHandler.RequestHandler = requestHandler;
+            var requestHandler = DataCollectionRequestHandler.CreateInstance(new SocketCommunicationManager(),new MessageSink());
 
             requestHandler.InitializeCommunication(port);
 
