@@ -69,6 +69,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="traceLevel">PlatformTraceLevel.</param>
         void SetTraceLevel(PlatformTraceLevel value);
 
+        /// <summary>
+        /// Gets platfrom specific trace value for tracing verbosity.
+        /// </summary>
+        PlatformTraceLevel GetTraceLevel();
+
 #if NET46
         /// <summary>
         /// Setup remote trace listener in the child domain.

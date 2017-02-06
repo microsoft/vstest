@@ -385,9 +385,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Source.Switch.Level = TraceSourceLevelsMap[MapPlatformTraceToTrace(value)];
         }
 
-        public TraceLevel GetTraceLevel()
+        public PlatformTraceLevel GetTraceLevel()
         {
-            return SourceTraceLevelsMap[Source.Switch.Level];
+            return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
         }
 
         public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)

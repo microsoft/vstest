@@ -45,5 +45,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             throw new NotImplementedException();
         }
+
+        public PlatformTraceLevel GetTraceLevel()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

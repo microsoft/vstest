@@ -38,6 +38,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public static TraceLevel TraceLevel
         {
+            get
+            {
+                return (TraceLevel)traceImpl.GetTraceLevel();
+            }
             set
             {
                 traceImpl.SetTraceLevel((PlatformTraceLevel)value);
@@ -47,11 +51,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #endif
 
 #if NETSTANDARD1_4
-        public static object TraceLevel
+        public static PlatformTraceLevel TraceLevel
         {
+            get
+            {
+                return traceImpl.GetTraceLevel();
+            }
             set
             {
-                traceImpl.SetTraceLevel((PlatformTraceLevel)value);
+                traceImpl.SetTraceLevel(value);
             }
         }
 #endif
