@@ -712,7 +712,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
 
         private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
         {
-            char x = match.Value.ToArray()[0];
+            char x = match.Value[0];
             return String.Format(@"\u{0:x4}", (ushort)x);
 
         }

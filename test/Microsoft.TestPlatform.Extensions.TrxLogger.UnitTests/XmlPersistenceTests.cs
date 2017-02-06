@@ -5,38 +5,56 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
 {
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System.IO;
 
     [TestClass]
     public class XmlPersistenceTests
     {
         [TestMethod]
-        public void SaveObjectShouldRemoveInvalidCharacter()
+        public void SaveObjectShouldReplaceInvalidCharacter()
         {
-            System.Diagnostics.Debugger.Launch();
             XmlPersistence xmlPersistence = new XmlPersistence();
             var node = xmlPersistence.CreateRootElement("TestRun");
 
-            string strWithInvalidCharForXml = "This string has these \0 \v invalid characters";
+            // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+            char[] invalidXmlCharacterArray = new char[7];
+            invalidXmlCharacterArray[0] = (char)0x5;
+            invalidXmlCharacterArray[1] = (char)0xb;
+            invalidXmlCharacterArray[2] = (char)0xf;
+            invalidXmlCharacterArray[3] = (char)0xd800;
+            invalidXmlCharacterArray[4] = (char)0xda12;
+            invalidXmlCharacterArray[5] = (char)0xfffe;
+            invalidXmlCharacterArray[6] = (char)0x0;
 
+            string strWithInvalidCharForXml = new string(invalidXmlCharacterArray);
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
-            string expectedResult = "This string has these \\u0000 \\u000b invalid characters";
+            string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\uda12\\ufffe\\u0000";
             Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
         }
 
         [TestMethod]
-        public void SaveObjectShouldDoesNotRemoveValidCharacter()
+        public void SaveObjectShouldNotReplaceValidCharacter()
         {
             XmlPersistence xmlPersistence = new XmlPersistence();
             var node = xmlPersistence.CreateRootElement("TestRun");
 
-            string strWithInvalidCharForXml = "This string has these \\0 \v invalid characters";
+            // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+            char[] validXmlCharacterArray = new char[9];
+            validXmlCharacterArray[0] = (char)0x9;
+            validXmlCharacterArray[1] = (char)0xa;
+            validXmlCharacterArray[2] = (char)0xd;
+            validXmlCharacterArray[3] = (char)0x20;
+            validXmlCharacterArray[4] = (char)0xc123;
+            validXmlCharacterArray[5] = (char)0xd7ff;
+            validXmlCharacterArray[6] = (char)0xe000;
+            validXmlCharacterArray[7] = (char)0xea12;
+            validXmlCharacterArray[8] = (char)0xfffd;
 
-            xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
+            string strWithValidCharForXml = new string(validXmlCharacterArray);
 
-            string expectedResult = "This string has these \\0 \\u000b invalid characters";
-            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
+            xmlPersistence.SaveObject(strWithValidCharForXml, node, null, "dummy");
+
+            Assert.AreEqual(node.InnerXml.Contains(@"\u"), false);
         }
     }
 }
