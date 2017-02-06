@@ -460,7 +460,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
         /// </summary>
         private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
 
-
         /// <summary>
         /// Tracks the time taken by each run request
         /// </summary>
