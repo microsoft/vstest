@@ -41,7 +41,7 @@ Param(
 
     # Build specific projects
     [Parameter(Mandatory=$false)]
-    [Alias("s")]
+    [Alias("p")]
     [System.String[]] $ProjectNamePatterns = @()
 )
 
@@ -482,14 +482,13 @@ if ($ProjectNamePatterns.Count -eq 0) {
         if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
 }
 else{
-    # Build Specific projects
-    #Framework format ("<target_framework>", "<output_dir>")
+    # Build Specific projects.
+    # Framework format ("<target_framework>", "<output_dir>").
     $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp1.0"), ("netcoreapp1.0", "netcoreapp1.0"))
     $dotnetPath = Get-DotNetPath
 
-    # Get projects to build
+    # Get projects to build.
     Get-ChildItem -Recurse -Path $env:TP_SRC_DIR -Include *.csproj | ForEach-Object {
-
         foreach ( $ProjectNamePattern in $ProjectNamePatterns){
             if( $_.FullName -match  $ProjectNamePattern){
                 $ProjectsToBuild += ,"$_"
@@ -497,7 +496,7 @@ else{
         }
     }
 
-    #Build Projects
+    # Build Projects.
     foreach($ProjectToBuild in $ProjectsToBuild){
         Write-Log "Building Project $ProjectToBuild"
         # Restore and Build
