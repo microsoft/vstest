@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void CapabilitiesShouldAppropriateProperties()
+        public void CapabilitiesShouldReturnAppropriateProperties()
         {
             var capabilities = new ParentProcessIdArgumentProcessorCapabilities();
             Assert.AreEqual("/ParentProcessId", capabilities.CommandName);
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             Assert.AreEqual(HelpContentPriority.ParentProcessIdArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
-            Assert.AreEqual(ArgumentProcessorPriority.ParentProcessId, capabilities.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.DesignMode, capabilities.Priority);
 
             Assert.AreEqual(false, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);

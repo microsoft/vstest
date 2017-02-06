@@ -4,35 +4,41 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
     using System;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using System.Collections.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
+
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// Utility class that facilitates the IPC comunication. Acts as server.
+    /// Utility class that facilitates the IPC communication. Acts as server.
     /// </summary>
     public sealed class DataCollectionRequestSender : IDataCollectionRequestSender, IDisposable
     {
         private ICommunicationManager communicationManager;
-
         private IDataSerializer dataSerializer;
 
         /// <summary>
-        /// Creates new instance of DataCollectionRequestSender.
+        /// Initializes a new instance of the <see cref="DataCollectionRequestSender"/> class. 
         /// </summary>
         public DataCollectionRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
         }
 
         /// <summary>
-        /// Creates new instance of DataCollectionRequestSender.
+        /// Initializes a new instance of the <see cref="DataCollectionRequestSender"/> class.
         /// </summary>
-        /// <param name="communicationManager"></param>
-        /// <param name="dataSerializer"></param>
+        /// <param name="communicationManager">
+        /// The communication manager.
+        /// </param>
+        /// <param name="dataSerializer">
+        /// The data serializer.
+        /// </param>
         internal DataCollectionRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
         {
             this.communicationManager = communicationManager;
@@ -42,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <summary>
         /// Creates an endpoint and listens for client connection asynchronously
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Port number</returns>
         public int InitializeCommunication()
         {
             var port = this.communicationManager.HostServer();
@@ -77,36 +83,60 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             EqtTrace.Info("Closing the connection");
         }
 
-        /// <summary>
-        /// Sends the BeforeTestRunStart event and waits for result
-        /// </summary>
-        /// <returns>BeforeTestRunStartResult containing environment variables</returns>
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml)
+        /// <inheritdoc/>
+        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler)
         {
+            var isDataCollectionStarted = false;
+            BeforeTestRunStartResult result = null;
+
             this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, settingsXml);
-            var message = this.communicationManager.ReceiveMessage();
-            if (message.MessageType == MessageType.BeforeTestRunStartResult)
+
+            while (!isDataCollectionStarted)
             {
-                return dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
+                var message = this.communicationManager.ReceiveMessage();
+
+                if (message.MessageType == MessageType.DataCollectionMessage)
+                {
+                    var msg = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    runEventsHandler.HandleLogMessage(msg.Level, msg.Message);
+                }
+                else if (message.MessageType == MessageType.BeforeTestRunStartResult)
+                {
+                    isDataCollectionStarted = true;
+                    result = this.dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
+                }
             }
 
-            return null;
+            return result;
         }
 
-        /// <summary>
-        /// Sends the AfterTestRunStart event and waits for result
-        /// </summary>
-        /// <returns>DataCollector attachments</returns>
-        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult()
+        /// <inheritdoc/>
+        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler runEventsHandler, bool isCancelled)
         {
-            this.communicationManager.SendMessage(MessageType.BeforeTestRunStart);
-            var message = this.communicationManager.ReceiveMessage();
-            if (message.MessageType == MessageType.BeforeTestRunStartResult)
+            var isDataCollectionComplete = false;
+            Collection<AttachmentSet> attachmentSets = null;
+
+            this.communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
+
+            // Cycle through the messages that the datacollector sends. 
+            // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
+            while (!isDataCollectionComplete)
             {
-                return dataSerializer.DeserializePayload<Collection<AttachmentSet>>(message);
+                var message = this.communicationManager.ReceiveMessage();
+
+                if (message.MessageType == MessageType.DataCollectionMessage)
+                {
+                    var msg = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    runEventsHandler.HandleLogMessage(msg.Level, msg.Message);
+                }
+                else if (message.MessageType == MessageType.AfterTestRunEndResult)
+                {
+                    attachmentSets = this.dataSerializer.DeserializePayload<Collection<AttachmentSet>>(message);
+                    isDataCollectionComplete = true;
+                }
             }
 
-            return null;
+            return attachmentSets;
         }
     }
 }

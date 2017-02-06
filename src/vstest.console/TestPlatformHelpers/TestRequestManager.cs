@@ -47,6 +47,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private readonly EventWaitHandle runRequestCreatedEventHandle = new AutoResetEvent(false);
 
+        private object syncobject = new object();
+
         #region Constructor
 
         public TestRequestManager() :
@@ -69,10 +71,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // Always enable logging for discovery or run requests
             this.testLoggerManager.EnableLogging();
 
-            // TODO: Is this required for design mode
-            // Add console logger as a listener to logger events.
-            var consoleLogger = new ConsoleLogger();
-            consoleLogger.Initialize(this.testLoggerManager.LoggerEvents, null);
+            if (!this.commandLineOptions.IsDesignMode)
+            {
+                var consoleLogger = new ConsoleLogger();
+                this.testLoggerManager.AddLogger(consoleLogger, ConsoleLogger.ExtensionUri, null);
+             }
         }
 
         #endregion
@@ -220,50 +223,58 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
-            bool success = true;
-            using (this.currentTestRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria))
+            // Make sure to run the run request inside a lock as the below section is not thread-safe
+            // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
+            // below logic needs to deserialize and do some cleanup
+            // While this section is cleaning up, TranslationLayer can trigger run causing multiple threads to run the below section at the same time
+            lock (syncobject)
             {
-                this.runRequestCreatedEventHandle.Set();
-                try
+                bool success = true;
+                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria))
                 {
-                    this.testLoggerManager.RegisterTestRunEvents(this.currentTestRunRequest);
-                    this.testRunResultAggregator.RegisterTestRunEvents(this.currentTestRunRequest);
-                    testRunEventsRegistrar?.RegisterTestRunEvents(this.currentTestRunRequest);
-
-                    this.testPlatformEventSource.ExecutionRequestStart();
-
-                    this.currentTestRunRequest.ExecuteAsync();
-
-                    // Wait for the run completion event
-                    this.currentTestRunRequest.WaitForCompletion();
-
-                    this.testPlatformEventSource.ExecutionRequestStop();
-                }
-                catch (Exception ex)
-                {
-                    if (ex is TestPlatformException ||
-                        ex is SettingsException ||
-                        ex is InvalidOperationException)
+                    this.currentTestRunRequest = testRunRequest;
+                    this.runRequestCreatedEventHandle.Set();
+                    try
                     {
-                        LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
-                        success = false;
+                        this.testLoggerManager.RegisterTestRunEvents(testRunRequest);
+                        this.testRunResultAggregator.RegisterTestRunEvents(testRunRequest);
+                        testRunEventsRegistrar?.RegisterTestRunEvents(testRunRequest);
+
+                        this.testPlatformEventSource.ExecutionRequestStart();
+
+                        testRunRequest.ExecuteAsync();
+
+                        // Wait for the run completion event
+                        testRunRequest.WaitForCompletion();
+
+                        this.testPlatformEventSource.ExecutionRequestStop();
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        throw;
+                        if (ex is TestPlatformException ||
+                            ex is SettingsException ||
+                            ex is InvalidOperationException)
+                        {
+                            LoggerUtilities.RaiseTestRunError(this.testLoggerManager, this.testRunResultAggregator, ex);
+                            success = false;
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    finally
+                    {
+                        this.testLoggerManager.UnregisterTestRunEvents(testRunRequest);
+                        this.testRunResultAggregator.UnregisterTestRunEvents(testRunRequest);
+                        testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
                     }
                 }
-                finally
-                {
-                    this.testLoggerManager.UnregisterTestRunEvents(this.currentTestRunRequest);
-                    this.testRunResultAggregator.UnregisterTestRunEvents(this.currentTestRunRequest);
-                    testRunEventsRegistrar?.UnregisterTestRunEvents(this.currentTestRunRequest);
-                }
+
+                this.currentTestRunRequest = null;
+
+                return success;
             }
-
-            this.currentTestRunRequest = null;
-
-            return success;
         }
     }
 }

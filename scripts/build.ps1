@@ -187,7 +187,6 @@ function Publish-Package
     $testhostCorePackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkCore")
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
-    $dataCollectorx86Project = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
 	
@@ -203,9 +202,6 @@ function Publish-Package
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
-
-    Write-Log "Package: Publish src\datacollector.x86\datacollector.x86.csproj"
-    Publish-Package-Internal $dataCollectorx86Project $TPB_TargetFramework $fullCLRPackageDir
 
     # Publish testhost
     

@@ -5,8 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
 {
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
     /// <summary>
     /// The DataCollectionLauncher interface.
     /// </summary>
@@ -25,13 +23,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// The <see cref="int"/>.
         /// </returns>
         int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments);
-
-        /// <summary>
-        /// The initialize.
-        /// </summary>
-        /// <param name="architecture">
-        /// The architecture.
-        /// </param>
-        void Initialize(Architecture architecture);
     }
 }

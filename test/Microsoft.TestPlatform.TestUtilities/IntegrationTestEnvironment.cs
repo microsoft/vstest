@@ -42,8 +42,10 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 // Running in VS/IDE. Use artifacts directory as root.
                 this.runningInCli = false;
-                this.testPlatformRootDirectory = Path.GetFullPath(@"..\..\..");
-                this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"artifacts\test\TestAssets");
+
+                // Get root directory from test assembly output directory
+                this.testPlatformRootDirectory = Path.GetFullPath(@"..\..\..\..\..");
+                this.TestAssetsPath = Path.Combine(this.testPlatformRootDirectory, @"test\TestAssets");
             }
             else
             {
@@ -104,11 +106,9 @@ namespace Microsoft.TestPlatform.TestUtilities
                 {
                     value = Path.Combine(
                     this.testPlatformRootDirectory,
-                    "artifacts",
                     @"src\Microsoft.TestPlatform.VSIXCreator\bin",
                     this.BuildConfiguration,
-                    "net461",
-                    this.TargetRuntime);
+                    "net46");
                 }
 
                 return value;

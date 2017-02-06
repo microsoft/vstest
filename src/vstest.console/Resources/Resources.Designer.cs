@@ -1449,5 +1449,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("UseVsixExtensionsValueRequired", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The /InIsolation flag is deprecated. The test are always run in a separate process
+        /// </summary>
+        public static string InIsolationDeprecated
+        {
+            get
+            {
+                return ResourceManager.GetString("InIsolationDeprecated", resourceCulture);
+            }
+        }
     }
 }

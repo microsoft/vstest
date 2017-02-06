@@ -11,6 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Runtime.InteropServices;
     using System.Text;
 
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -47,7 +48,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockTestHostLauncher.Object,
                                          this.mockProcessHelper.Object,
-                                         this.mockFileHelper.Object);
+                                         this.mockFileHelper.Object,
+                                         new DotnetHostHelper(this.mockFileHelper.Object));
 
             // Setup a dummy current process for tests
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
@@ -419,8 +421,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
     internal class TestableDotnetTestHostManager : DotnetTestHostManager
     {
-        public TestableDotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper)
-            : base(testHostLauncher, processHelper, fileHelper)
+        public TestableDotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper)
+            : base(testHostLauncher, processHelper, fileHelper, dotnetTestHostHelper)
         { }
     }
 
@@ -441,14 +443,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = new TestProcessStartInfo { FileName = "testhost.exe", Arguments = "a1", WorkingDirectory = "w" };
             var currentProcess = Process.GetCurrentProcess();
             var mockProcessHelper = new Mock<IProcessHelper>();
-            mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+            mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null))
                 .Returns(currentProcess);
             var hostLauncher = new DefaultTestHostLauncher(mockProcessHelper.Object);
 
             var processId = hostLauncher.LaunchTestHost(startInfo);
 
             Assert.AreEqual(currentProcess.Id, processId);
-            mockProcessHelper.Verify(ph => ph.LaunchProcess("testhost.exe", "a1", "w"), Times.Once);
+            mockProcessHelper.Verify(ph => ph.LaunchProcess("testhost.exe", "a1", "w", null), Times.Once);
         }
     }
 }
