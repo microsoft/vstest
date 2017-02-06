@@ -91,6 +91,41 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         }
 
         [TestMethod]
+        public void InitializeShouldSetTheValueOfEscapeInvalidCharToTrueIfPresentInArgumentWithTrue()
+        {
+            this.testableTrxLogger = new TestableTrxLogger();
+            this.parameters = new Dictionary<string, string>(2);
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
+            this.parameters[TrxLogger.EscapeInvalidChar] = "True";
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            Assert.AreEqual(true, TrxLogger.escapeInvalidChar);
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetTheValueOfEscapeInvalidCharToFalseIfPresentInArgumentWithFalse()
+        {
+            this.testableTrxLogger = new TestableTrxLogger();
+            this.parameters = new Dictionary<string, string>(2);
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
+            this.parameters[TrxLogger.EscapeInvalidChar] = "False";
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            Assert.AreEqual(true, TrxLogger.escapeInvalidChar);
+        }
+
+        [TestMethod]
+        public void InitializeShouldSetTheValueOfEscapeInvalidCharToFalseIfItIsNotPresentInArgument()
+        {
+            this.testableTrxLogger = new TestableTrxLogger();
+            this.parameters = new Dictionary<string, string>(2);
+            this.parameters[DefaultLoggerParameterNames.TestRunDirectory] = TrxLoggerTests.DefaultTestRunDirectory;
+            this.testableTrxLogger.Initialize(this.events.Object, this.parameters);
+
+            Assert.AreEqual(true, TrxLogger.escapeInvalidChar);
+        }
+
+        [TestMethod]
         public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>

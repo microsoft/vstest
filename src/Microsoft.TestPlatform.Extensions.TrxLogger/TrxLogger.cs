@@ -52,6 +52,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// </summary>
         public const string LogFileNameKey = "LogFileName";
 
+        /// <summary>
+        /// Escape sequence for invalid xml character parameter key
+        /// </summary>
+        public const string EscapeInvalidChar = "EscapeInvalidChar";
+
         #endregion
 
         #region Fields
@@ -89,6 +94,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
         /// Gets the directory under which default trx file and test results attachements should be saved.
         /// </summary>
         private string testResultsDirPath;
+
+        public static bool escapeInvalidChar = false;
 
         #endregion
 
@@ -131,6 +138,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
 
             this.parametersDictionary = parameters;
+            var isEscapeInvalidCharParameterExist = this.parametersDictionary.TryGetValue(TrxLogger.EscapeInvalidChar, out string escapeInvalidCharParametervalue);
+            if (isEscapeInvalidCharParameterExist && !string.IsNullOrWhiteSpace(escapeInvalidCharParametervalue) && string.Compare(escapeInvalidCharParametervalue, "true", true) == 0)
+            {
+                TrxLogger.escapeInvalidChar = true;
+            }
+
             this.Initialize(events, this.parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]);
         }
         #endregion
