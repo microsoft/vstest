@@ -79,7 +79,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                         It.Is<TestRunnerConnectionInfo>(
                             t => t.LogFile.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd"))
                                  && t.LogFile.Contains("_" + Thread.CurrentThread.ManagedThreadId + ".txt"))));
+#if NET46
             EqtTrace.TraceLevel = TraceLevel.Off;
+#else
+            EqtTrace.TraceLevel = PlatformTraceLevel.Off;
+#endif
         }
 
         [TestMethod]
