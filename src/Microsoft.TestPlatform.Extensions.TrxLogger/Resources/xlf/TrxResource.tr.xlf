@@ -298,11 +298,6 @@ Hata ayrıntıları: {1}: {2}</target>
         <target state="translated">UYARI: Sonuç dosyasının üzerine yazılıyor: {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="PlaceHolderForInvalidChar">
-        <source>?</source>
-        <target state="new">?</target>
-        <note>Place holder for invalid xml character in trx file</note>
-      </trans-unit>
     </body>
   </file>
 </xliff>

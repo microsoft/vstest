@@ -298,11 +298,6 @@ Détails de l’erreur : {1} : {2}</target>
         <target state="translated">AVERTISSEMENT : Fichier de résultats en cours de remplacement : {0}</target>
         <note />
       </trans-unit>
-      <trans-unit id="PlaceHolderForInvalidChar">
-        <source>?</source>
-        <target state="new">?</target>
-        <note>Place holder for invalid xml character in trx file</note>
-      </trans-unit>
     </body>
   </file>
 </xliff>
