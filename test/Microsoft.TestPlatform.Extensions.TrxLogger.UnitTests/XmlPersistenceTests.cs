@@ -21,14 +21,14 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             invalidXmlCharacterArray[1] = (char)0xb;
             invalidXmlCharacterArray[2] = (char)0xf;
             invalidXmlCharacterArray[3] = (char)0xd800;
-            invalidXmlCharacterArray[4] = (char)0xda12;
+            invalidXmlCharacterArray[4] = (char)0xdc00;
             invalidXmlCharacterArray[5] = (char)0xfffe;
             invalidXmlCharacterArray[6] = (char)0x0;
 
             string strWithInvalidCharForXml = new string(invalidXmlCharacterArray);
             xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
-            string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\uda12\\ufffe\\u0000";
+            string expectedResult = "\\u0005\\u000b\\u000f\\ud800\\udc00\\ufffe\\u0000";
             Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
         }
 
@@ -39,22 +39,33 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
             var node = xmlPersistence.CreateRootElement("TestRun");
 
             // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
-            char[] validXmlCharacterArray = new char[9];
+            char[] validXmlCharacterArray = new char[8];
             validXmlCharacterArray[0] = (char)0x9;
             validXmlCharacterArray[1] = (char)0xa;
             validXmlCharacterArray[2] = (char)0xd;
             validXmlCharacterArray[3] = (char)0x20;
             validXmlCharacterArray[4] = (char)0xc123;
-            validXmlCharacterArray[5] = (char)0xd7ff;
-            validXmlCharacterArray[6] = (char)0xe000;
-            validXmlCharacterArray[7] = (char)0xea12;
-            validXmlCharacterArray[8] = (char)0xfffd;
+            validXmlCharacterArray[5] = (char)0xe000;
+            validXmlCharacterArray[6] = (char)0xea12;
+            validXmlCharacterArray[7] = (char)0xfffd;
 
             string strWithValidCharForXml = new string(validXmlCharacterArray);
 
             xmlPersistence.SaveObject(strWithValidCharForXml, node, null, "dummy");
 
-            Assert.AreEqual(node.InnerXml.Contains(@"\u"), false);
+            string expectedResult = "\t\n\r 섣�";
+            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
+        }
+
+        [TestMethod]
+        public void SaveObjectShouldReplaceOnlyInvalidCharacter()
+        {
+            XmlPersistence xmlPersistence = new XmlPersistence();
+            var node = xmlPersistence.CreateRootElement("TestRun");
+            string strWithInvalidCharForXml = "This string has these \0 \v invalid characters";
+            xmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
+            string expectedResult = "This string has these \\u0000 \\u000b invalid characters";
+            Assert.AreEqual(string.Compare(expectedResult, node.InnerXml), 0);
         }
     }
 }
