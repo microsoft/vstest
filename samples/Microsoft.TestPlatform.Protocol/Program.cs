@@ -24,8 +24,8 @@ namespace Microsoft.TestPlatform.Protocol
             if(args == null || args.Length < 1)
             {
                 Console.WriteLine("Please provide appropriate arguments. Arguments can be passed as following:");
-                Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery|DebugAll]\" --testadapterpath:\"[path]\"");
-                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery|DebugAll]\" -p:\"[path]\" \n");
+                Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" --testadapterpath:\"[path]\"");
+                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" -p:\"[path]\" \n");
 
                 return 1;
             }
@@ -87,6 +87,11 @@ namespace Microsoft.TestPlatform.Protocol
 
                 case "debugall":
                     DebugAllTests(new List<string>() { testAssembly });
+                    break;
+
+                case "debugselected":
+                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly);
+                    DebugSelectedTests(discoveredTestCases);
                     break;
 
                 case "runall":
@@ -184,6 +189,18 @@ namespace Microsoft.TestPlatform.Protocol
             communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, new TestRunRequestPayload()
             {
                 Sources = sources,
+                RunSettings = null,
+                DebuggingEnabled = true
+            });
+            RecieveRunMesagesAndHandleRunComplete();
+        }
+
+        static void DebugSelectedTests(dynamic testCases)
+        {
+            Console.WriteLine("Starting Operation: DebugSelected");
+            communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunSelected, new TestRunRequestPayload()
+            {
+                TestCases = testCases,
                 RunSettings = null,
                 DebuggingEnabled = true
             });
