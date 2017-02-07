@@ -37,7 +37,12 @@ Param(
 
     [Parameter(Mandatory=$false)]
     [Alias("ci")]
-    [Switch] $CIBuild = $false
+    [Switch] $CIBuild = $false,
+
+    # Build specific projects
+    [Parameter(Mandatory=$false)]
+    [Alias("p")]
+    [System.String[]] $ProjectNamePatterns = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -51,6 +56,7 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
+$env:TP_SRC_DIR = Join-Path $env:TP_ROOT_DIR "src"
 
 #
 # Dotnet configuration
@@ -189,6 +195,7 @@ function Publish-Package
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
+    
 	
     Publish-Package-Internal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
@@ -239,7 +246,7 @@ function Publish-Package
     foreach($file in $loggers) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
-		
+        
         Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
     }
@@ -248,6 +255,26 @@ function Publish-Package
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
+    
+    Publish-PlatfromAbstractions-Internal
+}
+
+function Publish-PlatfromAbstractions-Internal
+{
+    Write-Log "Publish-PlatfromAbstractions-Internal: Started."
+	
+	$timer = Start-Timer
+	$fullCLRPackageDir = Get-FullCLRPackageDirectory
+    $coreCLRPackageDir = Get-CoreCLRPackageDirectory
+    
+    $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
+    $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
+    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
+    
+    Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
+    Copy-Item $platformAbstractionNetCore\* $coreCLRPackageDir -Force
+    
+    Write-Log "Publish-PlatfromAbstractions-Internal:: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
 
@@ -445,23 +472,73 @@ function Set-ScriptFailed
     $Script:ScriptFailed = $true
 }
 
-# Execute build
-$timer = Start-Timer
-Write-Log "Build started: args = '$args'"
-Write-Log "Test platform environment variables: "
-Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
+function PrintAndExit-OnError([System.String] $output){
+    if ($? -eq $false){
+        Write-Error $output
+        Exit 1
+    }
+}
 
-Write-Log "Test platform build variables: "
-Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-Install-DotNetCli
-Restore-Package
-#Update-LocalizedResources
-Invoke-Build
-Publish-Package
-Create-VsixPackage
-Create-NugetPackages
+if ($ProjectNamePatterns.Count -eq 0) {
+        # Execute build
+        $timer = Start-Timer
+        Write-Log "Build started: args = '$args'"
+        Write-Log "Test platform environment variables: "
+        Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 
-Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+        Write-Log "Test platform build variables: "
+        Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
+        Install-DotNetCli
+        Restore-Package
+        #Update-LocalizedResources
+        Invoke-Build
+        Publish-Package
+        Create-VsixPackage
+        Create-NugetPackages
+
+        Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+
+        if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
+}
+else{
+    # Build Specific projects.
+    # Framework format ("<target_framework>", "<output_dir>").
+    $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp1.0"), ("netcoreapp1.0", "netcoreapp1.0"))
+    $dotnetPath = Get-DotNetPath
+
+    # Get projects to build.
+    Get-ChildItem -Recurse -Path $env:TP_SRC_DIR -Include *.csproj | ForEach-Object {
+        foreach ( $ProjectNamePattern in $ProjectNamePatterns){
+            if( $_.FullName -match  $ProjectNamePattern){
+                $ProjectsToBuild += ,"$_"
+            }
+        }
+    }
+
+    # Build Projects.
+    foreach($ProjectToBuild in $ProjectsToBuild){
+        Write-Log "Building Project $ProjectToBuild"
+        # Restore and Build
+        $output = & $dotnetPath restore $ProjectToBuild
+        PrintAndExit-OnError $output
+        $output = & $dotnetPath build $ProjectToBuild
+        PrintAndExit-OnError $output
+
+        # Copy artifacts
+        $ProjectDir = [System.IO.Path]::GetDirectoryName($ProjectToBuild)
+        foreach($FrameworkAndOutDir in $FrameworksAndOutDirs){
+            $fromDir = $([System.IO.Path]::Combine($ProjectDir, "bin", $TPB_Configuration, $FrameworkAndOutDir[0]))
+            $toDir = $([System.IO.Path]::Combine($env:TP_OUT_DIR, $TPB_Configuration, $FrameworkAndOutDir[1]))
+            if ( Test-Path $fromDir){
+                Write-Log "Copying articates from $fromDir to $toDir"
+                Get-ChildItem $fromDir | ForEach-Object {
+                    if(-not ($_.PSIsContainer)){
+                        copy $_.FullName $toDir
+                    }
+                }
+            }
+        }
+    }
+}
