@@ -218,7 +218,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         // Known issue https://github.com/Microsoft/vstest/issues/135
-        [Ignore]
+        
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -110,6 +111,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             return cpuCount;
+        }
+
+        /// <summary>
+        /// Gets the test adapters path from the run configuration
+        /// </summary>
+        /// <param name="runSettings">Test run settings</param>
+        /// <param name="returnNullIfNotSet">True to return null, if adapter paths is not set.</param>
+        /// <returns>Test adapters paths</returns>
+        public static IEnumerable<string> GetTestAdaptersPaths(string runSettings)
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+
+            IEnumerable<string> testAdaptersPaths = null;
+            if (runConfiguration != null)
+            {
+                if (!runConfiguration.TestAdaptersPathsSet)
+                {
+                    testAdaptersPaths = null;
+                }
+                else
+                {
+                    testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+            }
+
+            return testAdaptersPaths;
         }
 
     }
