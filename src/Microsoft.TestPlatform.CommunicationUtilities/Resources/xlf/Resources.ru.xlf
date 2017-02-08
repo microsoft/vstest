@@ -21,7 +21,7 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted. Due to {0}</source>
+        <source>The active test run was aborted. {0}</source>
         <target state="new">Активный тестовый запуск прерван.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -39,7 +39,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted. Due to {0}</source>
+        <source>The active test discovery was aborted. {0}</source>
         <target state="new">Активное обнаружение тестов прервано.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -48,8 +48,8 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
-        <source>Unable to communicate with test execution process.</source>
-        <target state="translated">Не удается связаться с процессом выполнения теста.</target>
+        <source>Unable to communicate with test host process.</source>
+        <target state="new">Не удается связаться с процессом выполнения теста.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не удается установить соединение с процессом выполнения теста.</target>
