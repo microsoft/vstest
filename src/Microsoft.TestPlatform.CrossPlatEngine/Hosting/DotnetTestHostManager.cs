@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Linq;
 
     using Microsoft.Extensions.DependencyModel;
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -191,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
-                return this.fileHelper.EnumerateFiles(sourceDirectory, ".*.TestAdapter.dll", SearchOption.TopDirectoryOnly);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestAdapterPattern, SearchOption.TopDirectoryOnly);
             }
 
             return Enumerable.Empty<string>();

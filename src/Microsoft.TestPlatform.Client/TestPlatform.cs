@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -147,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         continue;
                     }
                     List<string> adapterFiles = new List<string>(
-                        Directory.EnumerateFiles(adapterPath, @"*.TestAdapter.dll", SearchOption.AllDirectories)
+                        Directory.EnumerateFiles(adapterPath,TestPlatformConstants.TestAdapterPattern , SearchOption.AllDirectories)
                         );
                     if (adapterFiles.Count > 0)
                     {
