@@ -18,9 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="isAborted">Specifies if discovery has been aborted.</param>
         public DiscoveryCompleteEventArgs(long totalTests, bool isAborted)
         {
-            Debug.Assert((isAborted ? -1 == totalTests : true), "If discovery request is aborted totalTest should be -1.");
             this.TotalCount = totalTests;
-            this.IsAborted = isAborted;            
+            this.IsAborted = isAborted;
         }
 
         /// <summary>
