@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.VSIXCreator
 
             if (Directory.Exists(inputDirectory))
             {
-                // Update the manifest file to have the entry for each file and their shah256 which are going to include in the vsix
+                // Update the manifest file to have the entry for each file and their sha256 which are going to include in the vsix
                 UpdateManifestFile(inputDirectory);
 
                 // Get all the files which are going to be part of vsix
@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.VSIXCreator
         }
 
         /// <summary>
-        /// Update the manifest file to have the entry for each file and their shah256 which are going to include in the vsix
+        /// Update the manifest file to have the entry for each file and their sha256 which are going to include in the vsix
         /// </summary>
         /// <param name="inputDirectory">The directory which contains the files</param>
         private static void UpdateManifestFile(string inputDirectory)
