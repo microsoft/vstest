@@ -180,15 +180,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ?.
-        /// </summary>
-        internal static string PlaceHolderForInvalidChar {
-            get {
-                return ResourceManager.GetString("PlaceHolderForInvalidChar", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Aborted.
         /// </summary>
         internal static string TestOutcomeAborted {
