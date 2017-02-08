@@ -195,6 +195,7 @@ function Publish-Package
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
+    
 	
     Publish-Package-Internal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
@@ -245,7 +246,7 @@ function Publish-Package
     foreach($file in $loggers) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
-		
+        
         Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
     }
@@ -254,6 +255,26 @@ function Publish-Package
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
+    
+    Publish-PlatfromAbstractions-Internal
+}
+
+function Publish-PlatfromAbstractions-Internal
+{
+    Write-Log "Publish-PlatfromAbstractions-Internal: Started."
+	
+	$timer = Start-Timer
+	$fullCLRPackageDir = Get-FullCLRPackageDirectory
+    $coreCLRPackageDir = Get-CoreCLRPackageDirectory
+    
+    $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
+    $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
+    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
+    
+    Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
+    Copy-Item $platformAbstractionNetCore\* $coreCLRPackageDir -Force
+    
+    Write-Log "Publish-PlatfromAbstractions-Internal:: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
 
