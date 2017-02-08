@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -26,28 +27,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager
     {
         private readonly ITestHostManager testHostManager;
+        private readonly IDataSerializer dataSerializer;
 
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
         /// </summary>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
-        public ProxyExecutionManager(ITestHostManager testHostManager) : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
+        public ProxyExecutionManager(ITestHostManager testHostManager)
+            :this(
+                new TestRequestSender(),
+                testHostManager,
+                Constants.ClientConnectionTimeout,
+                JsonDataSerializer.Instance)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
+        /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class.
         /// Constructor with Dependency injection. Used for unit testing.
         /// </summary>
         /// <param name="requestSender">Request Sender instance</param>
         /// <param name="testHostManager">Test host manager instance</param>
         /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
-        internal ProxyExecutionManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
+        /// <param name="dataSerializer">The data seriallizer</param>
+        internal ProxyExecutionManager(
+            ITestRequestSender requestSender,
+            ITestHostManager testHostManager,
+            int clientConnectionTimeout,
+            IDataSerializer dataSerializer)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
+            this.dataSerializer = dataSerializer;
         }
 
         #endregion
@@ -122,15 +135,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         testRunCriteria.Tests,
                         testRunCriteria.TestRunSettings,
                         executionContext);
-
                     this.RequestSender.StartTestRun(runRequest, eventHandler);
                 }
             }
             catch (Exception exception)
             {
-                var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
+                eventHandler.OnAbort(this.dataSerializer, exception);
             }
 
             return 0;
