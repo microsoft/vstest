@@ -140,8 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             {
                 foreach (string customTestAdaptersPath in customTestAdaptersPaths)
                 {
-                    string adapterPath = string.Empty;
-                    adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
+                    var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
                     if (!Directory.Exists(adapterPath))
                     {
                         EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));

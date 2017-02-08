@@ -103,20 +103,8 @@ namespace TestPlatform.Common.UnitTests.Utilities
             string[] expectedResult = new string[] { @"C:\testadapterpath", @"D:\secondtestadapterpath" };
 
             string[] result = (string[])RunSettingsUtilities.GetTestAdaptersPaths(settingXml);
-            if (expectedResult.Length == result.Length)
-            {
-                for (int count = 0; count < expectedResult.Length; count++)
-                {
-                    if (!(expectedResult[count].Equals(result[count])))
-                    {
-                        Assert.Fail();
-                    }
-                }
-            }
-            else
-            {
-                Assert.Fail();
-            }
+
+            CollectionAssert.AreEqual(expectedResult, result);
         }
     }
 

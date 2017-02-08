@@ -217,8 +217,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedProcessCreated);
         }
 
-        // Known issue https://github.com/Microsoft/vstest/issues/135
-        
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]

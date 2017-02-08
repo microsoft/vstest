@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -123,14 +124,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         {
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
 
-            IEnumerable<string> testAdaptersPaths = null;
+            IEnumerable<string> testAdaptersPaths = Enumerable.Empty<string>();
             if (runConfiguration != null)
             {
-                if (!runConfiguration.TestAdaptersPathsSet)
-                {
-                    testAdaptersPaths = null;
-                }
-                else
+                if (runConfiguration.TestAdaptersPathsSet)
                 {
                     testAdaptersPaths = runConfiguration.TestAdaptersPaths.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                 }
