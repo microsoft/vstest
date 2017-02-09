@@ -21,7 +21,7 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active test run was aborted. {0}</source>
+        <source>The active test run was aborted. Reason: {0}</source>
         <target state="new">Se ha anulado la serie de pruebas activa.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -39,7 +39,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active test discovery was aborted. {0}</source>
+        <source>The active test discovery was aborted. Reason: {0}</source>
         <target state="new">Se ha anulado la detección de pruebas activa.</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
