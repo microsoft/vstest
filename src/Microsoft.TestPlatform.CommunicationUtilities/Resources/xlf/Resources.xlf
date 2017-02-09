@@ -3,7 +3,7 @@
   <file datatype="xml" source-language="en" original="../Resources.resx">
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
+        <source>The active test run was aborted. Reason: {0}</source>
         <note></note>
       </trans-unit>
       <trans-unit id="ConnectionClosed">
@@ -11,11 +11,11 @@
         <note></note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
+        <source>The active test discovery was aborted. Reason: {0}</source>
         <note></note>
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
-        <source>Unable to communicate with test execution process.</source>
+        <source>Unable to communicate with test host process.</source>
         <note></note>
       </trans-unit>
     </body>
