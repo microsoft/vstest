@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">La série de tests active a été abandonnée.</target>
+        <target state="new">La série de tests active a été abandonnée. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La série de tests active a été abandonnée.</target>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">La découverte de tests active a été abandonnée.</target>
+        <target state="new">La découverte de tests active a été abandonnée. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La découverte active de Test a été abandonnée.</target>

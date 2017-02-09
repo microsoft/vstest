@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">活动的测试运行已中止。</target>
+        <target state="new">活动的测试运行已中止。{0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">活动测试运行已中止。</target>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">活动的测试发现已中止。</target>
+        <target state="new">活动的测试发现已中止。{0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">活动测试发现被中止。</target>

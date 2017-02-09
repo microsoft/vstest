@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">Aktywne uruchomienie testu zostało przerwane.</target>
+        <target state="new">Aktywne uruchomienie testu zostało przerwane. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aktywne Uruchom Test została przerwana.</target>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">Aktywny proces wykrywania testu został przerwany.</target>
+        <target state="new">Aktywny proces wykrywania testu został przerwany. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Odkrywanie Test została przerwana.</target>
