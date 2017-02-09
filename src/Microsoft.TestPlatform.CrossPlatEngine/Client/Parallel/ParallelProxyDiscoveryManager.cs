@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // In Case of Cancel or Abort, no need to trigger discovery for rest of the data
             // If there are no more sources/testcases, a parallel executor is truly done with discovery
-            if (isAborted || !this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager))
+            if (!this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager))
             {
                 lock (this.discoveryStatusLockObject)
                 {

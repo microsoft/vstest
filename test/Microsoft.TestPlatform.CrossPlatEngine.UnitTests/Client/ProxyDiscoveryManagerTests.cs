@@ -6,6 +6,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -41,7 +42,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
-                                            this.testableClientConnectionTimeout);
+                                            this.testableClientConnectionTimeout, JsonDataSerializer.Instance);
             this.discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
 
             // Default setup test host manager as shared (desktop)
@@ -138,7 +139,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
         {
-            // System.Diagnostics.Debugger.Launch();
             // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
             Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
@@ -147,8 +147,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
-            mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(0, It.IsAny<IEnumerable<TestCase>>(), false));
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(-1, It.IsAny<IEnumerable<TestCase>>(), true));
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()));
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.IsAny<string>()), Times.Exactly(2));
         }
 
         [TestMethod]

@@ -10,12 +10,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -43,7 +45,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestHostManager>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.clientConnectionTimeout);
+            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.clientConnectionTimeout, JsonDataSerializer.Instance);
 
             // Default to shared test host
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
@@ -171,6 +173,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
             mockTestRunEventsHandler.Verify(s => s.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null));
+            mockTestRunEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()));
+            mockTestRunEventsHandler.Verify(s => s.HandleRawMessage(It.IsAny<string>()), Times.Exactly(2));
         }
 
         [TestMethod]

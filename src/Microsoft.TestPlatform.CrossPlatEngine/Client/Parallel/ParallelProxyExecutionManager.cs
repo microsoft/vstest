@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // In Case of Cancel or Abort, no need to trigger run for rest of the data
             // If there are no more sources/testcases, a parallel executor is truly done with execution
-            if (testRunCompleteArgs.IsAborted || testRunCompleteArgs.IsCanceled || !this.StartTestRunOnConcurrentManager(proxyExecutionManager))
+            if (testRunCompleteArgs.IsCanceled || !this.StartTestRunOnConcurrentManager(proxyExecutionManager))
             {
                 lock (this.executionStatusLockObject)
                 {

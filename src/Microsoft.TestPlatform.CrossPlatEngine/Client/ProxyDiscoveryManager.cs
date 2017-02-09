@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -20,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager
     {
         private readonly ITestHostManager testHostManager;
+        private readonly IDataSerializer dataSerializer;
 
         #region Constructors
 
@@ -28,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(ITestHostManager testHostManager)
-            : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
+            : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout, JsonDataSerializer.Instance)
         {
             this.testHostManager = testHostManager;
         }
@@ -46,13 +48,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="clientConnectionTimeout">
         /// The client Connection Timeout
         /// </param>
+        /// <param name="dataSerializer">The data serializer</param>
         internal ProxyDiscoveryManager(
             ITestRequestSender requestSender,
             ITestHostManager testHostManager,
-            int clientConnectionTimeout)
+            int clientConnectionTimeout,
+            IDataSerializer dataSerializer)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
+            this.dataSerializer = dataSerializer;
         }
 
         #endregion
@@ -93,8 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             catch (Exception exception)
             {
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(0, new List<ObjectModel.TestCase>(), false);
+                eventHandler.OnAbort(this.dataSerializer, exception);
             }
         }
 
