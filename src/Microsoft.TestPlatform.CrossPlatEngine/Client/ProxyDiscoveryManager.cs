@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -28,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(ITestHostManager testHostManager)
-            : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
+            : this(new TestRequestSender(), testHostManager, CrossPlatEngine.Constants.ClientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
         }
@@ -93,6 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             catch (Exception exception)
             {
+                EqtTrace.Error("ProxyDiscoveryManager.DiscoverTests: Failed to discover tests: {0}", exception);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
                 eventHandler.HandleDiscoveryComplete(0, new List<ObjectModel.TestCase>(), false);
             }
