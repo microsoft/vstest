@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common
 {
     /// <summary>
-    /// Defines the defaults/constants used across different components.
+    /// Defines the defaults used across different components.
     /// </summary>
     public static class TestPlatformDefaults
     {
@@ -37,5 +37,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Default value of the boolean that determines whether or not job queue should be bounded.
         /// </summary>
         public const bool DefaultEnableBoundsOnLoggerEventQueue = true;
+    }
+
+    /// <summary>
+    /// Defines the constants used across different components.
+    /// </summary>
+    public static class TestPlatformConstants
+    {
+        /// <summary>
+        /// string pattern used to find the test adapters
+        /// </summary>
+        public const string TestAdapterPattern = @"*.TestAdapter.dll";
+
+        /// <summary>
+        /// Regex pattern used to find the test adapters
+        /// </summary>
+        public const string TestAdapterRedexPattern = @".*.TestAdapter.dll";
+
     }
 }
