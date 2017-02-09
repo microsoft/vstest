@@ -3,11 +3,8 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Payloads
 {
-    using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.Serialization;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Class used to define the DiscoveryRequestPayload sent by the Vstest.console translation layers into design mode
