@@ -21,9 +21,9 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">A Execução de Teste ativa foi anulada.</target>
-        <note />
+        <source>The active test run was aborted. Reason: {0}</source>
+        <target state="new">A Execução de Teste ativa foi anulada.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Execução de teste ativa foi anulada.</target>
         </alt-trans>
@@ -39,18 +39,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">A Descoberta de Teste ativa foi anulada.</target>
-        <note />
+        <source>The active test discovery was aborted. Reason: {0}</source>
+        <target state="new">A Descoberta de Teste ativa foi anulada.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">A detecção ativa de teste foi anulada.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
-        <source>Unable to communicate with test execution process.</source>
-        <target state="translated">Não é possível se comunicar com o processo de execução de teste.</target>
-        <note />
+        <source>Unable to communicate with test host process.</source>
+        <target state="new">Não é possível se comunicar com o processo de execução de teste.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Não é possível se comunicar com o processo de execução de teste.</target>
         </alt-trans>

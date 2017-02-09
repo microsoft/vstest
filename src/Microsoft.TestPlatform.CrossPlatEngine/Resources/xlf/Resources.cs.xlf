@@ -175,6 +175,11 @@
         <target state="translated">Nejde najít {0}. Ujistěte se, že na počítači je nainstalovaný dotnet.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostExitedWithError">
+        <source>Testhost process exited with error: {0}</source>
+        <target state="new">Testhost process exited with error: {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
