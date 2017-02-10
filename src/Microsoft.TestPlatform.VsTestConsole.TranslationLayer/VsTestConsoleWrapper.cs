@@ -3,10 +3,8 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -57,9 +55,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <summary>
         /// Initializes a new instance of the <see cref="VsTestConsoleWrapper"/> class.
         /// </summary>
-        /// <param name="vstestConsolePath">
-        /// Path to the test runner <c>vstest.console.exe</c>.
-        /// </param>
+        /// <param name="vstestConsolePath">Path to the test runner <c>vstest.console.exe</c>.</param>
+        /// <param name="consoleParameters">The parameters to be passed onto the runner process</param>
         public VsTestConsoleWrapper(string vstestConsolePath, ConsoleParameters consoleParameters) :
             this(new VsTestConsoleRequestSender(), new VsTestConsoleProcessManager(vstestConsolePath), consoleParameters)
         {
@@ -70,6 +67,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         /// <param name="requestSender">Sender for test messages.</param>
         /// <param name="processManager">Process manager.</param>
+        /// <param name="consoleParameters">The parameters to be passed onto the runner process</param>
         internal VsTestConsoleWrapper(ITranslationLayerRequestSender requestSender, IProcessManager processManager, ConsoleParameters consoleParameters)
         {
             this.requestSender = requestSender;
