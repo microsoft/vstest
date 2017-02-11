@@ -13,7 +13,8 @@
         }
       ],
       "vsixId": "Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf",
-      "extensionDir": "[installdir]\\Common7\\IDE\\Extensions\\qgyll0uu.4m0"
+      "extensionDir": "[installdir]\\Common7\\IDE\\Extensions\\TestPlatform",
+      "installSize": 8348725
     }
   ]
 }

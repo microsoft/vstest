@@ -5,10 +5,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.Text;
 
     /// <summary>
     /// Class which defines additional specifiable parameters for vstest.console.exe
@@ -19,6 +16,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private string logFilePath = null;
 
+        /// <summary>
+        /// Full path for the log file
+        /// </summary>
         public string LogFilePath
         {
             get

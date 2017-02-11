@@ -153,6 +153,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="sources">Sources for test run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
+        /// <param name="customHostLauncher">TestHostLauncher that launches the test host for the run</param>
         public void StartTestRunWithCustomHost(
             IEnumerable<string> sources,
             string runSettings,
@@ -177,6 +178,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="testCases">TestCases to run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
+        /// <param name="customHostLauncher">TestHostLauncher that launches the test host for the run</param>
         public void StartTestRunWithCustomHost(
             IEnumerable<TestCase> testCases,
             string runSettings,
@@ -212,21 +214,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.communicationManager.SendMessage(MessageType.AbortTestRun);
         }
 
+        /// <inheritdoc/>
         public void OnProcessExited()
         {
             this.processExitCancellationTokenSource.Cancel();
         }
 
+        /// <inheritdoc/>
         public void Close()
         {
             this.Dispose();
         }
 
+        /// <summary>
+        /// Sends message for terminating the session
+        /// </summary>
         public void EndSession()
         {
             this.communicationManager.SendMessage(MessageType.SessionEnd);
         }
 
+        /// <summary>
+        /// Closes the communication channel
+        /// </summary>
         public void Dispose()
         {
             this.communicationManager?.StopServer();

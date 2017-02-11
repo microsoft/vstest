@@ -10,6 +10,8 @@ namespace TestPlatform.Common.UnitTests.Utilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using System.Xml;
     using ExtensionFramework;
+    using System.Collections.Generic;
+
     [TestClass]
     public class RunSettingsUtilitiesTests
     {
@@ -92,6 +94,17 @@ namespace TestPlatform.Common.UnitTests.Utilities
             int result = RunSettingsUtilities.GetMaxCpuCount(settingXml);
 
             Assert.AreEqual(expectedResult, result);
+        }
+
+        [TestMethod]
+        public void GetTestAdaptersPaths()
+        {
+            string settingXml = @"<RunSettings><RunConfiguration><TestAdaptersPaths>C:\testadapterpath;D:\secondtestadapterpath</TestAdaptersPaths></RunConfiguration ></RunSettings>";
+            string[] expectedResult = new string[] { @"C:\testadapterpath", @"D:\secondtestadapterpath" };
+
+            string[] result = (string[])RunSettingsUtilities.GetTestAdaptersPaths(settingXml);
+
+            CollectionAssert.AreEqual(expectedResult, result);
         }
     }
 
