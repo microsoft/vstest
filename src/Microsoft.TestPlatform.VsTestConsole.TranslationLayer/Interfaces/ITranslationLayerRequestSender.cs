@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void AbortTestRun();
 
         /// <summary>
-        /// on process exit unblocks communication waiting calls
+        /// On process exit unblocks communication waiting calls
         /// </summary>
         void OnProcessExited();
     }

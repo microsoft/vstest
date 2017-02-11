@@ -100,7 +100,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, " /tests:ExitWithStdErrorMessageTest");
             this.InvokeVsTest(arguments);
-            this.StdErrorContains("The active Test Run was aborted.");
+            this.StdErrorContains("The active test run was aborted.");
         }
     }
 }

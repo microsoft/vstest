@@ -101,7 +101,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="pathToAdditionalExtensions">Paths to Additional extensions</param>
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
+            EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
             this.testPlatform.Initialize(pathToAdditionalExtensions, false, true);
+            EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 
         /// <summary>
@@ -120,6 +122,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <returns>True, if successful</returns>
         public bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar)
         {
+            EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
+
             bool success = false;
 
             // create discovery request
@@ -163,6 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
             }
 
+            EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, sucessful: {0}.", success);
             return success;
         }
 
@@ -175,6 +180,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <returns>True, if successful</returns>
         public bool RunTests(TestRunRequestPayload testRunRequestPayload, ITestHostLauncher testHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
+            EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
+
             TestRunCriteria runCriteria = null;
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
@@ -198,7 +205,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher);
             }
 
-            return this.RunTests(runCriteria, testRunEventsRegistrar);
+            var success = this.RunTests(runCriteria, testRunEventsRegistrar);
+            EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
+            return success;
         }
 
         /// <summary>
@@ -206,6 +215,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         public void CancelTestRun()
         {
+            EqtTrace.Info("TestRequestManager.CancelTestRun: Sending cancel request.");
+
             this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
             this.currentTestRunRequest?.CancelAsync();
         }
@@ -215,6 +226,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         public void AbortTestRun()
         {
+            EqtTrace.Info("TestRequestManager.AbortTestRun: Sending abort request.");
+
             this.runRequestCreatedEventHandle.WaitOne(runRequestTimeout);
             this.currentTestRunRequest?.Abort();
         }
@@ -251,6 +264,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     }
                     catch (Exception ex)
                     {
+                        EqtTrace.Error("TestRequestManager.RunTests: failed to run tests: {0}", ex);
                         if (ex is TestPlatformException ||
                             ex is SettingsException ||
                             ex is InvalidOperationException)

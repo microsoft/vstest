@@ -88,6 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         if (process.ExitCode != 0)
                         {
                             testHostProcessStdError = process.StandardError.ReadToEnd();
+                            EqtTrace.Error("Test host exited with error: {0}", testHostProcessStdError);
                         }
 
                         this.RequestSender.OnClientProcessExit(testHostProcessStdError);

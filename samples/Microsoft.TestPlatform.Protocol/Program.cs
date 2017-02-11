@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.Protocol
     using System.Diagnostics;
     using System.Globalization;
     using System.IO;
+    using System.Runtime.Serialization;
     using System.Threading;
 
     public class Program
@@ -23,8 +24,8 @@ namespace Microsoft.TestPlatform.Protocol
             if(args == null || args.Length < 1)
             {
                 Console.WriteLine("Please provide appropriate arguments. Arguments can be passed as following:");
-                Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery]\" --testadapterpath:\"[path]\"");
-                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery]\" -p:\"[path]\" \n");
+                Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" --testadapterpath:\"[path]\"");
+                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" -p:\"[path]\" \n");
 
                 return 1;
             }
@@ -82,6 +83,15 @@ namespace Microsoft.TestPlatform.Protocol
                 case "runselected":
                     discoveredTestCases = DiscoverTests(testadapterPath, testAssembly);
                     RunSelectedTests(discoveredTestCases);
+                    break;
+
+                case "debugall":
+                    DebugAllTests(new List<string>() { testAssembly });
+                    break;
+
+                case "debugselected":
+                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly);
+                    DebugSelectedTests(discoveredTestCases);
                     break;
 
                 case "runall":
@@ -173,6 +183,30 @@ namespace Microsoft.TestPlatform.Protocol
             RecieveRunMesagesAndHandleRunComplete();
         }
 
+        static void DebugAllTests(List<string> sources)
+        {
+            Console.WriteLine("Starting Operation: DebugAll");
+            communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, new TestRunRequestPayload()
+            {
+                Sources = sources,
+                RunSettings = null,
+                DebuggingEnabled = true
+            });
+            RecieveRunMesagesAndHandleRunComplete();
+        }
+
+        static void DebugSelectedTests(dynamic testCases)
+        {
+            Console.WriteLine("Starting Operation: DebugSelected");
+            communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunSelected, new TestRunRequestPayload()
+            {
+                TestCases = testCases,
+                RunSettings = null,
+                DebuggingEnabled = true
+            });
+            RecieveRunMesagesAndHandleRunComplete();
+        }
+
         static void RecieveRunMesagesAndHandleRunComplete()
         {
             var isTestRunComplete = false;
@@ -199,7 +233,38 @@ namespace Microsoft.TestPlatform.Protocol
                     var testMessagePayload = dataSerializer.DeserializePayload<dynamic>(message);
                     // TODO: Handle log messages here
                 }
+                else if (string.Equals(MessageType.CustomTestHostLaunch, message.MessageType))
+                {
+                    var testProcessStartInfo = dataSerializer.DeserializePayload<dynamic>(message);
+
+                    // Launch Test Host here and Send the acknowledgement
+                    var ackPayload = new CustomHostLaunchAckPayload() { HostProcessId = -1, ErrorMessage = null };
+
+                    Process process = new Process();
+                    process.StartInfo.FileName = testProcessStartInfo.FileName;
+                    process.StartInfo.Arguments = testProcessStartInfo.Arguments;
+                    process.StartInfo.WorkingDirectory = testProcessStartInfo.WorkingDirectory;
+                    process.Start();
+
+                    ackPayload.HostProcessId = process.Id;
+                    communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload);
+                }
             }
         }
+    }
+
+    public class CustomHostLaunchAckPayload
+    {
+        /// <summary>
+        /// ProcessId of the TestHost launched by Clients like IDE, LUT etc.
+        /// </summary>
+        [DataMember]
+        public int HostProcessId { get; set; }
+
+        /// <summary>
+        /// ErrorMessage, in cases where custom launch fails
+        /// </summary>
+        [DataMember]
+        public string ErrorMessage { get; set; }
     }
 }
