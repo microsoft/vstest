@@ -15,17 +15,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// </summary>
     internal class VsTestConsoleProcessManager : IProcessManager
     {
-        private string vstestConsolePath;
-
-        private object syncObject = new object();
-
-        private bool vstestConsoleStarted = false;
-
-        private bool vstestConsoleExited = false;
-
-        private Process process;
-
-        public event EventHandler ProcessExited;
+        #region Private Members
 
         /// <summary>
         /// Port number for communicating with Vstest CLI
@@ -44,8 +34,23 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// </summary>
         private const string DIAG_ARGUMENT = "/diag:{0}";
 
+        private string vstestConsolePath;
+        private object syncObject = new object();
+        private bool vstestConsoleStarted = false;
+        private bool vstestConsoleExited = false;
+        private Process process;
+
+        #endregion
+
+        /// <inheritdoc/>
+        public event EventHandler ProcessExited;
+
         #region Constructor
 
+        /// <summary>
+        /// Creates an instance of VsTestConsoleProcessManager class.
+        /// </summary>
+        /// <param name="vstestConsolePath">The fullpath to vstest.console.exe</param>
         public VsTestConsoleProcessManager(string vstestConsolePath)
         {
             this.vstestConsolePath = vstestConsolePath;
@@ -53,6 +58,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #endregion Constructor
 
+        /// <summary>
+        /// Checks if the process has been initialized.
+        /// </summary>
+        /// <returns>True if process is successfully initialized</returns>
         public bool IsProcessInitialized()
         {
             lock (syncObject)
@@ -92,6 +101,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
         }
 
+        /// <summary>
+        /// Shutdown the vstest.console process
+        /// </summary>
         public void ShutdownProcess()
         {
             // Ideally process should die by itself
