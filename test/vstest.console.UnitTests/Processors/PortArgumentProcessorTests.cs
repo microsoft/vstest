@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var capabilities = new PortArgumentProcessorCapabilities();
             Assert.AreEqual("/Port", capabilities.CommandName);
-            Assert.AreEqual(("--Port|/Port:<Port>" + Environment.NewLine + "      The Port for socket connection and receiving the event messages.").Replace("\r", string.Empty), capabilities.HelpContentResourceName.Replace("\r", string.Empty));
+            Assert.AreEqual("--Port|/Port:<Port>\n      The Port for socket connection and receiving the event messages.", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.PortArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
