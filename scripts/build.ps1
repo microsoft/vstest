@@ -42,7 +42,10 @@ Param(
     # Build specific projects
     [Parameter(Mandatory=$false)]
     [Alias("p")]
-    [System.String[]] $ProjectNamePatterns = @()
+    [System.String[]] $ProjectNamePatterns = @(),
+
+    [Parameter(Mandatory=$false)]
+    [System.String] $RunningInMicroBuild = "false"
 )
 
 $ErrorActionPreference = "Stop"
@@ -197,8 +200,8 @@ function Publish-Package
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
-    
-	
+
+
     Publish-Package-Internal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
@@ -264,9 +267,9 @@ function Publish-Package
 function Publish-PlatfromAbstractions-Internal
 {
     Write-Log "Publish-PlatfromAbstractions-Internal: Started."
-	
-	$timer = Start-Timer
-	$fullCLRPackageDir = Get-FullCLRPackageDirectory
+
+    $timer = Start-Timer
+    $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
     
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
@@ -288,35 +291,38 @@ function Publish-Package-Internal($packagename, $framework, $output)
 
 function Create-VsixPackage
 {
-    $timer = Start-Timer
+    # Create vsix here only when not running under Micro build
+    if($RunningInMicroBuild -eq "false")
+    {
+        $timer = Start-Timer
 
-    Write-Log "Create-VsixPackage: Started."
-    $packageDir = Get-FullCLRPackageDirectory
+        Write-Log "Create-VsixPackage: Started."
+        $packageDir = Get-FullCLRPackageDirectory
 
-    # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
-    Copy-Item -Recurse $legacyDir\* $packageDir -Force
+        # Copy legacy dependencies
+        $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
+        Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
-    # Copy COM Components and their manifests over
-    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
-    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+        # Copy COM Components and their manifests over
+        $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
+        Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
-    $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
-    Copy-Item $fileToCopy $packageDir -Force
+        $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
+        Copy-Item $fileToCopy $packageDir -Force
 
-    #update version of VSIX
-    Update-VsixVersion
-	
-	# Build vsix project
-    Write-Verbose "Locating MSBuild install path..."
-    $msbuildPath = Locate-MSBuildPath
-	
-	# Build vsix project to get TestPlatform.vsix
-	
-	Write-Log ".. .. Create-VsixPackage: Building project $TPB_VSIX_DIR\TestPlatform.csproj"
-	& $msbuildPath\msbuild.exe "$TPB_VSIX_DIR\TestPlatform.csproj" -p:Configuration=$Configuration
-	
-    Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+        #update version of VSIX
+        Update-VsixVersion
+
+        # Build vsix project
+        Write-Verbose "Locating MSBuild install path..."
+        $msbuildPath = Locate-MSBuildPath
+
+        # Build vsix project to get TestPlatform.vsix
+        Write-Verbose "$msbuildPath\msbuild.exe $TPB_VSIX_DIR\TestPlatform.csproj -p:Configuration=$Configuration"
+        & $msbuildPath\msbuild.exe "$TPB_VSIX_DIR\TestPlatform.csproj" -p:Configuration=$Configuration
+
+        Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+    }
 }
 
 function Create-NugetPackages
@@ -442,30 +448,28 @@ function Set-ScriptFailed
     $Script:ScriptFailed = $true
 }
 
-function PrintAndExit-OnError([System.String] $output){
+function PrintAndExit-OnError([System.String] $output)
+{
     if ($? -eq $false){
         Write-Error $output
         Exit 1
     }
 }
 
-function Locate-MSBuildPath() {
-
+function Locate-MSBuildPath 
+{
   $vsInstallPath = Locate-VsInstallPath
   $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
 
+  Write-Verbose "msbuildPath is : $msbuildPath"
   return Resolve-Path -path $msbuildPath
 }
 
-function Locate-VsInstallPath() {
-
+function Locate-VsInstallPath
+{
    $locateVsApi = Locate-LocateVsApi
 
-   $requiredPackageIds = @()
-   $requiredPackageIds += "Microsoft.Component.MSBuild"
-   $requiredPackageIds += "Microsoft.Net.Component.4.6.TargetingPack"
-   $requiredPackageIds += "Microsoft.VisualStudio.Component.Roslyn.Compiler"
-   $requiredPackageIds += "Microsoft.VisualStudio.Component.VSSDK"
+   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.Roslyn.Compiler", "Microsoft.VisualStudio.Component.VSSDK")
 
    Write-Verbose "VSInstallation requirements : $requiredPackageIds"
 
@@ -484,14 +488,15 @@ function Locate-VsInstallPath() {
    return Resolve-Path -path $vsInstallPath
 }
 
-function Locate-LocateVsApi {
-
+function Locate-LocateVsApi
+{
   $locateVsApi = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "RoslynTools.Microsoft.LocateVS\$env:LOCATE_VS_API_VERSION\tools\LocateVS.dll"
 
   if (!(Test-Path -path $locateVsApi)) {
     throw "The specified LocateVS API version ($env:LOCATE_VS_API_VERSION) could not be located."
   }
 
+  Write-Verbose "locateVsApi is : $locateVsApi"
   return Resolve-Path -path $locateVsApi
 }
 
@@ -509,8 +514,8 @@ function Update-VsixVersion
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
     }
 
-    $menifestContentWithVersion = Get-Content "$TPB_VSIX_DIR\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
-    Set-Content -path "$TPB_VSIX_DIR\source.extension.vsixmanifest" -value $menifestContentWithVersion
+    $manifestContentWithVersion = Get-Content "$TPB_VSIX_DIR\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
+    Set-Content -path "$TPB_VSIX_DIR\source.extension.vsixmanifest" -value $manifestContentWithVersion
 
     Write-Log "Update-VsixVersion: Completed."
 }

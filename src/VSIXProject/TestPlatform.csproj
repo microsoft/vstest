@@ -45,9 +45,6 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <!-- Localized resources -->
     <VsixSourceItem Include="$(VsixInputFileLocation)\cs\*.dll">
       <VSIXSubPath>cs</VSIXSubPath>
