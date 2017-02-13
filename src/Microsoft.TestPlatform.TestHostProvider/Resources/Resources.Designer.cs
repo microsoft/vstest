@@ -10,7 +10,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.TestHostProvider.Resources {
     using System;
-    using System.Reflection;
     
     
     /// <summary>

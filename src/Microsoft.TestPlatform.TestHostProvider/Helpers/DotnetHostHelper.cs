@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers
     using System;
     using System.IO;
     using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Resources;
+    using TestHostProviderResources = Microsoft.VisualStudio.TestPlatform.TestHostProvider.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers.Interfaces;
@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers
                 }
             }
 
-            string errorMessage = String.Format(Resources.NoDotnetExeFound, dotnetExeName);
+            string errorMessage = String.Format(TestHostProviderResources.NoDotnetExeFound, dotnetExeName);
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
         }
