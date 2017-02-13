@@ -23,9 +23,9 @@
     <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <IsProductComponent>true</IsProductComponent>
-    <artifactFolder>..\..\artifacts</artifactFolder>
-    <VsixInputFileLocation>$(artifactFolder)\$(Configuration)\net46\win7-x64</VsixInputFileLocation>
-    <OutputPath>$(artifactFolder)\$(Configuration)\VSIX</OutputPath>
+    <TestPlatformRoot>..\..\</TestPlatformRoot>
+    <VsixInputFileLocation>$(TestPlatformRoot)\artifacts\$(Configuration)\net46\win7-x64</VsixInputFileLocation>
+    <OutputPath>$(TestPlatformRoot)\artifacts\$(Configuration)\VSIX</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

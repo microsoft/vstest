@@ -319,72 +319,6 @@ function Create-VsixPackage
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
-function Locate-MSBuildPath() {
-
-  $vsInstallPath = Locate-VsInstallPath
-  $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
-
-  return Resolve-Path -path $msbuildPath
-}
-
-function Locate-VsInstallPath() {
-
-   $locateVsApi = Locate-LocateVsApi
-
-   $requiredPackageIds = @()
-   $requiredPackageIds += "Microsoft.Component.MSBuild"
-   $requiredPackageIds += "Microsoft.Net.Component.4.6.TargetingPack"
-   $requiredPackageIds += "Microsoft.VisualStudio.Component.Roslyn.Compiler"
-   $requiredPackageIds += "Microsoft.VisualStudio.Component.VSSDK"
-
-   Write-Verbose "VSInstallation requirements : $requiredPackageIds"
-
-   Add-Type -path $locateVsApi
-   Try
-   {
-     $vsInstallPath = [LocateVS.Instance]::GetInstallPath($env:MSBUILD_VERSION, $requiredPackageIds)
-   }
-   Catch [System.Management.Automation.MethodInvocationException]
-   {
-      Write-Error "Failed to find VS installation with requirements : $requiredPackageIds"
-   }
-
-   Write-Verbose "VSInstallPath is : $vsInstallPath"
-
-   return Resolve-Path -path $vsInstallPath
-}
-
-function Locate-LocateVsApi {
-
-  $locateVsApi = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "RoslynTools.Microsoft.LocateVS\$env:LOCATE_VS_API_VERSION\tools\LocateVS.dll"
-
-  if (!(Test-Path -path $locateVsApi)) {
-    throw "The specified LocateVS API version ($env:LOCATE_VS_API_VERSION) could not be located."
-  }
-
-  return Resolve-Path -path $locateVsApi
-}
-
-function Update-VsixVersion
-{
-    Write-Log "Update-VsixVersion: Started."
-
-    $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
-
-    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
-    # So Version of the vsix will be 15.0.3.2017011101
-    $vsixVersionSuffix = $VersionSuffix.Split("-");
-    if($vsixVersionSuffix.Length -ige 2) {
-        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
-    }
-
-    $menifestContentWithVersion = Get-Content "$TPB_VSIX_DIR\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
-    Set-Content -path "$TPB_VSIX_DIR\source.extension.vsixmanifest" -value $menifestContentWithVersion
-
-    Write-Log "Update-VsixVersion: Completed."
-}
-
 function Create-NugetPackages
 {
     $timer = Start-Timer
@@ -515,6 +449,71 @@ function PrintAndExit-OnError([System.String] $output){
     }
 }
 
+function Locate-MSBuildPath() {
+
+  $vsInstallPath = Locate-VsInstallPath
+  $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
+
+  return Resolve-Path -path $msbuildPath
+}
+
+function Locate-VsInstallPath() {
+
+   $locateVsApi = Locate-LocateVsApi
+
+   $requiredPackageIds = @()
+   $requiredPackageIds += "Microsoft.Component.MSBuild"
+   $requiredPackageIds += "Microsoft.Net.Component.4.6.TargetingPack"
+   $requiredPackageIds += "Microsoft.VisualStudio.Component.Roslyn.Compiler"
+   $requiredPackageIds += "Microsoft.VisualStudio.Component.VSSDK"
+
+   Write-Verbose "VSInstallation requirements : $requiredPackageIds"
+
+   Add-Type -path $locateVsApi
+   Try
+   {
+     $vsInstallPath = [LocateVS.Instance]::GetInstallPath($env:MSBUILD_VERSION, $requiredPackageIds)
+   }
+   Catch [System.Management.Automation.MethodInvocationException]
+   {
+      Write-Error "Failed to find VS installation with requirements : $requiredPackageIds"
+   }
+
+   Write-Verbose "VSInstallPath is : $vsInstallPath"
+
+   return Resolve-Path -path $vsInstallPath
+}
+
+function Locate-LocateVsApi {
+
+  $locateVsApi = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "RoslynTools.Microsoft.LocateVS\$env:LOCATE_VS_API_VERSION\tools\LocateVS.dll"
+
+  if (!(Test-Path -path $locateVsApi)) {
+    throw "The specified LocateVS API version ($env:LOCATE_VS_API_VERSION) could not be located."
+  }
+
+  return Resolve-Path -path $locateVsApi
+}
+
+function Update-VsixVersion
+{
+    Write-Log "Update-VsixVersion: Started."
+
+    $packageDir = Get-FullCLRPackageDirectory
+    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
+
+    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
+    # So Version of the vsix will be 15.0.3.2017011101
+    $vsixVersionSuffix = $VersionSuffix.Split("-");
+    if($vsixVersionSuffix.Length -ige 2) {
+        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
+    }
+
+    $menifestContentWithVersion = Get-Content "$TPB_VSIX_DIR\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
+    Set-Content -path "$TPB_VSIX_DIR\source.extension.vsixmanifest" -value $menifestContentWithVersion
+
+    Write-Log "Update-VsixVersion: Completed."
+}
 
 if ($ProjectNamePatterns.Count -eq 0) {
         # Execute build
