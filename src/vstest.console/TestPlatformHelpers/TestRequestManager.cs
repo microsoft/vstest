@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             bool success = false;
 
             // create discovery request
-            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, this.commandLineOptions.BatchSize, TimeSpan.MaxValue, discoveryPayload.RunSettings);
+            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, this.commandLineOptions.BatchSize, this.commandLineOptions.TestStatsEventTimeout, discoveryPayload.RunSettings);
             using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria))
             {
                 try
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   this.commandLineOptions.BatchSize,
                                   testRunRequestPayload.KeepAlive,
                                   testRunRequestPayload.RunSettings,
-                                  this.commandLineOptions.TestRunStatsEventTimeout,
+                                  this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
                 runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
             }
@@ -201,7 +201,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   this.commandLineOptions.BatchSize,
                                   testRunRequestPayload.KeepAlive,
                                   testRunRequestPayload.RunSettings,
-                                  this.commandLineOptions.TestRunStatsEventTimeout,
+                                  this.commandLineOptions.TestStatsEventTimeout,
                                   testHostLauncher);
             }
 

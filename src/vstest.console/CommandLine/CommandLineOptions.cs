@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         private CommandLineOptions()
         {
             this.BatchSize = DefaultBatchSize;
-            this.TestRunStatsEventTimeout = this.DefaultRetrievalTimeout;
+            this.TestStatsEventTimeout = this.DefaultRetrievalTimeout;
             this.FileHelper = new FileHelper();
 #if TODO
             UseVsixExtensions = Utilities.GetAppSettingValue(UseVsixExtensionsKey, false);
@@ -164,9 +164,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public long BatchSize { get; set; }
 
         /// <summary>
-        /// Specifies the timeout of the runStats event
+        /// Specifies the timeout of the test stats cache timeout event
         /// </summary>
-        public TimeSpan TestRunStatsEventTimeout { get; set; }
+        public TimeSpan TestStatsEventTimeout { get; set; }
 
         /// <summary>
         /// Test case filter value for run with sources.
