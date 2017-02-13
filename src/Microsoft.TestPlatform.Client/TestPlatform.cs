@@ -4,11 +4,15 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -54,6 +58,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException("discoveryCriteria");
             }
 
+            UpdateTestAdapterPaths(discoveryCriteria.RunSettings);
+
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration);
             
@@ -75,6 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             {
                 throw new ArgumentNullException("testRunCriteria");
             }
+
+            UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
@@ -120,6 +128,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             this.TestEngine.GetExtensionManager()
                    .UseAdditionalExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
+        }
+
+        /// <summary>
+        /// Update the test adapter paths provided through run settings to be used by the test service
+        /// </summary>
+        private void UpdateTestAdapterPaths(string runSettings)
+        {
+            IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
+
+            if (customTestAdaptersPaths != null)
+            {
+                foreach (string customTestAdaptersPath in customTestAdaptersPaths)
+                {
+                    var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
+                    if (!Directory.Exists(adapterPath))
+                    {
+                        EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                        continue;
+                    }
+                    List<string> adapterFiles = new List<string>(
+                        Directory.EnumerateFiles(adapterPath,TestPlatformConstants.TestAdapterPattern , SearchOption.AllDirectories)
+                        );
+                    if (adapterFiles.Count > 0)
+                    {
+                        this.UpdateExtensions(adapterFiles, false);
+                    }
+                }
+            }
         }
     }
 }

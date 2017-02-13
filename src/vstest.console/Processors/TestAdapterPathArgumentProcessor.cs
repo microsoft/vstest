@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Globalization;
     using System.IO;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -195,7 +196,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The list of test adapter assemblies. </returns>
         internal virtual IEnumerable<string> GetTestAdaptersFromDirectory(string directory)
         {
-            return Directory.EnumerateFiles(directory, @"*.TestAdapter.dll", SearchOption.AllDirectories);
+            return Directory.EnumerateFiles(directory, TestPlatformConstants.TestAdapterPattern, SearchOption.AllDirectories);
         }
 
         #endregion

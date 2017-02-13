@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
         public void CommandLineOptionsDefaultTestRunStatsEventTimeoutIsOnePointFiveSec()
         {
             var timeout = new TimeSpan(0, 0, 0, 1, 500);
-            Assert.AreEqual(timeout, CommandLineOptions.Instance.TestRunStatsEventTimeout);
+            Assert.AreEqual(timeout, CommandLineOptions.Instance.TestStatsEventTimeout);
         }
 
         [TestMethod]
