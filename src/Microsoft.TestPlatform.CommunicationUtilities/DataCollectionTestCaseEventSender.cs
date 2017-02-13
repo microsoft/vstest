@@ -14,10 +14,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     {
         private readonly ICommunicationManager communicationManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventSender"/> class. 
+        /// </summary>
         public DataCollectionTestCaseEventSender() : this(new SocketCommunicationManager())
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventSender"/> class. 
+        /// </summary>
+        /// <param name="communicationManager">Communication manager.</param>
         public DataCollectionTestCaseEventSender(ICommunicationManager communicationManager)
         {
             this.communicationManager = communicationManager;

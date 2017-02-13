@@ -3,19 +3,21 @@
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
+    using System;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     using Moq;
-    using System;
 
     [TestClass]
     public class DataCollectionTestCaseEventSenderTests
     {
-        DataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
-        Mock<ICommunicationManager> mockCommunicationManager;
+        private DataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
+        private Mock<ICommunicationManager> mockCommunicationManager;
 
         public DataCollectionTestCaseEventSenderTests()
         {
@@ -105,7 +107,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void SendTestCaseCompletedShouldSendMessageThroughCommunicationManager()
         {
             var testCase = new TestCase();
+
             this.dataCollectionTestCaseEventSender.SendTestCaseCompleted(testCase, TestOutcome.Passed);
+
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestCaseCompleted, JsonDataSerializer.Instance.Serialize<object[]>(new object[] { testCase, TestOutcome.Passed })), Times.Once);
         }
 
