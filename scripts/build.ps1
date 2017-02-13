@@ -68,6 +68,8 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
 $env:DOTNET_CLI_VERSION = "latest"
+$env:LOCATE_VS_API_VERSION = "0.2.4-beta"
+$env:MSBUILD_VERSION = "15.0"
 
 #
 # Build configuration
@@ -82,7 +84,7 @@ $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
-$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
+$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIXProject"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -299,26 +301,68 @@ function Create-VsixPackage
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
-    #Copy [Content_Types].xml and License.rtf
-    Copy-Item $TPB_VSIX_DIR\*.xml $packageDir -Force
-
-    $fileToCopy = Join-Path $TPB_VSIX_DIR "License.rtf"
-    Copy-Item $fileToCopy $packageDir -Force
-
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force
 
     #update version of VSIX
     Update-VsixVersion
-
-    # Zip the folder
-    # TODO remove vsix creator
-    $dotnetExe = Get-DotNetPath
-    & $dotnetExe restore src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj
-    & $dotnetExe build src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj
-    & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net46\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
-
+	
+	# Build vsix project
+    Write-Verbose "Locating MSBuild install path..."
+    $msbuildPath = Locate-MSBuildPath
+	
+	# Build vsix project to get TestPlatform.vsix
+	
+	Write-Log ".. .. Create-VsixPackage: Building project $TPB_VSIX_DIR\TestPlatform.csproj"
+	& $msbuildPath\msbuild.exe "$TPB_VSIX_DIR\TestPlatform.csproj" -p:Configuration=$Configuration
+	
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
+function Locate-MSBuildPath() {
+
+  $vsInstallPath = Locate-VsInstallPath
+  $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
+
+  return Resolve-Path -path $msbuildPath
+}
+
+function Locate-VsInstallPath() {
+
+   $locateVsApi = Locate-LocateVsApi
+
+   $requiredPackageIds = @()
+   $requiredPackageIds += "Microsoft.Component.MSBuild"
+   $requiredPackageIds += "Microsoft.Net.Component.4.6.TargetingPack"
+   $requiredPackageIds += "Microsoft.VisualStudio.Component.Roslyn.Compiler"
+   $requiredPackageIds += "Microsoft.VisualStudio.Component.VSSDK"
+
+   Write-Verbose "VSInstallation requirements : $requiredPackageIds"
+
+   Add-Type -path $locateVsApi
+   Try
+   {
+     $vsInstallPath = [LocateVS.Instance]::GetInstallPath($env:MSBUILD_VERSION, $requiredPackageIds)
+   }
+   Catch [System.Management.Automation.MethodInvocationException]
+   {
+      Write-Error "Failed to find VS installation with requirements : $requiredPackageIds"
+   }
+
+   Write-Verbose "VSInstallPath is : $vsInstallPath"
+
+   return Resolve-Path -path $vsInstallPath
+}
+
+function Locate-LocateVsApi {
+
+  $locateVsApi = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "RoslynTools.Microsoft.LocateVS\$env:LOCATE_VS_API_VERSION\tools\LocateVS.dll"
+
+  if (!(Test-Path -path $locateVsApi)) {
+    throw "The specified LocateVS API version ($env:LOCATE_VS_API_VERSION) could not be located."
+  }
+
+  return Resolve-Path -path $locateVsApi
 }
 
 function Update-VsixVersion
@@ -335,16 +379,8 @@ function Update-VsixVersion
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
     }
 
-    $filesToUpdate = @("extension.vsixmanifest",
-        "manifest.json",
-        "catalog.json")
-
-    foreach ($file in $filesToUpdate) {
-        Get-Content "$TPB_VSIX_DIR\$file" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content "$packageDir\$file"
-    }
-
-    $fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
-    Get-Content "$TPB_VSIX_DIR\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content $fileToUpdate
+    $menifestContentWithVersion = Get-Content "$TPB_VSIX_DIR\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
+    Set-Content -path "$TPB_VSIX_DIR\source.extension.vsixmanifest" -value $menifestContentWithVersion
 
     Write-Log "Update-VsixVersion: Completed."
 }

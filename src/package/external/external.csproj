@@ -41,6 +41,10 @@
       <Version>14.0.12-pre</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+	<PackageReference Include="RoslynTools.Microsoft.LocateVS">
+      <Version>0.2.4-beta</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
