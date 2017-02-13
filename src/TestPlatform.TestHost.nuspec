@@ -18,6 +18,7 @@
         
       <!-- CommunicationUtilities requires 8.0.3, but 8.0.3 doesn't provide a netcoreapp1.0 target -->
       <dependency id="Newtonsoft.Json" version="9.0.1"/>
+      <dependency id="Microsoft.Extensions.DependencyModel" version="1.1.0"/>
       </group>
     </dependencies>
   </metadata>
