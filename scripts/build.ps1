@@ -42,10 +42,7 @@ Param(
     # Build specific projects
     [Parameter(Mandatory=$false)]
     [Alias("p")]
-    [System.String[]] $ProjectNamePatterns = @(),
-
-    [Parameter(Mandatory=$false)]
-    [System.String] $RunningInMicroBuild = "false"
+    [System.String[]] $ProjectNamePatterns = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -291,12 +288,16 @@ function Publish-Package-Internal($packagename, $framework, $output)
 
 function Create-VsixPackage
 {
-    # Create vsix here only when not running under Micro build
-    if($RunningInMicroBuild -eq "false")
+    Write-Log "Create-VsixPackage: Started."
+
+    Write-Verbose "Locating MSBuild install path..."
+    $msbuildPath = Locate-MSBuildPath
+    
+    # Create vsix only when msbuild is installed.
+    if(![string]::IsNullOrEmpty($msbuildPath))
     {
         $timer = Start-Timer
 
-        Write-Log "Create-VsixPackage: Started."
         $packageDir = Get-FullCLRPackageDirectory
 
         # Copy legacy dependencies
@@ -313,16 +314,17 @@ function Create-VsixPackage
         #update version of VSIX
         Update-VsixVersion
 
-        # Build vsix project
-        Write-Verbose "Locating MSBuild install path..."
-        $msbuildPath = Locate-MSBuildPath
-
         # Build vsix project to get TestPlatform.vsix
         Write-Verbose "$msbuildPath\msbuild.exe $TPB_VSIX_DIR\TestPlatform.csproj -p:Configuration=$Configuration"
         & $msbuildPath\msbuild.exe "$TPB_VSIX_DIR\TestPlatform.csproj" -p:Configuration=$Configuration
 
-        Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
     }
+    else
+    {
+      Write-Log "Create-VsixPackage: Can not generate vsix as msbuild.exe not found"
+    }
+
+    Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
 function Create-NugetPackages
@@ -458,11 +460,18 @@ function PrintAndExit-OnError([System.String] $output)
 
 function Locate-MSBuildPath 
 {
-  $vsInstallPath = Locate-VsInstallPath
-  $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
+    $vsInstallPath = Locate-VsInstallPath
 
-  Write-Verbose "msbuildPath is : $msbuildPath"
-  return Resolve-Path -path $msbuildPath
+    if([string]::IsNullOrEmpty($vsInstallPath))
+    {
+      return $null
+    }
+
+    $vsInstallPath = Resolve-Path -path $vsInstallPath
+    $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
+
+    Write-Verbose "msbuildPath is : $msbuildPath"
+    return $msbuildPath
 }
 
 function Locate-VsInstallPath
@@ -480,12 +489,12 @@ function Locate-VsInstallPath
    }
    Catch [System.Management.Automation.MethodInvocationException]
    {
-      Write-Error "Failed to find VS installation with requirements : $requiredPackageIds"
+      Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
    }
 
    Write-Verbose "VSInstallPath is : $vsInstallPath"
 
-   return Resolve-Path -path $vsInstallPath
+   return $vsInstallPath
 }
 
 function Locate-LocateVsApi
@@ -497,7 +506,7 @@ function Locate-LocateVsApi
   }
 
   Write-Verbose "locateVsApi is : $locateVsApi"
-  return Resolve-Path -path $locateVsApi
+  return $locateVsApi
 }
 
 function Update-VsixVersion
