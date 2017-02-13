@@ -14,7 +14,7 @@
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
   </metadata>
   <files>
-    <file src="Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.Build.dll" target="lib\netstandard1.3\" />
-    <file src="Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
+    <file src="Microsoft.TestPlatform.Build\**\netstandard1.3\Microsoft.TestPlatform.Build.dll" target="lib\netstandard1.3\" />
+    <file src="Microsoft.TestPlatform.Build\**\netstandard1.3\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
   </files>
 </package>
