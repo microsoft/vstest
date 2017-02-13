@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    
+
     // <summary>
     // Tests for TestSourceArgumentProcessor
     // </summary>
@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(false, capabilities.AlwaysExecute);
             Assert.AreEqual(true, capabilities.IsSpecialCommand);
         }
-        
+
         #endregion
 
         #region TestSourceArgumentExecutorTests
@@ -64,8 +64,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void ExecuterInitializeWithInvalidSourceShouldThrowCommandLineException()
         {
             var options = CommandLineOptions.Instance;
+            var mockFileHelper = new Mock<IFileHelper>();
+            mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
+            options.FileHelper = mockFileHelper.Object;
             TestSourceArgumentExecutor executor = new TestSourceArgumentExecutor(options);
-            
+
             // This path is invalid
             string testFilePath = "TestFile.txt";
 
@@ -86,13 +89,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var testFilePath = "DummyTestFile.txt";
             var mockFileHelper = new Mock<IFileHelper>();
             mockFileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+            mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
+
             var options = CommandLineOptions.Instance;
             options.Reset();
             options.FileHelper = mockFileHelper.Object;
             var executor = new TestSourceArgumentExecutor(options);
 
             executor.Initialize(testFilePath);
-            
+
             // Check if the testsource is present in the TestSources
             Assert.IsTrue(options.Sources.Contains(testFilePath));
         }
@@ -105,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var result = executor.Execute();
             Assert.AreEqual(ArgumentProcessorResult.Success, result);
         }
-        
+
         #endregion
     }
 }

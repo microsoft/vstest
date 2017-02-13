@@ -37,9 +37,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockTestPlatform = new Mock<ITestPlatform>();
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
-                this.mockTestPlatform.Object, 
-                TestLoggerManager.Instance, 
-                TestRunResultAggregator.Instance, 
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object);
         }
 
@@ -101,6 +101,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        [Ignore]
         public void CancelTestRunShouldWaitForCreateTestRunRequest()
         {
             var payload = new TestRunRequestPayload()
@@ -143,6 +144,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        [Ignore]
         public void AbortTestRunShouldWaitForCreateTestRunRequest()
         {
             var payload = new TestRunRequestPayload()
@@ -188,7 +190,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void RunTestsWithSourcesShouldCallTestPlatformAndSucceed()
         {
             var payload = new TestRunRequestPayload()
-            {  
+            {
                 Sources = new List<string>() { "a", "b" }
             };
 
@@ -294,7 +296,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             if (run1Start < run2Start)
             {
-                Assert.IsTrue((run2Stop > run2Start) 
+                Assert.IsTrue((run2Stop > run2Start)
                     && (run2Start > run1Stop)
                     && (run1Stop > run1Start));
             }
@@ -328,10 +330,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
-            
+
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object);
 
-            Assert.IsFalse(success, "RunTests call must fail due to exception");           
+            Assert.IsFalse(success, "RunTests call must fail due to exception");
         }
 
         [TestMethod]
