@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var argumentsString = string.Join(" ", commandLineArguments);
 
-            this.dataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, processWorkingDirectory);
+            this.dataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, processWorkingDirectory, null);
             return this.dataCollectorProcess.Id;
         }
 

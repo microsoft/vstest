@@ -315,6 +315,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to WARNING: Overwriting results file: {0}.
+        /// </summary>
+        internal static string TrxLoggerResultsFileOverwriteWarning {
+            get {
+                return ResourceManager.GetString("TrxLoggerResultsFileOverwriteWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All Loaded Results.
         /// </summary>
         internal static string TS_AllResults {
@@ -329,17 +338,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources {
         internal static string TS_UncategorizedResults {
             get {
                 return ResourceManager.GetString("TS_UncategorizedResults", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to WARNING: Overwriting results file: {0}.
-        /// </summary>
-        internal static string TrxLoggerResultsFileOverwriteWarning
-        {
-            get
-            {
-                return ResourceManager.GetString("TrxLoggerResultsFileOverwriteWarning", resourceCulture);
             }
         }
     }

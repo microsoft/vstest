@@ -86,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// handle client process exit
         /// </summary>
-        void OnClientProcessExit();
+        /// <param name="stdError"></param>
+        void OnClientProcessExit(string stdError);
     }
 }

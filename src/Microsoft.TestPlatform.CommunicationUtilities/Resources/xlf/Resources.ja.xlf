@@ -21,9 +21,9 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">アクティブなテストの実行が中止されました。</target>
-        <note />
+        <source>The active test run was aborted. Reason: {0}</source>
+        <target state="new">アクティブなテストの実行が中止されました。{0}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの実行は中止されました。</target>
         </alt-trans>
@@ -39,18 +39,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">アクティブなテスト探索が中止されました。</target>
-        <note />
+        <source>The active test discovery was aborted. Reason: {0}</source>
+        <target state="new">アクティブなテスト探索が中止されました。{0}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの探索は中止されました。</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
-        <source>Unable to communicate with test execution process.</source>
-        <target state="translated">テスト実行プロセスと通信できません。</target>
-        <note />
+        <source>Unable to communicate with test host process.</source>
+        <target state="new">テスト実行プロセスと通信できません。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">テストの実行プロセスと通信できません。</target>
         </alt-trans>

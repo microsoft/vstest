@@ -21,9 +21,9 @@
     </header>
     <body>
       <trans-unit id="AbortedTestRun">
-        <source>The active Test Run was aborted.</source>
-        <target state="translated">活动的测试运行已中止。</target>
-        <note />
+        <source>The active test run was aborted. Reason: {0}</source>
+        <target state="new">活动的测试运行已中止。{0}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">活动测试运行已中止。</target>
         </alt-trans>
@@ -39,18 +39,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="10" adjWordcount="8.5" curWordcount="8.5"</note>
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
-        <source>The active Test Discovery was aborted.</source>
-        <target state="translated">活动的测试发现已中止。</target>
-        <note />
+        <source>The active test discovery was aborted. Reason: {0}</source>
+        <target state="new">活动的测试发现已中止。{0}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">活动测试发现被中止。</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="6" adjWordcount="5.1" curWordcount="5.1"</note>
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
-        <source>Unable to communicate with test execution process.</source>
-        <target state="translated">无法与测试执行过程通信。</target>
-        <note />
+        <source>Unable to communicate with test host process.</source>
+        <target state="new">无法与测试执行过程通信。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">无法与测试执行过程中进行通信。</target>
         </alt-trans>

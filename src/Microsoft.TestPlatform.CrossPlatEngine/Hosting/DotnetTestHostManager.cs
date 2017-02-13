@@ -344,7 +344,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return this.processHelper.LaunchProcess(
                     defaultTestHostStartInfo.FileName,
                     defaultTestHostStartInfo.Arguments,
-                    defaultTestHostStartInfo.WorkingDirectory).Id;
+                    defaultTestHostStartInfo.WorkingDirectory,
+                    defaultTestHostStartInfo.ExitCallback).Id;
         }
     }
 }

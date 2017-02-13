@@ -14,11 +14,13 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using System.Xml;
 
-    using VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     using TrxObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
+    using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
 
     /// <summary>
     /// The xml persistence class.
@@ -673,6 +675,8 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
                 }
             }
 
+            // Remove invalid char if any
+            valueToSave = XmlPersistence.RemoveInvalidXmlChar(valueToSave);
             XmlElement elementToSaveAt = nodeToSaveAt as XmlElement;
             if (elementToSaveAt != null)
             {
@@ -687,6 +691,30 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.XML
         public XmlNode EnsureLocationExists(XmlElement xml, string location)
         {
             return this.EnsureLocationExists(xml, location, this.namespaceUri);
+        }
+
+        private static string RemoveInvalidXmlChar(string str)
+        {
+            if (str != null)
+            {
+                // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars: 
+                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]  
+
+                // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
+                // because C# support unicode character in range \u0000 to \uFFFF
+                MatchEvaluator evaluator = new MatchEvaluator(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
+                string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
+                return Regex.Replace(str, invalidChar, evaluator);
+            }
+
+            return str;
+        }
+
+        private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
+        {
+            char x = match.Value[0];
+            return String.Format(@"\u{0:x4}", (ushort)x);
+
         }
 
         private XmlNode EnsureLocationExists(XmlElement xml, string location, string nameSpaceUri)
