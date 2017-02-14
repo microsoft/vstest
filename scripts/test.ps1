@@ -59,7 +59,6 @@ $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjects = @("testhost.UnitTests")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
 $Script:TPT_Parallel = $Parallel
@@ -114,19 +113,7 @@ function Invoke-Test
             $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
             $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
             
-            $skip="False"
-
-            foreach ($project in $Script:TPT_SkipProjects) {
-               if($_.Name.Contains($project))
-               {
-                   $skip="True"
-                   break
-               }
-            }
-
-            if ($skip -eq "True") {
-                 Write-Log ".. . $testContainerName is in skipped test list."
-            } elseif (!($testContainerName -match $Script:TPT_Pattern)) {
+            if (!($testContainerName -match $Script:TPT_Pattern)) {
                  Write-Log ".. . $testContainerName doesn't match test container pattern '$($Script:TPT_Pattern)'. Skipped from run."
             } else {
                 $testContainers += ,"$testContainerPath"
