@@ -266,6 +266,20 @@ function Publish-Package-Internal($packagename, $framework, $output)
 function Create-VsixPackage
 {
     Write-Log "Create-VsixPackage: Started."
+    $timer = Start-Timer
+
+    $packageDir = Get-FullCLRPackageDirectory
+
+    # Copy legacy dependencies
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
+    Copy-Item -Recurse $legacyDir\* $packageDir -Force
+
+    # Copy COM Components and their manifests over
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
+    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+
+    $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
+    Copy-Item $fileToCopy $packageDir -Force
 
     Write-Verbose "Locating MSBuild install path..."
     $msbuildPath = Locate-MSBuildPath
@@ -273,28 +287,12 @@ function Create-VsixPackage
     # Create vsix only when msbuild is installed.
     if(![string]::IsNullOrEmpty($msbuildPath))
     {
-        $timer = Start-Timer
-
-        $packageDir = Get-FullCLRPackageDirectory
-
-        # Copy legacy dependencies
-        $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
-        Copy-Item -Recurse $legacyDir\* $packageDir -Force
-
-        # Copy COM Components and their manifests over
-        $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
-        Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
-
-        $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
-        Copy-Item $fileToCopy $packageDir -Force
-
         #update version of VSIX
         Update-VsixVersion
 
         # Build vsix project to get TestPlatform.vsix
         Write-Verbose "$msbuildPath\msbuild.exe $TPB_VSIX_DIR\TestPlatform.csproj -p:Configuration=$Configuration"
         & $msbuildPath\msbuild.exe "$TPB_VSIX_DIR\TestPlatform.csproj" -p:Configuration=$Configuration
-
     }
     else
     {
