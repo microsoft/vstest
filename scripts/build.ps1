@@ -62,6 +62,8 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
 $env:DOTNET_CLI_VERSION = "latest"
+$env:LOCATE_VS_API_VERSION = "0.2.4-beta"
+$env:MSBUILD_VERSION = "15.0"
 
 #
 # Build configuration
@@ -76,7 +78,7 @@ $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
-$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIX"
+$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIXProject"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -190,7 +192,7 @@ function Publish-Package
     $dataCollectorx86Project = Join-Path $env:TP_ROOT_DIR "src\datacollector.x86\datacollector.x86.csproj"
 
     Write-Log "Package: Publish package\*.csproj"
-	
+
     Publish-Package-Internal $packageProject $TPB_TargetFramework $fullCLRPackageDir
     Publish-Package-Internal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
@@ -263,9 +265,9 @@ function Publish-Package-Internal($packagename, $framework, $output)
 
 function Create-VsixPackage
 {
+    Write-Log "Create-VsixPackage: Started."
     $timer = Start-Timer
 
-    Write-Log "Create-VsixPackage: Started."
     $packageDir = Get-FullCLRPackageDirectory
 
     # Copy legacy dependencies
@@ -276,54 +278,28 @@ function Create-VsixPackage
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
     Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
 
-    #Copy [Content_Types].xml and License.rtf
-    Copy-Item $TPB_VSIX_DIR\*.xml $packageDir -Force
-
-    $fileToCopy = Join-Path $TPB_VSIX_DIR "License.rtf"
-    Copy-Item $fileToCopy $packageDir -Force
-
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force
 
-    #update version of VSIX
-    Update-VsixVersion
+    Write-Verbose "Locating MSBuild install path..."
+    $msbuildPath = Locate-MSBuildPath
+    
+    # Create vsix only when msbuild is installed.
+    if(![string]::IsNullOrEmpty($msbuildPath))
+    {
+        #update version of VSIX
+        Update-VsixVersion
 
-    # Zip the folder
-    # TODO remove vsix creator
-    $dotnetExe = Get-DotNetPath
-    & $dotnetExe restore src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj
-    & $dotnetExe build src\Microsoft.TestPlatform.VSIXCreator\Microsoft.TestPlatform.VSIXCreator.csproj
-    & src\Microsoft.TestPlatform.VSIXCreator\bin\$TPB_Configuration\net46\Microsoft.TestPlatform.VSIXCreator.exe $packageDir $env:TP_OUT_DIR\$TPB_Configuration
+        # Build vsix project to get TestPlatform.vsix
+        Write-Verbose "$msbuildPath\msbuild.exe $TPB_VSIX_DIR\TestPlatform.csproj -p:Configuration=$Configuration"
+        & $msbuildPath\msbuild.exe "$TPB_VSIX_DIR\TestPlatform.csproj" -p:Configuration=$Configuration
+    }
+    else
+    {
+      Write-Log "Create-VsixPackage: Can not generate vsix as msbuild.exe not found"
+    }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
-}
-
-function Update-VsixVersion
-{
-    Write-Log "Update-VsixVersion: Started."
-
-    $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
-
-    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
-    # So Version of the vsix will be 15.0.3.2017011101
-    $vsixVersionSuffix = $VersionSuffix.Split("-");
-    if($vsixVersionSuffix.Length -ige 2) {
-        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
-    }
-
-    $filesToUpdate = @("extension.vsixmanifest",
-        "manifest.json",
-        "catalog.json")
-
-    foreach ($file in $filesToUpdate) {
-        Get-Content "$TPB_VSIX_DIR\$file" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content "$packageDir\$file"
-    }
-
-    $fileToUpdate = Join-Path $env:TP_ROOT_DIR "artifacts\$TPB_Configuration\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json"
-    Get-Content "$TPB_VSIX_DIR\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } | Set-Content $fileToUpdate
-
-    Write-Log "Update-VsixVersion: Completed."
 }
 
 function Create-NugetPackages
@@ -447,6 +423,77 @@ function Set-ScriptFailed
     }
 
     $Script:ScriptFailed = $true
+}
+
+function Locate-MSBuildPath 
+{
+    $vsInstallPath = Locate-VsInstallPath
+
+    if([string]::IsNullOrEmpty($vsInstallPath))
+    {
+      return $null
+    }
+
+    $vsInstallPath = Resolve-Path -path $vsInstallPath
+    $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
+
+    Write-Verbose "msbuildPath is : $msbuildPath"
+    return $msbuildPath
+}
+
+function Locate-VsInstallPath
+{
+   $locateVsApi = Locate-LocateVsApi
+
+   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.Roslyn.Compiler", "Microsoft.VisualStudio.Component.VSSDK")
+
+   Write-Verbose "VSInstallation requirements : $requiredPackageIds"
+
+   Add-Type -path $locateVsApi
+   Try
+   {
+     $vsInstallPath = [LocateVS.Instance]::GetInstallPath($env:MSBUILD_VERSION, $requiredPackageIds)
+   }
+   Catch [System.Management.Automation.MethodInvocationException]
+   {
+      Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
+   }
+
+   Write-Verbose "VSInstallPath is : $vsInstallPath"
+
+   return $vsInstallPath
+}
+
+function Locate-LocateVsApi
+{
+  $locateVsApi = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "RoslynTools.Microsoft.LocateVS\$env:LOCATE_VS_API_VERSION\tools\LocateVS.dll"
+
+  if (!(Test-Path -path $locateVsApi)) {
+    throw "The specified LocateVS API version ($env:LOCATE_VS_API_VERSION) could not be located."
+  }
+
+  Write-Verbose "locateVsApi is : $locateVsApi"
+  return $locateVsApi
+}
+
+function Update-VsixVersion
+{
+    Write-Log "Update-VsixVersion: Started."
+
+    $packageDir = Get-FullCLRPackageDirectory
+    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
+
+    # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
+    # So Version of the vsix will be 15.0.3.2017011101
+    $vsixVersionSuffix = $VersionSuffix.Split("-");
+    if($vsixVersionSuffix.Length -ige 2) {
+        $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
+    }
+
+    $manifestContentWithVersion = Get-Content "$TPB_VSIX_DIR\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
+    Set-Content -path "$TPB_VSIX_DIR\source.extension.vsixmanifest" -value $manifestContentWithVersion
+
+    Write-Log "Update-VsixVersion: Completed."
 }
 
 # Execute build

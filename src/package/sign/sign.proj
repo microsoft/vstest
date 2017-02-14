@@ -181,7 +181,7 @@
 
   <Target Name="SignVsix">
     <PropertyGroup>
-      <VsixOutDir>$(ArtifactsBaseDirectory)</VsixOutDir>
+      <VsixOutDir>$(ArtifactsBaseDirectory)VSIX\</VsixOutDir>
     </PropertyGroup>
 
     <ItemGroup>
