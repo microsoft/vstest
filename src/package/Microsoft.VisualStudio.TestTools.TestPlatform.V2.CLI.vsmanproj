@@ -7,7 +7,7 @@
     <FinalizeManifest>true</FinalizeManifest>
     <FinalizeSkipLayout>true</FinalizeSkipLayout>
     <IsPackage>true</IsPackage>
-    <OutputPath>$(TestPlatformRoot)artifacts\$(Configuration)\v3vsix\</OutputPath>
+    <OutputPath>$(TestPlatformRoot)artifacts\$(Configuration)\VSIX\</OutputPath>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
 	  <UseVisualStudioVersion>true</UseVisualStudioVersion>
     <ValidateManifest>false</ValidateManifest>
@@ -19,13 +19,6 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\MicroBuild.Core\0.2.0\build\MicroBuild.Core.targets" />
   <Import Project="..\..\packages\MicroBuild.Core\0.2.0\build\MicroBuild.Core.props" />
-  <ItemGroup>
-    <VsixFileToCopy Include="$(TestPlatformRoot)artifacts\$(Configuration)\Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" />
-    <VsixFileToCopy Include="$(TestPlatformRoot)artifacts\$(Configuration)\TestPlatform.vsix" />
-  </ItemGroup>
-  <Target Name="BeforeBuild"> 
-    <Copy SourceFiles="@(VsixFileToCopy)" DestinationFolder="$(OutputPath)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
-  </Target>
   <ItemGroup>
     <MergeManifest Include="$(OutputPath)Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.json" />
   </ItemGroup>
