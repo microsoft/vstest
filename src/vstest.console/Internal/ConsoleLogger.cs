@@ -45,17 +45,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        public class Verbosity
+        internal enum Verbosity
         {
-            public static Verbosity Minimal = new Verbosity("minimal");
-            public static Verbosity Normal = new Verbosity("normal");
-
-            public string level;
-
-            Verbosity(string level)
-            {
-                this.level = level;
-            }
+            Minimal,
+            Normal
         }
 
         #region Fields
@@ -63,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Level of verbosity
         /// </summary>
-        private Verbosity verbosityLevel = Verbosity.Normal;
+        private Verbosity verbosityLevel = Verbosity.Minimal;
 
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
@@ -103,9 +96,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             get;
             private set;
         }
+
+        /// <summary>
+        /// Get the verbosity level for the console logger
+        /// </summary>
+        public Verbosity VerbosityLevel => verbosityLevel;
+
         #endregion
 
-        #region ITestLogger
+        #region ITestLoggerWithParameters
 
         /// <summary>
         /// Initializes the Test Logger.
@@ -142,10 +141,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 throw new ArgumentException("No default parameters added", nameof(parameters));
             }
 
-            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosityLevel);
-            if (verbosityExists && verbosityLevel.Equals(Verbosity.Minimal.level))
+            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosity);
+            if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
             {
-                this.verbosityLevel = Verbosity.Minimal;
+                this.verbosityLevel = verbosityLevel;
             }
 
             this.Initialize(events, String.Empty);

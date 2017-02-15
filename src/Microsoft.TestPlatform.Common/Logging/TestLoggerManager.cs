@@ -65,11 +65,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Default constructor.
         /// </summary>
-        protected TestLoggerManager()
+        protected TestLoggerManager(TestSessionMessageLogger sessionLogger, InternalTestLoggerEvents loggerEvents)
         {
-            this.messageLogger = TestSessionMessageLogger.Instance;
+            this.messageLogger = sessionLogger;
             this.testLoggerExtensionManager = TestLoggerExtensionManager.Create(messageLogger);
-            this.loggerEvents = new InternalTestLoggerEvents((TestSessionMessageLogger)messageLogger);
+            this.loggerEvents = loggerEvents;
         }
 
         /// <summary>
@@ -85,7 +85,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                     {
                         if (testLoggerManager == null)
                         {
-                            testLoggerManager = new TestLoggerManager();
+                            testLoggerManager = new TestLoggerManager(TestSessionMessageLogger.Instance,
+                                new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
                         }
                     }
                 }
@@ -129,6 +130,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         #region Public Methods
 
+        /// <summary>
+        /// Add and initialize the logger with the given parameters
+        /// </summary>
+        /// <param name="logger">The logger that needs to be initialized</param>
+        /// <param name="extensionUri">URI of the logger</param>
+        /// <param name="parameters">Logger parameters</param>
         public void AddLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
         {
             this.CheckDisposed();
@@ -392,7 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <summary>
         /// Populates user supplied and default logger parameters.
         /// </summary>
-        private Dictionary<string, string> UpdateLoggerParamters(Dictionary<string, string> parameters)
+        private Dictionary<string, string> UpdateLoggerParameters(Dictionary<string, string> parameters)
         {
             var loggerParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (parameters != null)
@@ -441,7 +448,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             this.loggerEvents.CompleteTestRun(e.TestRunStatistics, e.IsCanceled, e.IsAborted, e.Error, e.AttachmentSets, e.ElapsedTimeInRunningTests);
         }
-
 
         /// <summary>
         /// Called when data collection message is received.
