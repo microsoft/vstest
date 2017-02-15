@@ -23,16 +23,15 @@
     <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
-    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(LocResourceFile.Identity) -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf" />
-    <!-- Due to bug (https://github.com/fmuecke/XliffParser/issues/4) in xlftool we are not updating nuteral xlf file -->
-    <!--<Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" />-->
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe update -Resx %(LocResourceFile.Identity) -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf" />
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" />
   </Target>
 
   <Target Name="CreateLocalizeResx" Condition="'$(LocalizedBuild)' == 'true'">
     <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
-    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.2\tools\xlftool.exe  writeTarget -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" />
+    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe  writeTarget -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" />
     <ItemGroup>
       <EmbeddedResource Include="$(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx" />
     </ItemGroup>
