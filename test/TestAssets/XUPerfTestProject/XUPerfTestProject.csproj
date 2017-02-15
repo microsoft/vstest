@@ -4,11 +4,12 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
   </PropertyGroup>
-  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Settings.targets" />
+  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
-    <AssemblyName>PerfTestProject</AssemblyName>
+    <AssemblyName>XUPerfTestProject</AssemblyName>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' Or '$(TargetFramework)' == 'netcoreapp1.1' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <DebugType>portable</DebugType>
@@ -16,5 +17,9 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46'">
     <DebugType>full</DebugType>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="$(XUnitFrameworkVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XUnitAdapterVersion)" />
+  </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>
