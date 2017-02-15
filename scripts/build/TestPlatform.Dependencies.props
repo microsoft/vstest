@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NETTestSdkPreviousVersion>15.0.0-preview-20170106-08</NETTestSdkPreviousVersion>
+
+    <MSTestFrameworkVersion>1.0.8-rc2</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>1.1.10-rc2</MSTestAdapterVersion>
+
+    <XUnitFrameworkVersion>2.2.0-rc2-build3523</XUnitFrameworkVersion>
+    <XUnitAdapterVersion>2.2.0-rc2-build1249</XUnitAdapterVersion>
+
+    <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
+    <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
+  </PropertyGroup>
+</Project>
