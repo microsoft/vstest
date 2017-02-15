@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-    internal class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender, IDisposable
+    internal class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
     {
         private readonly ICommunicationManager communicationManager;
 
@@ -45,19 +45,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void Close()
         {
-            this.Dispose();
+            this.communicationManager?.StopClient();
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("Closing the connection !");
             }
-        }
-
-        /// <summary>
-        /// Disposes communication manager.
-        /// </summary>
-        public void Dispose()
-        {
-            this.communicationManager?.StopClient();
         }
 
         /// <inheritdoc />
