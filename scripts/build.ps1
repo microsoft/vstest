@@ -32,7 +32,7 @@ Param(
     [Switch] $SyncXlf = $false,
 
     [Parameter(Mandatory=$false)]
-    [Alias("loc")]
+    [Alias("noloc")]
     [Switch] $DisableLocalizedBuild = $false,
 
     [Parameter(Mandatory=$false)]
@@ -199,27 +199,27 @@ function Publish-Package
     Write-Log "Package: Publish package\*.csproj"
 
 
-    Publish-Package-Internal $packageProject $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
-    Publish-Package-Internal $vstestConsoleProject $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $vstestConsoleProject $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-PackageInternal $vstestConsoleProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
-    Publish-Package-Internal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
-    Publish-Package-Internal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
 
     # Publish testhost
     
     Write-Log "Package: Publish testhost\testhost.csproj"
-    Publish-Package-Internal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
-    Publish-Package-Internal $testHostProject $TPB_TargetFrameworkCore $testhostCorePackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFramework $testhostFullPackageDir
+    Publish-PackageInternal $testHostProject $TPB_TargetFrameworkCore $testhostCorePackageDir
 
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
-    Publish-Package-Internal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
+    Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
 
     # Copy over the Full CLR built testhost package assemblies to the $fullCLRPackageDir
     Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force
@@ -234,6 +234,13 @@ function Publish-Package
         Set-ScriptFailed
     }
 
+    # Publish platform abstractions
+    $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
+    $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
+    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
+    Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
+    Copy-Item $platformAbstractionNetCore\* $coreCLRPackageDir -Force
+    
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
     $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
@@ -257,30 +264,9 @@ function Publish-Package
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"
-    
-    Publish-PlatfromAbstractions-Internal
 }
 
-function Publish-PlatfromAbstractions-Internal
-{
-    Write-Log "Publish-PlatfromAbstractions-Internal: Started."
-
-    $timer = Start-Timer
-    $fullCLRPackageDir = Get-FullCLRPackageDirectory
-    $coreCLRPackageDir = Get-CoreCLRPackageDirectory
-    
-    $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
-    $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
-    $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
-    
-    Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
-    Copy-Item $platformAbstractionNetCore\* $coreCLRPackageDir -Force
-    
-    Write-Log "Publish-PlatfromAbstractions-Internal:: Complete. {$(Get-ElapsedTime($timer))}"
-}
-
-
-function Publish-Package-Internal($packagename, $framework, $output)
+function Publish-PackageInternal($packagename, $framework, $output)
 {
     Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild"
     & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild
@@ -310,7 +296,7 @@ function Create-VsixPackage
     # Create vsix only when msbuild is installed.
     if(![string]::IsNullOrEmpty($msbuildPath))
     {
-        #update version of VSIX
+        # Update version of VSIX
         Update-VsixVersion
 
         # Build vsix project to get TestPlatform.vsix
@@ -319,7 +305,7 @@ function Create-VsixPackage
     }
     else
     {
-      Write-Log "Create-VsixPackage: Can not generate vsix as msbuild.exe not found"
+        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found"
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
@@ -527,7 +513,8 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Completed."
 }
 
-if ($ProjectNamePatterns.Count -eq 0) {
+if ($ProjectNamePatterns.Count -eq 0)
+{
         # Execute build
         $timer = Start-Timer
         Write-Log "Build started: args = '$args'"
@@ -549,7 +536,8 @@ if ($ProjectNamePatterns.Count -eq 0) {
 
         if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
 }
-else{
+else
+{
     # Build Specific projects.
     # Framework format ("<target_framework>", "<output_dir>").
     $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp1.0"), ("netcoreapp1.0", "netcoreapp1.0"))
@@ -557,15 +545,15 @@ else{
 
     # Get projects to build.
     Get-ChildItem -Recurse -Path $env:TP_SRC_DIR -Include *.csproj | ForEach-Object {
-        foreach ( $ProjectNamePattern in $ProjectNamePatterns){
-            if( $_.FullName -match  $ProjectNamePattern){
+        foreach ($ProjectNamePattern in $ProjectNamePatterns) {
+            if($_.FullName -match  $ProjectNamePattern) {
                 $ProjectsToBuild += ,"$_"
             }
         }
     }
 
     # Build Projects.
-    foreach($ProjectToBuild in $ProjectsToBuild){
+    foreach($ProjectToBuild in $ProjectsToBuild) {
         Write-Log "Building Project $ProjectToBuild"
         # Restore and Build
         $output = & $dotnetPath restore $ProjectToBuild
@@ -575,13 +563,13 @@ else{
 
         # Copy artifacts
         $ProjectDir = [System.IO.Path]::GetDirectoryName($ProjectToBuild)
-        foreach($FrameworkAndOutDir in $FrameworksAndOutDirs){
+        foreach($FrameworkAndOutDir in $FrameworksAndOutDirs) {
             $fromDir = $([System.IO.Path]::Combine($ProjectDir, "bin", $TPB_Configuration, $FrameworkAndOutDir[0]))
             $toDir = $([System.IO.Path]::Combine($env:TP_OUT_DIR, $TPB_Configuration, $FrameworkAndOutDir[1]))
             if ( Test-Path $fromDir){
                 Write-Log "Copying articates from $fromDir to $toDir"
                 Get-ChildItem $fromDir | ForEach-Object {
-                    if(-not ($_.PSIsContainer)){
+                    if(-not ($_.PSIsContainer)) {
                         copy $_.FullName $toDir
                     }
                 }
