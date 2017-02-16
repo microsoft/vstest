@@ -16,7 +16,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using System.Collections.Generic;
     using System.Text;
     using System.Linq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using System.Threading.Tasks;
     using System.Threading;
     using System.Diagnostics;

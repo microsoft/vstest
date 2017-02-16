@@ -16,6 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
     /// <summary>
     /// Implementation for TestPlatform
@@ -27,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         public TestPlatform() : this(new TestEngine())
         {
+            this.testHostProviderManager = TestHostProviderManager.Instance;
         }
 
         /// <summary>
@@ -45,6 +48,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         private ITestEngine TestEngine { get; set; }
 
+        private TestHostProviderManager testHostProviderManager;
+
         /// <summary>
         /// The create discovery request.
         /// </summary>
@@ -61,6 +66,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             UpdateTestAdapterPaths(discoveryCriteria.RunSettings);
 
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
+            //var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runconfiguration);
+            
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration);
             
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
@@ -85,6 +92,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
+            //var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runConfiguration);
+
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
 
             if (testRunCriteria.TestHostLauncher != null)

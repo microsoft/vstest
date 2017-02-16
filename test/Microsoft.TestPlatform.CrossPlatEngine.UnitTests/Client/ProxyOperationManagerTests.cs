@@ -12,7 +12,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -22,7 +22,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private readonly ProxyOperationManager testOperationManager;
 
-        private readonly Mock<ITestHostManager> mockTestHostManager;
+        private readonly Mock<ITestHostProvider> mockTestHostManager;
 
         private readonly Mock<ITestRequestSender> mockRequestSender;
 
@@ -33,7 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyOperationManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestHostManager>();
+            this.mockTestHostManager = new Mock<ITestHostProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
@@ -180,7 +180,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             public TestableProxyOperationManager(
                 ITestRequestSender requestSender,
-                ITestHostManager testHostManager,
+                ITestHostProvider testHostManager,
                 int clientConnectionTimeout) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
             }

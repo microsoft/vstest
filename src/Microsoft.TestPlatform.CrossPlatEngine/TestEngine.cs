@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
     /// <summary>
     /// Cross Platform test engine entry point for the client.
@@ -35,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// </summary>
         /// <param name="testHostManager"></param>
         /// <returns>ITestDiscoveryManager object that can do discovery</returns>
-        public IProxyDiscoveryManager GetDiscoveryManager(ITestHostManager testHostManager, DiscoveryCriteria discoveryCriteria)
+        public IProxyDiscoveryManager GetDiscoveryManager(ITestHostProvider testHostManager, DiscoveryCriteria discoveryCriteria)
         {
             int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
 
@@ -58,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <returns>
         /// ITestExecutionManager object that can do execution
         /// </returns>
-        public IProxyExecutionManager GetExecutionManager(ITestHostManager testHostManager, TestRunCriteria testRunCriteria)
+        public IProxyExecutionManager GetExecutionManager(ITestHostProvider testHostManager, TestRunCriteria testRunCriteria)
         {
             var distinctSources = GetDistinctNumberOfSources(testRunCriteria);
             int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
@@ -100,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         /// <param name="architecture">The architecture we want the test host manager for.</param>
         /// <param name="framework">Framework for the test session.</param>
         /// <returns>An instance of the test host manager.</returns>
-        public ITestHostManager GetDefaultTestHostManager(RunConfiguration runConfiguration)
+        public ITestHostProvider GetDefaultTestHostManager(RunConfiguration runConfiguration)
         {
             var framework = runConfiguration.TargetFrameworkVersion;
 

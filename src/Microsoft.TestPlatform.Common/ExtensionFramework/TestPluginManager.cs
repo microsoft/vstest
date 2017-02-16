@@ -14,7 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+
     /// <summary>
     /// Manages test plugins information.
     /// </summary>
@@ -236,6 +237,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             else if (typeof(ITestLogger).GetTypeInfo().IsAssignableFrom(extensionType))
             {
                 return this.GetValuesFromDictionary<TestLoggerPluginInformation>(extensions.TestLoggers);
+            }
+            else if (typeof(ITestHostProvider).GetTypeInfo().IsAssignableFrom(extensionType))
+            {
+                return this.GetValuesFromDictionary<TestHostPluginInformation>(extensions.TestHosts);
             }
             else
             {

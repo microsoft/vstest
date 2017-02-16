@@ -10,7 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -23,7 +23,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private ProxyDiscoveryManager testDiscoveryManager;
 
-        private Mock<ITestHostManager> mockTestHostManager;
+        private Mock<ITestHostProvider> mockTestHostManager;
 
         private Mock<ITestRequestSender> mockRequestSender;
 
@@ -36,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyDiscoveryManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestHostManager>();
+            this.mockTestHostManager = new Mock<ITestHostProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestSender.Object,

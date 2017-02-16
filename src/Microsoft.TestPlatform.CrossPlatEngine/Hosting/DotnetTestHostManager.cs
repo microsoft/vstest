@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// Note that some functionality of this entity overlaps with that of <see cref="DefaultTestHostManager"/>. That is
     /// intentional since we want to move this to a separate assembly (with some runtime extensibility discovery).
     /// </remarks>
-    public class DotnetTestHostManager : ITestHostManager
+    public class DotnetTestHostManager : ITestHostProvider
     {
         private readonly IProcessHelper processHelper;
 
@@ -280,6 +280,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             return testHostPath;
+        }
+
+        public bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration)
+        {
+            var framework = runConfiguration.TargetFrameworkVersion;
+
+            // This is expected to be called once every run so returning a new instance every time.
+            if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 

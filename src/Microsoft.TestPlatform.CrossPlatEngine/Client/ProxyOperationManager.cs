@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public abstract class ProxyOperationManager
     {
-        private readonly ITestHostManager testHostManager;
+        private readonly ITestHostProvider testHostManager;
 
         private bool initialized;
 
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        protected ProxyOperationManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
+        protected ProxyOperationManager(ITestRequestSender requestSender, ITestHostProvider testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;

@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// The default test host launcher for the engine.
     /// This works for Desktop local scenarios
     /// </summary>
-    public class DefaultTestHostManager : ITestHostManager
+    public class DefaultTestHostManager : ITestHostProvider
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
@@ -178,6 +178,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 this.testHostProcess.Exited -= this.registeredExitHandler;
             }
+        }
+
+        public bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration)
+        {
+            var framework = runConfiguration.TargetFrameworkVersion;
+
+            // This is expected to be called once every run so returning a new instance every time.
+            if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 #if !NET46
     using System.Runtime.Loader;
 #endif
@@ -63,7 +64,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>(StringComparer.OrdinalIgnoreCase),
                 TestExecutors = new Dictionary<string, TestExecutorPluginInformation>(StringComparer.OrdinalIgnoreCase),
                 TestSettingsProviders = new Dictionary<string, TestSettingsProviderPluginInformation>(StringComparer.OrdinalIgnoreCase),
-                TestLoggers = new Dictionary<string, TestLoggerPluginInformation>(StringComparer.OrdinalIgnoreCase)
+                TestLoggers = new Dictionary<string, TestLoggerPluginInformation>(StringComparer.OrdinalIgnoreCase),
+                TestHosts = new Dictionary<string, TestHostPluginInformation>(StringComparer.OrdinalIgnoreCase)
             };
 
 
@@ -75,7 +77,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 testExtensions.TestDiscoverers,
                 testExtensions.TestExecutors,
                 testExtensions.TestSettingsProviders,
-                testExtensions.TestLoggers);
+                testExtensions.TestLoggers,
+                testExtensions.TestHosts);
 
 #else
             var fileSearchTask = Windows.ApplicationModel.Package.Current.InstalledLocation.GetFilesAsync().AsTask();
@@ -139,7 +142,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         Dictionary<string, TestDiscovererPluginInformation> testDiscoverers,
                         Dictionary<string, TestExecutorPluginInformation> testExecutors,
                         Dictionary<string, TestSettingsProviderPluginInformation> testSettingsProviders,
-                        Dictionary<string, TestLoggerPluginInformation> testLoggers)
+                        Dictionary<string, TestLoggerPluginInformation> testLoggers,
+                        Dictionary<string, TestHostPluginInformation> testHosts)
         {
             Debug.Assert(files != null, "null files");
             Debug.Assert(testDiscoverers != null, "null testDiscoverers");
@@ -182,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 if (assembly != null)
                 {
-                    this.GetTestExtensionsFromAssembly(assembly, testDiscoverers, testExecutors, testSettingsProviders, testLoggers);
+                    this.GetTestExtensionsFromAssembly(assembly, testDiscoverers, testExecutors, testSettingsProviders, testLoggers, testHosts);
                 }
             }
         }
@@ -200,7 +204,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         Dictionary<string, TestDiscovererPluginInformation> testDiscoverers,
                         Dictionary<string, TestExecutorPluginInformation> testExecutors,
                         Dictionary<string, TestSettingsProviderPluginInformation> testSettingsProviders,
-                        Dictionary<string, TestLoggerPluginInformation> testLoggers)
+                        Dictionary<string, TestLoggerPluginInformation> testLoggers,
+                        Dictionary<string, TestHostPluginInformation> testHosts)
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(testDiscoverers != null, "null testDiscoverers");
@@ -238,6 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         this.GetTestExtensionFromType<TestExecutorPluginInformation>(type, typeof(ITestExecutor), testExecutors);
                         this.GetTestExtensionFromType<TestLoggerPluginInformation>(type, typeof(ITestLogger), testLoggers);
                         this.GetTestExtensionFromType<TestSettingsProviderPluginInformation>(type, typeof(ISettingsProvider), testSettingsProviders);
+                        this.GetTestExtensionFromType<TestHostPluginInformation>(type, typeof(ITestHostProvider), testHosts);
                     }
                 }
             }

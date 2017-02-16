@@ -11,7 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -21,7 +21,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private ProxyExecutionManager testExecutionManager;
 
-        private Mock<ITestHostManager> mockTestHostManager;
+        private Mock<ITestHostProvider> mockTestHostManager;
 
         private Mock<ITestRequestSender> mockRequestSender;
 
@@ -35,7 +35,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestInitialize]
         public void TestInit()
         {
-            this.mockTestHostManager = new Mock<ITestHostManager>();
+            this.mockTestHostManager = new Mock<ITestHostProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.testableClientConnectionTimeout);
             this.mockDataCollectionClient = new Mock<IProxyDataCollectionManager>();

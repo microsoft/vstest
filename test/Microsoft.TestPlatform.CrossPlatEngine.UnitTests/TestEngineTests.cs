@@ -13,6 +13,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
     using Moq;
 
@@ -21,12 +22,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     {
         private readonly ITestEngine testEngine;
 
-        private Mock<ITestHostManager> mockTestHostManager;
+        private Mock<ITestHostProvider> mockTestHostManager;
 
         public TestEngineTests()
         {
             this.testEngine = new TestEngine();
-            this.mockTestHostManager = new Mock<ITestHostManager>();
+            this.mockTestHostManager = new Mock<ITestHostProvider>();
             
             // Default setting for host manager
             this.mockTestHostManager.Setup(p => p.Shared).Returns(true);
