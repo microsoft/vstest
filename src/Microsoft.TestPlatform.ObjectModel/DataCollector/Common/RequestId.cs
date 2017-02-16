@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// Wrapper class for a request ID that can be used for messages or events for identification
     /// purposes
     /// </summary>
-#if NET451
+#if NET46
     [Serializable]
 #endif
     [SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes",

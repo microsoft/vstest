@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// Class identifying test execution id.
     /// Execution ID is assigned to test at run creation time and is guaranteed to be unique within that run.
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public sealed class TestExecId

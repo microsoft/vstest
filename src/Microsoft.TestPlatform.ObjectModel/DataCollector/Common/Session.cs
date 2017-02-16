@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Class identifying a session.
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public sealed class SessionId

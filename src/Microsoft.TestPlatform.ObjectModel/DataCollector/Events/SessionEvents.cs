@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Session Start event arguments
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public sealed class SessionStartEventArgs : DataCollectionEventArgs
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Session End event arguments
     /// </summary>
-#if NET451
+#if NET46
         [Serializable] 
 #endif
     public sealed class SessionEndEventArgs : DataCollectionEventArgs

@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Class representing the context in which data collection occurs.
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public class DataCollectionContext
