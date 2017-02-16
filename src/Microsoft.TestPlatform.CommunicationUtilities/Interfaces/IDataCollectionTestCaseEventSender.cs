@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    
     /// <summary>
     /// Interface for sending test case events from test exectuion process to data collection process
     /// </summary>
@@ -25,5 +27,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// Closes the connection
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// Sends the TestCaseStart event.
+        /// </summary>
+        /// <param name="testCase">Test case for which execution has started.</param>
+        void SendTestCaseStart(TestCase testCase);
+
+        /// <summary>
+        /// Sends the TestCaseCompleted event along with outcome.
+        /// </summary>
+        /// <param name="testCase">Test case for which execution has completed.</param>
+        /// <param name="outcome">Outcome of test case execution</param>
+        void SendTestCaseCompleted(TestCase testCase, TestOutcome outcome);
     }
 }
