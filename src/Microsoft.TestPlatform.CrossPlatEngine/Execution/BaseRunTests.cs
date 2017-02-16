@@ -30,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// The base run tests.
@@ -175,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 try
                 {
                     // Call Session-Start event on in-proc datacollectors
-                    this.dataCollectionTestCaseEventManager.RaiseSessionStart();
+                    this.dataCollectionTestCaseEventManager.RaiseSessionStart(new SessionStartEventArgs());
 
                     elapsedTime = this.RunTestsInternal();
 
@@ -199,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 finally
                 {
                     // Trigger Session End on in-proc datacollectors
-                    dataCollectionTestCaseEventManager?.RaiseSessionEnd();
+                    dataCollectionTestCaseEventManager?.RaiseSessionEnd(new SessionEndEventArgs());
 
                     try
                     {

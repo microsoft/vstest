@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
 
         void RaiseTestCaseStart(TestCaseStartEventArgs e);
         void RaiseTestCaseEnd(TestCaseEndEventArgs e);
-        void RaiseSessionStart();
-        void RaiseSessionEnd();
+        void RaiseSessionStart(SessionStartEventArgs e);
+        void RaiseSessionEnd(SessionEndEventArgs e);
         void RaiseTestResult(TestResultEventArgs e);
 
 

@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
+    using System;
     using System.Diagnostics;
 
     /// <summary>
@@ -14,6 +15,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     public sealed class SessionStartEventArgs : DataCollectionEventArgs
     {
         #region Constructor
+        public SessionStartEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)))
+        {
+
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
@@ -39,7 +44,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     public sealed class SessionEndEventArgs : DataCollectionEventArgs
     {
         #region Constructor
+        public SessionEndEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)))
+        {
 
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class. 
         /// </summary>

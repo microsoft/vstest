@@ -18,15 +18,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public event EventHandler<TestResultEventArgs> TestResult;
 
         /// <inheritdoc />
-        public void RaiseSessionEnd()
+        public void RaiseSessionEnd(SessionEndEventArgs e)
         {
-           this.SessionEnd.SafeInvoke(this, null, "DataCollectionTestCaseEventManager.RaiseSessionEnd");
+            this.SessionEnd.SafeInvoke(this, e, "DataCollectionTestCaseEventManager.RaiseSessionEnd");
         }
 
         /// <inheritdoc />
-        public void RaiseSessionStart()
+        public void RaiseSessionStart(SessionStartEventArgs e)
         {
-           this.SessionStart.SafeInvoke(this, null, "DataCollectionTestCaseEventManager.RaiseSessionStart");
+            this.SessionStart.SafeInvoke(this, e, "DataCollectionTestCaseEventManager.RaiseSessionStart");
         }
 
         /// <inheritdoc />
