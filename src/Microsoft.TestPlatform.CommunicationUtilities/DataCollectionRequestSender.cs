@@ -80,7 +80,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         public void Close()
         {
             this.Dispose();
-            EqtTrace.Info("Closing the connection");
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Closing the connection");
+            }
         }
 
         /// <inheritdoc/>

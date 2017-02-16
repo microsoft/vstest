@@ -165,6 +165,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// </summary>
         public const string AfterTestRunEndResult = "DataCollection.AfterTestRunEndResult";
 
+        /// <summary>
+        /// Event message for data collection process to signal start of test case execution.
+        /// </summary>
+        public const string BeforeTestCaseStart = "DataCollection.BeforeTestCaseStart";
+
+        /// <summary>
+        /// Event message for data collection process to signal start of test case execution.
+        /// </summary>
+        public const string AfterTestCaseCompleted = "DataCollection.AfterTestCaseCompleted";
+
         #endregion
     }
 }
