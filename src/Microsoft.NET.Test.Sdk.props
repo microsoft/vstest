@@ -12,10 +12,9 @@ Copyright (c) .NET Foundation. All rights reserved.
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ProjectCapability Include="UnitTestContainer" />
+    <ProjectCapability Include="TestContainer" />
   </ItemGroup>
   <PropertyGroup>
-    <!-- Output type for dotnet core test project should be exe. For full CLR it is Library by default. -->
-    <OutputType>Exe</OutputType>		
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 </Project>
