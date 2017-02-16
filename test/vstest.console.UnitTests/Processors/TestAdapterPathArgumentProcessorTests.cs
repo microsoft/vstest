@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var processor = new TestAdapterPathArgumentProcessor();
             Assert.IsTrue(processor.Metadata.Value is TestAdapterPathArgumentProcessorCapabilities);
         }
-        
+
         [TestMethod]
         public void GetExecuterShouldReturnTestAdapterPathArgumentProcessorCapabilities()
         {
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             try
             {
-                executor.Initialize("\"" +folder + "\"");
+                executor.Initialize("\"" + folder + "\"");
             }
             catch (Exception ex)
             {
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
                     return new List<string> { };
                 };
-            
+
 
             executor.Initialize(currentFolder);
 
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             {
                 return new List<string> { };
             };
-            
+
             executor.Initialize(currentFolder);
 
             mockOutput.Verify(

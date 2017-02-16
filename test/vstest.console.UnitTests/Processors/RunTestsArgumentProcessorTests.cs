@@ -43,6 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockFileHelper.Setup(fh => fh.Exists(this.dummyTestFilePath)).Returns(true);
+            this.mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             SetupMockExtensions();
         }
@@ -68,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunTestsArgumentProcessorCapabilities capabilities = new RunTestsArgumentProcessorCapabilities();
             Assert.AreEqual("/RunTests", capabilities.CommandName);
-            Assert.AreEqual("[TestFileNames]" + Environment.NewLine + "      Run tests from the specified files. Separate multiple test file names" + Environment.NewLine + "      by spaces." + Environment.NewLine + "      Examples: mytestproject.dll" + Environment.NewLine + "                mytestproject.dll myothertestproject.exe", capabilities.HelpContentResourceName);
+            Assert.AreEqual("[TestFileNames]\n      Run tests from the specified files. Separate multiple test file names\n      by spaces.\n      Examples: mytestproject.dll\n                mytestproject.dll myothertestproject.exe", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.RunTestsArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(true, capabilities.IsAction);
@@ -85,10 +86,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorExecuteShouldReturnSuccessWithoutExecutionInDesignMode()
         {
+            var runSettingsProvider = new TestableRunSettingsProvider();
+            runSettingsProvider.UpdateRunSettings("<RunSettings/>");
+
             CommandLineOptions.Instance.Reset();
             CommandLineOptions.Instance.IsDesignMode = true;
             var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, new TestPlatform(), TestLoggerManager.Instance, TestRunResultAggregator.Instance, this.mockTestPlatformEventSource.Object);
-            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, null, testRequestManager);
+            var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager);
 
             Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
         }

@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         #endregion
-   
+
         [TestMethod]
         public void ExecuterExecuteReturnArgumentProcessorResultAbort()
         {
