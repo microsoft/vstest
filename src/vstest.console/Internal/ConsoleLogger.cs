@@ -289,8 +289,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
                     break;
             }
-
-            Output.WriteLine(string.Empty, (OutputLevel)e.Level);
         }
 
         /// <summary>
@@ -324,9 +322,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
             else if (e.Result.Outcome == TestOutcome.Passed)
             {
-                string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
                 if (!this.verbosityLevel.Equals(Verbosity.Minimal))
                 {
+                    string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
                     Output.WriteLine(output, OutputLevel.Information);
                 }
                 this.testsPassed++;
