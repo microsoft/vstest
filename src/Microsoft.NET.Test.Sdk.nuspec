@@ -17,6 +17,7 @@
     </dependencies>
   </metadata>
   <files>
+    <file src="Microsoft.NET.Test.Sdk.props" target="build\netcoreapp1.0\" />
     <file src="Microsoft.NET.Test.Sdk.targets" target="build\netcoreapp1.0\" />
     <file src="Microsoft.NET.Test.Sdk.targets" target="build\net45\" />
   </files>
