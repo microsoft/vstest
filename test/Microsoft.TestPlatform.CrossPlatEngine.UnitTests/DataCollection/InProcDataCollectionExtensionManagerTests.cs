@@ -19,6 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Constants;
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+    using Moq;
 
     [TestClass]
     public class InProcDataCollectionExtensionManagerTests
@@ -34,12 +35,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
+        private Mock<IDataCollectionTestCaseEventManager> mockDataCollectionTestCaseEventManager;
 
+        public InProcDataCollectionExtensionManagerTests()
+        {
+            this.mockDataCollectionTestCaseEventManager = new Mock<IDataCollectionTestCaseEventManager>();
+        }
 
         [TestMethod]
         public void InProcDataCollectionExtensionManagerShouldLoadsDataCollectorsFromRunSettings()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
@@ -70,7 +76,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 2, "One Datacollector must be registered");
@@ -116,19 +122,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-           var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, null);
+            var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsFalse(manager.IsInProcDataCollectionEnabled, "InProcDataCollection must be disabled on invalid settings.");
         }
 
         [TestMethod]
         public void TriggerSessionStartShouldCallInProcDataCollector()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
 
-            inProcDataCollectionManager.TriggerTestSessionStart();
+            inProcDataCollectionManager.TriggerTestSessionStart(null, null);
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 1), "TestSessionStart must be called on datacollector");
@@ -140,12 +146,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerSessionEndShouldCallInProcDataCollector()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
 
-            inProcDataCollectionManager.TriggerTestSessionEnd();
+            inProcDataCollectionManager.TriggerTestSessionEnd(null, null);
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 0), "TestSessionEnd must NOT be called on datacollector");
@@ -157,7 +163,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerTestCaseStartShouldCallInProcDataCollector()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
@@ -165,7 +171,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            inProcDataCollectionManager.TriggerTestCaseStart(testCase);
+            inProcDataCollectionManager.TriggerTestCaseStart(null, new TestCaseStartEventArgs(testCase));
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
 
@@ -176,7 +182,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerTestCaseEndShouldCallInProcDataCollectorIfTestCaseStartWasCalledBefore()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
@@ -184,8 +190,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            inProcDataCollectionManager.TriggerTestCaseStart(testCase);
-            inProcDataCollectionManager.TriggerTestCaseEnd(testCase, TestOutcome.Passed);
+            inProcDataCollectionManager.TriggerTestCaseStart(null, new TestCaseStartEventArgs(testCase));
+            inProcDataCollectionManager.TriggerTestCaseEnd(null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 1), "TestCaseStart must be called on datacollector");
@@ -196,7 +202,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerTestCaseEndShouldNotBeCalledInCaseOfAMissingTestCaseStartInDataDrivenScenario()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
@@ -204,9 +210,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            inProcDataCollectionManager.TriggerTestCaseStart(testCase);
-            inProcDataCollectionManager.TriggerTestCaseEnd(testCase, TestOutcome.Passed);
-            inProcDataCollectionManager.TriggerTestCaseEnd(testCase, TestOutcome.Failed);
+            inProcDataCollectionManager.TriggerTestCaseStart(null, new TestCaseStartEventArgs(testCase));
+            inProcDataCollectionManager.TriggerTestCaseEnd(null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
+            inProcDataCollectionManager.TriggerTestCaseEnd(null, new TestCaseEndEventArgs(testCase, TestOutcome.Failed));
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 1), "TestCaseStart must only be called once");
@@ -216,7 +222,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerTestCaseEndShouldtBeCalledMultipleTimesInDataDrivenScenario()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
@@ -224,10 +230,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            inProcDataCollectionManager.TriggerTestCaseStart(testCase);
-            inProcDataCollectionManager.TriggerTestCaseEnd(testCase, TestOutcome.Passed);
-            inProcDataCollectionManager.TriggerTestCaseStart(testCase);
-            inProcDataCollectionManager.TriggerTestCaseEnd(testCase, TestOutcome.Failed);
+            inProcDataCollectionManager.TriggerTestCaseStart(null, new TestCaseStartEventArgs(testCase));
+            inProcDataCollectionManager.TriggerTestCaseEnd(null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
+            inProcDataCollectionManager.TriggerTestCaseStart(null, new TestCaseStartEventArgs(testCase));
+            inProcDataCollectionManager.TriggerTestCaseEnd(null, new TestCaseEndEventArgs(testCase, TestOutcome.Failed));
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 2), "TestCaseStart must only be called once");
@@ -237,7 +243,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerUpdateTestResultShouldNotFlushIfTestCaseEndWasNotCalledBefore()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
@@ -246,7 +252,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
             var testResult = new TestResult(testCase);
-            var allowFlush = inProcDataCollectionManager.TriggerUpdateTestResult(testResult);
+            inProcDataCollectionManager.TriggerUpdateTestResult(null, new TestResultEventArgs(testResult));
+
+            var allowFlush = testResult.GetPropertyValue<bool>(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, true);
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 0), "TestCaseStart must be called on datacollector");
@@ -257,7 +265,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerUpdateTestResultShouldFlushIfTestCaseEndWasCalledBefore()
         {
-            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            var inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             Assert.IsTrue(inProcDataCollectionManager.IsInProcDataCollectionEnabled, "InProcDataCollection must be enabled if runsettings contains inproc datacollectors.");
 
             Assert.AreEqual(inProcDataCollectionManager.DataCollectors.Count, 1, "One Datacollector must be registered");
@@ -266,9 +274,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
             var testResult = new TestResult(testCase);
-            inProcDataCollectionManager.TriggerTestCaseStart(testCase);
-            inProcDataCollectionManager.TriggerTestCaseEnd(testCase, TestOutcome.Passed);
-            var allowFlush = inProcDataCollectionManager.TriggerUpdateTestResult(testResult);
+            inProcDataCollectionManager.TriggerTestCaseStart(null, new TestCaseStartEventArgs(testCase));
+            inProcDataCollectionManager.TriggerTestCaseEnd(null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
+            inProcDataCollectionManager.TriggerUpdateTestResult(null, new TestResultEventArgs(testResult));
+
+            var allowFlush = testResult.GetPropertyValue<bool>(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, false);
 
             var mockDataCollector = inProcDataCollectionManager.DataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 1), "TestCaseStart must be called on datacollector");
@@ -278,7 +288,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache) : base(runSettings, testRunCache)
+            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager) : base(runSettings, testRunCache, dataCollectionTestCaseEventManager)
             {
             }
 
@@ -312,12 +322,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
             {
-               // Do Nothing
+                // Do Nothing
             }
 
             public void TriggerInProcDataCollectionMethod(string methodName, InProcDataCollectionArgs methodArg)
             {
-                switch(methodName)
+                switch (methodName)
                 {
                     case Constants.TestSessionStartMethodName: TestSessionStartCalled++; break;
                     case Constants.TestSessionEndMethodName: TestSessionEndCalled++; break;

@@ -29,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
     /// <summary>
     /// The base run tests.
@@ -58,6 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private ICollection<string> executorUrisThatRanTests;
         private ITestPlatformEventSource testPlatformEventSource;
+        private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
 
         #endregion
 
@@ -86,12 +88,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private void SetContext()
         {
             this.testRunCache = new TestRunCache(testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
-            this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache);
+            this.dataCollectionTestCaseEventManager = new DataCollectionTestCaseEventManager();
+
+            this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache, this.dataCollectionTestCaseEventManager);
+
+
 
             // Verify if datacollection is enabled and wrap the testcasehandler around to get the events 
             if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
             {
-                this.testCaseEventsHandler = new TestCaseEventsHandler(inProcDataCollectionExtensionManager, this.testCaseEventsHandler);
+                this.testCaseEventsHandler = new TestCaseEventsHandler(this.dataCollectionTestCaseEventManager, this.testCaseEventsHandler);
             }
             else
             {
@@ -169,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 try
                 {
                     // Call Session-Start event on in-proc datacollectors
-                    this.inProcDataCollectionExtensionManager?.TriggerTestSessionStart();
+                    this.dataCollectionTestCaseEventManager.RaiseSessionStart();
 
                     elapsedTime = this.RunTestsInternal();
 
@@ -193,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 finally
                 {
                     // Trigger Session End on in-proc datacollectors
-                    inProcDataCollectionExtensionManager?.TriggerTestSessionEnd();
+                    dataCollectionTestCaseEventManager?.RaiseSessionEnd();
 
                     try
                     {

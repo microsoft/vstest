@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private HashSet<Guid> testCaseEndStatusMap;
         private ITestRunCache testRunCache;
 
+        internal static TestProperty FlushResultTestResultPoperty;
+
         /// <summary>
         /// Loaded in-proc datacollectors collection
         /// </summary>
@@ -35,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private object testCaseEndStatusSyncObject = new object();
 
-        public InProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache)
+        public InProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager)
         {
             this.testRunCache = testRunCache;
 
@@ -46,7 +48,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             // Initialize InProcDataCollectors
             this.InitializeInProcDataCollectors(runSettings);
+
+            FlushResultTestResultPoperty = TestProperty.Register(id: "allowTestResultFlush", label: "allowTestResultFlush", category: string.Empty, description: string.Empty, valueType: typeof(bool), validateValueCallback: null, attributes: TestPropertyAttributes.None, owner: typeof(TestCase));
+
+            dataCollectionTestCaseEventManager.TestCaseEnd += TriggerTestCaseEnd;
+            dataCollectionTestCaseEventManager.TestCaseStart += TriggerTestCaseStart;
+            dataCollectionTestCaseEventManager.TestResult += TriggerUpdateTestResult;
+            dataCollectionTestCaseEventManager.SessionStart += TriggerTestSessionStart;
+            dataCollectionTestCaseEventManager.SessionEnd += TriggerTestSessionEnd;
         }
+
+
 
         public bool IsInProcDataCollectionEnabled { get; private set; }
 
@@ -98,10 +110,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             return inProcDataCollector;
         }
 
-        /// <summary>
-        /// The trigger session start.
         /// </summary>
-        public virtual void TriggerTestSessionStart()
+        public virtual void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
         {
             this.testCaseEndStatusMap.Clear();
             this.testResultDictionary.Clear();
@@ -113,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// The trigger session end.
         /// </summary>
-        public virtual void TriggerTestSessionEnd()
+        public virtual void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
         {
             var testSessionEndArgs = new TestSessionEndArgs();
             this.TriggerInProcDataCollectionMethods(Constants.TestSessionEndMethodName, testSessionEndArgs);
@@ -122,45 +132,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// The trigger test case start.
         /// </summary>
-        public virtual void TriggerTestCaseStart(TestCase testCase)
+        public virtual void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
         {
             lock (testCaseEndStatusSyncObject)
             {
-                this.testCaseEndStatusMap.Remove(testCase.Id);
+                this.testCaseEndStatusMap.Remove(e.TestCaseId);
             }
 
-            var testCaseStartArgs = new TestCaseStartArgs(testCase);
+            var testCaseStartArgs = new TestCaseStartArgs(e.TestElement);
             this.TriggerInProcDataCollectionMethods(Constants.TestCaseStartMethodName, testCaseStartArgs);
         }
 
         /// <summary>
         /// The trigger test case end.
         /// </summary>
-        public virtual void TriggerTestCaseEnd(TestCase testCase, TestOutcome outcome)
+        public virtual void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
             bool isTestCaseEndAlreadySent = false;
             lock (testCaseEndStatusSyncObject)
             {
-                isTestCaseEndAlreadySent = this.testCaseEndStatusMap.Contains(testCase.Id);
+                isTestCaseEndAlreadySent = this.testCaseEndStatusMap.Contains(e.TestCaseId);
                 if (!isTestCaseEndAlreadySent)
                 {
-                    this.testCaseEndStatusMap.Add(testCase.Id);
+                    this.testCaseEndStatusMap.Add(e.TestCaseId);
                 }
 
                 // Do not support multiple - testcasends for a single test case start
                 // TestCaseEnd must always be preceded by testcasestart for a given test case id
                 if (!isTestCaseEndAlreadySent)
                 {
-                    var dataCollectionContext = new DataCollectionContext(testCase);
-                    var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, outcome);
+                    var dataCollectionContext = new DataCollectionContext(e.TestElement);
+                    var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, e.TestOutcome);
+
 
                     // Call all in-proc datacollectors - TestCaseEnd event
                     this.TriggerInProcDataCollectionMethods(Constants.TestCaseEndMethodName, testCaseEndArgs);
 
                     // If dictionary contains results for this test case, update them with in-proc data and flush them
-                    if (testResultDictionary.ContainsKey(testCase.Id))
+                    if (testResultDictionary.ContainsKey(e.TestCaseId))
                     {
-                        foreach (var testResult in testResultDictionary[testCase.Id])
+                        foreach (var testResult in testResultDictionary[e.TestCaseId])
                         {
                             this.SetInProcDataCollectionDataInTestResult(testResult);
 
@@ -168,7 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                             this.testRunCache.OnNewTestResult(testResult);
                         }
 
-                        this.testResultDictionary.Remove(testCase.Id);
+                        this.testResultDictionary.Remove(e.TestCaseId);
                     }
                 }
             }
@@ -179,17 +190,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         /// <param name="testResult"></param>
         /// <returns>True, if result can be flushed. False, otherwise</returns>
-        public virtual bool TriggerUpdateTestResult(TestResult testResult)
+        public virtual void TriggerUpdateTestResult(object sender, TestResultEventArgs e)
         {
             bool allowTestResultFlush = true;
-            var testCaseId = testResult.TestCase.Id;
+            var testCaseId = e.TestResult.TestCase.Id;
 
             lock (testCaseEndStatusSyncObject)
             {
                 if (this.testCaseEndStatusMap.Contains(testCaseId))
                 {
                     // Just set the cached in-proc data if already exists
-                    this.SetInProcDataCollectionDataInTestResult(testResult);
+                    this.SetInProcDataCollectionDataInTestResult(e.TestResult);
                 }
                 else
                 {
@@ -200,15 +211,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     // Cache results so we can flush later with in proc data
                     if (testResultDictionary.ContainsKey(testCaseId))
                     {
-                        testResultDictionary[testCaseId].Add(testResult);
+                        testResultDictionary[testCaseId].Add(e.TestResult);
                     }
                     else
                     {
-                        testResultDictionary.Add(testCaseId, new List<TestResult>() { testResult });
+                        testResultDictionary.Add(testCaseId, new List<TestResult>() { e.TestResult });
                     }
                 }
             }
-            return allowTestResultFlush;
+
+            this.SetAllowTestResultFlushInTestResult(e.TestResult, allowTestResultFlush);
         }
 
         /// <summary>
@@ -218,9 +230,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             // Can happen if we cached test results expecting a test case end event for them
             // If test case end events never come, we have to flush all of them 
-            foreach(var results in this.testResultDictionary.Values)
+            foreach (var results in this.testResultDictionary.Values)
             {
-                foreach(var result in results)
+                foreach (var result in results)
                 {
                     this.testRunCache.OnNewTestResult(result);
                 }
@@ -262,6 +274,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     testResult.SetPropertyValue(testProperty, keyValuePair.Value);
                 }
             }
+        }
+
+        /// <summary>
+        /// Set the data sent via datacollection sink in the testresult property for upstream applications to read.
+        /// And removes the data from the dictionary.
+        /// </summary>
+        /// <param name="testResultArg"></param>
+        private void SetAllowTestResultFlushInTestResult(TestResult testResult, bool allowTestResultFlush)
+        {
+            var testProperty = TestProperty.Register(id: nameof(allowTestResultFlush), label: nameof(allowTestResultFlush), category: string.Empty, description: string.Empty, valueType: typeof(bool), validateValueCallback: null, attributes: TestPropertyAttributes.None, owner: typeof(TestCase));
+            testResult.SetPropertyValue(testProperty, allowTestResultFlush);
         }
     }
 

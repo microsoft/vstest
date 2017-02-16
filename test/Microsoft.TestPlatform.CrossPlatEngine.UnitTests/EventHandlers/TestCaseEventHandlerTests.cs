@@ -31,6 +31,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.EventHandlers
 
         private Mock<ITestCaseEventsHandler> mockTestCaseEvents;
 
+        private Mock<IDataCollectionTestCaseEventManager> mockDataCollectionTestCaseEventManager;
+
         private TestCaseEventsHandler testCasesEventsHandler;
 
         private string settingsXml = @"<RunSettings>
@@ -48,14 +50,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.EventHandlers
         [TestInitialize]
         public void InitializeTests()
         {
-            this.testableInProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            this.testableInProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
             this.mockTestCaseEvents = new Mock<ITestCaseEventsHandler>();
-            this.testCasesEventsHandler = new TestCaseEventsHandler(this.testableInProcDataCollectionExtensionManager, this.mockTestCaseEvents.Object);
+            this.mockDataCollectionTestCaseEventManager = new Mock<IDataCollectionTestCaseEventManager>();
+            this.testCasesEventsHandler = new TestCaseEventsHandler(this.mockDataCollectionTestCaseEventManager.Object, this.mockTestCaseEvents.Object);
         }
 
         [TestMethod]
         public void SendTestCaseStartShouldCallTriggerTestCaseStartOnInProcDataCollectionManager()
-        {            
+        {
             this.testCasesEventsHandler.SendTestCaseStart(null);
             Assert.IsTrue(
                 (this.testableInProcDataCollectionExtensionManager.TestCaseStartCalled == 1),
@@ -94,7 +97,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.EventHandlers
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache) : base(runSettings, testRunCache)
+            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager) : base(runSettings, testRunCache, dataCollectionTestCaseEventManager)
             {
             }
 
@@ -111,30 +114,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.EventHandlers
             public int TestCaseEndCalled { get; private set; }
             public int UpdateTestResult { get; private set; }
 
-            public override void TriggerTestSessionStart()
+            public override void TriggerTestSessionStart(object sender, SessionStartEventArgs e)
             {
                 TestSessionStartCalled++;
             }
 
-            public override void TriggerTestSessionEnd()
+            public override void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
             {
                 TestSessionEndCalled++;
             }
 
-            public override void TriggerTestCaseStart(TestCase testCase)
+            public override void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
             {
                 TestCaseStartCalled++;
             }
 
-            public override void TriggerTestCaseEnd(TestCase testCase, TestOutcome outcome)
+            public override void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
             {
                 TestCaseEndCalled++;
             }
 
-            public override bool TriggerUpdateTestResult(TestResult testResult)
+            public override void TriggerUpdateTestResult(object sender, TestResultEventArgs e)
             {
                 this.UpdateTestResult++;
-                return true;
             }
         }
 
