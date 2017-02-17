@@ -328,8 +328,8 @@ function Create-NugetPackages
         Copy-Item $tpSrcDir\$file $stagingDir -Force
     }
 
-    # Copy and rename props file.
-    Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk_props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
+    # Copy props file.
+    Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk.props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
 
     # Copy over empty and third patry notice file
 	$fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "_._"
