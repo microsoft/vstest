@@ -127,6 +127,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     {
         #region Constructor       
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class with default datacollection context.
+        /// </summary>
+        /// <param name="testElement">
+        /// The test element.
+        /// </param>
         public TestCaseStartEventArgs(TestCase testElement) : this(new DataCollectionContext(new SessionId(Guid.Empty)), testElement)
         {
         }
@@ -193,6 +199,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     {
         #region Constructor
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class with default data collection context.
+        /// </summary>
+        /// <param name="testElement">
+        /// The test element.
+        /// </param>
+        /// <param name="testOutcome">
+        /// The test outcome.
+        /// </param>
         public TestCaseEndEventArgs(TestCase testElement, TestOutcome testOutcome) : this(new DataCollectionContext(new SessionId(Guid.Empty)), testElement, testOutcome)
         {
         }
@@ -305,7 +320,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     {
         #region Constructor
 
-        public TestResultEventArgs(TestResult testResult): this(new DataCollectionContext(new SessionId(Guid.Empty)), testResult)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class with default data collection context.
+        /// </summary>
+        /// <param name="testResult">
+        /// The test result.
+        /// </param>
+        public TestResultEventArgs(TestResult testResult)
+            : this(new DataCollectionContext(new SessionId(Guid.Empty)), testResult)
         {
         }
 
@@ -316,11 +338,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="context">
         /// Context information for the test case
         /// </param>
-        /// <param name="testElement">
-        /// The test element of the test that this event is for.
-        /// </param>
-        /// <param name="testOutcome">
-        /// The outcome of the test case.
+        /// <param name="testResult">
+        /// The test Result.
         /// </param>
         public TestResultEventArgs(
             DataCollectionContext context,
@@ -352,8 +371,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="isChildTestCase">
         /// True if this is a child test case, false if this is a top-level test case
         /// </param>
-        /// <param name="testOutcome">
-        /// The outcome of the test case.
+        /// <param name="testResult">
+        /// The test Result.
         /// </param>
         internal TestResultEventArgs(
             DataCollectionContext context,

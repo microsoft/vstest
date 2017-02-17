@@ -9,12 +9,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
+    /// <summary>
+    /// The data collection test case event manager for sending events to in-proc and out-of-proc data collectors.
+    /// </summary>
     internal class DataCollectionTestCaseEventManager : IDataCollectionTestCaseEventManager
     {
+        /// <inheritdoc />
         public event EventHandler<SessionStartEventArgs> SessionStart;
+
+        /// <inheritdoc />
         public event EventHandler<SessionEndEventArgs> SessionEnd;
+
+        /// <inheritdoc />
         public event EventHandler<TestCaseStartEventArgs> TestCaseStart;
+
+        /// <inheritdoc />
         public event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+
+        /// <inheritdoc />
         public event EventHandler<TestResultEventArgs> TestResult;
 
         /// <inheritdoc />
@@ -41,6 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.TestCaseStart.SafeInvoke(this, e, "DataCollectionTestCaseEventManager.RaiseTestCaseStart");
         }
 
+        /// <inheritdoc />
         public void RaiseTestResult(TestResultEventArgs e)
         {
             this.TestResult.SafeInvoke(this, e, "DataCollectionTestCaseEventManager.TestResult");

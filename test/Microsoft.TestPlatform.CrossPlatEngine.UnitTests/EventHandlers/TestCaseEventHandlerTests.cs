@@ -62,7 +62,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.EventHandlers
         {
             this.testCasesEventsHandler.SendTestResult(new TestResult(new TestCase()));
             this.mockDataCollectionTestCaseEventManager.Verify(x => x.RaiseTestResult(It.IsAny<TestResultEventArgs>()), Times.Once);
-
         }
 
         [TestMethod]

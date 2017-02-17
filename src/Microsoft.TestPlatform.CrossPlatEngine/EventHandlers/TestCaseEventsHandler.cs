@@ -3,18 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
 {
-
-    using System;
-
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 #if !NET46
     using System.Runtime.Loader;
 #endif
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
     /// The test case events handler.
@@ -27,8 +23,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseEventsHandler"/> class.
         /// </summary>
-        /// <param name="inProcDCExtMgr">
-        /// The in proc tidc helper.
+        /// <param name="dataCollectionTestCaseEventManager">
+        /// The data Collection Test Case Event Manager.
+        /// </param>
+        /// <param name="testCaseEvents">
+        /// The test Case Events.
         /// </param>
         public TestCaseEventsHandler(IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager, ITestCaseEventsHandler testCaseEvents)
         {
@@ -69,6 +68,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         /// <param name="result">
         /// The result.
         /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public bool SendTestResult(TestResult result)
         {
             this.dataCollectionTestCaseEventManager.RaiseTestResult(new TestResultEventArgs(result));
