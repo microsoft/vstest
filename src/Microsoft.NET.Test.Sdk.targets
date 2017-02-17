@@ -23,6 +23,16 @@
     <GeneratedProgramFile Condition="'$(GeneratedProgramFile)' ==''">$(IntermediateOutputPath)$(MSBuildProjectName).Program$(DefaultLanguageSourceExtension)</GeneratedProgramFile>
     <GenerateProgramFile Condition="'$(GenerateProgramFile)' == ''">true</GenerateProgramFile>
   </PropertyGroup>
+
+  <!-- Output type for dotnet core test project should be exe. For full CLR it is Library by default.
+       This should be added in props file.
+       Issues: https://github.com/dotnet/roslyn-project-system/issues/268,
+       https://devdiv.visualstudio.com/DevDiv/_workitems?id=375688&_a=edit
+  -->
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
   <!--
      Note that this must run before every invocation of CoreCompile to ensure that all
      compiler runs see the generated Program file. Furthermore, we  must run *after*
