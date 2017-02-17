@@ -332,8 +332,10 @@ function Create-NugetPackages
     Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk_props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
 
     # Copy over empty and third patry notice file
-    Copy-Item Join-Path $env:TP_PACKAGE_PROJ_DIR "_._" $stagingDir -Force
-    Copy-Item Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt" $stagingDir -Force
+	$fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "_._"
+    Copy-Item $fileToCopy $stagingDir -Force
+	$fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
+    Copy-Item $fileToCopy $stagingDir -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
