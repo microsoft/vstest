@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public static class OutputUtilities
     {
-        private static string defaultFormat = "{0}";
+        private const string DefaultFormat = "{0}";
 
         /// <summary>
         /// Output an error message.
@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             using (new ConsoleColorHelper(ConsoleColor.Red))
             {
-                Output(output, OutputLevel.Error, defaultFormat, format, args);
+                Output(output, OutputLevel.Error, DefaultFormat, format, args);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             using (new ConsoleColorHelper(ConsoleColor.Yellow))
             {
-                Output(output, OutputLevel.Warning, defaultFormat, format, args);
+                Output(output, OutputLevel.Warning, DefaultFormat, format, args);
             }
         }
 
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Information(this IOutput output, string format, params object[] args)
         {
-            Output(output, OutputLevel.Information, defaultFormat, format, args);
+            Output(output, OutputLevel.Information, DefaultFormat, format, args);
         }
 
         /// <summary>
