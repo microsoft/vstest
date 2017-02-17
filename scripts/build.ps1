@@ -317,7 +317,7 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
-    $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
+    $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
     $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec")
@@ -325,17 +325,13 @@ function Create-NugetPackages
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
     foreach ($file in $nuspecFiles + $targetFiles) {
-        Copy-Item $tpSrcDir\$file $stagingDir -Force
+        Copy-Item $tpNuspecDir\$file $stagingDir -Force
     }
 
-    # Copy props file.
-    Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk.props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
-
-    # Copy over empty and third patry notice file
-	$fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "_._"
-    Copy-Item $fileToCopy $stagingDir -Force
-	$fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
-    Copy-Item $fileToCopy $stagingDir -Force
+    # Copy over props, empty and third patry notice file
+    Copy-Item $tpNuspecDir\"Microsoft.Net.Test.Sdk.props" $stagingDir -Force
+    Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
+    Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
