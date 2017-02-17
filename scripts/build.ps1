@@ -84,7 +84,7 @@ $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
-$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIXProject"
+$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -188,7 +188,7 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
-    $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package.csproj"
+    $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
@@ -196,7 +196,7 @@ function Publish-Package
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
-    Write-Log "Package: Publish package\*.csproj"
+    Write-Log "Package: Publish src\package\package\package.csproj"
 
 
     Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
@@ -332,8 +332,8 @@ function Create-NugetPackages
     Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk_props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
 
     # Copy over empty and third patry notice file
-    Copy-Item $tpSrcDir\package\"_._" $stagingDir -Force
-    Copy-Item $tpSrcDir\package\"ThirdPartyNotices.txt" $stagingDir -Force
+    Copy-Item Join-Path $env:TP_PACKAGE_PROJ_DIR "_._" $stagingDir -Force
+    Copy-Item Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt" $stagingDir -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
