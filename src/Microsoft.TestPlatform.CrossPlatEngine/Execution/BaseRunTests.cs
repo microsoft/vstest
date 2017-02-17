@@ -40,7 +40,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private string runSettings;
         private TestExecutionContext testExecutionContext;
         private ITestRunEventsHandler testRunEventsHandler;
-        private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
         private ITestRunCache testRunCache;
 
         /// <summary>
@@ -86,18 +85,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private void SetContext()
         {
             this.testRunCache = new TestRunCache(testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
-            this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache);
 
-            // Verify if datacollection is enabled and wrap the testcasehandler around to get the events 
-            if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
-            {
-                this.testCaseEventsHandler = new TestCaseEventsHandler(inProcDataCollectionExtensionManager, this.testCaseEventsHandler);
-            }
-            else
-            {
-                // No need to call any methods on this, if inproc-datacollection is not enabled
-                inProcDataCollectionExtensionManager = null;
-            }
+            //// Verify if datacollection is enabled and wrap the testcasehandler around to get the events 
+            //if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
+            //{
+            //    this.testCaseEventsHandler = new TestCaseEventsHandler(this.testCaseEventsHandler);
+            //}
 
             this.runContext = new RunContext();
             this.runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(this.runSettings);
@@ -168,13 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
                 try
                 {
-                    // Call Session-Start event on in-proc datacollectors
-                    this.inProcDataCollectionExtensionManager?.TriggerTestSessionStart();
-
                     elapsedTime = this.RunTestsInternal();
-
-                    // Flush any results cached by in-proc manager
-                    inProcDataCollectionExtensionManager?.FlushLastChunkResults();
 
                     // Check the adapter setting for shutting down this process after run
                     shutdownAfterRun = this.frameworkHandle.EnableShutdownAfterTestRun;
@@ -192,9 +179,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
                 finally
                 {
-                    // Trigger Session End on in-proc datacollectors
-                    inProcDataCollectionExtensionManager?.TriggerTestSessionEnd();
-
                     try
                     {
                         // Send the test run complete event.
