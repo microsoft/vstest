@@ -201,6 +201,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         }
 
         /// <summary>
+        /// True indicates the test run is started from an Editor or IDE.
+        /// Defaults to false.
+        /// </summary>
+        public bool IsDesignMode
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Specifies if /Platform has been specified on command line or not.
         /// </summary>
         internal bool ArchitectureSpecified { get; private set; }

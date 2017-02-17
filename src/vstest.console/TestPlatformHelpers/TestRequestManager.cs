@@ -5,8 +5,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading;
+    using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -19,6 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -125,8 +129,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             bool success = false;
 
+            var runsettings = discoveryPayload.RunSettings;
+            if (this.TryUpdateDesignMode(runsettings, out string updatedRunsettings))
+            {
+                runsettings = updatedRunsettings;
+            }
+
             // create discovery request
-            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, this.commandLineOptions.BatchSize, TimeSpan.MaxValue, discoveryPayload.RunSettings);
+            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, this.commandLineOptions.BatchSize, TimeSpan.MaxValue, runsettings);
             using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria))
             {
                 try
@@ -182,13 +192,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
 
             TestRunCriteria runCriteria = null;
+            var runsettings = testRunRequestPayload.RunSettings;
+            if (this.TryUpdateDesignMode(runsettings, out string updatedRunsettings))
+            {
+                runsettings = updatedRunsettings;
+            }
+
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
                 runCriteria = new TestRunCriteria(
                                   testRunRequestPayload.Sources,
                                   this.commandLineOptions.BatchSize,
                                   testRunRequestPayload.KeepAlive,
-                                  testRunRequestPayload.RunSettings,
+                                  runsettings,
                                   this.commandLineOptions.TestRunStatsEventTimeout,
                                   testHostLauncher);
                 runCriteria.TestCaseFilter = this.commandLineOptions.TestCaseFilterValue;
@@ -199,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testRunRequestPayload.TestCases,
                                   this.commandLineOptions.BatchSize,
                                   testRunRequestPayload.KeepAlive,
-                                  testRunRequestPayload.RunSettings,
+                                  runsettings,
                                   this.commandLineOptions.TestRunStatsEventTimeout,
                                   testHostLauncher);
             }
@@ -232,6 +248,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         }
 
         #endregion
+
+        private bool TryUpdateDesignMode(string runsettingsXml, out string updatedRunSettingsXml)
+        {
+            updatedRunSettingsXml = runsettingsXml;
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+            if (runConfiguration.DesignModeSet || !runConfiguration.TargetFrameworkSet ||
+                runConfiguration.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                runConfiguration.TargetFrameworkVersion.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return false;
+            }
+
+            // TargetFramework is full CLR. Set DesignMode based on current context.
+            using (var stream = new StringReader(runsettingsXml))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            {
+                var document = new XmlDocument();
+                document.Load(reader);
+
+                var navigator = document.CreateNavigator();
+                InferRunSettingsHelper.UpdateDesignMode(navigator, this.commandLineOptions.IsDesignMode);
+                updatedRunSettingsXml = navigator.OuterXml;
+            }
+
+            return true;
+        }
 
         private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
         {
