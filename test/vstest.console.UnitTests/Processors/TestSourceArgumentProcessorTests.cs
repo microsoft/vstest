@@ -86,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var testFilePath = "DummyTestFile.txt";
             var mockFileHelper = new Mock<IFileHelper>();
             mockFileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+            mockFileHelper.Setup(x => x.GetCurrentDirectory()).Returns("");
             var options = CommandLineOptions.Instance;
             options.Reset();
             options.FileHelper = mockFileHelper.Object;

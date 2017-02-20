@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Globalization;
@@ -22,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     /// </summary>
     [FriendlyName(ConsoleLogger.FriendlyName)]
     [ExtensionUri(ConsoleLogger.ExtensionUri)]
-    internal class ConsoleLogger : ITestLogger
+    internal class ConsoleLogger : ITestLoggerWithParameters
     {
         #region Constants
         private const string TestMessageFormattingPrefix = " ";
@@ -37,9 +38,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public const string FriendlyName = "Console";
 
+        /// <summary>
+        /// Parameter for Verbosity
+        /// </summary>
+        public const string VerbosityParam = "verbosity";
+
         #endregion
 
+        internal enum Verbosity
+        {
+            Minimal,
+            Normal
+        }
+
         #region Fields
+
+        /// <summary>
+        /// Level of verbosity
+        /// </summary>
+        private Verbosity verbosityLevel = Verbosity.Minimal;
 
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
@@ -79,9 +96,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             get;
             private set;
         }
+
+        /// <summary>
+        /// Get the verbosity level for the console logger
+        /// </summary>
+        public Verbosity VerbosityLevel => verbosityLevel;
+
         #endregion
-        
-        #region ITestLogger
+
+        #region ITestLoggerWithParameters
 
         /// <summary>
         /// Initializes the Test Logger.
@@ -106,6 +129,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             events.TestRunComplete += this.TestRunCompleteHandler;
         }
 
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
+                throw new ArgumentNullException(nameof(parameters));
+            }
+
+            if (parameters.Count == 0)
+            {
+                throw new ArgumentException("No default parameters added", nameof(parameters));
+            }
+
+            var verbosityExists = parameters.TryGetValue(ConsoleLogger.VerbosityParam, out string verbosity);
+            if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
+            {
+                this.verbosityLevel = verbosityLevel;
+            }
+
+            this.Initialize(events, String.Empty);
+        }
         #endregion
 
         #region Private Methods
@@ -246,8 +289,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
                     break;
             }
-
-            Output.WriteLine(string.Empty, (OutputLevel)e.Level);
         }
 
         /// <summary>
@@ -281,8 +322,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
             else if (e.Result.Outcome == TestOutcome.Passed)
             {
-                string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
-                Output.WriteLine(output, OutputLevel.Information);
+                if (!this.verbosityLevel.Equals(Verbosity.Minimal))
+                {
+                    string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
+                    Output.WriteLine(output, OutputLevel.Information);
+                }
                 this.testsPassed++;
             }
         }
