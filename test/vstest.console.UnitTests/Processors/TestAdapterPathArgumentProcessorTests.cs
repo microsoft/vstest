@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
                 o =>
                 o.WriteLine(
                     string.Format(
-                        "Warning: The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.",
+                        "The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.",
                         currentFolder),
                     OutputLevel.Warning));
 
