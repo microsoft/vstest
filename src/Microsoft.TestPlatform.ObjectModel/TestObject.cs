@@ -18,16 +18,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     [DataContract]
     public abstract class TestObject
     {
-        static TestObject()
-        {
-            // Do TypeConverter registrations in static constructor only to avoid multiple registrations
-            // If we register too much, deserialization of large number of testobjects will cause StackOverflow exception
-            TypeDescriptor.AddAttributes(typeof(Guid), new TypeConverterAttribute(typeof(CustomGuidConverter)));
-            TypeDescriptor.AddAttributes(typeof(KeyValuePair<string, string>[]), new TypeConverterAttribute(typeof(CustomKeyValueConverter)));
-            TypeDescriptor.AddAttributes(typeof(string[]), new TypeConverterAttribute(typeof(CustomStringArrayConverter)));
-        }
-
         #region Fields
+
+        private static CustomGuidConverter guidConverter = new CustomGuidConverter();
+        private static CustomKeyValueConverter keyValueConverter = new CustomKeyValueConverter();
+        private static CustomStringArrayConverter stringArrayConverter = new CustomStringArrayConverter();
 
         /// <summary>
         /// The store for all the properties registered.
@@ -287,6 +282,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return value;
             }
 
+            // Traits are KeyValuePair based. Use the custom converter in that case.
+            if (valueType == typeof(KeyValuePair<string, string>[]))
+            {
+                return keyValueConverter.ConvertFrom(null, culture, (string)value);
+            }
+
+            // Use a custom string array converter for string[] types.
+            if (valueType == typeof(string[]))
+            {
+                return stringArrayConverter.ConvertFrom(null, culture, (string)value);
+            }
+
             TypeConverter converter = TypeDescriptor.GetConverter(valueType);
             if (converter == null)
             {
@@ -333,6 +340,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             var valueType = property.GetValueType();
+
+            if (valueType == typeof(Guid))
+            {
+                return (T)guidConverter.ConvertTo(null, culture, value, valueType);
+            }
 
             TypeConverter converter = TypeDescriptor.GetConverter(valueType);
 
