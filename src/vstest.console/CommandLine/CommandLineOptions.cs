@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Default constructor.
         /// </summary>
-        private CommandLineOptions()
+        protected CommandLineOptions()
         {
             this.BatchSize = DefaultBatchSize;
             this.TestRunStatsEventTimeout = this.DefaultRetrievalTimeout;

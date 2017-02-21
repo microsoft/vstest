@@ -87,6 +87,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="designModeValue">Value to set</param>
         public static void UpdateDesignMode(XPathNavigator runSettingsNavigator, bool designModeValue)
         {
+            // Navigator should be at Root of runsettings xml, attempt to move to /RunSettings/RunConfiguration
+            if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+!runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+            {
+                EqtTrace.Error("InferRunSettingsHelper.UpdateDesignMode: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                return;
+            }
+
             var hasDesignMode = runSettingsNavigator.SelectSingleNode(DesignModeNodePath) != null;
             if (!hasDesignMode)
             {

@@ -252,6 +252,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         private bool TryUpdateDesignMode(string runsettingsXml, out string updatedRunSettingsXml)
         {
             updatedRunSettingsXml = runsettingsXml;
+
+            // If user is already setting DesignMode via runsettings or CLI args; we skip. We also skip if the target framework
+            // is not known or current run is targeted to netcoreapp (since it is a breaking change; user may be running older
+            // NET.Test.Sdk; we will remove this constraint in 15.1).
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             if (runConfiguration.DesignModeSet || !runConfiguration.TargetFrameworkSet ||
                 runConfiguration.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||

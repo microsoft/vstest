@@ -576,7 +576,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             // the test runner is of a newer version, but the test host is of an earlier version.
                             if (EqtTrace.IsErrorEnabled)
                             {
-                                EqtTrace.Error(
+                                EqtTrace.Warning(
                                     string.Format(
                                         CultureInfo.CurrentCulture,
                                         Resources.Resources.InvalidSettingsXmlElement,
