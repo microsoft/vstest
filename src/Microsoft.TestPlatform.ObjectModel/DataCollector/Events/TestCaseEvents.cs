@@ -5,13 +5,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
     using System;
     using System.Diagnostics;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Base class for all test case event arguments.
     /// </summary>
-#if NET46
-        [Serializable] 
-#endif
+    [DataContract]
     public abstract class TestCaseEventArgs : DataCollectionEventArgs
     {
         #region Constructor
@@ -81,6 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets the test case ID
         /// </summary>
+        [DataMember]
         public Guid TestCaseId
         {
             get;
@@ -90,6 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets the test case name
         /// </summary>
+        [DataMember]
         public string TestCaseName
         {
             get;
@@ -99,6 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets a value indicating whether this is a child test case, false if this is a top-level test case
         /// </summary>
+        [DataMember]
         public bool IsChildTestCase
         {
             get;
@@ -108,6 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets test element of the test this event is for.
         /// </summary>
+        [DataMember]
         public TestCase TestElement
         {
             get;
@@ -120,9 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case Start event arguments.
     /// </summary>
-#if NET46
-        [Serializable]
-#endif
+    [DataContract]
     public sealed class TestCaseStartEventArgs : TestCaseEventArgs
     {
         #region Constructor       
@@ -192,9 +193,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case End event arguments.
     /// </summary>
-#if NET46
-        [Serializable] 
-#endif
+    [DataContract]
     public sealed class TestCaseEndEventArgs : TestCaseEventArgs
     {
         #region Constructor
@@ -208,6 +207,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="testOutcome">
         /// The test outcome.
         /// </param>
+        /// <remarks>
+        /// Default constructor with default DataCollectionContext.
+        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// </remarks>
         public TestCaseEndEventArgs(TestCase testElement, TestOutcome testOutcome) : this(new DataCollectionContext(new SessionId(Guid.Empty)), testElement, testOutcome)
         {
         }
@@ -302,6 +305,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets the outcome of the test.
         /// </summary>
+        [DataMember]
         public TestOutcome TestOutcome
         {
             get;
@@ -313,9 +317,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Test Case Result event arguments.
     /// </summary>
-#if NET46
-        [Serializable] 
-#endif
+    [DataContract]
     public sealed class TestResultEventArgs : TestCaseEventArgs
     {
         #region Constructor
@@ -326,6 +328,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="testResult">
         /// The test result.
         /// </param>
+        /// <remarks>
+        /// Default constructor with default DataCollectionContext.
+        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// </remarks>
         public TestResultEventArgs(TestResult testResult)
             : this(new DataCollectionContext(new SessionId(Guid.Empty)), testResult)
         {
@@ -393,6 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets the outcome of the test.
         /// </summary>
+        [DataMember]
         public TestResult TestResult
         {
             get;

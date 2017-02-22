@@ -4,14 +4,13 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
     using System;
-    
+    using System.Runtime.Serialization;
+
     /// <summary>
     /// Class identifying test execution id.
     /// Execution ID is assigned to test at run creation time and is guaranteed to be unique within that run.
     /// </summary>
-#if NET46
-    [Serializable] 
-#endif
+    [DataContract]
     public sealed class TestExecId
     {
         private Guid execId;
@@ -28,11 +27,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             execId = id;
         }
 
+        [DataMember]
         public static TestExecId Empty
         {
             get { return empty; }
         }
 
+        [DataMember]
         public Guid Id
         {
             get { return execId; }
