@@ -159,6 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.commandLineOptions.Port = portNumber;
+            this.commandLineOptions.IsDesignMode = true;
             this.designModeClient = this.designModeInitializer?.Invoke(this.commandLineOptions.ParentProcessId);
         }
 

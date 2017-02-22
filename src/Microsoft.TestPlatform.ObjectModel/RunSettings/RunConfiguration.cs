@@ -53,6 +53,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private bool disableParallelization;
 
+        /// <summary>
+        /// True if test run is triggered 
+        /// </summary>
+        private bool designMode;
+
         #endregion
 
         #region Constructor
@@ -73,6 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.maxCpuCount = Constants.DefaultCpuCount;
             this.disableAppDomain = false;
             this.disableParallelization = false;
+            this.designMode = false;
         }
 
         #endregion
@@ -118,6 +124,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.maxCpuCount = value;
                 this.MaxCpuCountSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
+        /// </summary>
+        public bool DesignMode
+        {
+            get
+            {
+                return this.designMode;
+            }
+
+            set
+            {
+                this.designMode = value;
+                this.DesignModeSet = true;
             }
         }
 
@@ -238,6 +261,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets a value indicating whether design mode is set.
+        /// </summary>
+        public bool DesignModeSet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether app domain needs to be disabled by the adapters.
         /// </summary>
         public bool DisableAppDomainSet
@@ -245,7 +277,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             get;
             private set;
         }
-
 
         /// <summary>
         /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
@@ -310,6 +341,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement maxCpuCount = doc.CreateElement("MaxCpuCount");
             maxCpuCount.InnerXml = this.MaxCpuCount.ToString();
             root.AppendChild(maxCpuCount);
+
+            XmlElement designMode = doc.CreateElement("DesignMode");
+            designMode.InnerXml = this.DesignMode.ToString();
+            root.AppendChild(designMode);
 
             XmlElement disableAppDomain = doc.CreateElement("DisableAppDomain");
             disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
@@ -388,6 +423,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             }
 
                             runConfiguration.MaxCpuCount = count;
+                            break;
+
+                        case "DesignMode":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string designModeValueString = reader.ReadElementContentAsString();
+                            bool designMode;
+                            if (!bool.TryParse(designModeValueString, out designMode))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, designModeValueString, elementName));
+                            }
+                            runConfiguration.DesignMode = designMode;
                             break;
 
                         case "DisableAppDomain":
@@ -524,12 +572,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             break;
 
                         default:
-                            throw new SettingsException(
-                                string.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlElement,
-                                    Constants.RunConfigurationSettingsName,
-                                    reader.Name));
+                            // Ignore a runsettings element that we don't understand. It could occur in the case
+                            // the test runner is of a newer version, but the test host is of an earlier version.
+                            if (EqtTrace.IsErrorEnabled)
+                            {
+                                EqtTrace.Warning(
+                                    string.Format(
+                                        CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsXmlElement,
+                                        Constants.RunConfigurationSettingsName,
+                                        reader.Name));
+                            }
+                            reader.Skip();
+                            break;
                     }
                 }
 

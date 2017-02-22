@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Default constructor.
         /// </summary>
-        private CommandLineOptions()
+        protected CommandLineOptions()
         {
             this.BatchSize = DefaultBatchSize;
             this.TestRunStatsEventTimeout = this.DefaultRetrievalTimeout;
@@ -198,6 +198,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 this.architecture = value;
                 this.ArchitectureSpecified = true;
             }
+        }
+
+        /// <summary>
+        /// True indicates the test run is started from an Editor or IDE.
+        /// Defaults to false.
+        /// </summary>
+        public bool IsDesignMode
+        {
+            get;
+            set;
         }
 
         /// <summary>

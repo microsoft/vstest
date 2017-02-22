@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
+    using System;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class RunConfigurationTests
     {
@@ -30,22 +28,25 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(Constants.DefaultCpuCount, runConfiguration.MaxCpuCount);
             Assert.AreEqual(false, runConfiguration.DisableAppDomain);
             Assert.AreEqual(false, runConfiguration.DisableParallelization);
+            Assert.AreEqual(false, runConfiguration.DesignMode);
         }
 
         [TestMethod]
-        public void RunConfigurationThrowsExceptionOnUnknownElements()
+        public void RunConfigurationShouldNotThrowExceptionOnUnknownElements()
         {
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
                      <RunConfiguration>
                        <BadElement>TestResults</BadElement>
+                       <DesignMode>true</DesignMode>
                      </RunConfiguration>
                 </RunSettings>";
 
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-            Assert.ThrowsException<SettingsException>(() =>
-                XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml));
+            Assert.IsNotNull(runConfiguration);
+            Assert.IsTrue(runConfiguration.DesignMode);
         }
 
         [TestMethod]
@@ -89,6 +90,48 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(2, runConfiguration.MaxCpuCount);
             Assert.AreEqual(true, runConfiguration.DisableAppDomain);
             Assert.AreEqual(true, runConfiguration.DisableParallelization);
+        }
+
+        [DataRow(true)]
+        [DataRow(false)]
+        [DataTestMethod]
+        public void RunConfigurationShouldReadValueForDesignMode(bool designModeValue)
+        {
+            string settingsXml = string.Format(
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>{0}</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>", designModeValue);
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+
+            Assert.AreEqual(designModeValue, runConfiguration.DesignMode);
+        }
+
+        [TestMethod]
+        public void RunConfigurationShouldSetDesignModeAsFalseByDefault()
+        {
+            string settingsXml =
+              @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetPlatform>x64</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+            
+            Assert.IsFalse(runConfiguration.DesignMode);
+        }
+
+        [TestMethod]
+        public void RunConfigurationToXmlShouldProvideDesignMode()
+        {
+            var runConfiguration = new RunConfiguration { DesignMode = true };
+
+            StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<DesignMode>True</DesignMode>");
         }
     }
 }
