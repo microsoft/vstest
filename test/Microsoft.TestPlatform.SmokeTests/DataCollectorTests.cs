@@ -13,7 +13,6 @@ namespace Microsoft.TestPlatform.SmokeTests
     public class DataCollectorTests : IntegrationTestBase
     {
         [TestMethod]
-        [Ignore]
         public void RunAllWithInProcDataCollectorSettings()
         {
             var runSettings = this.GetInProcDataCollectionRunsettingsFile();
@@ -46,7 +45,7 @@ namespace Microsoft.TestPlatform.SmokeTests
             var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>
-                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
+                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
                                                 <Configuration>
                                                     <Port>4312</Port>
                                                 </Configuration>
