@@ -111,8 +111,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 this.testCaseEventsHandler = new TestCaseEventsHandler(this.dataCollectionTestCaseEventManager, this.testCaseEventsHandler);
             }
 
-
-
             this.runContext = new RunContext();
             this.runContext.RunSettings = RunSettingsUtilities.CreateAndInitializeRunSettings(this.runSettings);
             this.runContext.KeepAlive = this.testExecutionContext.KeepAlive;

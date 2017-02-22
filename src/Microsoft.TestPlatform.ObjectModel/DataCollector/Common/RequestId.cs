@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Runtime.Serialization;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources;
 
@@ -12,11 +13,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// Wrapper class for a request ID that can be used for messages or events for identification
     /// purposes
     /// </summary>
-#if NET46
-    [Serializable]
-#endif
+    [DataContract]
     [SuppressMessage("Microsoft.Design", "CA1036:OverrideMethodsOnComparableTypes",
-        Justification = "Guid does not define < and > operators")]
+            Justification = "Guid does not define < and > operators")]
     public sealed class RequestId : IEquatable<RequestId>, IComparable<RequestId>, IComparable
     {
         #region Constants
@@ -198,6 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets the underlying GUID that represents the request ID
         /// </summary>
+        [DataMember]
         public Guid Id
         {
             get;

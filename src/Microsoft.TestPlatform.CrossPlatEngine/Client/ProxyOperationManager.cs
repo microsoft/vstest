@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using System.Text;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -30,6 +31,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         protected readonly int connectionTimeout;
 
         private readonly IProcessHelper processHelper;
+
+        private StringBuilder testHostProcessStdError;
+
+        protected int ErrorLength { get; set; } = 1000;
 
         #region Constructors
 
@@ -68,10 +73,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="sources">List of test sources.</param>
         public virtual void SetupChannel(IEnumerable<string> sources)
         {
-            string testHostProcessStdError = string.Empty;
-
             if (!this.initialized)
             {
+                this.testHostProcessStdError = new StringBuilder(ErrorLength, ErrorLength);
                 var portNumber = this.RequestSender.InitializeCommunication();
                 var processId = this.processHelper.GetCurrentProcessId();
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
@@ -82,16 +86,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 if (testHostStartInfo != null)
                 {
-                    // Monitor testhost exit.
-                    testHostStartInfo.ExitCallback = (process) =>
+                    // Monitor testhost error callbacks.
+                    testHostStartInfo.ErrorReceivedCallback = (process, data) =>
                     {
-                        if (process.ExitCode != 0)
+                        if (data != null)
                         {
-                            testHostProcessStdError = process.StandardError.ReadToEnd();
-                            EqtTrace.Error("Test host exited with error: {0}", testHostProcessStdError);
-                        }
+                            //if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
+                            if (data.Length > testHostProcessStdError.MaxCapacity)
+                            {
+                                testHostProcessStdError.Clear();
+                                data = data.Substring(data.Length - testHostProcessStdError.MaxCapacity);
+                            }
 
-                        this.RequestSender.OnClientProcessExit(testHostProcessStdError);
+                            //remove only what is required, from beginning of error stream
+                            else
+                            {
+                                int required = data.Length + testHostProcessStdError.Length - testHostProcessStdError.MaxCapacity;
+                                if (required > 0)
+                                {
+                                    testHostProcessStdError.Remove(0, required);
+                                }
+                            }
+
+                            testHostProcessStdError.Append(data);
+                        }
+                        if (process.HasExited && process.ExitCode != 0)
+                        {
+                            EqtTrace.Error("Test host exited with error: {0}", testHostProcessStdError);
+                            this.RequestSender.OnClientProcessExit(testHostProcessStdError.ToString());
+                        }                        
                     };
                 }
 
@@ -112,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
-                if (!string.IsNullOrWhiteSpace(testHostProcessStdError))
+                if (!string.IsNullOrWhiteSpace(testHostProcessStdError.ToString()))
                 {
                     // Testhost failed with error
                     errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, testHostProcessStdError);
@@ -145,6 +168,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             return Path.ChangeExtension(logFile,
                 string.Format("host.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile)));
+        }
+
+        /// <summary>
+        /// Returns the current error data in stream
+        /// Written purely for UT as of now.
+        /// </summary>
+        protected virtual string GetStandardError()
+        {
+            return testHostProcessStdError.ToString();
         }
     }
 }

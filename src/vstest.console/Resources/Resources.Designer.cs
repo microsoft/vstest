@@ -905,6 +905,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("NoTestsFoundWarningMessageWithSuggestionToUseVsix", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Not Run  {0}.
+        /// </summary>
+        public static string NotRunTestIndicator
+        {
+            get
+            {
+                return ResourceManager.GetString("NotRunTestIndicator", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to -o|--Output|/o|/Output:&lt;Output&gt;

@@ -4,13 +4,12 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
     using System;
-    
+    using System.Runtime.Serialization;
+
     /// <summary>
     /// Class identifying a session.
     /// </summary>
-#if NET46
-    [Serializable] 
-#endif
+    [DataContract]
     public sealed class SessionId
     {
         private Guid sessionId;
@@ -27,11 +26,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
             sessionId = id;
         }
 
+        [DataMember]
         public static SessionId Empty
         {
             get { return empty; }
         }
 
+        [DataMember]
         public Guid Id
         {
             get { return sessionId; }

@@ -136,13 +136,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor       
 
         /// <summary>
-        /// Default constructor added for serialization/deserialization.
-        /// </summary>
-        public TestCaseStartEventArgs()
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class with default datacollection context.
         /// </summary>
         /// <param name="testElement">
@@ -227,6 +220,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="testOutcome">
         /// The test outcome.
         /// </param>
+        /// <remarks>
+        /// Default constructor with default DataCollectionContext.
+        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// </remarks>
         public TestCaseEndEventArgs(TestCase testElement, TestOutcome testOutcome) : this(new DataCollectionContext(new SessionId(Guid.Empty)), testElement, testOutcome)
         {
         }
@@ -338,18 +335,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     {
         #region Constructor
         /// <summary>
-        /// Default constructor added for serialization/deserialization.
-        /// </summary>
-        public TestResultEventArgs()
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class with default data collection context.
         /// </summary>
         /// <param name="testResult">
         /// The test result.
         /// </param>
+        /// <remarks>
+        /// Default constructor with default DataCollectionContext.
+        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// </remarks>
         public TestResultEventArgs(TestResult testResult)
             : this(new DataCollectionContext(new SessionId(Guid.Empty)), testResult)
         {
