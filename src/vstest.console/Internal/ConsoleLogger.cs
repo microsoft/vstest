@@ -329,6 +329,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
                 this.testsPassed++;
             }
+            else
+            {
+                string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, name);
+                Output.WriteLine(output, OutputLevel.Information);
+                DisplayFullInformation(e.Result);
+            }
         }
 
         /// <summary>

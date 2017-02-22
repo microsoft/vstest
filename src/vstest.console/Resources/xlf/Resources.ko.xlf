@@ -1520,6 +1520,11 @@
         <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="NotRunTestIndicator">
+        <source>Not Run  {0}</source>
+        <target state="new">Not Run  {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

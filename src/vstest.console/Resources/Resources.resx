@@ -637,4 +637,7 @@
   <data name="InIsolationDeprecated" xml:space="preserve">
     <value>The /InIsolation flag is deprecated. The tests are always run in a separate process</value>
   </data>
+  <data name="NotRunTestIndicator" xml:space="preserve">
+    <value>Not Run  {0}</value>
+  </data>
 </root>
