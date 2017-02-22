@@ -30,11 +30,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private readonly int connectionTimeout;
 
-        private readonly int errorLength;
-
         private readonly IProcessHelper processHelper;
 
         private StringBuilder testHostProcessStdError;
+
+        protected int ErrorLength { get; set; } = 1000;
 
         #region Constructors
 
@@ -44,14 +44,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        protected ProxyOperationManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout, int errorLength = 1000)
+        protected ProxyOperationManager(ITestRequestSender requestSender, ITestHostManager testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;
             this.testHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
-            this.errorLength = errorLength;
-            testHostProcessStdError = new StringBuilder(errorLength, errorLength);
             this.initialized = false;
         }
 
@@ -77,6 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (!this.initialized)
             {
+                this.testHostProcessStdError = new StringBuilder(ErrorLength, ErrorLength);
                 var portNumber = this.RequestSender.InitializeCommunication();
                 var processId = this.processHelper.GetCurrentProcessId();
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
@@ -90,16 +89,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // Monitor testhost error callbacks.
                     testHostStartInfo.ErrorReceivedCallback = (process, data) =>
                     {
-                        if(data != null)
+                        if (data != null)
                         {
                             //if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
                             if (data.Length > testHostProcessStdError.MaxCapacity)
                             {
-                                testHostProcessStdError.Remove(0, testHostProcessStdError.Length);
+                                testHostProcessStdError.Clear();
                                 data = data.Substring(data.Length - testHostProcessStdError.MaxCapacity);
                             }
 
-                            //remove only what is required, from begining of error stream
+                            //remove only what is required, from beginning of error stream
                             else
                             {
                                 int required = data.Length + testHostProcessStdError.Length - testHostProcessStdError.MaxCapacity;
@@ -175,7 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Returns the current error data in stream
         /// Written purely for UT as of now.
         /// </summary>
-        public virtual string GetStandardError()
+        protected virtual string GetStandardError()
         {
             return testHostProcessStdError.ToString();
         }

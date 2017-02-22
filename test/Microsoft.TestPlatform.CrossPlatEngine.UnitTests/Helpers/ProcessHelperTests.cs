@@ -22,7 +22,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     [TestClass]
     public class ProcessHelperTests
     {
-        private readonly ProxyOperationManager testOperationManager;
+        private readonly TestableProxyOperationManager testOperationManager;
 
         private readonly TestableTestHostManager testHostManager;
 
@@ -50,12 +50,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             string errorData = "Custom Error Strings";
             this.processHelper.SetErrorMessage(errorData);
-
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            Assert.AreEqual(this.testOperationManager.GetStandardError(), errorData);
+            Assert.AreEqual(this.testOperationManager.GetError(), errorData);
         }
 
         [TestMethod]
@@ -63,14 +62,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             string errorData = "Long Custom Error Strings";
             this.processHelper.SetErrorMessage(errorData);
-
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            Assert.AreEqual(this.testOperationManager.GetStandardError().Length, errorLength);
-
-            Assert.AreEqual(this.testOperationManager.GetStandardError(), errorData.Substring(5));
+            Assert.AreEqual(this.testOperationManager.GetError().Length, errorLength);
+            Assert.AreEqual(this.testOperationManager.GetError(), errorData.Substring(5));
         }
 
         [TestMethod]
@@ -78,12 +75,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             string errorData = "Error Strings";
             this.processHelper.SetErrorMessage(errorData);
-
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            Assert.AreEqual(this.testOperationManager.GetStandardError(), "StringsError Strings");
+            Assert.AreEqual(this.testOperationManager.GetError(), "StringsError Strings");
         }
 
         private class TestableProxyOperationManager : ProxyOperationManager
@@ -92,11 +88,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 ITestRequestSender requestSender,
                 ITestHostManager testHostManager,
                 int clientConnectionTimeout,
-                int errorLength) : base(requestSender, testHostManager, clientConnectionTimeout, errorLength)
+                int errorLength) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
+                base.ErrorLength = errorLength;
             }
 
-            public override string GetStandardError()
+            public string GetError()
             {
                 return base.GetStandardError();
             }
