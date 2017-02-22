@@ -309,7 +309,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
 
-            var expectedArgs = "exec \"" + expectedTestHostPath + "\" --port 0 --parentprocessid 0";
+            var expectedArgs = "exec \"" + expectedTestHostPath + "\" --port 0 --parentprocessid 0 --datacollectionport 0";
 
             this.dotnetHostManager.LaunchTestHost(startInfo);
 

@@ -25,9 +25,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestHostManager testHostManager;
 
-        private bool initialized;
+        protected bool initialized;
 
-        private readonly int connectionTimeout;
+        protected readonly int connectionTimeout;
 
         private readonly IProcessHelper processHelper;
 
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #endregion
 
-        private string GetTimestampedLogFile(string logFile)
+        protected string GetTimestampedLogFile(string logFile)
         {
             return Path.ChangeExtension(logFile,
                 string.Format("host.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),

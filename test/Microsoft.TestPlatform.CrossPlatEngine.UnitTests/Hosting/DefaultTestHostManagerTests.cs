@@ -16,7 +16,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     [TestClass]
     public class DefaultTestHostManagerTests
@@ -70,7 +69,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101", info.Arguments);
+            Assert.AreEqual(" --port 123 --parentprocessid 101 --datacollectionport 0", info.Arguments);
         }
 
         [TestMethod]
@@ -107,7 +106,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + "\"" + source + "\"", info.Arguments);
+            Assert.AreEqual(" --port 123 --parentprocessid 101 --datacollectionport 0 --testsourcepath " + "\"" + source + "\"", info.Arguments);
         }
 
         [TestMethod]

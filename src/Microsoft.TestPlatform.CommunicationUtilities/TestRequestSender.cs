@@ -55,6 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.clientExitErrorMessage = string.Empty;
             var port = this.communicationManager.HostServer();
             this.communicationManager.AcceptClientAsync();
+            this.WaitForRequestHandlerConnection(5 * 1000);
             return port;
         }
 

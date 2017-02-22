@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         private static void Run()
         {
-            var requestHandler = DataCollectionRequestHandler.CreateInstance(new SocketCommunicationManager(),new MessageSink());
+            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(),new MessageSink());
 
             requestHandler.InitializeCommunication(port);
 

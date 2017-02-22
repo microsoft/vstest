@@ -17,12 +17,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>Command line option string.</returns>
         public static string ToCommandLineOptions(this TestRunnerConnectionInfo connectionInfo)
         {
-            var options = "--port " + connectionInfo.Port + " --parentprocessid " + connectionInfo.RunnerProcessId;
+            var options = "--port " + connectionInfo.Port + " --parentprocessid " + connectionInfo.RunnerProcessId + " --datacollectionport "+connectionInfo.DataCollectionPort;
             if (!string.IsNullOrEmpty(connectionInfo.LogFile))
             {
                 options += " --diag " + connectionInfo.LogFile;
             }
-
+            
             return options;
         }
     }

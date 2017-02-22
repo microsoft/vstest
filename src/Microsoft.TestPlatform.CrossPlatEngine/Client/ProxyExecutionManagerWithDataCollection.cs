@@ -5,19 +5,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// The proxy execution manager with data collection.
     /// </summary>
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
+        private readonly ITestHostManager testHostManager;
+        private readonly IProcessHelper processHelper;
+        private DataCollectionParameters dataCollectionParameters;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
         /// </summary>
@@ -31,6 +41,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
+            this.testHostManager = testHostManager;
+            this.processHelper = new ProcessHelper();
         }
 
         /// <summary>
@@ -54,10 +66,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public override void Initialize()
         {
-            DataCollectionParameters dataCollectionParameters = null;
             try
             {
-                dataCollectionParameters = (this.ProxyDataCollectionManager == null)
+                this.dataCollectionParameters = (this.ProxyDataCollectionManager == null)
                                                ? DataCollectionParameters.CreateDefaultParameterInstance()
                                                : this.ProxyDataCollectionManager.BeforeTestRunStart(
                                                    resetDataCollectors: true,
@@ -89,7 +100,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
             }
 
-            // todo : pass dataCollectionParameters.EnvironmentVariables while initializaing testhostprocess.
             base.Initialize();
         }
 
@@ -130,6 +140,66 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public override void Close()
         {
             base.Close();
+        }
+
+        /// <summary>
+        /// Ensure that the engine is ready for test operations.
+        /// Usually includes starting up the test host process.
+        /// </summary>
+        /// <param name="sources">List of test sources.</param>
+        public override void SetupChannel(IEnumerable<string> sources)
+        {
+            string testHostProcessStdError = string.Empty;
+
+            if (!this.initialized)
+            {
+                var portNumber = this.RequestSender.InitializeCommunication();
+                var processId = this.processHelper.GetCurrentProcessId();
+                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), DataCollectionPort = this.dataCollectionParameters.DataCollectionEventsPort };
+
+                // Get the test process start info
+                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, this.dataCollectionParameters.EnvironmentVariables, connectionInfo);
+
+                if (testHostStartInfo != null)
+                {
+                    // Monitor testhost exit.
+                    testHostStartInfo.ExitCallback = (process) =>
+                    {
+                        if (process.ExitCode != 0)
+                        {
+                            testHostProcessStdError = process.StandardError.ReadToEnd();
+                            EqtTrace.Error("Test host exited with error: {0}", testHostProcessStdError);
+                        }
+
+                        this.RequestSender.OnClientProcessExit(testHostProcessStdError);
+                    };
+                }
+
+                // Warn the user that execution will wait for debugger attach.
+                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+                {
+                    ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
+                }
+
+                // Launch the test host.
+                this.testHostManager.LaunchTestHost(testHostStartInfo);
+                this.initialized = true;
+            }
+
+            // Wait for a timeout for the client to connect.
+            if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
+            {
+                var errorMsg = CrossPlatEngineResources.InitializationFailed;
+
+                if (!string.IsNullOrWhiteSpace(testHostProcessStdError))
+                {
+                    // Testhost failed with error
+                    errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, testHostProcessStdError);
+                }
+
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+            }
         }
     }
 

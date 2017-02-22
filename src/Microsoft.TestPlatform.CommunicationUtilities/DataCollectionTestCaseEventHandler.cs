@@ -5,19 +5,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// The test case data collection request handler.
     /// </summary>
-    internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEventHandler, IDisposable
+    internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEventHandler
     {
         private ICommunicationManager communicationManager;
+        private IDataCollectionManager dataCollectionManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventHandler"/> class.
         /// </summary>
-        internal DataCollectionTestCaseEventHandler() : this(new SocketCommunicationManager())
+        internal DataCollectionTestCaseEventHandler() : this(new SocketCommunicationManager(), DataCollectionManager.Instance)
         {
         }
 
@@ -27,9 +33,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <param name="communicationManager">
         /// The communication manager.
         /// </param>
-        internal DataCollectionTestCaseEventHandler(ICommunicationManager communicationManager)
+        internal DataCollectionTestCaseEventHandler(ICommunicationManager communicationManager, IDataCollectionManager dataCollectionManager)
         {
             this.communicationManager = communicationManager;
+            this.dataCollectionManager = dataCollectionManager;
         }
 
         /// <inheritDoc />
@@ -55,15 +62,69 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <inheritDoc />
         public void ProcessRequests()
         {
-            // todo : implement this while doing integration with test execution process.
-        }
+            var isSessionEnd = false;
 
-        /// <summary>
-        /// The dispose.
-        /// </summary>
-        public void Dispose()
-        {
-            this.communicationManager?.StopServer();
+            do
+            {
+                var message = this.communicationManager.ReceiveMessage();
+                switch (message.MessageType)
+                {
+                    case MessageType.BeforeTestCaseStart:
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case starting.");
+                        }
+
+                        var testCaseStartEventArgs = message.Payload.ToObject<TestCaseStartEventArgs>();
+                        this.dataCollectionManager.TestCaseStarted(testCaseStartEventArgs);
+
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case started.");
+                        }
+
+                        break;
+
+                    case MessageType.AfterTestCaseComplete:
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case completing.");
+                        }
+
+                        var testResultEventArgs = message.Payload.ToObject<TestResultEventArgs>();
+
+                        var attachments = this.dataCollectionManager.TestCaseEnded(new TestCaseEndEventArgs(testResultEventArgs.TestElement, testResultEventArgs.TestResult.Outcome));
+                        this.communicationManager.SendMessage(MessageType.AfterTestCaseEndResult, attachments);
+
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case completed");
+                        }
+
+                        break;
+
+                    case MessageType.SessionEnd:
+                        isSessionEnd = true;
+
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test session ended");
+                        }
+
+                        this.Close();
+
+                        break;
+
+                    default:
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Invalid Message types");
+                        }
+
+                        break;
+                }
+            }
+            while (!isSessionEnd);
         }
     }
 }

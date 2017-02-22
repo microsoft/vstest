@@ -31,10 +31,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <summary>
         /// Raises TestCaseEnd event to all data collectors configured for run.
         /// </summary>
-        /// <param name="testCase">Test case which is complete.</param>
-        /// <param name="testOutcome">Outcome of the test case.</param>
-        /// <returns>Collection of  testCase attachmentSet.</returns>
-        Collection<AttachmentSet> TestCaseEnded(TestCase testCase, TestOutcome testOutcome);
+        /// <param name="testCaseEndEventArgs">
+        /// The test Case End Event Args.
+        /// </param>
+        /// <returns>
+        /// Collection of  testCase attachmentSet.
+        /// </returns>
+        Collection<AttachmentSet> TestCaseEnded(TestCaseEndEventArgs testCaseEndEventArgs);
 
         /// <summary>
         /// Raises SessionStart event to all data collectors configured for run.
@@ -46,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// Raises SessionEnd event to all data collectors configured for run.
         /// </summary>
         /// <param name="isCancelled">
-        /// Boolean to specify is the test ruun is cancelled or not.
+        /// Boolean to specify is the test run is cancelled or not.
         /// </param>
         /// <returns>
         /// Collection of session attachmentSet.
