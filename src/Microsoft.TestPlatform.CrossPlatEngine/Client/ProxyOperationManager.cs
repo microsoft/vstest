@@ -10,8 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities;

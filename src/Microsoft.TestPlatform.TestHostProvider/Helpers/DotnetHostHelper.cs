@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
+namespace Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.IO;
     using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
+    using TestHostProviderResources = Microsoft.VisualStudio.TestPlatform.TestHostProvider.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers.Interfaces;
 
     internal class DotnetHostHelper : IDotnetHostHelper
     {
@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 }
             }
 
-            string errorMessage = String.Format(Resources.NoDotnetExeFound, dotnetExeName);
+            string errorMessage = String.Format(TestHostProviderResources.NoDotnetExeFound, dotnetExeName);
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
         }

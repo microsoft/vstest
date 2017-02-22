@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
+namespace Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers
 {
     using System;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>

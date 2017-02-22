@@ -11,9 +11,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Runtime.InteropServices;
     using System.Text;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;

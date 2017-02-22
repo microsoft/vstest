@@ -8,7 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;

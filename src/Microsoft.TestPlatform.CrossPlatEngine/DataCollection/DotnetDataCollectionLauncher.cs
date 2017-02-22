@@ -11,8 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Runtime.InteropServices;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.TestHostProvider.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
