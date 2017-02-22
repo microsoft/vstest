@@ -48,6 +48,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Callback on process exit
         /// </summary>
-        public Action<Process> ExitCallback { get; set; }
+        public Action<Process, string> ErrorReceivedCallback { get; set; }
     }
 }
