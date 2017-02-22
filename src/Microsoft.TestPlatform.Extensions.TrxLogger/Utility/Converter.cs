@@ -141,13 +141,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
                     outcome = TrxObjectModel.TestOutcome.Passed;
                     break;
                 case ObjectModel.TestOutcome.Skipped:
-                    outcome = TrxObjectModel.TestOutcome.NotExecuted;
-                    break;
                 case ObjectModel.TestOutcome.None:
-                    outcome = TrxObjectModel.TestOutcome.Failed;
-                    break;
                 case ObjectModel.TestOutcome.NotFound:
-                    outcome = TrxObjectModel.TestOutcome.Failed;
+                    outcome = TrxObjectModel.TestOutcome.NotExecuted;
                     break;
                 default:
                     Debug.Fail("Unexpected Outcome.");
