@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <param name="workingDirectory">The working directory for this process.</param>
         /// <param name="exitCallback">Call back for on process exit</param>
         /// <returns>The process created.</returns>
-        Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process> exitCallback);
+        Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process, string> errorCallback);
 
         /// <summary>
         /// Gets the current process file path.
