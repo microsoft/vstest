@@ -24,13 +24,22 @@
     <GenerateProgramFile Condition="'$(GenerateProgramFile)' == ''">true</GenerateProgramFile>
   </PropertyGroup>
 
-  <!-- Output type for dotnet core test project should be exe. For full CLR it is Library by default.
-       This should be added in props file.
-       Issues: https://github.com/dotnet/roslyn-project-system/issues/268,
-       https://devdiv.visualstudio.com/DevDiv/_workitems?id=375688&_a=edit
+  <!--
+     Output type for dotnet core test project should be exe. For full CLR it is Library by default.
+     This should be added in props file.
+     Issues: https://github.com/dotnet/roslyn-project-system/issues/268,
+     https://devdiv.visualstudio.com/DevDiv/_workitems?id=375688&_a=edit
   -->
   <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
     <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <!--
+     In IDE scenario for full CLR projects default test platform is v1, which expects full pdbs for source information.
+     This can be removed once TPv2 is default for full CLR. Related issue https://github.com/Microsoft/vstest/issues/373.
+   -->
+  <PropertyGroup>
+    <DebugType Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">Full</DebugType>
   </PropertyGroup>
 
   <!--

@@ -23,7 +23,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
                                                {
                                                    CodeFilePath = "/user/src/testFile.cs",
                                                    DisplayName = "sampleTestCase",
-                                                   Id = Guid.Empty,
+                                                   Id = new Guid("be78d6fc-61b0-4882-9d07-40d796fd96ce"),
                                                    LineNumber = 999,
                                                    Traits = { new Trait("Priority", "0"), new Trait("Category", "unit") }
                                                };
@@ -47,7 +47,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual("TestCase.DisplayName", properties[4]["Key"]["Id"].Value);
             Assert.AreEqual("sampleTestCase", properties[4]["Value"].Value);
             Assert.AreEqual("TestCase.Id", properties[5]["Key"]["Id"].Value);
-            Assert.AreEqual("00000000-0000-0000-0000-000000000000", properties[5]["Value"].Value);
+            Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", properties[5]["Value"].Value);
             Assert.AreEqual("TestCase.LineNumber", properties[6]["Key"]["Id"].Value);
             Assert.AreEqual(999, properties[6]["Value"].Value);
 
@@ -64,7 +64,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
                 + "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},"
                 + "{\"Key\":{\"Id\":\"TestCase.CodeFilePath\",\"Label\":\"File Path\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"/user/src/testFile.cs\"},"
                 + "{\"Key\":{\"Id\":\"TestCase.DisplayName\",\"Label\":\"Name\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestCase\"},"
-                + "{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"00000000-0000-0000-0000-000000000000\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"be78d6fc-61b0-4882-9d07-40d796fd96ce\"},"
                 + "{\"Key\":{\"Id\":\"TestCase.LineNumber\",\"Label\":\"Line Number\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Int32\"},\"Value\":999},"
                 + "{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"Priority\",\"Value\":\"0\"},{\"Key\":\"Category\",\"Value\":\"unit\"}]}]}";
             var test = Deserialize<TestCase>(json);
@@ -76,6 +76,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual(testCase.LineNumber, test.LineNumber);
             Assert.AreEqual(testCase.Source, test.Source);
             Assert.AreEqual(testCase.Traits.First().Name, test.Traits.First().Name);
+            Assert.AreEqual(testCase.Id, test.Id);
         }
 
         [TestMethod]
