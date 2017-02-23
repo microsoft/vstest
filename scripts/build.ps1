@@ -76,6 +76,11 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
+$FullVersion = $Version
+if ($VersionSuffix -ne '') {
+    $FullVersion += "-" + $VersionSuffix
+}
+$TPB_FullVersion = $FullVersion
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
 $TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIXProject"
@@ -164,8 +169,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_FullVersion -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_FullVersion -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -335,8 +340,8 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix`;Runtime=$TPB_TargetRuntime $additionalArgs
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$FullVersion -Properties Version=$FullVersion $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $FullVersion -Properties Version=$FullVersion`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -481,10 +486,10 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Started."
 
     $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = "15.0.3" # Hardcode since we want to keep 15.0.0 for other assemblies.
+    $vsixVersion = "15.0.4" # Hardcode since we want to keep 15.0.0 for other assemblies.
 
     # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
-    # So Version of the vsix will be 15.0.3.2017011101
+    # So Version of the vsix will be 15.0.4.2017011101
     $vsixVersionSuffix = $VersionSuffix.Split("-");
     if($vsixVersionSuffix.Length -ige 2) {
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
