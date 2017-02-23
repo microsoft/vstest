@@ -30,11 +30,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         protected readonly int connectionTimeout;
 
-        private readonly IProcessHelper processHelper;
-
-        private StringBuilder testHostProcessStdError;
+        protected StringBuilder testHostProcessStdError;
 
         protected int ErrorLength { get; set; } = 1000;
+
+        private readonly IProcessHelper processHelper;
 
         #region Constructors
 

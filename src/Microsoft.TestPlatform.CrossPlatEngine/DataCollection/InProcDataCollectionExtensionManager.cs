@@ -78,11 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public bool IsInProcDataCollectionEnabled { get; private set; }
 
-        /// <summary>
-        /// Gets a value indicating whether is in proc data collection enabled.
-        /// </summary>
-        public bool IsInProcDataCollectionEnabled { get; private set; }
-
         /// Flush any test results that are cached in dictionary
         /// </summary>
         public void FlushLastChunkResults()
@@ -96,6 +91,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     this.testRunCache.OnNewTestResult(result);
                 }
             }
+        }
+
+        /// <summary>
+        /// The create data collector.
+        /// </summary>
+        /// <param name="dataCollectorSettings">
+        /// The data collector settings.
+        /// </param>
+        /// <param name="interfaceTypeInfo">
+        /// The interface type info.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IInProcDataCollector"/>.
+        /// </returns>
+        protected virtual IInProcDataCollector CreateDataCollector(DataCollectorSettings dataCollectorSettings, TypeInfo interfaceTypeInfo)
+        {
+            var inProcDataCollector = new InProcDataCollector(
+                dataCollectorSettings.CodeBase,
+                dataCollectorSettings.AssemblyQualifiedName,
+                interfaceTypeInfo,
+                dataCollectorSettings.Configuration.OuterXml);
+
+            inProcDataCollector.LoadDataCollector(this.inProcDataCollectionSink);
+
+            return inProcDataCollector;
         }
 
         /// <summary>

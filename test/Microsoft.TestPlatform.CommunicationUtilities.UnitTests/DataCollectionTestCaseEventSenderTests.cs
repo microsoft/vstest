@@ -136,7 +136,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
     }
 
-    public class TestableDataCollectionTestCaseEventSender : DataCollectionTestCaseEventSender
+    internal class TestableDataCollectionTestCaseEventSender : DataCollectionTestCaseEventSender
     {
         public TestableDataCollectionTestCaseEventSender(ICommunicationManager communicationManager)
             : base(communicationManager)

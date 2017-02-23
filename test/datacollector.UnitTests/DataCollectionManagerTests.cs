@@ -369,7 +369,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                         });
 
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
-            var args = new TestCaseStartEventArgs();
+            var args = new TestCaseStartEventArgs(new TestCase());
             this.dataCollectionManager.TestCaseStarted(args);
 
             Assert.IsTrue(isStartInvoked);
@@ -392,7 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                             b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true;
                         });
 
-            var args = new TestCaseStartEventArgs();
+            var args = new TestCaseStartEventArgs(new TestCase());
             this.dataCollectionManager.TestCaseStarted(args);
 
             Assert.IsFalse(isStartInvoked);

@@ -136,6 +136,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor       
 
         /// <summary>
+        /// Default constructor for serialization/deserialization
+        /// </summary>
+        public TestCaseStartEventArgs()
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class with default datacollection context.
         /// </summary>
         /// <param name="testElement">
@@ -334,6 +341,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     public sealed class TestResultEventArgs : TestCaseEventArgs
     {
         #region Constructor
+
+        /// <summary>
+        /// Default constructor for serialization/deserialization
+        /// </summary>
+        public TestResultEventArgs()
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class with default data collection context.
         /// </summary>
