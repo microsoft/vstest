@@ -76,7 +76,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// Test results event arguments.
         /// </param>
         void RaiseTestResult(TestResultEventArgs e);
-
-
     }
 }

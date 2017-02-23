@@ -94,10 +94,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
             get;
             set;
         }
-
-        /// <summary>
-        /// Gets or sets the port for Data Collection
-        /// </summary>
-        public int DataCollectionPort { get; set; }
     }
 }

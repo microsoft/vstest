@@ -28,9 +28,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         protected bool initialized;
 
-        protected readonly int connectionTimeout;
+        private readonly int connectionTimeout;
 
-        protected StringBuilder testHostProcessStdError;
+        private StringBuilder testHostProcessStdError;
 
         private readonly IProcessHelper processHelper;
 
@@ -77,7 +77,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
 
-                var connectionInfo = this.GetTestRunnerConnectionInfo();
+                var portNumber = this.RequestSender.InitializeCommunication();
+                var processId = this.processHelper.GetCurrentProcessId();
+                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Get the test process start info
                 var testHostStartInfo = this.GetTestHostProcessStartInfo(sources, connectionInfo);
@@ -163,19 +165,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         /// <summary>
-        /// The get test runner connection info.
-        /// </summary>
-        /// <returns>
-        /// The <see cref="TestRunnerConnectionInfo"/>.
-        /// </returns>
-        protected virtual TestRunnerConnectionInfo GetTestRunnerConnectionInfo()
-        {
-            var portNumber = this.RequestSender.InitializeCommunication();
-            var processId = this.processHelper.GetCurrentProcessId();
-            return new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
-        }
-
-        /// <summary>
         /// The get test host process start info.
         /// </summary>
         /// <param name="sources">
@@ -194,7 +183,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             return this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
         }
-
 
         protected string GetTimestampedLogFile(string logFile)
         {

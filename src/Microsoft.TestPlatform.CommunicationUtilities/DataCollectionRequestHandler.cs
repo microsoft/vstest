@@ -78,7 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary>
         public static DataCollectionRequestHandler Instance { get; private set; }
 
-
         /// <summary>
         /// Creates singleton instance of DataCollectionRequestHandler.
         /// </summary>
@@ -222,7 +221,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         var attachments = this.dataCollectionManager.SessionEnded(isCancelled);
 
                         this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachments);
-                        EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");
+                        if (EqtTrace.IsInfoEnabled)
+                        {
+                            EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");
+                        }
 
                         isSessionEnded = true;
                         this.Close();

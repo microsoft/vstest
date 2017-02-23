@@ -102,7 +102,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var attachmentSets = new Collection<AttachmentSet>();
             this.communicationManager.SendMessage(MessageType.AfterTestCaseComplete, e);
 
-
             var message = this.communicationManager.ReceiveMessage();
 
             if (message.MessageType == MessageType.AfterTestCaseEndResult)

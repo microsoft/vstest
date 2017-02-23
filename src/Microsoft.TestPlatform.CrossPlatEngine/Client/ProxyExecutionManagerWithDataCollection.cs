@@ -8,8 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -21,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
         private readonly ITestHostManager testHostManager;
-        private readonly IProcessHelper processHelper;
         private DataCollectionParameters dataCollectionParameters;
 
         /// <summary>
@@ -38,7 +35,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
             this.testHostManager = testHostManager;
-            this.processHelper = new ProcessHelper();
         }
 
         /// <summary>
@@ -143,15 +139,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             IEnumerable<string> sources,
             TestRunnerConnectionInfo connectionInfo)
         {
-            return this.testHostManager.GetTestHostProcessStartInfo(sources, this.dataCollectionParameters.EnvironmentVariables, connectionInfo);
-        }
+            var testHostProcessStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, this.dataCollectionParameters.EnvironmentVariables, connectionInfo);
+            testHostProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionParameters.DataCollectionEventsPort;
 
-        /// <inheritdoc />
-        protected override TestRunnerConnectionInfo GetTestRunnerConnectionInfo()
-        {
-            var portNumber = this.RequestSender.InitializeCommunication();
-            var processId = this.processHelper.GetCurrentProcessId();
-            return new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), DataCollectionPort = this.dataCollectionParameters.DataCollectionEventsPort };
+            return testHostProcessStartInfo;
         }
     }
 

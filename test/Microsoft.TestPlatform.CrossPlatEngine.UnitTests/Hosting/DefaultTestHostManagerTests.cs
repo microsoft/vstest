@@ -69,7 +69,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101 --datacollectionport 0", info.Arguments);
+            Assert.AreEqual(" --port 123 --parentprocessid 101", info.Arguments);
         }
 
         [TestMethod]
@@ -106,7 +106,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101 --datacollectionport 0 --testsourcepath " + "\"" + source + "\"", info.Arguments);
+            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + "\"" + source + "\"", info.Arguments);
         }
 
         [TestMethod]
