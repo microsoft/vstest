@@ -146,7 +146,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted();
 
                         // Open a socket communication port for test level events.
-                        var testCaseEventsPort = -1;
+                        var testCaseEventsPort = 0;
                         if (areTestCaseLevelEventsRequired)
                         {
                             testCaseEventsPort = this.dataCollectionTestCaseEventHandler.InitializeCommunication();

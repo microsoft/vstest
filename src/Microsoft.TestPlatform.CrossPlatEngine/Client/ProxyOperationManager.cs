@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Text;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -17,7 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using System.Text;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -31,8 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         protected readonly int connectionTimeout;
 
         protected StringBuilder testHostProcessStdError;
-
-        protected int ErrorLength { get; set; } = 1000;
 
         private readonly IProcessHelper processHelper;
 
@@ -57,6 +55,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #region Properties
 
+        protected int ErrorLength { get; set; } = 1000;
+
         /// <summary>
         /// Gets or sets the server for communication.
         /// </summary>
@@ -75,14 +75,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (!this.initialized)
             {
-                this.testHostProcessStdError = new StringBuilder(ErrorLength, ErrorLength);
-                var portNumber = this.RequestSender.InitializeCommunication();
-                var processId = this.processHelper.GetCurrentProcessId();
-                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
+                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+
+                var connectionInfo = this.GetTestRunnerConnectionInfo();
 
                 // Get the test process start info
-                // TODO: Fix the environment variables usage
-                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
+                var testHostStartInfo = this.GetTestHostProcessStartInfo(sources, connectionInfo);
 
                 if (testHostStartInfo != null)
                 {
@@ -91,30 +89,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     {
                         if (data != null)
                         {
-                            //if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                            if (data.Length > testHostProcessStdError.MaxCapacity)
+                            // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
+                            if (data.Length > this.testHostProcessStdError.MaxCapacity)
                             {
-                                testHostProcessStdError.Clear();
-                                data = data.Substring(data.Length - testHostProcessStdError.MaxCapacity);
+                                this.testHostProcessStdError.Clear();
+                                data = data.Substring(data.Length - this.testHostProcessStdError.MaxCapacity);
                             }
 
-                            //remove only what is required, from beginning of error stream
+                            // remove only what is required, from beginning of error stream
                             else
                             {
-                                int required = data.Length + testHostProcessStdError.Length - testHostProcessStdError.MaxCapacity;
+                                int required = data.Length + this.testHostProcessStdError.Length - this.testHostProcessStdError.MaxCapacity;
                                 if (required > 0)
                                 {
-                                    testHostProcessStdError.Remove(0, required);
+                                    this.testHostProcessStdError.Remove(0, required);
                                 }
                             }
 
-                            testHostProcessStdError.Append(data);
+                            this.testHostProcessStdError.Append(data);
                         }
+
                         if (process.HasExited && process.ExitCode != 0)
                         {
-                            EqtTrace.Error("Test host exited with error: {0}", testHostProcessStdError);
-                            this.RequestSender.OnClientProcessExit(testHostProcessStdError.ToString());
-                        }                        
+                            EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
+                            this.RequestSender.OnClientProcessExit(this.testHostProcessStdError.ToString());
+                        }
                     };
                 }
 
@@ -135,10 +134,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
-                if (!string.IsNullOrWhiteSpace(testHostProcessStdError.ToString()))
+                if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError.ToString()))
                 {
                     // Testhost failed with error
-                    errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, testHostProcessStdError);
+                    errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
                 }
 
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
@@ -162,6 +161,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         #endregion
+
+        /// <summary>
+        /// The get test runner connection info.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="TestRunnerConnectionInfo"/>.
+        /// </returns>
+        protected virtual TestRunnerConnectionInfo GetTestRunnerConnectionInfo()
+        {
+            var portNumber = this.RequestSender.InitializeCommunication();
+            var processId = this.processHelper.GetCurrentProcessId();
+            return new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
+        }
+
+        /// <summary>
+        /// The get test host process start info.
+        /// </summary>
+        /// <param name="sources">
+        /// The sources.
+        /// </param>
+        /// <param name="envVariables">
+        /// The env variables.
+        /// </param>
+        /// <param name="connectionInfo">
+        /// The connection info.
+        /// </param>
+        /// <returns>
+        /// The <see cref="TestProcessStartInfo"/>.
+        /// </returns>
+        protected virtual TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, TestRunnerConnectionInfo connectionInfo)
+        {
+            return this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
+        }
+
 
         protected string GetTimestampedLogFile(string logFile)
         {

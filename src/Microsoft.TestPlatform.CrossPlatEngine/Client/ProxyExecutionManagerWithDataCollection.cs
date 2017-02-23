@@ -5,8 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -16,9 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-
-    using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// The proxy execution manager with data collection.
@@ -143,82 +138,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             base.Close();
         }
 
-        /// <summary>
-        /// Ensure that the engine is ready for test operations.
-        /// Usually includes starting up the test host process.
-        /// </summary>
-        /// <param name="sources">List of test sources.</param>
-        public override void SetupChannel(IEnumerable<string> sources)
+        /// <inheritdoc />
+        protected override TestProcessStartInfo GetTestHostProcessStartInfo(
+            IEnumerable<string> sources,
+            TestRunnerConnectionInfo connectionInfo)
         {
-            if (!this.initialized)
-            {
-                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-                var portNumber = this.RequestSender.InitializeCommunication();
-                var processId = this.processHelper.GetCurrentProcessId();
-                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), DataCollectionPort = this.dataCollectionParameters.DataCollectionEventsPort };
+            return this.testHostManager.GetTestHostProcessStartInfo(sources, this.dataCollectionParameters.EnvironmentVariables, connectionInfo);
+        }
 
-                // Get the test process start info
-                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
-
-                if (testHostStartInfo != null)
-                {
-                    // Monitor testhost error callbacks.
-                    testHostStartInfo.ErrorReceivedCallback = (process, data) =>
-                    {
-                        if (data != null)
-                        {
-                            //if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                            if (data.Length > this.testHostProcessStdError.MaxCapacity)
-                            {
-                                this.testHostProcessStdError.Clear();
-                                data = data.Substring(data.Length - this.testHostProcessStdError.MaxCapacity);
-                            }
-
-                            //remove only what is required, from beginning of error stream
-                            else
-                            {
-                                int required = data.Length + this.testHostProcessStdError.Length - this.testHostProcessStdError.MaxCapacity;
-                                if (required > 0)
-                                {
-                                    this.testHostProcessStdError.Remove(0, required);
-                                }
-                            }
-
-                            this.testHostProcessStdError.Append(data);
-                        }
-                        if (process.HasExited && process.ExitCode != 0)
-                        {
-                            EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                            this.RequestSender.OnClientProcessExit(this.testHostProcessStdError.ToString());
-                        }
-                    };
-                }
-
-                // Warn the user that execution will wait for debugger attach.
-                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
-                {
-                    ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
-                }
-
-                // Launch the test host.
-                this.testHostManager.LaunchTestHost(testHostStartInfo);
-                this.initialized = true;
-            }
-
-            // Wait for a timeout for the client to connect.
-            if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
-            {
-                var errorMsg = CrossPlatEngineResources.InitializationFailed;
-
-                if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError.ToString()))
-                {
-                    // Testhost failed with error
-                    errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
-                }
-
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
-            }
+        /// <inheritdoc />
+        protected override TestRunnerConnectionInfo GetTestRunnerConnectionInfo()
+        {
+            var portNumber = this.RequestSender.InitializeCommunication();
+            var processId = this.processHelper.GetCurrentProcessId();
+            return new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile), DataCollectionPort = this.dataCollectionParameters.DataCollectionEventsPort };
         }
     }
 

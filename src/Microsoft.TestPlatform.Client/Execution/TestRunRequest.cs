@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                             runCompleteArgs.IsCanceled,
                             runCompleteArgs.IsAborted,
                             runCompleteArgs.Error,
-                            new Collection<AttachmentSet>(new List<AttachmentSet>(runContextAttachments)),
+                            runContextAttachments as Collection<AttachmentSet>,
                             this.runRequestTimeTracker.Elapsed);
 
                     // Ignore the time sent (runCompleteArgs.ElapsedTimeInRunningTests) 
