@@ -395,14 +395,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         /// <summary>
         ///   Looks up a localized string similar to --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
-        ///      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+        ///      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
         ///      Creates file in TestResults directory with given LogFileName.
         ///
-        ///      Example: /logger:TfsPublisher;
-        ///                Collection=&lt;team project collection url&gt;;
-        ///                BuildName=&lt;build name&gt;;
-        ///                TeamProject=&lt;team project name&gt;
-        ///                [;Platform=&lt;Defaults to &quot;Any CPU&quot; [rest of string was truncated]&quot;;.
+        ///      Change the verbosity level for console logger. Allowed values for verbosity: minimal, normal.
+        ///      Example: /logger:console;verbosity=&lt;Defaults to &quot;minimal&quot;&gt;
+        ///
+        ///      To publish test results to Team Foun [rest of string was truncated]&quot;;.
         /// </summary>
         public static string EnableLoggersArgumentHelp {
             get {
