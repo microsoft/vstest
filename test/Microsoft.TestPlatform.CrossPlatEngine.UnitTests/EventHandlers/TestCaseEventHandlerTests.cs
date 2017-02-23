@@ -27,140 +27,55 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.EventHandlers
     [TestClass]
     public class TestCaseEventHandlerTests
     {
-        private TestableInProcDataCollectionExtensionManager testableInProcDataCollectionExtensionManager;
 
         private Mock<ITestCaseEventsHandler> mockTestCaseEvents;
 
-        private TestCaseEventsHandler testCasesEventsHandler;
+        private Mock<IDataCollectionTestCaseEventManager> mockDataCollectionTestCaseEventManager;
 
-        private string settingsXml = @"<RunSettings>
-                                    <InProcDataCollectionRunSettings>
-                                        <InProcDataCollectors>
-                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll'>
-                                                <Configuration>
-                                                    <Port>4312</Port>
-                                                </Configuration>
-                                            </InProcDataCollector>
-                                        </InProcDataCollectors>
-                                    </InProcDataCollectionRunSettings>
-                                </RunSettings>";
+        private TestCaseEventsHandler testCasesEventsHandler;
 
         [TestInitialize]
         public void InitializeTests()
         {
-            this.testableInProcDataCollectionExtensionManager = new TestableInProcDataCollectionExtensionManager(settingsXml, null);
+            this.mockDataCollectionTestCaseEventManager = new Mock<IDataCollectionTestCaseEventManager>();
+
             this.mockTestCaseEvents = new Mock<ITestCaseEventsHandler>();
-            this.testCasesEventsHandler = new TestCaseEventsHandler(this.testableInProcDataCollectionExtensionManager, this.mockTestCaseEvents.Object);
+            this.testCasesEventsHandler = new TestCaseEventsHandler(this.mockDataCollectionTestCaseEventManager.Object, this.mockTestCaseEvents.Object);
         }
 
         [TestMethod]
         public void SendTestCaseStartShouldCallTriggerTestCaseStartOnInProcDataCollectionManager()
-        {            
-            this.testCasesEventsHandler.SendTestCaseStart(null);
-            Assert.IsTrue(
-                (this.testableInProcDataCollectionExtensionManager.TestCaseStartCalled == 1),
-                "TestCaseStart must be called once");
+        {
+            this.testCasesEventsHandler.SendTestCaseStart(new TestCase());
+            this.mockDataCollectionTestCaseEventManager.Verify(x => x.RaiseTestCaseStart(It.IsAny<TestCaseStartEventArgs>()), Times.Once);
         }
 
         [TestMethod]
         public void SendTestCaseEndShouldCallTriggerTestCaseEndOnInProcDataCollectionManager()
         {
-            this.testCasesEventsHandler.SendTestCaseEnd(null, TestOutcome.Passed);
-            Assert.IsTrue(
-                (this.testableInProcDataCollectionExtensionManager.TestCaseEndCalled == 1),
-                "TestCaseStart must be called once");
+            this.testCasesEventsHandler.SendTestCaseEnd(new TestCase(), TestOutcome.Passed);
+            this.mockDataCollectionTestCaseEventManager.Verify(x => x.RaiseTestCaseEnd(It.IsAny<TestCaseEndEventArgs>()), Times.Once);
         }
 
         [TestMethod]
         public void SendTestResultShouldCallTriggerUpdateTestResultOnInProcDataCollectionManager()
         {
-            this.testCasesEventsHandler.SendTestResult(null);
-            Assert.IsTrue(
-                (this.testableInProcDataCollectionExtensionManager.UpdateTestResult == 1),
-                "TestCaseStart must be called once");
+            this.testCasesEventsHandler.SendTestResult(new TestResult(new TestCase()));
+            this.mockDataCollectionTestCaseEventManager.Verify(x => x.RaiseTestResult(It.IsAny<TestResultEventArgs>()), Times.Once);
         }
 
         [TestMethod]
         public void TestCaseEventsFromClientsShouldBeCalledWhenTestCaseEventsAreCalled()
         {
-            this.testCasesEventsHandler.SendTestCaseStart(null);
-            this.testCasesEventsHandler.SendTestCaseEnd(null, TestOutcome.Passed);
-            this.testCasesEventsHandler.SendTestResult(null);
+            var testCase = new TestCase();
+            this.testCasesEventsHandler.SendTestCaseStart(testCase);
+            this.testCasesEventsHandler.SendTestCaseEnd(testCase, TestOutcome.Passed);
+            var testResult = new TestResult(testCase);
+            this.testCasesEventsHandler.SendTestResult(testResult);
 
-            this.mockTestCaseEvents.Verify(x => x.SendTestCaseStart(null), Times.Once);
-            this.mockTestCaseEvents.Verify(x => x.SendTestCaseEnd(null, TestOutcome.Passed), Times.Once);
-            this.mockTestCaseEvents.Verify(x => x.SendTestResult(null), Times.Once);
-        }
-
-        internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
-        {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache) : base(runSettings, testRunCache)
-            {
-            }
-
-            public IDictionary<string, IInProcDataCollector> DataCollectors => this.inProcDataCollectors;
-
-            protected override IInProcDataCollector CreateDataCollector(DataCollectorSettings dataCollectorSettings, TypeInfo interfaceTypeInfo)
-            {
-                return new MockDataCollector(dataCollectorSettings);
-            }
-
-            public int TestSessionStartCalled { get; private set; }
-            public int TestSessionEndCalled { get; private set; }
-            public int TestCaseStartCalled { get; private set; }
-            public int TestCaseEndCalled { get; private set; }
-            public int UpdateTestResult { get; private set; }
-
-            public override void TriggerTestSessionStart()
-            {
-                TestSessionStartCalled++;
-            }
-
-            public override void TriggerTestSessionEnd()
-            {
-                TestSessionEndCalled++;
-            }
-
-            public override void TriggerTestCaseStart(TestCase testCase)
-            {
-                TestCaseStartCalled++;
-            }
-
-            public override void TriggerTestCaseEnd(TestCase testCase, TestOutcome outcome)
-            {
-                TestCaseEndCalled++;
-            }
-
-            public override bool TriggerUpdateTestResult(TestResult testResult)
-            {
-                this.UpdateTestResult++;
-                return true;
-            }
-        }
-
-        public class MockDataCollector : IInProcDataCollector
-        {
-            public MockDataCollector(DataCollectorSettings dataCollectorSettings)
-            {
-                this.DataCollectorSettings = dataCollectorSettings;
-            }
-
-            public string AssemblyQualifiedName => this.DataCollectorSettings.AssemblyQualifiedName;
-
-            public DataCollectorSettings DataCollectorSettings
-            {
-                get;
-                private set;
-            }
-
-            public void LoadDataCollector(IDataCollectionSink inProcDataCollectionSink)
-            {
-                // Do Nothing
-            }
-
-            public void TriggerInProcDataCollectionMethod(string methodName, InProcDataCollectionArgs methodArg)
-            {
-            }
+            this.mockTestCaseEvents.Verify(x => x.SendTestCaseStart(testCase), Times.Once);
+            this.mockTestCaseEvents.Verify(x => x.SendTestCaseEnd(testCase, TestOutcome.Passed), Times.Once);
+            this.mockTestCaseEvents.Verify(x => x.SendTestResult(testResult), Times.Once);
         }
     }
 }

@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    
+
     /// <summary>
     /// Interface for sending test case events from test exectuion process to data collection process
     /// </summary>
