@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProductSource Include="$(SourceRoot)**\*.csproj" Exclude="$(SourceRoot)package\**\*.csproj" />
-    <ExcludeProductSource Include="$(SourceRoot)package\**\*.csproj" />
   </ItemGroup>
 
   <Target Name="Localize">
