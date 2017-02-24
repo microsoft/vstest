@@ -28,10 +28,6 @@ Param(
     [System.Boolean] $FailFast = $true,
 
     [Parameter(Mandatory=$false)]
-    [Alias("xlf")]
-    [Switch] $SyncXlf = $false,
-
-    [Parameter(Mandatory=$false)]
     [Alias("noloc")]
     [Switch] $DisableLocalizedBuild = $false,
 
@@ -138,8 +134,9 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
+    # Uncomment to pull in additional shared frameworks.
     # This is added to get netcoreapp1.1 shared components.
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
+    #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -170,8 +167,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -268,8 +265,8 @@ function Publish-Package
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
 }
 
 function Create-VsixPackage
@@ -367,26 +364,23 @@ function Copy-PackageItems($packageName)
 function Update-LocalizedResources
 {
     $timer = Start-Timer
+    $dotnetExe = Get-DotNetPath
 
-    Write-Log "Update-LocalizedResources: Started."
-
-    # For each resx file, file the xlf files in all languages
-    # Sync the resx to xlf to ensure all new resources are added
-    $xlfTool = Join-Path $env:TP_PACKAGES_DIR "fmdev.xlftool\0.1.2\tools\xlftool.exe"
-    $resxFiles = Get-ChildItem -Recurse -Include *.resx "$env:TP_ROOT_DIR\src"
-
-    foreach ($resxFile in $resxFiles) {
-        Write-Log "... Resource: $resxFile"
-
-        foreach ($lang in @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")) {
-            $xlfFile = Join-Path $($resxFile.Directory.FullName) "xlf\$($resxFile.BaseName).$lang.xlf"
-
-            Write-VerboseLog "$xlfTool update -resx $($resxFile.FullName) -xlf $xlfFile -verbose"
-            & $xlfTool update -resx $resxFile.FullName -xlf $xlfFile -verbose
-        }
+    Write-Log ".. Update-LocalizedResources: Started: $TPB_Solution"
+    if (!$TPB_LocalizedBuild) {
+        Write-Log ".. Update-LocalizedResources: Skipped based on user setting."
+        return
     }
 
-    Write-Log "Update-LocalizedResources: Complete. {$(Get-ElapsedTime($timer))}"
+    $localizationProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "Localize\Localize.proj"
+    Write-Verbose "& $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize"
+    & $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize
+
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
+    }
+
+    Write-Log ".. Update-LocalizedResources: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
 #
@@ -524,7 +518,7 @@ if ($ProjectNamePatterns.Count -eq 0)
 
         Install-DotNetCli
         Restore-Package
-        #Update-LocalizedResources
+        Update-LocalizedResources
         Invoke-Build
         Publish-Package
         Create-VsixPackage
