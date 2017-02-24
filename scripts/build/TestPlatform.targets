@@ -2,8 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
-    <LocalizationTargetEnabled Condition="'$(SyncXlf)' == 'true' or '$(LocalizedBuild)' == 'true'">true</LocalizationTargetEnabled>
   </PropertyGroup>
 
-  <Import Condition="'$(LocalizationTargetEnabled)' == 'true'" Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" /> 
+  <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" /> 
 </Project>

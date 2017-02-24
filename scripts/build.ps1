@@ -28,10 +28,6 @@ Param(
     [System.Boolean] $FailFast = $true,
 
     [Parameter(Mandatory=$false)]
-    [Alias("xlf")]
-    [Switch] $SyncXlf = $false,
-
-    [Parameter(Mandatory=$false)]
     [Alias("noloc")]
     [Switch] $DisableLocalizedBuild = $false,
 
@@ -84,7 +80,7 @@ $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
-$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\VSIXProject"
+$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -138,8 +134,9 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
+    # Uncomment to pull in additional shared frameworks.
     # This is added to get netcoreapp1.1 shared components.
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
+    #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -170,8 +167,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SyncXlf
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -188,7 +185,7 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
-    $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package.csproj"
+    $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
     $testhostFullPackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFramework\$TPB_TargetRuntime")
@@ -196,7 +193,7 @@ function Publish-Package
     $vstestConsoleProject = Join-Path $env:TP_ROOT_DIR "src\vstest.console\vstest.console.csproj"
     $dataCollectorProject = Join-Path $env:TP_ROOT_DIR "src\datacollector\datacollector.csproj"
 
-    Write-Log "Package: Publish package\*.csproj"
+    Write-Log "Package: Publish src\package\package\package.csproj"
 
 
     Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
@@ -268,8 +265,8 @@ function Publish-Package
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:SyncXlf=$SyncXlf -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal
 }
 
 function Create-VsixPackage
@@ -317,7 +314,7 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
-    $tpSrcDir = Join-Path $env:TP_ROOT_DIR "src"
+    $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
     $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec")
@@ -325,15 +322,13 @@ function Create-NugetPackages
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
     foreach ($file in $nuspecFiles + $targetFiles) {
-        Copy-Item $tpSrcDir\$file $stagingDir -Force
+        Copy-Item $tpNuspecDir\$file $stagingDir -Force
     }
 
-    # Copy props file.
-    Copy-Item $tpSrcDir\"Microsoft.Net.Test.Sdk.props" $stagingDir\"Microsoft.Net.Test.Sdk.props" -Force
-
-    # Copy over empty and third patry notice file.
-    Copy-Item $tpSrcDir\package\"_._" $stagingDir -Force
-    Copy-Item $tpSrcDir\package\"ThirdPartyNotices.txt" $stagingDir -Force
+    # Copy over props, empty and third patry notice file
+    Copy-Item $tpNuspecDir\"Microsoft.Net.Test.Sdk.props" $stagingDir -Force
+    Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
+    Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
 
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
@@ -369,26 +364,23 @@ function Copy-PackageItems($packageName)
 function Update-LocalizedResources
 {
     $timer = Start-Timer
+    $dotnetExe = Get-DotNetPath
 
-    Write-Log "Update-LocalizedResources: Started."
-
-    # For each resx file, file the xlf files in all languages
-    # Sync the resx to xlf to ensure all new resources are added
-    $xlfTool = Join-Path $env:TP_PACKAGES_DIR "fmdev.xlftool\0.1.2\tools\xlftool.exe"
-    $resxFiles = Get-ChildItem -Recurse -Include *.resx "$env:TP_ROOT_DIR\src"
-
-    foreach ($resxFile in $resxFiles) {
-        Write-Log "... Resource: $resxFile"
-
-        foreach ($lang in @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")) {
-            $xlfFile = Join-Path $($resxFile.Directory.FullName) "xlf\$($resxFile.BaseName).$lang.xlf"
-
-            Write-VerboseLog "$xlfTool update -resx $($resxFile.FullName) -xlf $xlfFile -verbose"
-            & $xlfTool update -resx $resxFile.FullName -xlf $xlfFile -verbose
-        }
+    Write-Log ".. Update-LocalizedResources: Started: $TPB_Solution"
+    if (!$TPB_LocalizedBuild) {
+        Write-Log ".. Update-LocalizedResources: Skipped based on user setting."
+        return
     }
 
-    Write-Log "Update-LocalizedResources: Complete. {$(Get-ElapsedTime($timer))}"
+    $localizationProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "Localize\Localize.proj"
+    Write-Verbose "& $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize"
+    & $dotnetExe msbuild $localizationProject -m -nologo -v:minimal -t:Localize
+
+    if ($lastExitCode -ne 0) {
+        Set-ScriptFailed
+    }
+
+    Write-Log ".. Update-LocalizedResources: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
 #
@@ -526,7 +518,7 @@ if ($ProjectNamePatterns.Count -eq 0)
 
         Install-DotNetCli
         Restore-Package
-        #Update-LocalizedResources
+        Update-LocalizedResources
         Invoke-Build
         Publish-Package
         Create-VsixPackage
