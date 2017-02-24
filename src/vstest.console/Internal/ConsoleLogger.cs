@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// <summary>
         /// Level of verbosity
         /// </summary>
-        private Verbosity verbosityLevel = Verbosity.Normal;
+        private Verbosity verbosityLevel = Verbosity.Minimal;
 
         private TestOutcome testOutcome = TestOutcome.None;
         private int testsTotal = 0;
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Get the verbosity level for the console logger
         /// </summary>
         public Verbosity VerbosityLevel => verbosityLevel;
-        
+
         #endregion
 
         #region ITestLoggerWithParameters
@@ -289,8 +289,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
                     break;
             }
-
-            Output.WriteLine(string.Empty, (OutputLevel)e.Level);
         }
 
         /// <summary>
@@ -324,12 +322,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
             else if (e.Result.Outcome == TestOutcome.Passed)
             {
-                string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
                 if (!this.verbosityLevel.Equals(Verbosity.Minimal))
                 {
+                    string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
                     Output.WriteLine(output, OutputLevel.Information);
                 }
                 this.testsPassed++;
+            }
+            else
+            {
+                string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, name);
+                Output.WriteLine(output, OutputLevel.Information);
+                DisplayFullInformation(e.Result);
             }
         }
 

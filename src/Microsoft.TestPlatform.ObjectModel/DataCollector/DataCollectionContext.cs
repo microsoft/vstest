@@ -4,13 +4,12 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
     using System;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Class representing the context in which data collection occurs.
     /// </summary>
-#if NET451
-    [Serializable] 
-#endif
+    [DataContract]
     public class DataCollectionContext
     {
         #region Constructors
@@ -74,11 +73,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets test case.
         /// </summary>
+        [DataMember]
         public TestCase TestCase { get; private set; }
 
         /// <summary>
         /// Identifies the session under which the data collection occurs.  Will not be null.
         /// </summary>
+        [DataMember]
         public SessionId SessionId
         {
             get
@@ -91,6 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// Identifies the test execution under which the data collection occurs,
         /// or null if no such test exists.
         /// </summary>
+        [DataMember]
         public TestExecId TestExecId
         {
             get
@@ -102,6 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Returns true if there is an executing test case associated with this context.
         /// </summary>
+        [DataMember]
         public bool HasTestCase
         {
             get { return testExecId != null; }

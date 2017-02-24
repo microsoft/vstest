@@ -215,8 +215,11 @@
       <trans-unit id="EnableLoggersArgumentHelp">
         <source>--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       Specify a logger for test results.  For example, to log results into a 
-      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
+      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
+
+      Change the verbosity level for console logger. Allowed values for verbosity: minimal, normal.
+      Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
       Example: /logger:TfsPublisher;
@@ -1517,6 +1520,11 @@ Standardeinstellungen werden verwendet, wenn die Verwendung der Einstellungsdate
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
         <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="NotRunTestIndicator">
+        <source>Not Run  {0}</source>
+        <target state="new">Not Run  {0}</target>
         <note></note>
       </trans-unit>
     </body>

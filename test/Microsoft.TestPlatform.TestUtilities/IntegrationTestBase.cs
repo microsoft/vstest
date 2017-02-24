@@ -73,6 +73,8 @@ namespace Microsoft.TestPlatform.TestUtilities
                 arguments = string.Concat(arguments, " /Framework:", EncloseInQuotes(framework));
             }
 
+            arguments = string.Concat(arguments, " /logger:console;verbosity=normal");
+
             return arguments;
         }
 
