@@ -17,7 +17,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.0.0",
+    [System.String] $Version = "15.1.0",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -82,10 +82,8 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
-$FullVersion = $Version
-if ($VersionSuffix -ne '') {
-    $FullVersion += "-" + $VersionSuffix
-}
+# Version suffix is empty for RTM releases
+$FullVersion = if ($VersionSuffix -ne '') {$Version + "-" + $VersionSuffix} else {$Version}
 $TPB_FullVersion = $FullVersion
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
@@ -503,10 +501,10 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Started."
 
     $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = "15.0.4" # Hardcode since we want to keep 15.0.0 for other assemblies.
+    $vsixVersion = $Version
 
     # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
-    # So Version of the vsix will be 15.0.4.2017011101
+    # So Version of the vsix will be 15.1.0.2017011101
     $vsixVersionSuffix = $VersionSuffix.Split("-");
     if($vsixVersionSuffix.Length -ige 2) {
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
@@ -518,33 +516,10 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Completed."
 }
 
-if ($ProjectNamePatterns.Count -eq 0)
+function Build-SpecificProjects
 {
-        # Execute build
-        $timer = Start-Timer
-        Write-Log "Build started: args = '$args'"
-        Write-Log "Test platform environment variables: "
-        Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
-
-        Write-Log "Test platform build variables: "
-        Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-
-        Install-DotNetCli
-        Restore-Package
-        #Update-LocalizedResources
-        Invoke-Build
-        Publish-Package
-        Create-VsixPackage
-        Create-NugetPackages
-
-        Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
-
-        if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
-}
-else
-{
-    # Build Specific projects.
-    # Framework format ("<target_framework>", "<output_dir>").
+    Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
+    # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
     $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp1.0"), ("netcoreapp1.0", "netcoreapp1.0"))
     $dotnetPath = Get-DotNetPath
 
@@ -555,6 +530,10 @@ else
                 $ProjectsToBuild += ,"$_"
             }
         }
+    }
+
+    if( $ProjectsToBuild -eq $null){
+        Write-Error "No csproj name match for given pattern: $ProjectNamePatterns"
     }
 
     # Build Projects.
@@ -581,4 +560,29 @@ else
             }
         }
     }
+}
+
+if ($ProjectNamePatterns.Count -eq 0)
+{
+    # Execute build
+    $timer = Start-Timer
+    Write-Log "Build started: args = '$args'"
+    Write-Log "Test platform environment variables: "
+    Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
+    Write-Log "Test platform build variables: "
+    Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
+    Install-DotNetCli
+    Restore-Package
+    #Update-LocalizedResources
+    Invoke-Build
+    Publish-Package
+    Create-VsixPackage
+    Create-NugetPackages
+    Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+    if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
+}
+else
+{
+    # Build Specific projects.
+    Build-SpecificProjects
 }
