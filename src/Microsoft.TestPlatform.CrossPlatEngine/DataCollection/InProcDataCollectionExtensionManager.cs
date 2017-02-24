@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             // Initialize InProcDataCollectors
             this.InitializeInProcDataCollectors(runSettings);
 
-            FlushResultTestResultPoperty = TestProperty.Register(id: "allowTestResultFlush", label: "allowTestResultFlush", category: string.Empty, description: string.Empty, valueType: typeof(bool), validateValueCallback: null, attributes: TestPropertyAttributes.None, owner: typeof(TestCase));
+            FlushResultTestResultPoperty = TestProperty.Register(id: "allowTestResultFlush", label: "allowTestResultFlush", category: string.Empty, description: string.Empty, valueType: typeof(bool?), validateValueCallback: null, attributes: TestPropertyAttributes.None, owner: typeof(TestCase));
 
             if (this.IsInProcDataCollectionEnabled)
             {
@@ -297,7 +297,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 this.IsInProcDataCollectionEnabled = this.InProcDataCollectors.Any();
             }
-        }        
+        }
 
         private void TriggerInProcDataCollectionMethods(string methodName, InProcDataCollectionArgs methodArg)
         {

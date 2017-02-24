@@ -75,10 +75,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         {
             this.dataCollectionTestCaseEventManager.RaiseTestResult(new TestResultEventArgs(result));
 
-            var flushResult = result.GetPropertyValue(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, false);
+            var flushResult = result.GetPropertyValue<bool?>(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, null);
 
             this.testCaseEvents?.SendTestResult(result);
-            return flushResult;
+
+            return flushResult == null ? true : flushResult.Value;
         }
     }
 }
