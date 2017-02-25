@@ -6,8 +6,8 @@
     <MSTestFrameworkVersion>1.0.8-rc2</MSTestFrameworkVersion>
     <MSTestAdapterVersion>1.1.10-rc2</MSTestAdapterVersion>
 
-    <XUnitFrameworkVersion>2.2.0-rc2-build3523</XUnitFrameworkVersion>
-    <XUnitAdapterVersion>2.2.0-rc2-build1249</XUnitAdapterVersion>
+    <XUnitFrameworkVersion>2.2.0</XUnitFrameworkVersion>
+    <XUnitAdapterVersion>2.2.0</XUnitAdapterVersion>
 
     <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
     <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
