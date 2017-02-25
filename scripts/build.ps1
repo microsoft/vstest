@@ -486,10 +486,10 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Started."
 
     $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = "15.0.4" # Hardcode since we want to keep 15.0.0 for other assemblies.
+    $vsixVersion = "15.0.26226" # Hardcode since we want to keep 15.0.0 for other assemblies and 15.0.26004.1 is the version of vsix VS RC2
 
     # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
-    # So Version of the vsix will be 15.0.4.2017011101
+    # So Version of the vsix will be 15.0.26226.2017011101
     $vsixVersionSuffix = $VersionSuffix.Split("-");
     if($vsixVersionSuffix.Length -ige 2) {
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
