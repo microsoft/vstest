@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
+    <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <NETTestSdkPreviousVersion>15.0.0-preview-20170106-08</NETTestSdkPreviousVersion>
 
     <MSTestFrameworkVersion>1.0.8-rc2</MSTestFrameworkVersion>
@@ -11,5 +12,7 @@
 
     <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
     <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
+
+    <ChutzpahAdapterVersion>4.2.4</ChutzpahAdapterVersion>
   </PropertyGroup>
 </Project>

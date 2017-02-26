@@ -20,7 +20,7 @@
       <FromP2P>true</FromP2P>
     </ProjectReference>
     <PackageReference Include="Chutzpah">
-      <Version>4.2.4</Version>
+      <Version>$(ChutzpahAdapterVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.TestAsset.NativeCPP">
       <Version>1.0.0</Version>

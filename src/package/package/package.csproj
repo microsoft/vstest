@@ -48,6 +48,10 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+
+    <!-- For net46, testhost is packaged along with runner, include it in publish -->
+    <ProjectReference Include="$(TestPlatformRoot)src\testhost\testhost.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\testhost.x86\testhost.x86.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <PackageReference Include="Microsoft.NETCore.App">
