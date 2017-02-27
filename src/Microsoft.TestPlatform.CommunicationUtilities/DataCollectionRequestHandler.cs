@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
     using System;
+    using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -23,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDisposable
     {
         private const int dataCollectionConnTimeout = 15 * 1000;
-        private static readonly object obj = new object();
+        private static readonly object syncObject = new object();
 
         private readonly ICommunicationManager communicationManager;
 
@@ -82,10 +83,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// Creates singleton instance of DataCollectionRequestHandler.
         /// </summary>
         /// <param name="communicationManager">
-        /// The communication Manager.
+        /// Handles socket communication.
         /// </param>
         /// <param name="messageSink">
-        /// The message Sink.
+        /// Message sink for sending messages to execution process. 
         /// </param>
         /// <returns>
         /// The instance of <see cref="DataCollectionRequestHandler"/>.
@@ -97,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 ValidateArg.NotNull(communicationManager, nameof(communicationManager));
                 ValidateArg.NotNull(messageSink, nameof(messageSink));
 
-                lock (obj)
+                lock (syncObject)
                 {
                     if (Instance == null)
                     {
@@ -218,9 +219,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             }
                         }
 
-                        var attachments = this.dataCollectionManager.SessionEnded(isCancelled);
+                        var attachmentsTask = Task<Collection<AttachmentSet>>.Factory.StartNew(
+                            () =>
+                                {
+                                    return this.dataCollectionManager.SessionEnded(isCancelled);
+                                },
+                            this.cancellationTokenSource.Token);
 
-                        this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachments);
+                        attachmentsTask.Wait(this.cancellationTokenSource.Token);
+
+                        this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachmentsTask.Result);
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");

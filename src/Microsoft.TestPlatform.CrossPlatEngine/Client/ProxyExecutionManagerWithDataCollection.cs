@@ -18,7 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
-        private readonly ITestHostManager testHostManager;
         private DataCollectionParameters dataCollectionParameters;
 
         /// <summary>
@@ -34,7 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
-            this.testHostManager = testHostManager;
         }
 
         /// <summary>
@@ -135,14 +133,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <inheritdoc />
-        protected override TestProcessStartInfo GetTestHostProcessStartInfo(
-            IEnumerable<string> sources,
-            TestRunnerConnectionInfo connectionInfo)
+        protected override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
-            var testHostProcessStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, this.dataCollectionParameters.EnvironmentVariables, connectionInfo);
-            testHostProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionParameters.DataCollectionEventsPort;
+            if (testProcessStartInfo.EnvironmentVariables == null)
+            {
+                testProcessStartInfo.EnvironmentVariables = this.dataCollectionParameters.EnvironmentVariables;
+            }
+            else
+            {
+                foreach (var kvp in this.dataCollectionParameters.EnvironmentVariables)
+                {
+                    testProcessStartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
+                }
+            }
 
-            return testHostProcessStartInfo;
+            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionParameters.DataCollectionEventsPort;
+
+            return testProcessStartInfo;
         }
     }
 

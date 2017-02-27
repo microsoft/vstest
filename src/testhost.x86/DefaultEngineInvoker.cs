@@ -88,6 +88,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
                 // Wait for either processing to complete or parent process exit
                 Task.WaitAny(processingTask, parentProcessMonitoringTask);
+
+                // Close socket communication connection.
+                DataCollectionTestCaseEventSender.Instance.Close();
             }
         }
 
