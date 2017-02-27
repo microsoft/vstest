@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
   </PropertyGroup>
-  <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
+  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.TestPlatform.TestUtilities</AssemblyName>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
@@ -17,7 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework">
-      <Version>1.0.4-preview</Version>
+      <Version>$(MSTestFrameworkVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">

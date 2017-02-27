@@ -31,6 +31,9 @@
     <DefineConstants>$(DefineConstants);CODE_ANALYSIS</DefineConstants>
   </PropertyGroup> 
 
+  <!-- Package dependency versions -->
+  <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Dependencies.props" />
+
   <!-- Common dependencies for all projects -->
   <ItemGroup>
     <!--<PackageReference Include="StyleCop.Analyzers">-->
@@ -45,6 +48,7 @@
     </AdditionalFiles>
   </ItemGroup>
 
+  <!-- Test project settings -->
   <Choose>
     <When Condition="$(TestProject) == 'true'"> 
       <PropertyGroup>
@@ -76,10 +80,10 @@
         </ProjectReference>
 
         <PackageReference Include="MSTest.TestFramework">
-          <Version>1.0.7-preview</Version>
+          <Version>$(MSTestFrameworkVersion)</Version>
         </PackageReference>
         <PackageReference Include="MSTest.TestAdapter">
-          <Version>1.1.6-preview</Version>
+          <Version>$(MSTestAdapterVersion)</Version>
         </PackageReference>
         <PackageReference Include="Moq">
           <Version>4.6.38-*</Version>

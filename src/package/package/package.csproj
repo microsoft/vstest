@@ -5,9 +5,8 @@
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
-    <TargetFrameworks>net46;netcoreapp1.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <AssemblyName>package</AssemblyName>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -48,15 +47,11 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+
+    <!-- For net46, testhost is packaged along with runner, include it in publish -->
+    <ProjectReference Include="$(TestPlatformRoot)src\testhost\testhost.csproj" />
+    <ProjectReference Include="$(TestPlatformRoot)src\testhost.x86\testhost.x86.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <PackageReference Include="Microsoft.NETCore.App">
-      <Version>1.0.0</Version>
-    </PackageReference>
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
   <Target Name="CoreCompile" />
   <!-- Prevent Csc from being called -->

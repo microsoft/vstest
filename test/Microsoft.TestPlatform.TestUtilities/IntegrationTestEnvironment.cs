@@ -4,7 +4,9 @@
 namespace Microsoft.TestPlatform.TestUtilities
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
+    using System.Xml;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -15,8 +17,9 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestEnvironment
     {
-        private readonly string testPlatformRootDirectory;
+        private static Dictionary<string, string> dependencyVersions;
 
+        private readonly string testPlatformRootDirectory;
         private readonly bool runningInCli;
 
         public IntegrationTestEnvironment()
@@ -76,6 +79,19 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
         }
 
+        public Dictionary<string, string> DependencyVersions
+        {
+            get
+            {
+                if (dependencyVersions == null)
+                {
+                    dependencyVersions = GetDependencies(this.testPlatformRootDirectory);
+                }
+
+                return dependencyVersions;
+            }
+        }
+
         /// <summary>
         /// Gets the nuget packages directory for enlistment.
         /// </summary>
@@ -106,9 +122,10 @@ namespace Microsoft.TestPlatform.TestUtilities
                 {
                     value = Path.Combine(
                     this.testPlatformRootDirectory,
-                    @"src\Microsoft.TestPlatform.VSIXCreator\bin",
+                    @"src\package\package\bin",
                     this.BuildConfiguration,
-                    "net46");
+                    this.RunnerFramework,
+                    this.TargetRuntime);
                 }
 
                 return value;
@@ -225,6 +242,36 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
             return consoleRunnerPath;
+        }
+
+        private static Dictionary<string, string> GetDependencies(string testPlatformRoot)
+        {
+            var dependencyPropsFile = Path.Combine(testPlatformRoot, @"scripts\build\TestPlatform.Dependencies.props");
+            var dependencyProps = new Dictionary<string, string>();
+            if (!File.Exists(dependencyPropsFile))
+            {
+                throw new FileNotFoundException("Dependency props file not found: " + dependencyPropsFile);
+            }
+
+            using (var reader = XmlReader.Create(dependencyPropsFile))
+            {
+                reader.ReadToFollowing("PropertyGroup");
+                using (var props = reader.ReadSubtree())
+                {
+                    props.MoveToContent();
+                    props.Read();   // Read thru the PropertyGroup node
+                    while (!props.EOF)
+                    {
+                        if (props.IsStartElement() && !string.IsNullOrEmpty(props.Name))
+                        {
+                            dependencyProps.Add(props.Name, props.ReadElementContentAsString());
+                        }
+                        props.Read();
+                    }
+                }
+            }
+
+            return dependencyProps;
         }
     }
 }

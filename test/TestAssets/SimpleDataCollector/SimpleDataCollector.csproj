@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- Package dependency versions -->
+  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
+
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
@@ -7,25 +10,16 @@
     <AssemblyOriginatorKeyFile>TITestDllKey.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework">
-      <Version>1.0.4-preview</Version>
+      <Version>$(MSTestFrameworkVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel">
-      <Version>15.0.0-*</Version>
+      <Version>$(NETTestSdkPreviousVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20170106-08</Version>
+      <Version>$(NETTestSdkPreviousVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System.Runtime" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
 </Project>
