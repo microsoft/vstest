@@ -106,7 +106,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void ProcessRequestsShouldProcessBeforeTestCaseStartEvent()
         {
-            System.Diagnostics.Debugger.Launch();
             var message = new Message();
             message.MessageType = MessageType.BeforeTestCaseStart;
             message.Payload = JToken.FromObject(new TestCaseEndEventArgs());
