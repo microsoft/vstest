@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- Package dependency versions -->
+  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
+
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net46;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>SimpleTestProject</AssemblyName>
@@ -7,13 +10,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework">
-      <Version>1.0.6-preview</Version>
+      <Version>$(MSTestFrameworkVersion)</Version>
     </PackageReference>
     <PackageReference Include="MSTest.TestAdapter">
-      <Version>1.1.6-preview</Version>
+      <Version>$(MSTestAdapterVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20170106-08</Version>
+      <Version>$(NETTestSdkPreviousVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
@@ -29,8 +32,5 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net46'">
     <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
 </Project>

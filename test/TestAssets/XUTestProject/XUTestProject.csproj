@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-16"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- Package dependency versions -->
+  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
+
   <PropertyGroup>
     <TargetFrameworks>net46;netcoreapp1.0;netcoreapp1.1</TargetFrameworks>
     <AssemblyName>XUTestProject</AssemblyName>
@@ -7,21 +10,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="xunit">
-      <Version>2.2.0-beta3-build3402</Version>
+      <Version>$(XUnitFrameworkVersion)</Version>
     </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio">
-      <Version>2.2.0-beta4-build1188</Version>
+      <Version>$(XUnitAdapterVersion)</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk">
-      <Version>15.0.0-preview-20170106-08</Version>
+      <Version>$(NETTestSdkPreviousVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System.Runtime" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>
 </Project>
