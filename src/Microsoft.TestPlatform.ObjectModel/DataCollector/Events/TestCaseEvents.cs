@@ -16,6 +16,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
+        /// Default constructor added for serialization/deserialization.
+        /// </summary>
+        public TestCaseEventArgs()
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseEventArgs"/> class. 
         /// </summary>
         /// <param name="context">
@@ -129,6 +136,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor       
 
         /// <summary>
+        /// Default constructor for serialization/deserialization
+        /// </summary>
+        public TestCaseStartEventArgs()
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseStartEventArgs"/> class with default datacollection context.
         /// </summary>
         /// <param name="testElement">
@@ -197,6 +211,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     public sealed class TestCaseEndEventArgs : TestCaseEventArgs
     {
         #region Constructor
+        /// <summary>
+        /// Default constructor added for serialization/deserialization.
+        /// </summary>
+        public TestCaseEndEventArgs()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseEndEventArgs"/> class with default data collection context.
@@ -321,6 +341,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     public sealed class TestResultEventArgs : TestCaseEventArgs
     {
         #region Constructor
+
+        /// <summary>
+        /// Default constructor for serialization/deserialization
+        /// </summary>
+        public TestResultEventArgs()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestResultEventArgs"/> class with default data collection context.
