@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="settingsXml">
         /// Runsettings that contains the datacollector related configuration.
         /// </param>
-        public ProxyDataCollectionManager(Architecture arch, string settingsXml, string targetFramework)
+        public ProxyDataCollectionManager(string settingsXml)
             : this(settingsXml, new DataCollectionRequestSender(), DataCollectionLauncherFactory.GetDataCollectorLauncher(new ProcessHelper()))
         {
         }
@@ -126,10 +126,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionRequestSender.Close();
         }
 
-        /// <summary>
-        /// The initialize socket communication.
-        /// </summary>
-        public void InitializeSocketCommunication()
+        /// <inheritdoc />
+        public void Initialize()
         {
             var port = this.dataCollectionRequestSender.InitializeCommunication();
 

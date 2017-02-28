@@ -64,14 +64,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
 
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-            var architecture = runconfiguration.TargetPlatform;
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator =
                 () =>
                     isDataCollectorEnabled
-                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings, runconfiguration.TargetFrameworkVersion.Name))
+                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(testRunCriteria.TestRunSettings))
                         : new ProxyExecutionManager(testHostManager);
 
             // parallelLevel = 1 for desktop should go via else route.
@@ -179,11 +178,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return parallelLevelToUse;
         }
 
-        private IProxyDataCollectionManager GetDataCollectionManager(Architecture architecture, string settingsXml, string targetFramework)
+        private IProxyDataCollectionManager GetDataCollectionManager(string settingsXml)
         {
             try
             {
-                return new ProxyDataCollectionManager(architecture, settingsXml, targetFramework);
+                return new ProxyDataCollectionManager(settingsXml);
             }
             catch (Exception ex)
             {

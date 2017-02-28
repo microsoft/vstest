@@ -36,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void InitializeSocketCommunicationShouldInitializeCommunication()
         {
-            this.proxyDataCollectionManager.InitializeSocketCommunication();
+            this.proxyDataCollectionManager.Initialize();
 
             Assert.IsTrue(this.mockDataCollectionLauncher.dataCollectorLaunched);
             Assert.IsTrue(this.mockDataCollectionRequestSender.waitForRequestHandlerConnection);
