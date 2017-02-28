@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 var dcPort = GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
                 if (dcPort > 0)
                 {
-                    var dataCollectionTestCaseEventSender=DataCollectionTestCaseEventSender.Create(null);
+                    var dataCollectionTestCaseEventSender=DataCollectionTestCaseEventSender.Create();
                     dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
                     dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
                 }

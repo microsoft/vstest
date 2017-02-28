@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
-    internal class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
+    public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
     {
         private static readonly object obj = new object();
 
@@ -36,7 +36,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Gets the singleton instance of DataCollectionTestCaseEventSender.
         /// </summary>
-        internal static DataCollectionTestCaseEventSender Instance { get; private set; }
+        // todo : Refactor to pass the instance as singleton.
+        public static DataCollectionTestCaseEventSender Instance { get; private set; }
 
         /// <summary>
         /// Gets singleton instance of DataCollectionRequestHandler.
@@ -44,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="communicationManager">
         /// The communication Manager.
         /// </param>
-        public static DataCollectionTestCaseEventSender Create(ICommunicationManager communicationManager)
+        public static DataCollectionTestCaseEventSender Create()
         {
             if (Instance == null)
             {
@@ -52,15 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 {
                     if (Instance == null)
                     {
-                        if (communicationManager == null)
-                        {
-                            Instance = new DataCollectionTestCaseEventSender();
-
-                        }
-                        else
-                        {
-                            Instance = new DataCollectionTestCaseEventSender(communicationManager);
-                        }
+                        Instance = new DataCollectionTestCaseEventSender();
                     }
                 }
             }
