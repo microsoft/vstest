@@ -21,6 +21,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
     using System.Threading;
     using System.Diagnostics;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using vstest.console.UnitTests.TestDoubles;
 
     [TestClass]
     public class TestRequestManagerTests
@@ -41,6 +42,42 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 TestLoggerManager.Instance,
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object);
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            CommandLineOptions.Instance.Reset();
+        }
+
+        [TestMethod]
+        public void TestRequestManagerShouldInitializeConsoleLogger()
+        {
+            var mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
+            var mockLoggerManager = new DummyTestLoggerManager(mockLoggerEvents);
+            CommandLineOptions.Instance.IsDesignMode = false;
+            var requestManager = new TestRequestManager(CommandLineOptions.Instance,
+                new Mock<ITestPlatform>().Object,
+                mockLoggerManager,
+                TestRunResultAggregator.Instance,
+                new Mock<ITestPlatformEventSource>().Object);
+
+            Assert.IsTrue(mockLoggerEvents.EventsSubscribed());
+        }
+
+        [TestMethod]
+        public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
+        {
+            var mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
+            var mockLoggerManager = new DummyTestLoggerManager(mockLoggerEvents);
+            CommandLineOptions.Instance.IsDesignMode = true;
+            var requestManager = new TestRequestManager(CommandLineOptions.Instance,
+                new Mock<ITestPlatform>().Object,
+                mockLoggerManager,
+                TestRunResultAggregator.Instance,
+                new Mock<ITestPlatformEventSource>().Object);
+
+            Assert.IsFalse(mockLoggerEvents.EventsSubscribed());
         }
 
         [TestMethod]
