@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Client;
@@ -190,13 +191,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Gets the test adapters from directory.
+        /// Gets the test adapters and loggers from directory.
         /// </summary>
         /// <param name="directory"> The directory. </param>
-        /// <returns> The list of test adapter assemblies. </returns>
+        /// <returns> The list of test adapter and logger assemblies. </returns>
         internal virtual IEnumerable<string> GetTestAdaptersFromDirectory(string directory)
         {
-            return Directory.EnumerateFiles(directory, TestPlatformConstants.TestAdapterPattern, SearchOption.AllDirectories);
+            List<string> adapterAndLogger = new List<string>(); 
+            adapterAndLogger.AddRange(Directory.EnumerateFiles(directory, TestPlatformConstants.TestAdapterPattern, SearchOption.AllDirectories).ToList());
+            adapterAndLogger.AddRange(Directory.EnumerateFiles(directory, TestPlatformConstants.TestLoggerPattern, SearchOption.AllDirectories).ToList());
+            return adapterAndLogger;
         }
 
         #endregion

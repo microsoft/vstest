@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
+    using Microsoft.VisualStudio.TestPlatform.Client;
 
     /// <summary>
     /// An argument processor that allows the user to enable a specific logger
@@ -44,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(TestLoggerManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(LoggerList.Instance));
                 }
 
                 return this.executor;
@@ -115,7 +116,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         #region Fields
 
-        private readonly TestLoggerManager loggerManager;
+        /// <summary>
+        /// Used for saving loggers info.
+        /// </summary>
+        LoggerList loggerList;
 
         #endregion
 
@@ -124,13 +128,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
         /// </summary>
-        /// <param name="loggerManager">
-        /// The logger manager.
+        /// <param name="loggerList">
+        /// It will have the list of logger.
         /// </param>
-        public EnableLoggerArgumentExecutor(TestLoggerManager loggerManager)
+        public EnableLoggerArgumentExecutor(LoggerList loggerList)
         {
-            Contract.Requires(loggerManager != null);
-            this.loggerManager = loggerManager;
+            Contract.Requires(loggerList != null);
+            this.loggerList = loggerList;
         }
 
         #endregion
@@ -155,34 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 if (parseSucceeded)
                 {
-                    if (loggerIdentifier.Equals(ConsoleLogger.FriendlyName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
-                    }
-                    else
-                    {
-                        // First assume the logger is specified by URI. If that fails try with friendly name.
-                        try
-                        {
-                            this.AddLoggerByUri(loggerIdentifier, parameters);
-                        }
-                        catch (CommandLineException)
-                        {
-                            string loggerUri;
-                            if (this.loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
-                            {
-                                this.AddLoggerByUri(loggerUri, parameters);
-                            }
-                            else
-                            {
-                                throw new CommandLineException(
-                                String.Format(
-                                CultureInfo.CurrentUICulture,
-                                CommandLineResources.LoggerNotFound,
-                                argument));
-                            }
-                        }
-                    }
+                    this.loggerList.AddLogger(argument, loggerIdentifier, parameters);
                 }
                 else
                 {
@@ -206,7 +183,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #endregion
 
         #region Private Methods
-
         /// <summary>
         /// Throws an exception indicating that the argument is invalid.
         /// </summary>
@@ -218,30 +194,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     CultureInfo.CurrentUICulture,
                     CommandLineResources.LoggerUriInvalid,
                     argument));
-        }
-
-        private void AddLoggerByUri(string argument, Dictionary<string, string> parameters)
-        {
-            // Get the uri and if it is not valid, throw.
-            Uri loggerUri = null;
-            try
-            {
-                loggerUri = new Uri(argument);
-            }
-            catch (UriFormatException)
-            {
-                HandleInvalidArgument(argument);
-            }
-
-            // Add the logger and if it is a non-existent logger, throw.
-            try
-            {
-                this.loggerManager.AddLogger(loggerUri, parameters);
-            }
-            catch (InvalidOperationException e)
-            {
-                throw new CommandLineException(e.Message, e);
-            }
         }
 
         #endregion
