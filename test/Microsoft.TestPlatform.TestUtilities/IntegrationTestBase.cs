@@ -21,8 +21,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     public class IntegrationTestBase
     {
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
-        private string standardTestOutput = string.Empty;
-        private string standardTestError = string.Empty;
+        protected string standardTestOutput = string.Empty;
+        protected string standardTestError = string.Empty;
 
         private string arguments = string.Empty;
 

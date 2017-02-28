@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
@@ -57,13 +58,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
         public virtual int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
             string dataCollectorProcessPath = null, processWorkingDirectory = null;
+            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
+            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
             dataCollectorProcessPath = Path.Combine(currentWorkingDirectory, DataCollectorProcessName);
-            // For IDEs and other scenario - Current directory should be the working directory - not the vstest.console.exe location
-            // For VS - this becomes the solution directory for example
-            // "TestResults" directory will be created at "current directory" of test host
             processWorkingDirectory = Directory.GetCurrentDirectory();
 
             var argumentsString = string.Join(" ", commandLineArguments);
