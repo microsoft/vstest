@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public ParallelRunDataAggregator()
         {
             ElapsedTime = TimeSpan.Zero;
-            RunContextAttachments = new List<AttachmentSet>();
+            RunContextAttachments = new Collection<AttachmentSet>();
             RunCompleteArgsAttachments = new List<AttachmentSet>();
             Exceptions = new List<Exception>();
             executorUris = new List<string>();
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
         public TimeSpan ElapsedTime { get; set; }
 
-        public List<AttachmentSet> RunContextAttachments { get; }
+        public Collection<AttachmentSet> RunContextAttachments { get; }
 
         public List<AttachmentSet> RunCompleteArgsAttachments { get; }
 
@@ -111,7 +111,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.IsCanceled = this.IsCanceled || isCanceled;
 
                 ElapsedTime = TimeSpan.FromMilliseconds(Math.Max(ElapsedTime.TotalMilliseconds, elapsedTime.TotalMilliseconds));
-                if (runContextAttachments != null) RunContextAttachments.AddRange(runContextAttachments);
+                if (runContextAttachments != null)
+                {
+                    foreach (var attachmentSet in runContextAttachments)
+                    {
+                        RunContextAttachments.Add(attachmentSet);
+                    }
+                }
+
                 if (runCompleteArgsAttachments != null) RunCompleteArgsAttachments.AddRange(runCompleteArgsAttachments);
                 if (exception != null) Exceptions.Add(exception);
                 if (executorUris != null) this.executorUris.AddRange(executorUris);

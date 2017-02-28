@@ -18,6 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
+        private DataCollectionParameters dataCollectionParameters;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
         /// </summary>
@@ -54,10 +56,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public override void Initialize()
         {
-            DataCollectionParameters dataCollectionParameters = null;
             try
             {
-                dataCollectionParameters = (this.ProxyDataCollectionManager == null)
+                this.dataCollectionParameters = (this.ProxyDataCollectionManager == null)
                                                ? DataCollectionParameters.CreateDefaultParameterInstance()
                                                : this.ProxyDataCollectionManager.BeforeTestRunStart(
                                                    resetDataCollectors: true,
@@ -89,7 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
             }
 
-            // todo : pass dataCollectionParameters.EnvironmentVariables while initializaing testhostprocess.
             base.Initialize();
         }
 
@@ -130,6 +130,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public override void Close()
         {
             base.Close();
+        }
+
+        /// <inheritdoc />
+        protected override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        {
+            if (testProcessStartInfo.EnvironmentVariables == null)
+            {
+                testProcessStartInfo.EnvironmentVariables = this.dataCollectionParameters.EnvironmentVariables;
+            }
+            else
+            {
+                foreach (var kvp in this.dataCollectionParameters.EnvironmentVariables)
+                {
+                    testProcessStartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
+                }
+            }
+
+            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionParameters.DataCollectionEventsPort;
+
+            return testProcessStartInfo;
         }
     }
 
