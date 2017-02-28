@@ -30,13 +30,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             this.mockDataCollectionRequestSender = new DummyDataCollectionRequestSender();
             this.mockDataCollectionLauncher = new DummyDataCollectionLauncher();
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(Architecture.AnyCPU, string.Empty, this.mockDataCollectionRequestSender, this.mockDataCollectionLauncher);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(string.Empty, this.mockDataCollectionRequestSender, this.mockDataCollectionLauncher);
         }
 
         [TestMethod]
         public void InitializeSocketCommunicationShouldInitializeCommunication()
         {
-            this.proxyDataCollectionManager.InitializeSocketCommunication(Architecture.X86);
+            this.proxyDataCollectionManager.InitializeSocketCommunication();
 
             Assert.IsTrue(this.mockDataCollectionLauncher.dataCollectorLaunched);
             Assert.IsTrue(this.mockDataCollectionRequestSender.waitForRequestHandlerConnection);

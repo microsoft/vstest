@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                         : new ProxyExecutionManager(testHostManager);
 
             // parallelLevel = 1 for desktop should go via else route.
-            if (parallelLevel > 1 && !testHostManager.Shared)
+            if (parallelLevel > 1 || !testHostManager.Shared)
             {
                 return new ParallelProxyExecutionManager(proxyExecutionManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared);
             }

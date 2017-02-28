@@ -48,5 +48,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// The <see cref="Collection"/>.
         /// </returns>
         Collection<AttachmentSet> AfterTestRunEnd(bool isCanceled, ITestMessageEventHandler runEventsHandler);
+
+        /// <summary>
+        /// The initialize socket communication.
+        /// </summary>
+        void InitializeSocketCommunication();
     }
 }

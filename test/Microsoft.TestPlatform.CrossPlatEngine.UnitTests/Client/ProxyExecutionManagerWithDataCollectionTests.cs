@@ -69,7 +69,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             mockDataCollectionClient.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new System.Exception("MyException"));
             mockDataCollectionClient.Setup(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()));
 
-            ProxyDataCollectionManager proxyDataCollectonManager = new ProxyDataCollectionManager(Architecture.AnyCPU, string.Empty, new DummyDataCollectionRequestSender(), new DummyDataCollectionLauncher());
+            ProxyDataCollectionManager proxyDataCollectonManager = new ProxyDataCollectionManager(string.Empty, new DummyDataCollectionRequestSender(), new DummyDataCollectionLauncher());
 
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize();

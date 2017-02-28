@@ -60,6 +60,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                this.ProxyDataCollectionManager?.InitializeSocketCommunication();
+
                 this.dataCollectionParameters = (this.ProxyDataCollectionManager == null)
                                                ? DataCollectionParameters.CreateDefaultParameterInstance()
                                                : this.ProxyDataCollectionManager.BeforeTestRunStart(
