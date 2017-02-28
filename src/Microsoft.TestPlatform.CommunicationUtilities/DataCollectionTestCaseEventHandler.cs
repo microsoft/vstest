@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     case MessageType.BeforeTestCaseStart:
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case starting.");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case starting.");
                         }
 
                         var testCaseStartEventArgs = message.Payload.ToObject<TestCaseStartEventArgs>();
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case started.");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case started.");
                         }
 
                         break;
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case completed");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case completed");
                         }
 
                         break;
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Test session ended");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Test session ended");
                         }
 
                         this.Close();
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     default:
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionTestCaseEventHandler : Invalid Message types");
+                            EqtTrace.Info("DataCollectionTestCaseEventHandler: Invalid Message types");
                         }
 
                         break;

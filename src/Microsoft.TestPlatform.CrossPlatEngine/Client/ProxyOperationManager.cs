@@ -82,7 +82,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Get the test process start info
-                var testHostStartInfo = this.GetTestHostProcessStartInfo(sources, connectionInfo);
+                var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
+
+                this.UpdateTestProcessStartInfo(testHostStartInfo);
 
                 if (testHostStartInfo != null)
                 {
@@ -165,23 +167,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         #endregion
 
         /// <summary>
-        /// The get test host process start info.
+        /// This method is exposed to enable drived classes to modify TestProcessStartInfo. E.g. DataCollection need additional environment variables to be passed, etc.  
         /// </summary>
-        /// <param name="sources">
+        /// <param name="testProcessStartInfo">
         /// The sources.
-        /// </param>
-        /// <param name="envVariables">
-        /// The env variables.
-        /// </param>
-        /// <param name="connectionInfo">
-        /// The connection info.
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="TestProcessStartInfo"/>.
         /// </returns>
-        protected virtual TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, TestRunnerConnectionInfo connectionInfo)
+        protected virtual TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
         {
-            return this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
+            // do nothing. 
+            return testProcessStartInfo;
         }
 
         protected string GetTimestampedLogFile(string logFile)

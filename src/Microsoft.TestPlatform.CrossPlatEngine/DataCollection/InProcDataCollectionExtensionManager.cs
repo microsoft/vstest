@@ -94,13 +94,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <summary>
-        /// The create data collector.
+        /// Creates data collector instance based on datacollector settings provided. 
         /// </summary>
         /// <param name="dataCollectorSettings">
-        /// The data collector settings.
+        /// Settings to be used for creating DataCollector.
         /// </param>
         /// <param name="interfaceTypeInfo">
-        /// The interface type info.
+        /// TypeInfo of datacollector.
         /// </param>
         /// <returns>
         /// The <see cref="IInProcDataCollector"/>.

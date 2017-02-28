@@ -74,10 +74,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
         public bool SendTestResult(TestResult result)
         {
             this.dataCollectionTestCaseEventManager.RaiseTestResult(new TestResultEventArgs(result));
-
-            var flushResult = result.GetPropertyValue(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, false);
-
+            var flushResult = result.GetPropertyValue<bool>(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, true);
             this.testCaseEvents?.SendTestResult(result);
+
             return flushResult;
         }
     }

@@ -36,6 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             try
             {
                 ParseArgs(args);
+                // todo : Support debugging using VSTEST_COLLECTOR_DEBUG environment variable.
                 Run();
             }
             catch (SocketException ex)

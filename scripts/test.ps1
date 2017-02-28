@@ -139,7 +139,7 @@ function Invoke-Test
             Write-Log ".. Start run ($fx)"
 
             # Tests are only built for x86 at the moment, though we don't have architecture requirement
-            $testAdapterPath = "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\1.1.6-preview\build\_common"
+            $testAdapterPath = Get-TestAdapterPath
             $testArchitecture = ($Script:TPT_TargetRuntime).Split("-")[-1]
 
             if($fx -eq $TPT_TargetFrameworkCore)
@@ -252,6 +252,13 @@ function Get-DotNetPath
 function Get-PackageDirectory($framework, $targetRuntime)
 {
     return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($framework)\$($targetRuntime)")
+}
+
+function Get-TestAdapterPath
+{
+    [xml]$dependencyProps = Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props
+
+    return "$env:TP_PACKAGES_DIR\MSTest.TestAdapter\$($dependencyProps.Project.PropertyGroup.MSTestAdapterVersion)\build\_common"
 }
 
 function Start-Timer

@@ -28,10 +28,10 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         protected readonly IntegrationTestEnvironment testEnvironment;
 
-        private const string TestAdapterRelativePath = @"MSTest.TestAdapter\1.1.6-preview\build\_common";
-        private const string NUnitTestAdapterRelativePath = @"nunittestadapter\1.2.0\lib";
-        private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\2.2.0-beta4-build1188\build\_common";
-        private const string ChutzpahTestAdapterRelativePath = @"chutzpah\4.2.4\tools";
+        private const string TestAdapterRelativePath = @"MSTest.TestAdapter\{0}\build\_common";
+        private const string NUnitTestAdapterRelativePath = @"nunittestadapter\{0}\lib";
+        private const string XUnitTestAdapterRelativePath = @"xunit.runner.visualstudio\{0}\build\_common";
+        private const string ChutzpahTestAdapterRelativePath = @"chutzpah\{0}\tools";
 
         public enum UnitTestFramework
         {
@@ -251,19 +251,19 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             if (testFramework == UnitTestFramework.MSTest)
             {
-                adapterRelativePath = TestAdapterRelativePath;
+                adapterRelativePath = string.Format(TestAdapterRelativePath, this.testEnvironment.DependencyVersions["MSTestAdapterVersion"]);
             }
             else if (testFramework == UnitTestFramework.NUnit)
             {
-                adapterRelativePath = NUnitTestAdapterRelativePath;
+                adapterRelativePath = string.Format(NUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["NUnitAdapterVersion"]);
             }
             else if (testFramework == UnitTestFramework.XUnit)
             {
-                adapterRelativePath = XUnitTestAdapterRelativePath;
+                adapterRelativePath = string.Format(XUnitTestAdapterRelativePath, this.testEnvironment.DependencyVersions["XUnitAdapterVersion"]);
             }
             else if (testFramework == UnitTestFramework.Chutzpah)
             {
-                adapterRelativePath = ChutzpahTestAdapterRelativePath;
+                adapterRelativePath = string.Format(ChutzpahTestAdapterRelativePath, this.testEnvironment.DependencyVersions["ChutzpahAdapterVersion"]);
             }
 
             return this.testEnvironment.GetNugetPackage(adapterRelativePath);
