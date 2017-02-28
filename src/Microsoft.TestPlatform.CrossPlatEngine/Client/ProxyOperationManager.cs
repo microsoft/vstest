@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestHostManager testHostManager;
 
-        protected bool initialized;
+        private bool initialized;
 
         private readonly int connectionTimeout;
 
