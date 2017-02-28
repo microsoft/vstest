@@ -5,9 +5,6 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
@@ -22,6 +19,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             // Verify Default
             Assert.AreEqual(Constants.DefaultPlatform, runConfiguration.TargetPlatform);
             Assert.AreEqual(Framework.DefaultFramework, runConfiguration.TargetFrameworkVersion);
+            Assert.AreEqual(Constants.DefaultBatchSize, runConfiguration.BatchSize);
             Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
             Assert.AreEqual(null, runConfiguration.SolutionDirectory);
             Assert.AreEqual(Constants.DefaultTreatTestAdapterErrorsAsWarnings, runConfiguration.TreatTestAdapterErrorsAsWarnings);
@@ -63,6 +61,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <DisableAppDomain>true</DisableAppDomain>
                        <DisableParallelization>true</DisableParallelization>
                        <MaxCpuCount>2</MaxCpuCount>
+                       <BatchSize>5</BatchSize>
                        <TestAdaptersPaths>C:\a\b;D:\x\y</TestAdaptersPaths>
                        <BinariesRoot>E:\x\z</BinariesRoot>
                      </RunConfiguration>
@@ -87,8 +86,41 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(@"E:\x\z", runConfiguration.BinariesRoot);
             Assert.AreEqual(@"C:\a\b;D:\x\y", runConfiguration.TestAdaptersPaths);
             Assert.AreEqual(2, runConfiguration.MaxCpuCount);
+            Assert.AreEqual(5, runConfiguration.BatchSize);
             Assert.AreEqual(true, runConfiguration.DisableAppDomain);
             Assert.AreEqual(true, runConfiguration.DisableParallelization);
+        }
+
+        [TestMethod]
+        public void RunConfigurationFromXmlThrowsSettingsExceptionIfBatchSizeIsInvalid()
+        {
+            string settingsXml =
+             @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <BatchSize>Foo</BatchSize>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            Assert.ThrowsException<SettingsException>(
+              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml)
+            ).Message.Equals("");
+        }
+
+        [TestMethod]
+        public void RunConfigurationFromXmlThrowsSettingsExceptionIfBatchSizeIsNegativeInteger()
+        {
+            string settingsXml =
+             @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <BatchSize>-10</BatchSize>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            Assert.ThrowsException<SettingsException>(
+              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml)
+            ).Message.Equals("");
         }
     }
 }

@@ -64,6 +64,33 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldReadTheBatchSizeFromSettingsAndSetItForDiscoveryCriteria()
+        {
+            var payload = new DiscoveryRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                 @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <BatchSize>15</BatchSize>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            DiscoveryCriteria actualDiscoveryCriteria = null;
+            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>())).Callback<DiscoveryCriteria>(
+                (discoveryCriteria) =>
+                {
+                    actualDiscoveryCriteria = discoveryCriteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object);
+            Assert.AreEqual(15, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldCallTestPlatformAndSucceed()
         {
             var payload = new DiscoveryRequestPayload()
@@ -90,6 +117,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual(2, actualDiscoveryCriteria.Sources.Count(), "All Sources must be used for discovery request");
             Assert.AreEqual("a", actualDiscoveryCriteria.Sources.First(), "First Source in list is incorrect");
             Assert.AreEqual("b", actualDiscoveryCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
+
+            // Default frequency is set to 10, unless specified in runsettings.
+            Assert.AreEqual(10, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
 
             mockDiscoveryRegistrar.Verify(md => md.RegisterDiscoveryEvents(It.IsAny<IDiscoveryRequest>()), Times.Once);
             mockDiscoveryRegistrar.Verify(md => md.UnregisterDiscoveryEvents(It.IsAny<IDiscoveryRequest>()), Times.Once);
@@ -187,6 +217,33 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
+        public void RunTestsShouldReadTheBatchSizeFromSettingsAndSetItForTestRunCriteria()
+        {
+            var payload = new TestRunRequestPayload()
+            {
+                Sources = new List<string>() { "a" },
+                RunSettings =
+                 @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <BatchSize>15</BatchSize>
+                     </RunConfiguration>
+                </RunSettings>"
+            };
+
+            TestRunCriteria actualTestRunCriteria = null;
+            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
+                (criteria) =>
+                {
+                    actualTestRunCriteria = criteria;
+                }).Returns(mockDiscoveryRequest.Object);
+
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object);
+            Assert.AreEqual(15, actualTestRunCriteria.FrequencyOfRunStatsChangeEvent);
+        }
+
+        [TestMethod]
         public void RunTestsWithSourcesShouldCallTestPlatformAndSucceed()
         {
             var payload = new TestRunRequestPayload()
@@ -220,6 +277,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             Assert.AreEqual("a", observedCriteria.Sources.First(), "First Source in list is incorrect");
             Assert.AreEqual("b", observedCriteria.Sources.ElementAt(1), "Second Source in list is incorrect");
 
+            // Check for the default value for the frequency
+            Assert.AreEqual(10, observedCriteria.FrequencyOfRunStatsChangeEvent);
             mockRunEventsRegistrar.Verify(md => md.RegisterTestRunEvents(It.IsAny<ITestRunRequest>()), Times.Once);
             mockRunEventsRegistrar.Verify(md => md.UnregisterTestRunEvents(It.IsAny<ITestRunRequest>()), Times.Once);
 
