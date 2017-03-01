@@ -128,5 +128,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
         }
+
+        /// <summary>
+        /// In case TestCaseFilter is provide without any property like Name or ClassName. ex. /TestCaseFilter:"UnitTest1"
+        /// this command should provide same results as /TestCaseFilter:"FullyQualifiedName~UnitTest1".
+        /// </summary>
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void TestCaseFilterShouldWork_IfOnlyPropertyValueGivenInExpression(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var arguments = PrepareArguments(
+                this.GetSampleTestAssembly(),
+                this.GetTestAdapterPath(),
+                string.Empty,
+                this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " /TestCaseFilter:UnitTest1");
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 1, 1);
+        }
     }
 }

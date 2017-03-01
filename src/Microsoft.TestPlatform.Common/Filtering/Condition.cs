@@ -46,6 +46,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         private static string propertyNameValueSeperatorString = @"(\!\=)|(\=)|(\~)|(\!)";
 
+        /// <summary>
+        ///  Default property name which will be used when filter has only property value.
+        /// </summary>
+        public const string DefaultPropertyName = "FullyQualifiedName";
+
+        /// <summary>
+        ///  Default operation which will be used when filter has only property value.
+        /// </summary>
+        public const Operation DefaultOperation = Operation.Contains;
 
         /// <summary>
         /// Name of the property used in condition.
@@ -156,17 +165,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         /// </summary>
         internal static Condition Parse(string conditionString)
         {
+            if (string.IsNullOrWhiteSpace(conditionString))
+            {
+                ThrownFormatExceptionForInvalidCondition(conditionString);
+            }
             string[] parts = Regex.Split(conditionString, propertyNameValueSeperatorString);
+            if (parts.Length == 1)
+            {
+                // If only parameter values is passed, create condition with default property name,
+                // default operation and given condition string as parameter value.
+                return new Condition(Condition.DefaultPropertyName, Condition.DefaultOperation, conditionString.Trim());
+            }
+
             if (parts.Length != 3)
             {
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
+                ThrownFormatExceptionForInvalidCondition(conditionString);
             }
 
             for (int index = 0; index < 3; index++)
             {
                 if (string.IsNullOrWhiteSpace(parts[index]))
                 {
-                    throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
+                    ThrownFormatExceptionForInvalidCondition(conditionString);
                 }
                 parts[index] = parts[index].Trim();
             }
@@ -176,7 +196,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
             return condition;
         }
 
-
+        private static void ThrownFormatExceptionForInvalidCondition(string conditionString)
+        {
+            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException,
+                string.Format(CultureInfo.CurrentCulture, CommonResources.InvalidCondition, conditionString)));
+        }
 
 
         /// <summary>
