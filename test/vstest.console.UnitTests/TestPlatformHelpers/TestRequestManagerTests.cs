@@ -78,6 +78,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
         {
             CommandLineOptions.Instance.IsDesignMode = true;
+            this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
+            this.mockLoggerManager = new DummyTestLoggerManager(this.mockLoggerEvents);
             var requestManager = new TestRequestManager(CommandLineOptions.Instance,
                 new Mock<ITestPlatform>().Object,
                 this.mockLoggerManager,
@@ -310,6 +312,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             string testCaseFilterValue = "TestFilter";
             CommandLineOptions.Instance.TestCaseFilterValue = testCaseFilterValue;
+            this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
+                this.mockTestPlatform.Object,
+                TestLoggerManager.Instance,
+                TestRunResultAggregator.Instance,
+                this.mockTestPlatformEventSource.Object);
+
             var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object);
 
             Assert.IsTrue(success, "RunTests call must succeed");
