@@ -54,15 +54,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// </summary>
         public const string TestAdapterRedexPattern = @".*.TestAdapter.dll";
 
-        /// <summary>
-        /// string pattern used to find the test logger
-        /// </summary>
-        public const string TestLoggerPattern = @"*.TestLogger.dll";
-
-        /// <summary>
-        /// Regex pattern used to find the test logger
-        /// </summary>
-        public const string TestLoggerRedexPattern = @".*.TestLogger.dll";
-
     }
 }

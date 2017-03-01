@@ -77,27 +77,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Resources {
                 return ResourceManager.GetString("WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Looks up a localized string similar to The Test Logger URI &apos;{0}&apos; is not valid.  The Test Logger will be ignored..
-        /// </summary>
-        public static string LoggerUriInvalid
-        {
-            get
-            {
-                return ResourceManager.GetString("LoggerUriInvalid", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find a test logger with URI or FriendlyName &apos;{0}&apos;..
-        /// </summary>
-        public static string LoggerNotFound
-        {
-            get
-            {
-                return ResourceManager.GetString("LoggerNotFound", resourceCulture);
-            }
-        }
     }
 }
