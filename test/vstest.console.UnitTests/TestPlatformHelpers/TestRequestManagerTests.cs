@@ -33,7 +33,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         private Mock<IDiscoveryRequest> mockDiscoveryRequest;
         private Mock<ITestRunRequest> mockRunRequest;
         private ITestRequestManager testRequestManager;
-
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
         public TestRequestManagerTests()
@@ -44,7 +43,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockTestPlatform = new Mock<ITestPlatform>();
             this.mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
             this.mockRunRequest = new Mock<ITestRunRequest>();
-            var mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
+            this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
             var testRunResultAggregator = new DummyTestRunResultAggregator();
 
             this.testRequestManager = new TestRequestManager(this.commandLineOptions, this.mockTestPlatform.Object,
