@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void AreTestCaseEventsSubscribedSubscribedShouldReturnTrueIfTestCaseEndIsSubscribed()
+        public void AreTestCaseEventsSubscribedShouldReturnTrueIfTestCaseEndIsSubscribed()
         {
             this.events.TestCaseEnd += this.TestCaseEndMessageHandler;
 
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void AreTestCaseEventsSubscribedSubscribedShouldReturnDefaultValueInCaseOfAnyException()
+        public void AreTestCaseEventsSubscribedShouldFalseIfTestCaseEventsAreNotSubscribed()
         {
             Assert.IsFalse(this.events.AreTestCaseEventsSubscribed());
         }
