@@ -117,8 +117,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         #region Fields
 
         private readonly TestLoggerManager loggerManager;
+
         /// <summary>
-        /// Used for saving loggers info.
+        /// Used for saving loggers info which will later use to initialize it.
         /// </summary>
         private LoggerList loggerList;
 
@@ -129,6 +130,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes a new instance of the <see cref="EnableLoggerArgumentExecutor"/> class.
         /// </summary>
+        /// <param name="loggerManager">
+        /// The logger manager.
+        /// </param>
         /// <param name="loggerList">
         /// It will have the list of logger.
         /// </param>

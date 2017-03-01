@@ -21,13 +21,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Implementation for TestPlatform
     /// </summary>
     public class TestPlatform : ITestPlatform
     {
-        private FileHelper fileHelper;
+        protected IFileHelper fileHelper;
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
@@ -166,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         );
                     if (adapterFiles.Count > 0)
                     {
-                        this.UpdateExtensions(adapterFiles, false);
+                        this.UpdateExtensions(adapterFiles, true);
                     }
                 }
             }
@@ -241,22 +242,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
         private void UpdateTestLoggerPath(TestRunCriteria testRunCriteria)
         {
-            FileHelper fileHelper = new FileHelper();
             List<string> loggersToUpdate = new List<string>();
 
             var sources = testRunCriteria.Sources;
             foreach (var source in sources)
             {
                 var sourceDirectory = Path.GetDirectoryName(source);
-                if (!string.IsNullOrEmpty(sourceDirectory) && fileHelper.DirectoryExists(sourceDirectory))
+                if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    loggersToUpdate.AddRange(fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerResxPattern, SearchOption.TopDirectoryOnly).ToList());
+                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerResxPattern, SearchOption.TopDirectoryOnly).ToList());
                 }
             }
 
             if (loggersToUpdate.Count > 0)
             {
-                this.UpdateExtensions(loggersToUpdate, false);
+                this.UpdateExtensions(loggersToUpdate, true);
             }
         }
     }
