@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+
     [TestClass]
     public class RunConfigurationTests
     {
@@ -40,7 +40,6 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <BadElement>TestResults</BadElement>
                      </RunConfiguration>
                 </RunSettings>";
-
 
             Assert.ThrowsException<SettingsException>(() =>
                 XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml));
@@ -102,9 +101,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            Assert.ThrowsException<SettingsException>(
+            var ex = Assert.ThrowsException<SettingsException>(
               () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml)
-            ).Message.Equals("");
+            );
+            Assert.AreEqual(ex.Message, "Invalid settings 'RunConfiguration'.  Invalid value 'Foo' specified for 'BatchSize'.");
         }
 
         [TestMethod]
@@ -118,9 +118,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            Assert.ThrowsException<SettingsException>(
+            var ex = Assert.ThrowsException<SettingsException>(
               () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml)
-            ).Message.Equals("");
+            );
+            Assert.AreEqual(ex.Message, "Invalid settings 'RunConfiguration'.  Invalid value '-10' specified for 'BatchSize'.");
         }
     }
 }

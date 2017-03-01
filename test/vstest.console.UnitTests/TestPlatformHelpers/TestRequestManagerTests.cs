@@ -32,11 +32,16 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
 
+        TestLoggerManager mockLoggerManager;
+        DummyLoggerEvents mockLoggerEvents;
+
         [TestInitialize]
         public void TestInit()
         {
             this.mockTestPlatform = new Mock<ITestPlatform>();
             this.mockTestPlatformEventSource = new Mock<ITestPlatformEventSource>();
+            this.mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
+            this.mockLoggerManager = new DummyTestLoggerManager(mockLoggerEvents);
             this.testRequestManager = new TestRequestManager(CommandLineOptions.Instance,
                 this.mockTestPlatform.Object,
                 TestLoggerManager.Instance,
@@ -53,31 +58,27 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         [TestMethod]
         public void TestRequestManagerShouldInitializeConsoleLogger()
         {
-            var mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
-            var mockLoggerManager = new DummyTestLoggerManager(mockLoggerEvents);
             CommandLineOptions.Instance.IsDesignMode = false;
             var requestManager = new TestRequestManager(CommandLineOptions.Instance,
                 new Mock<ITestPlatform>().Object,
-                mockLoggerManager,
+                this.mockLoggerManager,
                 TestRunResultAggregator.Instance,
                 new Mock<ITestPlatformEventSource>().Object);
 
-            Assert.IsTrue(mockLoggerEvents.EventsSubscribed());
+            Assert.IsTrue(this.mockLoggerEvents.EventsSubscribed());
         }
 
         [TestMethod]
         public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
         {
-            var mockLoggerEvents = new DummyLoggerEvents(TestSessionMessageLogger.Instance);
-            var mockLoggerManager = new DummyTestLoggerManager(mockLoggerEvents);
             CommandLineOptions.Instance.IsDesignMode = true;
             var requestManager = new TestRequestManager(CommandLineOptions.Instance,
                 new Mock<ITestPlatform>().Object,
-                mockLoggerManager,
+                this.mockLoggerManager,
                 TestRunResultAggregator.Instance,
                 new Mock<ITestPlatformEventSource>().Object);
 
-            Assert.IsFalse(mockLoggerEvents.EventsSubscribed());
+            Assert.IsFalse(this.mockLoggerEvents.EventsSubscribed());
         }
 
         [TestMethod]
