@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Default constructor.
         /// </summary>
-        private CommandLineOptions()
+        protected CommandLineOptions()
         {
             this.BatchSize = DefaultBatchSize;
             this.TestStatsEventTimeout = this.DefaultRetrievalTimeout;
@@ -127,11 +127,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// Path to the custom test adapters. 
         /// </summary>
         public string TestAdapterPath { get; set; }
-
-        /// <summary>
-        /// True if console runner is running in design mode. 
-        /// </summary>
-        public bool IsDesignMode { get; set; }
 
         /// <summary>
         /// Process Id of the process which launched vstest runner
@@ -203,6 +198,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
                 this.architecture = value;
                 this.ArchitectureSpecified = true;
             }
+        }
+
+        /// <summary>
+        /// True indicates the test run is started from an Editor or IDE.
+        /// Defaults to false.
+        /// </summary>
+        public bool IsDesignMode
+        {
+            get;
+            set;
         }
 
         /// <summary>
