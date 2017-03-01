@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -54,8 +55,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         public TestRequestManager() :
             this(CommandLineOptions.Instance,
             TestPlatformFactory.GetTestPlatform(),
-            TestLoggerManager.Instance,            
-            TestRunResultAggregator.Instance, 
+            TestLoggerManager.Instance,
+            TestRunResultAggregator.Instance,
             TestPlatformEventSource.Instance)
         {
         }
@@ -75,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 var consoleLogger = new ConsoleLogger();
                 this.testLoggerManager.AddLogger(consoleLogger, ConsoleLogger.ExtensionUri, null);
-             }
+            }
         }
 
         #endregion
@@ -126,8 +127,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             bool success = false;
 
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryPayload.RunSettings);
+            var batchSize = runConfiguration.BatchSize;
+
             // create discovery request
-            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, this.commandLineOptions.BatchSize, this.commandLineOptions.TestStatsEventTimeout, discoveryPayload.RunSettings);
+            var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, discoveryPayload.RunSettings);
             using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria))
             {
                 try
@@ -182,12 +186,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         {
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
 
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunRequestPayload.RunSettings);
+            var batchSize = runConfiguration.BatchSize;
+
             TestRunCriteria runCriteria = null;
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
                 runCriteria = new TestRunCriteria(
                                   testRunRequestPayload.Sources,
-                                  this.commandLineOptions.BatchSize,
+                                  batchSize,
                                   testRunRequestPayload.KeepAlive,
                                   testRunRequestPayload.RunSettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
@@ -198,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 runCriteria = new TestRunCriteria(
                                   testRunRequestPayload.TestCases,
-                                  this.commandLineOptions.BatchSize,
+                                  batchSize,
                                   testRunRequestPayload.KeepAlive,
                                   testRunRequestPayload.RunSettings,
                                   this.commandLineOptions.TestStatsEventTimeout,
