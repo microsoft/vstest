@@ -90,9 +90,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
-            UpdateAndInitializeLoggers(testRunCriteria);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
+
+            // Update and initialize loggers only when DesignMode is false
+            if (runConfiguration.DesignMode == false)
+            {
+                UpdateAndInitializeLoggers(testRunCriteria);
+            }
+
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
 
             if (testRunCriteria.TestHostLauncher != null)
