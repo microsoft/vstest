@@ -78,7 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public bool IsInProcDataCollectionEnabled { get; private set; }
 
-        /// <summary>
         /// Flush any test results that are cached in dictionary
         /// </summary>
         public void FlushLastChunkResults()
@@ -92,6 +91,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     this.testRunCache.OnNewTestResult(result);
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates data collector instance based on datacollector settings provided. 
+        /// </summary>
+        /// <param name="dataCollectorSettings">
+        /// Settings to be used for creating DataCollector.
+        /// </param>
+        /// <param name="interfaceTypeInfo">
+        /// TypeInfo of datacollector.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IInProcDataCollector"/>.
+        /// </returns>
+        protected virtual IInProcDataCollector CreateDataCollector(DataCollectorSettings dataCollectorSettings, TypeInfo interfaceTypeInfo)
+        {
+            var inProcDataCollector = new InProcDataCollector(
+                dataCollectorSettings.CodeBase,
+                dataCollectorSettings.AssemblyQualifiedName,
+                interfaceTypeInfo,
+                dataCollectorSettings.Configuration.OuterXml);
+
+            inProcDataCollector.LoadDataCollector(this.inProcDataCollectionSink);
+
+            return inProcDataCollector;
         }
 
         /// <summary>
@@ -235,16 +259,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
 
             this.SetAllowTestResultFlushInTestResult(e.TestResult, allowTestResultFlush);
-        }
-
-        protected virtual IInProcDataCollector CreateDataCollector(DataCollectorSettings dataCollectorSettings, TypeInfo interfaceTypeInfo)
-        {
-            var inProcDataCollector = new InProcDataCollector(dataCollectorSettings.CodeBase, dataCollectorSettings.AssemblyQualifiedName,
-                interfaceTypeInfo, dataCollectorSettings.Configuration.OuterXml);
-
-            inProcDataCollector.LoadDataCollector(inProcDataCollectionSink);
-
-            return inProcDataCollector;
         }
 
         /// <summary>

@@ -106,7 +106,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             ITestMessageEventHandler runEventsHandler)
         {
             var areTestCaseLevelEventsRequired = false;
-            var isDataCollectionStarted = false;
             IDictionary<string, string> environmentVariables = null;
 
             var dataCollectionEventsPort = 0;
@@ -120,7 +119,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             },
                 runEventsHandler);
             return new DataCollectionParameters(
-                            isDataCollectionStarted,
                             areTestCaseLevelEventsRequired,
                             environmentVariables,
                             dataCollectionEventsPort);

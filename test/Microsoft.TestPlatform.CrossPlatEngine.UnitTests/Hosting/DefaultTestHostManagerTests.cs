@@ -16,7 +16,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     [TestClass]
     public class DefaultTestHostManagerTests

@@ -3,17 +3,18 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     internal class DefaultEngineInvoker :
 #if NET46
@@ -31,6 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private const string ParentProcessIdArgument = "--parentprocessid";
 
         private const string LogFileArgument = "--diag";
+
+        private const string DataCollectionPortArgument = "--datacollectionport";
 
         public void Invoke(IDictionary<string, string> argsDictionary)
         {
@@ -70,12 +73,24 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     requestHandler.SendLog(TestMessageLevel.Informational, string.Format("Logging TestHost Diagnostics in file: {0}", EqtTrace.LogFile));
                 }
 
+                // Initialize DataCollection Communication if data collection port is provided.
+                var dcPort = GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
+                if (dcPort > 0)
+                {
+                    var dataCollectionTestCaseEventSender=DataCollectionTestCaseEventSender.Create();
+                    dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
+                    dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
+                }
+
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var processingTask = StartProcessingAsync(requestHandler, new TestHostManagerFactory());
+                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
 
                 // Wait for either processing to complete or parent process exit
                 Task.WaitAny(processingTask, parentProcessMonitoringTask);
+
+                // Close socket communication connection.
+                DataCollectionTestCaseEventSender.Instance.Close();
             }
         }
 
