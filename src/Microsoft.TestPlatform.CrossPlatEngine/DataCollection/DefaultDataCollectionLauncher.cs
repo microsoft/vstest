@@ -60,7 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             string dataCollectorProcessPath = null, processWorkingDirectory = null;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
-            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
             dataCollectorProcessPath = Path.Combine(currentWorkingDirectory, DataCollectorProcessName);
             processWorkingDirectory = Directory.GetCurrentDirectory();

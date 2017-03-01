@@ -34,7 +34,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
-        public void InitializeSocketCommunicationShouldInitializeCommunication()
+        public void InitializeShouldInitializeCommunication()
         {
             this.proxyDataCollectionManager.Initialize();
 

@@ -297,7 +297,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 this.IsInProcDataCollectionEnabled = this.InProcDataCollectors.Any();
             }
-        }        
+        }
 
         private void TriggerInProcDataCollectionMethods(string methodName, InProcDataCollectionArgs methodArg)
         {

@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Reflection;
     using System.Threading;
     using System.Xml;
-    
+
     using global::TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -76,25 +76,26 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 dataCollectorNode.SetAttribute(kvp.Key, kvp.Value);
             }
 
-            Stream stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create);
-            doc.Save(stream);
-            stream.Dispose();
+            using (var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create))
+            {
+                doc.Save(stream);
+            }
         }
 
         public void VaildateDataCollectorOutput()
         {
             // Output of datacollection attachment.
-            Assert.IsTrue(this.standardTestOutput.Contains("filename.txt"));
+            this.StdOutputContains("filename.txt");
 
-            Assert.IsTrue(this.standardTestOutput.Contains("TestCaseStarted"));
-            Assert.IsTrue(this.standardTestOutput.Contains("TestCaseEnded"));
-            Assert.IsTrue(this.standardTestOutput.Contains("SessionEnded"));
+            this.StdOutputContains("TestCaseStarted");
+            this.StdOutputContains("TestCaseEnded");
+            this.StdOutputContains("SessionEnded");
 
             // todo : Error messages logged during Session Started event always comes as error.
-            Assert.IsTrue(this.standardTestError.Contains("SessionStarted"));
-            Assert.IsTrue(this.standardTestOutput.Contains("my warning"));
+            this.StdErrorContains("SessionStarted");
+            this.StdOutputContains("my warning");
 
-            Assert.IsTrue(this.standardTestError.Contains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: ."));
+            this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
         }
     }
 }

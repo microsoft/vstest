@@ -16,14 +16,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// The get data collector launcher.
         /// </summary>
-        /// <param name="frameworkVersion">
-        /// .NET framework version.
-        /// </param>
         /// <returns>
         /// The <see cref="IDataCollectionLauncher"/>.
         /// </returns>
         internal static IDataCollectionLauncher GetDataCollectorLauncher(IProcessHelper processHelper)
         {
+            // Target Framework of DataCollection process and Runner should be same.
             var currentProcessPath = processHelper.GetCurrentProcessFileName();
 
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)

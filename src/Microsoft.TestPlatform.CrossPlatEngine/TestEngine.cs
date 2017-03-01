@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             Func<IProxyExecutionManager> proxyExecutionManagerCreator =
                 () =>
                     isDataCollectorEnabled
-                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(testRunCriteria.TestRunSettings))
+                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
                         : new ProxyExecutionManager(testHostManager);
 
             // parallelLevel = 1 for desktop should go via else route.
@@ -176,28 +176,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             return parallelLevelToUse;
-        }
-
-        private IProxyDataCollectionManager GetDataCollectionManager(string settingsXml)
-        {
-            try
-            {
-                return new ProxyDataCollectionManager(settingsXml);
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestEngine: Error occured while initializing DataCollection Process: {0}", ex);
-                }
-
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("TestEngine: Skipping Data Collection");
-                }
-
-                return null;
-            }
         }
     }
 }

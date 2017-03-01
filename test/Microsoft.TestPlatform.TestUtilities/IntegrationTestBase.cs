@@ -21,8 +21,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     public class IntegrationTestBase
     {
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
-        protected string standardTestOutput = string.Empty;
-        protected string standardTestError = string.Empty;
+        private string standardTestOutput = string.Empty;
+        private string standardTestError = string.Empty;
 
         private string arguments = string.Empty;
 
@@ -168,6 +168,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void StdErrorContains(string substring)
         {
             Assert.IsTrue(this.standardTestError.Contains(substring));
+        }
+
+        public void StdOutputContains(string substring)
+        {
+            Assert.IsTrue(this.standardTestOutput.Contains(substring));
         }
 
         /// <summary>

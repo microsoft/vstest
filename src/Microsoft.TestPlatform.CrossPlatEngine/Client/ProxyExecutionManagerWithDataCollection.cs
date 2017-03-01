@@ -58,8 +58,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                this.ProxyDataCollectionManager?.Initialize();
+                this.ProxyDataCollectionManager.Initialize();
+            }
+            catch (Exception ex)
+            {
+                // Set proxy data collection manage to null as initialization failed.
+                this.ProxyDataCollectionManager = null;
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex);
+                }
+            }
 
+            try
+            {
                 this.dataCollectionParameters = (this.ProxyDataCollectionManager == null)
                                                ? DataCollectionParameters.CreateDefaultParameterInstance()
                                                : this.ProxyDataCollectionManager.BeforeTestRunStart(
@@ -75,19 +87,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     if (this.ProxyDataCollectionManager != null)
                     {
                         this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
+
+                        // Set Proxy Data Collection Manager to null as the communication channel is broken.
+                        this.ProxyDataCollectionManager = null;
                     }
                 }
                 catch (Exception ex)
                 {
+                    // Set Proxy Data Collection Manager to null as the communication channel is broken.
+                    this.ProxyDataCollectionManager = null;
+
                     // There is an issue with Data Collector, skipping data collection and continuing with test run.
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("TestEngine: Error occured while communicating with DataCollection Process: {0}", ex);
+                        EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex);
                     }
 
                     if (EqtTrace.IsWarningEnabled)
                     {
-                        EqtTrace.Warning("TestEngine: Skipping Data Collection");
+                        EqtTrace.Warning("ProxyExecutionManagerWithDataCollection: Skipping Data Collection");
                     }
                 }
             }
