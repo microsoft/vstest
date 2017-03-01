@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     /// <summary>
     /// Responsible for managing logger extensions and broadcasting results
@@ -88,6 +89,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                             testLoggerManager = new TestLoggerManager(TestSessionMessageLogger.Instance,
                                 new InternalTestLoggerEvents(TestSessionMessageLogger.Instance));
                         }
+                    }
+                }
+                else if (TestPluginCache.Instance.AreDefaultExtensionsDiscovered == false)
+                {
+                    lock (Synclock)
+                    {
+                        // If extension path has been modified, update testLoggerExtensionManager
+                        testLoggerManager.testLoggerExtensionManager = TestLoggerExtensionManager.Create(testLoggerManager.messageLogger);
                     }
                 }
                 return testLoggerManager;

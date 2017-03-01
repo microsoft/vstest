@@ -3,8 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
-    public class InvalidLoggerException : Exception
+
+    public class InvalidLoggerException : TestPlatformException
     {
         #region Constructors
 

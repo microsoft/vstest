@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(LoggerList.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(TestLoggerManager.Instance, LoggerList.Instance));
                 }
 
                 return this.executor;
@@ -116,10 +116,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         #region Fields
 
+        private readonly TestLoggerManager loggerManager;
         /// <summary>
         /// Used for saving loggers info.
         /// </summary>
-        LoggerList loggerList;
+        private LoggerList loggerList;
 
         #endregion
 
@@ -131,9 +132,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="loggerList">
         /// It will have the list of logger.
         /// </param>
-        public EnableLoggerArgumentExecutor(LoggerList loggerList)
+        public EnableLoggerArgumentExecutor(TestLoggerManager loggerManager, LoggerList loggerList)
         {
+            Contract.Requires(loggerManager != null);
             Contract.Requires(loggerList != null);
+            this.loggerManager = loggerManager;
             this.loggerList = loggerList;
         }
 
@@ -159,7 +162,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 if (parseSucceeded)
                 {
-                    this.loggerList.AddLogger(argument, loggerIdentifier, parameters);
+                    if (loggerIdentifier.Equals(ConsoleLogger.FriendlyName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
+                    }
+                    else
+                    {
+                        this.loggerList.AddLogger(argument, loggerIdentifier, parameters);
+                    }
                 }
                 else
                 {

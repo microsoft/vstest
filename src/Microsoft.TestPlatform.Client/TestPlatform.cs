@@ -27,11 +27,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     /// </summary>
     public class TestPlatform : ITestPlatform
     {
+        private FileHelper fileHelper;
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
         public TestPlatform() : this(new TestEngine())
         {
+            fileHelper = new FileHelper();
         }
 
         /// <summary>
@@ -88,6 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
+            UpdateAndInitializeLoggers(testRunCriteria);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
@@ -153,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         continue;
                     }
                     List<string> adapterFiles = new List<string>(
-                        Directory.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterPattern, SearchOption.AllDirectories)
+                        this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterResxPattern, SearchOption.AllDirectories)
                         );
                     if (adapterFiles.Count > 0)
                     {
@@ -166,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Update the test adapter paths provided through run settings to be used by the test service
         /// </summary>
-        private void InitializeLoggers(TestRunCriteria testRunCriteria)
+        private void UpdateAndInitializeLoggers(TestRunCriteria testRunCriteria)
         {
             this.UpdateTestLoggerPath(testRunCriteria);
 
@@ -175,37 +178,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             foreach (var logger in LoggerList.Instance.Loggers)
             {
-                string loggerIdentifier = null;
-                Dictionary<string, string> parameters = null;
+                string loggerIdentifier = logger.loggerIdentifier;
+                Dictionary<string, string> parameters = logger.parameters;
 
-                //if (loggerIdentifier.Equals(ConsoleLogger.FriendlyName, StringComparison.OrdinalIgnoreCase))
-                //{
-                //    loggerManager.AddLogger(new ConsoleLogger(), ConsoleLogger.ExtensionUri, parameters);
-                //}
-                //else
-                //{
-                    // First assume the logger is specified by URI. If that fails try with friendly name.
-                    try
+                // First assume the logger is specified by URI. If that fails try with friendly name.
+                try
+                {
+                    this.AddLoggerByUri(loggerManager, loggerIdentifier, parameters);
+                }
+                catch (InvalidLoggerException)
+                {
+                    string loggerUri;
+                    if (loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
                     {
-                        this.AddLoggerByUri(loggerManager, loggerIdentifier, parameters);
+                        this.AddLoggerByUri(loggerManager, loggerUri, parameters);
                     }
-                    catch (InvalidLoggerException)
+                    else
                     {
-                        string loggerUri;
-                        if (loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
-                        {
-                            this.AddLoggerByUri(loggerManager, loggerUri, parameters);
-                        }
-                        else
-                        {
-                            throw new InvalidLoggerException(
-                            String.Format(
-                            CultureInfo.CurrentUICulture,
-                            ClientResources.LoggerNotFound,
-                            logger));
-                        }
+                        throw new InvalidLoggerException(
+                        String.Format(
+                        CultureInfo.CurrentUICulture,
+                        ClientResources.LoggerNotFound,
+                        logger.arument));
                     }
-                //}
+                }
             }
         }
 
@@ -246,9 +242,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             foreach (var source in sources)
             {
                 var sourceDirectory = Path.GetDirectoryName(source);
-                if (!string.IsNullOrEmpty(sourceDirectory) && fileHelper.Exists(sourceDirectory))
+                if (!string.IsNullOrEmpty(sourceDirectory) && fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    loggersToUpdate.AddRange(fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerRedexPattern, SearchOption.TopDirectoryOnly).ToList());
+                    loggersToUpdate.AddRange(fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerResxPattern, SearchOption.TopDirectoryOnly).ToList());
                 }
             }
 

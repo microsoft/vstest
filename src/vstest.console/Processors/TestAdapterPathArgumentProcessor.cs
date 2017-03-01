@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// Allows the user to specify a path to load custom adapters from.
@@ -197,9 +198,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The list of test adapter and logger assemblies. </returns>
         internal virtual IEnumerable<string> GetTestAdaptersFromDirectory(string directory)
         {
+            FileHelper fileHelper = new FileHelper();
             List<string> adapterAndLogger = new List<string>(); 
-            adapterAndLogger.AddRange(Directory.EnumerateFiles(directory, TestPlatformConstants.TestAdapterPattern, SearchOption.AllDirectories).ToList());
-            adapterAndLogger.AddRange(Directory.EnumerateFiles(directory, TestPlatformConstants.TestLoggerPattern, SearchOption.AllDirectories).ToList());
+            adapterAndLogger.AddRange(fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestAdapterResxPattern, SearchOption.AllDirectories).ToList());
+            adapterAndLogger.AddRange(fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestLoggerResxPattern, SearchOption.AllDirectories).ToList());
             return adapterAndLogger;
         }
 
