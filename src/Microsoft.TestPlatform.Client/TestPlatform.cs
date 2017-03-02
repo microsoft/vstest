@@ -180,6 +180,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         private void UpdateTestLoggerPath(IEnumerable<string> sources)
         {
+            if (sources == null)
+            {
+                return;
+            }
+
             List<string> loggersToUpdate = new List<string>();
 
             foreach (var source in sources)

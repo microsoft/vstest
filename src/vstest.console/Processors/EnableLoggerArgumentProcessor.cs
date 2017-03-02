@@ -127,10 +127,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="loggerManager">
         /// The logger manager.
-        /// </param>
-        /// <param name="loggerList">
-        /// It will have the list of logger.
-        /// </param>
         public EnableLoggerArgumentExecutor(TestLoggerManager loggerManager)
         {
             Contract.Requires(loggerManager != null);
