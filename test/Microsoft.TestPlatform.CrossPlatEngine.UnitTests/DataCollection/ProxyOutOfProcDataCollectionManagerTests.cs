@@ -21,6 +21,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private Mock<IDataCollectionTestCaseEventSender> mockDataCollectionTestCaseEventSender;
         private Collection<AttachmentSet> attachmentSets;
         private TestCase testcase;
+        private VisualStudio.TestPlatform.ObjectModel.TestResult testResult;
 
         private ProxyOutOfProcDataCollectionManager proxyOutOfProcDataCollectionManager;
         public ProxyOutOfProcDataCollectionManagerTests()
@@ -36,16 +37,14 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
 
             this.testcase = new TestCase();
             testcase.Id = Guid.NewGuid();
+            this.mockDataCollectionTestCaseEventSender.Setup(x => x.SendTestCaseComplete(It.IsAny<TestCaseEndEventArgs>())).Returns(attachmentSets);
+            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
+            this.testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testcase);
         }
 
         [TestMethod]
         public void TriggerTestCaseEndShouldReturnCacheAttachmentsAndAssociateWithTestResultWhenTriggerSendTestResultIsInvoked()
         {
-            this.mockDataCollectionTestCaseEventSender.Setup(x => x.SendTestCaseComplete(It.IsAny<TestCaseEndEventArgs>())).Returns(attachmentSets);
-
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
-
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testcase);
             this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(testResult));
 
             Assert.AreEqual(1, testResult.Attachments.Count);
@@ -55,18 +54,11 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerSendTestResultShouldDeleteTheAttachmentsFromCache()
         {
-            this.mockDataCollectionTestCaseEventSender.Setup(x => x.SendTestCaseComplete(It.IsAny<TestCaseEndEventArgs>())).Returns(attachmentSets);
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
+            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(this.testResult));
 
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testcase);
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(testResult));
-
-            testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(testcase);
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(testResult));
+            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(this.testResult));
 
             Assert.AreEqual(0, testResult.Attachments.Count);
         }
-
-
     }
 }

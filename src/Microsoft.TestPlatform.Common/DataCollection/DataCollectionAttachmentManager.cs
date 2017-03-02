@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private IMessageSink messageSink;
 
         /// <summary>
-        /// Attachment transfer tasks.
+        /// Attachment transfer tasks associated with a given datacollection context.
         /// </summary>
         private Dictionary<DataCollectionContext, List<Task>> attachmentTasks;
 
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         internal string SessionOutputDirectory { get; private set; }
 
         /// <summary>
-        /// Gets the attachment sets for the session.
+        /// Gets the attachment sets for the given datacollection context.
         /// </summary>
         internal Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>> AttachmentSets
         {
