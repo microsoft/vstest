@@ -14,7 +14,7 @@ function usage()
 }
 
 CONFIGURATION="Debug"
-TARGET_RUNTIME="osx.10.11-x64"
+TARGET_RUNTIME=
 VERSION="15.0.0"
 VERSION_SUFFIX="DEV"
 FAIL_FAST=false
@@ -23,38 +23,40 @@ DISABLE_LOCALIZED_BUILD=false
 CI_BUILD=false
 PROJECT_NAME_PATTERNS=
 
-while [ "$1" != "" ]; do
-    PARAM=`echo $1 | awk -F= '{print $1}'`
-    VALUE=`echo $1 | awk -F= '{print $2}'`
-    case $PARAM in
-            -h | --help)
+while [ $# > 0 ]; do
+    lowerI="$(echo $1 | awk '{print tolower($0)}')"
+    case $lowerI in
+        -h | --help)
                     usage
                     exit
                     ;;
-                -c)
-            CONFIGURATION=$VALUE
+        -c)
+            CONFIGURATION=$2
             ;;
         -r)
-            TARGET_RUNTIME=$VALUE
+            TARGET_RUNTIME=$2
             ;;
         -v)
-            VERSION=$VALUE
+            VERSION=$2
             ;;
         -vs)
-            VERSION_SUFFIX=$VALUE
+            VERSION_SUFFIX=$2
             ;;
         -loc)
-            DISABLE_LOCALIZED_BUILD=$VALUE
+            DISABLE_LOCALIZED_BUILD=$2
             ;;
         -ci)
-                    CI_BUILD=$VALUE
-                    ;;
-                -p)
-            PROJECT_NAME_PATTERNS=$VALUE
+            CI_BUILD=$2
             ;;
-    esac
+        -p)
+            PROJECT_NAME_PATTERNS=$2
+            ;;
+        *)
+            break
+            ;;
+   esac
+   shift
 done
-
 #
 # Variables
 #
@@ -114,7 +116,7 @@ function restorepackage()
     echo "Restore-Package: Start restoring packages to $env:TP_PACKAGES_DIR."
     start=$SECONDS
     DOTNET_PATH="$TP_TOOLS_DIR/dotnet/dotnet"
-    if [[ -e $DOTNET_PATH ]]; then
+    if [[ ! -e $DOTNET_PATH ]]; then
         echo "dotnet not found at $DOTNET_PATH. Did the dotnet cli installation succeed?"
     fi
 
@@ -137,47 +139,40 @@ function invokebuild()
     echo "Invoke-Build: Start build."
     start=$SECONDS
     DOTNET_PATH="$TP_TOOLS_DIR/dotnet/dotnet"
-    if [[ -e $DOTNET_PATH ]]; then
+    if [[ ! -e $DOTNET_PATH ]]; then
         echo "dotnet not found at $DOTNET_PATH. Did the dotnet cli installation succeed?"
     fi
 
     echo ".. .. Build: Source: $TPB_Solution"
     
     #Need to target the appropriate targetframework for each project until netstandard2.0 ships
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/testhost.x86/testhost.x86.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netcoreapp1.0
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netcoreapp1.0
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.0
-
-    $DOTNET_PATH build ./src/package/package/package.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netcoreapp1.0
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/datacollector/datacollector.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netcoreapp1.0
-
-    $DOTNET_PATH build ./src/vstest.console/vstest.console.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netcoreapp1.0
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.Client/Microsoft.TestPlatform.Client.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.Extensions.TrxLogger/Microsoft.TestPlatform.Extensions.TrxLogger.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.5
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.Build/Microsoft.TestPlatform.Build.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.3
-
-    $DOTNET_PATH build ./src/testhost/testhost.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netcoreapp1.0
-
-    $DOTNET_PATH build ./src/Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=netstandard1.4
-
+    PROJECTFRAMEWORKMAP =(
+        Microsoft.TestPlatform.CrossPlatEngine:netstandard1.5 \
+        testhost.x86:netcoreapp1.0 \
+        Microsoft.TestPlatform.PlatformAbstractions:netcoreapp1.0 \
+        Microsoft.TestPlatform.PlatformAbstractions:netstandard1.0 \
+        package:netcoreapp1.0 \
+        Microsoft.TestPlatform.ObjectModel:netstandard1.5 \
+        Microsoft.TestPlatform.VsTestConsole.TranslationLayer:netstandard1.5 \
+        datacollector:netcoreapp1.0 \
+        vstest.console:netcoreapp1.0 \
+        Microsoft.TestPlatform.Common:netstandard1.5 \
+        Microsoft.TestPlatform.Client:netstandard1.5 \
+        Microsoft.TestPlatform.Extensions.TrxLogger:netstandard1.5 \
+        Microsoft.TestPlatform.Utilities:netstandard1.5 \
+        Microsoft.TestPlatform.CommunicationUtilities:netstandard1.5 \
+        Microsoft.TestPlatform.Build:netstandard1.3 \
+        testhost:netcoreapp1.0 \
+        Microsoft.TestPlatform.CoreUtilities:netstandard1.4
+    )
+    
+    for item in "${ARRAY[@]}" ;
+    do
+        projectToBuild="${item%%:*}"
+        framework="${item##*:}"
+        $DOTNET_PATH build src/$projectToBuild/$projectToBuild.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=$framework
+    done
+    
     echo ".. .. Build: Complete."
     if [[ $? -ne 0 ]]; then
         echo "Invoke Build failed."
@@ -192,35 +187,27 @@ function publishpackage()
     echo "Publish-Package: Started."
     start=$SECONDS
     DOTNET_PATH="$TP_TOOLS_DIR/dotnet/dotnet"
-    if [[ -e $DOTNET_PATH ]]; then
+    if [[ ! -e $DOTNET_PATH ]]; then
         echo "dotnet not found at $DOTNET_PATH. Did the dotnet cli installation succeed?"
     fi
     
     coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
-    packageProject=$TP_PACKAGE_PROJ_DIR/package.csproj
-    testHostProject=$TP_ROOT_DIR/src/testhost/testhost.csproj
-    testHostx86Project=$TP_ROOT_DIR/src/testhost.x86/testhost.x86.csproj
-    testhostCorePackageDir=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore
-    vstestConsoleProject=$TP_ROOT_DIR/src/vstest.console/vstest.console.csproj
-    dataCollectorProject=$TP_ROOT_DIR/src/datacollector/datacollector.csproj
-
-    echo "Package: Publish package\*.csproj"
-
-    echo "$DOTNET_PATH publish $packageProject --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $coreCLRPackageDir -v:minimal -p:SyncXlf=$SYNC_XLF -p:LocalizedBuild=$TPB_LocalizedBuild"
-     $DOTNET_PATH publish $packageProject --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $coreCLRPackageDir -v:minimal -p:SyncXlf=$SYNC_XLF -p:LocalizedBuild=$TPB_LocalizedBuild
-
-    # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.    
-    echo "Package: Publish src\vstest.console\vstest.console.csproj"
-    $DOTNET_PATH publish $vstestConsoleProject --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $coreCLRPackageDir -v:minimal -p:SyncXlf=$SYNC_XLF -p:LocalizedBuild=$TPB_LocalizedBuild
-
-    echo "Package: Publish src\datacollector\datacollector.csproj"
-    $DOTNET_PATH publish $dataCollectorProject --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $coreCLRPackageDir -v:minimal -p:SyncXlf=$SYNC_XLF -p:LocalizedBuild=$TPB_LocalizedBuild
-
-    # Publish testhost
     
-    echo "Package: Publish testhost\testhost.csproj"
-    $DOTNET_PATH publish $testHostProject --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $testhostCorePackageDir -v:minimal -p:SyncXlf=$SYNC_XLF -p:LocalizedBuild=$TPB_LocalizedBuild
+    PROJECTPACKAGEOUTPUTMAP = (
+        $TP_PACKAGE_PROJ_DIR/package.csproj:$coreCLRPackageDir \
+        $TP_ROOT_DIR/src/vstest.console/vstest.console.csproj:$coreCLRPackageDir \
+        $TP_ROOT_DIR/src/datacollector/datacollector.csproj:$coreCLRPackageDir \
+        $TP_ROOT_DIR/src/testhost/testhost.csproj:$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore
+    )
 
+    for item in "${PROJECTPACKAGEOUTPUTMAP[@]}" ;
+    do
+        projectToPackage="${item%%:*}"
+        packageOutputPath="${item##*:}"
+        echo "Package: Publish $projectToPackage"
+        $DOTNET_PATH publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:SyncXlf=$SYNC_XLF -p:LocalizedBuild=$TPB_LocalizedBuild
+    done
+    
     # Copy over the logger assemblies to the Extensions folder.
     coreCLRExtensionsDir="$coreCLRPackageDir/Extensions"
     # Create an extensions directory.
@@ -267,11 +254,11 @@ function createnugetpackages()
     stagingDir="$TP_OUT_DIR/$TPB_Configuration"
 
     DOTNET_PATH="$TP_TOOLS_DIR/dotnet/dotnet"
-    if [[ -e $DOTNET_PATH ]]; then
+    if [[ ! -e $DOTNET_PATH ]]; then
         echo "dotnet not found at $DOTNET_PATH. Did the dotnet cli installation succeed?"
     fi
 
-    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec" "TestPlatform.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" Microsoft.NET.Test.Sdk.nuspec)
+    nuspecFiles=("TestPlatform.TranslationLayer.nuspec" "TestPlatform.ObjectModel.nuspec" "TestPlatform.TestHost.nuspec" "TestPlatform.nuspec" "TestPlatform.CLI.nuspec" "TestPlatform.Build.nuspec" "Microsoft.NET.Test.Sdk.nuspec")
     projectFiles=("Microsoft.TestPlatform.CLI.csproj" "Microsoft.TestPlatform.Build.csproj")
     binDir="$TP_ROOT_DIR/bin/packages"
 
@@ -291,8 +278,8 @@ function createnugetpackages()
 
 
     for i in ${projectFiles[@]}; do
-        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $binDir --version-suffix $TPB_VersionSuffix" /p:Version=$TPB_Version \
-        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $binDir --version-suffix $TPB_VersionSuffix /p:Version=$TPB_Version
+        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir --version-suffix $TPB_VersionSuffix" /p:Version=$TPB_Version \
+        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir --version-suffix $TPB_VersionSuffix /p:Version=$TPB_Version
     done
 
     echo "Create-NugetPackages: Elapsed $(( SECONDS - start ))"
