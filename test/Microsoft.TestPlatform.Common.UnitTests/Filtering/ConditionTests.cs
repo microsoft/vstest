@@ -11,28 +11,28 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
     public class ConditionTests
     {
         [TestMethod]
-        public void ParseShouldThrownFormatException_OnNullConditionString()
+        public void ParseShouldThrownFormatExceptionOnNullConditionString()
         {
             string conditionString = null;
             Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
         }
 
         [TestMethod]
-        public void ParseShouldThrownFormatException_OnEmptyConditionString()
+        public void ParseShouldThrownFormatExceptionOnEmptyConditionString()
         {
             var conditionString = "";
             Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
         }
 
         [TestMethod]
-        public void ParseShouldThrownFormatException_OnIncompleteConditionString()
+        public void ParseShouldThrownFormatExceptionOnIncompleteConditionString()
         {
             var conditionString = "PropertyName=";
-            Assert.ThrowsException<FormatException>( ()=> Condition.Parse(conditionString));
+            Assert.ThrowsException<FormatException>( () => Condition.Parse(conditionString));
         }
 
         [TestMethod]
-        public void ParseShouldCreateDefaultCondition_WhenOnlyPropertyValuePassed()
+        public void ParseShouldCreateDefaultConditionWhenOnlyPropertyValuePassed()
         {
             var conditionString = "ABC";
             Condition condition = Condition.Parse(conditionString);
@@ -42,7 +42,7 @@ namespace Microsoft.TestPlatform.Common.UnitTests.Filtering
         }
 
         [TestMethod]
-        public void ParseShouldCreateProperCondition_OnValidConditionString()
+        public void ParseShouldCreateProperConditionOnValidConditionString()
         {
             var conditionString = "PropertyName=PropertyValue";
             Condition condition = Condition.Parse(conditionString);

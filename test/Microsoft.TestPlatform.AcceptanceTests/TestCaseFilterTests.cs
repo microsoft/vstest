@@ -136,7 +136,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
-        public void TestCaseFilterShouldWork_IfOnlyPropertyValueGivenInExpression(string runnerFramework, string targetFramework, string targetRuntime)
+        public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
