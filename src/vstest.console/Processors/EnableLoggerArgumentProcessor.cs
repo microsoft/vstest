@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(TestLoggerManager.Instance, LoggerList.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new EnableLoggerArgumentExecutor(TestLoggerManager.Instance));
                 }
 
                 return this.executor;
@@ -118,11 +118,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         private readonly TestLoggerManager loggerManager;
 
-        /// <summary>
-        /// Used for saving loggers info which will later use to initialize it.
-        /// </summary>
-        private LoggerList loggerList;
-
         #endregion
 
         #region Constructors
@@ -136,12 +131,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="loggerList">
         /// It will have the list of logger.
         /// </param>
-        public EnableLoggerArgumentExecutor(TestLoggerManager loggerManager, LoggerList loggerList)
+        public EnableLoggerArgumentExecutor(TestLoggerManager loggerManager)
         {
             Contract.Requires(loggerManager != null);
-            Contract.Requires(loggerList != null);
             this.loggerManager = loggerManager;
-            this.loggerList = loggerList;
         }
 
         #endregion
@@ -172,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                     else
                     {
-                        this.loggerList.AddLogger(argument, loggerIdentifier, parameters);
+                        this.loggerManager.UpdateLoggerList(argument, loggerIdentifier, parameters);
                     }
                 }
                 else

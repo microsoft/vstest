@@ -7,11 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using System.IO;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
-    using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -97,7 +95,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             // Update and initialize loggers only when DesignMode is false
             if (runConfiguration.DesignMode == false)
             {
-                UpdateAndInitializeLoggers(testRunCriteria);
+                UpdateTestLoggerPath(testRunCriteria.Sources);
+
+                // Initialize loggers
+                TestLoggerManager.Instance.InitializeLoggers();
             }
 
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
@@ -162,6 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
                         continue;
                     }
+
                     List<string> adapterFiles = new List<string>(
                         this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterResxPattern, SearchOption.AllDirectories)
                         );
@@ -174,77 +176,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// Update the test adapter paths provided through run settings to be used by the test service
+        /// Update the test logger paths from source directory
         /// </summary>
-        private void UpdateAndInitializeLoggers(TestRunCriteria testRunCriteria)
-        {
-            this.UpdateTestLoggerPath(testRunCriteria);
-
-            // Initialize Loggers
-            TestLoggerManager loggerManager = TestLoggerManager.Instance;
-
-            foreach (var logger in LoggerList.Instance.Loggers)
-            {
-                string loggerIdentifier = logger.loggerIdentifier;
-                Dictionary<string, string> parameters = logger.parameters;
-
-                // First assume the logger is specified by URI. If that fails try with friendly name.
-                try
-                {
-                    this.AddLoggerByUri(loggerManager, loggerIdentifier, parameters);
-                }
-                catch (InvalidLoggerException)
-                {
-                    string loggerUri;
-                    if (loggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
-                    {
-                        this.AddLoggerByUri(loggerManager, loggerUri, parameters);
-                    }
-                    else
-                    {
-                        throw new InvalidLoggerException(
-                        String.Format(
-                        CultureInfo.CurrentUICulture,
-                        ClientResources.LoggerNotFound,
-                        logger.arument));
-                    }
-                }
-            }
-        }
-
-        private void AddLoggerByUri(TestLoggerManager loggerManager, string argument, Dictionary<string, string> parameters)
-        {
-            // Get the uri and if it is not valid, throw.
-            Uri loggerUri = null;
-            try
-            {
-                loggerUri = new Uri(argument);
-            }
-            catch (UriFormatException)
-            {
-                throw new InvalidLoggerException(
-                string.Format(
-                    CultureInfo.CurrentUICulture,
-                    ClientResources.LoggerUriInvalid,
-                    argument));
-            }
-
-            // Add the logger and if it is a non-existent logger, throw.
-            try
-            {
-                loggerManager.AddLogger(loggerUri, parameters);
-            }
-            catch (InvalidOperationException e)
-            {
-                throw new InvalidLoggerException(e.Message, e);
-            }
-        }
-
-        private void UpdateTestLoggerPath(TestRunCriteria testRunCriteria)
+        private void UpdateTestLoggerPath(IEnumerable<string> sources)
         {
             List<string> loggersToUpdate = new List<string>();
 
-            var sources = testRunCriteria.Sources;
             foreach (var source in sources)
             {
                 var sourceDirectory = Path.GetDirectoryName(source);

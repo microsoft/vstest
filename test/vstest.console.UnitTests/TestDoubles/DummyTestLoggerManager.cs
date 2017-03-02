@@ -26,6 +26,11 @@ namespace vstest.console.UnitTests.TestDoubles
             }
         }
 
+        public List<LoggerInfo> GetLoggersInfoList()
+        {
+            return this.loggersInfoList;
+        }
+
         public static void Cleanup()
         {
             Instance = null;

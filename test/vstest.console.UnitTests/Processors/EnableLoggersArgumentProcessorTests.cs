@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorInitializeWithNullOrEmptyArgumentsShouldThrowException()
         {
-            var executor = new EnableLoggerArgumentExecutor(TestLoggerManager.Instance, LoggerList.Instance);
+            var executor = new EnableLoggerArgumentExecutor(TestLoggerManager.Instance);
             Assert.ThrowsException<CommandLineException>(() =>
             {
                 executor.Initialize(null);
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunTestsArgumentProcessorTests.SetupMockExtensions();
             var testloggerManager = new DummyTestLoggerManager();
-            var executor = new EnableLoggerArgumentExecutor(testloggerManager, LoggerList.Instance);
+            var executor = new EnableLoggerArgumentExecutor(testloggerManager);
 
             var countBefore = testloggerManager.GetInitializedLoggers.Count;
 
@@ -78,18 +78,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize("console;verbosity=minimal");
             countAfter = testloggerManager.GetInitializedLoggers.Count;
             Assert.IsTrue(countAfter == 1);
+
+            DummyTestLoggerManager.Cleanup();
         }
 
         [TestMethod]
         public void ExecutorInitializeWithValidArgumentsOtherThanConsoleLoggerShouldGetStoreInLoggerList()
         {
             var testloggerManager = new DummyTestLoggerManager();
-            var executor = new EnableLoggerArgumentExecutor(testloggerManager, LoggerList.Instance);
+            var executor = new EnableLoggerArgumentExecutor(testloggerManager);
 
             executor.Initialize("DummyLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
             
-            Assert.IsNotNull(LoggerList.Instance.Loggers.ToList().Find(l => l.loggerIdentifier == "DummyLoggerExtension"));
-
+            Assert.IsTrue(testloggerManager.GetLoggersInfoList().ToList().First().loggerIdentifier == "DummyLoggerExtension");
         }
 
         [TestMethod]
@@ -97,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             RunTestsArgumentProcessorTests.SetupMockExtensions();
             var testloggerManager = new DummyTestLoggerManager();
-            var executor = new EnableLoggerArgumentExecutor(testloggerManager, LoggerList.Instance);
+            var executor = new EnableLoggerArgumentExecutor(testloggerManager);
 
             executor.Initialize("console;verbosity=minimal");
             Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/ConsoleLogger/v2"));
@@ -106,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExectorInitializeShouldThrowExceptionIfInvalidArgumentIsPassed()
         {
-            var executor = new EnableLoggerArgumentExecutor(TestLoggerManager.Instance, LoggerList.Instance);
+            var executor = new EnableLoggerArgumentExecutor(TestLoggerManager.Instance);
             Assert.ThrowsException<CommandLineException>(() =>
             {
                 executor.Initialize("TestLoggerExtension;==;;;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
@@ -116,7 +117,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorExecuteShouldReturnArgumentProcessorResultSuccess()
         {
-            var executor = new EnableLoggerArgumentExecutor(null, null);
+            var executor = new EnableLoggerArgumentExecutor(null);
             var result = executor.Execute();
             Assert.AreEqual(ArgumentProcessorResult.Success, result);
         }
