@@ -17,6 +17,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         #region Constructor
 
         /// <summary>
+        /// Default constructor added for serialization/deserialization.
+        /// </summary>
+        public DataCollectionEventArgs()
+        {
+        }
+
+        /// <summary>
         /// Initializes the instance by storing the given information
         /// </summary>
         /// <param name="context">Context information for the event</param>
@@ -43,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         public DataCollectionContext Context
         {
             get;
-            private set;
+            internal set;
         }
 
         /// <summary>

@@ -27,11 +27,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Maximum number of cores that the engine can use to run tests in parallel
         /// </summary>
         private int maxCpuCount;
-        
+
         /// <summary>
         /// .Net framework which rocksteady should use for discovery/execution
         /// </summary>
         private Framework framework;
+
+        /// <summary>
+        /// Specifies the frequency of the runStats/discoveredTests event
+        /// </summary>
+        private long batchSize;
 
         /// <summary>
         /// Directory in which rocksteady/adapter should keep their run specific data. 
@@ -53,6 +58,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private bool disableParallelization;
 
+        /// <summary>
+        /// True if test run is triggered 
+        /// </summary>
+        private bool designMode;
+
         #endregion
 
         #region Constructor
@@ -71,8 +81,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.BinariesRoot = null;
             this.testAdaptersPaths = null;
             this.maxCpuCount = Constants.DefaultCpuCount;
+            this.batchSize = Constants.DefaultBatchSize;
             this.disableAppDomain = false;
             this.disableParallelization = false;
+            this.designMode = false;
         }
 
         #endregion
@@ -118,6 +130,39 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.maxCpuCount = value;
                 this.MaxCpuCountSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the frequency of the runStats/discoveredTests event. Should be non-negative integer.
+        /// </summary>
+        public long BatchSize
+        {
+            get
+            {
+                return this.batchSize;
+            }
+            set
+            {
+                this.batchSize = value;
+                this.BatchSizeSet = true;
+            }
+        }
+
+        /// <summary> 
+        /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
+        /// </summary>
+        public bool DesignMode
+        {
+            get
+            {
+                return this.designMode;
+            }
+
+            set
+            {
+                this.designMode = value;
+                this.DesignModeSet = true;
             }
         }
 
@@ -171,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.TargetPlatformSet = true;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
         /// </summary>
@@ -238,6 +283,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets a value indicating batch size is set
+        /// </summary>
+        public bool BatchSizeSet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether design mode is set.
+        /// </summary>
+        public bool DesignModeSet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether app domain needs to be disabled by the adapters.
         /// </summary>
         public bool DisableAppDomainSet
@@ -245,7 +308,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             get;
             private set;
         }
-
 
         /// <summary>
         /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
@@ -289,7 +351,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public string BinariesRoot { get; private set; }
 
         #endregion
-        
+
         /// <inheritdoc/>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
@@ -310,6 +372,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement maxCpuCount = doc.CreateElement("MaxCpuCount");
             maxCpuCount.InnerXml = this.MaxCpuCount.ToString();
             root.AppendChild(maxCpuCount);
+
+            XmlElement batchSize = doc.CreateElement("BatchSize");
+            batchSize.InnerXml = this.BatchSize.ToString();
+            root.AppendChild(batchSize);
+
+            XmlElement designMode = doc.CreateElement("DesignMode");
+            designMode.InnerXml = this.DesignMode.ToString();
+            root.AppendChild(designMode);
 
             XmlElement disableAppDomain = doc.CreateElement("DisableAppDomain");
             disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
@@ -343,7 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             return root;
         }
-        
+
         /// <summary>
         /// Loads RunConfiguration from XmlReader.
         /// </summary>
@@ -388,6 +458,38 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             }
 
                             runConfiguration.MaxCpuCount = count;
+                            break;
+
+                        case "BatchSize":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string batchSize = reader.ReadElementContentAsString();
+                            long size;
+                            if (!long.TryParse(batchSize, out size) || size < 0)
+                            {
+                                throw new SettingsException(
+                                    string.Format(
+                                        CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsIncorrectValue,
+                                        Constants.RunConfigurationSettingsName,
+                                        batchSize,
+                                        elementName));
+                            }
+
+                            runConfiguration.BatchSize = size;
+                            break;
+
+                        case "DesignMode":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string designModeValueString = reader.ReadElementContentAsString();
+                            bool designMode;
+                            if (!bool.TryParse(designModeValueString, out designMode))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, designModeValueString, elementName));
+                            }
+                            runConfiguration.DesignMode = designMode;
                             break;
 
                         case "DisableAppDomain":
@@ -524,12 +626,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             break;
 
                         default:
-                            throw new SettingsException(
-                                string.Format(
-                                    CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsXmlElement,
-                                    Constants.RunConfigurationSettingsName,
-                                    reader.Name));
+                            // Ignore a runsettings element that we don't understand. It could occur in the case
+                            // the test runner is of a newer version, but the test host is of an earlier version.
+                            if (EqtTrace.IsErrorEnabled)
+                            {
+                                EqtTrace.Warning(
+                                    string.Format(
+                                        CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsXmlElement,
+                                        Constants.RunConfigurationSettingsName,
+                                        reader.Name));
+                            }
+                            reader.Skip();
+                            break;
                     }
                 }
 
