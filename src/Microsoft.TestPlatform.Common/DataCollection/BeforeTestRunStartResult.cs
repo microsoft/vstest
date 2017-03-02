@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
     using System.Runtime.Serialization;
 
     /// <summary>
-    /// The before test run start result.
+    /// Payload object that is used to exchange data between datacollector process and runner process.
     /// </summary>
     [DataContract]
     public class BeforeTestRunStartResult
@@ -18,16 +18,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// <param name="environmentVariables">
         /// The environment variables.
         /// </param>
-        /// <param name="areTestCaseLevelEventsRequired">
-        /// The are test case level events required.
-        /// </param>
         /// <param name="dataCollectionEventsPort">
         /// The data Collection Events Port.
         /// </param>
         public BeforeTestRunStartResult(IDictionary<string, string> environmentVariables, bool areTestCaseLevelEventsRequired, int dataCollectionEventsPort)
         {
             this.EnvironmentVariables = environmentVariables;
-            this.AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
             this.DataCollectionEventsPort = dataCollectionEventsPort;
         }
 
@@ -36,12 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// </summary>
         [DataMember]
         public IDictionary<string, string> EnvironmentVariables { get; private set; }
-
-        /// <summary>
-        /// Gets a value indicating whether test case level events are required or not
-        /// </summary>
-        [DataMember]
-        public bool AreTestCaseLevelEventsRequired { get; private set; }
 
         /// <summary>
         /// Gets the data collection events port.
