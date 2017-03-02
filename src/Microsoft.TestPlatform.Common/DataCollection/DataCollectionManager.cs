@@ -264,7 +264,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             this.SendEvent(new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
 
-            return true;
+            return this.events.AreTestCaseEventsSubscribed();
         }
 
         /// <inheritdoc/>

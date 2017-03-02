@@ -193,9 +193,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
-            this.dataCollectionManager.SessionStarted();
+            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted();
 
             Assert.IsTrue(isStartInvoked);
+            Assert.IsFalse(areTestCaseEventsSubscribed);
+        }
+
+        [TestMethod]
+        public void SessionStartedShouldReturnTrueIfTestCaseStartIsSubscribed()
+        {
+            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
+            {
+                b.TestCaseStart += (sender, eventArgs) => { };
+            });
+
+            this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
+
+            var areTestCaseEventsSubscribed = this.dataCollectionManager.SessionStarted();
+
+            Assert.IsTrue(areTestCaseEventsSubscribed);
         }
 
         [TestMethod]
@@ -210,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             var result = this.dataCollectionManager.SessionStarted();
 
-            Assert.IsTrue(result);
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
