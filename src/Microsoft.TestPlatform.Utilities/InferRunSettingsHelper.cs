@@ -18,11 +18,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public class InferRunSettingsHelper
     {
+        private const string DesignModeNodeName = "DesignMode";
         private const string RunSettingsNodeName = "RunSettings";
         private const string RunConfigurationNodeName = "RunConfiguration";
         private const string ResultsDirectoryNodeName = "ResultsDirectory";
         private const string TargetPlatformNodeName = "TargetPlatform";
         private const string TargetFrameworkNodeName = "TargetFrameworkVersion";
+
+        private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
         private const string RunConfigurationNodePath = @"/RunSettings/RunConfiguration";
         private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
@@ -75,6 +78,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             runSettingsNavigator.MoveToRoot();
+        }
+
+        /// <summary>
+        /// Updates the <c>RunConfiguration.DesignMode</c> value for a run settings. Doesn't do anything if the value is already set.
+        /// </summary>
+        /// <param name="runSettingsNavigator">Navigator for runsettings xml</param>
+        /// <param name="designModeValue">Value to set</param>
+        public static void UpdateDesignMode(XPathNavigator runSettingsNavigator, bool designModeValue)
+        {
+            // Navigator should be at Root of runsettings xml, attempt to move to /RunSettings/RunConfiguration
+            if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+!runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+            {
+                EqtTrace.Error("InferRunSettingsHelper.UpdateDesignMode: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                return;
+            }
+
+            var hasDesignMode = runSettingsNavigator.SelectSingleNode(DesignModeNodePath) != null;
+            if (!hasDesignMode)
+            {
+                XmlUtilities.AppendOrModifyChild(runSettingsNavigator, DesignModeNodePath, DesignModeNodeName, designModeValue.ToString());
+                runSettingsNavigator.MoveToRoot();
+            }
         }
 
         /// <summary>
