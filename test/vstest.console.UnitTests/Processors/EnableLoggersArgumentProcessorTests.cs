@@ -86,10 +86,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var testloggerManager = new DummyTestLoggerManager();
             var executor = new EnableLoggerArgumentExecutor(testloggerManager, LoggerList.Instance);
 
-            executor.Initialize("TestLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
+            executor.Initialize("DummyLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
             
-            Assert.IsTrue(LoggerList.Instance.Loggers.ToList().Count == 1);
-            Assert.IsTrue(LoggerList.Instance.Loggers.ToList().First().loggerIdentifier == "TestLoggerExtension");
+            Assert.IsNotNull(LoggerList.Instance.Loggers.ToList().Find(l => l.loggerIdentifier == "DummyLoggerExtension"));
 
         }
 
