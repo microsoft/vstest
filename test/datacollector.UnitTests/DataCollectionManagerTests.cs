@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Reflection;
     using System.Xml;
 
@@ -13,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -33,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private Mock<IDataCollectorLoader> dataCollectorLoader;
         private Mock<DataCollector2> mockDataCollector;
         private List<KeyValuePair<string, string>> envVarList;
+        private Mock<IDataCollectionAttachmentManager> mockDataCollectionAttachmentManager;
 
         public DataCollectionManagerTests()
         {
@@ -52,7 +51,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorLoader = new Mock<IDataCollectorLoader>();
 
             this.dataCollectorLoader.Setup(x => x.Load(typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, this.mockDataCollector.Object.GetType().AssemblyQualifiedName)).Returns(this.mockDataCollector.Object);
-            this.dataCollectionManager = new TestableDataCollectionManager(new DataCollectionAttachmentManager(), this.mockMessageSink.Object, this.dataCollectorLoader.Object);
+            this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
+            this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
+
+            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.dataCollectorLoader.Object);
         }
 
         [TestMethod]
@@ -233,15 +235,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SessionEndedShouldReturnAttachments()
         {
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
-            {
-                b.SessionEnd += (sender, ev) =>
-                           {
-                               var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
-                               File.WriteAllText(filename, string.Empty);
-                               c.SendFileAsync(e.SessionDataCollectionContext, filename, true);
-                           };
-            });
+            var attachment = new AttachmentSet(new Uri("my://custom/datacollector"), "CustomDataCollector");
+            attachment.Attachments.Add(new UriDataAttachment(new Uri("my://filename.txt"), "filename.txt"));
+
+            this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
 
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
             this.dataCollectionManager.SessionStarted();
@@ -254,9 +251,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SessionEndedShouldNotReturnAttachmentsIfExceptionIsThrownWhileGettingAttachments()
         {
-            var mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
-            this.dataCollectionManager = new TestableDataCollectionManager(mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, new Mock<IDataCollectorLoader>().Object);
+            this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Throws<Exception>();
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
             var result = this.dataCollectionManager.SessionEnded();
@@ -267,13 +262,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SessionEndedShouldContinueDataCollectionIfExceptionIsThrownWhileSendingSessionEndEventToDataCollector()
         {
+            var attachment = new AttachmentSet(new Uri("my://custom/datacollector"), "CustomDataCollector");
+            attachment.Attachments.Add(new UriDataAttachment(new Uri("my://filename.txt"), "filename.txt"));
+
+            this.mockDataCollectionAttachmentManager.Setup(x => x.GetAttachments(It.IsAny<DataCollectionContext>())).Returns(new List<AttachmentSet>() { attachment });
+
             this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
             {
                 b.SessionEnd += (sender, ev) =>
                     {
-                        var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
-                        File.WriteAllText(filename, string.Empty);
-                        c.SendFileAsync(e.SessionDataCollectionContext, filename, true);
+                        c.SendFileAsync(e.SessionDataCollectionContext, "filename.txt", true);
                         throw new Exception();
                     };
             });
@@ -289,15 +287,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SessionEndedShouldCancelProcessingAttachmentRequestsIfSessionIsCancelled()
         {
-            var mockAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
-            this.dataCollectionManager = new TestableDataCollectionManager(mockAttachmentManager.Object, this.mockMessageSink.Object, this.dataCollectorLoader.Object);
-
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
             this.dataCollectionManager.SessionStarted();
 
             var result = this.dataCollectionManager.SessionEnded(true);
 
-            mockAttachmentManager.Verify(x => x.Cancel(), Times.Once);
+            this.mockDataCollectionAttachmentManager.Verify(x => x.Cancel(), Times.Once);
         }
 
         #region TestCaseEventsTest
@@ -345,11 +340,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         {
             var isEndInvoked = false;
             var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
-            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true; });
+            this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
+            {
+                b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true;
+            });
 
             var args = new TestCaseEndEventArgs();
-            this.dataCollectionManager.TestCaseEnded(args);
-
             Assert.IsFalse(isEndInvoked);
         }
 

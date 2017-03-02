@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Attachment transfer tasks.
         /// </summary>
-        private List<Task> attachmentTasks;
+        private Dictionary<DataCollectionContext, List<Task>> attachmentTasks;
 
         /// <summary>
         /// Use to cancel attachment transfers if test run is cancelled.
@@ -55,8 +55,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         public DataCollectionAttachmentManager()
         {
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.attachmentTasks = new List<Task>();
-            this.AttachmentSets = new Dictionary<Uri, AttachmentSet>();
+            this.attachmentTasks = new Dictionary<DataCollectionContext, List<Task>>();
+            this.AttachmentSets = new Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>>();
         }
 
         #endregion
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Gets the attachment sets for the session.
         /// </summary>
-        internal Dictionary<Uri, AttachmentSet> AttachmentSets
+        internal Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>> AttachmentSets
         {
             get; private set;
         }
@@ -111,14 +111,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             try
             {
-                Task.WhenAll(this.attachmentTasks.ToArray()).Wait();
+                Task.WhenAll(this.attachmentTasks[dataCollectionContext].ToArray()).Wait();
             }
             catch (Exception ex)
             {
                 EqtTrace.Error(ex.Message);
             }
 
-            return this.AttachmentSets.Values.ToList();
+            var attachments = this.AttachmentSets[dataCollectionContext].Values.ToList();
+            this.attachmentTasks.Remove(dataCollectionContext);
+            this.AttachmentSets.Remove(dataCollectionContext);
+
+            return attachments;
         }
 
         /// <inheritdoc/>
@@ -137,9 +141,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            if (!this.AttachmentSets.ContainsKey(uri))
+            if (!this.AttachmentSets.ContainsKey(fileTransferInfo.Context))
             {
-                this.AttachmentSets.Add(uri, new AttachmentSet(uri, friendlyName));
+                this.AttachmentSets.Add(fileTransferInfo.Context, new Dictionary<Uri, AttachmentSet>());
+                this.AttachmentSets[fileTransferInfo.Context].Add(uri, new AttachmentSet(uri, friendlyName));
+                this.attachmentTasks.Add(fileTransferInfo.Context, new List<Task>());
             }
 
             if (fileTransferInfo != null)
@@ -289,7 +295,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         {
                             if (t.Exception == null)
                             {
-                                this.AttachmentSets[uri].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
+                                this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
                             }
 
                             if (sendFileCompletedCallback != null)
@@ -310,7 +316,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     },
                 this.cancellationTokenSource.Token);
 
-            this.attachmentTasks.Add(continuationTask);
+            this.attachmentTasks[fileTransferInfo.Context].Add(continuationTask);
         }
 
         /// <summary>
