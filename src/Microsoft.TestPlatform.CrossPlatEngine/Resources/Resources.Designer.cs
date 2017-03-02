@@ -233,5 +233,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("UnsupportedPropertiesInTestCaseFilter", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again..
+        /// </summary>
+        internal static string DataCollectionCommunicationFailed
+        {
+            get
+            {
+                return ResourceManager.GetString("DataCollectionCommunicationFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again..
+        /// </summary>
+        internal static string DataCollectionFailed
+        {
+            get
+            {
+                return ResourceManager.GetString("DataCollectionFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again..
+        /// </summary>
+        internal static string DataCollectorsInitializationFailed
+        {
+            get
+            {
+                return ResourceManager.GetString("DataCollectorsInitializationFailed", resourceCulture);
+            }
+        }
     }
 }

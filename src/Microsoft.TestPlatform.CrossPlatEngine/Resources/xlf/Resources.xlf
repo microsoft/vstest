@@ -81,6 +81,21 @@
         <target state="new">Testhost process exited with error: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="DataCollectionCommunicationFailed">
+        <source>Failed to communicate with datacollector process.</source>
+        <target state="new">Failed to communicate with datacollector process.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectionFailed">
+        <source>Failed to start datacollector process. Please try again.</source>
+        <target state="new">Failed to start datacollector process. Please try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorsInitializationFailed">
+        <source>Failed to initialize datacollectors.</source>
+        <target state="new">Failed to initialize datacollectors.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

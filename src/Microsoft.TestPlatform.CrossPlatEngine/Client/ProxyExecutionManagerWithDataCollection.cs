@@ -18,7 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class ProxyExecutionManagerWithDataCollection : ProxyExecutionManager
     {
-        private DataCollectionParameters dataCollectionParameters;
+        private IDictionary<string, string> dataCollectionEnvironmentVariables;
+        private int dataCollectionPort;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
@@ -68,45 +69,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex);
                 }
+
+                throw new Exception(Resources.Resources.DataCollectionFailed, ex);
             }
 
             try
             {
-                this.dataCollectionParameters = (this.ProxyDataCollectionManager == null)
-                                               ? DataCollectionParameters.CreateDefaultParameterInstance()
-                                               : this.ProxyDataCollectionManager.BeforeTestRunStart(
+                var dataCollectionParameters = this.ProxyDataCollectionManager.BeforeTestRunStart(
                                                    resetDataCollectors: true,
                                                    isRunStartingNow: true,
                                                    runEventsHandler: this.DataCollectionRunEventsHandler);
+
+                if (dataCollectionParameters != null)
+                {
+                    this.dataCollectionEnvironmentVariables = dataCollectionParameters.EnvironmentVariables;
+                    this.dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
+                }
             }
-            catch
+            catch (Exception e)
             {
                 try
                 {
                     // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end DataCollectionProcess
-                    if (this.ProxyDataCollectionManager != null)
-                    {
-                        this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
-
-                        // Set Proxy Data Collection Manager to null as the communication channel is broken.
-                        this.ProxyDataCollectionManager = null;
-                    }
+                    this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
+                    throw new Exception(Resources.Resources.DataCollectorsInitializationFailed, e);
                 }
                 catch (Exception ex)
                 {
-                    // Set Proxy Data Collection Manager to null as the communication channel is broken.
-                    this.ProxyDataCollectionManager = null;
-
                     // There is an issue with Data Collector, skipping data collection and continuing with test run.
                     if (EqtTrace.IsErrorEnabled)
                     {
                         EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex);
                     }
 
-                    if (EqtTrace.IsWarningEnabled)
-                    {
-                        EqtTrace.Warning("ProxyExecutionManagerWithDataCollection: Skipping Data Collection");
-                    }
+                    throw new Exception(Resources.Resources.DataCollectionCommunicationFailed, ex);
                 }
             }
 
@@ -142,14 +138,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <inheritdoc/>
         public override void Cancel()
         {
-            this.ProxyDataCollectionManager?.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
+            try
+            {
+                this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(Resources.Resources.DataCollectionCommunicationFailed, ex);
+            }
             base.Cancel();
-        }
-
-        /// <inheritdoc/>
-        public override void Close()
-        {
-            base.Close();
         }
 
         /// <inheritdoc />
@@ -157,17 +154,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if (testProcessStartInfo.EnvironmentVariables == null)
             {
-                testProcessStartInfo.EnvironmentVariables = this.dataCollectionParameters.EnvironmentVariables;
+                testProcessStartInfo.EnvironmentVariables = this.dataCollectionEnvironmentVariables;
             }
             else
             {
-                foreach (var kvp in this.dataCollectionParameters.EnvironmentVariables)
+                foreach (var kvp in this.dataCollectionEnvironmentVariables)
                 {
                     testProcessStartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
                 }
             }
 
-            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionParameters.DataCollectionEventsPort;
+            testProcessStartInfo.Arguments += " --datacollectionport " + this.dataCollectionPort;
 
             return testProcessStartInfo;
         }

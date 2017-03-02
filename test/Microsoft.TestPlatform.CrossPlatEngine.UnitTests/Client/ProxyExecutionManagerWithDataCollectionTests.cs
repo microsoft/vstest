@@ -3,7 +3,8 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
-    using TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
+    using System;
+
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -13,6 +14,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
     using Moq;
 
@@ -25,7 +27,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<ITestRequestSender> mockRequestSender;
 
-        private Mock<IProxyDataCollectionManager> mockDataCollectionClient;
+        private Mock<IProxyDataCollectionManager> mockDataCollectionManager;
+
+        private ProxyExecutionManagerWithDataCollection proxyExecutionManager;
 
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
@@ -38,36 +42,48 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestHostManager>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.testableClientConnectionTimeout);
-            this.mockDataCollectionClient = new Mock<IProxyDataCollectionManager>();
+            this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
+            this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
         }
 
         [TestMethod]
         public void InitializeShouldInitializeDataCollectionProcessIfDataCollectionIsEnabled()
         {
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, this.mockDataCollectionClient.Object);
-            proxyExecutionManager.Initialize();
+            this.proxyExecutionManager.Initialize();
 
-            mockDataCollectionClient.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
+            mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeShouldThrowExceptionIfThrownByDataCollectionManager()
+        {
+            this.mockDataCollectionManager.Setup(x => x.Initialize()).Throws<Exception>();
+
+            Assert.ThrowsException<Exception>(() =>
+            {
+                this.proxyExecutionManager.Initialize();
+
+            });
         }
 
         [TestMethod]
         public void InitializeShouldCallAfterTestRunIfExceptionIsThrownWhileCreatingDataCollectionProcess()
         {
-            mockDataCollectionClient.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new System.Exception("MyException"));
-            mockDataCollectionClient.Setup(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()));
+            mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new System.Exception("MyException"));
 
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, this.mockDataCollectionClient.Object);
-            proxyExecutionManager.Initialize();
+            Assert.ThrowsException<Exception>(() =>
+            {
+                this.proxyExecutionManager.Initialize();
+            });
 
-            mockDataCollectionClient.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
-            mockDataCollectionClient.Verify(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
+            mockDataCollectionManager.Verify(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
+            mockDataCollectionManager.Verify(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
         }
 
         [TestMethod]
         public void InitializeShouldSaveExceptionMessagesIfThrownByDataCollectionProcess()
         {
-            mockDataCollectionClient.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new System.Exception("MyException"));
-            mockDataCollectionClient.Setup(dc => dc.AfterTestRunEnd(It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>()));
+            mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new System.Exception("MyException"));
 
             ProxyDataCollectionManager proxyDataCollectonManager = new ProxyDataCollectionManager(string.Empty, new DummyDataCollectionRequestSender(), new DummyDataCollectionLauncher());
 
@@ -75,6 +91,56 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             proxyExecutionManager.Initialize();
             Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.ExceptionMessages);
             Assert.AreEqual(1, proxyExecutionManager.DataCollectionRunEventsHandler.ExceptionMessages.Count);
+        }
+
+        [TestMethod]
+        public void CancelShouldInvokeAfterTestCaseEnd()
+        {
+            this.proxyExecutionManager.Cancel();
+
+            this.mockDataCollectionManager.Verify(x => x.AfterTestRunEnd(true, It.IsAny<ITestMessageEventHandler>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void CancelShouldThrowExceptionIfThrownByProxyDataCollectionManager()
+        {
+            this.mockDataCollectionManager.Setup(x => x.AfterTestRunEnd(true, It.IsAny<ITestMessageEventHandler>())).Throws<Exception>();
+
+            Assert.ThrowsException<Exception>(() =>
+            {
+                this.proxyExecutionManager.Cancel();
+            });
+        }
+
+        [TestMethod]
+        public void UpdateTestProcessStartInfoShouldUpdateDataCollectionPortArg()
+        {
+            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+
+            var testProcessStartInfo = new TestProcessStartInfo();
+            testProcessStartInfo.Arguments = string.Empty;
+
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
+
+            Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
+        }
+    }
+
+    internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
+    {
+        public TestableProxyExecutionManagerWithDataCollection(ITestHostManager testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager, proxyDataCollectionManager)
+        {
+        }
+
+        public TestProcessStartInfo UpdateTestProcessStartInfoWrapper(TestProcessStartInfo testProcessStartInfo)
+        {
+            return this.UpdateTestProcessStartInfo(testProcessStartInfo);
+        }
+
+        protected override TestProcessStartInfo UpdateTestProcessStartInfo(TestProcessStartInfo testProcessStartInfo)
+        {
+            return base.UpdateTestProcessStartInfo(testProcessStartInfo);
         }
     }
 }
