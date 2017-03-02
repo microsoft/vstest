@@ -210,6 +210,43 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                 XmlRunSettingsUtilities.OSArchitecture.ToString());
         }
 
+        [TestMethod]
+        public void UpdateDesignModeShouldNotModifyXmlIfNavigatorIsNotAtRootNode()
+        {
+            var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+            navigator.MoveToFirstChild();
+
+            InferRunSettingsHelper.UpdateDesignMode(navigator, true);
+
+            navigator.MoveToRoot();
+            Assert.IsTrue(navigator.InnerXml.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
+        }
+
+        [TestMethod]
+        public void UpdateDesignModeShouldNotModifyXmlIfItAlreadyHasDesignModeNode()
+        {
+            var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateDesignMode(navigator, true);
+
+            Assert.AreEqual("False", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/DesignMode"));
+        }
+
+        [DataTestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void UpdateDesignModeShouldModifyXmlToValueProvided(bool designModeValue)
+        {
+            var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.UpdateDesignMode(navigator, designModeValue);
+
+            Assert.AreEqual(designModeValue.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/DesignMode"));
+        }
+
         #region private methods
 
         private XPathNavigator GetNavigator(string settingsXml)
@@ -220,6 +257,11 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             return doc.CreateNavigator();
         }
 
+        private string GetValueOf(XPathNavigator navigator, string xpath)
+        {
+            navigator.MoveToRoot();
+            return navigator.SelectSingleNode(xpath).Value;
+        }
         #endregion
     }
 }
