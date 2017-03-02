@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         public void ExecutorPrintsSplashScreenTest()
         {
             var mockOutput = new MockOutput();
-            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("/?");
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("/badArgument");
 
             Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
 
