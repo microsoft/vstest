@@ -82,7 +82,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 EqtTrace.Fail("TestPlatformDataCollectionEvents.RaiseEvent: Unrecognized data collection event of type {0}.", e.GetType().FullName);
             }
-        }        
+        }
+
+        /// <summary>
+        /// Checks whether any data collector has subscribed for test case events.
+        /// </summary>
+        internal bool AreTestCaseEventsSubscribed()
+        {
+            bool valueOnFailure = false;
+            return (HasEventListener(this.TestCaseStart, valueOnFailure) || HasEventListener(this.TestCaseEnd, valueOnFailure));
+        }
+
+        private bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)
+        {
+            try
+            {
+                if (eventToCheck == null)
+                {
+                    return false;
+                }
+
+                Delegate[] listeners = eventToCheck.GetInvocationList();
+                if (listeners == null || listeners.Length == 0)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("TestPlatformDataCollectionEvents.AreTestCaseLevelEventsRequired: Exception occured while checking whether event {0} has any listeners or not. {1}", eventToCheck, ex);
+                }
+
+                return valueOnFailure;
+            }
+        }
 
         /// <summary>
         /// Raises the SessionStart event
