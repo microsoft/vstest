@@ -98,7 +98,7 @@ function Print-FailedTests($TrxFilePath)
     $FailedTestCaseDetailsDict = @{}
     # Get failed testcase data from UnitTestResult tag.
     $xdoc.TestRun.Results.UnitTestResult |?{$_.GetAttribute("outcome") -eq "Failed"} | %{
-        $FailedTestCaseDetailsDict.Add($_.testId, @{"Message" = $_.Output.ErrorInfo.Message; "StackTrace" = $_.Output.ErrorInfo.StackTrace});
+        $FailedTestCaseDetailsDict.Add($_.testId, @{"Message" = $_.Output.ErrorInfo.Message; "StackTrace" = $_.Output.ErrorInfo.StackTrace; "StdOut"=$_.Output.StdOut});
     }
 
     if ($FailedTestCaseDetailsDict)
@@ -110,6 +110,7 @@ function Print-FailedTests($TrxFilePath)
             Write-Log  (".. .. . $count. " + "$($_.TestMethod.className).$($_.TestMethod.name)") $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .ErrorMessage: $nl" + $FailedTestCaseDetailsDict[$_.id]["Message"]) $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .StackTrace: $nl" + $FailedTestCaseDetailsDict[$_.id]["StackTrace"]) $Script:TPT_ErrorMsgColor
+            Write-Log (".. .. .. .StdOut: $nl" + $FailedTestCaseDetailsDict[$_.id]["StdOut"]) $Script:TPT_ErrorMsgColor
             $count++
         }
     }
