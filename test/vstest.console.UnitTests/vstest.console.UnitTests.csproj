@@ -32,9 +32,6 @@
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.PlatformAbstractions\Microsoft.TestPlatform.PlatformAbstractions.csproj">
-      <FromP2P>true</FromP2P>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Runtime" />
