@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.Protocol
     {
         private const string PORT_ARGUMENT = "/port:{0}";
         private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
-        private const string DesktopFramework = "framework45";
+        private const string DesktopFramework = ".NETFramework";
 
         private static SocketCommunicationManager communicationManager;
         private static JsonDataSerializer dataSerializer = JsonDataSerializer.Instance;
@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.Protocol
             {
                 Console.WriteLine("Please provide appropriate arguments. Arguments can be passed as following:");
                 Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" --framework:Framework45 --testadapterpath:\"[path]\"");
-                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" -f:Framework45 -p:\"[path]\" \n");
+                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" -f:\".NETFramework,Version=v4.5.2\" -p:\"[path]\" \n");
 
                 return 1;
             }
@@ -86,13 +86,13 @@ namespace Microsoft.TestPlatform.Protocol
             HandShakeWithVsTestConsole();
 
             string settingsXml = null;
-            if (framework.Equals(DesktopFramework, StringComparison.OrdinalIgnoreCase))
+            if (framework.Contains(DesktopFramework))
             {
                 settingsXml =
                       @"<?xml version=""1.0"" encoding=""utf-8""?>
                         <RunSettings>
                              <RunConfiguration>
-                              <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                              <TargetFrameworkVersion>" + framework + @"</TargetFrameworkVersion>
                              </RunConfiguration>
                         </RunSettings>";
             }
