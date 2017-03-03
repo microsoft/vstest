@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             try
             {
-                Task.WhenAll(this.attachmentTasks[dataCollectionContext].ToArray());
+                Task.WhenAll(this.attachmentTasks[dataCollectionContext].ToArray()).Wait();
             }
             catch (Exception ex)
             {
