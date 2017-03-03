@@ -111,16 +111,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             try
             {
-                Task.WhenAll(this.attachmentTasks[dataCollectionContext].ToArray()).Wait();
+                Task.WhenAll(this.attachmentTasks[dataCollectionContext].ToArray());
             }
             catch (Exception ex)
             {
                 EqtTrace.Error(ex.Message);
             }
 
-            var attachments = this.AttachmentSets[dataCollectionContext].Values.ToList();
-            this.attachmentTasks.Remove(dataCollectionContext);
-            this.AttachmentSets.Remove(dataCollectionContext);
+            List<AttachmentSet> attachments = new List<AttachmentSet>();
+            if (this.AttachmentSets.ContainsKey(dataCollectionContext))
+            {
+                attachments = this.AttachmentSets[dataCollectionContext].Values.ToList();
+                this.attachmentTasks.Remove(dataCollectionContext);
+                this.AttachmentSets.Remove(dataCollectionContext);
+            }
 
             return attachments;
         }

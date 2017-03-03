@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
             var result = this.attachmentManager.GetAttachments(datacollectioncontext);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
+            Assert.AreEqual(0, this.attachmentManager.AttachmentSets.Count);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(friendlyName, result[0].DisplayName);
             Assert.AreEqual(uri, result[0].Uri);
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void GetAttachmentsShouldReturnTheAlreadyCompletedAttachmentsAfterCancelled()
+        public void GetAttachmentsShouldNotReturnAttachmentsAfterCancelled()
         {
             var filename = "filename1.txt";
             File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
@@ -205,23 +205,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
-            var result = this.attachmentManager.GetAttachments(datacollectioncontext);
-
-            Assert.AreEqual(friendlyName, result[0].DisplayName);
-            Assert.AreEqual(uri, result[0].Uri);
-            Assert.AreEqual(1, result[0].Attachments.Count);
-
-            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "filename2.txt"), string.Empty);
-            dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, "filename2.txt"), true);
-
             this.attachmentManager.Cancel();
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
+            var result = this.attachmentManager.GetAttachments(datacollectioncontext);
 
-            result = this.attachmentManager.GetAttachments(datacollectioncontext);
-
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets.Count);
+            Assert.AreEqual(0, result[0].Attachments.Count);
         }
     }
 }
