@@ -55,7 +55,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             Assert.IsNotNull(result);
             Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
             Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
-            Assert.AreEqual(res.AreTestCaseLevelEventsRequired, result.AreTestCaseLevelEventsRequired);
         }
 
         [TestMethod]
