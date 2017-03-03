@@ -6,26 +6,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using System;
     using System.IO;
     using System.Collections.Generic;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Implementation for TestPlatform
     /// </summary>
     public class TestPlatform : ITestPlatform
     {
+        private IFileHelper fileHelper;
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        public TestPlatform() : this(new TestEngine())
+        public TestPlatform() : this(new TestEngine(), new FileHelper())
         {
         }
 
@@ -35,9 +40,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="testEngine">
         /// The test engine.
         /// </param>
-        protected TestPlatform(ITestEngine testEngine)
+        protected TestPlatform(ITestEngine testEngine, IFileHelper filehelper)
         {
             this.TestEngine = testEngine;
+            this.fileHelper = filehelper;
         }
 
         /// <summary>
@@ -62,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration);
-            
+
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
             discoveryManager.Initialize();
 
@@ -85,6 +91,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
+
+            // Update and initialize loggers only when DesignMode is false
+            if (runConfiguration.DesignMode == false)
+            {
+                UpdateTestLoggerPath(testRunCriteria);
+
+                // Initialize loggers
+                TestLoggerManager.Instance.InitializeLoggers();
+            }
+
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
 
             if (testRunCriteria.TestHostLauncher != null)
@@ -147,14 +163,44 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
                         continue;
                     }
+
                     List<string> adapterFiles = new List<string>(
-                        Directory.EnumerateFiles(adapterPath,TestPlatformConstants.TestAdapterPattern , SearchOption.AllDirectories)
+                        this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories)
                         );
                     if (adapterFiles.Count > 0)
                     {
-                        this.UpdateExtensions(adapterFiles, false);
+                        this.UpdateExtensions(adapterFiles, true);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Update the test logger paths from source directory
+        /// </summary>
+        private void UpdateTestLoggerPath(TestRunCriteria testRunCriteria)
+        {
+            IEnumerable<string> sources = testRunCriteria.Sources;
+            if (testRunCriteria.HasSpecificTests)
+            {
+                // If the test execution is with a test filter, group them by sources
+                sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
+            }
+
+            List<string> loggersToUpdate = new List<string>();
+
+            foreach (var source in sources)
+            {
+                var sourceDirectory = Path.GetDirectoryName(source);
+                if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
+                {
+                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.TopDirectoryOnly).ToList());
+                }
+            }
+
+            if (loggersToUpdate.Count > 0)
+            {
+                this.UpdateExtensions(loggersToUpdate, true);
             }
         }
     }

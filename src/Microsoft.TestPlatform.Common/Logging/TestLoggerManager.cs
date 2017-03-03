@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using System.Globalization;
     using System.Linq;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Exceptions;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -17,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     /// <summary>
     /// Responsible for managing logger extensions and broadcasting results
@@ -28,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         private static readonly object Synclock = new object();
         private static TestLoggerManager testLoggerManager;
+        protected List<LoggerInfo> loggersInfoList = new List<LoggerInfo>();
 
         /// <summary>
         /// Test Logger Events instance which will be passed to loggers when they are initialized.
@@ -68,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         protected TestLoggerManager(TestSessionMessageLogger sessionLogger, InternalTestLoggerEvents loggerEvents)
         {
             this.messageLogger = sessionLogger;
-            this.testLoggerExtensionManager = TestLoggerExtensionManager.Create(messageLogger);
+            this.testLoggerExtensionManager = null;
             this.loggerEvents = loggerEvents;
         }
 
@@ -90,6 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         }
                     }
                 }
+
                 return testLoggerManager;
             }
 
@@ -126,9 +130,67 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
         }
 
+        private TestLoggerExtensionManager TestLoggerExtensionManager
+        {
+            get
+            {
+                if (this.testLoggerExtensionManager == null)
+                {
+                    this.testLoggerExtensionManager = TestLoggerExtensionManager.Create(messageLogger);
+                }
+
+                return this.testLoggerExtensionManager;
+            }
+        }
+
         #endregion
 
         #region Public Methods
+
+        /// <summary>
+        /// Update the logger list which will later use to initialize it.
+        /// </summary>
+        /// <param name="argument"> the actual argument pass by the user through --logger argument</param>
+        /// <param name="loggerIdentifier">friendly name of the logger</param>
+        /// <param name="parameters">parameter passed to logger</param>
+        public void UpdateLoggerList(string argument, string loggerIdentifier, Dictionary<string, string> parameters)
+        {
+            this.loggersInfoList.Add(new LoggerInfo(argument, loggerIdentifier, parameters));
+        }
+
+        /// <summary>
+        /// Initializes all the loggers passed by user
+        /// </summary>
+        public void InitializeLoggers()
+        {
+            foreach (var logger in this.loggersInfoList)
+            {
+                string loggerIdentifier = logger.loggerIdentifier;
+                Dictionary<string, string> parameters = logger.parameters;
+
+                // First assume the logger is specified by URI. If that fails try with friendly name.
+                try
+                {
+                    this.AddLoggerByUri(loggerIdentifier, parameters);
+                }
+                catch (InvalidLoggerException)
+                {
+                    string loggerUri;
+                    if (testLoggerManager.TryGetUriFromFriendlyName(loggerIdentifier, out loggerUri))
+                    {
+                        this.AddLoggerByUri(loggerUri, parameters);
+                    }
+                    else
+                    {
+                        throw new InvalidLoggerException(
+                        String.Format(
+                        CultureInfo.CurrentUICulture,
+                        CommonResources.LoggerNotFound,
+                        logger.argument));
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Add and initialize the logger with the given parameters
@@ -170,7 +232,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             this.initializedLoggers.Add(uri.AbsoluteUri);
 
             // Look up the extension and initialize it if one is found.
-            var extensionManager = this.testLoggerExtensionManager;
+            var extensionManager = this.TestLoggerExtensionManager;
             var logger = extensionManager.TryGetTestExtension(uri.AbsoluteUri);
 
             if (logger == null)
@@ -183,6 +245,34 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             }
 
             InitializeLogger(logger.Value, logger.Metadata.ExtensionUri, parameters);
+        }
+
+        private void AddLoggerByUri(string argument, Dictionary<string, string> parameters)
+        {
+            // Get the uri and if it is not valid, throw.
+            Uri loggerUri = null;
+            try
+            {
+                loggerUri = new Uri(argument);
+            }
+            catch (UriFormatException)
+            {
+                throw new InvalidLoggerException(
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CommonResources.LoggerUriInvalid,
+                    argument));
+            }
+
+            // Add the logger and if it is a non-existent logger, throw.
+            try
+            {
+                testLoggerManager.AddLogger(loggerUri, parameters);
+            }
+            catch (InvalidOperationException e)
+            {
+                throw new InvalidLoggerException(e.Message, e);
+            }
         }
 
         private void InitializeLogger(ITestLogger logger, string extensionUri, Dictionary<string, string> parameters)
@@ -218,7 +308,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         /// <returns><see cref="bool"/></returns>
         public bool TryGetUriFromFriendlyName(string friendlyName, out string loggerUri)
         {
-            var extensionManager = this.testLoggerExtensionManager;
+            var extensionManager = this.TestLoggerExtensionManager;
             foreach (var extension in extensionManager.TestExtensions)
             {
                 if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
@@ -479,5 +569,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         #endregion
 
         #endregion
+
+        /// <summary>
+        /// Class to store logger information
+        /// </summary>
+        protected class LoggerInfo
+        {
+            public string argument;
+            public string loggerIdentifier;
+            public Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="LoggerInfo"/> class.
+            /// </summary>
+            /// <param name="argument"> the actual argument pass by the user through --logger argument</param>
+            /// <param name="loggerIdentifier">friendly name of the logger</param>
+            /// <param name="parameters">parameter passed to logger</param>
+            public LoggerInfo(string argument, string loggerIdentifier, Dictionary<string, string> parameters)
+            {
+                this.argument = argument;
+                this.loggerIdentifier = loggerIdentifier;
+                this.parameters = parameters;
+            }
+        }
     }
 }
