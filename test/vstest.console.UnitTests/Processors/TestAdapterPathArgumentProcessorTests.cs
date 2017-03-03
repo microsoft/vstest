@@ -12,6 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using Moq;
 
@@ -59,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockOutput = new Mock<IOutput>();
-            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object);
+            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object, new FileHelper());
 
             var message =
                 @"The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters";
@@ -85,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockOutput = new Mock<IOutput>();
-            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object);
+            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object, new FileHelper());
 
             var message =
                 @"The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters";
@@ -111,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockOutput = new Mock<IOutput>();
-            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object);
+            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object, new FileHelper());
 
             var folder = "C:\\temp\\thisfolderdoesnotexist";
 
@@ -141,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockOutput = new Mock<IOutput>();
-            var executor = new TestableTestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object);
+            var executor = new TestableTestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object, new FileHelper());
 
             var currentAssemblyPath = typeof(TestAdapterPathArgumentExecutor).GetTypeInfo().Assembly.Location;
             var currentFolder = Path.GetDirectoryName(currentAssemblyPath);
@@ -171,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             var mockTestPlatform = new Mock<ITestPlatform>();
             var mockOutput = new Mock<IOutput>();
-            var executor = new TestableTestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object);
+            var executor = new TestableTestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockTestPlatform.Object, mockOutput.Object, new FileHelper());
 
             var currentAssemblyPath = typeof(TestAdapterPathArgumentExecutor).GetTypeInfo().Assembly.Location;
             var currentFolder = Path.GetDirectoryName(currentAssemblyPath);
@@ -199,8 +201,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
         private class TestableTestAdapterPathArgumentExecutor : TestAdapterPathArgumentExecutor
         {
-            internal TestableTestAdapterPathArgumentExecutor(CommandLineOptions options, ITestPlatform testPlatform, IOutput output)
-                : base(options, testPlatform, output)
+            internal TestableTestAdapterPathArgumentExecutor(CommandLineOptions options, ITestPlatform testPlatform, IOutput output, IFileHelper fileHelper)
+                : base(options, testPlatform, output, fileHelper)
             {
             }
 

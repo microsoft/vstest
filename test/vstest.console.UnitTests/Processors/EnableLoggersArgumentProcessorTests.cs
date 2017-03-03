@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
-    using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -90,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             executor.Initialize("DummyLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
             
-            Assert.IsTrue(testloggerManager.GetLoggersInfoList().ToList().First().loggerIdentifier == "DummyLoggerExtension");
+            Assert.IsTrue(testloggerManager.LoggerExist("DummyLoggerExtension"));
         }
 
         [TestMethod]

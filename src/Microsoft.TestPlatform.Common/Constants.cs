@@ -47,12 +47,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// <summary>
         /// Regex pattern used to find the test adapters
         /// </summary>
-        public const string TestAdapterResxPattern = @".*.TestAdapter.dll";
+        public const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
 
         /// <summary>
         /// Regex pattern used to find the test logger
         /// </summary>
-        public const string TestLoggerResxPattern = @".*.TestLogger.dll";
+        public const string TestLoggerRegexPattern = @".*.TestLogger.dll";
 
     }
 }

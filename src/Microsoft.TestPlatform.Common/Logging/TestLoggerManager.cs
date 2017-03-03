@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         {
             get
             {
-                if(this.testLoggerExtensionManager == null)
+                if (this.testLoggerExtensionManager == null)
                 {
                     this.testLoggerExtensionManager = TestLoggerExtensionManager.Create(messageLogger);
                 }
@@ -147,11 +147,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
         #region Public Methods
 
-        public void UpdateLoggerList(string arument, string loggerIdentifier, Dictionary<string, string> parameters)
+        /// <summary>
+        /// Update the logger list which will later use to initialize it.
+        /// </summary>
+        /// <param name="argument"> the actual argument pass by the user through --logger argument</param>
+        /// <param name="loggerIdentifier">friendly name of the logger</param>
+        /// <param name="parameters">parameter passed to logger</param>
+        public void UpdateLoggerList(string argument, string loggerIdentifier, Dictionary<string, string> parameters)
         {
-            this.loggersInfoList.Add(new LoggerInfo(arument, loggerIdentifier, parameters));
+            this.loggersInfoList.Add(new LoggerInfo(argument, loggerIdentifier, parameters));
         }
 
+        /// <summary>
+        /// Initializes all the loggers passed by user
+        /// </summary>
         public void InitializeLoggers()
         {
             foreach (var logger in this.loggersInfoList)
@@ -177,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                         String.Format(
                         CultureInfo.CurrentUICulture,
                         CommonResources.LoggerNotFound,
-                        logger.arument));
+                        logger.argument));
                     }
                 }
             }
@@ -560,5 +569,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
         #endregion
 
         #endregion
+
+        /// <summary>
+        /// Class to store logger information
+        /// </summary>
+        protected class LoggerInfo
+        {
+            public string argument;
+            public string loggerIdentifier;
+            public Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="LoggerInfo"/> class.
+            /// </summary>
+            /// <param name="argument"> the actual argument pass by the user through --logger argument</param>
+            /// <param name="loggerIdentifier">friendly name of the logger</param>
+            /// <param name="parameters">parameter passed to logger</param>
+            public LoggerInfo(string argument, string loggerIdentifier, Dictionary<string, string> parameters)
+            {
+                this.argument = argument;
+                this.loggerIdentifier = loggerIdentifier;
+                this.parameters = parameters;
+            }
+        }
     }
 }

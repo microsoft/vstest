@@ -26,13 +26,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     /// </summary>
     public class TestPlatform : ITestPlatform
     {
-        protected IFileHelper fileHelper;
+        private IFileHelper fileHelper;
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        public TestPlatform() : this(new TestEngine())
+        public TestPlatform() : this(new TestEngine(), new FileHelper())
         {
-            fileHelper = new FileHelper();
         }
 
         /// <summary>
@@ -41,9 +40,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="testEngine">
         /// The test engine.
         /// </param>
-        protected TestPlatform(ITestEngine testEngine)
+        protected TestPlatform(ITestEngine testEngine, IFileHelper filehelper)
         {
             this.TestEngine = testEngine;
+            this.fileHelper = filehelper;
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             // Update and initialize loggers only when DesignMode is false
             if (runConfiguration.DesignMode == false)
             {
-                UpdateTestLoggerPath(testRunCriteria.Sources);
+                UpdateTestLoggerPath(testRunCriteria);
 
                 // Initialize loggers
                 TestLoggerManager.Instance.InitializeLoggers();
@@ -165,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                     }
 
                     List<string> adapterFiles = new List<string>(
-                        this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterResxPattern, SearchOption.AllDirectories)
+                        this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories)
                         );
                     if (adapterFiles.Count > 0)
                     {
@@ -178,11 +178,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Update the test logger paths from source directory
         /// </summary>
-        private void UpdateTestLoggerPath(IEnumerable<string> sources)
+        private void UpdateTestLoggerPath(TestRunCriteria testRunCriteria)
         {
-            if (sources == null)
+            IEnumerable<string> sources = testRunCriteria.Sources;
+            if (testRunCriteria.HasSpecificTests)
             {
-                return;
+                // If the test execution is with a test filter, group them by sources
+                sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
             }
 
             List<string> loggersToUpdate = new List<string>();
@@ -192,7 +194,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var sourceDirectory = Path.GetDirectoryName(source);
                 if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerResxPattern, SearchOption.TopDirectoryOnly).ToList());
+                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.TopDirectoryOnly).ToList());
                 }
             }
 

@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     /// <summary>
     /// Allows the user to specify a path to load custom adapters from.
     /// </summary>
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), ConsoleOutput.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), ConsoleOutput.Instance, new FileHelper()));
                 }
 
                 return this.executor;
@@ -113,6 +113,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private IOutput output;
 
+        /// <summary>
+        /// For file related operation
+        /// </summary>
+        private IFileHelper fileHelper;
+
         #endregion
 
         #region Constructor
@@ -122,13 +127,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="options"> The options. </param>
         /// <param name="testPlatform">The test platform</param>
-        public TestAdapterPathArgumentExecutor(CommandLineOptions options, ITestPlatform testPlatform, IOutput output)
+        public TestAdapterPathArgumentExecutor(CommandLineOptions options, ITestPlatform testPlatform, IOutput output, IFileHelper fileHelper)
         {
             Contract.Requires(options != null);
 
             this.commandLineOptions = options;
             this.testPlatform = testPlatform;
             this.output = output;
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -155,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 argument = argument.Trim().Trim(new char[] { '\"' });
 
                 customAdaptersPath = Path.GetFullPath(argument);
-                if (!Directory.Exists(customAdaptersPath))
+                if (!fileHelper.DirectoryExists(customAdaptersPath))
                 {
                     throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
                 }
@@ -198,10 +204,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The list of test adapter and logger assemblies. </returns>
         internal virtual IEnumerable<string> GetTestAdaptersFromDirectory(string directory)
         {
-            FileHelper fileHelper = new FileHelper();
             List<string> adapterAndLogger = new List<string>(); 
-            adapterAndLogger.AddRange(fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestAdapterResxPattern, SearchOption.AllDirectories).ToList());
-            adapterAndLogger.AddRange(fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestLoggerResxPattern, SearchOption.AllDirectories).ToList());
+            adapterAndLogger.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories).ToList());
+            adapterAndLogger.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories).ToList());
             return adapterAndLogger;
         }
 
