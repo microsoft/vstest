@@ -127,7 +127,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testCase = new TestCase();
             var testCaseEndEventArgs = new TestCaseEndEventArgs(testCase, TestOutcome.Failed);
-            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.AfterTestCaseComplete, It.IsAny<TestResultEventArgs>())).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.AfterTestCaseComplete, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
             {

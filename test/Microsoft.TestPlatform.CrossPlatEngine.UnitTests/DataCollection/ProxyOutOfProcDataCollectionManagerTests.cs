@@ -56,6 +56,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(this.testResult));
 
+            this.testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testcase);
             this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(this.testResult));
 
             Assert.AreEqual(0, testResult.Attachments.Count);
