@@ -29,44 +29,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             Assert.IsNull(this.runContext.GetTestCaseFilter(null, (s) => { return null; }));
         }
 
+        /// <summary>
+        /// If only property value passed, consider property key and operation defaults.
+        /// </summary>
         [TestMethod]
-        public void GetTestCaseFilterShouldThrowOnfilterExpressionParsingError()
+        public void GetTestCaseFilterShouldNotThrowIfPropertyValueOnlyPassed()
         {
             this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("Infinity");
 
-            var isExceptionThrown = false;
+            var filter = this.runContext.GetTestCaseFilter(new List<string>{ "FullyQualifiedName" }, (s) => { return null; });
 
-            try
-            {
-                this.runContext.GetTestCaseFilter(null, (s) => { return null; });
-            }
-            catch (TestPlatformFormatException ex)
-            {
-                isExceptionThrown = true;
-                StringAssert.Contains(ex.Message, "Incorrect format for TestCaseFilter Error: Invalid Condition 'Infinity'. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.");
-            }
-
-            Assert.IsTrue(isExceptionThrown);
+            Assert.IsNotNull(filter);
         }
 
         [TestMethod]
         public void GetTestCaseFilterShouldThrowOnInvalidProperties()
         {
             this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
-            
-            var isExceptionThrown = false;
 
-            try
-            {
-                this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
-            }
-            catch (TestPlatformFormatException ex)
-            {
-                isExceptionThrown = true;
-                StringAssert.Contains(ex.Message, "No tests matched the filter because it contains one or more properties that are not valid (highlyunlikelyproperty). Specify filter expression containing valid properties (TestCategory) and try again.");
-            }
+            var exception = Assert.ThrowsException<TestPlatformFormatException>(() => this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; }));
 
-            Assert.IsTrue(isExceptionThrown);
+            StringAssert.Contains(exception.Message, "No tests matched the filter because it contains one or more properties that are not valid (highlyunlikelyproperty). Specify filter expression containing valid properties (TestCategory) and try again.");
         }
 
         [TestMethod]

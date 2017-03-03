@@ -117,6 +117,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.IsTrue(this.isEventRaised);
         }
 
+        [TestMethod]
+        public void AreTestCaseEventsSubscribedShouldReturnTrueIfTestCaseStartIsSubscribed()
+        {
+            this.events.TestCaseStart += this.TestCaseStartMessageHandler;
+
+            Assert.IsTrue(this.events.AreTestCaseEventsSubscribed());
+        }
+
+        [TestMethod]
+        public void AreTestCaseEventsSubscribedShouldReturnTrueIfTestCaseEndIsSubscribed()
+        {
+            this.events.TestCaseEnd += this.TestCaseEndMessageHandler;
+
+            Assert.IsTrue(this.events.AreTestCaseEventsSubscribed());
+        }
+
+        [TestMethod]
+        public void AreTestCaseEventsSubscribedShouldFalseIfTestCaseEventsAreNotSubscribed()
+        {
+            Assert.IsFalse(this.events.AreTestCaseEventsSubscribed());
+        }
+
         private void SessionStartMessageHandler(object sender, SessionStartEventArgs e)
         {
             this.isEventRaised = true;
