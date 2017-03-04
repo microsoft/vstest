@@ -12,6 +12,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -73,8 +74,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize();
-            Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.ExceptionMessages);
-            Assert.AreEqual(1, proxyExecutionManager.DataCollectionRunEventsHandler.ExceptionMessages.Count);
+            Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
+            Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
+            Assert.AreEqual("MyException", proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2);
         }
     }
 }

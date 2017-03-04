@@ -108,12 +108,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
 
             // Log all the exceptions that has occured while initializing DataCollectionClient
-            if (this.DataCollectionRunEventsHandler?.ExceptionMessages?.Count > 0)
+            if (this.DataCollectionRunEventsHandler?.Messages?.Count > 0)
             {
-                foreach (var message in this.DataCollectionRunEventsHandler.ExceptionMessages)
+                foreach (var message in this.DataCollectionRunEventsHandler.Messages)
                 {
-                    currentEventHandler.HandleLogMessage(TestMessageLevel.Error, message);
+                    currentEventHandler.HandleLogMessage(message.Item1, message.Item2);
                 }
+
+                this.DataCollectionRunEventsHandler.Messages.Clear();
             }
 
             return base.StartTestRun(testRunCriteria, currentEventHandler);
@@ -154,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     }
 
     /// <summary>
-    /// Handles Log events and stores them in list. Messages in the list will be emptied after test execution begins.
+    /// Handles Log events and stores them in list. Messages in the list will be logged after test execution begins.
     /// </summary>
     internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
     {
@@ -163,13 +165,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public DataCollectionRunEventsHandler()
         {
-            this.ExceptionMessages = new List<string>();
+            this.Messages = new List<Tuple<TestMessageLevel, string>>();
         }
 
         /// <summary>
         /// Gets the exception messages.
         /// </summary>
-        public List<string> ExceptionMessages { get; private set; }
+        public List<Tuple<TestMessageLevel, string>> Messages { get; private set; }
 
         /// <summary>
         /// The handle log message.
@@ -182,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </param>
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.ExceptionMessages.Add(message);
+            this.Messages.Add(new Tuple<TestMessageLevel, string>(level, message));
         }
 
         /// <summary>
