@@ -41,6 +41,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
             // Complete discovery.
             discoveryEventsHandler.HandleDiscoveryComplete(-1, null, true);
         }
-
     }
 }

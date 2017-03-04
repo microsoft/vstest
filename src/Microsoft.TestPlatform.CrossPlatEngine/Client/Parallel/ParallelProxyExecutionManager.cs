@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.concurrentManagerHandlerMap.Add(proxyExecutionManager, parallelEventsHandler);
             }
 
-            // In Case of Cancel or Abort, no need to trigger run for rest of the data
+            // In Case of Cancel no need to trigger run for rest of the data
             // If there are no more sources/testcases, a parallel executor is truly done with execution
             if (testRunCompleteArgs.IsCanceled || !this.StartTestRunOnConcurrentManager(proxyExecutionManager))
             {
