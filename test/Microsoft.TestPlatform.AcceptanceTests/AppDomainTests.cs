@@ -5,6 +5,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
+    using System.Linq;
+#if !NET46
+    using System.Runtime.Loader;
+#else
+    using System.Reflection;
+#endif
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             File.Delete(dataCollectorAppDomainDetailFileName);
             var runsettingsFilePath = this.GetInProcDataCollectionRunsettingsFile(true);
             var arguments = PrepareArguments(
-                this.GetSampleTestAssembly(),
+                this.testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
                 this.GetTestAdapterPath(),
                 runsettingsFilePath,
                 this.FrameworkArgValue);
@@ -51,10 +57,17 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var runSettings = Path.Combine(Path.GetTempPath(), "test_" + Guid.NewGuid() + ".runsettings");
             var inprocasm = this.testEnvironment.GetTestAsset("SimpleDataCollector.dll");
+#if !NET46
+            var asm = AssemblyLoadContext.Default.LoadFromAssemblyPath(inprocasm);
+#else
+            var asm = Assembly.LoadFrom(inprocasm);
+#endif
+            var assemblyQualifiedName = asm?.GetExportedTypes()
+                    .FirstOrDefault(x => (x.FullName.Equals("SimpleDataCollector.SimpleDataCollector"))).AssemblyQualifiedName;
             var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>
-                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase={0}>
+                                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='{0}'  codebase='{1}'>
                                                 <Configuration>
                                                     <Port>4312</Port>
                                                 </Configuration>
@@ -66,7 +79,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                     </RunConfiguration>
                                 </RunSettings>";
 
-            fileContents = string.Format(fileContents, "'" + inprocasm + "'");
+            fileContents = string.Format(fileContents, assemblyQualifiedName, inprocasm);
             File.WriteAllText(runSettings, fileContents);
 
             return runSettings;

@@ -25,10 +25,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(2, 2, 2);
         }
 
-        [Ignore]
         [CustomDataTestMethod]
         [NET46TargetFramework]
-        [NETCORETargetFramework]
+        // [NETCORETargetFramework] Issue:https://github.com/Microsoft/vstest/issues/292, Currently not customer scenario.
         public void RunMultipleTestAssembliesInParallel(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);

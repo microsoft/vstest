@@ -3,6 +3,8 @@
 namespace SampleUnitTestProject2
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.IO;
 
     /// <summary>
     /// The unit test 1.
@@ -25,6 +27,11 @@ namespace SampleUnitTestProject2
         [TestMethod]
         public void FailingTest()
         {
+#if NET46
+            // current App domain should be write to file to test DisableAppDomain acceptance test.
+            var appDomainFilePath = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
+            File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: " + AppDomain.CurrentDomain.FriendlyName);
+#endif
             Assert.AreEqual(2, 3);
         }
 

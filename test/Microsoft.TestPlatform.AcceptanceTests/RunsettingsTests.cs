@@ -194,7 +194,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NET46TargetFramework]
-        [NETCORETargetFramework]
+        // [NETCORETargetFramework] Issue:https://github.com/Microsoft/vstest/issues/292, Currently not customer scenario.
         public void RunSettingsWithParallelAndPlatformX64(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
