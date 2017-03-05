@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using System;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
     [TestClass]
@@ -40,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
             {
                 var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
@@ -53,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
             {
                 proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
@@ -75,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
 #else
             var dataCollectionLauncher = new DotnetDataCollectionLauncher();
 #endif
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(ObjectModel.Architecture.AnyCPU, this.runSettings, dataCollectionRequestSender, dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, dataCollectionLauncher))
             {
                 proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
