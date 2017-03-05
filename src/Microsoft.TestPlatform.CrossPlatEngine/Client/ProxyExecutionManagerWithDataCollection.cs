@@ -63,14 +63,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             catch (Exception ex)
             {
-                // Set proxy data collection manage to null as initialization failed.
-                this.ProxyDataCollectionManager = null;
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex);
+                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
                 }
 
-                throw new Exception(Resources.Resources.DataCollectionFailed, ex);
+                throw;
             }
 
             try
@@ -86,23 +84,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 try
                 {
                     // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end DataCollectionProcess
                     this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
-                    throw new Exception(Resources.Resources.DataCollectorsInitializationFailed, e);
+                    throw;
                 }
-                catch (Exception ex)
+                finally
                 {
                     // There is an issue with Data Collector, skipping data collection and continuing with test run.
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex);
+                        EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
                     }
-
-                    throw new Exception(Resources.Resources.DataCollectionCommunicationFailed, ex);
                 }
             }
 
@@ -144,9 +140,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             catch (Exception ex)
             {
-                throw new Exception(Resources.Resources.DataCollectionCommunicationFailed, ex);
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
+                }
+
+                throw;
             }
-            base.Cancel();
+            finally
+            {
+                base.Cancel();
+            }
         }
 
         /// <inheritdoc />

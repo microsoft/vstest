@@ -62,7 +62,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.ThrowsException<Exception>(() =>
             {
                 this.proxyExecutionManager.Initialize();
-
             });
         }
 
