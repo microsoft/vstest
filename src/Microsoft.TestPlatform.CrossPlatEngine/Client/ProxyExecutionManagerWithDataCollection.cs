@@ -119,8 +119,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 currentEventHandler = new DataCollectionTestRunEventsHandler(eventHandler, this.ProxyDataCollectionManager);
             }
 
-            // Log all the exceptions that has occured while initializing DataCollectionClient
-            if (this.DataCollectionRunEventsHandler?.Messages?.Count > 0)
+            // Log all the messages that are reported while initializing DataCollectionClient
+            if (this.DataCollectionRunEventsHandler.Messages.Count > 0)
             {
                 foreach (var message in this.DataCollectionRunEventsHandler.Messages)
                 {
