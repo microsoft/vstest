@@ -161,6 +161,11 @@
         <target state="new">Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="LoggerUriInvalid">
+        <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
+        <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
