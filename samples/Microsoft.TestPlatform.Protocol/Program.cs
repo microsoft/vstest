@@ -15,6 +15,7 @@ namespace Microsoft.TestPlatform.Protocol
     {
         private const string PORT_ARGUMENT = "/port:{0}";
         private const string PARENT_PROCESSID_ARGUMENT = "/parentprocessid:{0}";
+        private const string DesktopFramework = ".NETFramework";
 
         private static SocketCommunicationManager communicationManager;
         private static JsonDataSerializer dataSerializer = JsonDataSerializer.Instance;
@@ -24,8 +25,8 @@ namespace Microsoft.TestPlatform.Protocol
             if(args == null || args.Length < 1)
             {
                 Console.WriteLine("Please provide appropriate arguments. Arguments can be passed as following:");
-                Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" --testadapterpath:\"[path]\"");
-                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" -p:\"[path]\" \n");
+                Console.WriteLine("Microsoft.TestPlatform.Protocol.exe --testassembly:\"[assemblyPath]\" --operation:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" --framework:Framework45 --testadapterpath:\"[path]\"");
+                Console.WriteLine("or Microsoft.TestPlatform.Protocol.exe -a:\"[assemblyPath]\" -o:\"[RunAll|RunSelected|Discovery|DebugAll|DebugSelected]\" -f:\".NETFramework,Version=v4.5.2\" -p:\"[path]\" \n");
 
                 return 1;
             }
@@ -36,6 +37,8 @@ namespace Microsoft.TestPlatform.Protocol
             var testAssembly = Path.Combine(executingLocation, "UnitTestProject.dll");
             string testadapterPath = null;
             string operation = "Discovery";
+            string framework = String.Empty;
+
             var separator = new char[] { ':' };
             foreach (var arg in args)
             {
@@ -51,6 +54,16 @@ namespace Microsoft.TestPlatform.Protocol
                 {
                     operation = arg.Split(separator, 2)[1];
                 }
+                else if (arg.StartsWith("-f:") || arg.StartsWith("--framework:"))
+                {
+                    framework = arg.Split(separator, 2)[1];
+                }
+            }
+
+            if(framework.Equals(DesktopFramework, StringComparison.OrdinalIgnoreCase) && String.IsNullOrEmpty(testadapterPath))
+            {
+                Console.WriteLine("Please specify the test adapter path for running tests targeting net45 plus frameworks");
+                return 0;
             }
 
             Console.WriteLine("TestAdapter Path : {0}", testadapterPath);
@@ -72,31 +85,49 @@ namespace Microsoft.TestPlatform.Protocol
             communicationManager.WaitForClientConnection(Timeout.Infinite);
             HandShakeWithVsTestConsole();
 
+            string settingsXml = null;
+            if (framework.Contains(DesktopFramework))
+            {
+                settingsXml =
+                      @"<?xml version=""1.0"" encoding=""utf-8""?>
+                        <RunSettings>
+                             <RunConfiguration>
+                              <TargetFrameworkVersion>" + framework + @"</TargetFrameworkVersion>
+                             </RunConfiguration>
+                        </RunSettings>";
+            }
+
+            // Intialize the extensions
+            if (testadapterPath != null)
+            {
+                communicationManager.SendMessage(MessageType.ExtensionsInitialize, new List<string>() { testadapterPath });
+            }
+
             // Actual operation
             dynamic discoveredTestCases;
             switch (operation.ToLower())
             {
                 case "discovery":
-                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly);
+                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly, settingsXml);
                     break;
                
                 case "runselected":
-                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly);
-                    RunSelectedTests(discoveredTestCases);
+                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly, settingsXml);
+                    RunSelectedTests(discoveredTestCases, settingsXml);
                     break;
 
                 case "debugall":
-                    DebugAllTests(new List<string>() { testAssembly });
+                    DebugAllTests(new List<string>() { testAssembly }, settingsXml);
                     break;
 
                 case "debugselected":
-                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly);
-                    DebugSelectedTests(discoveredTestCases);
+                    discoveredTestCases = DiscoverTests(testadapterPath, testAssembly, settingsXml);
+                    DebugSelectedTests(discoveredTestCases, settingsXml);
                     break;
 
                 case "runall":
                 default:
-                    RunAllTests(new List<string>() { testAssembly });
+                    RunAllTests(new List<string>() { testAssembly }, settingsXml);
                     break;
             }
 
@@ -124,20 +155,14 @@ namespace Microsoft.TestPlatform.Protocol
             }
         }
 
-        static dynamic DiscoverTests(string testadapterPath, string testAssembly)
+        static dynamic DiscoverTests(string testadapterPath, string testAssembly, string settingsXml)
         {
             Console.WriteLine("Starting Operation : Discovery");
-
-            // Intialize the extensions
-            if (testadapterPath != null)
-            {
-                communicationManager.SendMessage(MessageType.ExtensionsInitialize, new List<string>() { testadapterPath });
-            }
 
             // Start Discovery
             communicationManager.SendMessage(
                            MessageType.StartDiscovery,
-                           new DiscoveryRequestPayload() { Sources = new List<string>() { testAssembly }, RunSettings = null });
+                           new DiscoveryRequestPayload() { Sources = new List<string>() { testAssembly }, RunSettings = settingsXml });
             var isDiscoveryComplete = false;
 
             dynamic testCases = null;
@@ -169,39 +194,39 @@ namespace Microsoft.TestPlatform.Protocol
             return testCases;
         }
         
-        static void RunAllTests(List<string> sources)
+        static void RunAllTests(List<string> sources, string settingsXml)
         {
             Console.WriteLine("Starting Operation: RunAll");
-            communicationManager.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, new TestRunRequestPayload() { Sources = sources, RunSettings = null });
+            communicationManager.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, new TestRunRequestPayload() { Sources = sources, RunSettings = settingsXml });
             RecieveRunMesagesAndHandleRunComplete();
         }
         
-        static void RunSelectedTests(dynamic testCases)
+        static void RunSelectedTests(dynamic testCases, string settingsXml)
         {
             Console.WriteLine("Starting Operation: RunSelected");
-            communicationManager.SendMessage(MessageType.TestRunSelectedTestCasesDefaultHost, new TestRunRequestPayload() { TestCases = testCases, RunSettings = null });
+            communicationManager.SendMessage(MessageType.TestRunSelectedTestCasesDefaultHost, new TestRunRequestPayload() { TestCases = testCases, RunSettings = settingsXml });
             RecieveRunMesagesAndHandleRunComplete();
         }
 
-        static void DebugAllTests(List<string> sources)
+        static void DebugAllTests(List<string> sources, string settingsXml)
         {
             Console.WriteLine("Starting Operation: DebugAll");
             communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunAll, new TestRunRequestPayload()
             {
                 Sources = sources,
-                RunSettings = null,
+                RunSettings = settingsXml,
                 DebuggingEnabled = true
             });
             RecieveRunMesagesAndHandleRunComplete();
         }
 
-        static void DebugSelectedTests(dynamic testCases)
+        static void DebugSelectedTests(dynamic testCases, string settingsXml)
         {
             Console.WriteLine("Starting Operation: DebugSelected");
             communicationManager.SendMessage(MessageType.GetTestRunnerProcessStartInfoForRunSelected, new TestRunRequestPayload()
             {
                 TestCases = testCases,
-                RunSettings = null,
+                RunSettings = settingsXml,
                 DebuggingEnabled = true
             });
             RecieveRunMesagesAndHandleRunComplete();
