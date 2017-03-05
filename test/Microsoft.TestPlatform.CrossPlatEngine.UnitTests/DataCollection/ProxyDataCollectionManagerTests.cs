@@ -30,13 +30,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             this.mockDataCollectionRequestSender = new DummyDataCollectionRequestSender();
             this.mockDataCollectionLauncher = new DummyDataCollectionLauncher();
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(Architecture.AnyCPU, string.Empty, this.mockDataCollectionRequestSender, this.mockDataCollectionLauncher);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(string.Empty, this.mockDataCollectionRequestSender, this.mockDataCollectionLauncher);
         }
 
         [TestMethod]
-        public void InitializeSocketCommunicationShouldInitializeCommunication()
+        public void InitializeShouldInitializeCommunication()
         {
-            this.proxyDataCollectionManager.InitializeSocketCommunication(Architecture.X86);
+            this.proxyDataCollectionManager.Initialize();
 
             Assert.IsTrue(this.mockDataCollectionLauncher.dataCollectorLaunched);
             Assert.IsTrue(this.mockDataCollectionRequestSender.waitForRequestHandlerConnection);
@@ -55,7 +55,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             Assert.IsNotNull(result);
             Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
             Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
-            Assert.AreEqual(res.AreTestCaseLevelEventsRequired, result.AreTestCaseLevelEventsRequired);
         }
 
         [TestMethod]

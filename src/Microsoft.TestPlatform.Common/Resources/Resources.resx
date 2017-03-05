@@ -189,6 +189,9 @@
   <data name="LoggerNotFound" xml:space="preserve">
     <value>Could not find a test logger with URI or FriendlyName '{0}'.</value>
   </data>
+  <data name="LoggerUriInvalid" xml:space="preserve">
+    <value>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</value>
+  </data>
   <data name="MissingCloseParenthesis" xml:space="preserve">
     <value>Error: Missing ')'</value>
   </data>

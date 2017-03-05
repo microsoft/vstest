@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -27,23 +28,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
-        /// <param name="arch">
-        /// Architecture for datacollection process.
-        /// </param>
         /// <param name="settingsXml">
         /// Runsettings that contains the datacollector related configuration.
         /// </param>
-        public ProxyDataCollectionManager(Architecture arch, string settingsXml, string targetFramework)
-            : this(arch, settingsXml, new DataCollectionRequestSender(), DataCollectionLauncherFactory.GetDataCollectorLauncher(targetFramework))
+        public ProxyDataCollectionManager(string settingsXml)
+            : this(settingsXml, new DataCollectionRequestSender(), DataCollectionLauncherFactory.GetDataCollectorLauncher(new ProcessHelper()))
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
-        /// <param name="arch">
-        /// Architecture for datacollection process.
-        /// </param>
         /// <param name="settingsXml">
         /// Runsettings that contains the datacollector related configuration.
         /// </param>
@@ -53,12 +48,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataCollectionLauncher">
         /// Launches datacollector process.
         /// </param>
-        internal ProxyDataCollectionManager(Architecture arch, string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IDataCollectionLauncher dataCollectionLauncher)
+        internal ProxyDataCollectionManager(string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IDataCollectionLauncher dataCollectionLauncher)
         {
             this.settingsXml = settingsXml;
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
-            this.InitializeSocketCommunication(arch);
         }
 
         /// <summary>
@@ -113,7 +107,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             () =>
             {
                 var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler);
-                areTestCaseLevelEventsRequired = result.AreTestCaseLevelEventsRequired;
                 environmentVariables = result.EnvironmentVariables;
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
             },
@@ -132,13 +125,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionRequestSender.Close();
         }
 
-        /// <summary>
-        /// The initialize socket communication.
-        /// </summary>
-        /// <param name="arch">
-        /// The arch.
-        /// </param>
-        internal void InitializeSocketCommunication(Architecture arch)
+        /// <inheritdoc />
+        public void Initialize()
         {
             var port = this.dataCollectionRequestSender.InitializeCommunication();
 

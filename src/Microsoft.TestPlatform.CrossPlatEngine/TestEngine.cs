@@ -64,14 +64,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             int parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
 
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-            var architecture = runconfiguration.TargetPlatform;
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator =
                 () =>
                     isDataCollectorEnabled
-                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, this.GetDataCollectionManager(architecture, testRunCriteria.TestRunSettings, runconfiguration.TargetFrameworkVersion.Name))
+                        ? new ProxyExecutionManagerWithDataCollection(testHostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
                         : new ProxyExecutionManager(testHostManager);
 
             // parallelLevel = 1 for desktop should go via else route.
@@ -177,28 +176,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             return parallelLevelToUse;
-        }
-
-        private IProxyDataCollectionManager GetDataCollectionManager(Architecture architecture, string settingsXml, string targetFramework)
-        {
-            try
-            {
-                return new ProxyDataCollectionManager(architecture, settingsXml, targetFramework);
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("TestEngine: Error occured while initializing DataCollection Process: {0}", ex);
-                }
-
-                if (EqtTrace.IsWarningEnabled)
-                {
-                    EqtTrace.Warning("TestEngine: Skipping Data Collection");
-                }
-
-                return null;
-            }
         }
     }
 }
