@@ -6,11 +6,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
-    using System.Threading;
+#if !NET46
+    using System.Runtime.Loader;
+#else
+     using System.Reflection;
+#endif
     using System.Xml;
 
-    using global::TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -50,7 +52,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.testEnvironment.RunnerFramework,
                 "OutOfProcDataCollector.dll");
 
-            dataCollectionAttributes.Add("assemblyQualifiedName", "OutOfProcDataCollector.SampleDataCollector, OutOfProcDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=null");
+            var outOfProcAssemblyPath = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll");
+
+#if !NET46
+            var assemblyName = AssemblyLoadContext.GetAssemblyName(outOfProcAssemblyPath);
+#else
+            var assemblyName = AssemblyName.GetAssemblyName(outOfProcAssemblyPath);
+#endif
+
+            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", assemblyName));
             dataCollectionAttributes.Add("codebase", codebase);
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;

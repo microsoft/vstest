@@ -21,12 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     /// </summary>
     internal class DataCollectionManager : IDataCollectionManager
     {
-        private static object obj = new object();
-
-        /// <summary>
-        /// The source directory.
-        /// </summary>
-        private static string sourceDirectory;
+        private static object syncObject = new object();
 
         /// <summary>
         /// Value indicating whether data collection is currently enabled.
@@ -121,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             if (Instance == null)
             {
-                lock (obj)
+                lock (syncObject)
                 {
                     if (Instance == null)
                     {
@@ -147,14 +142,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var dataCollectionContext = new DataCollectionContext(sessionId);
             this.dataCollectionEnvironmentContext = DataCollectionEnvironmentContext.CreateForLocalEnvironment(dataCollectionContext);
 
-            this.attachmentManager.Initialize(sessionId, sourceDirectory, this.messageSink);
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+            var resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+
+            this.attachmentManager.Initialize(sessionId, resultsDirectory, this.messageSink);
 
             // Enviornment variables are passed to testhost process, through ProcessStartInfo.EnvironmentVariables, which handles the key in a case-insensitive manner, which is translated to lowercase.
             // Therefore, using StringComparer.OrdinalIgnoreCase so that same keys with different cases are treated as same.
             var executionEnvironmentVariables = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
-            sourceDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
 
             var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
 
