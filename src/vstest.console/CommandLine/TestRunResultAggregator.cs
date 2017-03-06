@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// Initializes the TestRunResultAggregator
         /// </summary>
         /// <remarks>Constructor is private since the factory method should be used to get the instance.</remarks>
-        private TestRunResultAggregator()
+        protected TestRunResultAggregator()
         {
             // Outcome is passed until we see a failure.
             this.Outcome = TestOutcome.Passed;
