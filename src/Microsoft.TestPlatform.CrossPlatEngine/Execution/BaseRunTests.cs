@@ -4,25 +4,28 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -58,6 +61,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private ICollection<string> executorUrisThatRanTests;
         private ITestPlatformEventSource testPlatformEventSource;
+        private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
+        private ProxyOutOfProcDataCollectionManager outOfProcDataCollectionManager;
 
         #endregion
 
@@ -85,18 +90,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private void SetContext()
         {
-            this.testRunCache = new TestRunCache(testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
-            this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache);
+            this.testRunCache = new TestRunCache(this.testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
+            this.dataCollectionTestCaseEventManager = new DataCollectionTestCaseEventManager();
 
-            // Verify if datacollection is enabled and wrap the testcasehandler around to get the events 
-            if (inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
+            this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache, this.dataCollectionTestCaseEventManager);
+
+            if (DataCollectionTestCaseEventSender.Instance != null)
             {
-                this.testCaseEventsHandler = new TestCaseEventsHandler(inProcDataCollectionExtensionManager, this.testCaseEventsHandler);
+                this.outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, this.dataCollectionTestCaseEventManager);
             }
-            else
+
+            if (!inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
             {
                 // No need to call any methods on this, if inproc-datacollection is not enabled
                 inProcDataCollectionExtensionManager = null;
+            }
+
+            if (inProcDataCollectionExtensionManager != null || DataCollectionTestCaseEventSender.Instance != null)
+            {
+                this.testCaseEventsHandler = new TestCaseEventsHandler(this.dataCollectionTestCaseEventManager, this.testCaseEventsHandler);
             }
 
             this.runContext = new RunContext();
@@ -115,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 this.testRunCache,
                 this.testExecutionContext,
                 this.testRunEventsHandler);
-            this.frameworkHandle.TestRunMessage += OnTestRunMessage;
+            this.frameworkHandle.TestRunMessage += this.OnTestRunMessage;
 
             this.executorUrisThatRanTests = new List<string>();
         }
@@ -169,12 +181,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 try
                 {
                     // Call Session-Start event on in-proc datacollectors
-                    this.inProcDataCollectionExtensionManager?.TriggerTestSessionStart();
+                    this.dataCollectionTestCaseEventManager.RaiseSessionStart(new SessionStartEventArgs());
 
                     elapsedTime = this.RunTestsInternal();
 
                     // Flush any results cached by in-proc manager
-                    inProcDataCollectionExtensionManager?.FlushLastChunkResults();
+                    this.inProcDataCollectionExtensionManager?.FlushLastChunkResults();
 
                     // Check the adapter setting for shutting down this process after run
                     shutdownAfterRun = this.frameworkHandle.EnableShutdownAfterTestRun;
@@ -193,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 finally
                 {
                     // Trigger Session End on in-proc datacollectors
-                    inProcDataCollectionExtensionManager?.TriggerTestSessionEnd();
+                    this.dataCollectionTestCaseEventManager?.RaiseSessionEnd(new SessionEndEventArgs());
 
                     try
                     {

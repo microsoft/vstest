@@ -8,9 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using vstest.console.UnitTests.TestDoubles;
 
+    using System.Linq;
+
     [TestClass]
     public class EnableLoggersArgumentProcessorTests
     {
+
         [TestInitialize]
         public void Initialize()
         {
@@ -36,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             EnableLoggerArgumentProcessorCapabilities capabilities = new EnableLoggerArgumentProcessorCapabilities();
             Assert.AreEqual("/Logger", capabilities.CommandName);
-            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>\n      Specify a logger for test results.  For example, to log results into a \n      Visual Studio Test Results File (TRX) use  /logger:trx [;LogFileName=<Defaults to unique file name>]\n      Creates file in TestResults directory with given LogFileName.\n\n      To publish test results to Team Foundation Server, use TfsPublisher as shown below\n      Example: /logger:TfsPublisher;\n                Collection=<team project collection url>;\n                BuildName=<build name>;\n                TeamProject=<team project name>\n                [;Platform=<Defaults to \"Any CPU\">]\n                [;Flavor=<Defaults to \"Debug\">]\n                [;RunTitle=<title>]", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--logger|/logger:<Logger Uri/FriendlyName>\n      Specify a logger for test results.  For example, to log results into a \n      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=<Defaults to unique file name>]\n      Creates file in TestResults directory with given LogFileName.\n\n      Change the verbosity level for console logger. Allowed values for verbosity: minimal, normal.\n      Example: /logger:console;verbosity=<Defaults to \"minimal\">\n\n      To publish test results to Team Foundation Server, use TfsPublisher as shown below\n      Example: /logger:TfsPublisher;\n                Collection=<team project collection url>;\n                BuildName=<build name>;\n                TeamProject=<team project name>\n                [;Platform=<Defaults to \"Any CPU\">]\n                [;Flavor=<Defaults to \"Debug\">]\n                [;RunTitle=<title>]", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.EnableLoggerArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -58,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void ExecutorInitializeWithValidArgumentsShouldAddTestLoggerToTestLoggerManager()
+        public void ExecutorInitializeWithValidArgumentsShouldAddOnlyConsoleLoggerToTestLoggerManager()
         {
             RunTestsArgumentProcessorTests.SetupMockExtensions();
             var testloggerManager = new DummyTestLoggerManager();
@@ -69,7 +72,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize("TestLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
             var countAfter = testloggerManager.GetInitializedLoggers.Count;
             Assert.IsTrue(countBefore == 0);
+            Assert.IsTrue(countAfter == 0);
+
+            executor.Initialize("console;verbosity=minimal");
+            countAfter = testloggerManager.GetInitializedLoggers.Count;
             Assert.IsTrue(countAfter == 1);
+
+            DummyTestLoggerManager.Cleanup();
+        }
+
+        [TestMethod]
+        public void ExecutorInitializeWithValidArgumentsOtherThanConsoleLoggerShouldGetStoreInLoggerList()
+        {
+            var testloggerManager = new DummyTestLoggerManager();
+            var executor = new EnableLoggerArgumentExecutor(testloggerManager);
+
+            executor.Initialize("DummyLoggerExtension;Collection=http://localhost:8080/tfs/DefaultCollection;TeamProject=MyProject;BuildName=DailyBuild_20121130.1");
+            
+            Assert.IsTrue(testloggerManager.LoggerExist("DummyLoggerExtension"));
         }
 
         [TestMethod]

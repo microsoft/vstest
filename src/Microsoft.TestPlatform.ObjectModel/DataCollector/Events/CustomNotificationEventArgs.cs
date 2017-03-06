@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Base class for all data collector custom notification event arguments
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public abstract class CustomNotificationEventArgs : DataCollectionEventArgs
@@ -64,14 +64,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Custom data send from the collector
     /// </summary>
-#if NET451
+#if NET46
     [Serializable]
 #endif
     public abstract class CustomCollectorData
     {
     }
 
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public class CustomCollectorGenericErrorData : CustomCollectorData

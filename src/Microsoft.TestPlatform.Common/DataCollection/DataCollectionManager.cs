@@ -21,6 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     /// </summary>
     internal class DataCollectionManager : IDataCollectionManager
     {
+        private static object obj = new object();
+
         /// <summary>
         /// The source directory.
         /// </summary>
@@ -37,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private DataCollectionEnvironmentContext dataCollectionEnvironmentContext;
 
         /// <summary>
-        /// Attachment manager for performing file transfer from datacollector.
+        /// Attachment manager for performing file transfers for datacollectors.
         /// </summary>
         private IDataCollectionAttachmentManager attachmentManager;
 
@@ -57,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private bool disposed;
 
         /// <summary>
-        /// Loads datacollector.
+        /// Load datacollectors.
         /// </summary>
         private IDataCollectorLoader dataCollectorLoader;
 
@@ -83,7 +85,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="dataCollectorLoader">
         /// The data Collector Loader.
         /// </param>
-        internal DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader)
+        /// <remarks>
+        /// The constructor is not public because the factory method should be used to get instances of this class.
+        /// </remarks>
+        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader)
         {
             this.attachmentManager = datacollectionAttachmentManager;
             this.messageSink = messageSink;
@@ -94,9 +99,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         }
 
         /// <summary>
+        /// Gets the instance of DataCollectionManager.
+        /// </summary>
+        public static DataCollectionManager Instance { get; private set; }
+
+        /// <summary>
         /// Gets cache of data collectors associated with the run.
         /// </summary>
         internal Dictionary<Type, DataCollectorInformation> RunDataCollectors { get; private set; }
+
+        /// <summary>
+        /// Creates an instance of the TestLoggerExtensionManager.
+        /// </summary>
+        /// <param name="messageSink">
+        /// The message sink.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataCollectionManager"/>.
+        /// </returns>
+        public static DataCollectionManager Create(IMessageSink messageSink)
+        {
+            if (Instance == null)
+            {
+                lock (obj)
+                {
+                    if (Instance == null)
+                    {
+                        Instance = new DataCollectionManager(messageSink);
+                    }
+                }
+            }
+
+            return Instance;
+        }
 
         /// <inheritdoc/>
         public IDictionary<string, string> InitializeDataCollectors(string settingsXml)
@@ -183,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var endEvent = new SessionEndEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext);
             this.SendEvent(endEvent);
 
-            List<AttachmentSet> result = new List<AttachmentSet>();
+            var result = new List<AttachmentSet>();
             try
             {
                 result = this.attachmentManager.GetAttachments(endEvent.Context);
@@ -228,19 +263,38 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             this.SendEvent(new SessionStartEventArgs(this.dataCollectionEnvironmentContext.SessionDataCollectionContext));
 
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public Collection<AttachmentSet> TestCaseEnded(TestCase testCase, TestOutcome testOutcome)
-        {
-            throw new NotImplementedException();
+            return this.events.AreTestCaseEventsSubscribed();
         }
 
         /// <inheritdoc/>
         public void TestCaseStarted(TestCaseStartEventArgs testCaseStartEventArgs)
         {
-            throw new NotImplementedException();
+            if (!this.isDataCollectionEnabled)
+            {
+                return;
+            }
+
+            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, new TestExecId(testCaseStartEventArgs.TestCaseId));
+            testCaseStartEventArgs.Context = context;
+
+            this.SendEvent(testCaseStartEventArgs);
+        }
+
+        /// <inheritdoc/>
+        public Collection<AttachmentSet> TestCaseEnded(TestCaseEndEventArgs testCaseEndEventArgs)
+        {
+            if (!this.isDataCollectionEnabled)
+            {
+                return new Collection<AttachmentSet>();
+            }
+
+            var context = new DataCollectionContext(this.dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, new TestExecId(testCaseEndEventArgs.TestCaseId));
+            testCaseEndEventArgs.Context = context;
+
+            this.SendEvent(testCaseEndEventArgs);
+
+            // todo : get actual test casel leve attachments here.
+            return new Collection<AttachmentSet>();
         }
 
         /// <summary>

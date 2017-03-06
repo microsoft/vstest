@@ -9,12 +9,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Base class for all execution event arguments
     /// </summary>
-#if NET451
+#if NET46
     [Serializable] 
 #endif
     public abstract class DataCollectionEventArgs : EventArgs
     {
         #region Constructor
+
+        /// <summary>
+        /// Default constructor added for serialization/deserialization.
+        /// </summary>
+        public DataCollectionEventArgs()
+        {
+        }
 
         /// <summary>
         /// Initializes the instance by storing the given information
@@ -43,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         public DataCollectionContext Context
         {
             get;
-            private set;
+            internal set;
         }
 
         /// <summary>

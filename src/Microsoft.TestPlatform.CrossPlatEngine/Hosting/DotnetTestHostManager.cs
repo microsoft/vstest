@@ -192,7 +192,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
-                return this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestAdapterRedexPattern, SearchOption.TopDirectoryOnly);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.TopDirectoryOnly);
             }
 
             return Enumerable.Empty<string>();
@@ -327,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     defaultTestHostStartInfo.FileName,
                     defaultTestHostStartInfo.Arguments,
                     defaultTestHostStartInfo.WorkingDirectory,
-                    defaultTestHostStartInfo.ExitCallback).Id;
+                    defaultTestHostStartInfo.ErrorReceivedCallback).Id;
         }
     }
 }

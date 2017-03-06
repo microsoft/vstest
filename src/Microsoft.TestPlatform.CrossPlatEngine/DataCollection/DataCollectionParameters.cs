@@ -13,9 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionParameters"/> class.
         /// </summary>
-        /// <param name="isDataCollectionStarted">
-        /// The is data collection started.
-        /// </param>
         /// <param name="areTestCaseLevelEventsRequired">
         /// The are test case level events required.
         /// </param>
@@ -26,21 +23,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The data Collection Events Port.
         /// </param>
         public DataCollectionParameters(
-            bool isDataCollectionStarted,
             bool areTestCaseLevelEventsRequired,
             IDictionary<string, string> environmentVariables,
             int dataCollectionEventsPort)
         {
-            this.IsDataCollectionStarted = isDataCollectionStarted;
             this.AreTestCaseLevelEventsRequired = areTestCaseLevelEventsRequired;
             this.EnvironmentVariables = environmentVariables;
             this.DataCollectionEventsPort = dataCollectionEventsPort;
         }
-
-        /// <summary>
-        /// Gets a value indicating whether DataCollection is started 
-        /// </summary>
-        public bool IsDataCollectionStarted { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether any of the enabled data collectors
@@ -66,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </returns>
         public static DataCollectionParameters CreateDefaultParameterInstance()
         {
-            return new DataCollectionParameters(isDataCollectionStarted: false, areTestCaseLevelEventsRequired: false, environmentVariables: null, dataCollectionEventsPort: 0);
+            return new DataCollectionParameters(areTestCaseLevelEventsRequired: false, environmentVariables: null, dataCollectionEventsPort: 0);
         }
     }
 }

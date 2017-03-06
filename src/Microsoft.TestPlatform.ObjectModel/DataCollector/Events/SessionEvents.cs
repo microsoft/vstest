@@ -3,17 +3,29 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
+    using System;
     using System.Diagnostics;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Session Start event arguments
     /// </summary>
-#if NET451
-    [Serializable] 
-#endif
+    [DataContract]
     public sealed class SessionStartEventArgs : DataCollectionEventArgs
     {
         #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
+        /// </summary>
+        /// <remarks>
+        /// Default constructor with default DataCollectionContext.
+        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// </remarks>
+        public SessionStartEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)))
+        {
+
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionStartEventArgs"/> class. 
@@ -33,12 +45,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Session End event arguments
     /// </summary>
-#if NET451
-        [Serializable] 
-#endif
+    [DataContract]
     public sealed class SessionEndEventArgs : DataCollectionEventArgs
     {
         #region Constructor
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class. 
+        /// </summary>
+        /// <remarks>
+        /// Default constructor with default DataCollectionContext.
+        /// DataCollectionContext with empty session signifies that is it irrelevent in the current context.
+        /// </remarks>
+        public SessionEndEventArgs() : this(new DataCollectionContext(new SessionId(Guid.Empty)))
+        {
+
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionEndEventArgs"/> class. 

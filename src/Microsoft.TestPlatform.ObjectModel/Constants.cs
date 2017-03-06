@@ -71,6 +71,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const int DefaultCpuCount = 1;
 
         /// <summary>
+        /// The default batch size.
+        /// </summary>
+        public const long DefaultBatchSize = 10;
+
+        /// <summary>
         /// Name of the results directory
         /// </summary>
         public const string ResultsDirectoryName = "TestResults";

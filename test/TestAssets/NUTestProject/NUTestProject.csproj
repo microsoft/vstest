@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <!-- Package dependency versions -->
+  <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
+
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>NUTestProject</AssemblyName>
@@ -7,19 +10,10 @@
 
   <ItemGroup>
     <PackageReference Include="NUnit">
-      <Version>2.6.4</Version>
+      <Version>$(NUnitFrameworkVersion)</Version>
     </PackageReference>
     <PackageReference Include="NUnitTestAdapter">
-      <Version>1.2.0</Version>
+      <Version>$(NUnitAdapterVersion)</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <Reference Include="System.Runtime" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
-  </PropertyGroup>  
 </Project>

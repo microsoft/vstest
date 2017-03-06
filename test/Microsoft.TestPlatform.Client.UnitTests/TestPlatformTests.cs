@@ -12,6 +12,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using Moq;
 
@@ -23,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         private readonly Mock<ITestExtensionManager> extensionManager;
         private readonly Mock<ITestHostProvider> hostManager;
         private readonly Mock<IProxyExecutionManager> executionManager;
+        private readonly Mock<IFileHelper> mockFileHelper;
 
         public TestPlatformTests()
         {
@@ -31,6 +34,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.extensionManager = new Mock<ITestExtensionManager>();
             this.executionManager = new Mock<IProxyExecutionManager>();
             this.hostManager = new Mock<ITestHostProvider>();
+            this.mockFileHelper = new Mock<IFileHelper>();
+
         }
 
         [TestMethod]
@@ -65,6 +70,60 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             tp.UpdateExtensions(additionalExtensions, loadOnlyWellKnownExtensions: true);
 
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+        }
+
+        [TestMethod]
+        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalseForRunAll()
+        {
+            var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
+
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<RunConfiguration>())).Returns(this.hostManager.Object);
+            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, mockFileHelper.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>false</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { @"x:dummy\foo.dll" }, 10, false, settingsXml, TimeSpan.Zero);
+            var testRunRequest = tp.CreateTestRunRequest(testRunCriteria);
+            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
+        }
+
+        [TestMethod]
+        public void CreateTestRunRequestShouldUpdateLoggerExtensionWhenDesingModeIsFalseForRunSelected()
+        {
+            var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
+
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<RunConfiguration>())).Returns(this.hostManager.Object);
+            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
+            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
+            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
+
+            var tp = new TestableTestPlatform(this.testEngine.Object, mockFileHelper.Object);
+
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DesignMode>false</DesignMode>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<TestCase> { new TestCase("dll1.class1.test1", new Uri("hello://x/"), "xyz\\1.dll") }, 10, false, settingsXml);
+            var testRunRequest = tp.CreateTestRunRequest(testRunCriteria);
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
         }
 
@@ -112,7 +171,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
         private class TestableTestPlatform : TestPlatform
         {
-            public TestableTestPlatform(ITestEngine testEngine) : base(testEngine)
+            public TestableTestPlatform(ITestEngine testEngine) : base(testEngine, new FileHelper())
+            {
+            }
+
+            public TestableTestPlatform(ITestEngine testEngine, IFileHelper fileHelper) : base(testEngine, fileHelper)
             {
             }
         }

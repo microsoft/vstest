@@ -45,14 +45,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
     public static class TestPlatformConstants
     {
         /// <summary>
-        /// string pattern used to find the test adapters
-        /// </summary>
-        public const string TestAdapterPattern = @"*.TestAdapter.dll";
-
-        /// <summary>
         /// Regex pattern used to find the test adapters
         /// </summary>
-        public const string TestAdapterRedexPattern = @".*.TestAdapter.dll";
+        public const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
+
+        /// <summary>
+        /// Regex pattern used to find the test logger
+        /// </summary>
+        public const string TestLoggerRegexPattern = @".*.TestLogger.dll";
 
     }
 }
