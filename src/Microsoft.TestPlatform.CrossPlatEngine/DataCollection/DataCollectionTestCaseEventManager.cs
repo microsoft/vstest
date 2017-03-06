@@ -48,10 +48,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public DataCollectionTestCaseEventManager(ITestRunCache testRunCache)
         {
             this.testRunCache = testRunCache;
-
-            FlushResultTestResultPoperty = TestProperty.Register(id: "allowTestResultFlush", label: "allowTestResultFlush", category: string.Empty, description: string.Empty, valueType: typeof(bool), validateValueCallback: null, attributes: TestPropertyAttributes.None, owner: typeof(TestCase));
             this.testResultDictionary = new Dictionary<Guid, List<TestResult>>();
             this.testCaseEndStatusMap = new HashSet<Guid>();
+
+            FlushResultTestResultPoperty = TestProperty.Register(id: "allowTestResultFlush", label: "allowTestResultFlush", category: string.Empty, description: string.Empty, valueType: typeof(bool), validateValueCallback: null, attributes: TestPropertyAttributes.None, owner: typeof(TestCase));
         }
 
         /// <inheritdoc />

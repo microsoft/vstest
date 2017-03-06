@@ -45,7 +45,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public InProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager)
         {
             this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
-
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
 
             // Initialize InProcDataCollectors
