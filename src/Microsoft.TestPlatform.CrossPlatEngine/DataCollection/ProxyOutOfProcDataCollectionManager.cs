@@ -57,14 +57,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             {
                 lock (syncObject)
                 {
-                    if (!attachmentsCache.ContainsKey(e.TestCaseId))
+                    Collection<AttachmentSet> attachmentSets;
+                    if (!attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
                     {
-                        this.attachmentsCache.Add(e.TestCaseId, new Collection<AttachmentSet>());
+                        attachmentSets = new Collection<AttachmentSet>();
+                        this.attachmentsCache.Add(e.TestCaseId, attachmentSets);
                     }
 
                     foreach (var attachment in attachments)
                     {
-                        this.attachmentsCache[e.TestCaseId].Add(attachment);
+                        attachmentSets.Add(attachment);
                     }
                 }
             }
@@ -74,9 +76,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             lock (syncObject)
             {
-                if (this.attachmentsCache.ContainsKey(e.TestCaseId))
+                Collection<AttachmentSet> attachmentSets;
+                if (this.attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
                 {
-                    foreach (var attachment in this.attachmentsCache[e.TestCaseId])
+                    foreach (var attachment in attachmentSets)
                     {
                         e.TestResult.Attachments.Add(attachment);
                     }

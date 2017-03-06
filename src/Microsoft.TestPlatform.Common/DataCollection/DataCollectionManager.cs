@@ -234,21 +234,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             }
 
             if (EqtTrace.IsVerboseEnabled)
-
-                foreach (var entry in result)
-                {
-                    foreach (var file in entry.Attachments)
-                    {
-                        {
-                            EqtTrace.Verbose(
-                                "Run Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
-                                entry.DisplayName,
-                                entry.Uri,
-                                file.Description,
-                                file.Uri);
-                        }
-                    }
-                }
+            {
+                this.LogAttachments(result);
+            }
 
             return new Collection<AttachmentSet>(result);
         }
@@ -311,19 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             if (EqtTrace.IsVerboseEnabled)
             {
-                foreach (var entry in result)
-                {
-                    foreach (var file in entry.Attachments)
-                    {
-
-                        EqtTrace.Verbose(
-                            "Test Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
-                            entry.DisplayName,
-                            entry.Uri,
-                            file.Description,
-                            file.Uri);
-                    }
-                }
+                this.LogAttachments(result);
             }
 
             return new Collection<AttachmentSet>(result);
@@ -637,6 +613,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 if (this.RunDataCollectors.Count == 0)
                 {
                     this.isDataCollectionEnabled = false;
+                }
+            }
+        }
+
+        private void LogAttachments(List<AttachmentSet> attachmentSets)
+        {
+            foreach (var entry in attachmentSets)
+            {
+                foreach (var file in entry.Attachments)
+                {
+
+                    EqtTrace.Verbose(
+                        "Test Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
+                        entry.DisplayName,
+                        entry.Uri,
+                        file.Description,
+                        file.Uri);
                 }
             }
         }
