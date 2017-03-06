@@ -8,13 +8,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Diagnostics.Contracts;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     /// <summary>
     /// Allows the user to specify a path to load custom adapters from.
     /// </summary>
@@ -58,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), ConsoleOutput.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), ConsoleOutput.Instance, new FileHelper()));
                 }
 
                 return this.executor;
@@ -111,6 +113,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         private IOutput output;
 
+        /// <summary>
+        /// For file related operation
+        /// </summary>
+        private IFileHelper fileHelper;
+
         #endregion
 
         #region Constructor
@@ -120,13 +127,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </summary>
         /// <param name="options"> The options. </param>
         /// <param name="testPlatform">The test platform</param>
-        public TestAdapterPathArgumentExecutor(CommandLineOptions options, ITestPlatform testPlatform, IOutput output)
+        public TestAdapterPathArgumentExecutor(CommandLineOptions options, ITestPlatform testPlatform, IOutput output, IFileHelper fileHelper)
         {
             Contract.Requires(options != null);
 
             this.commandLineOptions = options;
             this.testPlatform = testPlatform;
             this.output = output;
+            this.fileHelper = fileHelper;
         }
 
         #endregion
@@ -153,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 argument = argument.Trim().Trim(new char[] { '\"' });
 
                 customAdaptersPath = Path.GetFullPath(argument);
-                if (!Directory.Exists(customAdaptersPath))
+                if (!fileHelper.DirectoryExists(customAdaptersPath))
                 {
                     throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
                 }
@@ -190,13 +198,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
 
         /// <summary>
-        /// Gets the test adapters from directory.
+        /// Gets the test adapters and loggers from directory.
         /// </summary>
         /// <param name="directory"> The directory. </param>
-        /// <returns> The list of test adapter assemblies. </returns>
+        /// <returns> The list of test adapter and logger assemblies. </returns>
         internal virtual IEnumerable<string> GetTestAdaptersFromDirectory(string directory)
         {
-            return Directory.EnumerateFiles(directory, TestPlatformConstants.TestAdapterPattern, SearchOption.AllDirectories);
+            List<string> adapterAndLogger = new List<string>(); 
+            adapterAndLogger.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories).ToList());
+            adapterAndLogger.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories).ToList());
+            return adapterAndLogger;
         }
 
         #endregion

@@ -5,6 +5,7 @@ namespace vstest.console.UnitTests.TestDoubles
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 
     internal class DummyTestLoggerManager : TestLoggerManager
@@ -24,6 +25,11 @@ namespace vstest.console.UnitTests.TestDoubles
             {
                 return InitializedLoggers;
             }
+        }
+
+        public bool LoggerExist(string loggerIdentifier)
+        {
+            return this.loggersInfoList.ToList().Find(l => l.loggerIdentifier == loggerIdentifier) != null;
         }
 
         public static void Cleanup()
