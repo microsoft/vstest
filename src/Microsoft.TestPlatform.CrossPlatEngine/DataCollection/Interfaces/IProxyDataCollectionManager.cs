@@ -16,6 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
     public interface IProxyDataCollectionManager : IDisposable
     {
         /// <summary>
+        /// Initializes proxy datacollection manager.
+        /// </summary>
+        void Initialize();
+
+        /// <summary>
         /// Invoked before starting of test run
         /// </summary>
         /// <param name="resetDataCollectors">
