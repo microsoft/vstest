@@ -146,7 +146,7 @@ function invokebuild()
     echo ".. .. Build: Source: $TPB_Solution"
     
     #Need to target the appropriate targetframework for each project until netstandard2.0 ships
-    PROJECTFRAMEWORKMAP =(
+    PROJECTFRAMEWORKMAP=( \
         Microsoft.TestPlatform.CrossPlatEngine:netstandard1.5 \
         testhost.x86:netcoreapp1.0 \
         Microsoft.TestPlatform.PlatformAbstractions:netcoreapp1.0 \
@@ -166,7 +166,7 @@ function invokebuild()
         Microsoft.TestPlatform.CoreUtilities:netstandard1.4
     )
     
-    for item in "${ARRAY[@]}" ;
+    for item in "${PROJECTFRAMEWORKMAP[@]}" ;
     do
         projectToBuild="${item%%:*}"
         framework="${item##*:}"
@@ -193,7 +193,7 @@ function publishpackage()
     
     coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
     
-    PROJECTPACKAGEOUTPUTMAP = (
+    PROJECTPACKAGEOUTPUTMAP=( \
         $TP_PACKAGE_PROJ_DIR/package.csproj:$coreCLRPackageDir \
         $TP_ROOT_DIR/src/vstest.console/vstest.console.csproj:$coreCLRPackageDir \
         $TP_ROOT_DIR/src/datacollector/datacollector.csproj:$coreCLRPackageDir \
