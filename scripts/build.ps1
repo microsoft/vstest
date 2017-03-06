@@ -554,27 +554,26 @@ function Build-SpecificProjects
     }
 }
 
-if ($ProjectNamePatterns.Count -eq 0)
-{
-    # Execute build
-    $timer = Start-Timer
-    Write-Log "Build started: args = '$args'"
-    Write-Log "Test platform environment variables: "
-    Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
-    Write-Log "Test platform build variables: "
-    Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-    Install-DotNetCli
-    Restore-Package
-    #Update-LocalizedResources
-    Invoke-Build
-    Publish-Package
-    Create-VsixPackage
-    Create-NugetPackages
-    Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
-    if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
-}
-else
+if ($ProjectNamePatterns.Count -ne 0)
 {
     # Build Specific projects.
     Build-SpecificProjects
+    Exit
 }
+
+# Execute build
+$timer = Start-Timer
+Write-Log "Build started: args = '$args'"
+Write-Log "Test platform environment variables: "
+Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
+Write-Log "Test platform build variables: "
+Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
+Install-DotNetCli
+Restore-Package
+Update-LocalizedResources
+Invoke-Build
+Publish-Package
+Create-VsixPackage
+Create-NugetPackages
+Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }

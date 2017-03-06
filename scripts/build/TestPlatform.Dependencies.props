@@ -4,8 +4,8 @@
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <NETTestSdkPreviousVersion>15.0.0</NETTestSdkPreviousVersion>
 
-    <MSTestFrameworkVersion>1.0.8-rc2</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>1.1.10-rc2</MSTestAdapterVersion>
+    <MSTestFrameworkVersion>1.1.11</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>1.1.11</MSTestAdapterVersion>
 
     <XUnitFrameworkVersion>2.2.0</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.2.0</XUnitAdapterVersion>
