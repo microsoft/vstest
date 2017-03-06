@@ -180,6 +180,11 @@
         <target state="new">Testhost process exited with error: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="DataCollectorDebuggerWarning">
+        <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
+        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
