@@ -276,7 +276,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
                 return ResourceManager.GetString("LoggerNotFound", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to The Test Logger URI &apos;{0}&apos; is not valid.  The Test Logger will be ignored..
+        /// </summary>
+        public static string LoggerUriInvalid
+        {
+            get
+            {
+                return ResourceManager.GetString("LoggerUriInvalid", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Error: Missing &apos;)&apos;.
         /// </summary>
