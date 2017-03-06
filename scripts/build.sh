@@ -16,7 +16,7 @@ function usage()
 CONFIGURATION="Debug"
 TARGET_RUNTIME=
 VERSION="15.0.0"
-VERSION_SUFFIX="DEV"
+VERSION_SUFFIX="dev"
 FAIL_FAST=false
 SYNC_XLF=false
 DISABLE_LOCALIZED_BUILD=false
@@ -90,6 +90,7 @@ TPB_TargetRuntime=$TARGET_RUNTIME
 TPB_Version=$VERSION
 TPB_VersionSuffix=$VERSION_SUFFIX
 TPB_CIBuild=$CI_BUILD
+TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 
 function installdotnetcli()
 {
@@ -147,30 +148,30 @@ function invokebuild()
     
     #Need to target the appropriate targetframework for each project until netstandard2.0 ships
     PROJECTFRAMEWORKMAP=( \
-        Microsoft.TestPlatform.CrossPlatEngine:netstandard1.5 \
-        testhost.x86:netcoreapp1.0 \
-        Microsoft.TestPlatform.PlatformAbstractions:netcoreapp1.0 \
-        Microsoft.TestPlatform.PlatformAbstractions:netstandard1.0 \
-        package:netcoreapp1.0 \
-        Microsoft.TestPlatform.ObjectModel:netstandard1.5 \
-        Microsoft.TestPlatform.VsTestConsole.TranslationLayer:netstandard1.5 \
-        datacollector:netcoreapp1.0 \
-        vstest.console:netcoreapp1.0 \
-        Microsoft.TestPlatform.Common:netstandard1.5 \
-        Microsoft.TestPlatform.Client:netstandard1.5 \
-        Microsoft.TestPlatform.Extensions.TrxLogger:netstandard1.5 \
-        Microsoft.TestPlatform.Utilities:netstandard1.5 \
-        Microsoft.TestPlatform.CommunicationUtilities:netstandard1.5 \
-        Microsoft.TestPlatform.Build:netstandard1.3 \
-        testhost:netcoreapp1.0 \
-        Microsoft.TestPlatform.CoreUtilities:netstandard1.4
+        Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine:netstandard1.5 \
+        testhost.x86/testhost.x86:netcoreapp1.0 \
+        Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions:netcoreapp1.0 \
+        Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions:netstandard1.0 \
+        package/package/package:netcoreapp1.0 \
+        Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel:netstandard1.5 \
+        Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Microsoft.TestPlatform.VsTestConsole.TranslationLayer:netstandard1.5 \
+        datacollector/datacollector:netcoreapp1.0 \
+        vstest.console/vstest.console:netcoreapp1.0 \
+        Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common:netstandard1.5 \
+        Microsoft.TestPlatform.Client/Microsoft.TestPlatform.Client:netstandard1.5 \
+        Microsoft.TestPlatform.Extensions.TrxLogger/Microsoft.TestPlatform.Extensions.TrxLogger:netstandard1.5 \
+        Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities:netstandard1.5 \
+        Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities:netstandard1.5 \
+        Microsoft.TestPlatform.Build/Microsoft.TestPlatform.Build:netstandard1.3 \
+        testhost/testhost:netcoreapp1.0 \
+        Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities:netstandard1.4
     )
     
     for item in "${PROJECTFRAMEWORKMAP[@]}" ;
     do
         projectToBuild="${item%%:*}"
         framework="${item##*:}"
-        $DOTNET_PATH build src/$projectToBuild/$projectToBuild.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:SyncXlf=$SYNC_XLF -p:TargetFramework=$framework
+        $DOTNET_PATH build src/$projectToBuild.csproj --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild -p:TargetFramework=$framework
     done
     
     echo ".. .. Build: Complete."
@@ -222,7 +223,7 @@ function publishpackage()
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
-    binariesDirectory="src/$packageName/bin/$TPB_Configuration"
+    binariesDirectory="src/$packageName/bin/$TPB_Configuration/**"
     publishDirectory="$TP_OUT_DIR/$TPB_Configuration/$packageName"
     mkdir -p $publishDirectory
     cp -r $binariesDirectory $publishDirectory
@@ -278,8 +279,8 @@ function createnugetpackages()
 
 
     for i in ${projectFiles[@]}; do
-        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir --version-suffix $TPB_VersionSuffix" /p:Version=$TPB_Version \
-        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir --version-suffix $TPB_VersionSuffix /p:Version=$TPB_Version
+        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir /p:Version=$TPB_Version-$TPB_VersionSuffix \
+        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir /p:Version=$TPB_Version-$TPB_VersionSuffix
     done
 
     echo "Create-NugetPackages: Elapsed $(( SECONDS - start ))"

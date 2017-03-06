@@ -9,7 +9,6 @@ Param(
     [System.String] $Configuration = "Debug",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("win7-x64", "win7-x86")]
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
@@ -352,6 +351,7 @@ function Copy-PackageItems($packageName)
     # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net46\* is copied
     # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net46
     $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
+    $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
     Write-Log "Copy-PackageItems: Package: $packageName"
     Write-Verbose "Create $publishDirectory"
