@@ -25,9 +25,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(2, 2, 2);
         }
 
+        // Randomly failing with error "The active test run was aborted. Reason: Destination array was not long enough.
+        // Check destIndex and length, and the array's lower bounds. Test Run Failed."
+        // Issue: https://github.com/Microsoft/vstest/issues/292
+        [Ignore]
         [CustomDataTestMethod]
         [NET46TargetFramework]
-        // [NETCORETargetFramework] Issue:https://github.com/Microsoft/vstest/issues/292, Currently not customer scenario.
+        [NETCORETargetFramework]
         public void RunMultipleTestAssembliesInParallel(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);

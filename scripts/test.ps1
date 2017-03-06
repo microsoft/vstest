@@ -107,7 +107,7 @@ function Print-FailedTests($TrxFilePath)
         $count = 1
         $nl = [Environment]::NewLine
         $xdoc.TestRun.TestDefinitions.UnitTest |?{$FailedTestCaseDetailsDict.ContainsKey($_.id)} | %{
-            Write-Log  (".. .. . $count. " + "$($_.TestMethod.className).$($_.TestMethod.name)") $Script:TPT_ErrorMsgColor
+            Write-Log (".. .. . $count. " + "$($_.TestMethod.className).$($_.TestMethod.name)") $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .ErrorMessage: $nl" + $FailedTestCaseDetailsDict[$_.id]["Message"]) $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .StackTrace: $nl" + $FailedTestCaseDetailsDict[$_.id]["StackTrace"]) $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .StdOut: $nl" + $FailedTestCaseDetailsDict[$_.id]["StdOut"]) $Script:TPT_ErrorMsgColor
