@@ -13,6 +13,7 @@ namespace OutOfProcDataCollector
     [DataCollectorTypeUri("my://sample/datacollector")]
     public class SampleDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
+        int i = 0;
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
         private DataCollectionLogger logger;
@@ -41,6 +42,9 @@ namespace OutOfProcDataCollector
         private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
         {
             this.logger.LogWarning(this.context.SessionDataCollectionContext, "TestCaseStarted " + e.TestCaseName);
+            var filename = Path.Combine(AppContext.BaseDirectory, "testcasefilename" + i++ + ".txt");
+            File.WriteAllText(filename, string.Empty);
+            this.dataCollectionSink.SendFileAsync(e.Context, filename, true);
         }
 
         private void SessionStarted_Handler(object sender, SessionStartEventArgs args)

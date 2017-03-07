@@ -123,7 +123,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("HostDebuggerWarning", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Host debugging is enabled. Please attach debugger to testhost process to continue..
+        /// </summary>
+        internal static string DataCollectorDebuggerWarning
+        {
+            get
+            {
+                return ResourceManager.GetString("DataCollectorDebuggerWarning", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in..
         /// </summary>
