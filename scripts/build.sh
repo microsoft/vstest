@@ -281,7 +281,7 @@ function createnugetpackages()
 
 
     for i in ${projectFiles[@]}; do
-        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir /p:Version=$TPB_Version-$TPB_VersionSuffix \
+        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir /p:Version=$TPB_Version-$TPB_VersionSuffix" \
         && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir /p:Version=$TPB_Version-$TPB_VersionSuffix
     done
 
