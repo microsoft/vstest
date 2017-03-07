@@ -21,8 +21,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
         private Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
 
-        private object syncObject = new object();
-
         /// <summary>
         /// Sync object for ensuring that only run is active at a time
         /// </summary>
@@ -57,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
-            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseComplete(e);
+            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
 
             if (attachments != null)
             {
@@ -92,30 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 }
 
                 this.attachmentsCache.Remove(e.TestCaseId);
-            }
-        }
-
-        private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
-        {
-            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
-
-            if (attachments != null && attachments.Count > 0)
-            {
-                lock (this.syncObject)
-                {
-                    Collection<AttachmentSet> existingEntries = null;
-                    if (this.attachmentsCache.TryGetValue(e.TestCaseId, out existingEntries))
-                    {
-                        foreach (AttachmentSet newEntry in attachments)
-                        {
-                            existingEntries.Add(newEntry);
-                        }
-                    }
-                    else
-                    {
-                        this.attachmentsCache.Add(e.TestCaseId, attachments);
-                    }
-                }
             }
         }
 
