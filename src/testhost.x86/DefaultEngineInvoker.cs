@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 var dcPort = GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
                 if (dcPort > 0)
                 {
-                    var dataCollectionTestCaseEventSender=DataCollectionTestCaseEventSender.Create();
+                    var dataCollectionTestCaseEventSender = DataCollectionTestCaseEventSender.Create();
                     dataCollectionTestCaseEventSender.InitializeCommunication(dcPort);
                     dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(ClientListenTimeOut);
                 }
@@ -89,8 +89,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 // Wait for either processing to complete or parent process exit
                 Task.WaitAny(processingTask, parentProcessMonitoringTask);
 
-                // Close socket communication connection.
-                DataCollectionTestCaseEventSender.Instance.Close();
+                if (dcPort > 0)
+                {
+                    // Close socket communication connection.
+                    DataCollectionTestCaseEventSender.Instance.Close();
+                }
             }
         }
 

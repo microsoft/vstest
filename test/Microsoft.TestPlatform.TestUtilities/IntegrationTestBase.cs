@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 arguments = string.Concat(arguments, " /Framework:", EncloseInQuotes(framework));
             }
 
-            arguments = string.Concat(arguments, " /logger:console;verbosity=normal");
+            arguments = string.Concat(arguments, " /logger:", EncloseInQuotes("console;verbosity=normal"));
 
             return arguments;
         }
@@ -168,6 +168,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         public void StdErrorContains(string substring)
         {
             Assert.IsTrue(this.standardTestError.Contains(substring));
+        }
+
+        public void StdOutputContains(string substring)
+        {
+            Assert.IsTrue(this.standardTestOutput.Contains(substring));
         }
 
         /// <summary>
