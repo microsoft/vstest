@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Text;
@@ -123,13 +124,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Warn the user that execution will wait for debugger attach.
                 var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+
+
+                // Launch the test host.
+                var testHostProcessId = this.testHostManager.LaunchTestHost(testHostStartInfo);
+
                 if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
                 {
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
+                    ConsoleOutput.Instance.WriteLine(
+                    string.Format("Process Id: {0}, Name: {1}", processId, Process.GetProcessById(testHostProcessId).ProcessName),
+                    OutputLevel.Information);
                 }
-
-                // Launch the test host.
-                this.testHostManager.LaunchTestHost(testHostStartInfo);
                 this.initialized = true;
             }
 
