@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">Parametr nie może mieć wartości null ani być pusty.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametr nie może być zerowy ani pusty.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
         <target state="translated">Uruchomienie testu użyje plików DLL przeznaczonych dla struktury {0} i platformy {1}. Następujące pliki DLL nie będą częścią uruchomienia: {2}. Aby uzyskać więcej informacji na temat zarządzania tymi ustawieniami, przejdź do strony {3}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uruchom test użyje dll (s), zbudowane dla framework {0} i platformy {1}. Po dll (s) nie będzie częścią run: {2} Przejdź do {3} szczegółowe informacje dotyczące zarządzania tych ustawień.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
         <target state="translated">Żaden z dostarczonych kontenerów testów nie odpowiada architekturze platformy i ustawieniom programu .NET Framework dotyczącym uruchomienia testu. Platforma: {0}. Program .NET Framework: {1}. Aby uzyskać więcej informacji na temat zarządzania tymi ustawieniami, przejdź do strony http://go.microsoft.com/fwlink/?LinkID=330428.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Brak kontenerów podany test zgodne z architekturą platformy i .net Framework ustawienia dla testu. Platforma: {0} .net Framework: {1}. Przejdź do http://go.microsoft.com/fwlink/?LinkID=330428 uzyskać więcej informacji o zarządzaniu te ustawienia.</target>
         </alt-trans>

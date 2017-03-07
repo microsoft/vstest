@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">Parametr nemůže být null nebo prázdný.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametr nemůže být null nebo prázdný.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
         <target state="translated">Testovací běh použije knihovny DLL sestavené pro rozhraní {0} a platformu {1}. Tyto knihovny DLL nebudou součástí běhu: {2} Další podrobnosti o správě těchto nastavení najdete na adrese {3}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Spuštění testu použije DLL(s) vybudované framework {0} a platformu {1}. Po DLL(s) nebudou součástí run: {2} {3} podrobnosti přejít na správu těchto nastavení.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
         <target state="translated">Žádný s poskytnutých kontejnerů testů neodpovídá nastavení architektury platformy a rozhraní .NET Framework pro testovací běh. Platforma: {0}  .NET Framework: {1}. Další podrobnosti o správě těchto nastavení najdete na adrese http://go.microsoft.com/fwlink/?LinkID=330428.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Poskytnutý testovací kontejnery neodpovídají Architektura platformy a .net Framework nastavení spuštění testu. Platforma: {0} rozhraní .net Framework: {1}. přejít na http://go.microsoft.com/fwlink/?LinkID=330428 pro další informace o správě těchto nastavení.</target>
         </alt-trans>

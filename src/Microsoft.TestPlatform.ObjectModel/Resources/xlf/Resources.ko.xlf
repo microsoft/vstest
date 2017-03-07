@@ -32,7 +32,7 @@
       <trans-unit id="TestOutcomeNone">
         <source>None</source>
         <target state="translated">없음</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">없음</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="BasicTestResultFormat">
         <source>{0,-10}  {1}</source>
         <target state="translated">{0,-10}  {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0,-10}  {1}</target>
         </alt-trans>
@@ -61,7 +61,7 @@
 {1}</source>
         <target state="translated">  {0}:
 {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}:
 {1}</target>
@@ -73,7 +73,7 @@
 {0}</source>
         <target state="translated">  테스트 메시지:
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트 메시지:
 {0}</target>
@@ -83,7 +83,7 @@
       <trans-unit id="TestFailureMessageFormat">
         <source>  Message: {0}</source>
         <target state="translated">  메시지: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">메시지: {0}</target>
         </alt-trans>
@@ -94,7 +94,7 @@
 {0}</source>
         <target state="translated">  StackTrace:
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">StackTrace:
 {0}</target>
@@ -104,7 +104,7 @@
       <trans-unit id="NullString">
         <source>(null)</source>
         <target state="translated">(null)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(null)</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="Exception_RegisteredTestPropertyHasDifferentValueType">
         <source>Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</source>
         <target state="translated">'{0}' 속성은 이미 '{2}'(으)로 등록되었으므로 '{1}' 값 형식으로 등록할 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">값 형식 ' {1} ' 속성 ' {0} '이 (가) ' {2} '으로 이미 등록 된 등록할 수 없습니다.</target>
         </alt-trans>
@@ -248,7 +248,7 @@
       <trans-unit id="ConverterNotSupported">
         <source>Cannot find TypeConverter for type {0}.</source>
         <target state="translated">{0} 형식에 대해 TypeConverter를 찾을 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">형식 {0}에 대 한 TypeConverter를 찾을 수 없습니다.</target>
         </alt-trans>
@@ -275,7 +275,7 @@
       <trans-unit id="TestCasePropertyIdLabel">
         <source>Id</source>
         <target state="translated">ID</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Id</target>
         </alt-trans>
@@ -284,7 +284,7 @@
       <trans-unit id="InvalidSettingsXmlAttribute">
         <source>Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</source>
         <target state="translated">'{0}' 설정이 잘못되었습니다. 예기치 않은 XmlAttribute '{1}'이(가) 있습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">설정 ' {0} '이 (가) 잘못 되었습니다. 예기치 않은 XmlAttribute: ' {1} '입니다.</target>
         </alt-trans>
@@ -293,7 +293,7 @@
       <trans-unit id="InvalidSettingsXmlElement">
         <source>Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</source>
         <target state="translated">'{0}' 설정이 잘못되었습니다. 예기치 않은 XmlElement '{1}'이(가) 있습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">설정 ' {0} '이 (가) 잘못 되었습니다. 예기치 않은 XmlElement: ' {1} '입니다.</target>
         </alt-trans>
@@ -302,7 +302,7 @@
       <trans-unit id="MissingDataCollectorAttributes">
         <source>Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</source>
         <target state="translated">데이터 수집기 설정이 잘못되었습니다. 필요한 '{0}' 특성이 없습니다. 일반적인 데이터 수집기 설정은 &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;와 같습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">잘못 된 데이터 수집기 설정 합니다. 필요한 특성 ' {0} '이 (가)이 없습니다.  일반적인 데이터 수집기 설정 다음과 같은 &lt; uri DataCollector = "dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, 버전 1.0.0.0, Culture = = 중립, publickeytoken 등 1111111111111111 =" friendlyName "sampleCollector" = &gt;.</target>
         </alt-trans>
@@ -328,7 +328,7 @@
       </trans-unit>
       <trans-unit id="NotificationTimeoutIsZero">
         <source>Notification timeout must be greater than zero.</source>
-        <target state="translated">알림 시간 제한은 0보다 커야 합니다.</target>
+        <target state="translated">알림 시간 제한은&amp;0;보다 커야 합니다.</target>
         <note>Timeout used during test discovery and execution must be greater than zero.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">알림 시간 제한이 0 보다 커야 합니다.</target>
@@ -338,7 +338,7 @@
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</source>
         <target state="translated">'{0}' 설정이 잘못되었습니다. '{2}'에 대해 잘못된 값 '{1}'을(를) 지정했습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">설정 ' {0} '이 (가) 잘못 되었습니다.  ' {1} '의 ' {2} '에 대해 지정한 값이 잘못 되었습니다.</target>
         </alt-trans>
@@ -347,7 +347,7 @@
       <trans-unit id="InvalidRunSettingsRootNode">
         <source>The root node of the run settings must be named 'RunSettings'.</source>
         <target state="translated">실행 설정의 루트 노드 이름은 'RunSettings'여야 합니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">실행된 설정의 루트 노드 'RunSettings' 이름을 지정 해야 합니다.</target>
         </alt-trans>
@@ -356,7 +356,7 @@
       <trans-unit id="NoTestCaseFilterForSpecificTests">
         <source>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</source>
         <target state="translated">특정 테스트 실행에 대해 TestCaseFilter를 지정할 수 없습니다. FilterCriteria는 소스와 실행하기 위한 용도로만 사용됩니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">특정 테스트 실행에 대 한 TestCaseFilter를 지정할 수 없습니다. FilterCriteria 원본과 실행에 대해서만입니다.</target>
         </alt-trans>
@@ -365,7 +365,7 @@
       <trans-unit id="UnexpectedTypeOfProperty">
         <source>The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </source>
         <target state="translated">속성 '{1}'의 테스트 속성 형식 '{0}'이(가) 지원되지 않습니다. 지원되는 속성 형식(기본 형식, URI, 문자열, string[]) 중 하나를 사용하고 다시 시도하세요. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트 속성 형식 ' {1} ' 속성의 ' {0} '이 (가) 지원 되지 않습니다. (Uri의 기본 형식, 문자열, 시간이 걸린다는 결과도 다시 시도 하십시오 지원 되는 속성 형식 중 하나를 사용 하 여.</target>
         </alt-trans>
@@ -383,7 +383,7 @@
       <trans-unit id="TestCasePropertyFullyQualifiedNameLabel">
         <source>FullyQualifiedName</source>
         <target state="translated">FullyQualifiedName</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">어셈블리가</target>
         </alt-trans>
@@ -401,7 +401,7 @@
       <trans-unit id="SolutionDirectoryNotExists">
         <source>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</source>
         <target state="translated">솔루션 디렉터리 '{0}'이(가) 없습니다. runsettings에 지정된 솔루션 디렉터리가 존재하는지와 디렉터리에 대한 읽기 권한이 있는지 확인하세요.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">솔루션 디렉터리 ' {0} '이 (가) 존재 하지 않습니다. Runsettings에 지정 된 솔루션 디렉터리가 있는지, 그리고 읽기 디렉터리에 대 한 권한이 있는지 확인 하십시오.</target>
         </alt-trans>
@@ -410,7 +410,7 @@
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">매개 변수는 null이거나 비워 둘 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">매개 변수는 null 이거나 비워 둘 수 없습니다.</target>
         </alt-trans>
@@ -419,7 +419,7 @@
       <trans-unit id="Common_FileNotExist">
         <source>File {0} does not exist.</source>
         <target state="translated">{0} 파일이 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} 파일을 존재 하지 않습니다.</target>
         </alt-trans>
@@ -428,7 +428,7 @@
       <trans-unit id="Common_ObjectMustBeOfType">
         <source>Object must be of type {0}.</source>
         <target state="translated">개체는 {0} 형식이어야 합니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">개체 유형 {0} 이어야 합니다.</target>
         </alt-trans>
@@ -437,7 +437,7 @@
       <trans-unit id="Common_TestOutcomeAborted">
         <source>Aborted</source>
         <target state="translated">중단됨</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">중단</target>
         </alt-trans>
@@ -446,7 +446,7 @@
       <trans-unit id="Common_TestOutcomeCompleted">
         <source>Completed</source>
         <target state="translated">완료됨</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">완료</target>
         </alt-trans>
@@ -455,7 +455,7 @@
       <trans-unit id="Common_TestOutcomeDisconnected">
         <source>Disconnected</source>
         <target state="translated">연결 끊김</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">연결 끊김</target>
         </alt-trans>
@@ -464,7 +464,7 @@
       <trans-unit id="Common_TestOutcomeError">
         <source>Error</source>
         <target state="translated">오류</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">오류</target>
         </alt-trans>
@@ -473,7 +473,7 @@
       <trans-unit id="Common_TestOutcomeFailed">
         <source>Failed</source>
         <target state="translated">실패</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">실패</target>
         </alt-trans>
@@ -482,7 +482,7 @@
       <trans-unit id="Common_TestOutcomeInconclusive">
         <source>Inconclusive</source>
         <target state="translated">결과 불충분</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">결과 불충분</target>
         </alt-trans>
@@ -491,7 +491,7 @@
       <trans-unit id="Common_TestOutcomeInProgress">
         <source>In Progress</source>
         <target state="translated">진행 중</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">진행 중</target>
         </alt-trans>
@@ -500,7 +500,7 @@
       <trans-unit id="Common_TestOutcomeNotExecuted">
         <source>Not Executed</source>
         <target state="translated">실행되지 않음</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">실행 안 함</target>
         </alt-trans>
@@ -509,7 +509,7 @@
       <trans-unit id="Common_TestOutcomeNotRunnable">
         <source>Not Runnable</source>
         <target state="translated">실행할 수 없음</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">실행할 수 없음</target>
         </alt-trans>
@@ -518,7 +518,7 @@
       <trans-unit id="Common_TestOutcomePassed">
         <source>Passed</source>
         <target state="translated">통과</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">전달</target>
         </alt-trans>
@@ -527,7 +527,7 @@
       <trans-unit id="Common_TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
         <target state="translated">통과(실행이 중단됨)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">성공된 (실행이 중단 되었습니다)</target>
         </alt-trans>
@@ -536,7 +536,7 @@
       <trans-unit id="Common_TestOutcomePending">
         <source>Pending</source>
         <target state="translated">보류 중</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">보류 중</target>
         </alt-trans>
@@ -545,7 +545,7 @@
       <trans-unit id="Common_TestOutcomeTimeout">
         <source>Timeout</source>
         <target state="translated">시간 초과</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">시간 제한</target>
         </alt-trans>
@@ -554,7 +554,7 @@
       <trans-unit id="Common_TestOutcomeWarning">
         <source>Warning</source>
         <target state="translated">경고</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">경고</target>
         </alt-trans>
@@ -563,7 +563,7 @@
       <trans-unit id="DataCollectionSink_CanNotReadStream">
         <source>Unable to read from the provided stream.  Data from a stream cannot be sent unless the stream supports reading.</source>
         <target state="translated">제공된 스트림에서 읽을 수 없습니다. 스트림에서 읽기를 지원하지 않으면 스트림의 데이터를 보낼 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">제공 된 스트림에서 읽을 수 없습니다.  스트림이 읽기를 지원 하지 않는 한 스트림에서 데이터를 보낼 수 없습니다.</target>
         </alt-trans>
@@ -572,7 +572,7 @@
       <trans-unit id="DataCollectionSink_InvalidFileNameCharacters">
         <source>The provided file name '{0}' contains the following invalid characters: '{1}'.</source>
         <target state="translated">제공된 파일 이름 '{0}'에 다음과 같은 잘못된 문자가 들어 있습니다. '{1}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">제공 된 파일 이름 ' {0} '이 (가) 다음과 같은 잘못 된 문자가: ' {1} '입니다.</target>
         </alt-trans>
@@ -581,7 +581,7 @@
       <trans-unit id="DataCollectionSink_ReservedFilenameUsed">
         <source>The provided file name '{0}' is reserved.</source>
         <target state="translated">제공된 파일 이름 '{0}'이(가) 예약되어 있습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">제공 된 파일 이름 ' {0} '이 (가) 예약 되어 있습니다.</target>
         </alt-trans>

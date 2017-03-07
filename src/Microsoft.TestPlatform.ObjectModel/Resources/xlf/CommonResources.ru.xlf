@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">Параметр не может быть пустым или иметь значение null.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Параметр не может быть неопределенным или пустым.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
         <target state="translated">При запуске тестов будут использоваться библиотеки DLL, собранные для платформ {0} и {1}. Следующие библиотеки DLL не будут участвовать в запуске: {2}. Дополнительные сведения об управлении этими параметрами см. в разделе {3}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тестовый запуск будет использовать DLL(s) для framework {0} и платформы {1}. После DLL(s) не будет частью выполнения: {2} перейти {3} для получения дополнительных сведений об управлении эти параметры.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
         <target state="translated">Ни один из предоставленных контейнеров тестов не соответствует архитектуре платформы и параметрам .NET Framework для тестового запуска. Платформа: {0} .NET Framework: {1}. Дополнительные сведения об управлении этими параметрами см. по адресу http://go.microsoft.com/fwlink/?LinkID=330428.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ни один из предоставленных тестовых контейнерах соответствует архитектуре платформы и .net Framework параметры для тестового запуска. Платформа: {0} .net Framework: {1}. Перейдите к http://go.microsoft.com/fwlink/?LinkID=330428 для получения дополнительных сведений об управлении эти параметры.</target>
         </alt-trans>

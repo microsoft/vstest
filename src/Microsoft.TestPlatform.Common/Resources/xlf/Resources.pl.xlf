@@ -23,7 +23,7 @@
       <trans-unit id="DataCollectionMessageFormat">
         <source>Diagnostic data adapter message: {0}</source>
         <target state="translated">Komunikat adaptera danych diagnostycznych: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Wiadomość karty danych diagnostycznych: {0}</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DataCollectorMessageFormat">
         <source>Diagnostic data adapter ('{0}') message: {1}.</source>
         <target state="translated">Komunikat adaptera danych diagnostycznych („{0}”): {1}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Dane diagnostyczne wiadomości adapter ({0}): {1}.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="DuplicateExtensionUri">
         <source>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</source>
         <target state="translated">Zduplikowany identyfikator URI rozszerzenia testu „{0}”. Zduplikowane rozszerzenie zostanie zignorowane.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Zduplikowane rozszerzenie testów identyfikatora URI "{0}".  Ignorowanie zduplikowane rozszerzenie.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="DuplicateSettingsName">
         <source>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</source>
         <target state="translated">Zduplikowany dostawca ustawień o nazwie „{0}”. Zduplikowany dostawca zostanie zignorowany.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Zduplikowane ustawienia dostawcy o nazwie "{0}".  Ignorowanie duplikatów dostawcy.</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
         <target state="translated">Znaleziono zduplikowaną sekcję parametrów uruchomieniowych o nazwie „{0}”. Zduplikowane ustawienia zostaną zignorowane.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Zduplikowane ustawienia wykonywania sekcji o nazwie "{0}' znaleziono.  Ignorowanie duplikatów ustawienia.</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="EmptyParenthesis">
         <source>Error: Empty parenthesis ( )</source>
         <target state="translated">Błąd: puste nawiasy ( )</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Error: Puste nawiasy)</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="InvalidCondition">
         <source>Error: Invalid Condition '{0}'</source>
         <target state="translated">Błąd: nieprawidłowy warunek „{0}”</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Błąd: Nieprawidłowy warunek "{0}"</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="InvalidExtensionUriFormat">
         <source>Test Extension has an invalid URI '{0}': {1}</source>
         <target state="translated">Rozszerzenie testu ma nieprawidłowy identyfikator URI „{0}”: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test rozszerzenie ma nieprawidłowy identyfikator URI "{0}": {1}</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="InvalidOperator">
         <source>Error: Invalid operator '{0}'</source>
         <target state="translated">Błąd: nieprawidłowy operator „{0}”</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Błąd: Nieprawidłowy operator '{0}'</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
         <target state="translated">Wystąpił wyjątek podczas inicjowania rejestratora o identyfikatorze URI „{0}”. Rejestrator nie będzie używany. Wyjątek: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Wystąpił wyjątek podczas inicjowania rejestratora o identyfikatorze URI "{0}".  Rejestrator nie będzie używany.  Wyjątek: {1}.</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
         <target state="translated">Nie można odnaleźć rejestratora testów z identyfikatorem URI lub przyjazną nazwą „{0}”.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nie można odnaleźć rejestratora test z identyfikatora URI lub FriendlyName '{0}'.</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="MissingCloseParenthesis">
         <source>Error: Missing ')'</source>
         <target state="translated">Błąd: brak znaku „)”</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Błąd: Brak ")"</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="MissingOpenParenthesis">
         <source>Error: Missing '('</source>
         <target state="translated">Błąd: brak znaku „(”</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Błąd: Brak "("</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="MissingOperand">
         <source>Error: Missing operand</source>
         <target state="translated">Błąd: brak argumentu operacji</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Błąd: Brak operandu</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="MissingOperator">
         <source>Missing Operator '|' or '&amp;'</source>
         <target state="translated">Brak operatora „|” lub „&amp;”</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Brak operatora ' |' lub 'i'</target>
         </alt-trans>
@@ -158,7 +158,7 @@
       <trans-unit id="RunSettingsAlreadyLoaded">
         <source>The Run Settings have already been loaded.</source>
         <target state="translated">Parametry uruchomieniowe zostały już załadowane.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uruchom ustawienia zostały już załadowane.</target>
         </alt-trans>
@@ -167,7 +167,7 @@
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the run settings.  Error: {0}</source>
         <target state="translated">Wystąpił błąd podczas ładowania parametrów uruchomieniowych. Błąd: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Wystąpił błąd podczas ładowania ustawień uruchamiania.  Błąd: {0}</target>
         </alt-trans>
@@ -176,7 +176,7 @@
       <trans-unit id="SettingsNodeInvalidName">
         <source>Invalid settings node specified. The name property of the settings node must be non-empty.</source>
         <target state="translated">Określono nieprawidłowy węzeł ustawień. Właściwość name węzła ustawień nie może być pusta.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Określony węzeł nieprawidłowe ustawienia. Właściwość Nazwa węzła Ustawienia musi być pusty.</target>
         </alt-trans>
@@ -185,7 +185,7 @@
       <trans-unit id="SettingsProviderInitializationError">
         <source>An error occurred while initializing the settings provider named '{0}'. Error: {1}</source>
         <target state="translated">Wystąpił błąd podczas inicjowania dostawcy ustawień o nazwie „{0}”. Błąd: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Wystąpił błąd podczas inicjowania dostawcy ustawień o nazwie "{0}". Błąd: {1}</target>
         </alt-trans>
@@ -194,7 +194,7 @@
       <trans-unit id="SettingsProviderNotFound">
         <source>Settings Provider named '{0}' was not found.  The settings can not be loaded.</source>
         <target state="translated">Nie znaleziono dostawcy ustawień o nazwie „{0}”. Nie można załadować ustawień.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Dostawca ustawień o nazwie "{0}" nie został znaleziony.  Nie można załadować ustawienia.</target>
         </alt-trans>
@@ -203,7 +203,7 @@
       <trans-unit id="TestCaseFilterFormatException">
         <source>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</source>
         <target state="translated">Niepoprawny format elementu TestCaseFilter {0}. Określ poprawny format i spróbuj ponownie. Należy pamiętać, że niepoprawny format może spowodować, że żadne testy nie zostaną wykonane.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nieprawidłowy format TestCaseFilter {0}. Określ poprawny format i spróbuj ponownie. Należy zauważyć, że niepoprawny format może prowadzić do nie testów coraz wykonane.</target>
         </alt-trans>

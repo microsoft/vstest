@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">A Execução de Teste ativa foi anulada.</target>
+        <target state="new">A Execução de Teste ativa foi anulada. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Execução de teste ativa foi anulada.</target>
@@ -32,7 +32,7 @@
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
         <target state="translated">Uma conexão existente foi fechada à força pelo host remoto.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uma conexão existente forçosamente foi fechada pelo host remoto.</target>
         </alt-trans>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">A Descoberta de Teste ativa foi anulada.</target>
+        <target state="new">A Descoberta de Teste ativa foi anulada. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">A detecção ativa de teste foi anulada.</target>
