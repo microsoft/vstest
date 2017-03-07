@@ -76,23 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
-            // TODO: DRY: Move this code to a common place
-            // If we are running in the dotnet.exe context we do not want to launch dataCollector.exe but dotnet.exe with the dataCollector assembly. 
-            // Since dotnet.exe is already built for multiple platforms this would avoid building dataCollector.exe also in multiple platforms.
             var currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
-
-            // This host manager can create process start info for dotnet core targets only.
-            // If already running with the dotnet executable, use it; otherwise pick up the dotnet available on path.
-            // Wrap the paths with quotes in case dotnet executable is installed on a path with whitespace.
-            if (currentProcessPath.EndsWith(DotnetProcessNameXPlat, StringComparison.OrdinalIgnoreCase)
-                || currentProcessPath.EndsWith(DotnetProcessName, StringComparison.OrdinalIgnoreCase))
-            {
-                currentProcessFileName = currentProcessPath;
-            }
-            else
-            {
-                currentProcessFileName = this.dotnetHostHelper.GetDotnetHostFullPath();
-            }
 
             if (EqtTrace.IsVerboseEnabled)
             {

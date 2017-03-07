@@ -89,14 +89,30 @@ function Write-VerboseLog([string] $message)
 
 function Print-FailedTests($TrxFilePath)
 {
-    if(![System.IO.File]::Exists($TrxFilePath)){
+    if(![System.IO.File]::Exists($TrxFilePath))
+    {
       Write-Log "TrxFile: $TrxFilePath doesn't exists"
       return
     }
     $xdoc = [xml] (get-content $TrxFilePath)
-    $FailedTestIds = $xdoc.TestRun.Results.UnitTestResult |?{$_.GetAttribute("outcome") -eq "Failed"} | %{$_.testId}
-    if ($FailedTestIds) {
-        Write-Log (".. .. . " + ($xdoc.TestRun.TestDefinitions.UnitTest | ?{ $FailedTestIds.Contains($_.GetAttribute("id")) } | %{ "$($_.TestMethod.className).$($_.TestMethod.name)"})) $Script:TPT_ErrorMsgColor
+    $FailedTestCaseDetailsDict = @{}
+    # Get failed testcase data from UnitTestResult tag.
+    $xdoc.TestRun.Results.UnitTestResult |?{$_.GetAttribute("outcome") -eq "Failed"} | %{
+        $FailedTestCaseDetailsDict.Add($_.testId, @{"Message" = $_.Output.ErrorInfo.Message; "StackTrace" = $_.Output.ErrorInfo.StackTrace; "StdOut"=$_.Output.StdOut});
+    }
+
+    if ($FailedTestCaseDetailsDict)
+    {
+        # Print failed test details.
+        $count = 1
+        $nl = [Environment]::NewLine
+        $xdoc.TestRun.TestDefinitions.UnitTest |?{$FailedTestCaseDetailsDict.ContainsKey($_.id)} | %{
+            Write-Log (".. .. . $count. " + "$($_.TestMethod.className).$($_.TestMethod.name)") $Script:TPT_ErrorMsgColor
+            Write-Log (".. .. .. .ErrorMessage: $nl" + $FailedTestCaseDetailsDict[$_.id]["Message"]) $Script:TPT_ErrorMsgColor
+            Write-Log (".. .. .. .StackTrace: $nl" + $FailedTestCaseDetailsDict[$_.id]["StackTrace"]) $Script:TPT_ErrorMsgColor
+            Write-Log (".. .. .. .StdOut: $nl" + $FailedTestCaseDetailsDict[$_.id]["StdOut"]) $Script:TPT_ErrorMsgColor
+            $count++
+        }
     }
 }
 
@@ -164,6 +180,13 @@ function Invoke-Test
                 # Fill in the framework in test containers
                 $testContainerSet = $testContainers | % { [System.String]::Format($_, $fx) }
                 $trxLogFileName  =  [System.String]::Format("Parallel_{0}_{1}", $fx, $Script:TPT_DefaultTrxFileName)
+
+                # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break
+                $fullTrxFilePath = Join-Path $Script:TPT_TestResultsDir $trxLogFileName
+                if([System.IO.File]::Exists($fullTrxFilePath)) {
+                    Remove-Item $fullTrxFilePath
+                }
+					
                 Set-TestEnvironment
                 if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
@@ -177,10 +200,10 @@ function Invoke-Test
 
                 Reset-TestEnvironment
 
-                if ($output[-2].Contains("Test Run Successful.")) {
-                    Write-Log ".. . $($output[-3])"
+                if ($output[-3].Contains("Test Run Successful.")) {
+                    Write-Log ".. . $($output[-4])"
                 } else {
-                    Write-Log ".. . $($output[-2])"
+                    Write-Log ".. . $($output[-3])"
                     Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
                     Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
 
@@ -196,6 +219,12 @@ function Invoke-Test
                     # Fill in the framework in test containers
                     $testContainer = [System.String]::Format($_, $fx)
                     $trxLogFileName =  [System.String]::Format("{0}_{1}_{2}", ($(Get-ChildItem $testContainer).Name), $fx, $Script:TPT_DefaultTrxFileName)
+					
+                    # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break
+                    $fullTrxFilePath = Join-Path $Script:TPT_TestResultsDir $trxLogFileName
+                    if([System.IO.File]::Exists($fullTrxFilePath)) {
+                        Remove-Item $fullTrxFilePath
+                    }
 
                     Write-Log ".. Container: $testContainer"
 
@@ -212,10 +241,10 @@ function Invoke-Test
                     }
 
                     Reset-TestEnvironment
-                    if ($output[-2].Contains("Test Run Successful.")) {
-                        Write-Log ".. . $($output[-3])"
+                    if ($output[-3].Contains("Test Run Successful.")) {
+                        Write-Log ".. . $($output[-4])"
                     } else {
-                        Write-Log ".. . $($output[-2])"
+                        Write-Log ".. . $($output[-3])"
                         Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
                         Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
 
