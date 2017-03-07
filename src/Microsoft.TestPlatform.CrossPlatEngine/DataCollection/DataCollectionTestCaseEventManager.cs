@@ -97,9 +97,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 if (!isTestCaseEndAlreadySent)
                 {
                     // If dictionary contains results for this test case, update them with in-proc data and flush them
-                    if (this.testResultDictionary.ContainsKey(e.TestCaseId))
+                    List<TestResult> testResults;
+                    if (this.testResultDictionary.TryGetValue(e.TestCaseId, out testResults))
                     {
-                        foreach (var testResult in this.testResultDictionary[e.TestCaseId])
+                        foreach (var testResult in testResults)
                         {
                             var testResultEventArgs = new TestResultEventArgs(testResult);
                             this.TestResult.SafeInvoke(this, testResultEventArgs, "DataCollectionTestCaseEventManager.RaiseTestCaseEnd");
@@ -137,10 +138,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     // We need to wait for testcaseend before flushing
                     allowTestResultFlush = false;
 
+                    List<TestResult> testResults;
                     // Cache results so we can flush later with in proc data
-                    if (this.testResultDictionary.ContainsKey(testCaseId))
+                    if (this.testResultDictionary.TryGetValue(testCaseId, out testResults))
                     {
-                        this.testResultDictionary[testCaseId].Add(e.TestResult);
+                        testResults.Add(e.TestResult);
                     }
                     else
                     {

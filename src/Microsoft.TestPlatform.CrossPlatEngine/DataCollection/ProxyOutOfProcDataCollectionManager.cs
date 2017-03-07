@@ -51,7 +51,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             lock (syncObject)
             {
-                this.UpdateTestResultsWithCollectionDataNoLock(e.TestResult);
+                Collection<AttachmentSet> dcEntries;
+                if (this.attachmentsCache.TryGetValue(e.TestResult.TestCase.Id, out dcEntries))
+                {
+                    foreach (var entry in dcEntries)
+                    {
+                        e.TestResult.Attachments.Add(entry);
+                    }
+
+                    // Remove the key
+                    this.attachmentsCache.Remove(e.TestResult.TestCase.Id);
+                }
             }
         }
 
@@ -87,24 +97,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private void TriggerTestSessionEnd(object sender, SessionEndEventArgs e)
         {
             this.dataCollectionTestCaseEventSender.SendTestSessionEnd(e);
-        }
-
-        /// <summary>
-        /// Update the test result with collection data
-        /// </summary>
-        private void UpdateTestResultsWithCollectionDataNoLock(TestResult result)
-        {
-            Collection<AttachmentSet> dcEntries;
-            if (this.attachmentsCache.TryGetValue(result.TestCase.Id, out dcEntries))
-            {
-                foreach (var entry in dcEntries)
-                {
-                    result.Attachments.Add(entry);
-                }
-
-                // Remove the key
-                this.attachmentsCache.Remove(result.TestCase.Id);
-            }
         }
     }
 }
