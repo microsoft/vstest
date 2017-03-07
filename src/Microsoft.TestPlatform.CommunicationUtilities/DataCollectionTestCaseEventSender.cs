@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
     {
-        private static readonly object obj = new object();
+        private static readonly object syncObject = new object();
 
         private readonly ICommunicationManager communicationManager;
 
@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             if (Instance == null)
             {
-                lock (obj)
+                lock (syncObject)
                 {
                     if (Instance == null)
                     {
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public void SendTestCaseComplete(TestResultEventArgs e)
+        public Collection<AttachmentSet> SendTestCaseComplete(TestCaseEndEventArgs e)
         {
             var attachmentSets = new Collection<AttachmentSet>();
             this.communicationManager.SendMessage(MessageType.AfterTestCaseComplete, e);
@@ -102,10 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 attachmentSets = message.Payload.ToObject<Collection<AttachmentSet>>();
             }
 
-            foreach (var attachmentSet in attachmentSets)
-            {
-                e.TestResult.Attachments.Add(attachmentSet);
-            }
+            return attachmentSets;
         }
 
         /// <inheritdoc />

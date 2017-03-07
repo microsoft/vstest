@@ -23,7 +23,7 @@
       <trans-unit id="InvalidStateForExecution">
         <source>The test run could not be executed because the initial state was invalid.</source>
         <target state="translated">Nie można wykonać testu, ponieważ stan początkowy jest nieprawidłowy.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nie można wykonać testu, ponieważ stan początkowy jest nieprawidłowy.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive">
         <source>Wait for completion operation is not allowed when there is no active test run. </source>
         <target state="translated">Oczekiwanie na operację zakończenia nie jest dozwolone, gdy nie ma żadnych aktywnych uruchomień testów. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Czekać na ukończenie operacja nie jest dozwolona, gdy nie ma żadnych aktywnych Jazda testowa.</target>
         </alt-trans>

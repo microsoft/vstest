@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">パラメーターを null または空にすることはできません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">パラメーターは、null または空にすることはできません。</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
         <target state="translated">テスト実行ではフレームワーク {0} およびプラットフォーム {1} 用にビルドされた DLL を使用します。次の DLL は実行には含まれません: {2}。これらの設定の管理方法の詳細については、{3} にアクセスしてください。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">テストの実行では、framework {0} と {1} のプラットフォーム用に構築された DLL(s) を使用します。次の DLL(s) は含まれませんの実行: {2} には、詳細については {3} にこれらの設定を管理します。</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
         <target state="translated">提供されたどのテスト コンテナーも、テスト実行のプラットフォーム アーキテクチャおよび .NET Framework 設定に一致しません。プラットフォーム: {0}、.NET Framework: {1}。これらの設定の管理方法の詳細については、http://go.microsoft.com/fwlink/?LinkID=330428 にアクセスしてください。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定したテスト コンテナーと一致しません、プラットフォーム ・ アーキテクチャと .Net Framework テストの設定を実行します。プラットフォーム: {0} .Net フレームワーク: {1} が含まれています。 これらの設定の管理の詳細については http://go.microsoft.com/fwlink/?LinkID=330428 に移動します。</target>
         </alt-trans>

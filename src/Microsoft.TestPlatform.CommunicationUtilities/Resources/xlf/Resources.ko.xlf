@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">활성 테스트 실행이 중단되었습니다.</target>
+        <target state="new">활성 테스트 실행이 중단되었습니다. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">활성 테스트 실행이 중단 되었습니다.</target>
@@ -32,7 +32,7 @@
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
         <target state="translated">원격 호스트에 의해 기존 연결이 강제로 종료되었습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">기존 연결 원격 호스트에 의해 강제로 닫혔습니다.</target>
         </alt-trans>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">활성 테스트 검색이 중단되었습니다.</target>
+        <target state="new">활성 테스트 검색이 중단되었습니다. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">현재 테스트 검색 중단 되었습니다.</target>

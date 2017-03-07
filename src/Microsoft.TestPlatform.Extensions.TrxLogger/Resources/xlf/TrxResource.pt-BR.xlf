@@ -23,7 +23,7 @@
       <trans-unit id="TestOutcomeAborted">
         <source>Aborted</source>
         <target state="translated">Anulado</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Anulado</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="TestOutcomeCompleted">
         <source>Completed</source>
         <target state="translated">Concluído</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Concluída</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="TestOutcomeDisconnected">
         <source>Disconnected</source>
         <target state="translated">Desconectado</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Desconectado</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="TestOutcomeError">
         <source>Error</source>
         <target state="translated">Erro</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Erro</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="TestOutcomeFailed">
         <source>Failed</source>
         <target state="translated">Com falha</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Falha</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="TestOutcomeInconclusive">
         <source>Inconclusive</source>
         <target state="translated">Inconclusivo</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Inconclusive</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="TestOutcomeInProgress">
         <source>In Progress</source>
         <target state="translated">Em andamento</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Em andamento</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="TestOutcomeNotExecuted">
         <source>Not Executed</source>
         <target state="translated">Não executado</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Não executado</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="TestOutcomeNotRunnable">
         <source>Not Runnable</source>
         <target state="translated">Não executável</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Não executável</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="TestOutcomePassed">
         <source>Passed</source>
         <target state="translated">Aprovado</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Passado</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
         <target state="translated">Aprovado (execução anulada)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Passado (execução anulada)</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="TestOutcomePending">
         <source>Pending</source>
         <target state="translated">Pendente</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Pendente</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="TestOutcomeTimeout">
         <source>Timeout</source>
         <target state="translated">Tempo limite</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Tempo limite</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="TestOutcomeWarning">
         <source>Warning</source>
         <target state="translated">Aviso</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aviso</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="Common_CannotBeLessThanZero">
         <source>The parameter cannot be less than 0.</source>
         <target state="translated">O parâmetro não pode ser menor que 0.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">O parâmetro não pode ser menor que 0.</target>
         </alt-trans>
@@ -158,7 +158,7 @@
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">O parâmetro não pode ser nulo ou estar vazio.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">O parâmetro não pode ser nulo ou vazio.</target>
         </alt-trans>
@@ -167,7 +167,7 @@
       <trans-unit id="Common_CannotGetNextIterationName">
         <source>Cannot get free name for {0}(1),(2),... in directory {1}. Please clean up this directory.</source>
         <target state="translated">Não é possível obter o nome livre para {0}(1),(2),... no diretório {1}. Limpe esse diretório.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Não é possível obter o nome livre para {0}(1),(2),... no diretório {1}. Limpe este diretório.</target>
         </alt-trans>
@@ -176,7 +176,7 @@
       <trans-unit id="Common_MissingRunConfigInRun">
         <source>Test Settings are not specified.</source>
         <target state="translated">As Configurações de Teste não estão especificadas.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Configurações de teste não estão especificadas.</target>
         </alt-trans>
@@ -185,7 +185,7 @@
       <trans-unit id="Common_MissingRunDeploymentRootInRunConfig">
         <source>The active Test Settings do not define the Run Deployment Directory.</source>
         <target state="translated">As Configurações de Teste ativas não definem o Diretório de Implantação de Execução.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">As configurações de teste ativo não definem o diretório de implantação executar.</target>
         </alt-trans>
@@ -194,7 +194,7 @@
       <trans-unit id="Common_MissingRunInResult">
         <source>The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</source>
         <target state="translated">O resultado não está associado a uma execução de teste. Use um resultado obtido de uma execução de teste em andamento ou concluída.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">O resultado não está associado com uma execução de teste. Use um resultado obtido de uma execução de teste em andamento ou concluído.</target>
         </alt-trans>
@@ -203,7 +203,7 @@
       <trans-unit id="Common_NothingLeftAfterReplaciingBadCharsInName">
         <source>The specified file/directory name '{0}' is not valid.</source>
         <target state="translated">O nome do arquivo/diretório '{0}' especificado não é válido.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">O nome do arquivo/diretório especificado '{0}' não é válido.</target>
         </alt-trans>
@@ -212,7 +212,7 @@
       <trans-unit id="Common_TestRunName">
         <source>{0}@{1} {2}</source>
         <target state="translated">{0}@{1} {2}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}@{1} {2}</target>
         </alt-trans>
@@ -223,7 +223,7 @@
 Error Details: {1}:{2}</source>
         <target state="translated">Falha ao anexar arquivos de: {0}
 Detalhes do erro: {1}:{2}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Falha ao anexar arquivos a partir de: {0}
 Detalhes do erro: {1}: {2}</target>
@@ -233,7 +233,7 @@ Detalhes do erro: {1}: {2}</target>
       <trans-unit id="MessageForSkippedTests">
         <source>Test '{0}' was skipped in the test run.</source>
         <target state="translated">O teste '{0}' foi ignorado na execução de teste.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Teste '{0}' foi ignorada na execução de teste.</target>
         </alt-trans>
@@ -242,7 +242,7 @@ Detalhes do erro: {1}: {2}</target>
       <trans-unit id="TrxLoggerResultsFile">
         <source>Results File: {0}</source>
         <target state="translated">Arquivo de resultados: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Arquivo de resultados: {0}</target>
         </alt-trans>
@@ -251,7 +251,7 @@ Detalhes do erro: {1}: {2}</target>
       <trans-unit id="TS_AllResults">
         <source>All Loaded Results</source>
         <target state="translated">Todos os resultados carregados</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Carregados todos os resultados</target>
         </alt-trans>
@@ -260,7 +260,7 @@ Detalhes do erro: {1}: {2}</target>
       <trans-unit id="TS_UncategorizedResults">
         <source>Results Not in a List</source>
         <target state="translated">Resultados que não estão em uma lista</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Resultados não em uma lista</target>
         </alt-trans>
@@ -269,7 +269,7 @@ Detalhes do erro: {1}: {2}</target>
       <trans-unit id="Common_DeploymentItem">
         <source>deployment item '{0}'</source>
         <target state="translated">item de implantação '{0}'</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">item de implantação '{0}'</target>
         </alt-trans>
@@ -278,7 +278,7 @@ Detalhes do erro: {1}: {2}</target>
       <trans-unit id="Common_DeploymentItemWithOutputDirectory">
         <source>deployment item '{0}' (output directory '{1}')</source>
         <target state="translated">item de implantação '{0}' (diretório de saída '{1}')</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">item de implantação (diretório de saída) '{1}' ' {0}'</target>
         </alt-trans>
@@ -287,7 +287,7 @@ Detalhes do erro: {1}: {2}</target>
       <trans-unit id="Common_NullInMessages">
         <source>(null)</source>
         <target state="translated">(nulo)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(nulo)</target>
         </alt-trans>
@@ -295,8 +295,8 @@ Detalhes do erro: {1}: {2}</target>
       </trans-unit>
       <trans-unit id="TrxLoggerResultsFileOverwriteWarning">
         <source>WARNING: Overwriting results file: {0}</source>
-        <target state="new">WARNING: Overwriting results file: {0}</target>
-        <note></note>
+        <target state="translated">AVISO: sobrescrevendo o arquivo de resultados: {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>

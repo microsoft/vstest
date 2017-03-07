@@ -192,6 +192,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
         }
 
+        // Randomly failing with error "The active test run was aborted. Reason: Destination array was not long enough.
+        // Check destIndex and length, and the array's lower bounds. Test Run Failed."
+        // Issue: https://github.com/Microsoft/vstest/issues/292
+        [Ignore]
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]

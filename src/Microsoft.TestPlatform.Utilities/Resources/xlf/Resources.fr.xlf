@@ -23,7 +23,7 @@
       <trans-unit id="InvalidRunSettingsXml">
         <source>Run settings XML does not contain "RunSettings" node.</source>
         <target state="translated">Le fichier XML des paramètres d'exécution ne contient pas le nœud "RunSettings".</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Paramètres d’exécution XML ne contient pas le nœud de « RunSettings ».</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</source>
         <target state="translated">Paramètre non valide '{0}'. Valeur non valide '{1}' spécifiée pour '{2}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Non valide du paramètre '{0}'. Valeur non valide '{1}' spécifiée pour '{2}'.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="MissingRunSettingsNode">
         <source>Could not find 'RunSettings' node.</source>
         <target state="translated">Nœud 'RunSettings' introuvable.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Noeud de 'RunSettings' introuvable.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="NoRunSettingsNodeFound">
         <source>Could not find 'RunSettings' node.</source>
         <target state="translated">Nœud 'RunSettings' introuvable.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Noeud de 'RunSettings' introuvable.</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the settings.  Error: {0}.</source>
         <target state="translated">Une erreur s'est produite durant le chargement des paramètres. Erreur : {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Une erreur s’est produite lors du chargement des paramètres des.  Erreur : {0}.</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
         <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
         <target state="translated">Paramètres de plateforme cible '{0}' incompatibles avec l'architecture système '{1}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Incompatible cible paramètres de plateforme '{0}' avec une architecture de système '{1}'.</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <target state="translated">Un fichier de paramètres inattendu a été spécifié.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Fichier de paramètres inattendue spécifié.</target>
         </alt-trans>
