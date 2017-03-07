@@ -122,13 +122,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     };
                 }
 
-                // Warn the user that execution will wait for debugger attach.
-                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-
-
                 // Launch the test host.
                 var testHostProcessId = this.testHostManager.LaunchTestHost(testHostStartInfo);
 
+                // Warn the user that execution will wait for debugger attach.
+                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
                 if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
                 {
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
