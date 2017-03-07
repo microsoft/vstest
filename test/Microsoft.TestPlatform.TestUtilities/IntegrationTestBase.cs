@@ -324,7 +324,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 stdError = vstestconsole.StandardError.ReadToEnd();
                 stdOut = vstestconsole.StandardOutput.ReadToEnd();
 
-                vstestconsole.WaitForExit(5 * 60 * 1000);
+                vstestconsole.WaitForExit(60 * 1000);
                 Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
             }
         }
