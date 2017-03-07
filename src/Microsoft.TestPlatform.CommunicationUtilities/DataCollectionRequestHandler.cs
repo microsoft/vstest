@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                                 this.cancellationTokenSource.Token);
                         }
 
-                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, areTestCaseLevelEventsRequired, testCaseEventsPort));
+                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, testCaseEventsPort));
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : DataCollection started.");

@@ -46,7 +46,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void BeforeTestRunStartShouldReturnDataCollectorParameters()
         {
-            BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), true, 123);
+            BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
             this.mockDataCollectionRequestSender.BeforeTestRunStartResult = res;
 
             var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, null);

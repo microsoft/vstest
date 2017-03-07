@@ -168,17 +168,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// <summary>
         /// Event message for data collection process to signal start of test case execution.
         /// </summary>
-        public const string BeforeTestCaseStart = "DataCollection.BeforeTestCaseStart";
+        public const string DataCollectionTestStart = "DataCollection.TestStart";
 
         /// <summary>
         /// Event message for data collection process to signal start of test case execution.
         /// </summary>
-        public const string AfterTestCaseComplete = "DataCollection.AfterTestCaseComplete";
+        public const string DataCollectionTestEnd = "DataCollection.TestEnd";
 
         /// <summary>
         /// Message for attachments for After Test Case End Result
         /// </summary>
-        public const string AfterTestCaseEndResult = "DataCollection.AfterTestCaseEndResult";
+        public const string DataCollectionTestEndResult = "DataCollection.TestEndResult";
 
         #endregion
     }
