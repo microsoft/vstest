@@ -96,5 +96,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
                 return ResourceManager.GetString("UnableToCommunicateToTestHost", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to communicate with test execution process..
+        /// </summary>
+        internal static string DataCollectorUriForLogMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("DataCollectorUriForLogMessage", resourceCulture);
+            }
+        }
     }
 }

@@ -18,6 +18,11 @@
         <source>Unable to communicate with test host process.</source>
         <note></note>
       </trans-unit>
+      <trans-unit id="DataCollectorUriForLogMessage">
+        <source>Diagnostic data adapter ('{0}') message: {1}</source>
+        <target state="new">Diagnostic data adapter ('{0}') message: {1}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
