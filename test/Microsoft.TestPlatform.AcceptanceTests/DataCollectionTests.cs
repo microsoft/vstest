@@ -97,15 +97,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             // Output of datacollection attachment.
             this.StdOutputContains("filename.txt");
-
             this.StdOutputContains("TestCaseStarted");
             this.StdOutputContains("TestCaseEnded");
             this.StdOutputContains("SessionEnded");
-
-            // todo : Error messages logged during Session Started event always comes as error.
-            this.StdErrorContains("SessionStarted");
+            this.StdOutputContains("SessionStarted");
             this.StdOutputContains("my warning");
-
             this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
         }
     }
