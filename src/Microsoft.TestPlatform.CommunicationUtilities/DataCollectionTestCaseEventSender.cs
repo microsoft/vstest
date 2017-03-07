@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
-    using System;
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -42,9 +41,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Gets singleton instance of DataCollectionRequestHandler.
         /// </summary>
-        /// <param name="communicationManager">
-        /// The communication Manager.
-        /// </param>
         public static DataCollectionTestCaseEventSender Create()
         {
             if (Instance == null)
@@ -90,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc />
-        public Collection<AttachmentSet> SendTestCaseComplete(TestCaseEndEventArgs e)
+        public Collection<AttachmentSet> SendTestCaseEnd(TestCaseEndEventArgs e)
         {
             var attachmentSets = new Collection<AttachmentSet>();
             this.communicationManager.SendMessage(MessageType.AfterTestCaseComplete, e);

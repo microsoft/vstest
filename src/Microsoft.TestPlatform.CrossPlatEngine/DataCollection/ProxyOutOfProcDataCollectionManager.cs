@@ -21,7 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
         private Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
 
-        private object syncObject = new object();
+        /// <summary>
+        /// Sync object for ensuring that only run is active at a time
+        /// </summary>
+        private Object syncObject = new Object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyOutOfProcDataCollectionManager"/> class.
@@ -34,6 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager)
         {
+            this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
             this.dataCollectionTestCaseEventManager = dataCollectionTestCaseEventManager;
             this.dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
 
@@ -51,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
-            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseComplete(e);
+            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(e);
 
             if (attachments != null)
             {

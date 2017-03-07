@@ -110,13 +110,15 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void SendTestCaseCompletedShouldSendMessageThroughCommunicationManager()
+        public void SendTestCaseCompletedShouldReturnAttachments()
         {
             var testCase = new TestCase();
-            var testCaseEndEventArgs = new TestCaseEndEventArgs(testCase, TestOutcome.Passed);
+            var testResultEventArgs = new TestResultEventArgs(new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase));
+            var testCaseEndEventArgs = new TestCaseEndEventArgs();
+
             var attachmentSet = new AttachmentSet(new Uri("my://attachment"), "displayname");
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestCaseEndResult, Payload = JToken.FromObject(new Collection<AttachmentSet>() { attachmentSet }) });
-            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseComplete(testCaseEndEventArgs);
+            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
 
             Assert.AreEqual(attachments[0].Uri, attachmentSet.Uri);
             Assert.AreEqual(attachments[0].DisplayName, attachmentSet.DisplayName);
@@ -126,12 +128,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void SendTestCaseCompletedShouldThrowExceptionIfThrownByCommunicationManager()
         {
             var testCase = new TestCase();
-            var testCaseEndEventArgs = new TestCaseEndEventArgs(testCase, TestOutcome.Failed);
+            var testCaseEndEventArgs = new TestCaseEndEventArgs();
+
             this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.AfterTestCaseComplete, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
             {
-                this.dataCollectionTestCaseEventSender.SendTestCaseComplete(testCaseEndEventArgs);
+                this.dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
             });
         }
     }

@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -34,7 +33,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.AddKeyValuePairToDictionary(testCaseId, key, value);
         }
 
-
         /// <summary>
         /// Gets the data collection data stored in the in process data collection sink
         /// </summary>
@@ -50,13 +48,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 {
                     EqtTrace.Warning("No DataCollection Data set for the test case {0}", testCaseId);
                 }
+
                 return new Dictionary<string, string>();
             }
             else
-            {                
-                this.testCaseDataCollectionDataMap.Remove(testCaseId);
+            {
                 return testCaseDataCollection.CollectionData;
             }
+        }
+
+        /// <summary>
+        /// Removes data collection data stored in the in proc data collection sink.
+        /// </summary>
+        /// <param name="testCaseId">Valid test case id</param>
+        public void RemoveDataCollectionDataSetForTestCase(Guid testCaseId)
+        {
+            this.testCaseDataCollectionDataMap.Remove(testCaseId);
         }
 
         private void AddKeyValuePairToDictionary(Guid testCaseId, string key, string value)
@@ -66,7 +73,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 var testCaseCollectionData = new TestCaseDataCollectionData();
                 testCaseCollectionData.AddOrUpdateData(key, value);
                 this.testCaseDataCollectionDataMap[testCaseId] = testCaseCollectionData;
-
             }
             else
             {

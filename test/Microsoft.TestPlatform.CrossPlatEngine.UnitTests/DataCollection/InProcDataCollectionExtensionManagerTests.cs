@@ -162,35 +162,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         }
 
         [TestMethod]
-        public void TriggerTestCaseEndShouldCallInProcDataCollectorIfTestCaseStartWasCalledBefore()
-        {
-            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-            // random guid
-            testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
-
-            var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
-            Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 1), "TestCaseStart must be called on datacollector");
-            Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 1), "TestCaseEnd must be called on datacollector");
-        }
-
-        [TestMethod]
-        public void TriggerTestCaseEndShouldNotBeCalledInCaseOfAMissingTestCaseStartInDataDrivenScenario()
-        {
-            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-            // random guid
-            testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Failed));
-
-            var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
-            Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 1), "TestCaseStart must only be called once");
-            Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 1), "TestCaseEnd must only be called once");
-        }
-
-        [TestMethod]
         public void TriggerTestCaseEndShouldtBeCalledMultipleTimesInDataDrivenScenario()
         {
             var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
@@ -204,44 +175,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 2), "TestCaseStart must only be called once");
             Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 2), "TestCaseEnd must only be called once");
-        }
-
-        [TestMethod]
-        public void TriggerUpdateTestResultShouldNotFlushIfTestCaseEndWasNotCalledBefore()
-        {
-            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-            // random guid
-            testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            var testResult = new TestResult(testCase);
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(testResult));
-
-            var allowFlush = testResult.GetPropertyValue<bool>(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, true);
-
-            var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
-            Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 0), "TestCaseStart must be called on datacollector");
-            Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 0), "TestCaseEnd must be called on datacollector");
-            Assert.IsFalse(allowFlush, "TestResult must not be flushed");
-        }
-
-        [TestMethod]
-        public void TriggerUpdateTestResultShouldFlushIfTestCaseEndWasCalledBefore()
-        {
-            var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
-            // random guid
-            testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            var testResult = new TestResult(testCase);
-
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestResult += null, new TestResultEventArgs(testResult));
-
-            var allowFlush = testResult.GetPropertyValue<bool>(InProcDataCollectionExtensionManager.FlushResultTestResultPoperty, false);
-
-            var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
-            Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 1), "TestCaseStart must be called on datacollector");
-            Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 1), "TestCaseEnd must be called on datacollector");
-            Assert.IsTrue(allowFlush, "TestResult must be flushed");
-        }
+        }        
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
