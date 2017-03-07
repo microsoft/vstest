@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">参数不能为 NULL 或为空。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">参数不能为 null 或为空。</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
         <target state="translated">测试运行将使用为框架 {0} 和平台 {1} 生成的 DLL。以下 DLL 将不是运行的一部分: {2}。转到 {3} 了解有关管理这些设置的详细信息。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">测试运行将使用 DLL(s) 框架 {0} 和 {1} 的平台的构建。按照 DLL(s) 将不能运行的过程︰ {2} 转到详细 {3} 上管理这些设置。</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
         <target state="translated">提供的所有测试容器均与用于测试运行的平台体系结构和 .Net Framework 设置不匹配。平台: {0}。.Net Framework: {1}。有关管理这些设置的详细信息，请转到http://go.microsoft.com/fwlink/?LinkID=330428。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">所有提供的测试容器都不匹配的平台体系结构和.Net 框架运行测试的设置。平台︰ {0}.Net 框架︰ {1}。 在管理这些设置，请转到 http://go.microsoft.com/fwlink/?LinkID=330428 了解详情。</target>
         </alt-trans>

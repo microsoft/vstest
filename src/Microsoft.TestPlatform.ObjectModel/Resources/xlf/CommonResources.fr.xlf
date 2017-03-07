@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">Le paramètre ne peut pas avoir une valeur null ou être vide.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le paramètre ne peut pas être null ou vide.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
         <target state="translated">La série de tests utilise des DLL générées pour le framework {0} et la plateforme {1}. Les DLL suivantes ne font pas partie de la série de tests : {2} Accédez à {3} pour plus de détails sur la gestion de ces paramètres.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Série de tests utilise DLL conçu pour {0} de l’infrastructure et de plateforme {1}. Suivant les DLL ne fera pas partie de l’exécution : {2} atteindre {3} pour plus de détails sur la gestion de ces paramètres.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
         <target state="translated">Aucun des conteneurs de tests fournis ne correspond aux paramètres d'architecture de la plateforme et du .Net Framework pour la série de tests. Plateforme : {0} .Net Framework : {1}. Accédez à http://go.microsoft.com/fwlink/?LinkID=330428 pour plus de détails sur la gestion de ces paramètres.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aucun conteneur de test fourni correspond à l’Architecture de la plate-forme et de .net pour la série de tests, les paramètres de Framework. Plateforme : {0} .net Framework : {1}. Accédez à http://go.microsoft.com/fwlink/?LinkID=330428 pour plus de détails sur la gestion de ces paramètres.</target>
         </alt-trans>

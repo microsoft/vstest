@@ -3,6 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
+    using System.Collections.ObjectModel;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
@@ -37,12 +40,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendTestCaseStart(TestCaseStartEventArgs e);
 
         /// <summary>
-        /// Sends the TestCaseCompleted event along with outcome.
+        /// Sends the TestCaseCompleted event args.
         /// </summary>
         /// <param name="e">
         /// The args containing info about TestResult event.
         /// </param>
-        void SendTestCaseComplete(TestResultEventArgs e);
+        /// <returns>
+        /// Collection of testcase attachments
+        /// </returns>
+        Collection<AttachmentSet> SendTestCaseComplete(TestCaseEndEventArgs e);
 
         /// <summary>
         /// Sends the SessionEnd event. This is used to as a trigger to close communication channel between datacollector process and testhost process.

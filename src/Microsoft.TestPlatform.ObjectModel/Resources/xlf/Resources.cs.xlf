@@ -32,7 +32,7 @@
       <trans-unit id="TestOutcomeNone">
         <source>None</source>
         <target state="translated">Žádné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Žádný</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="BasicTestResultFormat">
         <source>{0,-10}  {1}</source>
         <target state="translated">{0,-10}  {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0, -10}  {1}.</target>
         </alt-trans>
@@ -61,7 +61,7 @@
 {1}</source>
         <target state="translated">  {0}:
 {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}:
 {1}.</target>
@@ -73,7 +73,7 @@
 {0}</source>
         <target state="translated">  Zprávy testů:
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Zkušební zprávy:
 {0}</target>
@@ -83,7 +83,7 @@
       <trans-unit id="TestFailureMessageFormat">
         <source>  Message: {0}</source>
         <target state="translated">  Zpráva: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Zprávy: {0}</target>
         </alt-trans>
@@ -94,7 +94,7 @@
 {0}</source>
         <target state="translated">  Trasování zásobníku:
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">StackTrace:
 {0}</target>
@@ -104,7 +104,7 @@
       <trans-unit id="NullString">
         <source>(null)</source>
         <target state="translated">(null)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(null)</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="Exception_RegisteredTestPropertyHasDifferentValueType">
         <source>Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</source>
         <target state="translated">Vlastnost {0} nejde zaregistrovat jako typ hodnoty {1}, protože už je zaregistrovaná jako {2}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Vlastnost {0} jako hodnota typu {1} nelze zaregistrovat, protože již byl registrován jako {2}.</target>
         </alt-trans>
@@ -248,7 +248,7 @@
       <trans-unit id="ConverterNotSupported">
         <source>Cannot find TypeConverter for type {0}.</source>
         <target state="translated">Nejde najít TypeConverter pro typ {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nelze najít TypeConverter pro typ {0}.</target>
         </alt-trans>
@@ -275,7 +275,7 @@
       <trans-unit id="TestCasePropertyIdLabel">
         <source>Id</source>
         <target state="translated">ID</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">ID</target>
         </alt-trans>
@@ -284,7 +284,7 @@
       <trans-unit id="InvalidSettingsXmlAttribute">
         <source>Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</source>
         <target state="translated">Neplatné nastavení {0}. Neočekávaný XmlAttribute: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neplatné nastavení {0}. Neočekávané XmlAttribute:: {1}.</target>
         </alt-trans>
@@ -293,7 +293,7 @@
       <trans-unit id="InvalidSettingsXmlElement">
         <source>Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</source>
         <target state="translated">Neplatné nastavení {0}. Neočekávaný XmlElement: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neplatné nastavení {0}. Neočekávané XmlElement:: {1}.</target>
         </alt-trans>
@@ -302,7 +302,7 @@
       <trans-unit id="MissingDataCollectorAttributes">
         <source>Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</source>
         <target state="translated">Neplatné nastavení kolekce dat. Chybí očekávaný atribut {0}.  Běžné nastavení kolekce dat by vypadalo takto: &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="ukazkovaKolekce"&gt;.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neplatná data nastavení kolekcí. Chybí očekávaný atribut {0}.  Kolekcí dat typické nastavení vypadat &lt; DataCollector uri = "dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, verze = 1.0.0.0 Culture = neutral, PublicKeyToken = 1111111111111111" friendlyName "sampleCollector" = &gt;.</target>
         </alt-trans>
@@ -338,7 +338,7 @@
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</source>
         <target state="translated">Neplatné nastavení {0}.  Pro {2} se zadala neplatná hodnota {1}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neplatné nastavení {0}.  Neplatná hodnota {1}' zadaná pro {2}.</target>
         </alt-trans>
@@ -347,7 +347,7 @@
       <trans-unit id="InvalidRunSettingsRootNode">
         <source>The root node of the run settings must be named 'RunSettings'.</source>
         <target state="translated">Kořenový uzel parametrů spouštění se musí jmenovat RunSettings.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Kořenový uzel běhu nastavení musí mít název "RunSettings".</target>
         </alt-trans>
@@ -356,7 +356,7 @@
       <trans-unit id="NoTestCaseFilterForSpecificTests">
         <source>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</source>
         <target state="translated">TestCaseFilter se nedá zadat pro konkrétní běh testů. Parametr FilterCriteria je určený jenom pro běhy se zdroji.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">TestCaseFilter nelze zadat pro specifické testy spuštěny. FilterCriteria je pouze pro spuštění se zdroji.</target>
         </alt-trans>
@@ -365,7 +365,7 @@
       <trans-unit id="UnexpectedTypeOfProperty">
         <source>The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </source>
         <target state="translated">Typ vlastnosti testu {0} vlastnosti {1} se nepodporuje. Použijte jeden z podporovaných typů vlastností (primitivní typy, identifikátor URI, řetězec, string[]) a zkuste to znovu. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test typ vlastnosti {0}' vlastnosti: {1}, není podporována. Použijte jednu z podporovaných vlastností typu (primitivní typy, identifikátor uri, string, string[]) a akci opakujte.</target>
         </alt-trans>
@@ -383,7 +383,7 @@
       <trans-unit id="TestCasePropertyFullyQualifiedNameLabel">
         <source>FullyQualifiedName</source>
         <target state="translated">PlněKvalifikovanýNázev</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">FullyQualifiedName</target>
         </alt-trans>
@@ -401,7 +401,7 @@
       <trans-unit id="SolutionDirectoryNotExists">
         <source>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</source>
         <target state="translated">Adresář řešení {0} neexistuje. Ujistěte se prosím, že adresář řešení zadaný v parametrech spouštění existuje a že máte oprávnění ho číst.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Adresář řešení {0}' neexistuje. Ujistěte se, existuje řešení adresář zadaný v runsettings a mít číst oprávnění pro adresář.</target>
         </alt-trans>
@@ -410,7 +410,7 @@
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">Parametr nemůže být null nebo prázdný.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametr nemůže být null nebo prázdný.</target>
         </alt-trans>
@@ -419,7 +419,7 @@
       <trans-unit id="Common_FileNotExist">
         <source>File {0} does not exist.</source>
         <target state="translated">Soubor {0} neexistuje.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Soubor {0} neexistuje.</target>
         </alt-trans>
@@ -428,7 +428,7 @@
       <trans-unit id="Common_ObjectMustBeOfType">
         <source>Object must be of type {0}.</source>
         <target state="translated">Objekt musí být typu {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Objekt musí být typu {0}.</target>
         </alt-trans>
@@ -437,7 +437,7 @@
       <trans-unit id="Common_TestOutcomeAborted">
         <source>Aborted</source>
         <target state="translated">Přerušené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Přerušeno</target>
         </alt-trans>
@@ -446,7 +446,7 @@
       <trans-unit id="Common_TestOutcomeCompleted">
         <source>Completed</source>
         <target state="translated">Dokončené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Byla dokončena</target>
         </alt-trans>
@@ -455,7 +455,7 @@
       <trans-unit id="Common_TestOutcomeDisconnected">
         <source>Disconnected</source>
         <target state="translated">Odpojené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Odpojení</target>
         </alt-trans>
@@ -464,7 +464,7 @@
       <trans-unit id="Common_TestOutcomeError">
         <source>Error</source>
         <target state="translated">Chyba</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Chyba</target>
         </alt-trans>
@@ -473,7 +473,7 @@
       <trans-unit id="Common_TestOutcomeFailed">
         <source>Failed</source>
         <target state="translated">Neúspěšné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Se nezdařilo</target>
         </alt-trans>
@@ -482,7 +482,7 @@
       <trans-unit id="Common_TestOutcomeInconclusive">
         <source>Inconclusive</source>
         <target state="translated">Neprůkazné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neprůkazné</target>
         </alt-trans>
@@ -491,7 +491,7 @@
       <trans-unit id="Common_TestOutcomeInProgress">
         <source>In Progress</source>
         <target state="translated">Probíhá</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">V průběhu</target>
         </alt-trans>
@@ -500,7 +500,7 @@
       <trans-unit id="Common_TestOutcomeNotExecuted">
         <source>Not Executed</source>
         <target state="translated">Neprovedené</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nebyly provedeny</target>
         </alt-trans>
@@ -509,7 +509,7 @@
       <trans-unit id="Common_TestOutcomeNotRunnable">
         <source>Not Runnable</source>
         <target state="translated">Nejde spustit</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Není spustitelného</target>
         </alt-trans>
@@ -518,7 +518,7 @@
       <trans-unit id="Common_TestOutcomePassed">
         <source>Passed</source>
         <target state="translated">Úspěšné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Předáno</target>
         </alt-trans>
@@ -527,7 +527,7 @@
       <trans-unit id="Common_TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
         <target state="translated">Úspěšné (běh se přerušil)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Předané (spuštění přerušeno)</target>
         </alt-trans>
@@ -536,7 +536,7 @@
       <trans-unit id="Common_TestOutcomePending">
         <source>Pending</source>
         <target state="translated">Čekající</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Čekající na vyřízení</target>
         </alt-trans>
@@ -545,7 +545,7 @@
       <trans-unit id="Common_TestOutcomeTimeout">
         <source>Timeout</source>
         <target state="translated">Časový limit</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Časový limit</target>
         </alt-trans>
@@ -554,7 +554,7 @@
       <trans-unit id="Common_TestOutcomeWarning">
         <source>Warning</source>
         <target state="translated">Upozornění</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Upozornění</target>
         </alt-trans>
@@ -563,7 +563,7 @@
       <trans-unit id="DataCollectionSink_CanNotReadStream">
         <source>Unable to read from the provided stream.  Data from a stream cannot be sent unless the stream supports reading.</source>
         <target state="translated">Z poskytnutého streamu nejde číst. Pokud stream nepodporuje čtení, jeho data nejde poslat.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nelze číst ze zadaného datového proudu.  Nelze odeslat data z datového proudu, pokud datový proud nepodporuje čtení.</target>
         </alt-trans>
@@ -572,7 +572,7 @@
       <trans-unit id="DataCollectionSink_InvalidFileNameCharacters">
         <source>The provided file name '{0}' contains the following invalid characters: '{1}'.</source>
         <target state="translated">Zadaný název souboru {0} obsahuje tyto neplatné znaky: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Název souboru zadaný {0} obsahuje následujících neplatných znaků: {1}.</target>
         </alt-trans>
@@ -581,7 +581,7 @@
       <trans-unit id="DataCollectionSink_ReservedFilenameUsed">
         <source>The provided file name '{0}' is reserved.</source>
         <target state="translated">Zadaný název souboru {0} je rezervovaný.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Název zadaný soubor '{0}' je rezervován.</target>
         </alt-trans>

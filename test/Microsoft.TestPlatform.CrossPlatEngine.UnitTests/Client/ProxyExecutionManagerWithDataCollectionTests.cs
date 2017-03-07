@@ -5,7 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
 
-
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
@@ -13,8 +13,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using TestPlatform.CrossPlatEngine.UnitTests.DataCollection;
 
     using Moq;
 
@@ -68,7 +68,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void InitializeShouldCallAfterTestRunIfExceptionIsThrownWhileCreatingDataCollectionProcess()
         {
-            mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new System.Exception("MyException"));
+            mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
 
             Assert.ThrowsException<Exception>(() =>
             {
@@ -82,14 +82,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void InitializeShouldSaveExceptionMessagesIfThrownByDataCollectionProcess()
         {
-            mockDataCollectionManager.Setup(dc => dc.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Throws(new System.Exception("MyException"));
+            var mockRequestSender = new Mock<IDataCollectionRequestSender>();
+            mockRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Throws(new Exception("MyException"));
 
-            ProxyDataCollectionManager proxyDataCollectonManager = new ProxyDataCollectionManager(string.Empty, new DummyDataCollectionRequestSender(), new DummyDataCollectionLauncher());
+            var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
+            var proxyDataCollectonManager = new ProxyDataCollectionManager(string.Empty, mockRequestSender.Object, mockDataCollectionLauncher.Object);
 
             var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize();
-            Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.ExceptionMessages);
-            Assert.AreEqual(1, proxyExecutionManager.DataCollectionRunEventsHandler.ExceptionMessages.Count);
+            Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
+            Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
+            Assert.AreEqual("MyException", proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item2);
         }
 
         [TestMethod]

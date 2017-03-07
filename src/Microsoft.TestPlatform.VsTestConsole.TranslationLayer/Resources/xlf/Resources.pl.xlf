@@ -23,7 +23,7 @@
       <trans-unit id="AbortedTestsRun">
         <source>The active Tests Run was aborted.</source>
         <target state="translated">Aktywne uruchomienie testów zostało przerwane.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aktywne testy przeprowadzone zostało przerwane.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="AbortedTestsDiscovery">
         <source>The active Tests Discovery was aborted.</source>
         <target state="translated">Aktywny proces wykrywania testów został przerwany.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Odkrywanie testy zostało przerwane.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="FailedToReceiveMessage">
         <source>Failed to receive message from vstest.console process</source>
         <target state="translated">Nie można odebrać komunikatu z procesu vstest.console</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nie można odebrać komunikatu z procesu vstest.console</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="VsTestProcessExitedAbnormally">
         <source>vstest.console process exited abnormally</source>
         <target state="translated">Proces vstest.console zakończył się nieprawidłowo</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">proces vstest.Console zakończyło się niestandardowo</target>
         </alt-trans>

@@ -233,20 +233,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return new Collection<AttachmentSet>(result);
             }
 
-            foreach (var entry in result)
+            if (EqtTrace.IsVerboseEnabled)
             {
-                foreach (var file in entry.Attachments)
-                {
-                    if (EqtTrace.IsVerboseEnabled)
-                    {
-                        EqtTrace.Verbose(
-                            "Run Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
-                            entry.DisplayName,
-                            entry.Uri,
-                            file.Description,
-                            file.Uri);
-                    }
-                }
+                this.LogAttachments(result);
             }
 
             return new Collection<AttachmentSet>(result);
@@ -293,8 +282,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             this.SendEvent(testCaseEndEventArgs);
 
-            // todo : get actual test casel leve attachments here.
-            return new Collection<AttachmentSet>();
+            List<AttachmentSet> result = null;
+            try
+            {
+                result = this.attachmentManager.GetAttachments(testCaseEndEventArgs.Context);
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments : {0}", ex.Message);
+                }
+
+                return new Collection<AttachmentSet>(result);
+            }
+
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                this.LogAttachments(result);
+            }
+
+            return new Collection<AttachmentSet>(result);
         }
 
         /// <summary>
@@ -605,6 +613,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 if (this.RunDataCollectors.Count == 0)
                 {
                     this.isDataCollectionEnabled = false;
+                }
+            }
+        }
+
+        private void LogAttachments(List<AttachmentSet> attachmentSets)
+        {
+            foreach (var entry in attachmentSets)
+            {
+                foreach (var file in entry.Attachments)
+                {
+
+                    EqtTrace.Verbose(
+                        "Test Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
+                        entry.DisplayName,
+                        entry.Uri,
+                        file.Description,
+                        file.Uri);
                 }
             }
         }
