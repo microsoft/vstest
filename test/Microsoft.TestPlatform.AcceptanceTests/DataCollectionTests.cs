@@ -20,6 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class DataCollectionTests : AcceptanceTestBase
     {
+        [Ignore] // Harsh will remove this when merging PR:https://github.com/Microsoft/vstest/pull/568
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]

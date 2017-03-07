@@ -23,7 +23,7 @@
       <trans-unit id="DuplicateSource">
         <source>Duplicate source {0} specified.</source>
         <target state="translated">Указан повторяющийся источник {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Дублировать указан источник {0}.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="FileNotFound">
         <source>'{0}' not found.</source>
         <target state="translated">"{0}": не найдено.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">«{0}» не найден.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="AvailableDiscoverersHeaderMessage">
         <source>The following Test Discovery Add-Ins are available:</source>
         <target state="translated">Доступны следующие надстройки обнаружения тестов:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Следующий тест обнаружения надстроек доступны:</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="AvailableExecutorsHeaderMessage">
         <source>The following Test Execution Add-Ins are available:</source>
         <target state="translated">Доступны следующие надстройки выполнения тестов:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Доступны следующие проверки выполнения надстройки.</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="AvailableExtensionsMetadataFormat">
         <source>        {0}: {1}</source>
         <target state="translated">        {0}: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}: {1}</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="AvailableLoggersHeaderMessage">
         <source>The following Test Logger Add-Ins are available:</source>
         <target state="translated">Доступны следующие надстройки средства ведения журнала тестирования:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Доступны следующие тестовые средства ведения журнала надстройки:</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
         <target state="translated">Ошибка: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ошибка: {0}</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="DuplicateArgumentError">
         <source>The parameter "{0}" should be provided only once.</source>
         <target state="translated">Параметр "{0}" должен быть указан только один раз.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Параметр «{0}» должны быть предоставлены только один раз.</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="ExceptionFromExtension">
         <source>Exception occurred when instantiating extension '{0}': {1}</source>
         <target state="translated">При создании экземпляра расширения "{0}" возникло исключение: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">При создании экземпляра расширения '{0}» возникло исключение: {1}</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="ListTestsHeaderMessage">
         <source>The following Tests are available:</source>
         <target state="translated">Доступны следующие тесты:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Доступны следующие тесты:</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="NoArgumentProcessorFound">
         <source>Unrecognized parameter "{0}".</source>
         <target state="translated">Нераспознанный параметр "{0}".</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Нераспознанный параметр «{0}».</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="TestSourceFileNotFound">
         <source>The test source file "{0}" provided was not found.</source>
         <target state="translated">Указанный исходный файл теста "{0}" не найден.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не найден исходный файл «{0}» указано.</target>
         </alt-trans>
@@ -158,7 +158,7 @@
       <trans-unit id="LoggerUriInvalid">
         <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
         <target state="translated">URI средства ведения журнала тестирования "{0}" недопустимо. Это средство ведения журнала тестирования будет игнорироваться.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Средство ведения журнала тестирования URI «{0}» не является допустимым.  Средство ведения журнала тестирования будет игнорироваться.</target>
         </alt-trans>
@@ -167,7 +167,7 @@
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
         <target state="translated">Сведения: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Сведения: {0}</target>
         </alt-trans>
@@ -176,7 +176,7 @@
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
         <target state="translated">Предупреждение: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Предупреждение: {0}</target>
         </alt-trans>
@@ -187,7 +187,7 @@
       Display this usage message.</source>
         <target state="translated">-?|--Help|/?|/Help
       Отображение этого сообщения об использовании.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-?| --Справка | /? | / Help
       Отображение этого сообщения об использовании.</target>
@@ -197,7 +197,7 @@
       <trans-unit id="CopyrightCommandLineTitle">
         <source>Copyright (c) Microsoft Corporation.  All rights reserved.</source>
         <target state="translated">(с) Корпорация Майкрософт (Microsoft Corporation). Все права защищены.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(C) Корпорация Майкрософт.  Все права защищены.</target>
         </alt-trans>
@@ -206,7 +206,7 @@
       <trans-unit id="MicrosoftCommandLineTitle">
         <source>Microsoft (R) Test Execution Command Line Tool Version {0}</source>
         <target state="translated">Программа Microsoft (R) Test Execution Command Line Tool версии {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Microsoft (R) тест выполнения командной строки средство версии {0}</target>
         </alt-trans>
@@ -229,18 +229,20 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;URI или понятное имя средства ведения журналов&gt;
-      Укажите средство ведения журнала для результатов тестирования. Например, для записи результатов
-      в файл результатов теста Visual Studio (TRX) используйте /logger:trx.
-      Для публикации результатов тестов в Team Foundation Server используйте TfsPublisher, как показано ниже.
+        <target state="translated">--logger|/logger:&lt;URI или понятное имя средства ведения журналов&gt;
+      Укажите средство ведения журналов для результатов тестирования. Например, для записи результатов
+      в файл результатов теста Visual Studio (TRX) используйте/logger:trx [;LogFileName=&lt;умолчание: уникальное имя файла&gt;].
+      Создает файл в каталоге TestResults с указанным LogFileName.
+
+      Для публикации результатов тестов на Team Foundation Server используйте TfsPublisher, как показано ниже.
       Пример: /logger:TfsPublisher;
-                Collection=&lt;URL-адрес коллекции командного проекта&gt;;
-                BuildName=&lt;имя сборки&gt;;
-                TeamProject=&lt;имя командного проекта&gt;
-                [;Platform=&lt;по умолчанию используется значение Any CPU (Любой ЦП)&gt;]
-                [;Flavor=&lt;по умолчанию имеет значение Debug (Отладка)&gt;]
-                [;RunTitle=&lt;заголовок&gt;]</target>
-        <note></note>
+                Collection=&lt;URL-адрес коллекции командных проектов&gt;;
+                BuildName=&lt;название сборки&gt;;
+                TeamProject=&lt;название командного проекта&gt;;
+                [;Platform=&lt;по умолчанию используется значение Any CPU (Любой ЦП)&gt;];
+                [;Flavor=&lt;по умолчанию имеет значение Debug (Отладка)&gt;];
+                [;RunTitle=&lt;заголовок&gt;].</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--средства ведения журнала | / logger: &lt; Uri средство ведения журнала и FriendlyName &gt;
       Укажите средство ведения журнала для результатов тестов.  Например для регистрации результатов в Visual Studio теста результаты файла (TRX) используется /logger:trx.
@@ -258,7 +260,7 @@
       <trans-unit id="HelpDescriptionText">
         <source>Description: Runs tests from the specified files.</source>
         <target state="translated">Описание: выполняет тесты из указанных файлов.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Описание: Выполняет тесты из указанных файлов.</target>
         </alt-trans>
@@ -275,8 +277,8 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]]</source>
-        <target state="new">Использование: vstest.console.exe [аргументы] [параметры]</target>
-        <note></note>
+        <target state="translated">Использование: vstest.console.exe [аргументы] [параметры] [[--] &lt;аргументы&gt;...]]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Использование: vstest.console.exe [параметры] [аргументы]</target>
         </alt-trans>
@@ -285,7 +287,7 @@
       <trans-unit id="MissingTestSourceFile">
         <source>No test source files were specified.</source>
         <target state="translated">Исходные файлы тестов не указаны.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Были указаны без проверки исходных файлов.</target>
         </alt-trans>
@@ -294,7 +296,7 @@
       <trans-unit id="NoArgumentsProvided">
         <source>No arguments were specified.</source>
         <target state="translated">Аргументы не указаны.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргументы не указаны.</target>
         </alt-trans>
@@ -311,7 +313,7 @@
       пробелами.
       Примеры: mytestproject.dll
                 mytestproject.dll myothertestproject.exe</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[TestFileNames]
       Выполнение тестов из указанных файлов. При вводе нескольких имен файла теста
@@ -324,7 +326,7 @@
       <trans-unit id="AvailableSettingsProvidersHeaderMessage">
         <source>The following Settings Providers Add-Ins are available:</source>
         <target state="translated">Доступны следующие надстройки поставщиков параметров:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Доступны следующие параметры поставщиков надстроек:</target>
         </alt-trans>
@@ -335,7 +337,7 @@
       Settings to use when running tests.</source>
         <target state="translated">--Settings|/Settings:&lt;файл параметров&gt;
       Параметры для использования при запуске тестов.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Параметры | / параметры: &lt; файл &gt;
       Параметры для использования при запуске тестов.</target>
@@ -345,7 +347,7 @@
       <trans-unit id="RunSettingsRequired">
         <source>The /Settings parameter requires a settings file to be provided.</source>
         <target state="translated">Для параметра /Settings требуется указать файл параметров.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Параметр/Settings требуется файл настройки должны быть предоставлены.</target>
         </alt-trans>
@@ -354,7 +356,7 @@
       <trans-unit id="RunSettingsFileNotFound">
         <source>The Settings file '{0}' could not be found.</source>
         <target state="translated">Не удалось найти файл параметров "{0}".</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Файл параметров «{0}» не найден.</target>
         </alt-trans>
@@ -363,7 +365,7 @@
       <trans-unit id="TestRunFailed">
         <source>Test Run Failed.</source>
         <target state="translated">Сбой тестового запуска.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тестовый запуск не удался.</target>
         </alt-trans>
@@ -372,7 +374,7 @@
       <trans-unit id="TestRunSuccessful">
         <source>Test Run Successful.</source>
         <target state="translated">Тестовый запуск выполнен.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Успешное выполнение теста.</target>
         </alt-trans>
@@ -381,7 +383,7 @@
       <trans-unit id="InvalidInIsolationCommand">
         <source>Argument {0} is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.</source>
         <target state="translated">Аргумент {0} не ожидается в команде InIsolation. Укажите команду без аргумента (например, vstest.console.exe myTests.dll /InIsolation) и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент {0} не ожидается в команде «InIsolation». Укажите команды без аргумента (пример: vstest.console.exe myTests.dll /InIsolation) и повторите попытку.</target>
         </alt-trans>
@@ -390,7 +392,7 @@
       <trans-unit id="SuggestUseVsixExtensionsIfNoTestsIsFound">
         <source>Additionally, you can try specifying '/UseVsixExtensions' command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true</source>
         <target state="translated">Кроме того, можно попытаться указать команду "/UseVsixExtensions", если средства обнаружения и выполнения тестов установлены на компьютере как расширение VSIX и установка поддерживает расширения VSIX. Пример: vstest.console.exe myTests.dll /UseVsixExtensions:true</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Кроме того, можно попытаться указать "/ UseVsixExtensions команды, если тест discoverer &amp; исполнитель установлен на компьютере как расширения vsix и установки поддерживает расширения vsix. Пример: vstest.console.exe myTests.dll /UseVsixExtensions:true</target>
         </alt-trans>
@@ -399,7 +401,7 @@
       <trans-unit id="UseVsixExtensionsValueRequired">
         <source>The /UseVsixExtensions parameter requires a value. If 'true', the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true</source>
         <target state="translated">Для параметра /UseVsixExtensions требуется значение. Если задано значение true, установленные расширения VSIX (при наличии) будут использоваться в тестовом запуске. Если задано значение false, то они будут игнорироваться. Пример: /UseVsixExtensions:true</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Значение параметра /UseVsixExtensions должно быть. При значении 'true', установленных расширений VSIX (при наличии) будет использоваться в тестовом запуске. Если false, то они будут игнорироваться.   Пример: /UseVsixExtensions:true</target>
         </alt-trans>
@@ -408,7 +410,7 @@
       <trans-unit id="InvalidUseVsixExtensionsCommand">
         <source>Argument {0} is not expected in the 'UseVsixExtensions' command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again.</source>
         <target state="translated">Аргумент {0} не ожидается в команде UseVsixExtensions. Укажите команду, определяющую, требуется ли использовать или игнорировать расширения VSIX (например, vstest.console.exe myTests.dll /UseVsixExtensions:true), и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент {0} не ожидается в команде «UseVsixExtensions». Укажите команду, отражающее используется или пропущенных расширений vsix (пример: vstest.console.exe myTests.dll /UseVsixExtensions:true) и повторите попытку.</target>
         </alt-trans>
@@ -423,7 +425,7 @@
       Запуск тестов в изолированном процессе. Это снижает вероятность
       остановки процесса vstest.console.exe из-за ошибки в тестах, но
       тесты могут выполняться медленнее.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
       Тесты выполняются в изолированном процессе. Это делает процесс vstest.console.exe менее вероятно, что остановлена на ошибки в тестах, но тесты могут работать медленнее.</target>
@@ -439,7 +441,7 @@
       Определяет использование или пропуск процессом vstest.console.exe
       установленных расширений VSIX (при наличии) в тестовом запуске. 
       Пример: /UseVsixExtensions:true</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ UseVsixExtensions
       Это делает процесс vstest.console.exe использовать или пропустить расширения VSIX установлен (если есть) в тестовом запуске. 
@@ -450,7 +452,7 @@
       <trans-unit id="BatchSizeRequired">
         <source>The /BatchSize argument requires the size of the batch.  Example:  /BatchSize:10</source>
         <target state="translated">Для аргумента /BatchSize требуется указать размер пакета. Пример: /BatchSize:10</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент /BatchSize требует размер пакета.  Пример: /BatchSize:10</target>
         </alt-trans>
@@ -459,7 +461,7 @@
       <trans-unit id="InvalidBatchSize">
         <source>Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10</source>
         <target state="translated">Недопустимый размер пакета {0}. Размер пакета должен быть больше нуля. Пример: /BatchSize:10</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Недопустимый размер пакета {0}. Размер пакета должно быть больше нуля. Пример: /BatchSize:10</target>
         </alt-trans>
@@ -478,7 +480,7 @@
     &gt;vstest.console.exe /inIsolation tests.dll
   Для запуска тестов с дополнительными параметрами, например со сборщиками данных:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Для выполнения тестов в том же процессе:
     &gt; tests.dll vstest.console.exe для выполнения тестов в отдельном процессе:
@@ -493,7 +495,7 @@
       Lists installed test discoverers.</source>
         <target state="translated">/ListDiscoverers
       Список установленных средств обнаружения тестов.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListDiscoverers
       Список установленных discoverers теста.</target>
@@ -505,7 +507,7 @@
       Lists installed test executors.</source>
         <target state="translated">/ListExecutors
       Список установленных исполнителей тестов.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListExecutors
       Список установленных исполнители теста.</target>
@@ -517,7 +519,7 @@
       Lists installed test loggers.</source>
         <target state="translated">/ListLoggers
       Список установленных средств ведения журналов тестирования.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListLoggers
       Список установленных средств ведения журнала тестирования.</target>
@@ -529,7 +531,7 @@
       Lists installed test settings providers.</source>
         <target state="translated">/ListSettingsProviders
       Список установленных поставщиков параметров тестирования.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ ListSettingsProviders
       Список установленных поставщиков параметров тестирования.</target>
@@ -541,7 +543,7 @@
       Lists discovered tests from the given test container.</source>
         <target state="translated">-lt|--ListTests|/lt|/ListTests:&lt;имя файла&gt;
       Список обнаруженных тестов из заданного контейнера тестов.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-lt |-ListTests | / lt | / ListTests: &lt; имя файла &gt;
       Список обнаруженных тестов в заданном тестовом контейнере.</target>
@@ -551,7 +553,7 @@
       <trans-unit id="TimeElapsed">
         <source>Time elapsed :</source>
         <target state="translated">Прошло времени:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Прошло времени:</target>
         </alt-trans>
@@ -562,7 +564,7 @@
        Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 </source>
         <target state="translated">Для аргумента /Tests требуется указать один или несколько конкретных имен тестов или их подстрок.
        Примеры: /Tests:TestsMethod1, /Tests:TestMethod1, method2 </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент /Tests требуется одно или несколько имен определенного теста или их подстрок.
        Примеры: /Tests:TestsMethod1, /Tests:TestMethod1, метод2</target>
@@ -572,7 +574,7 @@
       <trans-unit id="NoTestsAvailableAfterFiltering">
         <source>A total of {0} tests were discovered but no test matches the specified selection criteria({1}). Use right value(s) and try again.</source>
         <target state="translated">Всего обнаружено тестов: {0}, но тесты не соответствуют указанному условию выбора ({1}). Задайте правильные значения и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Всего {0} тесты были обнаружены, но тесты не соответствует criteria({1}) указанного выделения. Использование вправо значения и повторите попытку.</target>
         </alt-trans>
@@ -581,7 +583,7 @@
       <trans-unit id="SearchStringDelimiter">
         <source>,</source>
         <target state="translated">,</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
           <source />
           <target state-qualifier="tm-suggestion">,</target>
@@ -612,7 +614,7 @@
       <trans-unit id="SwitchToNoIsolation">
         <source>Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning.</source>
         <target state="translated">Используется режим изоляции для запуска тестов, так как в параметрах запуска включены адаптеры диагностических данных. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">В режиме изоляции для выполнения тестов как адаптеры диагностических данных были включены в runsettings. Параметр /inIsolation используется для подавления этого предупреждения.</target>
         </alt-trans>
@@ -621,7 +623,7 @@
       <trans-unit id="SwitchToIsolationInAppContainerMode">
         <source>Using Isolation mode to run unit tests for Windows Store apps. Use the /InIsolation parameter to suppress this warning.</source>
         <target state="translated">Использование режима изоляции для запуска модульных тестов приложений для Магазина Windows. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Использование режима изоляции выполнение модульных тестов для приложений для магазина Windows. Параметр /InIsolation используется для подавления этого предупреждения.</target>
         </alt-trans>
@@ -630,7 +632,7 @@
       <trans-unit id="DisablingDataCollectionInAppContainerTestExecution">
         <source>Diagnostic data adapters are not supported when running unit tests for Windows Store apps. Remove diagnostic data adapters settings from settings.</source>
         <target state="translated">Адаптеры диагностических данных не поддерживаются при запуске модульных тестов для приложений для Магазина Windows. Удалите параметры адаптеров диагностических данных из параметров.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Адаптеры диагностических данных не поддерживаются при запуске модульных тестов для приложений для магазина Windows. Удалите настройки адаптеров диагностических данных с параметрами.</target>
         </alt-trans>
@@ -639,7 +641,7 @@
       <trans-unit id="NoTestsFoundWarningMessageWithSuggestionToUseVsix">
         <source>{0} {1}</source>
         <target state="translated">{0} {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} {1}</target>
         </alt-trans>
@@ -648,7 +650,7 @@
       <trans-unit id="LoggerFriendlyNameFormat">
         <source>        FriendlyName: {0}</source>
         <target state="translated">        Понятное имя: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">FriendlyName: {0}</target>
         </alt-trans>
@@ -657,7 +659,7 @@
       <trans-unit id="ExtensionUriFormat">
         <source>        Uri: {0}</source>
         <target state="translated">        URI: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI: {0}</target>
         </alt-trans>
@@ -666,7 +668,7 @@
       <trans-unit id="SuggestUseVsixExtensionsInListLoggersCommand">
         <source>The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
         <target state="translated">Устанавливаемые с помощью VSIX надстройки средства ведения журналов тестирования игнорируются. Используйте параметр /UseVsixExtensions, чтобы включить их, если установка поддерживает расширения VSIX. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тест средство ведения журнала надстройки, установленные с помощью установки VSIX, игнорируются. Используйте параметр /UseVsixExtensions для включения, если установки поддерживает расширения vsix. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
         </alt-trans>
@@ -675,7 +677,7 @@
       <trans-unit id="SuggestUseVsixExtensionsInListExecutorsCommand">
         <source>The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
         <target state="translated">Устанавливаемые с помощью VSIX надстройки исполнителя тестов игнорируются. Используйте параметр /UseVsixExtensions, чтобы включить их, если установка поддерживает расширения VSIX. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тест исполнитель надстройки, установленные с помощью установки VSIX, игнорируются. Используйте параметр /UseVsixExtensions для включения, если установки поддерживает расширения vsix. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
         </alt-trans>
@@ -684,7 +686,7 @@
       <trans-unit id="SuggestUseVsixExtensionsInListDiscoverersCommand">
         <source>The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
         <target state="translated">Устанавливаемые с помощью VSIX надстройки средства обнаружения тестов игнорируются. Используйте параметр /UseVsixExtensions, чтобы включить их, если установка поддерживает расширения VSIX. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тест обнаружения надстроек с помощью установки VSIX установлен, игнорируются. Используйте параметр /UseVsixExtensions для включения, если установки поддерживает расширения vsix. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
         </alt-trans>
@@ -693,7 +695,7 @@
       <trans-unit id="SuggestUseVsixExtensionsInListSettingsProviderCommand">
         <source>The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true</source>
         <target state="translated">Устанавливаемые с помощью VSIX надстройки поставщиков параметров игнорируются. Используйте параметр /UseVsixExtensions, чтобы включить их, если установка поддерживает расширения VSIX. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Настройка поставщиков надстроек с помощью установки VSIX установлен, игнорируются. Используйте параметр /UseVsixExtensions для включения, если установки поддерживает расширения vsix. Пример: vstest.console.exe {0} /UseVsixExtensions:true</target>
         </alt-trans>
@@ -702,7 +704,7 @@
       <trans-unit id="SettingFormat">
         <source>        SettingName: {0}</source>
         <target state="translated">        Имя параметра: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">SettingName: {0}</target>
         </alt-trans>
@@ -711,7 +713,7 @@
       <trans-unit id="SupportedFileTypesIndicator">
         <source>        Supported File Types:</source>
         <target state="translated">        Поддерживаемые типы файлов:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Поддерживаемые типы файлов:</target>
         </alt-trans>
@@ -720,7 +722,7 @@
       <trans-unit id="SupportedFileWithoutSeparator">
         <source> {0}</source>
         <target state="translated"> {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
         </alt-trans>
@@ -729,7 +731,7 @@
       <trans-unit id="SupportedFileWithSeparator">
         <source> {0},</source>
         <target state="translated"> {0},</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0},</target>
         </alt-trans>
@@ -738,7 +740,7 @@
       <trans-unit id="UriOfDefaultExecutor">
         <source>        Default Executor Uri: {0}</source>
         <target state="translated">        URI исполнителя по умолчанию: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">По умолчанию исполнитель Uri: {0}</target>
         </alt-trans>
@@ -747,7 +749,7 @@
       <trans-unit id="LoggerUriFormat">
         <source>        Uri: {0}</source>
         <target state="translated">        URI: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI: {0}</target>
         </alt-trans>
@@ -756,7 +758,7 @@
       <trans-unit id="InvalidPlatformType">
         <source>Invalid platform type:{0}. Valid platform types are x86, x64 and Arm.</source>
         <target state="translated">Неверный тип платформы: {0}. Допустимые типы платформы: x86, x64 и Arm.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Неверный тип: {0}. типы допустимых платформы, x86, x64 и Arm.</target>
         </alt-trans>
@@ -764,8 +766,8 @@
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">
         <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>
-        <target state="translated">Для аргумента /Platform требуется указать тип целевой платформы для тестового запуска. Пример: /Platform:x 86</target>
-        <note></note>
+        <target state="translated">Для аргумента /Platform требуется указать тип целевой платформы для тестового запуска. Пример: /Platform:x&amp;86;</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент/Platform требует тип целевой платформы для выполнения теста должны быть предоставлены.   Пример: /Platform:x 86</target>
         </alt-trans>
@@ -778,7 +780,7 @@
         <target state="translated">--Platform|/Platform:&lt;тип платформы&gt;
       Архитектура целевой платформы для выполнения теста. 
       Допустимые значения: x86, x64 и ARM.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Платформа | / Platform: &lt; тип &gt;
       Целевая архитектура платформы для выполнения теста. 
@@ -789,7 +791,7 @@
       <trans-unit id="SwitchToIsolationInMultiTargetingMode">
         <source>Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning.</source>
         <target state="translated">Для запуска тестов используется изолированный режим в соответствии с параметрами Platform:{0} и .Net Framework:{1} для тестового запуска. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">В режиме изоляции для выполнения тестов, как того требует платформа: {0} и .net Framework: {1} параметры для тестового запуска. Параметр /inIsolation используется для подавления этого предупреждения.</target>
         </alt-trans>
@@ -804,7 +806,7 @@
       Целевая версия .NET Framework для запуска тестов. 
       Допустимые значения: ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" и т. д.
       Другие поддерживаемые значения: Framework35, Framework40, Framework45 и FrameworkCore10.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework версии &gt;
       Целевой .net Framework версии, используемый для выполнения теста. 
@@ -816,7 +818,7 @@
       <trans-unit id="FrameworkVersionRequired">
         <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
         <target state="translated">Для аргумента /Framework требуется указать целевую версию .NET Framework для тестового запуска. Пример: Framework:".NETFramework,Version=v4.6"</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент /Framework требует целевой .net Framework версии для тестового запуска.   Пример: /Framework:». NETFramework, версия = v4.6»</target>
         </alt-trans>
@@ -825,7 +827,7 @@
       <trans-unit id="InvalidFrameworkVersion">
         <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
         <target state="translated">Недопустимая версия .NET Framework: {0}. Укажите полное имя целевой платформы. Другие поддерживаемые версии .NET Framework: Framework35, Framework40 и Framework45.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Недопустимый .net Framework версии: {0}. Укажите имя fullname TargetFramework. Другие поддерживаемые .net Framework версии, Framework35, Framework40 и Framework45.</target>
         </alt-trans>
@@ -834,7 +836,7 @@
       <trans-unit id="AppContainerTestPrerequisiteFail">
         <source>Could not start test run for unit tests for Windows Store app: {0}.</source>
         <target state="translated">Не удалось запустить тестовый запуск для модульных тестов приложений для Магазина Windows: {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не удалось запустить тестовый запуск для модульных тестов для приложений для магазина Windows: {0}.</target>
         </alt-trans>
@@ -859,7 +861,7 @@
       Примеры: /TestCaseFilter:"Priority=1"
                 /TestCaseFilter:"(FullyQualifiedName~Nightly
                                   |Name=MyTestMethod)"</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--TestCaseFilter | / TestCaseFilter: &lt; выражение &gt;
       Запустите тесты, соответствующие данному выражению.
@@ -880,7 +882,7 @@
         <target state="translated">Для аргумента /TestCaseFilter требуется указать значение фильтра.
          Значение фильтра можно задать в формате &lt;свойство&gt;=&lt;значение&gt;.
         Примеры: "Priority=1", "TestCategory=Nightly"</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент /TestCaseFilter требует значение фильтра.
         Значение фильтра может быть &lt; свойство &gt; = &lt; значение &gt; тип.
@@ -891,7 +893,7 @@
       <trans-unit id="InvalidTestCaseFilterValueForSpecificTests">
         <source>The /TestCaseFilter argument cannot be specified with /Tests. Filtering of test cases is not applicable when tests are specified.</source>
         <target state="translated">Аргумент /TestCaseFilter нельзя указывать при использовании аргумента /Tests. Если указываются тесты, фильтрация тестовых случаев не применяется.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент /TestCaseFilter не может указываться с /Tests. Фильтрация тестовых случаев, не применяется при указании тестов.</target>
         </alt-trans>
@@ -900,7 +902,7 @@
       <trans-unit id="NonDefaultFrameworkAndOrArchDetected">
         <source>{0} is built for {1}/{2}. The test assemblies specified in a run should have a common target .Net framework and platform.</source>
         <target state="translated">Сборка {0} выполняется для {1}/{2}. Заданные в запуске тестовые сборки должны иметь одинаковые значения целевой среды .NET Framework и платформы.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">построения {0} {1} / {2}. Тестовых сборок, указанных в сеансе должны иметь общие цели .net framework и платформы.</target>
         </alt-trans>
@@ -909,7 +911,7 @@
       <trans-unit id="RunSingleAppContainerSource">
         <source>Only one app package (.appx file) can be specified for running tests.</source>
         <target state="translated">Для выполнения тестов можно указать только один пакет приложения (APPX-файл).</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Может быть указан только один app пакет (файл .appx) для выполнения тестов.</target>
         </alt-trans>
@@ -918,7 +920,7 @@
       <trans-unit id="StartingDiscovery">
         <source>Starting test discovery, please wait...</source>
         <target state="translated">Запуск обнаружения тестов; подождите...</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Запуск обнаружения тестов, пожалуйста, подождите...</target>
         </alt-trans>
@@ -927,7 +929,7 @@
       <trans-unit id="StartingExecution">
         <source>Starting test execution, please wait...</source>
         <target state="translated">Запуск выполнения тестов; подождите...</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Запуск выполнения теста, пожалуйста, подождите...</target>
         </alt-trans>
@@ -936,7 +938,7 @@
       <trans-unit id="DisablingDCOnExceptionWhileParsingDCInfo">
         <source>Reading diagnostic data adapter settings threw an running '{0}'. All diagnostic data adapters will be skipped in this run.</source>
         <target state="translated">При чтении параметров адаптера диагностических данных возникло выполнение "{0}". Все адаптеры диагностических данных будут пропущены в этом запуске.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Чтение параметров адаптера диагностических данных вызвал запуск «{0}». В этом сеансе будут пропущены все адаптеры диагностических данных.</target>
         </alt-trans>
@@ -949,7 +951,7 @@
         <target state="translated">/EnableCodeCoverage
        Включение адаптера диагностических данных CodeCoverage в тестовом запуске. Если параметры
        не заданы с помощью файла параметров, используются значения по умолчанию.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Позволяет адаптера диагностических данных «CodeCoverage» в тестовом запуске. Параметры по умолчанию используются, если не указана с помощью файла параметров.</target>
@@ -959,7 +961,7 @@
       <trans-unit id="InvalidEnableCodeCoverageCommand">
         <source>Argument {0} is not expected in the 'EnableCodeCoverage' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again.</source>
         <target state="translated">Аргумент {0} не ожидается в команде EnableCodeCoverage. Укажите команду без аргумента (например, vstest.console.exe myTests.dll /EnableCodeCoverage) и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент {0} не ожидается в команде «EnableCodeCoverage». Укажите команды без аргумента (пример: vstest.console.exe myTests.dll /EnableCodeCoverage) и повторите попытку.</target>
         </alt-trans>
@@ -968,7 +970,7 @@
       <trans-unit id="MalformedRunSettingsFile">
         <source>Settings file provided do not confirm to required format. </source>
         <target state="translated">Указанный файл параметров не соответствует требуемому формату. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Файл настроек не подтверждаю требуемый формат.</target>
         </alt-trans>
@@ -977,7 +979,7 @@
       <trans-unit id="NoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project.</source>
         <target state="translated">У пакета приложения "{0}" нет точки входа исполнителя тестов. Для запуска модульных тестов приложений для Магазина Windows создайте пакет приложения с помощью проекта библиотеки модульных тестов приложений для Магазина Windows.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Пакет приложения «{0}» не имеет точки входа исполнителя теста. Для запуска модульных тестов для приложений для магазина Windows, создайте пакет приложения с помощью проекта библиотеки модульного тестирования приложений магазина Windows.</target>
         </alt-trans>
@@ -986,7 +988,7 @@
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">Покрытие кода недоступно для приложений для Магазина Windows. Анализ покрытия кода пропущен для этого тестового запуска.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Покрытие кода не доступен для приложений для магазина Windows. Пропущен анализа покрытия кода для данного тестового запуска.</target>
         </alt-trans>
@@ -995,7 +997,7 @@
       <trans-unit id="SomeTestsUnavailableAfterFiltering">
         <source>A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again.</source>
         <target state="translated">Всего обнаружено тестов: {0}, но некоторые тесты не соответствуют указанному условию выбора ({1}). Задайте правильные значения и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Общее количество тестов {0} были обнаружены, но некоторые тесты не соответствуют criteria({1}) указанного выделения. Использование вправо значения и повторите попытку.</target>
         </alt-trans>
@@ -1010,7 +1012,7 @@
       Определяет использование процессом vstest.console.exe пользовательских адаптеров тестов
        по заданному пути (если имеется) в тестовом запуске. 
       Пример:  /TestAdapterPath:&lt;путь_к_пользовательским_адаптерам&gt;</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--TestAdapterPath | / TestAdapterPath
       Это делает процесс vstest.console.exe используется пользовательскими адаптерами теста
@@ -1022,7 +1024,7 @@
       <trans-unit id="TestAdapterPathValueRequired">
         <source>The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters</source>
         <target state="translated">Для параметра /TestAdapterPath требуется значение, представляющее собой путь к расположению с пользовательскими адаптерами тестов. Пример: /TestAdapterPath:c:\MyCustomAdapters</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Параметр /TestAdapterPath требуется значение, являющееся путь с пользовательскими адаптерами теста. Пример: /TestAdapterPath:c:\MyCustomAdapters</target>
         </alt-trans>
@@ -1031,7 +1033,7 @@
       <trans-unit id="InvalidTestAdapterPathCommand">
         <source>The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}</source>
         <target state="translated">Путь {0}, заданный в параметре TestAdapterPath, недопустим. Ошибка: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Недопустимый путь «{0}», указанный в «TestAdapterPath». Ошибка: {1}</target>
         </alt-trans>
@@ -1040,7 +1042,7 @@
       <trans-unit id="TestAdapterPathDoesNotExist">
         <source>The custom test adapter search path provided was not found, provide a valid path and try again.</source>
         <target state="translated">Указанный путь поиска пользовательского адаптера теста не найден. Укажите допустимый путь и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Предоставленный путь поиска адаптер пользовательского теста не найден, укажите правильный путь и повторите попытку.</target>
         </alt-trans>
@@ -1049,7 +1051,7 @@
       <trans-unit id="NoAdaptersFoundInTestAdapterPath">
         <source>The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.</source>
         <target state="translated">Путь "{0}", заданный в параметре TestAdapterPath, не содержит адаптеров тестов. Укажите допустимый путь и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Путь «{0}», указанный в «TestAdapterPath» не содержат все адаптеры тестов, укажите правильный путь и повторите попытку.</target>
         </alt-trans>
@@ -1058,7 +1060,7 @@
       <trans-unit id="PhoneAppContainerTestPrerequisiteFail">
         <source>Could not start test run for the tests for Windows Phone app: {0}.</source>
         <target state="translated">Не удалось запустить тестовый запуск для тестов приложений Windows Phone: {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не удалось запустить тестовый запуск тестов для приложений Windows Phone: {0}.</target>
         </alt-trans>
@@ -1067,7 +1069,7 @@
       <trans-unit id="SwitchToIsolationInPhoneAppContainerMode">
         <source>Using Isolation mode to run unit tests for Windows Phone apps. Use the /InIsolation parameter to suppress this warning.</source>
         <target state="translated">Использование режима изоляции для запуска модульных тестов приложений Windows Phone. Используйте параметр /InIsolation, чтобы отключить это предупреждение.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Использование режима изоляции выполнение модульных тестов для приложений Windows Phone. Параметр /InIsolation используется для подавления этого предупреждения.</target>
         </alt-trans>
@@ -1076,7 +1078,7 @@
       <trans-unit id="DisablingCodeCoverageInPhoneAppContainerTestExecution">
         <source>Code coverage is not available for Windows Phone apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">Покрытие кода недоступно для приложений Windows Phone. Анализ покрытия кода пропущен для этого тестового запуска.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Покрытие кода не доступен для приложений Windows Phone. Пропущен анализа покрытия кода для данного тестового запуска.</target>
         </alt-trans>
@@ -1085,7 +1087,7 @@
       <trans-unit id="DisablingDataCollectionInPhoneAppContainerTestExecution">
         <source>Diagnostic data adapters are not supported when running unit tests for Windows Phone apps. Remove diagnostic data adapters settings from settings.</source>
         <target state="translated">Адаптеры диагностических данных не поддерживаются при запуске модульных тестов для приложений Windows Phone. Удалите параметры адаптеров диагностических данных из параметров.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Адаптеры диагностических данных не поддерживаются при запуске модульных тестов для приложений Windows Phone. Удалите настройки адаптеров диагностических данных с параметрами.</target>
         </alt-trans>
@@ -1094,7 +1096,7 @@
       <trans-unit id="PhoneNoTestEntryPoint">
         <source>App package '{0}' does not has test executor entry point. For running unit tests for Windows Phone apps, create app package using Windows Phone Unit Test App project.</source>
         <target state="translated">У пакета приложения "{0}" нет точки входа исполнителя тестов. Для запуска модульных тестов приложений Windows Phone создайте пакет приложения с помощью проекта приложения модульного тестирования Windows Phone.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Пакет приложения «{0}» не имеет точки входа исполнителя теста. Для выполнения модульных тестов для приложений Windows Phone, создайте проект приложения Windows Phone модульного тестирования с помощью пакета приложения.</target>
         </alt-trans>
@@ -1103,7 +1105,7 @@
       <trans-unit id="TestSettingsFrameworkMismatch">
         <source>Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning.</source>
         <target state="translated">Использование платформы {0} для запуска тестов. Укажите /Framework:{1}, чтобы отключить это предупреждение.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Для выполнения тестов с помощью framework {0}. Укажите /Framework: {1} для подавления этого предупреждения.</target>
         </alt-trans>
@@ -1112,7 +1114,7 @@
       <trans-unit id="AppxBundleSourceWarning">
         <source>No test found in the specified test containers. Additionally, Microsoft Windows Store Unit test adapter does not support .appxbundle files. Create an appx (set Generate App bundle option to Never) when creating App Package and try again.</source>
         <target state="translated">В указанных контейнерах тестов тесты не найдены. Кроме того, адаптер модульных тестов для Магазина Windows (Майкрософт) не поддерживает APPXBUNDLE-файлы. Создайте APPX-файл (установите значение "Никогда" для параметра "Создать набор приложений") при создании пакета приложения и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тест не найден в указанном тестовых контейнерах. Кроме того адаптер Microsoft Windows Store модульного теста не поддерживает файлы .appxbundle. Создание appx (создать приложение комплект для параметра никогда не) при создании пакета приложения и повторите попытку.</target>
         </alt-trans>
@@ -1127,7 +1129,7 @@
       Указывает, что тесты должны выполняться параллельно. По умолчанию
       можно использовать любое имеющееся число ядер на компьютере.
       Число используемых ядер можно настроить с помощью файла параметров.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Параллельно | / параллельный
       Указывает, что тесты выполняться параллельно. По умолчанию вверх
@@ -1139,7 +1141,7 @@
       <trans-unit id="InvalidParallelCommand">
         <source>Argument {0} is not expected in the 'Parallel' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again.</source>
         <target state="translated">Аргумент {0} не ожидается в команде Parallel. Укажите команду без аргумента (например, vstest.console.exe myTests.dll /Parallel) и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент {0} не ожидается в команде «Параллельный». Укажите команды без аргумента (пример: vstest.console.exe myTests.dll /Parallel) и повторите попытку.</target>
         </alt-trans>
@@ -1148,7 +1150,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>Cannot be null or empty</source>
         <target state="translated">Неопределенное или отсутствующее значение недопустимо.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не может быть неопределенным или пустым</target>
         </alt-trans>
@@ -1159,7 +1161,7 @@
       The Port for socket connection and receiving the event messages.</source>
         <target state="translated">--Port|/Port:&lt;порт&gt;
       Порт для подключения через сокет и получения событий сообщений.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Порта | / порт: &lt; порт &gt;
       Порт для подключения сокета и прием сообщений о событиях.</target>
@@ -1169,7 +1171,7 @@
       <trans-unit id="InvalidPortArgument">
         <source>The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages.</source>
         <target state="translated">Для аргумента --Port|/Port требуется указать номер порта, который должен быть целым числом. Укажите порт для подключения через сокет и получения событий сообщений.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Порта | / требует аргумент порта номер порта, который представляет собой целое число. Укажите порт для подключения сокета и прием сообщений о событиях.</target>
         </alt-trans>
@@ -1178,7 +1180,7 @@
       <trans-unit id="AssemblyPathInvalid">
         <source>Unable to find the assembly under test. Please make sure that the project is built.</source>
         <target state="translated">Не удается найти тестируемую сборку. Убедитесь, что проект создан.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не удается найти сборки в ходе теста. Убедитесь, что проект создан.</target>
         </alt-trans>
@@ -1187,7 +1189,7 @@
       <trans-unit id="ProjectPathNotFound">
         <source>The Path {0} does not exist.</source>
         <target state="translated">Путь {0} не существует.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Путь {0} не существует.</target>
         </alt-trans>
@@ -1198,7 +1200,7 @@
       The directory containing the temporary outputs.</source>
         <target state="translated">--BuildBasePath|/BuildBasePath:&lt;базовый_путь_к_сборке&gt;
       Каталог, содержащий временные выходные данные.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--BuildBasePath | / BuildBasePath: &lt; BuildBasePath &gt;
       Каталог, содержащий временные выходные данные.</target>
@@ -1210,7 +1212,7 @@
       The configuration the project is built for i.e. Debug/Release</source>
         <target state="translated">-c|--Configuration|/c|/Configuration:&lt;конфигурация&gt;
       Конфигурация, для которой предназначен проект, например Debug/Release.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-c |--конфигурации | / c | / конфигурации: &lt; конфигурации &gt;
       Построение конфигурации проекта для отладки и выпуска т. е.</target>
@@ -1220,7 +1222,7 @@
       <trans-unit id="InvalidConfiguration">
         <source>The given configuration is invalid.</source>
         <target state="translated">Данная конфигурация недопустима.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Данной конфигурации является недопустимым.</target>
         </alt-trans>
@@ -1231,7 +1233,7 @@
       The directory containing the binaries to run.</source>
         <target state="translated">-o|--Output|/o|/Output:&lt;выходные данные&gt;
       Каталог, содержащий двоичные файлы для запуска.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-o |--вывод | / o | / Output: &lt; выход &gt;
       Каталог, содержащий двоичные файлы для запуска.</target>
@@ -1241,7 +1243,7 @@
       <trans-unit id="BuildBasePathNotFound">
         <source>The BuildBasePath was not found, provide a valid path and try again.</source>
         <target state="translated">Базовый путь к сборке не найден, укажите допустимый путь и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">BuildBasePath не найден, укажите правильный путь и повторите попытку.</target>
         </alt-trans>
@@ -1250,7 +1252,7 @@
       <trans-unit id="OutputPathNotFound">
         <source>The Output path was not found, provide a valid path and try again.</source>
         <target state="translated">Выходной путь не найден, укажите допустимый путь и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Выходной путь не найден, и укажите правильный путь и повторите попытку.</target>
         </alt-trans>
@@ -1259,7 +1261,7 @@
       <trans-unit id="AddnlInfoMessagesBanner">
         <source>Additional Information Messages:</source>
         <target state="translated">Дополнительные информационные сообщения:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Дополнительные информационные сообщения:</target>
         </alt-trans>
@@ -1268,7 +1270,7 @@
       <trans-unit id="Days">
         <source>Days</source>
         <target state="translated">Дни</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Дней</target>
         </alt-trans>
@@ -1277,7 +1279,7 @@
       <trans-unit id="ErrorMessageBanner">
         <source>Error Message:</source>
         <target state="translated">Сообщение об ошибке:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Сообщение об ошибке:</target>
         </alt-trans>
@@ -1286,7 +1288,7 @@
       <trans-unit id="ExecutionTimeFormatString">
         <source>Test execution time: {0:0.0000} {1}</source>
         <target state="translated">Время выполнения теста: {0:0.0000} {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Проверки времени выполнения: {1} {0:0.0000}</target>
         </alt-trans>
@@ -1295,7 +1297,7 @@
       <trans-unit id="Hours">
         <source>Hours</source>
         <target state="translated">Часы</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Часы</target>
         </alt-trans>
@@ -1304,7 +1306,7 @@
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
         <target state="translated">Не удалось найти средство ведения журнала тестирования с URI или понятным именем "{0}".</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не удалось найти средство ведения журнала тестирования с URI или FriendlyName «{0}».</target>
         </alt-trans>
@@ -1313,7 +1315,7 @@
       <trans-unit id="Minutes">
         <source>Minutes</source>
         <target state="translated">Минуты</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Минут</target>
         </alt-trans>
@@ -1322,7 +1324,7 @@
       <trans-unit id="Seconds">
         <source>Seconds</source>
         <target state="translated">Секунды</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Секунд</target>
         </alt-trans>
@@ -1331,7 +1333,7 @@
       <trans-unit id="StacktraceBanner">
         <source>Stack Trace:</source>
         <target state="translated">Трассировка стека:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Трассировка стека:</target>
         </alt-trans>
@@ -1340,7 +1342,7 @@
       <trans-unit id="StdErrMessagesBanner">
         <source>Standard Error Messages:</source>
         <target state="translated">Стандартные сообщения об ошибке:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Стандартная ошибка сообщения:</target>
         </alt-trans>
@@ -1349,7 +1351,7 @@
       <trans-unit id="StdOutMessagesBanner">
         <source>Standard Output Messages:</source>
         <target state="translated">Стандартные выходные сообщения:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Стандартный вывод сообщения:</target>
         </alt-trans>
@@ -1358,7 +1360,7 @@
       <trans-unit id="AttachmentsBanner">
         <source>Attachments:</source>
         <target state="translated">Вложения:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Вложения:</target>
         </alt-trans>
@@ -1367,7 +1369,7 @@
       <trans-unit id="AttachmentOutputFormat">
         <source>  {0}</source>
         <target state="translated">  {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}</target>
         </alt-trans>
@@ -1376,7 +1378,7 @@
       <trans-unit id="NoTestsAvailableInSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
         <target state="translated">В {0} нет доступных тестов. Проверьте правильность параметров установленных средств обнаружения и выполнения тестов, а также платформы и версии среды, и повторите попытку.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Тесты не доступна в {0}. Убедитесь, что установленный тестирования discoverers &amp; исполнители, параметры платформы &amp; framework версии и повторите попытку.</target>
         </alt-trans>
@@ -1403,7 +1405,7 @@
       <trans-unit id="SkippedTestIndicator">
         <source>Skipped  {0}</source>
         <target state="translated">Пропущено:  {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Пропущенные {0}</target>
         </alt-trans>
@@ -1412,7 +1414,7 @@
       <trans-unit id="TestRunSummary">
         <source>Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}.</source>
         <target state="translated">Всего тестов: {0}. Пройдено: {1}. Не пройдено: {2}. Пропущено: {3}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Общее число тестов: {0}. пройден: {1}. Ошибка: {2}. пропущено: {3}.</target>
         </alt-trans>
@@ -1421,7 +1423,7 @@
       <trans-unit id="DiscoveryFailed">
         <source>Discovery failed for given sources. Exception : {0}</source>
         <target state="translated">Не удалось выполнить обнаружение для заданных источников. Исключение: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Не удалось выполнить обнаружение для заданной источников. Исключение: {0}</target>
         </alt-trans>
@@ -1432,7 +1434,7 @@
       Process Id of the Parent Process responsible for launching current process.</source>
         <target state="translated">--ParentProcessId|/ParentProcessId:&lt;ИД_родительского_процесса&gt;
       Идентификатор родительского процесса, ответственного за запуск текущего процесса.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--ParentProcessId | / ParentProcessId: &lt; ParentProcessId &gt;
       Идентификатор процесса родительского процесса, ответственного за запуск текущего процесса.</target>
@@ -1442,7 +1444,7 @@
       <trans-unit id="InvalidParentProcessIdArgument">
         <source>The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process.</source>
         <target state="translated">Для аргумента --ParentProcessId|/ParentProcessId требуется указать ИД процесса, который должен быть целым числом. Укажите идентификатор родительского процесса, ответственного за запуск текущего процесса.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--ParentProcessId | / ParentProcessId аргумент необходим идентификатор процесса, который представляет собой целое число. Задайте идентификатор процесса родительского процесса, который запущен этот процесс.</target>
         </alt-trans>
@@ -1451,7 +1453,7 @@
       <trans-unit id="HelpArgumentsText">
         <source>Arguments:</source>
         <target state="translated">Аргументы:</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргументы:</target>
         </alt-trans>
@@ -1464,7 +1466,7 @@
         <target state="translated">--Diag|/Diag:&lt;путь к файлу журнала&gt;
       Включение подробных журналов для платформы тестирования.
       Журналы записываются в указанный файл.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Diag | / Diag: &lt; путь к файлу журнала &gt;
       Включение подробных журналов для тестовой платформы.
@@ -1475,7 +1477,7 @@
       <trans-unit id="LoggerFileIsReadOnly">
         <source>The file {0} provided is read only</source>
         <target state="translated">Указанный файл {0} доступен только для чтения.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Предоставленный файл {0} доступен только для чтения</target>
         </alt-trans>
@@ -1483,20 +1485,20 @@
       </trans-unit>
       <trans-unit id="DesignModeClientTimeoutError">
         <source>Timeout to connect or process request for DesignModeClient on port: {0}</source>
-        <target state="new">Timeout to connect or process request for DesignModeClient on port: {0}</target>
-        <note></note>
+        <target state="translated">Время ожидания установления подключения или обработки запроса для DesignModeClient на порту {0} истекло.</target>
+        <note />
       </trans-unit>
       <trans-unit id="CLIRunSettingsArgumentHelp">
         <source>Args:
       Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</source>
-        <target state="new">Args:
-      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</target>
-        <note></note>
+        <target state="translated">Args:
+      Все дополнительные аргументы должны передаваться в адаптер. Их можно указать в виде пар "название-значение" (как &lt;н&gt;=&lt;з&gt;), где &lt;н&gt; — название аргумента, а &lt;з&gt; — значение. Для разделения нескольких аргументов используется пробел.</target>
+        <note />
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
-        <target state="new">One or more runsettings provided contain invalid token</target>
-        <note></note>
+        <target state="translated">Один параметр запуска (или несколько) включает в себя недопустимый токен.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryArgumentHelp">
         <source>--ResultsDirectory|/ResultsDirectory

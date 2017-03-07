@@ -23,7 +23,7 @@
       <trans-unit id="DataCollectionMessageFormat">
         <source>Diagnostic data adapter message: {0}</source>
         <target state="translated">Messaggio dell'adattatore dati di diagnostica: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Messaggio di adattatore dati di diagnostica: {0}</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="DataCollectorMessageFormat">
         <source>Diagnostic data adapter ('{0}') message: {1}.</source>
         <target state="translated">Messaggio dell'adattatore dati di diagnostica ('{0}'): {1}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Messaggio ('{0}') adattatore dati di diagnostica: {1}.</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="DuplicateExtensionUri">
         <source>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</source>
         <target state="translated">L'URI dell'estensione di test '{0}' è duplicato. L'estensione duplicata verrà ignorata.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Duplicare l'estensione del test URI '{0}'.  Ignorando tale estensione.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="DuplicateSettingsName">
         <source>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</source>
         <target state="translated">Il provider di impostazioni denominato '{0}' è duplicato. Il provider duplicato verrà ignorato.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Provider di impostazioni denominato '{0}' duplicato.  Ignorando il provider di duplicati.</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
         <target state="translated">La sezione delle impostazioni esecuzione test denominata '{0}' è duplicata. Le impostazioni duplicate verranno ignorate.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Duplicare una sezione di impostazioni di esecuzione denominata '{0}'.  Ignorando le impostazioni di duplicati.</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="EmptyParenthesis">
         <source>Error: Empty parenthesis ( )</source>
         <target state="translated">Errore: parentesi vuote ( )</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Errore: Parentesi vuote)</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="InvalidCondition">
         <source>Error: Invalid Condition '{0}'</source>
         <target state="translated">Errore: condizione non valida '{0}'</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Errore: Condizione non valida '{0}'</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="InvalidExtensionUriFormat">
         <source>Test Extension has an invalid URI '{0}': {1}</source>
         <target state="translated">L'URI '{0}' dell'estensione di test non è valido: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Estensione del test è un URI non valido: '{0}': {1}</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="InvalidOperator">
         <source>Error: Invalid operator '{0}'</source>
         <target state="translated">Errore: operatore non valido '{0}'</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Errore: Operatore non valido '{0}'</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
         <target state="translated">Si è verificata un'eccezione durante l'inizializzazione del logger con URI '{0}'. Il logger non verrà usato. Eccezione: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Eccezione durante l'inizializzazione del logger con URI '{0}'.  Non verrà utilizzato il logger.  Eccezione: {1}</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
         <target state="translated">Non è stato trovato alcun logger di test con URI o nome descrittivo '{0}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossibile trovare un logger di test con l'URI o FriendlyName '{0}'.</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="MissingCloseParenthesis">
         <source>Error: Missing ')'</source>
         <target state="translated">Errore: manca ')'</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Errore: Manca ')'</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="MissingOpenParenthesis">
         <source>Error: Missing '('</source>
         <target state="translated">Errore: manca '('</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Errore: Manca ' ('</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="MissingOperand">
         <source>Error: Missing operand</source>
         <target state="translated">Errore: manca l'operando</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Errore: Operando mancante</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="MissingOperator">
         <source>Missing Operator '|' or '&amp;'</source>
         <target state="translated">Manca l'operatore '|' o '&amp;'</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Manca l'operatore ' |' o '&amp;'</target>
         </alt-trans>
@@ -158,7 +158,7 @@
       <trans-unit id="RunSettingsAlreadyLoaded">
         <source>The Run Settings have already been loaded.</source>
         <target state="translated">Le impostazioni esecuzione test sono già state caricate.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le impostazioni di esecuzione sono già state caricate.</target>
         </alt-trans>
@@ -167,7 +167,7 @@
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the run settings.  Error: {0}</source>
         <target state="translated">Errore durante il caricamento delle impostazioni esecuzione test. Errore: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Si è verificato un errore durante il caricamento delle impostazioni di esecuzione.  Errore: {0}</target>
         </alt-trans>
@@ -176,7 +176,7 @@
       <trans-unit id="SettingsNodeInvalidName">
         <source>Invalid settings node specified. The name property of the settings node must be non-empty.</source>
         <target state="translated">Il nodo impostazioni specificato non è valido. La proprietà del nome del nodo impostazioni non deve essere vuota.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nodo di impostazioni non valido specificato. La proprietà name del nodo di impostazioni deve essere non vuota.</target>
         </alt-trans>
@@ -185,7 +185,7 @@
       <trans-unit id="SettingsProviderInitializationError">
         <source>An error occurred while initializing the settings provider named '{0}'. Error: {1}</source>
         <target state="translated">Si è verificato un errore durante l'inizializzazione del provider di impostazioni denominato '{0}'. Errore: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Si è verificato un errore durante l'inizializzazione del provider di impostazioni denominato '{0}'. Errore: {1}</target>
         </alt-trans>
@@ -194,7 +194,7 @@
       <trans-unit id="SettingsProviderNotFound">
         <source>Settings Provider named '{0}' was not found.  The settings can not be loaded.</source>
         <target state="translated">Il provider di impostazioni denominato '{0}' non è stato trovato. Non è possibile caricare le impostazioni.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Provider di impostazioni denominato '{0}' non trovata.  Le impostazioni non possono essere caricate.</target>
         </alt-trans>
@@ -203,7 +203,7 @@
       <trans-unit id="TestCaseFilterFormatException">
         <source>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</source>
         <target state="translated">Il formato per TestCaseFilter {0} non è corretto. Specificare il formato corretto e riprovare. Se il formato non è corretto, potrebbe non essere eseguito alcun test.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Formato non valido per TestCaseFilter: {0}. Specificare il formato corretto e riprovare. Si noti che il formato non corretto può portare a nessun test eseguito il recupero.</target>
         </alt-trans>

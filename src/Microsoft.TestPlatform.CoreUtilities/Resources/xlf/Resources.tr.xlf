@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
-        <note></note>
+        <target state="translated">Parametre null veya boş olamaz.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata: {0}</target>
-        <note></note>
+        <target state="translated">Hata: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata: {0}</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">Bilgi: {0}</target>
-        <note></note>
+        <target state="translated">Bilgi: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Bilgi: {0}</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">Uyarı: {0}</target>
-        <note></note>
+        <target state="translated">Uyarı: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uyarı: {0}</target>
         </alt-trans>
@@ -58,8 +58,8 @@
       </trans-unit>
       <trans-unit id="Error_ArgumentIsEmpty">
         <source>The specified argument cannot be empty.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen bağımsız değişken boş olamaz.</target>
-        <note></note>
+        <target state="translated">Belirtilen bağımsız değişken boş olamaz.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen bağımsız değişken boş olamaz.</target>
         </alt-trans>
@@ -67,8 +67,8 @@
       </trans-unit>
       <trans-unit id="Error_ArgumentIsNegative">
         <source>The specified argument cannot be negative.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen bağımsız değişken negatif olamaz.</target>
-        <note></note>
+        <target state="translated">Belirtilen bağımsız değişken negatif olamaz.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen bağımsız değişken negatif olamaz.</target>
         </alt-trans>
@@ -76,8 +76,8 @@
       </trans-unit>
       <trans-unit id="Error_ArgumentNotTypeOf">
         <source>The specified argument must have the following type: {0}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen bağımsız değişken şu türde olmalıdır: {0}.</target>
-        <note></note>
+        <target state="translated">Belirtilen bağımsız değişken şu türde olmalıdır: {0}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen bağımsız değişken türü aşağıdaki olması gerekir: {0}.</target>
         </alt-trans>
@@ -85,8 +85,8 @@
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsEmpty">
         <source>The specified argument has the following property, which cannot be an empty string: {0}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen bağımsız değişken, boş dize olamayacak olan şu özelliğe sahiptir: {0}.</target>
-        <note></note>
+        <target state="translated">Belirtilen bağımsız değişken, boş dize olamayacak olan şu özelliğe sahiptir: {0}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen bağımsız değişken boş bir dize olamaz aşağıdaki özelliğine sahiptir: {0}.</target>
         </alt-trans>
@@ -94,8 +94,8 @@
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsNegative">
         <source>The specified argument has the following property, which cannot be negative: {0}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen bağımsız değişken, negatif olamayacak olan şu özelliğe sahiptir: {0}.</target>
-        <note></note>
+        <target state="translated">Belirtilen bağımsız değişken, negatif olamayacak olan şu özelliğe sahiptir: {0}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen bağımsız değişken negatif olamaz aşağıdaki özelliğine sahiptir: {0}.</target>
         </alt-trans>
@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyIsNull">
         <source>The specified argument has the following property, which cannot be null: {0}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen bağımsız değişken, null olamayacak olan şu özelliğe sahiptir: {0}.</target>
-        <note></note>
+        <target state="translated">Belirtilen bağımsız değişken, null olamayacak olan şu özelliğe sahiptir: {0}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen bağımsız değişken null olamaz aşağıdaki özelliğine sahiptir: {0}.</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="Error_ArgumentPropertyNotTypeOf">
         <source>The specified argument has the following property: {0}. This property must have the following type: {1}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen bağımsız değişken şu özelliğe sahiptir: {0}. Bu özellik şu türde olmalıdır: {1}.</target>
-        <note></note>
+        <target state="translated">Belirtilen bağımsız değişken şu özelliğe sahiptir: {0}. Bu özellik şu türde olmalıdır: {1}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen bağımsız değişken þu özelliklere sahiptir: {0}. Bu özellik aşağıdaki türü olmalıdır: {1}.</target>
         </alt-trans>
@@ -121,8 +121,8 @@
       </trans-unit>
       <trans-unit id="ExceptionFromJobProcessor">
         <source>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' kuyruğundan bir iş işlenirken, işlenmeyen özel durum oluştu: {1}</target>
-        <note></note>
+        <target state="translated">'{0}' kuyruğundan bir iş işlenirken, işlenmeyen özel durum oluştu: {1}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' sıradan bir iş işlenirken işlenmeyen bir özel durum oluştu: {1}</target>
         </alt-trans>
@@ -130,8 +130,8 @@
       </trans-unit>
       <trans-unit id="QueueAlreadyDisposed">
         <source>The {0} queue has already been disposed.</source>
-        <target state="translated" state-qualifier="mt-suggestion">{0} kuyruğu zaten atıldı.</target>
-        <note></note>
+        <target state="translated">{0} kuyruğu zaten atıldı.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} sıra zaten atıldı.</target>
         </alt-trans>
@@ -139,8 +139,8 @@
       </trans-unit>
       <trans-unit id="QueuePausedDisposeError">
         <source>The {0} queue cannot be disposed while paused.</source>
-        <target state="translated" state-qualifier="mt-suggestion">{0} kuyruğu duraklatılmış durumdayken atılamaz.</target>
-        <note></note>
+        <target state="translated">{0} kuyruğu duraklatılmış durumdayken atılamaz.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Duraklatılmış durumdayken {0} kuyruğa atılamaz.</target>
         </alt-trans>
@@ -148,8 +148,8 @@
       </trans-unit>
       <trans-unit id="Utility_ProcessNameWhenCannotGetIt">
         <source>Error getting process name.</source>
-        <target state="translated" state-qualifier="mt-suggestion">İşlem adı alınırken hata oluştu.</target>
-        <note></note>
+        <target state="translated">İşlem adı alınırken hata oluştu.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">İşlem adı alınırken hata oluştu.</target>
         </alt-trans>
