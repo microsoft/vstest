@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">已中止使用中的測試回合。</target>
+        <target state="new">已中止使用中的測試回合。 {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">活动测试运行已中止。</target>
@@ -32,7 +32,7 @@
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
         <target state="translated">遠端主機已強制關閉現有連線。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">现有的连接被远程主机强行关闭。</target>
         </alt-trans>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">已中止使用中的測試探索。</target>
+        <target state="new">已中止使用中的測試探索。 {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">活动测试发现被中止。</target>

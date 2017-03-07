@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Diagnostic data adapter message: {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">Tanılama verisi bağdaştırıcısı iletisi: {0}</target>
-        <note></note>
+        <target state="translated">Tanılama verisi bağdaştırıcısı iletisi: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Tanılama veri bağdaştırıcısı ileti: {0}</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Diagnostic data adapter ('{0}') message: {1}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Tanılama verisi bağdaştırıcısı ('{0}') iletisi: {1}.</target>
-        <note></note>
+        <target state="translated">Tanılama verisi bağdaştırıcısı ('{0}') iletisi: {1}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Tanılama veri bağdaştırıcısı ('{0}') iletisi: {1}.</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="DuplicateExtensionUri">
         <source>Duplicate test extension URI '{0}'.  Ignoring the duplicate extension.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Yinelenen test uzantısı URI’si '{0}'. Yinelenen uzantı yoksayılıyor.</target>
-        <note></note>
+        <target state="translated">Yinelenen test uzantısı URI’si '{0}'. Yinelenen uzantı yoksayılıyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test uzantısı '{0}' URI yinelenen.  Yinelenen uzantı yok sayılıyor.</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="DuplicateSettingsName">
         <source>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' adlı yinelenen ayar sağlayıcısı. Yinelenen sağlayıcı yoksayılıyor.</target>
-        <note></note>
+        <target state="translated">'{0}' adlı yinelenen ayar sağlayıcısı. Yinelenen sağlayıcı yoksayılıyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ayarları Sağlayıcı '{0}' adlı yinelenen.  Yinelenen sağlayıcı yok sayılıyor.</target>
         </alt-trans>
@@ -58,8 +58,8 @@
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
         <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' adlı yinelenen çalıştırma ayarları bölümü bulundu. Yinelenen ayarlar yoksayılıyor.</target>
-        <note></note>
+        <target state="translated">'{0}' adlı yinelenen çalıştırma ayarları bölümü bulundu. Yinelenen ayarlar yoksayılıyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Çalışma Ayarları bölümünde bulunan ' {0}' adlı birden fazla kopyası.  Yinelenen ayarları göz ardı ediliyor.</target>
         </alt-trans>
@@ -67,8 +67,8 @@
       </trans-unit>
       <trans-unit id="EmptyParenthesis">
         <source>Error: Empty parenthesis ( )</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata: Boş ayraç ( )</target>
-        <note></note>
+        <target state="translated">Hata: Boş ayraç ( )</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata: Boş ayraç)</target>
         </alt-trans>
@@ -76,8 +76,8 @@
       </trans-unit>
       <trans-unit id="InvalidCondition">
         <source>Error: Invalid Condition '{0}'</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata: Geçersiz Koşul '{0}'</target>
-        <note></note>
+        <target state="translated">Hata: Geçersiz Koşul '{0}'</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata: Geçersiz '{0}' durumu</target>
         </alt-trans>
@@ -85,8 +85,8 @@
       </trans-unit>
       <trans-unit id="InvalidExtensionUriFormat">
         <source>Test Extension has an invalid URI '{0}': {1}</source>
-        <target state="translated" state-qualifier="mt-suggestion">Test Uzantısı geçersiz bir '{0}' URI’sine sahip: {1}</target>
-        <note></note>
+        <target state="translated">Test Uzantısı geçersiz bir '{0}' URI’sine sahip: {1}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test uzantısı geçersiz bir URI '{0}' olan: {1}</target>
         </alt-trans>
@@ -94,8 +94,8 @@
       </trans-unit>
       <trans-unit id="InvalidOperator">
         <source>Error: Invalid operator '{0}'</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata: Geçersiz işleç '{0}'</target>
-        <note></note>
+        <target state="translated">Hata: Geçersiz işleç '{0}'</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata: Geçersiz işleç '{0}'</target>
         </alt-trans>
@@ -103,8 +103,8 @@
       </trans-unit>
       <trans-unit id="LoggerInitializationError">
         <source>Exception occurred while initializing logger with URI '{0}'.  The logger will not be used.  Exception: {1}</source>
-        <target state="translated" state-qualifier="mt-suggestion">Günlükçü, '{0}' URI’si ile başlatılırken özel durum oluştu. Günlükçü kullanılmayacak. Özel durum: {1}</target>
-        <note></note>
+        <target state="translated">Günlükçü, '{0}' URI’si ile başlatılırken özel durum oluştu. Günlükçü kullanılmayacak. Özel durum: {1}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI '{0}' ile Günlükçü başlatılırken özel durum oluştu.  Günlükçü kullanılmayacak.  Özel durum: {1}</target>
         </alt-trans>
@@ -112,8 +112,8 @@
       </trans-unit>
       <trans-unit id="LoggerNotFound">
         <source>Could not find a test logger with URI or FriendlyName '{0}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">URI veya FriendlyName değeri '{0}' olan bir test günlükçüsü bulunamadı.</target>
-        <note></note>
+        <target state="translated">URI veya FriendlyName değeri '{0}' olan bir test günlükçüsü bulunamadı.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">URI veya FriendlyName '{0}' olan bir test Günlükçü bulunamadı.</target>
         </alt-trans>
@@ -121,8 +121,8 @@
       </trans-unit>
       <trans-unit id="MissingCloseParenthesis">
         <source>Error: Missing ')'</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata: ')' eksik</target>
-        <note></note>
+        <target state="translated">Hata: ')' eksik</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata: Eksik ')'</target>
         </alt-trans>
@@ -130,8 +130,8 @@
       </trans-unit>
       <trans-unit id="MissingOpenParenthesis">
         <source>Error: Missing '('</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata: '(' eksik</target>
-        <note></note>
+        <target state="translated">Hata: '(' eksik</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata: Eksik ' ('</target>
         </alt-trans>
@@ -139,8 +139,8 @@
       </trans-unit>
       <trans-unit id="MissingOperand">
         <source>Error: Missing operand</source>
-        <target state="translated" state-qualifier="mt-suggestion">Hata: İşlenen eksik</target>
-        <note></note>
+        <target state="translated">Hata: İşlenen eksik</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Hata: işlenen eksik</target>
         </alt-trans>
@@ -148,8 +148,8 @@
       </trans-unit>
       <trans-unit id="MissingOperator">
         <source>Missing Operator '|' or '&amp;'</source>
-        <target state="translated" state-qualifier="mt-suggestion">'|' veya '&amp;' İşleci Eksik</target>
-        <note></note>
+        <target state="translated">'|' veya '&amp;' İşleci Eksik</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Eksik işleç ' |' veya '&amp;'</target>
         </alt-trans>
@@ -157,8 +157,8 @@
       </trans-unit>
       <trans-unit id="RunSettingsAlreadyLoaded">
         <source>The Run Settings have already been loaded.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Çalıştırma Ayarları zaten yüklendi.</target>
-        <note></note>
+        <target state="translated">Çalıştırma Ayarları zaten yüklendi.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Çalıştırma ayarları önceden yüklenmiş.</target>
         </alt-trans>
@@ -166,8 +166,8 @@
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the run settings.  Error: {0}</source>
-        <target state="translated" state-qualifier="mt-suggestion">Çalıştırma ayarları yüklenirken bir hata oluştu. Hata: {0}</target>
-        <note></note>
+        <target state="translated">Çalıştırma ayarları yüklenirken bir hata oluştu. Hata: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Çalışma ayarları yüklenirken bir hata oluştu.  Hata: {0}</target>
         </alt-trans>
@@ -175,8 +175,8 @@
       </trans-unit>
       <trans-unit id="SettingsNodeInvalidName">
         <source>Invalid settings node specified. The name property of the settings node must be non-empty.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen ayar düğümü geçersiz. Ayar düğümünün ad özelliği boş olmamalıdır.</target>
-        <note></note>
+        <target state="translated">Belirtilen ayar düğümü geçersiz. Ayar düğümünün ad özelliği boş olmamalıdır.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Belirtilen ayarları geçersiz düğüm. Ayarları düğümünü name özelliği boş olmayan olmalıdır.</target>
         </alt-trans>
@@ -184,8 +184,8 @@
       </trans-unit>
       <trans-unit id="SettingsProviderInitializationError">
         <source>An error occurred while initializing the settings provider named '{0}'. Error: {1}</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' adlı ayar sağlayıcısı başlatılırken bir hata oluştu. Hata: {1}</target>
-        <note></note>
+        <target state="translated">'{0}' adlı ayar sağlayıcısı başlatılırken bir hata oluştu. Hata: {1}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' adlı ayarları sağlayıcısı başlatılırken bir hata oluştu. Hata: {1}</target>
         </alt-trans>
@@ -193,8 +193,8 @@
       </trans-unit>
       <trans-unit id="SettingsProviderNotFound">
         <source>Settings Provider named '{0}' was not found.  The settings can not be loaded.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' adlı Ayar Sağlayıcısı bulunamadı. Ayarlar yüklenemiyor.</target>
-        <note></note>
+        <target state="translated">'{0}' adlı Ayar Sağlayıcısı bulunamadı. Ayarlar yüklenemiyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' adlı ayarları sağlayıcısı bulunamadı.  Ayarları yüklenemiyor.</target>
         </alt-trans>
@@ -202,8 +202,8 @@
       </trans-unit>
       <trans-unit id="TestCaseFilterFormatException">
         <source>Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.</source>
-        <target state="translated" state-qualifier="mt-suggestion">TestCaseFilter {0} için yanlış biçim. Doğru biçimi belirtin ve yeniden deneyin. Yanlış biçim hiçbir testin yürütülmemesine neden olabilir.</target>
-        <note></note>
+        <target state="translated">TestCaseFilter {0} için yanlış biçim. Doğru biçimi belirtin ve yeniden deneyin. Yanlış biçim hiçbir testin yürütülmemesine neden olabilir.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">TestCaseFilter {0}'için yanlış biçim. Doğru biçimde belirtin ve yeniden deneyin. Yanlış biçim hiçbir test yürütülen için neden olabilir unutmayın.</target>
         </alt-trans>

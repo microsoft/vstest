@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
-        <note></note>
+        <target state="translated">Parametre null veya boş olamaz.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Parametre null veya boş olamaz.</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="DisplayChosenSettings">
         <source>Test run will use DLL(s) built for framework {0} and platform {1}. Following DLL(s) will not be part of run: {2} Go to {3} for more details on managing these settings.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Test çalıştırmasında, {0} çerçevesi ve {1} platformu için oluşturulan DLL’ler kullanılacak. Şu DLL’ler çalıştırmaya dahil edilmeyecek: {2} Bu ayarları yönetmeye ilişkin ayrıntılar için {3} sayfasına gidin.</target>
-        <note></note>
+        <target state="translated">Test çalıştırmasında, {0} çerçevesi ve {1} platformu için oluşturulan DLL’ler kullanılacak. Şu DLL’ler çalıştırmaya dahil edilmeyecek: {2} Bu ayarları yönetmeye ilişkin ayrıntılar için {3} sayfasına gidin.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test çalışması DLL(s) framework {0} ve {1} platform için yerleşik kullanır. DLL(s) aşağıdaki çalışma parçası olmayacak: {2} Git {3} daha fazla ayrıntı için bu ayarları yönetme hakkında.</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="NoMatchingSourcesFound">
         <source>None of the provided test containers match the Platform Architecture and .Net Framework settings for the test run. Platform: {0}  .Net Framework: {1}. Go to http://go.microsoft.com/fwlink/?LinkID=330428 for more details on managing these settings.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Belirtilen test kapsayıcılarının hiçbiri test çalıştırmasına ait Platform Mimarisi ve .NET Framework ayarlarıyla eşleşmiyor. Platform: {0} .NET Framework: {1}. Bu ayarları yönetmeye ilişkin ayrıntılar için bkz. http://go.microsoft.com/fwlink/?LinkID=330428.</target>
-        <note></note>
+        <target state="translated">Belirtilen test kapsayıcılarının hiçbiri test çalıştırmasına ait Platform Mimarisi ve .NET Framework ayarlarıyla eşleşmiyor. Platform: {0} .NET Framework: {1}. Bu ayarları yönetmeye ilişkin ayrıntılar için bkz. http://go.microsoft.com/fwlink/?LinkID=330428.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sağlanan test kapsayıcıları hiçbiri eşleşen Platform mimarisi ve .net Framework ayarları test çalıştırması için. Platform: {0} .net Framework: {1}. Bu ayarları yönetme hakkında daha fazla ayrıntı için http://go.microsoft.com/fwlink/?LinkID=330428 gidin.</target>
         </alt-trans>

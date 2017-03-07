@@ -23,7 +23,7 @@
       <trans-unit id="TestOutcomeAborted">
         <source>Aborted</source>
         <target state="translated">中止</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">中止</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="TestOutcomeCompleted">
         <source>Completed</source>
         <target state="translated">完了</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">完了</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="TestOutcomeDisconnected">
         <source>Disconnected</source>
         <target state="translated">切断</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">切断</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="TestOutcomeError">
         <source>Error</source>
         <target state="translated">エラー</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">エラー</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="TestOutcomeFailed">
         <source>Failed</source>
         <target state="translated">失敗</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">失敗しました。</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="TestOutcomeInconclusive">
         <source>Inconclusive</source>
         <target state="translated">結果不確定</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">[結果不確定]</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="TestOutcomeInProgress">
         <source>In Progress</source>
         <target state="translated">処理中</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">進行中</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="TestOutcomeNotExecuted">
         <source>Not Executed</source>
         <target state="translated">実行されませんでした</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">実行されませんでした。</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="TestOutcomeNotRunnable">
         <source>Not Runnable</source>
         <target state="translated">実行できませんでした</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">実行できませんでした。</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="TestOutcomePassed">
         <source>Passed</source>
         <target state="translated">成功</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">渡されました。</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
         <target state="translated">成功 (中止された実行)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">成功 (中止された実行)</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="TestOutcomePending">
         <source>Pending</source>
         <target state="translated">保留中</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">保留中</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="TestOutcomeTimeout">
         <source>Timeout</source>
         <target state="translated">タイムアウト</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">タイムアウト</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="TestOutcomeWarning">
         <source>Warning</source>
         <target state="translated">警告</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">警告</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="Common_CannotBeLessThanZero">
         <source>The parameter cannot be less than 0.</source>
         <target state="translated">パラメーターを 0 より小さい値にすることはできません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">パラメーターは、0 より小さい値にすることはできません。</target>
         </alt-trans>
@@ -158,7 +158,7 @@
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">パラメーターを null または空にすることはできません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">パラメーターは、null または空にすることはできません。</target>
         </alt-trans>
@@ -167,7 +167,7 @@
       <trans-unit id="Common_CannotGetNextIterationName">
         <source>Cannot get free name for {0}(1),(2),... in directory {1}. Please clean up this directory.</source>
         <target state="translated">{0}(1),(2),.. に対して、ディレクトリ {1} で使用可能な名前を取得できません。このディレクトリをクリーンアップしてください。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">空き {ディレクトリ {1} では 0}(1),(2) 名を取得できませんです。このディレクトリのクリーンアップを実行してください。</target>
         </alt-trans>
@@ -176,7 +176,7 @@
       <trans-unit id="Common_MissingRunConfigInRun">
         <source>Test Settings are not specified.</source>
         <target state="translated">テストの設定が指定されていません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">テストの設定が指定されていません。</target>
         </alt-trans>
@@ -185,7 +185,7 @@
       <trans-unit id="Common_MissingRunDeploymentRootInRunConfig">
         <source>The active Test Settings do not define the Run Deployment Directory.</source>
         <target state="translated">アクティブなテストの設定は実行配置ディレクトリを定義していません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの設定は実行配置ディレクトリを定義してください。</target>
         </alt-trans>
@@ -194,7 +194,7 @@
       <trans-unit id="Common_MissingRunInResult">
         <source>The result is not associated with a test run. Use a result that was obtained from an in-progress or completed test run.</source>
         <target state="translated">この結果はテストの実行に関連付けられていません。進行中または完了したテストの実行から取得した結果をご使用ください。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">結果は、テストの実行では関連付けられているではありません。進行中または完了したテストの実行から取得した結果を使用します。</target>
         </alt-trans>
@@ -203,7 +203,7 @@
       <trans-unit id="Common_NothingLeftAfterReplaciingBadCharsInName">
         <source>The specified file/directory name '{0}' is not valid.</source>
         <target state="translated">指定されたファイルまたはディレクトリ名 '{0}' は有効ではありません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定したファイルまたはディレクトリ名 '{0}' は有効ではありません。</target>
         </alt-trans>
@@ -212,7 +212,7 @@
       <trans-unit id="Common_TestRunName">
         <source>{0}@{1} {2}</source>
         <target state="translated">{0}@{1} {2}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0}@{1} {2}</target>
         </alt-trans>
@@ -223,7 +223,7 @@
 Error Details: {1}:{2}</source>
         <target state="translated">次の場所からのファイルの添付に失敗しました: {0}
 エラーの詳細: {1}:{2}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">ファイルを添付できませんでした: {0}
 エラーの詳細: {1}: {2}</target>
@@ -233,7 +233,7 @@ Error Details: {1}:{2}</source>
       <trans-unit id="MessageForSkippedTests">
         <source>Test '{0}' was skipped in the test run.</source>
         <target state="translated">テストの実行でテスト '{0}' がスキップされました。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">テスト '{0}' は、テストの実行でスキップされました。</target>
         </alt-trans>
@@ -242,7 +242,7 @@ Error Details: {1}:{2}</source>
       <trans-unit id="TrxLoggerResultsFile">
         <source>Results File: {0}</source>
         <target state="translated">結果ファイル: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">結果ファイル: {0}</target>
         </alt-trans>
@@ -251,7 +251,7 @@ Error Details: {1}:{2}</source>
       <trans-unit id="TS_AllResults">
         <source>All Loaded Results</source>
         <target state="translated">読み込まれたすべての結果</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">読み込まれたすべての結果</target>
         </alt-trans>
@@ -260,7 +260,7 @@ Error Details: {1}:{2}</source>
       <trans-unit id="TS_UncategorizedResults">
         <source>Results Not in a List</source>
         <target state="translated">一覧に存在しない結果</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">結果リストではなく</target>
         </alt-trans>
@@ -269,7 +269,7 @@ Error Details: {1}:{2}</source>
       <trans-unit id="Common_DeploymentItem">
         <source>deployment item '{0}'</source>
         <target state="translated">配置項目 '{0}'</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">配置項目 ' {0} '</target>
         </alt-trans>
@@ -278,7 +278,7 @@ Error Details: {1}:{2}</source>
       <trans-unit id="Common_DeploymentItemWithOutputDirectory">
         <source>deployment item '{0}' (output directory '{1}')</source>
         <target state="translated">配置項目 '{0}' (出力ディレクトリ ' {1} ')</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">配置項目 '{0}' (出力ディレクトリ ' {1} ')</target>
         </alt-trans>
@@ -287,7 +287,7 @@ Error Details: {1}:{2}</source>
       <trans-unit id="Common_NullInMessages">
         <source>(null)</source>
         <target state="translated">(null)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(null)</target>
         </alt-trans>
@@ -295,8 +295,8 @@ Error Details: {1}:{2}</source>
       </trans-unit>
       <trans-unit id="TrxLoggerResultsFileOverwriteWarning">
         <source>WARNING: Overwriting results file: {0}</source>
-        <target state="new">WARNING: Overwriting results file: {0}</target>
-        <note></note>
+        <target state="translated">警告: 結果ファイルを上書きしています: {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>
