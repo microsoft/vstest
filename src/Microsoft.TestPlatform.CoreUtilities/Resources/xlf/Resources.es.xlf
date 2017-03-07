@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">El parámetro no puede ser nulo ni estar vacío.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El parámetro no puede ser nulo ni estar vacío.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
         <target state="translated">Error: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Error: {0}</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
         <target state="translated">Información: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Información: {0}</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
         <target state="translated">Advertencia: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Advertencia: {0}</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="Error_ArgumentIsEmpty">
         <source>The specified argument cannot be empty.</source>
         <target state="translated">El argumento especificado no puede estar vacío.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento especificado no puede estar vacío.</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="Error_ArgumentIsNegative">
         <source>The specified argument cannot be negative.</source>
         <target state="translated">El argumento especificado no puede ser negativo.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento especificado no puede ser negativo.</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="Error_ArgumentNotTypeOf">
         <source>The specified argument must have the following type: {0}.</source>
         <target state="translated">El argumento especificado debe tener el tipo {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento especificado debe tener el tipo siguiente: {0}.</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="Error_ArgumentPropertyIsEmpty">
         <source>The specified argument has the following property, which cannot be an empty string: {0}.</source>
         <target state="translated">El argumento especificado tiene la siguiente propiedad, que no puede ser una cadena vacía: {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad, que no puede ser una cadena vacía: {0}.</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="Error_ArgumentPropertyIsNegative">
         <source>The specified argument has the following property, which cannot be negative: {0}.</source>
         <target state="translated">El argumento especificado tiene la siguiente propiedad, que no puede ser negativa: {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad, que no puede ser negativa: {0}.</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="Error_ArgumentPropertyIsNull">
         <source>The specified argument has the following property, which cannot be null: {0}.</source>
         <target state="translated">El argumento especificado tiene la siguiente propiedad, que no puede ser nula: {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad, que no puede ser nula: {0}.</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="Error_ArgumentPropertyNotTypeOf">
         <source>The specified argument has the following property: {0}. This property must have the following type: {1}.</source>
         <target state="translated">El argumento especificado tiene la siguiente propiedad: {0}. Esta propiedad debe tener el tipo {1}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento especificado tiene la siguiente propiedad: {0}. esta propiedad debe tener los siguientes tipos: {1}.</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="ExceptionFromJobProcessor">
         <source>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</source>
         <target state="translated">Se produjo una excepción no controlada al procesar un trabajo de la cola '{0}': {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Se produjo una excepción no controlada al procesar un trabajo de la cola '{0}': {1}</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="QueueAlreadyDisposed">
         <source>The {0} queue has already been disposed.</source>
         <target state="translated">La cola {0} ya se ha eliminado.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La cola {0} ha sido cancelada.</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="QueuePausedDisposeError">
         <source>The {0} queue cannot be disposed while paused.</source>
         <target state="translated">La cola {0} no se puede eliminar mientras está en pausa.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La cola {0} no se puede eliminar mientras está en pausa.</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="Utility_ProcessNameWhenCannotGetIt">
         <source>Error getting process name.</source>
         <target state="translated">Error al obtener el nombre del proceso.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Error al obtener el nombre de proceso.</target>
         </alt-trans>

@@ -29,6 +29,16 @@ Param(
     [Switch] $Parallel = $false
 )
 
+function Get-DotNetPath
+{
+    $dotnetPath = Join-Path $env:TP_TOOLS_DIR "dotnet\dotnet.exe"
+    if (-not (Test-Path $dotnetPath)) {
+        Write-Error "Dotnet.exe not found at $dotnetPath. Did the dotnet cli installation succeed?"
+    }
+
+    return $dotnetPath
+}
+
 $ErrorActionPreference = "Stop"
 
 #
@@ -39,6 +49,8 @@ $env:TP_ROOT_DIR = (Get-Item (Split-Path $MyInvocation.MyCommand.Path)).Parent.F
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
+# Add latest dotnet.exe directory to environment variable PATH to tests run on latest dotnet.
+$env:PATH = "$(Split-Path $(Get-DotNetPath));$env:PATH"
 
 #
 # Dotnet configuration
@@ -107,7 +119,7 @@ function Print-FailedTests($TrxFilePath)
         $count = 1
         $nl = [Environment]::NewLine
         $xdoc.TestRun.TestDefinitions.UnitTest |?{$FailedTestCaseDetailsDict.ContainsKey($_.id)} | %{
-            Write-Log  (".. .. . $count. " + "$($_.TestMethod.className).$($_.TestMethod.name)") $Script:TPT_ErrorMsgColor
+            Write-Log (".. .. . $count. " + "$($_.TestMethod.className).$($_.TestMethod.name)") $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .ErrorMessage: $nl" + $FailedTestCaseDetailsDict[$_.id]["Message"]) $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .StackTrace: $nl" + $FailedTestCaseDetailsDict[$_.id]["StackTrace"]) $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .StdOut: $nl" + $FailedTestCaseDetailsDict[$_.id]["StdOut"]) $Script:TPT_ErrorMsgColor
@@ -268,16 +280,6 @@ function Invoke-Test
 #
 # Helper functions
 #
-function Get-DotNetPath
-{
-    $dotnetPath = Join-Path $env:TP_TOOLS_DIR "dotnet\dotnet.exe"
-    if (-not (Test-Path $dotnetPath)) {
-        Write-Error "Dotnet.exe not found at $dotnetPath. Did the dotnet cli installation succeed?"
-    }
-
-    return $dotnetPath
-}
-
 function Get-PackageDirectory($framework, $targetRuntime)
 {
     return $(Join-Path $env:TP_OUT_DIR "$($Script:TPT_Configuration)\$($framework)\$($targetRuntime)")

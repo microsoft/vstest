@@ -9,7 +9,6 @@ Param(
     [System.String] $Configuration = "Debug",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("win7-x64", "win7-x86")]
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
@@ -317,6 +316,8 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+    $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
+    New-Item $packageOutputDir -type directory
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
@@ -342,8 +343,8 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$FullVersion -Properties Version=$FullVersion $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $FullVersion -Properties Version=$FullVersion`;Runtime=$TPB_TargetRuntime $additionalArgs
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $FullVersion -Properties Version=$FullVersion $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $FullVersion -Properties Version=$FullVersion`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -354,13 +355,14 @@ function Copy-PackageItems($packageName)
     # Packages published separately are copied into their own artifacts directory
     # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net46\* is copied
     # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net46
-    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration", "*.*")
+    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
+    $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
     Write-Log "Copy-PackageItems: Package: $packageName"
     Write-Verbose "Create $publishDirectory"
     New-Item -ItemType directory -Path $publishDirectory -Force | Out-Null
 
-    Write-Verbose "Copy binaries for package '$packageName' from '$binariesDirectory' to '$publishDirectory'"
+    Write-Log "Copy binaries for package '$packageName' from '$binariesDirectory' to '$publishDirectory'"
     Copy-Item -Path $binariesDirectory -Destination $publishDirectory -Recurse -Force
 }
 

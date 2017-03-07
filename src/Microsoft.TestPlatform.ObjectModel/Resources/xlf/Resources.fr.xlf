@@ -32,7 +32,7 @@
       <trans-unit id="TestOutcomeNone">
         <source>None</source>
         <target state="translated">Aucun</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aucun</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="BasicTestResultFormat">
         <source>{0,-10}  {1}</source>
         <target state="translated">{0,-10}  {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0, -10}  {1}</target>
         </alt-trans>
@@ -61,7 +61,7 @@
 {1}</source>
         <target state="translated">  {0} :
 {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} :
 {1}</target>
@@ -73,7 +73,7 @@
 {0}</source>
         <target state="translated">  Messages de test :
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Messages de test :
 {0}</target>
@@ -83,7 +83,7 @@
       <trans-unit id="TestFailureMessageFormat">
         <source>  Message: {0}</source>
         <target state="translated">  Message : {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Message : {0}</target>
         </alt-trans>
@@ -94,7 +94,7 @@
 {0}</source>
         <target state="translated">  StackTrace :
 {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">StackTrace :
 {0}</target>
@@ -104,7 +104,7 @@
       <trans-unit id="NullString">
         <source>(null)</source>
         <target state="translated">(null)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">(null)</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="Exception_RegisteredTestPropertyHasDifferentValueType">
         <source>Cannot register property '{0}' as value type '{1}' because it was already registered as '{2}'.</source>
         <target state="translated">Impossible d'inscrire la propriété '{0}' en tant que type valeur '{1}', car elle est déjà inscrite en tant que '{2}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossible d’enregistrer la propriété '{0}' comme type de valeur '{1}', car il a déjà été enregistré en tant que '{2}'.</target>
         </alt-trans>
@@ -248,7 +248,7 @@
       <trans-unit id="ConverterNotSupported">
         <source>Cannot find TypeConverter for type {0}.</source>
         <target state="translated">TypeConverter introuvable pour le type {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossible de trouver le TypeConverter pour le type {0}.</target>
         </alt-trans>
@@ -275,7 +275,7 @@
       <trans-unit id="TestCasePropertyIdLabel">
         <source>Id</source>
         <target state="translated">ID</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">ID</target>
         </alt-trans>
@@ -284,7 +284,7 @@
       <trans-unit id="InvalidSettingsXmlAttribute">
         <source>Invalid settings '{0}'. Unexpected XmlAttribute: '{1}'.</source>
         <target state="translated">Paramètres non valides '{0}'. XmlAttribute inattendu : '{1}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Paramètres non valides : '{0}'. XmlAttribute inattendu : '{1}'.</target>
         </alt-trans>
@@ -293,7 +293,7 @@
       <trans-unit id="InvalidSettingsXmlElement">
         <source>Invalid settings '{0}'. Unexpected XmlElement: '{1}'.</source>
         <target state="translated">Paramètres non valides '{0}'. XmlElement inattendu : '{1}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Paramètres non valides : '{0}'. XmlElement inattendu : '{1}'.</target>
         </alt-trans>
@@ -302,7 +302,7 @@
       <trans-unit id="MissingDataCollectorAttributes">
         <source>Invalid data collector settings. Expected attribute '{0}' is missing.  A typical data collector setting would look like &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</source>
         <target state="translated">Paramètres du collecteur de données non valides. L'attribut '{0}' attendu est manquant. Un paramètre de collecteur de données classique se présente comme suit : &lt;DataCollector uri="dataCollector://Samples/SampleCollector/1.0" assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1111111111111111" friendlyName="sampleCollector"&gt;.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Paramètres du collecteur de données non valides. L’attribut attendu '{0}' est manquant.  Un collecteur de données de type paramètre ressemblerait à &lt; uri de DataCollector = « dataCollector://Samples/SampleCollector/1.0 » assemblyQualifiedName="Samples.SampleCollector.SampleDataCollector, SampleCollectors, Version = 1.0.0.0, Culture = neutral, PublicKeyToken = 1111111111111111 » friendlyName = « sampleCollector » &gt;.</target>
         </alt-trans>
@@ -338,7 +338,7 @@
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid settings '{0}'.  Invalid value '{1}' specified for '{2}'.</source>
         <target state="translated">Paramètres non valides '{0}'. Valeur non valide '{1}' spécifiée pour '{2}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Paramètres non valides : '{0}'.  Valeur non valide '{1}' spécifiée pour '{2}'.</target>
         </alt-trans>
@@ -347,7 +347,7 @@
       <trans-unit id="InvalidRunSettingsRootNode">
         <source>The root node of the run settings must be named 'RunSettings'.</source>
         <target state="translated">Le nœud racine des paramètres d'exécution doit être nommé 'RunSettings'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le nœud racine de paramètres d’exécution doit être nommé 'RunSettings'.</target>
         </alt-trans>
@@ -356,7 +356,7 @@
       <trans-unit id="NoTestCaseFilterForSpecificTests">
         <source>Cannot specify TestCaseFilter for specific tests run. FilterCriteria is only for run with sources.</source>
         <target state="translated">Impossible de spécifier TestCaseFilter pour l'exécution de tests spécifiques. FilterCriteria est destiné uniquement à l'exécution avec des sources.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossible de spécifier TestCaseFilter pour exécuter des tests spécifiques. Propriété FilterCriteria est uniquement pour s’exécuter avec les sources.</target>
         </alt-trans>
@@ -365,7 +365,7 @@
       <trans-unit id="UnexpectedTypeOfProperty">
         <source>The test property type '{0}' of property '{1}' is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. </source>
         <target state="translated">Le type de propriété de test '{0}' de la propriété '{1}' n'est pas pris en charge. Utilisez l'un des types de propriété pris en charge (types primitifs, uri, string, string[]), puis réessayez. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le type de propriété de test '{0}' de la propriété '{1}' n’est pas pris en charge. Utilisez un des type de propriété pris en charge (les types primitifs, uri, chaîne, qu’et essayez à nouveau.</target>
         </alt-trans>
@@ -383,7 +383,7 @@
       <trans-unit id="TestCasePropertyFullyQualifiedNameLabel">
         <source>FullyQualifiedName</source>
         <target state="translated">FullyQualifiedName</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">FullyQualifiedName</target>
         </alt-trans>
@@ -401,7 +401,7 @@
       <trans-unit id="SolutionDirectoryNotExists">
         <source>Solution directory '{0}' does not exists. Please make sure solution directory specified in runsettings exists and have read permissions for directory.</source>
         <target state="translated">Le répertoire de solution '{0}' n'existe pas. Vérifiez que le répertoire de solution spécifié dans runsettings existe, et que vous disposez d'autorisations d'accès en lecture pour celui-ci.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Répertoire de la solution '{0}' n’existe pas. Vérifiez que le répertoire de solution spécifié dans runsettings existe et disposent d’autorisations pour le répertoire de lecture.</target>
         </alt-trans>
@@ -410,7 +410,7 @@
       <trans-unit id="Common_CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">Le paramètre ne peut pas avoir une valeur null ou être vide.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le paramètre ne peut pas être null ou vide.</target>
         </alt-trans>
@@ -419,7 +419,7 @@
       <trans-unit id="Common_FileNotExist">
         <source>File {0} does not exist.</source>
         <target state="translated">Le fichier {0} n'existe pas.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le fichier {0} n’existe pas.</target>
         </alt-trans>
@@ -428,7 +428,7 @@
       <trans-unit id="Common_ObjectMustBeOfType">
         <source>Object must be of type {0}.</source>
         <target state="translated">L'objet doit être de type {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">L’objet doit être de type {0}.</target>
         </alt-trans>
@@ -437,7 +437,7 @@
       <trans-unit id="Common_TestOutcomeAborted">
         <source>Aborted</source>
         <target state="translated">Abandonné</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Abandonnée</target>
         </alt-trans>
@@ -446,7 +446,7 @@
       <trans-unit id="Common_TestOutcomeCompleted">
         <source>Completed</source>
         <target state="translated">Effectué</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Terminé</target>
         </alt-trans>
@@ -455,7 +455,7 @@
       <trans-unit id="Common_TestOutcomeDisconnected">
         <source>Disconnected</source>
         <target state="translated">Déconnecté</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Déconnecté</target>
         </alt-trans>
@@ -464,7 +464,7 @@
       <trans-unit id="Common_TestOutcomeError">
         <source>Error</source>
         <target state="translated">Erreur</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Erreur</target>
         </alt-trans>
@@ -473,7 +473,7 @@
       <trans-unit id="Common_TestOutcomeFailed">
         <source>Failed</source>
         <target state="translated">Échec</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">A échoué</target>
         </alt-trans>
@@ -482,7 +482,7 @@
       <trans-unit id="Common_TestOutcomeInconclusive">
         <source>Inconclusive</source>
         <target state="translated">Non concluant</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Non concluant</target>
         </alt-trans>
@@ -491,7 +491,7 @@
       <trans-unit id="Common_TestOutcomeInProgress">
         <source>In Progress</source>
         <target state="translated">En cours</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">En cours</target>
         </alt-trans>
@@ -500,7 +500,7 @@
       <trans-unit id="Common_TestOutcomeNotExecuted">
         <source>Not Executed</source>
         <target state="translated">Non exécuté</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Non exécuté</target>
         </alt-trans>
@@ -509,7 +509,7 @@
       <trans-unit id="Common_TestOutcomeNotRunnable">
         <source>Not Runnable</source>
         <target state="translated">Non exécutable</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Non exécutable</target>
         </alt-trans>
@@ -518,7 +518,7 @@
       <trans-unit id="Common_TestOutcomePassed">
         <source>Passed</source>
         <target state="translated">Réussite</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Passé</target>
         </alt-trans>
@@ -527,7 +527,7 @@
       <trans-unit id="Common_TestOutcomePassedButRunAborted">
         <source>Passed (run aborted)</source>
         <target state="translated">Réussi (exécution abandonnée)</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Réussi (exécution abandonnée)</target>
         </alt-trans>
@@ -536,7 +536,7 @@
       <trans-unit id="Common_TestOutcomePending">
         <source>Pending</source>
         <target state="translated">En attente</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">En attente</target>
         </alt-trans>
@@ -545,7 +545,7 @@
       <trans-unit id="Common_TestOutcomeTimeout">
         <source>Timeout</source>
         <target state="translated">Délai d'expiration</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Délai d’attente</target>
         </alt-trans>
@@ -554,7 +554,7 @@
       <trans-unit id="Common_TestOutcomeWarning">
         <source>Warning</source>
         <target state="translated">Avertissement</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Avertissement</target>
         </alt-trans>
@@ -563,7 +563,7 @@
       <trans-unit id="DataCollectionSink_CanNotReadStream">
         <source>Unable to read from the provided stream.  Data from a stream cannot be sent unless the stream supports reading.</source>
         <target state="translated">Impossible de lire le flux fourni. Impossible d'envoyer les données d'un flux s'il ne prend pas en charge la lecture.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Impossible de lire à partir du flux fourni.  Impossible d’envoyer les données à partir d’un flux de données, sauf si le flux prend en charge la lecture.</target>
         </alt-trans>
@@ -572,7 +572,7 @@
       <trans-unit id="DataCollectionSink_InvalidFileNameCharacters">
         <source>The provided file name '{0}' contains the following invalid characters: '{1}'.</source>
         <target state="translated">Le nom de fichier '{0}' fourni contient les caractères non valides suivants : '{1}'.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le nom de fichier fourni '{0}' contient des caractères non valides suivants : '{1}'.</target>
         </alt-trans>
@@ -581,7 +581,7 @@
       <trans-unit id="DataCollectionSink_ReservedFilenameUsed">
         <source>The provided file name '{0}' is reserved.</source>
         <target state="translated">Le nom de fichier '{0}' fourni est réservé.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Le nom de fichier fourni '{0}' est réservé.</target>
         </alt-trans>

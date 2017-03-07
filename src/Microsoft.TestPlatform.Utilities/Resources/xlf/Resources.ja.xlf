@@ -23,7 +23,7 @@
       <trans-unit id="InvalidRunSettingsXml">
         <source>Run settings XML does not contain "RunSettings" node.</source>
         <target state="translated">実行設定 XML に "RunSettings" ノードがありません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">実行設定 XML が含まれていません"RunSettings"のノードには。</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</source>
         <target state="translated">設定 '{0}' は無効です。無効な値 '{1}' が '{2}' に指定されました。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">設定 '{0}' は無効です。無効な値 '{1}' は '{2}' を指定します。</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="MissingRunSettingsNode">
         <source>Could not find 'RunSettings' node.</source>
         <target state="translated">'RunSettings' ノードが見つかりませんでした。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'RunSettings' ノードが見つかりませんでした。</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="NoRunSettingsNodeFound">
         <source>Could not find 'RunSettings' node.</source>
         <target state="translated">'RunSettings' ノードが見つかりませんでした。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'RunSettings' ノードが見つかりませんでした。</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the settings.  Error: {0}.</source>
         <target state="translated">設定の読み込み中にエラーが発生しました。エラー: {0}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">設定の読み込み中にエラーが発生しました。 エラー: {0}。</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
         <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
         <target state="translated">ターゲット プラットフォームの設定 '{0}' はシステム アーキテクチャ '{1}' と互換性がありません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">互換性のないターゲット ・ プラットフォームの設定 '{0}' システム アーキテクチャでは '{1}' です。</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <target state="translated">予期しない設定ファイルが指定されました。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">予期しない設定ファイルを指定します。</target>
         </alt-trans>
