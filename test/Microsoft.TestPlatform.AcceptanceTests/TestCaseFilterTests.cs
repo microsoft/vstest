@@ -141,7 +141,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
             var arguments = PrepareArguments(
-                this.GetSampleTestAssembly(),
+                this.testEnvironment.GetTestAsset("SimpleTestProject2.dll"),
                 this.GetTestAdapterPath(),
                 string.Empty,
                 this.FrameworkArgValue);

@@ -5,7 +5,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined. -->
-    <Version Condition="'$(Version)' == ''">15.0.0</Version>
+    <Version Condition="'$(Version)' == ''">15.1.0</Version>
     <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

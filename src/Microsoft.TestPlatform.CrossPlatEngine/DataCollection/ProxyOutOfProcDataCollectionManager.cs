@@ -21,6 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
         private Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
 
+        private object syncObject = new object();
+
         /// <summary>
         /// Sync object for ensuring that only run is active at a time
         /// </summary>
@@ -42,32 +44,55 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             this.dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
 
             this.dataCollectionTestCaseEventManager.TestCaseStart += this.TriggerTestCaseStart;
-            this.dataCollectionTestCaseEventManager.SessionEnd += this.TriggerTestSessionEnd;
             this.dataCollectionTestCaseEventManager.TestCaseEnd += this.TriggerTestCaseEnd;
-            this.dataCollectionTestCaseEventManager.TestResult += this.TriggerTestResult;
-        }
-
-        private void TriggerTestResult(object sender, TestResultEventArgs e)
-        {
-            lock (syncObject)
-            {
-                Collection<AttachmentSet> dcEntries;
-                if (this.attachmentsCache.TryGetValue(e.TestResult.TestCase.Id, out dcEntries))
-                {
-                    foreach (var entry in dcEntries)
-                    {
-                        e.TestResult.Attachments.Add(entry);
-                    }
-
-                    // Remove the key
-                    this.attachmentsCache.Remove(e.TestResult.TestCase.Id);
-                }
-            }
+            this.dataCollectionTestCaseEventManager.TestResult += TriggerSendTestResult;
+            this.dataCollectionTestCaseEventManager.SessionEnd += this.TriggerTestSessionEnd;
+            attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
         }
 
         private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
         {
             this.dataCollectionTestCaseEventSender.SendTestCaseStart(e);
+        }
+
+        private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
+        {
+            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseComplete(e);
+
+            if (attachments != null)
+            {
+                lock (syncObject)
+                {
+                    Collection<AttachmentSet> attachmentSets;
+                    if (!attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
+                    {
+                        attachmentSets = new Collection<AttachmentSet>();
+                        this.attachmentsCache.Add(e.TestCaseId, attachmentSets);
+                    }
+
+                    foreach (var attachment in attachments)
+                    {
+                        attachmentSets.Add(attachment);
+                    }
+                }
+            }
+        }
+
+        private void TriggerSendTestResult(object sender, TestResultEventArgs e)
+        {
+            lock (syncObject)
+            {
+                Collection<AttachmentSet> attachmentSets;
+                if (this.attachmentsCache.TryGetValue(e.TestCaseId, out attachmentSets))
+                {
+                    foreach (var attachment in attachmentSets)
+                    {
+                        e.TestResult.Attachments.Add(attachment);
+                    }
+                }
+
+                this.attachmentsCache.Remove(e.TestCaseId);
+            }
         }
 
         private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)

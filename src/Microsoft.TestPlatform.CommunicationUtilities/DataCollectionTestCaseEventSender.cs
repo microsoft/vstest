@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
     {
-        private static readonly object obj = new object();
+        private static readonly object syncObject = new object();
 
         private readonly ICommunicationManager communicationManager;
 
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             if (Instance == null)
             {
-                lock (obj)
+                lock (syncObject)
                 {
                     if (Instance == null)
                     {

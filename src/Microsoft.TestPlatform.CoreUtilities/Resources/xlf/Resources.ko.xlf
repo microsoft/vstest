@@ -23,7 +23,7 @@
       <trans-unit id="CannotBeNullOrEmpty">
         <source>The parameter cannot be null or empty.</source>
         <target state="translated">매개 변수는 null이거나 비워 둘 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">매개 변수는 null 이거나 비워 둘 수 없습니다.</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
         <target state="translated">오류: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">오류: {0}</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="CommandLineInformational">
         <source>Information: {0}</source>
         <target state="translated">정보: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">정보: {0}</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="CommandLineWarning">
         <source>Warning: {0}</source>
         <target state="translated">경고: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">경고: {0}</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="Error_ArgumentIsEmpty">
         <source>The specified argument cannot be empty.</source>
         <target state="translated">지정한 인수는 비워 둘 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정 된 인수를 입력 해야 합니다.</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="Error_ArgumentIsNegative">
         <source>The specified argument cannot be negative.</source>
         <target state="translated">지정한 인수는 음수일 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정 된 인수는 양수 여야 합니다.</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="Error_ArgumentNotTypeOf">
         <source>The specified argument must have the following type: {0}.</source>
         <target state="translated">지정한 인수는 {0} 형식이어야 합니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정 된 인수는 다음과 같은 형식 이어야 합니다.: {0}입니다.</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="Error_ArgumentPropertyIsEmpty">
         <source>The specified argument has the following property, which cannot be an empty string: {0}.</source>
         <target state="translated">지정한 인수에 {0} 속성이 있습니다. 이 속성은 빈 문자열일 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정 된 인수에는 다음 속성은 빈 문자열일 수 없습니다: {0}입니다.</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="Error_ArgumentPropertyIsNegative">
         <source>The specified argument has the following property, which cannot be negative: {0}.</source>
         <target state="translated">지정한 인수에 {0} 속성이 있습니다. 이 속성은 음수일 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정 된 인수는 다음과 같은 속성을 음수가 될 수 없습니다: {0}입니다.</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="Error_ArgumentPropertyIsNull">
         <source>The specified argument has the following property, which cannot be null: {0}.</source>
         <target state="translated">지정한 인수에 {0} 속성이 있습니다. 이 속성은 null일 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정 된 인수는 다음과 같은 속성을 null 일 수 없습니다: {0}입니다.</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="Error_ArgumentPropertyNotTypeOf">
         <source>The specified argument has the following property: {0}. This property must have the following type: {1}.</source>
         <target state="translated">지정한 인수에 {0} 속성이 있습니다. 이 속성은 {1} 형식이어야 합니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정 된 인수는 다음과 같은 속성: {0}입니다.이 속성에는 다음과 같은 형식이 같아야 합니다.: {1}입니다.</target>
         </alt-trans>
@@ -122,7 +122,7 @@
       <trans-unit id="ExceptionFromJobProcessor">
         <source>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</source>
         <target state="translated">'{0}' 큐에서 작업을 처리하는 동안 처리되지 않은 예외가 발생했습니다. {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">' {0} '이 (가) 대기열에서 작업을 처리 하는 동안 처리 되지 않은 예외가 발생 했습니다: {1}</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="QueueAlreadyDisposed">
         <source>The {0} queue has already been disposed.</source>
         <target state="translated">{0} 큐가 이미 삭제되었습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} 큐가 이미 삭제 되었습니다.</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="QueuePausedDisposeError">
         <source>The {0} queue cannot be disposed while paused.</source>
         <target state="translated">일시 중지된 동안에는 {0} 큐를 삭제할 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">일시 중지 된 동안 {0} 대기열을 삭제할 수 없습니다.</target>
         </alt-trans>
@@ -149,7 +149,7 @@
       <trans-unit id="Utility_ProcessNameWhenCannotGetIt">
         <source>Error getting process name.</source>
         <target state="translated">프로세스 이름을 가져오는 동안 오류가 발생했습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">오류 가져오는 프로세스 이름입니다.</target>
         </alt-trans>

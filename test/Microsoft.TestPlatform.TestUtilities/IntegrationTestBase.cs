@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 arguments = string.Concat(arguments, " /Framework:", EncloseInQuotes(framework));
             }
 
-            arguments = string.Concat(arguments, " /logger:console;verbosity=normal");
+            arguments = string.Concat(arguments, " /logger:", EncloseInQuotes("console;verbosity=normal"));
 
             return arguments;
         }
@@ -324,7 +324,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 stdError = vstestconsole.StandardError.ReadToEnd();
                 stdOut = vstestconsole.StandardOutput.ReadToEnd();
 
-                vstestconsole.WaitForExit(5 * 60 * 1000);
+                vstestconsole.WaitForExit(60 * 1000);
                 Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
             }
         }
