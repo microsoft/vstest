@@ -113,25 +113,25 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void SendTestCaseCompletedShouldSendMessageThroughCommunicationManager()
         {
             var testCase = new TestCase();
-            var testResultEventArgs = new TestResultEventArgs(new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase));
+            var testCaseEndEventArgs = new TestCaseEndEventArgs(testCase, TestOutcome.Passed);
             var attachmentSet = new AttachmentSet(new Uri("my://attachment"), "displayname");
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestCaseEndResult, Payload = JToken.FromObject(new Collection<AttachmentSet>() { attachmentSet }) });
-            this.dataCollectionTestCaseEventSender.SendTestCaseComplete(testResultEventArgs);
+            var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseComplete(testCaseEndEventArgs);
 
-            Assert.AreEqual(testResultEventArgs.TestResult.Attachments[0].Uri, attachmentSet.Uri);
-            Assert.AreEqual(testResultEventArgs.TestResult.Attachments[0].DisplayName, attachmentSet.DisplayName);
+            Assert.AreEqual(attachments[0].Uri, attachmentSet.Uri);
+            Assert.AreEqual(attachments[0].DisplayName, attachmentSet.DisplayName);
         }
 
         [TestMethod]
         public void SendTestCaseCompletedShouldThrowExceptionIfThrownByCommunicationManager()
         {
             var testCase = new TestCase();
-            var testResultEventArgs = new TestResultEventArgs(new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase));
-            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.AfterTestCaseComplete, It.IsAny<TestResultEventArgs>())).Throws<Exception>();
+            var testCaseEndEventArgs = new TestCaseEndEventArgs(testCase, TestOutcome.Failed);
+            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.AfterTestCaseComplete, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
             {
-                this.dataCollectionTestCaseEventSender.SendTestCaseComplete(testResultEventArgs);
+                this.dataCollectionTestCaseEventSender.SendTestCaseComplete(testCaseEndEventArgs);
             });
         }
     }
