@@ -313,6 +313,8 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+    $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
+    New-Item $packageOutputDir -type directory
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
@@ -338,8 +340,8 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix`;Runtime=$TPB_TargetRuntime $additionalArgs
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"

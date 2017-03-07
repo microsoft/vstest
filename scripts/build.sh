@@ -253,6 +253,8 @@ function createnugetpackages()
     start=$SECONDS
     echo "Create-NugetPackages: Started."
     stagingDir="$TP_OUT_DIR/$TPB_Configuration"
+    packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
+    mkdir -p $packageOutputDir
 
     DOTNET_PATH="$TP_TOOLS_DIR/dotnet/dotnet"
     if [[ ! -e $DOTNET_PATH ]]; then
@@ -279,8 +281,8 @@ function createnugetpackages()
 
 
     for i in ${projectFiles[@]}; do
-        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir /p:Version=$TPB_Version-$TPB_VersionSuffix \
-        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $stagingDir /p:Version=$TPB_Version-$TPB_VersionSuffix
+        echo "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir /p:Version=$TPB_Version-$TPB_VersionSuffix \
+        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir /p:Version=$TPB_Version-$TPB_VersionSuffix
     done
 
     echo "Create-NugetPackages: Elapsed $(( SECONDS - start ))"
