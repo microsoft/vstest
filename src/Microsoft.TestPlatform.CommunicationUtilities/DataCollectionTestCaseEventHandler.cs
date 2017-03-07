@@ -91,10 +91,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case completing.");
                         }
 
-                        var testResultEventArgs = message.Payload.ToObject<TestResultEventArgs>();
-
-                        var attachments = this.dataCollectionManager.TestCaseEnded(new TestCaseEndEventArgs(testResultEventArgs.TestElement, testResultEventArgs.TestResult.Outcome));
-                        this.communicationManager.SendMessage(MessageType.AfterTestCaseEndResult, attachments);
+                        var testCaseEndEventArgs = message.Payload.ToObject<TestCaseEndEventArgs>();
+                        var attachmentSets = this.dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
+                        this.communicationManager.SendMessage(MessageType.AfterTestCaseEndResult, attachmentSets);
 
                         if (EqtTrace.IsInfoEnabled)
                         {
