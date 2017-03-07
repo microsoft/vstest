@@ -23,7 +23,7 @@
       <trans-unit id="InvalidRunSettingsXml">
         <source>Run settings XML does not contain "RunSettings" node.</source>
         <target state="translated">回合設定 XML 不包含 " RunSettings" 節點。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">运行设置 XML 不包含"RunSettings"节点。</target>
         </alt-trans>
@@ -32,7 +32,7 @@
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</source>
         <target state="translated">設定 '{0}' 無效。為 '{2}' 指定的值 '{1}' 無效。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">设置"{0} 无效。值"{1} 指定为 {2} 无效。</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="MissingRunSettingsNode">
         <source>Could not find 'RunSettings' node.</source>
         <target state="translated">找不到 'RunSettings' 節點。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">找不到 RunSettings 节点。</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="NoRunSettingsNodeFound">
         <source>Could not find 'RunSettings' node.</source>
         <target state="translated">找不到 'RunSettings' 節點。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">找不到 RunSettings 节点。</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the settings.  Error: {0}.</source>
         <target state="translated">載入設定時發生錯誤。錯誤: {0}。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">加载设置时出错。 错误︰ {0}。</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
         <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
         <target state="translated">目標平台設定 '{0}' 與系統架構 '{1}' 不相容。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">不兼容目标平台设置"{0} 与系统体系结构"{1}。</target>
         </alt-trans>
@@ -77,7 +77,7 @@
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
         <target state="translated">指定了非預期的設定檔案。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">意外的设置指定文件。</target>
         </alt-trans>

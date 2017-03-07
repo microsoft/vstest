@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new" state-qualifier="mt-suggestion">Etkin Test Çalıştırması iptal edildi.</target>
+        <target state="new" state-qualifier="mt-suggestion">Etkin Test Çalıştırması iptal edildi. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Etkin Test çalışmasını iptal edildi.</target>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Mevcut bir bağlantı uzak konak tarafından zorla kapatıldı.</target>
-        <note></note>
+        <target state="translated">Mevcut bir bağlantı uzak konak tarafından zorla kapatıldı.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Varolan bir bağlantının uzak ana makine tarafından zorla kapatıldı.</target>
         </alt-trans>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new" state-qualifier="mt-suggestion">Etkin Test Bulma iptal edildi.</target>
+        <target state="new" state-qualifier="mt-suggestion">Etkin Test Bulma iptal edildi. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Etkin Test keşfi iptal edildi.</target>
