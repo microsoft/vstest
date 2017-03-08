@@ -6,11 +6,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -24,13 +26,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private DummyDataCollectionRequestSender mockDataCollectionRequestSender;
         private ProxyDataCollectionManager proxyDataCollectionManager;
         private DummyDataCollectionLauncher mockDataCollectionLauncher;
+        private Mock<IProcessHelper> mockProcessHelper;
 
         [TestInitialize]
         public void Initialize()
         {
             this.mockDataCollectionRequestSender = new DummyDataCollectionRequestSender();
             this.mockDataCollectionLauncher = new DummyDataCollectionLauncher();
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(string.Empty, this.mockDataCollectionRequestSender, this.mockDataCollectionLauncher);
+            this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(string.Empty, this.mockDataCollectionRequestSender, this.mockProcessHelper.Object, this.mockDataCollectionLauncher);
         }
 
         [TestMethod]
@@ -146,7 +150,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             if (this.sendBeforeTestRunStartAndGetResultThrowException)
             {
                 throw new Exception("SocketException");
-
             }
 
             this.sendBeforeTestRunStartAndGetResult = true;
@@ -170,5 +173,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             this.dataCollectorLaunched = true;
             return 1;
         }
+
+        public Process DataCollectorProcess { get; }
     }
 }
