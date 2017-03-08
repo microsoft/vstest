@@ -6,12 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -27,7 +27,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
+        private IProcessHelper processHelper;
         private string settingsXml;
+        private int connectionTimeout;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
@@ -36,7 +39,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// Runsettings that contains the datacollector related configuration.
         /// </param>
         public ProxyDataCollectionManager(string settingsXml)
-            : this(settingsXml, new DataCollectionRequestSender(), DataCollectionLauncherFactory.GetDataCollectorLauncher(new ProcessHelper()))
+            : this(settingsXml, new ProcessHelper())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
+        /// </summary>
+        /// <param name="settingsXml">
+        /// The settings xml.
+        /// </param>
+        /// <param name="processHelper">
+        /// The process helper.
+        /// </param>
+        internal ProxyDataCollectionManager(string settingsXml, IProcessHelper processHelper) : this(settingsXml, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper))
         {
         }
 
@@ -49,14 +65,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataCollectionRequestSender">
         /// Handles communication with datacollector process.
         /// </param>
+        /// <param name="processHelper">
+        /// The process Helper.
+        /// </param>
         /// <param name="dataCollectionLauncher">
         /// Launches datacollector process.
         /// </param>
-        internal ProxyDataCollectionManager(string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IDataCollectionLauncher dataCollectionLauncher)
+        internal ProxyDataCollectionManager(string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper, IDataCollectionLauncher dataCollectionLauncher)
         {
             this.settingsXml = settingsXml;
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
+            this.processHelper = processHelper;
+            this.connectionTimeout = 5 * 1000;
         }
 
         /// <summary>
@@ -135,16 +156,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var port = this.dataCollectionRequestSender.InitializeCommunication();
 
             // Warn the user that execution will wait for debugger attach.
-            var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
 
             var processId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
 
+            var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
             if (!string.IsNullOrEmpty(dataCollectorDebugEnabled) && dataCollectorDebugEnabled.Equals("1", StringComparison.Ordinal))
             {
                 ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.DataCollectorDebuggerWarning, OutputLevel.Warning);
                 ConsoleOutput.Instance.WriteLine(
-                    string.Format("Process Id: {0}, Name: {1}", processId, Process.GetProcessById(processId).ProcessName),
+                    string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(processId)),
                     OutputLevel.Information);
+
+                // Increase connection timeout when debugging is enabled.
+                this.connectionTimeout = 5 * this.connectionTimeout;
             }
 
             this.dataCollectionRequestSender.WaitForRequestHandlerConnection(connectionTimeout: 5000);
