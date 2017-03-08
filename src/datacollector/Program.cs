@@ -4,11 +4,13 @@
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
     using System;
+    using System.Diagnostics;
+    using System.Net.Sockets;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using System.Net.Sockets;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;    
 
     /// <summary>
     /// The program.
@@ -36,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             try
             {
                 ParseArgs(args);
-                // todo : Support debugging using VSTEST_COLLECTOR_DEBUG environment variable.
+                WaitForDebuggerIfEnabled();
                 Run();
             }
             catch (SocketException ex)
@@ -78,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         private static void Run()
         {
-            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(),new MessageSink());
+            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
 
             requestHandler.InitializeCommunication(port);
 
@@ -92,6 +94,27 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 EqtTrace.Info("DataCollector: RequestHandler timed out while connecting to the Sender.");
                 requestHandler.Close();
                 throw new TimeoutException();
+            }
+        }   
+
+        private static void WaitForDebuggerIfEnabled()
+        {
+            var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
+            if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
+
+                var currentProcess = Process.GetCurrentProcess();
+                ConsoleOutput.Instance.WriteLine(
+                    string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
+                    OutputLevel.Information);
+
+                while (!Debugger.IsAttached)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                }
+
+                Debugger.Break();
             }
         }
     }
