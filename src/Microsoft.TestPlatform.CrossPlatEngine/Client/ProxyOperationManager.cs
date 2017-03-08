@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Text;
@@ -74,6 +73,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="sources">List of test sources.</param>
         public virtual void SetupChannel(IEnumerable<string> sources)
         {
+            var connTimeout = this.connectionTimeout;
+
             if (!this.initialized)
             {
                 this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
@@ -131,14 +132,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
                     ConsoleOutput.Instance.WriteLine(
-                    string.Format("Process Id: {0}, Name: {1}", processId, Process.GetProcessById(testHostProcessId).ProcessName),
-                    OutputLevel.Information);
+                        string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(testHostProcessId)),
+                        OutputLevel.Information);
+
+                    // Increase connection timeout when debugging is enabled.
+                    connTimeout = 5 * this.connectionTimeout;
                 }
+
                 this.initialized = true;
             }
 
             // Wait for a timeout for the client to connect.
-            if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
+            if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
             {
                 var errorMsg = CrossPlatEngineResources.InitializationFailed;
 

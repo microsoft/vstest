@@ -9,10 +9,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 
     [TestClass]
     public class CommunicationLayerIntegrationTests
@@ -21,17 +23,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         private Mock<ObjectModel.Client.ITestMessageEventHandler> mockTestMessageEventHandler;
         private string dataCollectorSettings, runSettings;
         private IDataCollectionLauncher dataCollectionLauncher;
+        private IProcessHelper processHelper;
 
         public CommunicationLayerIntegrationTests()
         {
             this.mockTestMessageEventHandler = new Mock<ObjectModel.Client.ITestMessageEventHandler>();
             this.dataCollectorSettings = string.Format("<DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"{0}\" codebase=\"{1}\" />", typeof(CustomDataCollector).AssemblyQualifiedName, typeof(CustomDataCollector).GetTypeInfo().Assembly.Location);
             this.runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
-#if NET46
-            this.dataCollectionLauncher = new DefaultDataCollectionLauncher();
-#else
-            this.dataCollectionLauncher = new DotnetDataCollectionLauncher();
-#endif
+            this.processHelper = new ProcessHelper();
+            this.dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper);
         }
 
         [TestMethod]
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher))
             {
                 var result = proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var dataCollectionRequestSender = new DataCollectionRequestSender();
 
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.dataCollectionLauncher))
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.processHelper, this.dataCollectionLauncher))
             {
                 proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
@@ -69,12 +69,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var socketCommManager = new SocketCommunicationManager();
             var dataCollectionRequestSender = new DataCollectionRequestSender(socketCommManager, JsonDataSerializer.Instance);
-#if NET46
-            var dataCollectionLauncher = new DefaultDataCollectionLauncher();
-#else
-            var dataCollectionLauncher = new DotnetDataCollectionLauncher();
-#endif
-            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, dataCollectionLauncher))
+            var dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper);
+
+            using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.processHelper, dataCollectionLauncher))
             {
                 proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
