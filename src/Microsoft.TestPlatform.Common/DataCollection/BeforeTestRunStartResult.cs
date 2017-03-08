@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// <param name="dataCollectionEventsPort">
         /// The data Collection Events Port.
         /// </param>
-        public BeforeTestRunStartResult(IDictionary<string, string> environmentVariables, bool areTestCaseLevelEventsRequired, int dataCollectionEventsPort)
+        public BeforeTestRunStartResult(IDictionary<string, string> environmentVariables, int dataCollectionEventsPort)
         {
             this.EnvironmentVariables = environmentVariables;
             this.DataCollectionEventsPort = dataCollectionEventsPort;
