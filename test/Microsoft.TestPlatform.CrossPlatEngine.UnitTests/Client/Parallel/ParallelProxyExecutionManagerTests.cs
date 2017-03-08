@@ -493,7 +493,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             }
 
                             var completeArgs = new TestRunCompleteEventArgs(new
-                                TestRunStatistics(stats), isCanceled, isAborted, null, runAttachments, timespan);
+                                TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, timespan);
 
                             handler.HandleTestRunComplete(completeArgs, null, runAttachments, executorUris);
                         });
