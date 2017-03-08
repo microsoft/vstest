@@ -4,12 +4,21 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     /// The DataCollectionLauncher interface.
     /// </summary>
     internal interface IDataCollectionLauncher
     {
+        /// <summary>
+        /// Gets the data collector process info.
+        /// </summary>
+        Process DataCollectorProcess
+        {
+            get;
+        }
+
         /// <summary>
         /// The launch data collector.
         /// </summary>
