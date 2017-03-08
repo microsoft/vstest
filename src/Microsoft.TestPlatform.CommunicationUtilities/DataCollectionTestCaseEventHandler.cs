@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         var testCaseEndEventArgs = message.Payload.ToObject<TestCaseEndEventArgs>();
                         var attachmentSets = this.dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
-                        this.communicationManager.SendMessage(MessageType.AfterTestCaseEndResult, attachmentSets);
+                        this.communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets);
 
                         if (EqtTrace.IsInfoEnabled)
                         {

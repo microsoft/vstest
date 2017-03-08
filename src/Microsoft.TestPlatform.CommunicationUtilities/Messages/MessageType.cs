@@ -146,37 +146,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         #region DataCollector messages
 
         /// <summary>
-        /// Event message for Before Test Run Start
+        /// Event message type send to datacollector process before test run starts.
         /// </summary>
         public const string BeforeTestRunStart = "DataCollection.BeforeTestRunStart";
 
         /// <summary>
-        /// Message for result for Before Test Run Start
+        /// Event message type used by datacollector to send results  after receiving test run start event.
         /// </summary>
         public const string BeforeTestRunStartResult = "DataCollection.BeforeTestRunStartResult";
 
         /// <summary>
-        /// Event message for After Test Run End
+        /// Event message type send to datacollector process after test run ends.
         /// </summary>
         public const string AfterTestRunEnd = "DataCollection.AfterTestRunEnd";
 
         /// <summary>
-        /// Message for attachments for After Test Run End Result
+        /// Event message type used by dastacollector to send result on receiving test run end event.
         /// </summary>
         public const string AfterTestRunEndResult = "DataCollection.AfterTestRunEndResult";
 
         /// <summary>
-        /// Event message for data collection process to signal start of test case execution.
+        /// Event message type send to datacollector process before test case execution starts. 
         /// </summary>
         public const string DataCollectionTestStart = "DataCollection.TestStart";
 
         /// <summary>
-        /// Event message for data collection process to signal start of test case execution.
+        /// Event message type used to signal datacollector process that test case execution has ended.
         /// </summary>
         public const string DataCollectionTestEnd = "DataCollection.TestEnd";
 
         /// <summary>
-        /// Message for attachments for After Test Case End Result
+        /// Event message type used by datacollector to send result on receiving TestEnd.
         /// </summary>
         public const string DataCollectionTestEndResult = "DataCollection.TestEndResult";
 
