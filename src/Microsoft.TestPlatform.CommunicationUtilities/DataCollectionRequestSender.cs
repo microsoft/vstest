@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
-    using System;
     using System.Collections.ObjectModel;
     using System.Globalization;
 
@@ -19,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     /// <summary>
     /// Utility class that facilitates the IPC communication. Acts as server.
     /// </summary>
-    public sealed class DataCollectionRequestSender : IDataCollectionRequestSender, IDisposable
+    public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     {
         private ICommunicationManager communicationManager;
         private IDataSerializer dataSerializer;
@@ -80,11 +79,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// </summary>
         public void Close()
         {
-            this.Dispose();
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("Closing the connection");
             }
+
+            this.communicationManager?.StopServer();
         }
 
         /// <inheritdoc/>

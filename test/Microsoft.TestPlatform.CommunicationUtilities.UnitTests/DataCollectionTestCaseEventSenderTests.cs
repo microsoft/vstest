@@ -93,7 +93,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var testcaseStartEventArgs = new TestCaseStartEventArgs(testCase);
             this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
 
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestCaseStart, testcaseStartEventArgs), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
         }
 
         [TestMethod]
@@ -101,7 +101,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var testCase = new TestCase();
             var testcaseStartEventArgs = new TestCaseStartEventArgs(testCase);
-            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.BeforeTestCaseStart, testcaseStartEventArgs)).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs)).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
             {
@@ -110,14 +110,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
-        public void SendTestCaseCompletedShouldReturnAttachments()
+        public void SendTestCaseEndShouldReturnAttachments()
         {
-            var testCase = new TestCase();
-            var testResultEventArgs = new TestResultEventArgs(new VisualStudio.TestPlatform.ObjectModel.TestResult(testCase));
             var testCaseEndEventArgs = new TestCaseEndEventArgs();
 
             var attachmentSet = new AttachmentSet(new Uri("my://attachment"), "displayname");
-            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.AfterTestCaseEndResult, Payload = JToken.FromObject(new Collection<AttachmentSet>() { attachmentSet }) });
+            this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Returns(new Message() { MessageType = MessageType.DataCollectionTestEndResult, Payload = JToken.FromObject(new Collection<AttachmentSet>() { attachmentSet }) });
             var attachments = this.dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
 
             Assert.AreEqual(attachments[0].Uri, attachmentSet.Uri);
@@ -130,7 +128,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             var testCase = new TestCase();
             var testCaseEndEventArgs = new TestCaseEndEventArgs();
 
-            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.AfterTestCaseComplete, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestEnd, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
             {
