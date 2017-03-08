@@ -189,6 +189,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             {
                 return Process.GetCurrentProcess();
             }
+
+            public string GetProcessName(int processId)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
