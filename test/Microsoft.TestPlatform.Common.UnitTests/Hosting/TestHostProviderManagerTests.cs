@@ -19,6 +19,7 @@ namespace TestPlatform.Common.UnitTests.Logging
     using TestPlatform.Common.UnitTests.ExtensionFramework;
     using TestPlatform.Common.UnitTests.Utilities;
     using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Tests the behaviors of the TestLoggerManager class.
@@ -33,25 +34,16 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        public void TestHostProviderManagerDisposeShouldNotThrowExceptionIfCalledMultipleTimes()
-        {
-            // Dispose the logger manager multiple times and verify that no exception is thrown.
-            var manager = TestHostProviderManager.Instance;
-            manager.Dispose();
-            manager.Dispose();
-        }
-
-        [TestMethod]
         public void TestHostProviderManagerShouldReturnTestHostWhenAppropriateCustomURIProvided()
         {
-            var manager = TestHostProviderManager.Instance;
+            var manager = TestRunTimeProviderManager.Instance;
             Assert.IsNotNull(manager.GetTestHostManagerByUri("executor://CustomTestHost/"));
         }
 
         [TestMethod]
         public void TestHostProviderManagerShouldReturnNullWhenInvalidCustomURIProvided()
         {
-            var manager = TestHostProviderManager.Instance;
+            var manager = TestRunTimeProviderManager.Instance;
             Assert.IsNull(manager.GetTestHostManagerByUri("executor://InvalidHost/"));
         }
 
@@ -69,7 +61,7 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             RunConfiguration config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
 
-            var manager = TestHostProviderManager.Instance;
+            var manager = TestRunTimeProviderManager.Instance;
             Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(config));
         }
 
@@ -77,9 +69,12 @@ namespace TestPlatform.Common.UnitTests.Logging
 
         [ExtensionUri("executor://CustomTestHost")]
         [FriendlyName("CustomHost")]
-        private class CustomTestHost : ITestHostProvider
+        private class CustomTestHost : ITestRunTimeProvider
         {
             public bool Shared => throw new NotImplementedException();
+
+            public event EventHandler<HostProviderEventArgs> HostLaunched;
+            public event EventHandler<HostProviderEventArgs> HostError;
 
             public bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration)
             {
@@ -87,6 +82,11 @@ namespace TestPlatform.Common.UnitTests.Logging
             }
 
             public void DeregisterForExitNotification()
+            {
+                throw new NotImplementedException();
+            }
+
+            public CancellationTokenSource GetCancellationTokenSource()
             {
                 throw new NotImplementedException();
             }
@@ -101,9 +101,19 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public int LaunchTestHost(TestProcessStartInfo testHostStartInfo)
+            public Task<int> LaunchTestHost(TestProcessStartInfo testHostStartInfo)
             {
                 throw new NotImplementedException();
+            }
+
+            public void OnHostError(HostProviderEventArgs e)
+            {
+                this.HostError.Invoke(this, new HostProviderEventArgs("Error"));
+            }
+
+            public void OnHostLaunched(HostProviderEventArgs e)
+            {
+                this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
             public void RegisterForExitNotification(Action abortCallback)

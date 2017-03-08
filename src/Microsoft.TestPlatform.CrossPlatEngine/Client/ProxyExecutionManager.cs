@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager
     {
-        private readonly ITestHostProvider testHostManager;
+        private readonly ITestRunTimeProvider testHostManager;
 
         #region Constructors
 
@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// </summary>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
-        public ProxyExecutionManager(ITestHostProvider testHostManager) : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
+        public ProxyExecutionManager(ITestRunTimeProvider testHostManager) : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
         {
         }
 
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance</param>
         /// <param name="testHostManager">Test host manager instance</param>
         /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
-        internal ProxyExecutionManager(ITestRequestSender requestSender, ITestHostProvider testHostManager, int clientConnectionTimeout)
+        internal ProxyExecutionManager(ITestRequestSender requestSender, ITestRunTimeProvider testHostManager, int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
             this.testHostManager = testHostManager;

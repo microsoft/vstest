@@ -22,12 +22,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     {
         private readonly ITestEngine testEngine;
 
-        private Mock<ITestHostProvider> mockTestHostManager;
+        private Mock<ITestRunTimeProvider> mockTestHostManager;
 
         public TestEngineTests()
         {
             this.testEngine = new TestEngine();
-            this.mockTestHostManager = new Mock<ITestHostProvider>();
+            this.mockTestHostManager = new Mock<ITestRunTimeProvider>();
             
             // Default setting for host manager
             this.mockTestHostManager.Setup(p => p.Shared).Returns(true);

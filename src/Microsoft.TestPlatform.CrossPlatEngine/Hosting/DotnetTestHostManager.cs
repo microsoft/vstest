@@ -17,12 +17,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using System.Threading.Tasks;
+    using System.Threading;
+    using System.Text;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -31,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// Note that some functionality of this entity overlaps with that of <see cref="DefaultTestHostManager"/>. That is
     /// intentional since we want to move this to a separate assembly (with some runtime extensibility discovery).
     /// </remarks>
-    public class DotnetTestHostManager : ITestHostProvider
+    public class DotnetTestHostManager : ITestRunTimeProvider
     {
         private readonly IProcessHelper processHelper;
 
@@ -41,11 +44,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private Process testHostProcess;
 
-        private EventHandler registeredExitHandler;
-
         private IDotnetHostHelper dotnetHostHelper;
 
+        private CancellationTokenSource hostLaunchCTS;
+
         private TestSessionMessageLogger logger = TestSessionMessageLogger.Instance;
+        private StringBuilder testHostProcessStdError;
+
+        public event EventHandler<HostProviderEventArgs> HostLaunched;
+        public event EventHandler<HostProviderEventArgs> HostError;
+
+        protected int ErrorLength { get; set; } = 1000;
+        protected int TimeOut { get; set; } = 10000;
+
+        /// <summary>
+        /// Callback on process exit
+        /// </summary>
+        private Action<Process, string> ErrorReceivedCallback => ((process, data) =>
+        {
+            if (data != null)
+            {
+                // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
+                if (data.Length > this.testHostProcessStdError.MaxCapacity)
+                {
+                    this.testHostProcessStdError.Clear();
+                    data = data.Substring(data.Length - this.testHostProcessStdError.MaxCapacity);
+                }
+
+                // remove only what is required, from beginning of error stream
+                else
+                {
+                    int required = data.Length + this.testHostProcessStdError.Length - this.testHostProcessStdError.MaxCapacity;
+                    if (required > 0)
+                    {
+                        this.testHostProcessStdError.Remove(0, required);
+                    }
+                }
+
+                this.testHostProcessStdError.Append(data);
+                this.OnHostError(new HostProviderEventArgs(this.testHostProcessStdError.ToString()));
+            }
+
+            if (process.HasExited && process.ExitCode != 0)
+            {
+                EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
+                this.OnHostError(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), process.ExitCode));
+            }
+        });
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -87,11 +132,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostLauncher = customLauncher;
         }
 
-        /// <inheritdoc/>
-        public int LaunchTestHost(TestProcessStartInfo testHostStartInfo)
+        public async Task<int> LaunchTestHost(TestProcessStartInfo testHostStartInfo)
         {
+            return await Task.Run(() => LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
+        }
+
+        public CancellationTokenSource GetCancellationTokenSource()
+        {
+            this.hostLaunchCTS = new CancellationTokenSource(TimeOut);
+            return this.hostLaunchCTS;
+        }
+
+        /// <inheritdoc/>
+        private int LaunchHost(TestProcessStartInfo testHostStartInfo)
+        {
+            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+            testHostStartInfo.ErrorReceivedCallback = this.ErrorReceivedCallback;
             var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
             this.testHostProcess = Process.GetProcessById(processId);
+
+            this.OnHostLaunched(new HostProviderEventArgs("Test RunTime launched with Pid: " + processId));
+
             return processId;
         }
 
@@ -198,25 +259,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return Enumerable.Empty<string>();
         }
 
-        /// <inheritdoc/>
-        public void RegisterForExitNotification(Action abortCallback)
-        {
-            if (this.testHostProcess != null && abortCallback != null)
-            {
-                this.registeredExitHandler = (sender, args) => abortCallback();
-                this.testHostProcess.Exited += this.registeredExitHandler;
-            }
-        }
-
-        /// <inheritdoc/>
-        public void DeregisterForExitNotification()
-        {
-            if (this.testHostProcess != null && this.registeredExitHandler != null)
-            {
-                this.testHostProcess.Exited -= this.registeredExitHandler;
-            }
-        }
-
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)
         {
             string testHostPackageName = "microsoft.testplatform.testhost";
@@ -294,6 +336,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             return false;
+        }
+
+        public void OnHostLaunched(HostProviderEventArgs e)
+        {
+            this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
+        }
+
+        public void OnHostError(HostProviderEventArgs e)
+        {
+            this.HostError.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
         }
     }
 

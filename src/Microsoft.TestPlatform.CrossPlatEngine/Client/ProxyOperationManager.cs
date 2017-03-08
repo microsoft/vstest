@@ -18,13 +18,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
     /// </summary>
     public abstract class ProxyOperationManager
     {
-        private readonly ITestHostProvider testHostManager;
+        private readonly ITestRunTimeProvider testHostManager;
 
         private bool initialized;
 
@@ -42,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        protected ProxyOperationManager(ITestRequestSender requestSender, ITestHostProvider testHostManager, int clientConnectionTimeout)
+        protected ProxyOperationManager(ITestRequestSender requestSender, ITestRunTimeProvider testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;
@@ -83,43 +84,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Get the test process start info
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
+                
+                //Subscribe to TestHost Event
+                this.testHostManager.HostLaunched += TestHostManager_HostLaunched;
+                this.testHostManager.HostError += TestHostManager_HostError;
 
                 this.UpdateTestProcessStartInfo(testHostStartInfo);
-
-                if (testHostStartInfo != null)
-                {
-                    // Monitor testhost error callbacks.
-                    testHostStartInfo.ErrorReceivedCallback = (process, data) =>
-                    {
-                        if (data != null)
-                        {
-                            // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                            if (data.Length > this.testHostProcessStdError.MaxCapacity)
-                            {
-                                this.testHostProcessStdError.Clear();
-                                data = data.Substring(data.Length - this.testHostProcessStdError.MaxCapacity);
-                            }
-
-                            // remove only what is required, from beginning of error stream
-                            else
-                            {
-                                int required = data.Length + this.testHostProcessStdError.Length - this.testHostProcessStdError.MaxCapacity;
-                                if (required > 0)
-                                {
-                                    this.testHostProcessStdError.Remove(0, required);
-                                }
-                            }
-
-                            this.testHostProcessStdError.Append(data);
-                        }
-
-                        if (process.HasExited && process.ExitCode != 0)
-                        {
-                            EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                            this.RequestSender.OnClientProcessExit(this.testHostProcessStdError.ToString());
-                        }
-                    };
-                }
 
                 // Warn the user that execution will wait for debugger attach.
                 var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
@@ -129,7 +99,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
 
                 // Launch the test host.
-                this.testHostManager.LaunchTestHost(testHostStartInfo);
+                CancellationTokenSource hostLaunchCTS = new CancellationTokenSource();
+                Task<int> hostLaunchedTask = this.testHostManager.LaunchTestHost(testHostStartInfo);
+
+                try
+                {
+                    hostLaunchedTask.Wait(hostLaunchCTS.Token);
+                }
+                catch(OperationCanceledException ex)
+                {
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
+                }
+                
                 this.initialized = true;
             }
 
@@ -148,6 +129,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
         }
 
+        private void TestHostManager_HostLaunched(object sender, HostProviderEventArgs e)
+        {
+            EqtTrace.Verbose(e.Data);
+        }
+
+        private void TestHostManager_HostError(object sender, HostProviderEventArgs e)
+        {
+            this.testHostProcessStdError.Clear();
+            this.testHostProcessStdError.Append(e.Data);
+        }
+
         /// <summary>
         /// Closes the channel, terminate test host process.
         /// </summary>
@@ -161,6 +153,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             finally
             {
                 this.initialized = false;
+                this.testHostManager.HostError -= TestHostManager_HostError;
+                this.testHostManager.HostLaunched -= TestHostManager_HostLaunched;
             }
         }
 

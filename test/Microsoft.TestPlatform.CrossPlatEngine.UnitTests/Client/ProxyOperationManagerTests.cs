@@ -22,7 +22,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private readonly ProxyOperationManager testOperationManager;
 
-        private readonly Mock<ITestHostProvider> mockTestHostManager;
+        private readonly Mock<ITestRunTimeProvider> mockTestHostManager;
 
         private readonly Mock<ITestRequestSender> mockRequestSender;
 
@@ -33,7 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyOperationManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestHostProvider>();
+            this.mockTestHostManager = new Mock<ITestRunTimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
@@ -144,6 +144,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        [Ignore]
+        //Not valid test anymore, since host providers now monitor test host themselves
         public void SetupChannelShouldAddExitCallbackToTestHostStartInfo()
         {
             TestProcessStartInfo startInfo = null;
@@ -180,7 +182,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             public TestableProxyOperationManager(
                 ITestRequestSender requestSender,
-                ITestHostProvider testHostManager,
+                ITestRunTimeProvider testHostManager,
                 int clientConnectionTimeout) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
             }

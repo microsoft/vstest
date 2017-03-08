@@ -27,7 +27,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private readonly ProxyExecutionManager testExecutionManager;
 
-        private readonly Mock<ITestHostProvider> mockTestHostManager;
+        private readonly Mock<ITestRunTimeProvider> mockTestHostManager;
 
         private readonly Mock<ITestRequestSender> mockRequestSender;
 
@@ -40,7 +40,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyExecutionManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestHostProvider>();
+            this.mockTestHostManager = new Mock<ITestRunTimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
             this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.clientConnectionTimeout);

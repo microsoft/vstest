@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="proxyDataCollectionManager">
         /// The proxy Data Collection Manager.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(ITestHostProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager)
+        public ProxyExecutionManagerWithDataCollection(ITestRunTimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();

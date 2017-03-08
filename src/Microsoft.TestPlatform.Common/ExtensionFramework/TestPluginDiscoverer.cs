@@ -243,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         this.GetTestExtensionFromType<TestExecutorPluginInformation>(type, typeof(ITestExecutor), testExecutors);
                         this.GetTestExtensionFromType<TestLoggerPluginInformation>(type, typeof(ITestLogger), testLoggers);
                         this.GetTestExtensionFromType<TestSettingsProviderPluginInformation>(type, typeof(ISettingsProvider), testSettingsProviders);
-                        this.GetTestExtensionFromType<TestHostPluginInformation>(type, typeof(ITestHostProvider), testHosts);
+                        this.GetTestExtensionFromType<TestHostPluginInformation>(type, typeof(ITestRunTimeProvider), testHosts);
                     }
                 }
             }

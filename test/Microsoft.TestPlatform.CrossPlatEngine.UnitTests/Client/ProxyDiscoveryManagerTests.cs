@@ -23,7 +23,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private ProxyDiscoveryManager testDiscoveryManager;
 
-        private Mock<ITestHostProvider> mockTestHostManager;
+        private Mock<ITestRunTimeProvider> mockTestHostManager;
 
         private Mock<ITestRequestSender> mockRequestSender;
 
@@ -36,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyDiscoveryManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestHostProvider>();
+            this.mockTestHostManager = new Mock<ITestRunTimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestSender.Object,

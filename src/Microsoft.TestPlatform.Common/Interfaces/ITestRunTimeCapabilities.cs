@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
     /// <summary>
     /// Metadata that is available from Test Host.
     /// </summary>
-    public interface ITestHostCapabilities : ITestExtensionCapabilities
+    public interface ITestRunTimeCapabilities : ITestExtensionCapabilities
     {
         /// specifies the friendly name corresponding to the TestHost.
         string FriendlyName { get; }

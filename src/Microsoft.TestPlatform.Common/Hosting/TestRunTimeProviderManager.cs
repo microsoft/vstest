@@ -10,26 +10,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
-    /// Responsible for managing testHostProvider extensions
+    /// Responsible for managing TestRunTimeProviderManager extensions
     /// </summary>
-    internal class TestHostProviderManager : IDisposable
+    internal class TestRunTimeProviderManager
     {
         #region Fields
 
-        private static readonly object Synclock = new object();
-        private static TestHostProviderManager testHostManager;
-
-        /// <summary>
-        /// Keeps track if we are disposed.
-        /// </summary>
-        private bool isDisposed = false;
+        private static TestRunTimeProviderManager testHostManager;
 
         /// <summary>
         /// Gets an instance of the logger.
         /// </summary>
         private IMessageLogger messageLogger;
 
-        private TestHostExtensionManager testHostExtensionManager;
+        private TestRunTimeExtensionManager testHostExtensionManager;
         
         #endregion
 
@@ -38,28 +32,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         /// <summary>
         /// Default constructor.
         /// </summary>
-        protected TestHostProviderManager(TestSessionMessageLogger sessionLogger)
+        protected TestRunTimeProviderManager(TestSessionMessageLogger sessionLogger)
         {
             this.messageLogger = sessionLogger;
-            this.testHostExtensionManager = TestHostExtensionManager.Create(sessionLogger);
+            this.testHostExtensionManager = TestRunTimeExtensionManager.Create(sessionLogger);
         }
 
         /// <summary>
         /// Gets the instance.
         /// </summary>
-        public static TestHostProviderManager Instance
+        public static TestRunTimeProviderManager Instance
         {
             get
             {
                 if (testHostManager == null)
                 {
-                    lock (Synclock)
-                    {
-                        if (testHostManager == null)
-                        {
-                            testHostManager = new TestHostProviderManager(TestSessionMessageLogger.Instance);
-                        }
-                    }
+                    testHostManager = new TestRunTimeProviderManager(TestSessionMessageLogger.Instance);
                 }
                 return testHostManager;
             }
@@ -74,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
 
         #region Public Methods
 
-        public ITestHostProvider GetTestHostManagerByUri(string hostUri)
+        public ITestRunTimeProvider GetTestHostManagerByUri(string hostUri)
         {
             var host = this.testHostExtensionManager.TryGetTestExtension(hostUri);
             if (host != null)
@@ -83,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
             return null;
         }
 
-        public ITestHostProvider GetTestHostManagerByRunConfiguration(RunConfiguration runConfiguarion)
+        public ITestRunTimeProvider GetTestHostManagerByRunConfiguration(RunConfiguration runConfiguarion)
         {
             foreach (var testExtension in this.testHostExtensionManager.TestExtensions)
             {
@@ -92,28 +80,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Ensure that all pending messages are sent to the loggers.
-        /// </summary>
-        public void Dispose()
-        {
-            // Use SupressFinalize in case a subclass
-            // of this type implements a finalizer.
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
-
-        #region Private Members
-
-        private void CheckDisposed()
-        {
-            if (this.isDisposed)
-            {
-                throw new ObjectDisposedException(typeof(TestHostProviderManager).FullName);
-            }
         }
 
         #endregion

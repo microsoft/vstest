@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager
     {
-        private readonly ITestHostProvider testHostManager;
+        private readonly ITestRunTimeProvider testHostManager;
 
         #region Constructors
 
@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
         /// </summary>
         /// <param name="testHostManager">Test host manager instance.</param>
-        public ProxyDiscoveryManager(ITestHostProvider testHostManager)
+        public ProxyDiscoveryManager(ITestRunTimeProvider testHostManager)
             : this(new TestRequestSender(), testHostManager, CrossPlatEngine.Constants.ClientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </param>
         internal ProxyDiscoveryManager(
             ITestRequestSender requestSender,
-            ITestHostProvider testHostManager,
+            ITestRunTimeProvider testHostManager,
             int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {

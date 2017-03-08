@@ -23,7 +23,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private ProxyExecutionManager testExecutionManager;
 
-        private Mock<ITestHostProvider> mockTestHostManager;
+        private Mock<ITestRunTimeProvider> mockTestHostManager;
 
         private Mock<ITestRequestSender> mockRequestSender;
 
@@ -39,7 +39,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestInitialize]
         public void TestInit()
         {
-            this.mockTestHostManager = new Mock<ITestHostProvider>();
+            this.mockTestHostManager = new Mock<ITestRunTimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.testableClientConnectionTimeout);
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
@@ -128,7 +128,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
     {
-        public TestableProxyExecutionManagerWithDataCollection(ITestHostProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager, proxyDataCollectionManager)
+        public TestableProxyExecutionManagerWithDataCollection(ITestRunTimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager, proxyDataCollectionManager)
         {
         }
 

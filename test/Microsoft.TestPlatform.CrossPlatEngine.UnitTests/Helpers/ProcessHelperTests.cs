@@ -41,7 +41,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
 
             this.processHelper = new TestableProcessHelper();
-            this.testHostManager = new TestableTestHostManager(Architecture.X64, Framework.DefaultFramework, this.processHelper, true);
+            this.testHostManager = new TestableTestHostManager(Architecture.X64, Framework.DefaultFramework, this.processHelper, true, errorLength);
 
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.testHostManager, this.connectionTimeout, this.errorLength);
         }
@@ -87,7 +87,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             public TestableProxyOperationManager(
                 ITestRequestSender requestSender,
-                ITestHostProvider testHostManager,
+                ITestRunTimeProvider testHostManager,
                 int clientConnectionTimeout,
                 int errorLength) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
@@ -106,8 +106,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 Architecture architecture, 
                 Framework framework, 
                 IProcessHelper processHelper, 
-                bool shared) : base(architecture, framework, processHelper, shared)
+                bool shared,
+                int errorLength) : base(architecture, framework, processHelper, shared)
             {
+                base.TimeOut = 30000;
+                base.ErrorLength = errorLength;
             }
 
             public override TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)

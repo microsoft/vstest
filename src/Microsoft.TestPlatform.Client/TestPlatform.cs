@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         public TestPlatform() : this(new TestEngine(), new FileHelper())
         {
-            this.testHostProviderManager = TestHostProviderManager.Instance;
+            this.testHostProviderManager = TestRunTimeProviderManager.Instance;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         private ITestEngine TestEngine { get; set; }
 
-        private TestHostProviderManager testHostProviderManager;
+        private TestRunTimeProviderManager testHostProviderManager;
 
         /// <summary>
         /// The create discovery request.
