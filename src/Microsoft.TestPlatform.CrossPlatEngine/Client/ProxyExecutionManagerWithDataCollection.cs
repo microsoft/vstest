@@ -57,19 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public override void Initialize()
         {
-            try
-            {
-                this.ProxyDataCollectionManager.Initialize();
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
-                }
-
-                throw;
-            }
+            this.ProxyDataCollectionManager.Initialize();
 
             try
             {
@@ -84,22 +72,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                try
-                {
-                    // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end DataCollectionProcess
-                    this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
-                    throw;
-                }
-                finally
-                {
-                    // There is an issue with Data Collector, skipping data collection and continuing with test run.
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
-                    }
-                }
+                // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end DataCollectionProcess
+                this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
+                throw;
             }
 
             base.Initialize();
@@ -140,15 +117,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
             }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
-                }
-
-                throw;
-            }
             finally
             {
                 base.Cancel();
@@ -182,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
     {
         /// <summary>
-        /// The constructor.
+        /// Initializes a new instance of the <see cref="DataCollectionRunEventsHandler"/> class. 
         /// </summary>
         public DataCollectionRunEventsHandler()
         {
@@ -190,32 +158,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Gets the exception messages.
+        /// Gets the cached messages.
         /// </summary>
         public List<Tuple<TestMessageLevel, string>> Messages { get; private set; }
 
-        /// <summary>
-        /// The handle log message.
-        /// </summary>
-        /// <param name="level">
-        /// The level.
-        /// </param>
-        /// <param name="message">
-        /// The message.
-        /// </param>
+       /// <inheritdoc />
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
             this.Messages.Add(new Tuple<TestMessageLevel, string>(level, message));
         }
 
-        /// <summary>
-        /// The handle raw message.
-        /// </summary>
-        /// <param name="rawMessage">
-        /// The raw message.
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
+        /// <inheritdoc />
         public void HandleRawMessage(string rawMessage)
         {
             throw new NotImplementedException();
