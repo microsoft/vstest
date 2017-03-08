@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="InvalidRunSettingsXml">
         <source>Run settings XML does not contain "RunSettings" node.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Çalıştırma ayarları XML dosyası "RunSettings" düğümünü içermiyor.</target>
-        <note></note>
+        <target state="translated">Çalıştırma ayarları XML dosyası "RunSettings" düğümünü içermiyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Çalışma ayarı düğümü "RunSettings" XML içermiyor.</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="InvalidSettingsIncorrectValue">
         <source>Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' ayarı geçersiz. '{2}' için geçersiz '{1}' değeri belirtildi.</target>
-        <note></note>
+        <target state="translated">'{0}' ayarı geçersiz. '{2}' için geçersiz '{1}' değeri belirtildi.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' ayarını geçersiz. '{1}' '{2}' için belirtilen değer geçersiz.</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="MissingRunSettingsNode">
         <source>Could not find 'RunSettings' node.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
-        <note></note>
+        <target state="translated">'RunSettings' düğümü bulunamadı.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="NoRunSettingsNodeFound">
         <source>Could not find 'RunSettings' node.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
-        <note></note>
+        <target state="translated">'RunSettings' düğümü bulunamadı.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'RunSettings' düğümü bulunamadı.</target>
         </alt-trans>
@@ -58,8 +58,8 @@
       </trans-unit>
       <trans-unit id="RunSettingsParseError">
         <source>An error occurred while loading the settings.  Error: {0}.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Ayarlar yüklenirken bir hata oluştu. Hata: {0}.</target>
-        <note></note>
+        <target state="translated">Ayarlar yüklenirken bir hata oluştu. Hata: {0}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ayarları yüklenirken bir hata oluştu.  Hata: {0}.</target>
         </alt-trans>
@@ -67,8 +67,8 @@
       </trans-unit>
       <trans-unit id="SystemArchitectureIncompatibleWithTargetPlatform">
         <source>Incompatible Target platform settings '{0}' with system architecture '{1}'.</source>
-        <target state="translated" state-qualifier="mt-suggestion">'{0}' hedef platform ayarları, '{1}' sistem mimarisiyle uyumlu değil.</target>
-        <note></note>
+        <target state="translated">'{0}' hedef platform ayarları, '{1}' sistem mimarisiyle uyumlu değil.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uyumsuz hedef platform Ayarları '{0}' ile '{1}' sistem mimarisi.</target>
         </alt-trans>
@@ -76,8 +76,8 @@
       </trans-unit>
       <trans-unit id="UnExpectedSettingsFile">
         <source>Unexpected settings file specified.</source>
-        <target state="translated" state-qualifier="mt-suggestion">Beklenmeyen ayarlar dosyası belirtildi.</target>
-        <note></note>
+        <target state="translated">Beklenmeyen ayarlar dosyası belirtildi.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Beklenmeyen bir ayarlar dosyası belirtilmedi.</target>
         </alt-trans>

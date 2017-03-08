@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
-    using System;
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -13,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
     {
-        private static readonly object obj = new object();
+        private static readonly object syncObject = new object();
 
         private readonly ICommunicationManager communicationManager;
 
@@ -42,14 +41,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Gets singleton instance of DataCollectionRequestHandler.
         /// </summary>
-        /// <param name="communicationManager">
-        /// The communication Manager.
-        /// </param>
         public static DataCollectionTestCaseEventSender Create()
         {
             if (Instance == null)
             {
-                lock (obj)
+                lock (syncObject)
                 {
                     if (Instance == null)
                     {
@@ -86,26 +82,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void SendTestCaseStart(TestCaseStartEventArgs e)
         {
-            this.communicationManager.SendMessage(MessageType.BeforeTestCaseStart, e);
+            this.communicationManager.SendMessage(MessageType.DataCollectionTestStart, e);
         }
 
         /// <inheritdoc />
-        public void SendTestCaseComplete(TestResultEventArgs e)
+        public Collection<AttachmentSet> SendTestCaseEnd(TestCaseEndEventArgs e)
         {
             var attachmentSets = new Collection<AttachmentSet>();
-            this.communicationManager.SendMessage(MessageType.AfterTestCaseComplete, e);
+            this.communicationManager.SendMessage(MessageType.DataCollectionTestEnd, e);
 
             var message = this.communicationManager.ReceiveMessage();
 
-            if (message.MessageType == MessageType.AfterTestCaseEndResult)
+            if (message.MessageType == MessageType.DataCollectionTestEndResult)
             {
                 attachmentSets = message.Payload.ToObject<Collection<AttachmentSet>>();
             }
 
-            foreach (var attachmentSet in attachmentSets)
-            {
-                e.TestResult.Attachments.Add(attachmentSet);
-            }
+            return attachmentSets;
         }
 
         /// <inheritdoc />

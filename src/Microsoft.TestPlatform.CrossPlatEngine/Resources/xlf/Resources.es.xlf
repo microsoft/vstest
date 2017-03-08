@@ -23,7 +23,7 @@
       <trans-unit id="DiscovererInstantiationException">
         <source>Exception occurred while instantiating discoverer : {0}</source>
         <target state="translated">Se produjo una excepción al crear una instancia del programa de detección: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Excepción al crear instancias de descubridor: {0}</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="DuplicateSource">
         <source>Ignoring the specified duplicate source '{0}'.</source>
         <target state="translated">Se omitirá el origen duplicado especificado ({0}).</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Omitiendo el origen duplicado especificado '{0}'.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="ExceptionFromLoadTests">
         <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
         <target state="translated">Se produjo una excepción cuando el programa de detección de pruebas '{0}' estaba cargando pruebas. Excepción: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Se produjo una excepción al carga pruebas descubridor de prueba '{0}'. Excepción: {1}</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="ExceptionFromRunTests">
         <source>An exception occurred while invoking executor '{0}': {1}</source>
         <target state="translated">Se produjo una excepción al invocar al ejecutor '{0}': {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Excepción al ejecutor invocar '{0}': {1}</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="FileNotFound">
         <source>Could not find file {0}.</source>
         <target state="translated">No se encuentra el archivo {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">No se pudo encontrar el archivo {0}.</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
         <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
         <target state="translated">Se omitirá el ejecutor de pruebas correspondiente al programa de detección de pruebas {0}, porque este último no tiene el atributo DefaultExecutorUri. Puede ser necesario reinstalar el complemento del adaptador de prueba.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Se omitirá el ejecutor de pruebas correspondiente para probar descubridor {0} porque el descubridor no tiene el atributo DefaultExecutorUri. Puede que necesite volver a instalar el adaptador complemento prueba.</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="InitializationFailed">
         <source>Failed to initialize client proxy: could not connect to test process.</source>
         <target state="translated">No se pudo inicializar el proxy de cliente: no se puede conectar al proceso de prueba.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">No se pudo inicializar el proxy de cliente: no se puede conectar para probar el proceso.</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
         <source>This operation is not allowed in the context of a non-debug run.</source>
         <target state="translated">Esta operación no se permite en el contexto de una ejecución que no sea de depuración.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Esta operación no se permite en el contexto de un ejecutar sin depuración.</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="NoDiscovererRegistered">
         <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
         <target state="translated">No hay ningún programa de detección de pruebas registrado para detectar casos de prueba. Registre un programa de detección de pruebas y vuelva a intentarlo.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ningún descubridor prueba está registrada para realizar el descubrimiento de casos de prueba. Registrar un descubridor de prueba y vuelva a intentarlo.</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="NoValidSourceFoundForDiscovery">
         <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
         <target state="translated">Ninguno de los orígenes especificados ({0}) es válido. Corrija los errores o advertencias y vuelva a intentarlo. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Los orígenes especificados '{0}' no válido. Corregir las errores o advertencias anteriores y vuelva a intentarlo.</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="StringSeperator">
         <source>, </source>
         <target state="translated">, </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
           <source />
           <target state-qualifier="tm-suggestion">,</target>
@@ -150,7 +150,7 @@
       <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
         <target state="translated">No hay ninguna prueba disponible en {0}. Asegúrese de que la configuración de versión de los ejecutores y programas de detección de pruebas, la plataforma y el marco instalados es correcta y vuelva a intentarlo.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ninguna prueba está disponible en {0}. Asegúrese de que instala descubridores &amp; prueba ejecutores, configuración de versión de plataforma &amp; marco es adecuada y vuelva a intentarlo.</target>
         </alt-trans>
@@ -159,7 +159,7 @@
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
         <target state="translated">Ninguna prueba coincide con el filtro porque contiene una o varias propiedades no válidas ({0}). Especifique una expresión de filtro que contenga propiedades válidas ({1}) y vuelva a intentarlo.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">No hay pruebas que coincide con el filtro porque contiene una o más propiedades que no son válidos ({0}). Especifique la expresión de filtro que contiene propiedades válidas ({1}) y vuelva a intentarlo.</target>
         </alt-trans>
@@ -167,17 +167,22 @@
       </trans-unit>
       <trans-unit id="NoTestHostFileExist">
         <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="new">Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
-        <note></note>
+        <target state="translated">No se pudo encontrar testhost.dll para el origen "{0}". Asegúrese de que el proyecto de prueba tenga una referencia de nuget del paquete "microsoft.testplatform.testhost".</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
-        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
-        <note></note>
+        <target state="translated">No se pudo encontrar {0}. Asegúrese de que dotnet esté instalado en la máquina.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
         <target state="new">Testhost process exited with error: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorDebuggerWarning">
+        <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
+        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
         <note></note>
       </trans-unit>
     </body>

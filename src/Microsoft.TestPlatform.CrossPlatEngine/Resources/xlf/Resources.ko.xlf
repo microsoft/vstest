@@ -23,7 +23,7 @@
       <trans-unit id="DiscovererInstantiationException">
         <source>Exception occurred while instantiating discoverer : {0}</source>
         <target state="translated">{0} Discoverer를 인스턴스화하는 중 예외가 발생했습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Discoverer를 인스턴스화하는 동안 예외가 발생 했습니다: {0}</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="DuplicateSource">
         <source>Ignoring the specified duplicate source '{0}'.</source>
         <target state="translated">지정한 중복되는 '{0}' 소스를 무시합니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">지정된 된 중복 소스 ' {0} '이 (가) 무시 됩니다.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="ExceptionFromLoadTests">
         <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
         <target state="translated">테스트 Discoverer '{0}'에서 테스트를 로드하는 동안 예외가 발생했습니다. 예외: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Discoverer를 테스트 ' {0} '이 (가) 테스트를 로드 하는 동안 예외가 발생 했습니다. 예외: {1}</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="ExceptionFromRunTests">
         <source>An exception occurred while invoking executor '{0}': {1}</source>
         <target state="translated">'{0}' Executor를 호출하는 동안 예외가 발생했습니다. {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">호출 실행 자가 ' {0} '이 (가) 하는 동안 예외가 발생 했습니다: {1}</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="FileNotFound">
         <source>Could not find file {0}.</source>
         <target state="translated">{0} 파일을 찾을 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} 파일을 찾을 수 없습니다.</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
         <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
         <target state="translated">Discoverer에 DefaultExecutorUri 특성이 없으므로 테스트 Discoverer {0}에 해당하는 테스트 Executor를 무시합니다. 테스트 어댑터 추가 기능을 다시 설치해야 할 수 있습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Discoverer는 DefaultExecutorUri 특성이 없기 때문에 {0} discoverer를 테스트 하려면 해당 테스트 실행 자가 무시 합니다. 테스트 어댑터 추가 기능에서 다시 설치 해야 합니다.</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="InitializationFailed">
         <source>Failed to initialize client proxy: could not connect to test process.</source>
         <target state="translated">클라이언트 프록시를 초기화하지 못했습니다. 테스트 프로세스에 연결할 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">클라이언트 프록시를 초기화 하지 못했습니다: 테스트 프로세스에 연결 하지 못했습니다.</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
         <source>This operation is not allowed in the context of a non-debug run.</source>
         <target state="translated">디버그가 아닌 실행의 컨텍스트에서는 이 작업을 수행할 수 없습니다.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">비-디버그 실행의 경우에는이 작업이 허용 되지 않습니다.</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="NoDiscovererRegistered">
         <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
         <target state="translated">테스트 사례 검색을 수행하기 위한 테스트 Discoverer가 등록되지 않았습니다. 테스트 Discoverer를 등록하고 다시 시도하세요.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트 사례에 대 한 검색을 수행할 수 없는 테스트 discoverer 등록 됩니다. 테스트 discoverer를 등록 하 고 다시 시도 하십시오.</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="NoValidSourceFoundForDiscovery">
         <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
         <target state="translated">지정한 '{0}' 소스가 올바르지 않습니다. 위의 오류/경고를 해결한 후 다시 시도하세요. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">어떤 지정 된 소스 ' {0} '이 (가) 유효합니다. 위의 오류/경고를 해결 한 후 다시 시도 하십시오.</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="StringSeperator">
         <source>, </source>
         <target state="translated">, </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
           <source />
           <target state-qualifier="tm-suggestion">,</target>
@@ -150,7 +150,7 @@
       <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
         <target state="translated">{0}에서 테스트를 사용할 수 없습니다. 설치된 테스트 Discoverer와 Executor, 플랫폼 및 프레임워크 버전 설정이 적절한지 확인한 후에 다시 시도하세요.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">없음 테스트 {0}에 있습니다. 설치 플랫폼 및 프레임 워크 버전 설정이 적절 한지 discoverers 및 실행자를 테스트 하 고 다시 시도 하십시오 있는지 확인 하십시오.</target>
         </alt-trans>
@@ -159,7 +159,7 @@
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
         <target state="translated">필터에 잘못된 속성({0})이 하나 이상 포함되어 있으므로 해당 필터와 일치하는 테스트가 없습니다. 유효한 속성({1})을 포함하는 필터 식을 지정하고 다시 시도하세요.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트가 잘못 되었습니다 ({0}) 없는 하나 이상의 속성을 포함 하기 때문에 필터를 일치 합니다. 유효한 속성 ({1})을 포함 하는 필터 식을 지정 하 고 다시 시도 하십시오.</target>
         </alt-trans>
@@ -167,17 +167,22 @@
       </trans-unit>
       <trans-unit id="NoTestHostFileExist">
         <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="new">Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
-        <note></note>
+        <target state="translated">소스 '{0}'에 대해 testhost.dll을 찾을 수 없습니다. 테스트 프로젝트에 패키지 "microsoft.testplatform.testhost"의 NuGet 참조가 있는지 확인하세요.</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
-        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
-        <note></note>
+        <target state="translated">{0}을(를) 찾을 수 없습니다. 컴퓨터에 dotnet이 설치되어 있는지 확인하세요.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
         <target state="new">Testhost process exited with error: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorDebuggerWarning">
+        <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
+        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
         <note></note>
       </trans-unit>
     </body>

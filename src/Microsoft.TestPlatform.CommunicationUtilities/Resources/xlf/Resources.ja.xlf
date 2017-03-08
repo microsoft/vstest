@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">アクティブなテストの実行が中止されました。</target>
+        <target state="new">アクティブなテストの実行が中止されました。 {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの実行は中止されました。</target>
@@ -32,7 +32,7 @@
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
         <target state="translated">既存の接続はリモート ホストに強制的に切断されました。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">既存の接続は、リモート ホストによって強制的に切断されました。</target>
         </alt-trans>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">アクティブなテスト探索が中止されました。</target>
+        <target state="new">アクティブなテスト探索が中止されました。 {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの探索は中止されました。</target>
@@ -55,6 +55,11 @@
           <target state-qualifier="mt-suggestion">テストの実行プロセスと通信できません。</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
+      </trans-unit>
+      <trans-unit id="DataCollectorUriForLogMessage">
+        <source>Data collector ('{0}') message: {1}</source>
+        <target state="new">Diagnostic data adapter ('{0}') message: {1}</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

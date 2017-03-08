@@ -38,5 +38,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// </summary>
         /// <returns>pid of test engine.</returns>
         int GetCurrentProcessId();
+
+        /// <summary>
+        /// Gets the process name for given process id.
+        /// </summary>
+        /// <param name="processId">process id</param>
+        /// <returns>Name of process</returns>
+        string GetProcessName(int processId);
     }
 }

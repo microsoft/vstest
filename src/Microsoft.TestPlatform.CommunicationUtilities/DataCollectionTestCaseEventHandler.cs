@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 var message = this.communicationManager.ReceiveMessage();
                 switch (message.MessageType)
                 {
-                    case MessageType.BeforeTestCaseStart:
+                    case MessageType.DataCollectionTestStart:
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case starting.");
@@ -85,16 +85,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         break;
 
-                    case MessageType.AfterTestCaseComplete:
+                    case MessageType.DataCollectionTestEnd:
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionTestCaseEventHandler : Test case completing.");
                         }
 
-                        var testResultEventArgs = message.Payload.ToObject<TestResultEventArgs>();
-
-                        var attachments = this.dataCollectionManager.TestCaseEnded(new TestCaseEndEventArgs(testResultEventArgs.TestElement, testResultEventArgs.TestResult.Outcome));
-                        this.communicationManager.SendMessage(MessageType.AfterTestCaseEndResult, attachments);
+                        var testCaseEndEventArgs = message.Payload.ToObject<TestCaseEndEventArgs>();
+                        var attachmentSets = this.dataCollectionManager.TestCaseEnded(testCaseEndEventArgs);
+                        this.communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets);
 
                         if (EqtTrace.IsInfoEnabled)
                         {

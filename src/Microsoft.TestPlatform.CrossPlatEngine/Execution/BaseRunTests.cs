@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private void SetContext()
         {
             this.testRunCache = new TestRunCache(this.testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
-            this.dataCollectionTestCaseEventManager = new DataCollectionTestCaseEventManager();
+            this.dataCollectionTestCaseEventManager = new DataCollectionTestCaseEventManager(testRunCache);
 
             this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache, this.dataCollectionTestCaseEventManager);
 
@@ -186,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     elapsedTime = this.RunTestsInternal();
 
                     // Flush any results cached by in-proc manager
-                    this.inProcDataCollectionExtensionManager?.FlushLastChunkResults();
+                    this.dataCollectionTestCaseEventManager?.FlushLastChunkResults();
 
                     // Check the adapter setting for shutting down this process after run
                     shutdownAfterRun = this.frameworkHandle.EnableShutdownAfterTestRun;

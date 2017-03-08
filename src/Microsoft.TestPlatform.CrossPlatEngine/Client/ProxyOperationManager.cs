@@ -74,6 +74,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="sources">List of test sources.</param>
         public virtual void SetupChannel(IEnumerable<string> sources)
         {
+            var connTimeout = this.connectionTimeout;
+
             if (!this.initialized)
             {
                 this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
@@ -91,13 +93,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 this.UpdateTestProcessStartInfo(testHostStartInfo);
 
-                // Warn the user that execution will wait for debugger attach.
-                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
-                {
-                    ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
-                }
-
                 // Launch the test host.
                 CancellationTokenSource hostLaunchCTS = new CancellationTokenSource();
                 Task<int> hostLaunchedTask = this.testHostManager.LaunchTestHost(testHostStartInfo);
@@ -110,12 +105,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
                 }
+
+                // Warn the user that execution will wait for debugger attach.
+                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+                {
+                    ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
+                    ConsoleOutput.Instance.WriteLine(
+                        string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(hostLaunchedTask.Result)),
+                        OutputLevel.Information);
+
+                    // Increase connection timeout when debugging is enabled.
+                    connTimeout = 5 * this.connectionTimeout;
+                }
                 
                 this.initialized = true;
             }
 
             // Wait for a timeout for the client to connect.
-            if (!this.RequestSender.WaitForRequestHandlerConnection(this.connectionTimeout))
+            if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
             {
                 var errorMsg = CrossPlatEngineResources.InitializationFailed;
 

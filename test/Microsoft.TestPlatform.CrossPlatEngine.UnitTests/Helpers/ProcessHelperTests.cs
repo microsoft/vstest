@@ -152,6 +152,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 
                 return process;
             }
+
+            public string GetProcessName(int processId)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

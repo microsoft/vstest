@@ -23,7 +23,7 @@
       <trans-unit id="DiscovererInstantiationException">
         <source>Exception occurred while instantiating discoverer : {0}</source>
         <target state="translated">探索プログラムのインスタンス化中に例外が発生しました: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Discoverer をインスタンス化中に例外が発生しました: {0}</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="DuplicateSource">
         <source>Ignoring the specified duplicate source '{0}'.</source>
         <target state="translated">指定された重複データ ソース '{0}' を無視します。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定された重複データ ソース '{0}' を無視します。</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="ExceptionFromLoadTests">
         <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
         <target state="translated">テスト探索プログラム '{0}' がテストを読み込んでいるときに例外が発生しました。例外: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Discoverer のテスト '{0}' のテストの読み込み中に例外が発生しました。例外: {1}</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="ExceptionFromRunTests">
         <source>An exception occurred while invoking executor '{0}': {1}</source>
         <target state="translated">実行プログラム '{0}' の呼び出し中に例外が発生しました: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">'{0}' 呼び出しの実行中に例外が発生しました: {1}</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="FileNotFound">
         <source>Could not find file {0}.</source>
         <target state="translated">ファイル {0} は見つかりませんでした。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">ファイル {0} が見つかりませんでした。</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
         <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
         <target state="translated">テスト探索プログラム {0} には DefaultExecutorUri 属性が含まれていないため、このテスト探索プログラムに対応するテスト実行プログラムを無視しています。テスト アダプター アドインの再インストールが必要になる場合があります。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Discoverer は DefaultExecutorUri 属性を持っていないために、{0} の discoverer をテストするのには対応するテストの実行を無視します。テスト アダプター アドインを再インストールする必要があります。</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="InitializationFailed">
         <source>Failed to initialize client proxy: could not connect to test process.</source>
         <target state="translated">クライアント プロキシを初期化できませんでした。テスト プロセスに接続できませんでした。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">クライアント プロキシの初期化に失敗しました: プロセスをテストするのには接続できませんでした。</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
         <source>This operation is not allowed in the context of a non-debug run.</source>
         <target state="translated">この操作は、非デバッグ実行のコンテキストでは許可されていません。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">この操作は、非デバッグ実行のコンテキストでは実行できません。</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="NoDiscovererRegistered">
         <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
         <target state="translated">テスト ケースの探索を実行するテスト探索プログラムが登録されていません。テスト探索プログラムを登録し、もう一度お試しください。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">テスト_ケースの検索を実行するテストの discoverer が登録されていません。テスト discoverer を登録してからやり直してください。</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="NoValidSourceFoundForDiscovery">
         <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
         <target state="translated">指定されたソース '{0}' がいずれも有効ではありません。上記のエラーおよび警告を修正してから、もう一度お試しください。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">指定したソース '{0}' の [なし] は、有効です。上記のエラーまたは警告を修正してからやり直してください。</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="StringSeperator">
         <source>, </source>
         <target state="translated">, </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
           <source />
           <target state-qualifier="tm-suggestion">,</target>
@@ -150,7 +150,7 @@
       <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
         <target state="translated">{0} で使用できるテストはありません。インストールされているテスト探索プログラム、実行プログラム、プラットフォーム、およびフレームワークのバージョン設定が適切であることを確認し、もう一度お試しください。</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">{0} ではテストは有効ではありません。インストールされているプラットフォームおよびフレームワークのバージョンの設定が適切なテスト discoverers &amp; エグゼキュータでは、もう一度やり直してください。</target>
         </alt-trans>
@@ -158,8 +158,8 @@
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="translated">フィルターに一致するテストがありません。フィルターに無効なプロパティが 1 つ以上含まれています ({0})。有効なプロパティを含むフィルター式を指定 ({1}) してもう一度お試しください。</target>
-        <note></note>
+        <target state="translated">フィルターに一致するテストがありません。フィルターに無効なプロパティが&amp;1; つ以上含まれています ({0})。有効なプロパティを含むフィルター式を指定 ({1}) してもう一度お試しください。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">1 つまたは複数のプロパティは無効です ({0}) が含まれているために、テストによって、フィルターは一致しませんでした。有効なプロパティ ({1}) を含むフィルター式を指定してからやり直してください。</target>
         </alt-trans>
@@ -167,17 +167,22 @@
       </trans-unit>
       <trans-unit id="NoTestHostFileExist">
         <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="new">Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
-        <note></note>
+        <target state="translated">ソース '{0}' の testhost.dll が見つかりませんでした。テスト プロジェクトにパッケージ "microsoft.testplatform.testhost" の NuGet 参照が指定されていることを確認してください。</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
-        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
-        <note></note>
+        <target state="translated">{0} が見つかりませんでした。dotnet がマシンにインストールされていることを確認してください。</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
         <target state="new">Testhost process exited with error: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorDebuggerWarning">
+        <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
+        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
         <note></note>
       </trans-unit>
     </body>

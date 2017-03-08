@@ -9,7 +9,6 @@ Param(
     [System.String] $Configuration = "Debug",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("win7-x64", "win7-x86")]
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
@@ -17,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.0.0",
+    [System.String] $Version = "15.1.0",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -78,6 +77,9 @@ $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = $Version
 $TPB_VersionSuffix = $VersionSuffix
+# Version suffix is empty for RTM releases
+$FullVersion = if ($VersionSuffix -ne '') {$Version + "-" + $VersionSuffix} else {$Version}
+$TPB_FullVersion = $FullVersion
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
 $TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
@@ -167,8 +169,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration --version-suffix $TPB_VersionSuffix -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_FullVersion -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_FullVersion -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -314,6 +316,8 @@ function Create-NugetPackages
 
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
+    $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
+    New-Item $packageOutputDir -type directory
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
@@ -339,8 +343,8 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $stagingDir -Version $Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix`;Runtime=$TPB_TargetRuntime $additionalArgs
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $FullVersion -Properties Version=$FullVersion $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $FullVersion -Properties Version=$FullVersion`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -351,13 +355,14 @@ function Copy-PackageItems($packageName)
     # Packages published separately are copied into their own artifacts directory
     # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net46\* is copied
     # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net46
-    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration", "*.*")
+    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
+    $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
     Write-Log "Copy-PackageItems: Package: $packageName"
     Write-Verbose "Create $publishDirectory"
     New-Item -ItemType directory -Path $publishDirectory -Force | Out-Null
 
-    Write-Verbose "Copy binaries for package '$packageName' from '$binariesDirectory' to '$publishDirectory'"
+    Write-Log "Copy binaries for package '$packageName' from '$binariesDirectory' to '$publishDirectory'"
     Copy-Item -Path $binariesDirectory -Destination $publishDirectory -Recurse -Force
 }
 
@@ -490,7 +495,7 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Started."
 
     $packageDir = Get-FullCLRPackageDirectory
-    $vsixVersion = "15.1.0" # Hardcode since we want to keep 15.0.0 for other assemblies.
+    $vsixVersion = $Version
 
     # VersionSuffix in microbuild comes in the form preview-20170111-01(preview-yyyymmdd-buildNoOfThatDay)
     # So Version of the vsix will be 15.1.0.2017011101
@@ -505,33 +510,10 @@ function Update-VsixVersion
     Write-Log "Update-VsixVersion: Completed."
 }
 
-if ($ProjectNamePatterns.Count -eq 0)
+function Build-SpecificProjects
 {
-        # Execute build
-        $timer = Start-Timer
-        Write-Log "Build started: args = '$args'"
-        Write-Log "Test platform environment variables: "
-        Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
-
-        Write-Log "Test platform build variables: "
-        Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-
-        Install-DotNetCli
-        Restore-Package
-        Update-LocalizedResources
-        Invoke-Build
-        Publish-Package
-        Create-VsixPackage
-        Create-NugetPackages
-
-        Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
-
-        if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
-}
-else
-{
-    # Build Specific projects.
-    # Framework format ("<target_framework>", "<output_dir>").
+    Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
+    # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
     $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp1.0"), ("netcoreapp1.0", "netcoreapp1.0"))
     $dotnetPath = Get-DotNetPath
 
@@ -542,6 +524,10 @@ else
                 $ProjectsToBuild += ,"$_"
             }
         }
+    }
+
+    if( $ProjectsToBuild -eq $null){
+        Write-Error "No csproj name match for given pattern: $ProjectNamePatterns"
     }
 
     # Build Projects.
@@ -569,3 +555,27 @@ else
         }
     }
 }
+
+if ($ProjectNamePatterns.Count -ne 0)
+{
+    # Build Specific projects.
+    Build-SpecificProjects
+    Exit
+}
+
+# Execute build
+$timer = Start-Timer
+Write-Log "Build started: args = '$args'"
+Write-Log "Test platform environment variables: "
+Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
+Write-Log "Test platform build variables: "
+Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
+Install-DotNetCli
+Restore-Package
+Update-LocalizedResources
+Invoke-Build
+Publish-Package
+Create-VsixPackage
+Create-NugetPackages
+Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }

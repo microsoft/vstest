@@ -23,7 +23,7 @@
       <trans-unit id="DiscovererInstantiationException">
         <source>Exception occurred while instantiating discoverer : {0}</source>
         <target state="translated">Při vytváření instance nástroje zjišťování došlo k výjimce: {0}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Při vytváření instance discoverer došlo k výjimce: {0}</target>
         </alt-trans>
@@ -41,7 +41,7 @@
       <trans-unit id="DuplicateSource">
         <source>Ignoring the specified duplicate source '{0}'.</source>
         <target state="translated">Ignoruje se zadaný duplicitní zdroj {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Ignorovat duplicitní zadaný zdroj: {0}.</target>
         </alt-trans>
@@ -50,7 +50,7 @@
       <trans-unit id="ExceptionFromLoadTests">
         <source>An exception occurred while test discoverer '{0}' was loading tests. Exception: {1}</source>
         <target state="translated">V době, kdy nástroj zjišťování testů {0} načítal testy, došlo k výjimce. Výjimka: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testy při zavádění discoverer test '{0}' došlo k výjimce. Výjimka: {1}.</target>
         </alt-trans>
@@ -59,7 +59,7 @@
       <trans-unit id="ExceptionFromRunTests">
         <source>An exception occurred while invoking executor '{0}': {1}</source>
         <target state="translated">Při volání prováděcího modulu {0} došlo k výjimce: {1}</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Při vyvolání exekutor '{0}' došlo k výjimce: {1}.</target>
         </alt-trans>
@@ -68,7 +68,7 @@
       <trans-unit id="FileNotFound">
         <source>Could not find file {0}.</source>
         <target state="translated">Nepovedlo se najít soubor {0}.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nelze najít soubor {0}.</target>
         </alt-trans>
@@ -86,7 +86,7 @@
       <trans-unit id="IgnoringExecutorAsNoDefaultExecutorUriAttribute">
         <source>Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in.</source>
         <target state="translated">Ignoruje se prováděcí modul testování, který odpovídá nástroji zjišťování testů {0}, protože nástroj zjišťování nemá atribut DefaultExecutorUri. Možná bude nutné přeinstalovat doplněk adaptéru testu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Testovací exekutor odpovídající testování discoverer {0}, protože discoverer nemá atribut DefaultExecutorUri je ignorován. Může být nutné znovu nainstalovat doplněk test adaptéru.</target>
         </alt-trans>
@@ -95,7 +95,7 @@
       <trans-unit id="InitializationFailed">
         <source>Failed to initialize client proxy: could not connect to test process.</source>
         <target state="translated">Nepovedlo se inicializovat proxy klienta: nešlo se připojit k procesu testu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nepodařilo se inicializovat klienta proxy: Nelze se připojit k proces nejprve otestovat.</target>
         </alt-trans>
@@ -104,7 +104,7 @@
       <trans-unit id="LaunchDebugProcessNotAllowedForANonDebugRun">
         <source>This operation is not allowed in the context of a non-debug run.</source>
         <target state="translated">Tato operace se v kontextu běhu bez ladění nepovoluje.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Tato operace není povolena v souvislosti non ladění spustit.</target>
         </alt-trans>
@@ -113,7 +113,7 @@
       <trans-unit id="NoDiscovererRegistered">
         <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
         <target state="translated">Není zaregistrovaný žádný nástroj zjišťování testů, který by mohl zjišťovat testovací případy. Zaregistrujte nástroj zjišťování testů a zkuste to znovu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Provést zjišťování testových případů je registrován žádný test discoverer. Test discoverer registrovat a akci opakujte.</target>
         </alt-trans>
@@ -131,7 +131,7 @@
       <trans-unit id="NoValidSourceFoundForDiscovery">
         <source>None of the specified source(s) '{0}' is valid. Fix the above errors/warnings and then try again. </source>
         <target state="translated">Žádný ze zadaných zdrojů {0} není platný. Opravte chyby/upozornění výše a zkuste to znovu. </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Žádný ze zadaného zdroje '{0}' je platná. Opravte výše uvedené chyby a varování a akci opakujte.</target>
         </alt-trans>
@@ -140,7 +140,7 @@
       <trans-unit id="StringSeperator">
         <source>, </source>
         <target state="translated">, </target>
-        <note></note>
+        <note />
         <alt-trans match-quality="0%" tool="BlackBox/MSR MT">
           <source />
           <target state-qualifier="tm-suggestion">,</target>
@@ -150,7 +150,7 @@
       <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
         <target state="translated">V {0} není k dispozici žádný test. Ujistěte se, že nainstalované nástroje zjišťování testů, prováděcí moduly testů a verze platformy a rozhraní jsou správné. Pak to zkuste znovu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Žádný test je k dispozici v {0}. Přesvědčte se, zda nainstalované test discoverers &amp; vykonavatelů jsou vhodné nastavení platformy &amp; framework verze a opakujte akci.</target>
         </alt-trans>
@@ -159,7 +159,7 @@
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
         <target state="translated">Filtru neodpovídá žádný test, protože obsahuje nejméně jednu vlastnost, která není platná ({0}). Zadejte výraz filtru, který obsahuje platné vlastnosti ({1}), a zkuste to znovu.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Žádné zkoušky odpovídá filtru, protože obsahuje jednu nebo více vlastností, které nejsou platné ({0}). Zadejte výraz filtru obsahující platné vlastnosti ({1}) a akci opakujte.</target>
         </alt-trans>
@@ -167,17 +167,22 @@
       </trans-unit>
       <trans-unit id="NoTestHostFileExist">
         <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="new">Could not find testhost.dll. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
-        <note></note>
+        <target state="translated">Nejde najít testhost.dll pro zdroj {0}. Ujistěte se, že testovací projekt má odkaz na balíček nuget microsoft.testplatform.testhost.</target>
+        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
-        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
-        <note></note>
+        <target state="translated">Nejde najít {0}. Ujistěte se, že na počítači je nainstalovaný dotnet.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
         <target state="new">Testhost process exited with error: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorDebuggerWarning">
+        <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
+        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
         <note></note>
       </trans-unit>
     </body>

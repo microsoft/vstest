@@ -57,19 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public override void Initialize()
         {
-            try
-            {
-                this.ProxyDataCollectionManager.Initialize();
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
-                }
-
-                throw;
-            }
+            this.ProxyDataCollectionManager.Initialize();
 
             try
             {
@@ -84,22 +72,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.dataCollectionPort = dataCollectionParameters.DataCollectionEventsPort;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                try
-                {
-                    // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end DataCollectionProcess
-                    this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
-                    throw;
-                }
-                finally
-                {
-                    // There is an issue with Data Collector, skipping data collection and continuing with test run.
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
-                    }
-                }
+                // On failure in calling BeforeTestRunStart, call AfterTestRunEnd to end DataCollectionProcess
+                this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
+                throw;
             }
 
             base.Initialize();
@@ -119,13 +96,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 currentEventHandler = new DataCollectionTestRunEventsHandler(eventHandler, this.ProxyDataCollectionManager);
             }
 
-            // Log all the exceptions that has occured while initializing DataCollectionClient
-            if (this.DataCollectionRunEventsHandler?.ExceptionMessages?.Count > 0)
+            // Log all the messages that are reported while initializing DataCollectionClient
+            if (this.DataCollectionRunEventsHandler.Messages.Count > 0)
             {
-                foreach (var message in this.DataCollectionRunEventsHandler.ExceptionMessages)
+                foreach (var message in this.DataCollectionRunEventsHandler.Messages)
                 {
-                    currentEventHandler.HandleLogMessage(TestMessageLevel.Error, message);
+                    currentEventHandler.HandleLogMessage(message.Item1, message.Item2);
                 }
+
+                this.DataCollectionRunEventsHandler.Messages.Clear();
             }
 
             return base.StartTestRun(testRunCriteria, currentEventHandler);
@@ -137,15 +116,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 this.ProxyDataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: this.DataCollectionRunEventsHandler);
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("ProxyExecutionManagerWithDataCollection: Error occured while communicating with DataCollection Process: {0}", ex.Message);
-                }
-
-                throw;
             }
             finally
             {
@@ -175,45 +145,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     }
 
     /// <summary>
-    /// Handles Log events and stores them in list. Messages in the list will be emptied after test execution begins.
+    /// Handles Log events and stores them in list. Messages in the list will be logged after test execution begins.
     /// </summary>
     internal class DataCollectionRunEventsHandler : ITestMessageEventHandler
     {
         /// <summary>
-        /// The constructor.
+        /// Initializes a new instance of the <see cref="DataCollectionRunEventsHandler"/> class. 
         /// </summary>
         public DataCollectionRunEventsHandler()
         {
-            this.ExceptionMessages = new List<string>();
+            this.Messages = new List<Tuple<TestMessageLevel, string>>();
         }
 
         /// <summary>
-        /// Gets the exception messages.
+        /// Gets the cached messages.
         /// </summary>
-        public List<string> ExceptionMessages { get; private set; }
+        public List<Tuple<TestMessageLevel, string>> Messages { get; private set; }
 
-        /// <summary>
-        /// The handle log message.
-        /// </summary>
-        /// <param name="level">
-        /// The level.
-        /// </param>
-        /// <param name="message">
-        /// The message.
-        /// </param>
+       /// <inheritdoc />
         public void HandleLogMessage(TestMessageLevel level, string message)
         {
-            this.ExceptionMessages.Add(message);
+            this.Messages.Add(new Tuple<TestMessageLevel, string>(level, message));
         }
 
-        /// <summary>
-        /// The handle raw message.
-        /// </summary>
-        /// <param name="rawMessage">
-        /// The raw message.
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
+        /// <inheritdoc />
         public void HandleRawMessage(string rawMessage)
         {
             throw new NotImplementedException();

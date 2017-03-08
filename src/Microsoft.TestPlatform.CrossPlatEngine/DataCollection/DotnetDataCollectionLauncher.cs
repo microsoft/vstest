@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Gets the data collector process.
         /// </summary>
-        internal Process DataCollectorProcess
+        public Process DataCollectorProcess
         {
             get; private set;
         }

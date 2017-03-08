@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                                 this.cancellationTokenSource.Token);
                         }
 
-                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, areTestCaseLevelEventsRequired, testCaseEventsPort));
+                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, testCaseEventsPort));
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : DataCollection started.");
@@ -219,16 +219,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             }
                         }
 
-                        var attachmentsTask = Task<Collection<AttachmentSet>>.Factory.StartNew(
-                            () =>
-                                {
-                                    return this.dataCollectionManager.SessionEnded(isCancelled);
-                                },
-                            this.cancellationTokenSource.Token);
-
-                        attachmentsTask.Wait(this.cancellationTokenSource.Token);
-
-                        this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachmentsTask.Result);
+                        var attachmentsets = this.dataCollectionManager.SessionEnded(isCancelled);
+                        this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachmentsets);
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");

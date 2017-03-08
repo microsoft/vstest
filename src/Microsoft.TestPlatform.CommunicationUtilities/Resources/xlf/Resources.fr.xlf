@@ -22,7 +22,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">La série de tests active a été abandonnée.</target>
+        <target state="new">La série de tests active a été abandonnée. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La série de tests active a été abandonnée.</target>
@@ -32,7 +32,7 @@
       <trans-unit id="ConnectionClosed">
         <source>An existing connection was forcibly closed by the remote host.</source>
         <target state="translated">Une connexion existante a été fermée de force par l'hôte distant.</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Une connexion a été fermée par l’hôte distant.</target>
         </alt-trans>
@@ -40,7 +40,7 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">La découverte de tests active a été abandonnée.</target>
+        <target state="new">La découverte de tests active a été abandonnée. {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">La découverte active de Test a été abandonnée.</target>
@@ -55,6 +55,11 @@
           <target state-qualifier="mt-suggestion">Impossible de communiquer avec le processus d’exécution de test.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="7" adjWordcount="5.95" curWordcount="5.95"</note>
+      </trans-unit>
+      <trans-unit id="DataCollectorUriForLogMessage">
+        <source>Data collector ('{0}') message: {1}</source>
+        <target state="new">Diagnostic data adapter ('{0}') message: {1}</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

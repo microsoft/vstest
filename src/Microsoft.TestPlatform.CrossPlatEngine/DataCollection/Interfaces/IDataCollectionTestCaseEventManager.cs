@@ -76,5 +76,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// Test results event arguments.
         /// </param>
         void RaiseTestResult(TestResultEventArgs e);
+
+        /// <summary>
+        /// Flush any test results that are cached in dictionary
+        /// </summary>
+        void FlushLastChunkResults();
     }
 }
