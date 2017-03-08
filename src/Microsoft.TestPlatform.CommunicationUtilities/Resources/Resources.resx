@@ -127,7 +127,7 @@
     <value>An existing connection was forcibly closed by the remote host.</value>
   </data>
   <data name="DataCollectorUriForLogMessage" xml:space="preserve">
-    <value>Diagnostic data adapter ('{0}') message: {1}</value>
+    <value>Data collector ('{0}') message: {1}</value>
   </data>
   <data name="UnableToCommunicateToTestHost" xml:space="preserve">
     <value>Unable to communicate with test host process.</value>
