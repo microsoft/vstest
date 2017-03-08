@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -101,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {
                     var msg = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                    runEventsHandler.HandleLogMessage(msg.Level, msg.Message);
+                    runEventsHandler.HandleLogMessage(msg.Level, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorUriForLogMessage, msg.FriendlyName, msg.Message));
                 }
                 else if (message.MessageType == MessageType.BeforeTestRunStartResult)
                 {
@@ -130,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {
                     var msg = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                    runEventsHandler.HandleLogMessage(msg.Level, msg.Message);
+                    runEventsHandler.HandleLogMessage(msg.Level, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorUriForLogMessage, msg.FriendlyName, msg.Message));
                 }
                 else if (message.MessageType == MessageType.AfterTestRunEndResult)
                 {
