@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     public abstract class ProxyOperationManager
     {
-        private readonly ITestRunTimeProvider testHostManager;
+        private readonly ITestRuntimeProvider testHostManager;
 
         private bool initialized;
 
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         /// <param name="clientConnectionTimeout">Client Connection Timeout.</param>
-        protected ProxyOperationManager(ITestRequestSender requestSender, ITestRunTimeProvider testHostManager, int clientConnectionTimeout)
+        protected ProxyOperationManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, int clientConnectionTimeout)
         {
             this.RequestSender = requestSender;
             this.connectionTimeout = clientConnectionTimeout;
@@ -89,13 +89,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 
                 //Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += TestHostManager_HostLaunched;
-                this.testHostManager.HostError += TestHostManager_HostError;
+                this.testHostManager.HostExited += TestHostManager_HostExited;
 
                 this.UpdateTestProcessStartInfo(testHostStartInfo);
 
                 // Launch the test host.
                 CancellationTokenSource hostLaunchCTS = new CancellationTokenSource();
-                Task<int> hostLaunchedTask = this.testHostManager.LaunchTestHost(testHostStartInfo);
+                Task<int> hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo);
 
                 try
                 {
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             EqtTrace.Verbose(e.Data);
         }
 
-        private void TestHostManager_HostError(object sender, HostProviderEventArgs e)
+        private void TestHostManager_HostExited(object sender, HostProviderEventArgs e)
         {
             this.testHostProcessStdError.Clear();
             this.testHostProcessStdError.Append(e.Data);
@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             finally
             {
                 this.initialized = false;
-                this.testHostManager.HostError -= TestHostManager_HostError;
+                this.testHostManager.HostExited -= TestHostManager_HostExited;
                 this.testHostManager.HostLaunched -= TestHostManager_HostLaunched;
             }
         }

@@ -24,7 +24,7 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                var testLoggerExtensionManager = TestRunTimeExtensionManager.Create(null);
+                var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(null);
             });
 
         }
@@ -34,9 +34,9 @@ namespace TestPlatform.Common.UnitTests.Logging
         {
             try
             {
-                var testLoggerExtensionManager = TestRunTimeExtensionManager.Create(TestSessionMessageLogger.Instance);
+                var testLoggerExtensionManager = TestRuntimeExtensionManager.Create(TestSessionMessageLogger.Instance);
                 Assert.IsNotNull(testLoggerExtensionManager);
-                Assert.IsInstanceOfType(testLoggerExtensionManager, typeof(TestRunTimeExtensionManager));
+                Assert.IsInstanceOfType(testLoggerExtensionManager, typeof(TestRuntimeExtensionManager));
             }
             finally
             {

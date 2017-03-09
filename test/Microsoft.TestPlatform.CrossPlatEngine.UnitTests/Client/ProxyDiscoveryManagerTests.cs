@@ -23,7 +23,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private ProxyDiscoveryManager testDiscoveryManager;
 
-        private Mock<ITestRunTimeProvider> mockTestHostManager;
+        private Mock<ITestRuntimeProvider> mockTestHostManager;
 
         private Mock<ITestRequestSender> mockRequestSender;
 
@@ -36,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyDiscoveryManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestRunTimeProvider>();
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestSender.Object,
@@ -119,7 +119,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
         }
 
         [TestMethod]
@@ -132,7 +132,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.Once);
         }
 
         [TestMethod]

@@ -180,7 +180,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
 
-            Task<int> processId = this.dotnetHostManager.LaunchTestHost(startInfo);
+            Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
             processId.Wait();
             Assert.AreEqual(expectedProcessId, processId.Result);
         }
@@ -191,7 +191,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var variables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
             var startInfo = new TestProcessStartInfo { EnvironmentVariables = variables };
 
-            Task<int> processId = this.dotnetHostManager.LaunchTestHost(startInfo);
+            Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
             processId.Wait();
 
             this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables))), Times.Once);
@@ -313,7 +313,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var expectedArgs = "exec \"" + expectedTestHostPath + "\" --port 0 --parentprocessid 0";
 
-            Task<int> processId = this.dotnetHostManager.LaunchTestHost(startInfo);
+            Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
             processId.Wait();
 
             this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);

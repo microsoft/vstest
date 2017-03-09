@@ -36,14 +36,14 @@ namespace TestPlatform.Common.UnitTests.Logging
         [TestMethod]
         public void TestHostProviderManagerShouldReturnTestHostWhenAppropriateCustomURIProvided()
         {
-            var manager = TestRunTimeProviderManager.Instance;
+            var manager = TestRuntimeProviderManager.Instance;
             Assert.IsNotNull(manager.GetTestHostManagerByUri("executor://CustomTestHost/"));
         }
 
         [TestMethod]
         public void TestHostProviderManagerShouldReturnNullWhenInvalidCustomURIProvided()
         {
-            var manager = TestRunTimeProviderManager.Instance;
+            var manager = TestRuntimeProviderManager.Instance;
             Assert.IsNull(manager.GetTestHostManagerByUri("executor://InvalidHost/"));
         }
 
@@ -61,7 +61,7 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             RunConfiguration config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
 
-            var manager = TestRunTimeProviderManager.Instance;
+            var manager = TestRuntimeProviderManager.Instance;
             Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(config));
         }
 
@@ -69,12 +69,12 @@ namespace TestPlatform.Common.UnitTests.Logging
 
         [ExtensionUri("executor://CustomTestHost")]
         [FriendlyName("CustomHost")]
-        private class CustomTestHost : ITestRunTimeProvider
+        private class CustomTestHost : ITestRuntimeProvider
         {
             public bool Shared => throw new NotImplementedException();
 
             public event EventHandler<HostProviderEventArgs> HostLaunched;
-            public event EventHandler<HostProviderEventArgs> HostError;
+            public event EventHandler<HostProviderEventArgs> HostExited;
 
             public bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration)
             {
@@ -101,14 +101,18 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public Task<int> LaunchTestHost(TestProcessStartInfo testHostStartInfo)
+            public void Initialize(IMessageLogger logger)
+            {
+            }
+
+            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
             {
                 throw new NotImplementedException();
             }
 
-            public void OnHostError(HostProviderEventArgs e)
+            public void OnHostExited(HostProviderEventArgs e)
             {
-                this.HostError.Invoke(this, new HostProviderEventArgs("Error"));
+                this.HostExited.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
             public void OnHostLaunched(HostProviderEventArgs e)

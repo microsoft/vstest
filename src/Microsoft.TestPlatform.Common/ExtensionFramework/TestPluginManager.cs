@@ -238,9 +238,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 return this.GetValuesFromDictionary<TestLoggerPluginInformation>(extensions.TestLoggers);
             }
-            else if (typeof(ITestRunTimeProvider).GetTypeInfo().IsAssignableFrom(extensionType))
+            else if (typeof(ITestRuntimeProvider).GetTypeInfo().IsAssignableFrom(extensionType))
             {
-                return this.GetValuesFromDictionary<TestHostPluginInformation>(extensions.TestHosts);
+                return this.GetValuesFromDictionary<TestRuntimePluginInformation>(extensions.TestHosts);
             }
             else
             {

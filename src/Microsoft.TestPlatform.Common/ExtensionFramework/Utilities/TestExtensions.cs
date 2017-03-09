@@ -40,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <summary>
         /// Gets or sets test logger extensions.
         /// </summary>
-        internal Dictionary<string, TestHostPluginInformation> TestHosts { get; set; }
+        internal Dictionary<string, TestRuntimePluginInformation> TestHosts { get; set; }
 
         #endregion
 
@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             this.TestExecutors = this.AddExtension<TestExecutorPluginInformation>(this.TestExecutors, extensions.TestExecutors);
             this.TestSettingsProviders = this.AddExtension<TestSettingsProviderPluginInformation>(this.TestSettingsProviders, extensions.TestSettingsProviders);
             this.TestLoggers = this.AddExtension<TestLoggerPluginInformation>(this.TestLoggers, extensions.TestLoggers);
-            this.TestHosts = this.AddExtension<TestHostPluginInformation>(this.TestHosts, extensions.TestHosts);
+            this.TestHosts = this.AddExtension<TestRuntimePluginInformation>(this.TestHosts, extensions.TestHosts);
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                     this.TestLoggers,
                     extensionAssembly);
             testExtensions.TestHosts =
-                this.GetExtensionsDiscoveredFromAssembly<TestHostPluginInformation>(
+                this.GetExtensionsDiscoveredFromAssembly<TestRuntimePluginInformation>(
                     this.TestHosts,
                     extensionAssembly);
 

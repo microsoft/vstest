@@ -8,10 +8,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
     /// <summary>
     /// Hold data about the Test Host.
     /// </summary>
-    public class TestRunTimeMetadata : ITestRunTimeCapabilities
+    public class TestRuntimeMetadata : ITestRuntimeCapabilities
     {
         /// <summary>
-        /// Constructor for TestRunTimeMetadata
+        /// Constructor for TestRuntimeMetadata
         /// </summary>
         /// <param name="extension">
         /// Uri identifying the testhost. 
@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         /// <param name="friendlyName">
         /// The friendly Name.
         /// </param>
-        public TestRunTimeMetadata(string extension, string friendlyName)
+        public TestRuntimeMetadata(string extension, string friendlyName)
         {
             this.ExtensionUri = extension;
             this.FriendlyName = friendlyName;

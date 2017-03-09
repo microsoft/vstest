@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 TestExecutors = new Dictionary<string, TestExecutorPluginInformation>(StringComparer.OrdinalIgnoreCase),
                 TestSettingsProviders = new Dictionary<string, TestSettingsProviderPluginInformation>(StringComparer.OrdinalIgnoreCase),
                 TestLoggers = new Dictionary<string, TestLoggerPluginInformation>(StringComparer.OrdinalIgnoreCase),
-                TestHosts = new Dictionary<string, TestHostPluginInformation>(StringComparer.OrdinalIgnoreCase)
+                TestHosts = new Dictionary<string, TestRuntimePluginInformation>(StringComparer.OrdinalIgnoreCase)
             };
 
 
@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         Dictionary<string, TestExecutorPluginInformation> testExecutors,
                         Dictionary<string, TestSettingsProviderPluginInformation> testSettingsProviders,
                         Dictionary<string, TestLoggerPluginInformation> testLoggers,
-                        Dictionary<string, TestHostPluginInformation> testHosts)
+                        Dictionary<string, TestRuntimePluginInformation> testHosts)
         {
             Debug.Assert(files != null, "null files");
             Debug.Assert(testDiscoverers != null, "null testDiscoverers");
@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         Dictionary<string, TestExecutorPluginInformation> testExecutors,
                         Dictionary<string, TestSettingsProviderPluginInformation> testSettingsProviders,
                         Dictionary<string, TestLoggerPluginInformation> testLoggers,
-                        Dictionary<string, TestHostPluginInformation> testHosts)
+                        Dictionary<string, TestRuntimePluginInformation> testHosts)
         {
             Debug.Assert(assembly != null, "null assembly");
             Debug.Assert(testDiscoverers != null, "null testDiscoverers");
@@ -243,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         this.GetTestExtensionFromType<TestExecutorPluginInformation>(type, typeof(ITestExecutor), testExecutors);
                         this.GetTestExtensionFromType<TestLoggerPluginInformation>(type, typeof(ITestLogger), testLoggers);
                         this.GetTestExtensionFromType<TestSettingsProviderPluginInformation>(type, typeof(ISettingsProvider), testSettingsProviders);
-                        this.GetTestExtensionFromType<TestHostPluginInformation>(type, typeof(ITestRunTimeProvider), testHosts);
+                        this.GetTestExtensionFromType<TestRuntimePluginInformation>(type, typeof(ITestRuntimeProvider), testHosts);
                     }
                 }
             }

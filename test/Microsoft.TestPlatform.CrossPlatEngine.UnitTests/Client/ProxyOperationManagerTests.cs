@@ -22,7 +22,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private readonly ProxyOperationManager testOperationManager;
 
-        private readonly Mock<ITestRunTimeProvider> mockTestHostManager;
+        private readonly Mock<ITestRuntimeProvider> mockTestHostManager;
 
         private readonly Mock<ITestRequestSender> mockRequestSender;
 
@@ -33,7 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyOperationManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestRunTimeProvider>();
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
@@ -60,7 +60,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo)), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo)), Times.Once);
         }
 
         [TestMethod]
@@ -149,7 +149,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelShouldAddExitCallbackToTestHostStartInfo()
         {
             TestProcessStartInfo startInfo = null;
-            this.mockTestHostManager.Setup(m => m.LaunchTestHost(It.IsAny<TestProcessStartInfo>()))
+            this.mockTestHostManager.Setup(m => m.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()))
                 .Callback<TestProcessStartInfo>(
                     (s) => { startInfo = s; });
 
@@ -175,14 +175,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testOperationManager.Close();
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
-            this.mockTestHostManager.Verify(th => th.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
+            this.mockTestHostManager.Verify(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
         }
 
         private class TestableProxyOperationManager : ProxyOperationManager
         {
             public TestableProxyOperationManager(
                 ITestRequestSender requestSender,
-                ITestRunTimeProvider testHostManager,
+                ITestRuntimeProvider testHostManager,
                 int clientConnectionTimeout) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
             }

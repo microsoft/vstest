@@ -3,12 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
 {
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
     /// Metadata that is available from Test Host.
     /// </summary>
-    public interface ITestRunTimeCapabilities : ITestExtensionCapabilities
+    public interface ITestRuntimeCapabilities : ITestExtensionCapabilities
     {
         /// specifies the friendly name corresponding to the TestHost.
         string FriendlyName { get; }

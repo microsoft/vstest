@@ -8,18 +8,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
     using System.Linq;
     using System.Reflection;
 
-    using ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// The test host plugin information.
     /// </summary>
-    internal class TestHostPluginInformation : TestExtensionPluginInformation
+    internal class TestRuntimePluginInformation : TestExtensionPluginInformation
     {
         /// <summary>
         /// Default constructor
         /// </summary>
         /// <param name="testHostType"> The testhost Type. </param>
-        public TestHostPluginInformation(Type testHostType)
+        public TestRuntimePluginInformation(Type testHostType)
             : base(testHostType)
         {
             this.FriendlyName = GetFriendlyName(testHostType);

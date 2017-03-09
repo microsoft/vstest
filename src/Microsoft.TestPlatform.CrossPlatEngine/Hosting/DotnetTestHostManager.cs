@@ -26,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading.Tasks;
     using System.Threading;
     using System.Text;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -34,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// Note that some functionality of this entity overlaps with that of <see cref="DefaultTestHostManager"/>. That is
     /// intentional since we want to move this to a separate assembly (with some runtime extensibility discovery).
     /// </remarks>
-    public class DotnetTestHostManager : ITestRunTimeProvider
+    public class DotnetTestHostManager : ITestRuntimeProvider
     {
         private readonly IProcessHelper processHelper;
 
@@ -48,11 +49,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private CancellationTokenSource hostLaunchCTS;
 
-        private TestSessionMessageLogger logger = TestSessionMessageLogger.Instance;
         private StringBuilder testHostProcessStdError;
 
+        private IMessageLogger messageLogger;
+
         public event EventHandler<HostProviderEventArgs> HostLaunched;
-        public event EventHandler<HostProviderEventArgs> HostError;
+        public event EventHandler<HostProviderEventArgs> HostExited;
 
         protected int ErrorLength { get; set; } = 1000;
         protected int TimeOut { get; set; } = 10000;
@@ -82,13 +84,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
 
                 this.testHostProcessStdError.Append(data);
-                this.OnHostError(new HostProviderEventArgs(this.testHostProcessStdError.ToString()));
+                this.messageLogger.SendMessage(TestMessageLevel.Warning, this.testHostProcessStdError.ToString());
             }
 
             if (process.HasExited && process.ExitCode != 0)
             {
                 EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostError(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), process.ExitCode));
+                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), process.ExitCode));
             }
         });
 
@@ -132,12 +134,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostLauncher = customLauncher;
         }
 
-        public async Task<int> LaunchTestHost(TestProcessStartInfo testHostStartInfo)
+        public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
             return await Task.Run(() => LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
         }
 
-        public CancellationTokenSource GetCancellationTokenSource()
+        private CancellationTokenSource GetCancellationTokenSource()
         {
             this.hostLaunchCTS = new CancellationTokenSource(TimeOut);
             return this.hostLaunchCTS;
@@ -151,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
             this.testHostProcess = Process.GetProcessById(processId);
 
-            this.OnHostLaunched(new HostProviderEventArgs("Test RunTime launched with Pid: " + processId));
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + processId));
 
             return processId;
         }
@@ -343,9 +345,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
         }
 
-        public void OnHostError(HostProviderEventArgs e)
+        public void OnHostExited(HostProviderEventArgs e)
         {
-            this.HostError.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
+            this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+        }
+
+        public void Initialize(IMessageLogger logger)
+        {
+            this.messageLogger = logger;
         }
     }
 

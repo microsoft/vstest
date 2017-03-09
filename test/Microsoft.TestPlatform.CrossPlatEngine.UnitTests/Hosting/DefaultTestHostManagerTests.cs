@@ -120,7 +120,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, mockProcessHelper, true);
             var startInfo = testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
-            Task<int> processId = testHostManager.LaunchTestHost(startInfo);
+            Task<int> processId = testHostManager.LaunchTestHostAsync(startInfo);
 
             try
             {
@@ -151,7 +151,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var currentProcess = Process.GetCurrentProcess();
             mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
 
-            Task<int> pid = this.testHostManager.LaunchTestHost(this.startInfo);
+            Task<int> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo);
             try
             {
                 pid.Wait(new CancellationTokenSource(3000).Token);

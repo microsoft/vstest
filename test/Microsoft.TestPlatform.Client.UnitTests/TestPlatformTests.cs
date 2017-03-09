@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         private readonly Mock<ITestEngine> testEngine;
         private readonly Mock<IProxyDiscoveryManager> discoveryManager;
         private readonly Mock<ITestExtensionManager> extensionManager;
-        private readonly Mock<ITestRunTimeProvider> hostManager;
+        private readonly Mock<ITestRuntimeProvider> hostManager;
         private readonly Mock<IProxyExecutionManager> executionManager;
         private readonly Mock<IFileHelper> mockFileHelper;
 
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.discoveryManager = new Mock<IProxyDiscoveryManager>();
             this.extensionManager = new Mock<ITestExtensionManager>();
             this.executionManager = new Mock<IProxyExecutionManager>();
-            this.hostManager = new Mock<ITestRunTimeProvider>();
+            this.hostManager = new Mock<ITestRuntimeProvider>();
             this.mockFileHelper = new Mock<IFileHelper>();
 
         }

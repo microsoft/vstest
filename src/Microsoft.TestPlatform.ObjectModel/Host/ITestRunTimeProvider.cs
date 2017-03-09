@@ -8,11 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
-    /// Interface for TestRunTimeProvider which manages test host processes for test engine.
+    /// Interface for TestRuntimeProvider which manages test host processes for test engine.
     /// </summary>
-    public interface ITestRunTimeProvider
+    public interface ITestRuntimeProvider
     {
         #region events
         /// <summary>
@@ -23,13 +24,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// <summary>
         /// Raised when host is reports Error
         /// </summary>
-        event EventHandler<HostProviderEventArgs> HostError;
-
-        void OnHostLaunched(HostProviderEventArgs e);
-        
-        void OnHostError(HostProviderEventArgs e);
+        event EventHandler<HostProviderEventArgs> HostExited;
 
         #endregion
+
+        /// <summary>
+        /// Sets a custom launcher
+        /// </summary>
+        /// <param name="customLauncher">Custom launcher to set</param>
+        void Initialize(IMessageLogger logger);
 
         /// <summary>
         /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
@@ -54,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// </summary>
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-        Task<int> LaunchTestHost(TestProcessStartInfo testHostStartInfo);
+        Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo);
 
         /// <summary>
         /// Gets the start parameters for the test host.

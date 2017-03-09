@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         public TestPlatform() : this(new TestEngine(), new FileHelper())
         {
-            this.testHostProviderManager = TestRunTimeProviderManager.Instance;
+            this.testHostProviderManager = TestRuntimeProviderManager.Instance;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         private ITestEngine TestEngine { get; set; }
 
-        private TestRunTimeProviderManager testHostProviderManager;
+        private TestRuntimeProviderManager testHostProviderManager;
 
         /// <summary>
         /// The create discovery request.
@@ -99,9 +99,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
-            // Update and initialize loggers only when DesignMode is false
             //var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runConfiguration);
 
+            // Update and initialize loggers only when DesignMode is false
             if (runConfiguration.DesignMode == false)
             {
                 UpdateTestLoggerPath(testRunCriteria);
@@ -111,6 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
+            testHostManager.Initialize(TestSessionMessageLogger.Instance);
 
             if (testRunCriteria.TestHostLauncher != null)
             {

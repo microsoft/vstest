@@ -10,20 +10,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
-    /// Responsible for managing TestRunTimeProviderManager extensions
+    /// Responsible for managing TestRuntimeProviderManager extensions
     /// </summary>
-    internal class TestRunTimeProviderManager
+    internal class TestRuntimeProviderManager
     {
         #region Fields
 
-        private static TestRunTimeProviderManager testHostManager;
+        private static TestRuntimeProviderManager testHostManager;
 
         /// <summary>
         /// Gets an instance of the logger.
         /// </summary>
         private IMessageLogger messageLogger;
 
-        private TestRunTimeExtensionManager testHostExtensionManager;
+        private TestRuntimeExtensionManager testHostExtensionManager;
         
         #endregion
 
@@ -32,22 +32,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         /// <summary>
         /// Default constructor.
         /// </summary>
-        protected TestRunTimeProviderManager(TestSessionMessageLogger sessionLogger)
+        protected TestRuntimeProviderManager(TestSessionMessageLogger sessionLogger)
         {
             this.messageLogger = sessionLogger;
-            this.testHostExtensionManager = TestRunTimeExtensionManager.Create(sessionLogger);
+            this.testHostExtensionManager = TestRuntimeExtensionManager.Create(sessionLogger);
         }
 
         /// <summary>
         /// Gets the instance.
         /// </summary>
-        public static TestRunTimeProviderManager Instance
+        public static TestRuntimeProviderManager Instance
         {
             get
             {
                 if (testHostManager == null)
                 {
-                    testHostManager = new TestRunTimeProviderManager(TestSessionMessageLogger.Instance);
+                    testHostManager = new TestRuntimeProviderManager(TestSessionMessageLogger.Instance);
                 }
                 return testHostManager;
             }
@@ -62,21 +62,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
 
         #region Public Methods
 
-        public ITestRunTimeProvider GetTestHostManagerByUri(string hostUri)
+        public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)
         {
             var host = this.testHostExtensionManager.TryGetTestExtension(hostUri);
             if (host != null)
+            {
                 return host.Value;
+            }
 
             return null;
         }
 
-        public ITestRunTimeProvider GetTestHostManagerByRunConfiguration(RunConfiguration runConfiguarion)
+        public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(RunConfiguration runConfiguration)
         {
             foreach (var testExtension in this.testHostExtensionManager.TestExtensions)
             {
-                if (testExtension.Value.CanExecuteCurrentRunConfiguration(runConfiguarion))
+                if (testExtension.Value.CanExecuteCurrentRunConfiguration(runConfiguration))
+                {
                     return testExtension.Value;
+                }
             }
 
             return null;
