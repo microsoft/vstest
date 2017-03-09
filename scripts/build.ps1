@@ -317,7 +317,7 @@ function Create-NugetPackages
     Write-Log "Create-NugetPackages: Started."
     $stagingDir = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     $packageOutputDir = (Join-Path $env:TP_OUT_DIR $TPB_Configuration\packages )
-    New-Item $packageOutputDir -type directory
+    New-Item $packageOutputDir -type directory -Force
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
