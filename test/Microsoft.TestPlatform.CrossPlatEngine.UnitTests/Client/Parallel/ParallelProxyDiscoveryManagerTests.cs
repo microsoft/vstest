@@ -20,21 +20,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ParallelProxyDiscoveryManagerTests
     {
+        private const int taskTimeout = 15 * 1000; // In milliseconds.
         private IParallelProxyDiscoveryManager proxyParallelDiscoveryManager;
+        private List<Mock<IProxyDiscoveryManager>> createdMockManagers;
+        private Func<IProxyDiscoveryManager> proxyManagerFunc;
+        private Mock<ITestDiscoveryEventsHandler> mockHandler;
+        private List<string> sources = new List<string>() { "1.dll", "2.dll" };
+        private DiscoveryCriteria testDiscoveryCriteria;
+
+        public ParallelProxyDiscoveryManagerTests()
+        {
+            this.createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
+            this.proxyManagerFunc = () =>
+            {
+                var manager = new Mock<IProxyDiscoveryManager>();
+                this.createdMockManagers.Add(manager);
+                return manager.Object;
+            };
+            this.mockHandler = new Mock<ITestDiscoveryEventsHandler>();
+            this.testDiscoveryCriteria = new DiscoveryCriteria(sources, 100, null);
+        }
 
         [TestMethod]
         public void InitializeShouldCallAllConcurrentManagersOnce()
         {
-            var createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
-            Func<IProxyDiscoveryManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyDiscoveryManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 3, false);
+            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.proxyManagerFunc, 3, false);
             this.proxyParallelDiscoveryManager.Initialize();
 
             Assert.AreEqual(3, createdMockManagers.Count, "Number of Concurrent Managers created should be 3");
@@ -48,16 +58,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AbortShouldCallAllConcurrentManagersOnce()
         {
-            var createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
-            Func<IProxyDiscoveryManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyDiscoveryManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 4, false);
+            this.proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.proxyManagerFunc, 4, false);
             this.proxyParallelDiscoveryManager.Abort();
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
@@ -67,133 +68,81 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 manager.Verify(m => m.Abort(), Times.Once);
             }
         }
-        
+
         [TestMethod]
         public void DiscoverTestsShouldProcessAllSources()
         {
-            var createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
-            Func<IProxyDiscoveryManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyDiscoveryManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 2, false);
-
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
-            var sources = new List<string>() { "1.dll", "2.dll" };
-            var testDiscoveryCriteria = new DiscoveryCriteria(sources, 100, null);
-
+            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.proxyManagerFunc, 2, false);
             var processedSources = new List<string>();
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler>())).
-                    Callback<DiscoveryCriteria, ITestDiscoveryEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedSources.AddRange(criteria.Sources);
-                            }
-
-                            Task.Delay(100).Wait();
-
-                            handler.HandleDiscoveryComplete(10, null, false);
-                        });
-            }
-
+            SetupDiscoveryTests(processedSources, false);
             AutoResetEvent completeEvent = new AutoResetEvent(false);
-
-            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(20, null, false))
-                .Callback<long, IEnumerable<TestCase>, bool>(
-                (totalTests, lastChunk, aborted) =>
-                {
-                    completeEvent.Set();
-                });
-
-            proxyParallelDiscoveryManager.DiscoverTests(testDiscoveryCriteria, mockHandler.Object);
-            Assert.IsTrue(completeEvent.WaitOne(5000), "CompleteEvent was not set" );
-
-            Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
-
-            foreach (var source in sources)
-            {
-                bool matchFound = false;
-
-                foreach (var processedSrc in processedSources)
-                {
-                    if (processedSrc.Equals(source))
-                    {
-                        if (matchFound) Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
-                        matchFound = true;
-                    }
-                }
-
-                Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
-            }
-        }
-        
-        [TestMethod]
-        public void DiscoverTestsShouldNotSendCompleteUntilAllSourcesAreProcessed()
-        {
-            var createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
-            Func<IProxyDiscoveryManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyDiscoveryManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(proxyManagerFunc, 2, false);
-
-            var mockHandler = new Mock<ITestDiscoveryEventsHandler>();
-
-            var sources = new List<string>() { "1.dll", "2.dll" };
-
-            var discoveryCriteria = new DiscoveryCriteria(sources, 100, null);
-
-            var processedSources = new List<string>();
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler>())).
-                    Callback<DiscoveryCriteria, ITestDiscoveryEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedSources.AddRange(criteria.Sources);
-                            }
-
-                            Task.Delay(100).Wait();
-                            
-                            handler.HandleDiscoveryComplete(10, null, false);
-                        });
-            }
-
-            AutoResetEvent eventHandle = new AutoResetEvent(false);
-
-            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(20, null, false))
-                 .Callback<long, IEnumerable<TestCase>, bool>(
-                 (totalTests, lastChunk, aborted) =>
-                 {
-                     eventHandle.Set();
-                 });
+            SetupHandleDiscoveyComplete(completeEvent, false);
 
             Task.Run(() =>
             {
-                proxyParallelDiscoveryManager.DiscoverTests(discoveryCriteria, mockHandler.Object);
+                proxyParallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, mockHandler.Object);
             });
 
-            Assert.IsTrue(eventHandle.WaitOne(15000), "eventHandle was not set");
-
+            Assert.IsTrue(completeEvent.WaitOne(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
+            AssertMissingAndDuplicateSources(processedSources);
+        }
 
-            foreach (var source in sources)
+        /// <summary>
+        ///  Create ParallelProxyDiscoveryManager with parallel level 1 and two source,
+        ///  Abort in any source should stop discovery for other sources.
+        /// </summary>
+        [TestMethod]
+        public void DiscoveryTestsShouldNotProcessAllSourcesOnDiscoveryAbortsForAnySource()
+        {
+            var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
+            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(() => discoveryManagerMock.Object, 1, false);
+            this.createdMockManagers.Add(discoveryManagerMock);
+            var processedSources = new List<string>();
+            SetupDiscoveryTests(processedSources, true);
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
+            SetupHandleDiscoveyComplete(completeEvent, true, totalTests:10);
+
+            Task.Run(() =>
+            {
+                proxyParallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, mockHandler.Object);
+            });
+
+            Assert.IsTrue(completeEvent.WaitOne(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.AreEqual(1, processedSources.Count, "All Sources must not be processed.");
+        }
+
+        private void SetupHandleDiscoveyComplete(AutoResetEvent eventHandle, bool isAbort, int totalTests=20)
+        {
+            mockHandler.Setup(mh => mh.HandleDiscoveryComplete(totalTests, null, isAbort))
+                .Callback<long, IEnumerable<TestCase>, bool>(
+                    (totalTests1, lastChunk, aborted) => { eventHandle.Set(); });
+        }
+
+        private void SetupDiscoveryTests(List<string> processedSources, bool isAbort)
+        {
+            var syncObject = new object();
+            foreach (var manager in createdMockManagers)
+            {
+                manager.Setup(m => m.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler>())).
+                    Callback<DiscoveryCriteria, ITestDiscoveryEventsHandler>(
+                        (criteria, handler) =>
+                        {
+                            lock (syncObject)
+                            {
+                                processedSources.AddRange(criteria.Sources);
+                            }
+
+                            Task.Delay(100).Wait();
+
+                            handler.HandleDiscoveryComplete(10, null, isAbort);
+                        });
+            }
+        }
+
+        private void AssertMissingAndDuplicateSources(List<string> processedSources)
+        {
+            foreach (var source in this.sources)
             {
                 bool matchFound = false;
 
@@ -201,7 +150,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 {
                     if (processedSrc.Equals(source))
                     {
-                        if (matchFound) Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
+                        if (matchFound)
+                        {
+                            Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
+                        }
+
                         matchFound = true;
                     }
                 }
