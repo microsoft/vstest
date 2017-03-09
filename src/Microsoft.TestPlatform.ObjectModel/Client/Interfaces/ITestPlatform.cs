@@ -3,7 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using System;
     using System.Collections.Generic;
 

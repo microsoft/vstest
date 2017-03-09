@@ -89,9 +89,9 @@ namespace testhost.UnitTests
 
             Assert.AreEqual(1, startupElements.Count(), "Merged config must have only one 'startup' element");
 
-            var supportedRunTimeXml = startupElements.First().Descendants("supportedRuntime").FirstOrDefault()?.ToString();
-            Assert.AreEqual(supportedRunTimeXml, @"<supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.0"" />",
-                "TestHost Supported RunTime must be used on merging");
+            var supportedRuntimeXml = startupElements.First().Descendants("supportedRuntime").FirstOrDefault()?.ToString();
+            Assert.AreEqual(supportedRuntimeXml, @"<supportedRuntime version=""v4.0"" sku="".NETFramework,Version=v4.0"" />",
+                "TestHost Supported Runtime must be used on merging");
 
             var runtimeEle = doc.Descendants("runtime").FirstOrDefault();
             Assert.IsNotNull(runtimeEle, "Runtime element must be present");
