@@ -110,6 +110,7 @@
     <!-- Sign Microsoft.TestPlatform.Build -->
     <ItemGroup>
       <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.Build.dll" />
+      <BuildAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.Build\net46\Microsoft.TestPlatform.Build.dll" />
     </ItemGroup>
 
     <!-- Sign Microsoft.TestPlatform.TestHost -->
