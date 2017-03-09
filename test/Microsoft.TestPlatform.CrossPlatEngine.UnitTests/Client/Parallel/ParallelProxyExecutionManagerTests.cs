@@ -105,50 +105,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             AssertMissingAndDuplicateSources(processedSources);
         }
 
-        private void SetupHandleTestRunComplete(AutoResetEvent completeEvent)
-        {
-            this.mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                    It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
-                    It.IsAny<ICollection<string>>()))
-                .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-                    (testRunCompleteArgs, testRunChangedEventArgs, attachmentSets, executorUris) => { completeEvent.Set(); });
-        }
-
-        private void AssertMissingAndDuplicateSources(List<string> processedSources)
-        {
-            foreach (var source in this.sources)
-            {
-                var matchFound = false;
-
-                foreach (var processedSrc in processedSources)
-                {
-                    if (processedSrc.Equals(source))
-                    {
-                        if (matchFound)
-                        {
-                            Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
-                        }
-
-                        matchFound = true;
-                    }
-                }
-
-                Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
-            }
-        }
-
-        private static TestRunCompleteEventArgs CreateTestRunCompleteArgs(bool isCanceled=false, bool isAborted=false)
-        {
-            return new TestRunCompleteEventArgs(
-                new TestRunStatistics(new Dictionary<TestOutcome, long>()),
-                isCanceled,
-                isAborted,
-                null,
-                null,
-                TimeSpan.FromMilliseconds(1));
-        }
-
         [TestMethod]
         public void StartTestRunShouldProcessAllTestCases()
         {
@@ -166,63 +122,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(tests.Count, processedTestCases.Count, "All Tests must be processed.");
             AssertMissingAndDuplicateTestCases(tests, processedTestCases);
         }
-
-        private static void AssertMissingAndDuplicateTestCases(List<TestCase> tests, List<TestCase> processedTestCases)
-        {
-            foreach (var test in tests)
-            {
-                bool matchFound = false;
-
-                foreach (var processedTest in processedTestCases)
-                {
-                    if (processedTest.FullyQualifiedName.Equals(test.FullyQualifiedName))
-                    {
-                        if (matchFound)
-                            Assert.Fail("Concurrreny issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
-                        matchFound = true;
-                    }
-                }
-
-                Assert.IsTrue(matchFound, "Concurrency issue detected: Test['{0}'] did NOT get processed at all",
-                    test.FullyQualifiedName);
-            }
-        }
-
-        private void SetupMockManagersForTestCase(List<TestCase> processedTestCases, TestRunCriteria testRunCriteria)
-        {
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                    Callback<TestRunCriteria, ITestRunEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedTestCases.AddRange(criteria.Tests);
-                            }
-
-                            Task.Delay(100).Wait();
-
-                            // Duplicated testRunCriteria should match the actual one.
-                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
-                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(), null, null, null);
-                        });
-            }
-        }
-
-        private static List<TestCase> CreateTestCases()
-        {
-            TestCase tc1 = new TestCase("dll1.class1.test1", new Uri("hello://x/"), "1.dll");
-            TestCase tc21 = new TestCase("dll2.class21.test21", new Uri("hello://x/"), "2.dll");
-            TestCase tc22 = new TestCase("dll2.class21.test22", new Uri("hello://x/"), "2.dll");
-            TestCase tc31 = new TestCase("dll3.class31.test31", new Uri("hello://x/"), "3.dll");
-            TestCase tc32 = new TestCase("dll3.class31.test32", new Uri("hello://x/"), "3.dll");
-
-            var tests = new List<TestCase>() {tc1, tc21, tc22, tc31, tc32};
-            return tests;
-        }
-
 
         [TestMethod]
         public void StartTestRunWithSourcesShouldNotSendCompleteUntilAllSourcesAreProcessed()
@@ -243,29 +142,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
             AssertMissingAndDuplicateSources(processedSources);
         }
-
-        private void SetupMockManagers(List<string> processedSources, bool isCanceled = false, bool isAborted = false)
-        {
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                    Callback<TestRunCriteria, ITestRunEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedSources.AddRange(criteria.Sources);
-                            }
-                            Task.Delay(100).Wait();
-
-                            // Duplicated testRunCriteria should match the actual one.
-                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
-                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(isCanceled, isAborted), null, null, null);
-                        });
-            }
-        }
-
 
         [TestMethod]
         public void StartTestRunWithTestsShouldNotSendCompleteUntilAllTestsAreProcessed()
@@ -401,6 +277,128 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.IsNull(assertException, assertException?.ToString());
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
             AssertMissingAndDuplicateSources(processedSources);
+        }
+
+        private void SetupHandleTestRunComplete(AutoResetEvent completeEvent)
+        {
+            this.mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+                    It.IsAny<TestRunChangedEventArgs>(),
+                    It.IsAny<ICollection<AttachmentSet>>(),
+                    It.IsAny<ICollection<string>>()))
+                .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
+                    (testRunCompleteArgs, testRunChangedEventArgs, attachmentSets, executorUris) => { completeEvent.Set(); });
+        }
+
+        private void AssertMissingAndDuplicateSources(List<string> processedSources)
+        {
+            foreach (var source in this.sources)
+            {
+                var matchFound = false;
+
+                foreach (var processedSrc in processedSources)
+                {
+                    if (processedSrc.Equals(source))
+                    {
+                        if (matchFound)
+                        {
+                            Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
+                        }
+
+                        matchFound = true;
+                    }
+                }
+
+                Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
+            }
+        }
+
+        private static TestRunCompleteEventArgs CreateTestRunCompleteArgs(bool isCanceled = false, bool isAborted = false)
+        {
+            return new TestRunCompleteEventArgs(
+                new TestRunStatistics(new Dictionary<TestOutcome, long>()),
+                isCanceled,
+                isAborted,
+                null,
+                null,
+                TimeSpan.FromMilliseconds(1));
+        }
+
+        private static void AssertMissingAndDuplicateTestCases(List<TestCase> tests, List<TestCase> processedTestCases)
+        {
+            foreach (var test in tests)
+            {
+                bool matchFound = false;
+
+                foreach (var processedTest in processedTestCases)
+                {
+                    if (processedTest.FullyQualifiedName.Equals(test.FullyQualifiedName))
+                    {
+                        if (matchFound)
+                            Assert.Fail("Concurrreny issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
+                        matchFound = true;
+                    }
+                }
+
+                Assert.IsTrue(matchFound, "Concurrency issue detected: Test['{0}'] did NOT get processed at all",
+                    test.FullyQualifiedName);
+            }
+        }
+
+        private void SetupMockManagersForTestCase(List<TestCase> processedTestCases, TestRunCriteria testRunCriteria)
+        {
+            var syncObject = new object();
+            foreach (var manager in createdMockManagers)
+            {
+                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
+                    Callback<TestRunCriteria, ITestRunEventsHandler>(
+                        (criteria, handler) =>
+                        {
+                            lock (syncObject)
+                            {
+                                processedTestCases.AddRange(criteria.Tests);
+                            }
+
+                            Task.Delay(100).Wait();
+
+                            // Duplicated testRunCriteria should match the actual one.
+                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
+                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(), null, null, null);
+                        });
+            }
+        }
+
+        private static List<TestCase> CreateTestCases()
+        {
+            TestCase tc1 = new TestCase("dll1.class1.test1", new Uri("hello://x/"), "1.dll");
+            TestCase tc21 = new TestCase("dll2.class21.test21", new Uri("hello://x/"), "2.dll");
+            TestCase tc22 = new TestCase("dll2.class21.test22", new Uri("hello://x/"), "2.dll");
+            TestCase tc31 = new TestCase("dll3.class31.test31", new Uri("hello://x/"), "3.dll");
+            TestCase tc32 = new TestCase("dll3.class31.test32", new Uri("hello://x/"), "3.dll");
+
+            var tests = new List<TestCase>() { tc1, tc21, tc22, tc31, tc32 };
+            return tests;
+        }
+
+        private void SetupMockManagers(List<string> processedSources, bool isCanceled = false, bool isAborted = false)
+        {
+            var syncObject = new object();
+            foreach (var manager in createdMockManagers)
+            {
+                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
+                    Callback<TestRunCriteria, ITestRunEventsHandler>(
+                        (criteria, handler) =>
+                        {
+                            lock (syncObject)
+                            {
+                                processedSources.AddRange(criteria.Sources);
+                            }
+                            Task.Delay(100).Wait();
+
+                            // Duplicated testRunCriteria should match the actual one.
+                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
+                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(isCanceled, isAborted), null, null, null);
+                        });
+            }
         }
     }
 }
