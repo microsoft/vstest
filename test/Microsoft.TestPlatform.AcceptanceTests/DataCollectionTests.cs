@@ -6,21 +6,29 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-#if !NET46
-    using System.Runtime.Loader;
-#else
-     using System.Reflection;
-#endif
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class DataCollectionTests : AcceptanceTestBase
     {
-        [Ignore] // Harsh will remove this when merging PR:https://github.com/Microsoft/vstest/pull/568
+        private string resultsDir;
+
+        public DataCollectionTests()
+        {
+            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            Directory.Delete(resultsDir, true);
+        }
+
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
@@ -31,7 +39,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string runSettings = GetRunsettingsFilePath();
 
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            this.InvokeVsTest(arguments);
+
             this.ValidateSummaryStatus(1, 1, 1);
             this.VaildateDataCollectorOutput();
         }
@@ -55,13 +66,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var outOfProcAssemblyPath = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll");
 
-#if !NET46
-            var assemblyName = AssemblyLoadContext.GetAssemblyName(outOfProcAssemblyPath);
-#else
-            var assemblyName = AssemblyName.GetAssemblyName(outOfProcAssemblyPath);
-#endif
-
-            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", assemblyName));
+            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(outOfProcAssemblyPath)));
             dataCollectionAttributes.Add("codebase", codebase);
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;
@@ -103,6 +108,30 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("SessionStarted");
             this.StdOutputContains("my warning");
             this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
+
+            // Verify attachments
+            bool isTestRunLevelAttachmentFound = false;
+            int testCaseLevelAttachmentsCount = 0;
+
+            var resultFiles = Directory.GetFiles(this.resultsDir, "*.txt", SearchOption.AllDirectories);
+
+            foreach (var file in resultFiles)
+            {
+                // Test Run level attachments are logged in standard output.
+                if (file.Contains("filename.txt"))
+                {
+                    this.StdOutputContains(file);
+                    isTestRunLevelAttachmentFound = true;
+                }
+
+                if (file.Contains("testcasefilename"))
+                {
+                    testCaseLevelAttachmentsCount++;
+                }
+            }
+
+            Assert.IsTrue(isTestRunLevelAttachmentFound);
+            Assert.AreEqual(3, testCaseLevelAttachmentsCount);
         }
     }
 }
