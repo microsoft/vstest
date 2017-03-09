@@ -37,6 +37,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// </summary>
         internal Dictionary<string, TestLoggerPluginInformation> TestLoggers { get; set; }
 
+        /// <summary>
+        /// Gets or sets test logger extensions.
+        /// </summary>
+        internal Dictionary<string, TestRuntimePluginInformation> TestHosts { get; set; }
+
         #endregion
 
         #region Internal methods
@@ -56,6 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             this.TestExecutors = this.AddExtension<TestExecutorPluginInformation>(this.TestExecutors, extensions.TestExecutors);
             this.TestSettingsProviders = this.AddExtension<TestSettingsProviderPluginInformation>(this.TestSettingsProviders, extensions.TestSettingsProviders);
             this.TestLoggers = this.AddExtension<TestLoggerPluginInformation>(this.TestLoggers, extensions.TestLoggers);
+            this.TestHosts = this.AddExtension<TestRuntimePluginInformation>(this.TestHosts, extensions.TestHosts);
         }
 
         /// <summary>
@@ -83,8 +89,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 this.GetExtensionsDiscoveredFromAssembly<TestLoggerPluginInformation>(
                     this.TestLoggers,
                     extensionAssembly);
+            testExtensions.TestHosts =
+                this.GetExtensionsDiscoveredFromAssembly<TestRuntimePluginInformation>(
+                    this.TestHosts,
+                    extensionAssembly);
 
-            if (testExtensions.TestDiscoverers.Any() || testExtensions.TestExecutors.Any() || testExtensions.TestSettingsProviders.Any() || testExtensions.TestLoggers.Any())
+            if (testExtensions.TestDiscoverers.Any() || testExtensions.TestExecutors.Any() || testExtensions.TestSettingsProviders.Any() || 
+                testExtensions.TestLoggers.Any() || testExtensions.TestHosts.Any())
             {
                 // This extension has already been discovered.
                 return testExtensions;

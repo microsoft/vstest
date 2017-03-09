@@ -15,7 +15,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -27,7 +27,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private readonly ProxyExecutionManager testExecutionManager;
 
-        private readonly Mock<ITestHostManager> mockTestHostManager;
+        private readonly Mock<ITestRuntimeProvider> mockTestHostManager;
 
         private readonly Mock<ITestRequestSender> mockRequestSender;
 
@@ -40,7 +40,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         public ProxyExecutionManagerTests()
         {
-            this.mockTestHostManager = new Mock<ITestHostManager>();
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
             this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.clientConnectionTimeout);
@@ -127,7 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
         }
 
         [TestMethod]
@@ -138,7 +138,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.Once);
         }
 
         [TestMethod]
