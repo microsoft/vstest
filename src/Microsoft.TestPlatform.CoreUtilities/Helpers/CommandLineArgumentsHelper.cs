@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
     /// <summary>
     /// Helper class for processing argumets passed to a process.
     /// </summary>
-    public class ArgumentHelper
+    public class CommandLineArgumentsHelper
     {
         /// <summary>
         /// Parse command line arguments to a dictionary.

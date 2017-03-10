@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private static void Run(string[] args)
         {
-            var argsDictionary = ArgumentHelper.GetArgumentsDictionary(args);
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
             // Invoke the engine with arguments
             GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
         }

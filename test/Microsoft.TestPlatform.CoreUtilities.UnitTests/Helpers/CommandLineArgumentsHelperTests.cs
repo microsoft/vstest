@@ -9,13 +9,13 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
     [TestClass]
-    public class ArgumentHelperTests
+    public class CommandLineArgumentsHelperTests
     {
         [TestMethod]
         public void GetArgumentsDictionaryShouldReturnDictionary()
         {
             var args = new List<string>() { "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", @"C:\temp\1.dll" };
-            var argsDictionary = ArgumentHelper.GetArgumentsDictionary(args.ToArray());
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
 
             Assert.AreEqual("12312", argsDictionary["--port"]);
             Assert.AreEqual("2312", argsDictionary["--parentprocessid"]);
@@ -26,14 +26,14 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
         public void GetArgumentsDictionaryShouldIgnoreValuesWithoutPreceedingHypen()
         {
             var args = new List<string>() { "port", "12312", "--parentprocessid", "2312", "--testsourcepath", @"C:\temp\1.dll" };
-            var argsDictionary = ArgumentHelper.GetArgumentsDictionary(args.ToArray());
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
 
             Assert.IsTrue(argsDictionary.Count == 2);
             Assert.AreEqual("2312", argsDictionary["--parentprocessid"]);
             Assert.AreEqual(@"C:\temp\1.dll", argsDictionary["--testsourcepath"]);
 
             args = new List<string>() { "--port", "12312", "--parentprocessid", "2312", "testsourcepath", @"C:\temp\1.dll" };
-            argsDictionary = ArgumentHelper.GetArgumentsDictionary(args.ToArray());
+            argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
 
             Assert.IsTrue(argsDictionary.Count == 2);
             Assert.AreEqual("12312", argsDictionary["--port"]);

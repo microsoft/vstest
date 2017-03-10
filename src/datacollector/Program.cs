@@ -7,11 +7,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Diagnostics;
     using System.Net.Sockets;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 
         private static void Run(string[] args)
         {
-            var argsDictionary = ArgumentHelper.GetArgumentsDictionary(args);
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
             var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
 
             // Setup logging if enabled
