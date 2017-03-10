@@ -21,20 +21,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ParallelProxyExecutionManagerTests
     {
+        private static readonly int taskTimeout = 15 * 1000; // In milli seconds
+
         private IParallelProxyExecutionManager proxyParallelExecutionManager;
+        private List<Mock<IProxyExecutionManager>> createdMockManagers;
+        private Func<IProxyExecutionManager> proxyManagerFunc;
+        private Mock<ITestRunEventsHandler> mockHandler;
+        private List<string> sources;
+        private TestRunCriteria testRunCriteria;
+
+        public ParallelProxyExecutionManagerTests()
+        {
+            this.createdMockManagers = new List<Mock<IProxyExecutionManager>>();
+            this.proxyManagerFunc = () =>
+            {
+                var manager = new Mock<IProxyExecutionManager>();
+                createdMockManagers.Add(manager);
+                return manager.Object;
+            };
+            this.mockHandler = new Mock<ITestRunEventsHandler>();
+            this.sources = new List<string>() { "1.dll", "2.dll" };
+            this.testRunCriteria = new TestRunCriteria(sources, 100);
+        }
 
         [TestMethod]
         public void InitializeShouldCallAllConcurrentManagersOnce()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
             this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
             this.proxyParallelExecutionManager.Initialize();
 
@@ -49,16 +61,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AbortShouldCallAllConcurrentManagersOnce()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 4);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 4);
             this.proxyParallelExecutionManager.Abort();
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
@@ -72,16 +75,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void CancelShouldCallAllConcurrentManagersOnce()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 4);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 4);
             this.proxyParallelExecutionManager.Cancel();
 
             Assert.AreEqual(4, createdMockManagers.Count, "Number of Concurrent Managers created should be 4");
@@ -95,368 +89,107 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void StartTestRunShouldProcessAllSources()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 2);
 
-            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
-
-            var mockHandler = new Mock<ITestRunEventsHandler>();
-
-            var sources = new List<string>() { "1.dll", "2.dll" };
-
-            var testRunCriteria = new TestRunCriteria(sources, 100) { TestCaseFilter = "Name~Test" };
-
+            // Testcase filter should be passed to all parallel test run criteria.
+            this.testRunCriteria.TestCaseFilter = "Name~Test";
             var processedSources = new List<string>();
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                    Callback<TestRunCriteria, ITestRunEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedSources.AddRange(criteria.Sources);
-                            }
-
-                            Task.Delay(100).Wait();
-
-                            // Duplicated testRunCriteria should match the actual one.
-                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
-
-                            handler.HandleTestRunComplete(
-                                new TestRunCompleteEventArgs(
-                                    new TestRunStatistics(new Dictionary<TestOutcome, long>()),
-                                    false,
-                                    false,
-                                    null,
-                                    null,
-                                    TimeSpan.Zero),
-                                null,
-                                null,
-                                null);
-                        });
-            }
-
+            this.SetupMockManagers(processedSources);
             AutoResetEvent completeEvent = new AutoResetEvent(false);
+            this.SetupHandleTestRunComplete(completeEvent);
 
-            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(),
-                It.IsAny<ICollection<AttachmentSet>>(),
-                It.IsAny<ICollection<string>>()))
-                .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-                (testRunCompleteArgs, testRunChangedEventArgs, attachmentSets, executorUris) =>
-                {
-                    completeEvent.Set();
-                });
+            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object);
 
-            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
-            completeEvent.WaitOne();
-
-            Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
-
-            foreach (var source in sources)
-            {
-                bool matchFound = false;
-
-                foreach (var processedSrc in processedSources)
-                {
-                    if (processedSrc.Equals(source))
-                    {
-                        if (matchFound) Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
-                        matchFound = true;
-                    }
-                }
-
-                Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
-            }
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
+            Assert.AreEqual(this.sources.Count, processedSources.Count, "All Sources must be processed.");
+            AssertMissingAndDuplicateSources(processedSources);
         }
 
         [TestMethod]
         public void StartTestRunShouldProcessAllTestCases()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
-
-            var mockHandler = new Mock<ITestRunEventsHandler>();
-
-            TestCase tc1 = new TestCase("dll1.class1.test1", new Uri("hello://x/"), "1.dll");
-            TestCase tc21 = new TestCase("dll2.class21.test21", new Uri("hello://x/"), "2.dll");
-            TestCase tc22 = new TestCase("dll2.class21.test22", new Uri("hello://x/"), "2.dll");
-            TestCase tc31 = new TestCase("dll3.class31.test31", new Uri("hello://x/"), "3.dll");
-            TestCase tc32 = new TestCase("dll3.class31.test32", new Uri("hello://x/"), "3.dll");
-
-            var tests = new List<TestCase>() { tc1, tc21, tc22, tc31, tc32 };
-
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 3);
+            var tests = CreateTestCases();
             var testRunCriteria = new TestRunCriteria(tests, 100);
-
             var processedTestCases = new List<TestCase>();
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                    Callback<TestRunCriteria, ITestRunEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedTestCases.AddRange(criteria.Tests);
-                            }
-
-                            Task.Delay(100).Wait();
-
-                            // Duplicated testRunCriteria should match the actual one.
-                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
-
-                            handler.HandleTestRunComplete(
-                                new TestRunCompleteEventArgs(new TestRunStatistics(new Dictionary<TestOutcome, long>())
-                                , false, false, null, null, TimeSpan.Zero)
-                                , null, null, null);
-                        });
-            }
-
+            SetupMockManagersForTestCase(processedTestCases, testRunCriteria);
             AutoResetEvent completeEvent = new AutoResetEvent(false);
+            this.SetupHandleTestRunComplete(completeEvent);
 
-            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(),
-                It.IsAny<ICollection<AttachmentSet>>(),
-                It.IsAny<ICollection<string>>()))
-                .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-                (testRunCompleteArgs, testRunChangedEventArgs, attachmentSets, executorUris) =>
-                {
-                    completeEvent.Set();
-                });
+            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object);
 
-            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
-            completeEvent.WaitOne();
-
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
             Assert.AreEqual(tests.Count, processedTestCases.Count, "All Tests must be processed.");
-
-            foreach (var test in tests)
-            {
-                bool matchFound = false;
-
-                foreach (var processedTest in processedTestCases)
-                {
-                    if (processedTest.FullyQualifiedName.Equals(test.FullyQualifiedName))
-                    {
-                        if (matchFound) Assert.Fail("Concurrreny issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
-                        matchFound = true;
-                    }
-                }
-
-                Assert.IsTrue(matchFound, "Concurrency issue detected: Test['{0}'] did NOT get processed at all", test.FullyQualifiedName);
-            }
-
+            AssertMissingAndDuplicateTestCases(tests, processedTestCases);
         }
-
 
         [TestMethod]
         public void StartTestRunWithSourcesShouldNotSendCompleteUntilAllSourcesAreProcessed()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
-
-            var mockHandler = new Mock<ITestRunEventsHandler>();
-
-            var sources = new List<string>() { "1.dll", "2.dll" };
-
-            var testRunCriteria = new TestRunCriteria(sources, 100);
-
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 2);
             var processedSources = new List<string>();
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                    Callback<TestRunCriteria, ITestRunEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedSources.AddRange(criteria.Sources);
-                            }
+            this.SetupMockManagers(processedSources);
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
 
-                            Task.Delay(100).Wait();
-
-                            var completeArgs = new TestRunCompleteEventArgs(new
-                                 TestRunStatistics(new Dictionary<TestOutcome, long>()),
-                                 false, false, null, null, TimeSpan.FromMilliseconds(1));
-                            handler.HandleTestRunComplete(completeArgs, null, null, null);
-                        });
-            }
-
-            AutoResetEvent eventHandle = new AutoResetEvent(false);
-
-            mockHandler.Setup(m => m.HandleTestRunComplete(
-                It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(),
-                It.IsAny<ICollection<AttachmentSet>>(),
-                It.IsAny<ICollection<string>>())).Callback
-                <TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-                (completeArgs, runChangedArgs, runAttachments, executorUris) =>
-                {
-                    eventHandle.Set();
-                });
+            SetupHandleTestRunComplete(completeEvent);
 
             Task.Run(() =>
             {
-                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object);
             });
 
-            eventHandle.WaitOne();
-
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
-
-            foreach (var source in sources)
-            {
-                bool matchFound = false;
-
-                foreach (var processedSrc in processedSources)
-                {
-                    if (processedSrc.Equals(source))
-                    {
-                        if (matchFound) Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
-                        matchFound = true;
-                    }
-                }
-
-                Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
-            }
-
+            AssertMissingAndDuplicateSources(processedSources);
         }
-
 
         [TestMethod]
         public void StartTestRunWithTestsShouldNotSendCompleteUntilAllTestsAreProcessed()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 3);
 
-            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 3);
-
-            var mockHandler = new Mock<ITestRunEventsHandler>();
-
-            TestCase tc1 = new TestCase("dll1.class1.test1", new Uri("hello://x/"), "1.dll");
-            TestCase tc21 = new TestCase("dll2.class21.test21", new Uri("hello://x/"), "2.dll");
-            TestCase tc22 = new TestCase("dll2.class21.test22", new Uri("hello://x/"), "2.dll");
-            TestCase tc31 = new TestCase("dll3.class31.test31", new Uri("hello://x/"), "3.dll");
-            TestCase tc32 = new TestCase("dll3.class31.test32", new Uri("hello://x/"), "3.dll");
-
-            var tests = new List<TestCase>() { tc1, tc21, tc22, tc31, tc32 };
-
+            var tests = CreateTestCases();
             var testRunCriteria = new TestRunCriteria(tests, 100);
-
             var processedTestCases = new List<TestCase>();
-            var syncObject = new object();
-            foreach (var manager in createdMockManagers)
-            {
-                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
-                    Callback<TestRunCriteria, ITestRunEventsHandler>(
-                        (criteria, handler) =>
-                        {
-                            lock (syncObject)
-                            {
-                                processedTestCases.AddRange(criteria.Tests);
-                            }
+            SetupMockManagersForTestCase(processedTestCases, testRunCriteria);
 
-                            Task.Delay(100).Wait();
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
 
-                            var completeArgs = new TestRunCompleteEventArgs(new
-                             TestRunStatistics(new Dictionary<TestOutcome, long>()),
-                             false, false, null, null, TimeSpan.FromMilliseconds(1));
-                            handler.HandleTestRunComplete(completeArgs, null, null, null);
-                        });
-            }
-
-            AutoResetEvent eventHandle = new AutoResetEvent(false);
-
-            mockHandler.Setup(m => m.HandleTestRunComplete(
-                It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(),
-                It.IsAny<ICollection<AttachmentSet>>(),
-                It.IsAny<ICollection<string>>())).Callback
-                <TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-                (completeArgs, runChangedArgs, runAttachments, executorUris) =>
-                {
-                    eventHandle.Set();
-                });
+            SetupHandleTestRunComplete(completeEvent);
 
             Task.Run(() =>
             {
-                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object);
             });
 
-            eventHandle.WaitOne();
-
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
             Assert.AreEqual(tests.Count, processedTestCases.Count, "All Tests must be processed.");
-
-            foreach (var test in tests)
-            {
-                bool matchFound = false;
-
-                foreach (var processedTest in processedTestCases)
-                {
-                    if (processedTest.FullyQualifiedName.Equals(test.FullyQualifiedName))
-                    {
-                        if (matchFound) Assert.Fail("Concurrreny issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
-                        matchFound = true;
-                    }
-                }
-
-                Assert.IsTrue(matchFound, "Concurrency issue detected: Test['{0}'] did NOT get processed at all", test.FullyQualifiedName);
-            }
-
+            AssertMissingAndDuplicateTestCases(tests, processedTestCases);
         }
 
+        [DataRow(true, false)]
+        [DataRow(false, true)]
+        [TestMethod]
+        public void ExecutionTestsShouldNotProcessAllSourcesOnExecutionCancelsOrAbortsForAnySource(bool isCanceled, bool isAborted)
+        {
+            var executionManagerMock = new Mock<IProxyExecutionManager>();
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(() => executionManagerMock.Object, 1);
+            this.createdMockManagers.Add(executionManagerMock);
+            var processedSources = new List<string>();
+            this.SetupMockManagers(processedSources, isCanceled: isCanceled, isAborted: isAborted);
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
+            SetupHandleTestRunComplete(completeEvent);
+
+            Task.Run(() => { this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object); });
+
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
+            Assert.AreEqual(1, processedSources.Count, "Abort should stop all sources execution.");
+        }
 
         [TestMethod]
         public void StartTestRunShouldAggregateRunData()
         {
-            var createdMockManagers = new List<Mock<IProxyExecutionManager>>();
-            Func<IProxyExecutionManager> proxyManagerFunc =
-                () =>
-                {
-                    var manager = new Mock<IProxyExecutionManager>();
-                    createdMockManagers.Add(manager);
-                    return manager.Object;
-                };
-
-            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(proxyManagerFunc, 2);
-
-            var mockHandler = new Mock<ITestRunEventsHandler>();
-
-            var sources = new List<string>() { "1.dll", "2.dll" };
-
-            var testRunCriteria = new TestRunCriteria(sources, 100);
-
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 2);
             var processedSources = new List<string>();
             var syncObject = new object();
 
@@ -472,19 +205,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             }
 
                             Task.Delay(100).Wait();
-
                             var stats = new Dictionary<TestOutcome, long>();
                             stats.Add(TestOutcome.Passed, 3);
                             stats.Add(TestOutcome.Failed, 2);
-
                             var runAttachments = new Collection<AttachmentSet>();
                             runAttachments.Add(new AttachmentSet(new Uri("hello://x/"), "Hello"));
-
                             var executorUris = new List<string>() { "hello1" };
-
                             bool isCanceled = false;
                             bool isAborted = false;
                             TimeSpan timespan = TimeSpan.FromMilliseconds(100);
+
                             if (string.Equals(criteria.Sources?.FirstOrDefault(), "2.dll"))
                             {
                                 isCanceled = true;
@@ -493,15 +223,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             }
 
                             var completeArgs = new TestRunCompleteEventArgs(new
-                                TestRunStatistics(stats), isCanceled, isAborted, null, runAttachments, timespan);
-
+                                TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, timespan);
                             handler.HandleTestRunComplete(completeArgs, null, runAttachments, executorUris);
                         });
             }
 
-            AutoResetEvent eventHandle = new AutoResetEvent(false);
-
-            mockHandler.Setup(m => m.HandleTestRunComplete(
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
+            Exception assertException = null;
+            this.mockHandler.Setup(m => m.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(),
                 It.IsAny<ICollection<AttachmentSet>>(),
@@ -509,39 +238,72 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 <TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
                 (completeArgs, runChangedArgs, runAttachments, executorUris) =>
                 {
-                    eventHandle.Set();
+                    try
+                    {
+                        Assert.AreEqual(TimeSpan.FromMilliseconds(200), completeArgs.ElapsedTimeInRunningTests,
+                            "Time should be max of all");
+                        Assert.AreEqual(2, completeArgs.AttachmentSets.Count,
+                            "All Complete Arg attachments should return");
+                        Assert.AreEqual(2, runAttachments.Count, "All RunContextAttachments should return");
 
-                    Assert.AreEqual(TimeSpan.FromMilliseconds(200), completeArgs.ElapsedTimeInRunningTests, "Time should be max of all");
-                    Assert.AreEqual(2, completeArgs.AttachmentSets.Count, "All Complete Arg attachments should return");
-                    Assert.AreEqual(2, runAttachments.Count, "All RunContextAttachments should return");
+                        Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
+                        Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
 
-                    Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
-                    Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
+                        Assert.AreEqual(10, completeArgs.TestRunStatistics.ExecutedTests,
+                            "Stats must be aggregated properly");
 
-                    Assert.AreEqual(10, completeArgs.TestRunStatistics.ExecutedTests, "Stats must be aggregated properly");
-
-                    Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats[TestOutcome.Passed], "Stats must be aggregated properly");
-                    Assert.AreEqual(4, completeArgs.TestRunStatistics.Stats[TestOutcome.Failed], "Stats must be aggregated properly");
+                        Assert.AreEqual(6, completeArgs.TestRunStatistics.Stats[TestOutcome.Passed],
+                            "Stats must be aggregated properly");
+                        Assert.AreEqual(4, completeArgs.TestRunStatistics.Stats[TestOutcome.Failed],
+                            "Stats must be aggregated properly");
+                    }
+                    catch (Exception ex)
+                    {
+                        assertException = ex;
+                    }
+                    finally
+                    {
+                        completeEvent.Set();
+                    }
                 });
 
             Task.Run(() =>
             {
-                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, mockHandler.Object);
+                this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object);
             });
 
-            eventHandle.WaitOne();
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
 
+            Assert.IsNull(assertException, assertException?.ToString());
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
+            AssertMissingAndDuplicateSources(processedSources);
+        }
 
-            foreach (var source in sources)
+        private void SetupHandleTestRunComplete(AutoResetEvent completeEvent)
+        {
+            this.mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
+                    It.IsAny<TestRunChangedEventArgs>(),
+                    It.IsAny<ICollection<AttachmentSet>>(),
+                    It.IsAny<ICollection<string>>()))
+                .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
+                    (testRunCompleteArgs, testRunChangedEventArgs, attachmentSets, executorUris) => { completeEvent.Set(); });
+        }
+
+        private void AssertMissingAndDuplicateSources(List<string> processedSources)
+        {
+            foreach (var source in this.sources)
             {
-                bool matchFound = false;
+                var matchFound = false;
 
                 foreach (var processedSrc in processedSources)
                 {
                     if (processedSrc.Equals(source))
                     {
-                        if (matchFound) Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
+                        if (matchFound)
+                        {
+                            Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
+                        }
+
                         matchFound = true;
                     }
                 }
@@ -550,5 +312,93 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             }
         }
 
+        private static TestRunCompleteEventArgs CreateTestRunCompleteArgs(bool isCanceled = false, bool isAborted = false)
+        {
+            return new TestRunCompleteEventArgs(
+                new TestRunStatistics(new Dictionary<TestOutcome, long>()),
+                isCanceled,
+                isAborted,
+                null,
+                null,
+                TimeSpan.FromMilliseconds(1));
+        }
+
+        private static void AssertMissingAndDuplicateTestCases(List<TestCase> tests, List<TestCase> processedTestCases)
+        {
+            foreach (var test in tests)
+            {
+                bool matchFound = false;
+
+                foreach (var processedTest in processedTestCases)
+                {
+                    if (processedTest.FullyQualifiedName.Equals(test.FullyQualifiedName))
+                    {
+                        if (matchFound)
+                            Assert.Fail("Concurrreny issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
+                        matchFound = true;
+                    }
+                }
+
+                Assert.IsTrue(matchFound, "Concurrency issue detected: Test['{0}'] did NOT get processed at all",
+                    test.FullyQualifiedName);
+            }
+        }
+
+        private void SetupMockManagersForTestCase(List<TestCase> processedTestCases, TestRunCriteria testRunCriteria)
+        {
+            var syncObject = new object();
+            foreach (var manager in createdMockManagers)
+            {
+                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
+                    Callback<TestRunCriteria, ITestRunEventsHandler>(
+                        (criteria, handler) =>
+                        {
+                            lock (syncObject)
+                            {
+                                processedTestCases.AddRange(criteria.Tests);
+                            }
+
+                            Task.Delay(100).Wait();
+
+                            // Duplicated testRunCriteria should match the actual one.
+                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
+                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(), null, null, null);
+                        });
+            }
+        }
+
+        private static List<TestCase> CreateTestCases()
+        {
+            TestCase tc1 = new TestCase("dll1.class1.test1", new Uri("hello://x/"), "1.dll");
+            TestCase tc21 = new TestCase("dll2.class21.test21", new Uri("hello://x/"), "2.dll");
+            TestCase tc22 = new TestCase("dll2.class21.test22", new Uri("hello://x/"), "2.dll");
+            TestCase tc31 = new TestCase("dll3.class31.test31", new Uri("hello://x/"), "3.dll");
+            TestCase tc32 = new TestCase("dll3.class31.test32", new Uri("hello://x/"), "3.dll");
+
+            var tests = new List<TestCase>() { tc1, tc21, tc22, tc31, tc32 };
+            return tests;
+        }
+
+        private void SetupMockManagers(List<string> processedSources, bool isCanceled = false, bool isAborted = false)
+        {
+            var syncObject = new object();
+            foreach (var manager in createdMockManagers)
+            {
+                manager.Setup(m => m.StartTestRun(It.IsAny<TestRunCriteria>(), It.IsAny<ITestRunEventsHandler>())).
+                    Callback<TestRunCriteria, ITestRunEventsHandler>(
+                        (criteria, handler) =>
+                        {
+                            lock (syncObject)
+                            {
+                                processedSources.AddRange(criteria.Sources);
+                            }
+                            Task.Delay(100).Wait();
+
+                            // Duplicated testRunCriteria should match the actual one.
+                            Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
+                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(isCanceled, isAborted), null, null, null);
+                        });
+            }
+        }
     }
 }

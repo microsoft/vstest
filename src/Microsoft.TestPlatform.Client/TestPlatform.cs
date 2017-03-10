@@ -20,6 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
     /// <summary>
     /// Implementation for TestPlatform
@@ -32,6 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         public TestPlatform() : this(new TestEngine(), new FileHelper())
         {
+            this.testHostProviderManager = TestRuntimeProviderManager.Instance;
         }
 
         /// <summary>
@@ -51,6 +54,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         private ITestEngine TestEngine { get; set; }
 
+        private TestRuntimeProviderManager testHostProviderManager;
+
         /// <summary>
         /// The create discovery request.
         /// </summary>
@@ -67,6 +72,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             UpdateTestAdapterPaths(discoveryCriteria.RunSettings);
 
             var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
+            //var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runconfiguration);
+            
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration);
 
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
@@ -92,6 +99,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
+            //var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runConfiguration);
+
             // Update and initialize loggers only when DesignMode is false
             if (runConfiguration.DesignMode == false)
             {
@@ -102,6 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             }
 
             var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
+            testHostManager.Initialize(TestSessionMessageLogger.Instance);
 
             if (testRunCriteria.TestHostLauncher != null)
             {
