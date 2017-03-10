@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading;
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
     /// The default test host launcher for the engine.
@@ -220,9 +221,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return Enumerable.Empty<string>();
         }
 
-        public bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration)
+        public bool CanExecuteCurrentRunConfiguration(string runConfiguration)
         {
-            var framework = runConfiguration.TargetFrameworkVersion;
+            RunConfiguration config = XmlRunSettingsUtilities.GetRunConfigurationNode(runConfiguration);
+            var framework = config.TargetFrameworkVersion;
 
             // This is expected to be called once every run so returning a new instance every time.
             if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0

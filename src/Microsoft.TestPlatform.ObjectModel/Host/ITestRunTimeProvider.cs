@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
         /// is launched in a separate host process.
         /// </summary>
-        bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration);
+        bool CanExecuteCurrentRunConfiguration(string runConfiguration);
 
         /// <summary>
         /// Sets a custom launcher

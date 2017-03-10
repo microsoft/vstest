@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading;
     using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
     /// A host manager for <c>dotnet</c> core runtime.
@@ -326,9 +327,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return testHostPath;
         }
 
-        public bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration)
+        public bool CanExecuteCurrentRunConfiguration(string runConfiguration)
         {
-            var framework = runConfiguration.TargetFrameworkVersion;
+            RunConfiguration config = XmlRunSettingsUtilities.GetRunConfigurationNode(runConfiguration);
+            var framework = config.TargetFrameworkVersion;
 
             // This is expected to be called once every run so returning a new instance every time.
             if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
