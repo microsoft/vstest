@@ -112,7 +112,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
-            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null)).Returns(Process.GetCurrentProcess());
+            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, It.IsAny<IDictionary<string,string>>())).Returns(Process.GetCurrentProcess());
 
             var processId = this.testHostManager.LaunchTestHost(this.startInfo);
 
