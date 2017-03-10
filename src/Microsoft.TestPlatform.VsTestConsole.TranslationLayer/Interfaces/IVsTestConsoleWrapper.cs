@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
     /// <summary>
     /// Controller for various test operations on the test runner.

@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using Moq;
     using ObjectModel;
     using ObjectModel.Client;
-    using ObjectModel.Client.Interfaces;
+    using ObjectModel.Host;
     using ObjectModel.Engine;
     using System;
     using System.Collections.Generic;

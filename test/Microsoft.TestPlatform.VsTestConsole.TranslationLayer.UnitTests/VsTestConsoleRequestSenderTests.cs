@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    using VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using VisualStudio.TestPlatform.ObjectModel.Host;
 
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 

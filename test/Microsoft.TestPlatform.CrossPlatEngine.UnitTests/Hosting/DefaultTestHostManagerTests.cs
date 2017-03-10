@@ -11,11 +11,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using System.Threading.Tasks;
+    using System.Threading;
+    using System;
 
     [TestClass]
     public class DefaultTestHostManagerTests
@@ -112,11 +115,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
-            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null, It.IsAny<IDictionary<string,string>>())).Returns(Process.GetCurrentProcess());
+            var mockProcessHelper = new TestableProcessHelper();
+            
+            var testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, mockProcessHelper, true);
+            var startInfo = testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
-            var processId = this.testHostManager.LaunchTestHost(this.startInfo);
+            Task<int> processId = testHostManager.LaunchTestHostAsync(startInfo);
 
-            Assert.AreEqual(Process.GetCurrentProcess().Id, processId);
+            try
+            {
+                processId.Wait();
+            }
+            catch (AggregateException) { }
+            
+            Assert.AreEqual(Process.GetCurrentProcess().Id, processId.Result);
         }
 
         [TestMethod]
@@ -139,10 +151,49 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var currentProcess = Process.GetCurrentProcess();
             mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
 
-            var pid = this.testHostManager.LaunchTestHost(this.startInfo);
-
+            Task<int> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo);
+            try
+            {
+                pid.Wait(new CancellationTokenSource(3000).Token);
+            }
+            catch (Exception) { }
+            
             mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
-            Assert.AreEqual(currentProcess.Id, pid);
+            Assert.AreEqual(currentProcess.Id, pid.Result);
+        }
+
+        private class TestableProcessHelper : IProcessHelper
+        {
+            private string ErrorMessage;
+
+            public void SetErrorMessage(string errorMessage)
+            {
+                this.ErrorMessage = errorMessage;
+            }
+            public string GetCurrentProcessFileName()
+            {
+                return "vstest.console.exe";
+            }
+
+            public int GetCurrentProcessId()
+            {
+                throw new NotImplementedException();
+            }
+
+            public string GetTestEngineDirectory()
+            {
+                throw new NotImplementedException();
+            }
+
+            public Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process, string> errorCallback, IDictionary<string,string> environmentVariables)
+            {
+                return Process.GetCurrentProcess();
+            }
+
+            public string GetProcessName(int processId)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 {
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
     public class Program
     {

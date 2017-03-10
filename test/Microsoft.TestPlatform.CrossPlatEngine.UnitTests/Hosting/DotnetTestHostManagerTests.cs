@@ -10,12 +10,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -179,9 +180,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
 
-            var processId = this.dotnetHostManager.LaunchTestHost(startInfo);
-
-            Assert.AreEqual(expectedProcessId, processId);
+            Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
+            processId.Wait();
+            Assert.AreEqual(expectedProcessId, processId.Result);
         }
 
         [TestMethod]
@@ -190,7 +191,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var variables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
             var startInfo = new TestProcessStartInfo { EnvironmentVariables = variables };
 
-            this.dotnetHostManager.LaunchTestHost(startInfo);
+            Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
+            processId.Wait();
 
             this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.EnvironmentVariables.Equals(variables))), Times.Once);
         }
@@ -311,7 +313,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             var expectedArgs = "exec \"" + expectedTestHostPath + "\" --port 0 --parentprocessid 0";
 
-            this.dotnetHostManager.LaunchTestHost(startInfo);
+            Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
+            processId.Wait();
 
             this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);
         }

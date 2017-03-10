@@ -18,6 +18,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     [TestClass]
     public class ProcessHelperTests
@@ -34,15 +37,26 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
         private int errorLength = 20;
 
+        private TestSessionMessageLogger sessionMessageLogger;
+
+        private string errorMessage;
+
         public ProcessHelperTests()
         {
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
 
             this.processHelper = new TestableProcessHelper();
-            this.testHostManager = new TestableTestHostManager(Architecture.X64, Framework.DefaultFramework, this.processHelper, true);
+            this.testHostManager = new TestableTestHostManager(Architecture.X64, Framework.DefaultFramework, this.processHelper, true, errorLength);
 
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.testHostManager, this.connectionTimeout, this.errorLength);
+            this.sessionMessageLogger = TestSessionMessageLogger.Instance;
+            this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
+        }
+
+        private void TestSessionMessageHandler(object sender, TestRunMessageEventArgs e)
+        {
+            errorMessage = e.Message;
         }
 
         [TestMethod]
@@ -54,7 +68,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            Assert.AreEqual(this.testOperationManager.GetError(), errorData);
+            Assert.AreEqual(errorMessage, errorData);
         }
 
         [TestMethod]
@@ -66,8 +80,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            Assert.AreEqual(this.testOperationManager.GetError().Length, errorLength);
-            Assert.AreEqual(this.testOperationManager.GetError(), errorData.Substring(5));
+            Assert.AreEqual(errorMessage.Length, errorLength);
+            Assert.AreEqual(errorMessage, errorData.Substring(5));
         }
 
         [TestMethod]
@@ -79,34 +93,33 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            Assert.AreEqual(this.testOperationManager.GetError(), "StringsError Strings");
+            Assert.AreEqual(errorMessage, "StringsError Strings");
         }
 
         private class TestableProxyOperationManager : ProxyOperationManager
         {
             public TestableProxyOperationManager(
                 ITestRequestSender requestSender,
-                ITestHostManager testHostManager,
+                ITestRuntimeProvider testHostManager,
                 int clientConnectionTimeout,
                 int errorLength) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
                 base.ErrorLength = errorLength;
-            }
-
-            public string GetError()
-            {
-                return base.GetStandardError();
             }
         }
 
         private class TestableTestHostManager : DefaultTestHostManager
         {
             public TestableTestHostManager(
-                Architecture architecture,
-                Framework framework,
-                IProcessHelper processHelper,
-                bool shared) : base(architecture, framework, processHelper, shared)
+                Architecture architecture, 
+                Framework framework, 
+                IProcessHelper processHelper, 
+                bool shared,
+                int errorLength) : base(architecture, framework, processHelper, shared)
             {
+                base.TimeOut = 30000;
+                base.ErrorLength = errorLength;
+                base.Initialize(TestSessionMessageLogger.Instance);
             }
 
             public override TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
