@@ -28,7 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private const string PortOption = "--port";
         private const string DiagOption = "--diag";
 
-
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
         private IProcessHelper processHelper;

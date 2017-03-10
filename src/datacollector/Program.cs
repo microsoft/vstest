@@ -4,11 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Net.Sockets;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -57,36 +57,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             }
         }
 
-        /// <summary>
-        /// Parse command line arguments to a dictionary.
-        /// </summary>
-        /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", "C:\temp\1.dll" }</c></param>
-        /// <returns>Dictionary of arguments keys and values.</returns>
-        private static IDictionary<string, string> GetArguments(string[] args)
-        {
-            var argsDictionary = new Dictionary<string, string>();
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i].StartsWith("-"))
-                {
-                    if (i < args.Length - 1 && !args[i + 1].StartsWith("-"))
-                    {
-                        argsDictionary.Add(args[i], args[i + 1]);
-                        i++;
-                    }
-                    else
-                    {
-                        argsDictionary.Add(args[i], null);
-                    }
-                }
-            }
-
-            return argsDictionary;
-        }
-
         private static void Run(string[] args)
         {
-            var argsDictionary = GetArguments(args);
+            var argsDictionary = ArgumentHelper.GetArgumentsDictionary(args);
             var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
 
             // Setup logging if enabled

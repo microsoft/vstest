@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 
     /// <summary>
@@ -44,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private static void Run(string[] args)
         {
-            var argsDictionary = GetArguments(args);
+            var argsDictionary = ArgumentHelper.GetArgumentsDictionary(args);
             // Invoke the engine with arguments
             GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
         }
@@ -70,33 +71,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 #endif
             return invoker ?? new DefaultEngineInvoker();
-        }
-
-        /// <summary>
-        /// Parse command line arguments to a dictionary.
-        /// </summary>
-        /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", "C:\temp\1.dll" }</c></param>
-        /// <returns>Dictionary of arguments keys and values.</returns>
-        private static IDictionary<string, string> GetArguments(string[] args)
-        {
-            IDictionary<string, string> argsDictionary = new Dictionary<string, string>();
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i].StartsWith("-"))
-                {
-                    if (i < args.Length - 1 && !args[i + 1].StartsWith("-"))
-                    {
-                        argsDictionary.Add(args[i], args[i + 1]);
-                        i++;
-                    }
-                    else
-                    {
-                        argsDictionary.Add(args[i], null);
-                    }
-                }
-            }
-
-            return argsDictionary;
         }
 
         private static void WaitForDebuggerIfEnabled()
