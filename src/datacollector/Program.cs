@@ -4,13 +4,15 @@
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Net.Sockets;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;    
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The program.
@@ -23,9 +25,14 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private const int ClientListenTimeOut = 5 * 1000;
 
         /// <summary>
-        /// Port where vstest.console is listening 
+        /// Port number used to communicate with test runner process.
         /// </summary>
-        private static int port;
+        private const string PortArgument = "--port";
+
+        /// <summary>
+        /// Log file for writing eqt trace logs.
+        /// </summary>
+        private const string LogFileArgument = "--diag";
 
         /// <summary>
         /// The main.
@@ -37,9 +44,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             try
             {
-                ParseArgs(args);
                 WaitForDebuggerIfEnabled();
-                Run();
+                Run(args);
             }
             catch (SocketException ex)
             {
@@ -52,37 +58,60 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
 
         /// <summary>
-        /// Parse args.
+        /// Parse command line arguments to a dictionary.
         /// </summary>
-        /// <param name="args">The args.</param>
-        private static void ParseArgs(string[] args)
+        /// <param name="args">Command line arguments. Ex: <c>{ "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", "C:\temp\1.dll" }</c></param>
+        /// <returns>Dictionary of arguments keys and values.</returns>
+        private static IDictionary<string, string> GetArguments(string[] args)
         {
-            port = -1;
-
-            for (var i = 0; i < args.Length; i++)
+            var argsDictionary = new Dictionary<string, string>();
+            for (int i = 0; i < args.Length; i++)
             {
-                if (string.Equals("--port", args[i], StringComparison.OrdinalIgnoreCase) || string.Equals("-p", args[i], StringComparison.OrdinalIgnoreCase))
+                if (args[i].StartsWith("-"))
                 {
-                    if (i < args.Length - 1)
+                    if (i < args.Length - 1 && !args[i + 1].StartsWith("-"))
                     {
-                        int.TryParse(args[i + 1], out port);
+                        argsDictionary.Add(args[i], args[i + 1]);
+                        i++;
                     }
-
-                    break;
+                    else
+                    {
+                        argsDictionary.Add(args[i], null);
+                    }
                 }
             }
 
-            if (port < 0)
+            return argsDictionary;
+        }
+
+        private static void Run(string[] args)
+        {
+            var argsDictionary = GetArguments(args);
+            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
+
+            // Setup logging if enabled
+            string logFile;
+            if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
+            {
+                EqtTrace.InitializeVerboseTrace(logFile);
+            }
+
+            // Get server port and initialize communication.
+            string portValue;
+            int port = argsDictionary.TryGetValue(PortArgument, out portValue) ? int.Parse(portValue) : 0;
+
+            if (port <= 0)
             {
                 throw new ArgumentException("Incorrect/No Port number");
             }
-        }
-
-        private static void Run()
-        {
-            var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
 
             requestHandler.InitializeCommunication(port);
+
+            // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized
+            if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+            {
+                requestHandler.SendDataCollectionMessage(new DataCollectionMessageEventArgs(TestMessageLevel.Informational, string.Format("Logging DataCollector Diagnostics in file: {0}", EqtTrace.LogFile)));
+            }
 
             // Wait for the connection to the sender and start processing requests from sender
             if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
@@ -95,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 requestHandler.Close();
                 throw new TimeoutException();
             }
-        }   
+        }
 
         private static void WaitForDebuggerIfEnabled()
         {
