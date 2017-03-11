@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -221,14 +220,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             this.WriteAndFlushToChannel(rawMessage);
-        }
-
-        /// <summary>
-        /// The send hand shake message.
-        /// </summary>
-        public void SendHandShakeMessage()
-        {
-            this.SendMessage(MessageType.SessionStart);
         }
 
         /// <summary>

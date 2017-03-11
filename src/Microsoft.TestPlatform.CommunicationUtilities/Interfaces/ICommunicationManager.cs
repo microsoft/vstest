@@ -111,11 +111,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendRawMessage(string rawMessage);
 
         /// <summary>
-        /// The send hand shake message.
-        /// </summary>
-        void SendHandShakeMessage();
-
-        /// <summary>
         /// Deserializes the Message into actual TestPlatform objects
         /// </summary>
         /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
