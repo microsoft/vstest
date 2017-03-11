@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="proxyDataCollectionManager">
         /// The proxy Data Collection Manager.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(ITestHostManager testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager)
+        public ProxyExecutionManagerWithDataCollection(ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();

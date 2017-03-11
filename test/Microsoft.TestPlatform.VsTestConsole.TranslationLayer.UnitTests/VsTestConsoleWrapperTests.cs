@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
