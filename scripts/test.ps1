@@ -1,5 +1,5 @@
 # Copyright (c) Microsoft. All rights reserved.
-# Build script for Test Platform.
+# Test script for Test Platform.
 
 [CmdletBinding()]
 Param(
@@ -66,12 +66,16 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 $TPT_TargetFrameworkFullCLR = "net46"
 $TPT_TargetFrameworkCore = "netcoreapp1.0"
+$TPT_TargetFramework20Core = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjects = @("Microsoft.TestPlatform.Build.UnitTests.csproj")
+$Script:TPT_SkipProjects = @("Microsoft.TestPlatform.Build.UnitTests.csproj", 
+ "Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests.csproj",
+ "vstest.console.UnitTests.csproj"
+  )
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
 $Script:TPT_Parallel = $Parallel
@@ -175,14 +179,15 @@ function Invoke-Test
                 $testFrameWork = ".NETCoreApp,Version=v1.0"
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFramework20Core $targetRuntime) $vstestConsoleFileName
             } else{
 
                 $testFrameWork = ".NETFramework,Version=v4.6"
                 $vstestConsoleFileName = "vstest.console.exe"
                 $targetRunTime = $Script:TPT_TargetRuntime
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkFullCLR $targetRuntime) $vstestConsoleFileName
             }
 
-            $vstestConsolePath = Join-Path (Get-PackageDirectory $fx $targetRuntime) $vstestConsoleFileName
             if (!(Test-Path $vstestConsolePath)) {
                 Write-Log "Unable to find $vstestConsoleFileName at $vstestConsolePath. Did you run build.cmd?"
                 Write-Error "Test aborted."
