@@ -9,8 +9,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     public class AcceptanceTestBase : IntegrationTestBase
     {
-        public const string DesktopRunnerFramework = "net46";
-        public const string CoreRunnerFramework = "netcoreapp1.0";
         public const string DesktopTargetFramework = "net46";
         public const string CoreTargetFramework = "netcoreapp1.0";
         public const string Core11TargetFramework = "netcoreapp1.1";
@@ -53,11 +51,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         protected bool IsDesktopTargetFramework()
         {
             return this.testEnvironment.TargetFramework == AcceptanceTestBase.DesktopTargetFramework;
-        }
-
-        protected bool IsDesktopRunner()
-        {
-            return this.testEnvironment.RunnerFramework == AcceptanceTestBase.DesktopRunnerFramework;
         }
 
         protected string GetTargetFramworkForRunsettings()

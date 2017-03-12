@@ -327,7 +327,7 @@ function Reset-TestEnvironment
 
 # Execute build
 $timer = Start-Timer
-Write-Log "Build started: args = '$args'"
+Write-Log "Test started: args = '$args'"
 Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 
@@ -336,6 +336,6 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPT_") } | Forma
 
 Invoke-Test
 
-Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+Write-Log "Test complete. {$(Get-ElapsedTime($timer))}"
 
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }

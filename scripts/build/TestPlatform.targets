@@ -4,7 +4,7 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
-    <RuntimeFrameworkVersion>2.0.0-beta-001728-00</RuntimeFrameworkVersion>
+    <RuntimeFrameworkVersion>2.0.0-beta-001737-00</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" /> 
