@@ -117,8 +117,9 @@ function Print-FailedTests($TrxFilePath)
         $FailedTestCaseDetailsDict.Add($_.testId, @{"Message" = $_.Output.ErrorInfo.Message; "StackTrace" = $_.Output.ErrorInfo.StackTrace; "StdOut"=$_.Output.StdOut});
     }
 
-    if ($FailedTestCaseDetailsDict)
+    if ($FailedTestCaseDetailsDict.Count -ne 0)
     {
+        Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
         # Print failed test details.
         $count = 1
         $nl = [Environment]::NewLine
@@ -128,6 +129,12 @@ function Print-FailedTests($TrxFilePath)
             Write-Log (".. .. .. .StackTrace: $nl" + $FailedTestCaseDetailsDict[$_.id]["StackTrace"]) $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .StdOut: $nl" + $FailedTestCaseDetailsDict[$_.id]["StdOut"]) $Script:TPT_ErrorMsgColor
             $count++
+        }
+
+        Set-ScriptFailed
+        if ($Script:TPT_FailFast) {
+            Write-Log ".. Stop execution since fail fast is enabled."
+            continue
         }
     }
 }
@@ -250,28 +257,15 @@ function Invoke-Test
                     if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
                         Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
-                        $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
+                        & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"  /logger:"console;verbosity=normal"
                     } else {
 
                         Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
-                        $output = & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
+                        & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"  /logger:"console;verbosity=normal"
                     }
 
                     Reset-TestEnvironment
-                    if ($output[-3].Contains("Test Run Successful.")) {
-                        Write-Log ".. . $($output[-4])"
-                    } else {
-                        Write-Log ".. . $($output[-3])"
-                        Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
-                        Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
-
-                        Set-ScriptFailed
-
-                        if ($Script:TPT_FailFast) {
-                            Write-Log ".. Stop execution since fail fast is enabled."
-                            continue
-                        }
-                    }
+                    Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
                 }
             }
 
