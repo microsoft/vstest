@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Get the test process start info
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
                 
-                //Subscribe to TestHost Event
+                // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += TestHostManager_HostLaunched;
                 this.testHostManager.HostExited += TestHostManager_HostExited;
 
@@ -101,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     hostLaunchedTask.Wait(hostLaunchCTS.Token);
                 }
-                catch(OperationCanceledException ex)
+                catch (OperationCanceledException ex)
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
                 }
