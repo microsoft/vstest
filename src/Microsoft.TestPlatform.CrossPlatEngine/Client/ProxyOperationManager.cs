@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
                     ConsoleOutput.Instance.WriteLine(
-                        string.Format("Process Id: {0}, Name: {1}", processId, this.processHelper.GetProcessName(hostLaunchedTask.Result)),
+                        string.Format("Process Id: {0}, Name: {1}", hostLaunchedTask.Result, this.processHelper.GetProcessName(hostLaunchedTask.Result)),
                         OutputLevel.Information);
 
                     // Increase connection timeout when debugging is enabled.
