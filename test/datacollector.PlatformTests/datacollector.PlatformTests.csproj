@@ -10,7 +10,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
-    <AssemblyName>Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests</AssemblyName>
+    <AssemblyName>datacollector.PlatformTests</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
@@ -30,6 +30,10 @@
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
+
+    <Content Include="$(TestPlatformRoot)src\datacollector\bin\$(Configuration)\$(TargetFramework)\datacollector*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.Runtime" />
@@ -46,19 +50,4 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
-
-  <Target Name="AfterBuild" Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <Copy
-        SourceFiles="$(TestPlatformRoot)src/datacollector/bin/$(Configuration)/$(TargetFramework)/datacollector.deps.json"
-        DestinationFolder="$(TestPlatformRoot)test/datacollector.PlatformTests/bin/$(Configuration)/$(TargetFramework)/"
-    />
-    <Copy
-          SourceFiles="$(TestPlatformRoot)src/datacollector/bin/$(Configuration)/$(TargetFramework)/datacollector.runtimeconfig.json"
-          DestinationFolder="$(TestPlatformRoot)test/datacollector.PlatformTests/bin/$(Configuration)/$(TargetFramework)/"
-    />
-    <Copy
-           SourceFiles="$(TestPlatformRoot)src/datacollector/bin/$(Configuration)/$(TargetFramework)/datacollector.runtimeconfig.dev.json"
-           DestinationFolder="$(TestPlatformRoot)test/datacollector.PlatformTests/bin/$(Configuration)/$(TargetFramework)/"
-    />
-  </Target>
 </Project>
