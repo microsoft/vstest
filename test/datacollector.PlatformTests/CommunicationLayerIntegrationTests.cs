@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
     using Moq;
 
     [TestClass]
+    [Ignore]    // Tests are flaky
     public class CommunicationLayerIntegrationTests
     {
         private string defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
