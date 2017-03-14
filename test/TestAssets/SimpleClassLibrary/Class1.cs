@@ -10,7 +10,7 @@ namespace SimpleClassLibrary
     {
         public void PassingTest()
         {
-            Debug.Assert(2 == 2);
+            if (new System.Random().Next() == 20) { throw new System.NotImplementedException(); }
         }
 
         public async Task AsyncTestMethod()
