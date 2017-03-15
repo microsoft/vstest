@@ -76,11 +76,8 @@ $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
-$TPB_Version = $Version
-$TPB_VersionSuffix = $VersionSuffix
 # Version suffix is empty for RTM releases
-$FullVersion = if ($VersionSuffix -ne '') {$Version + "-" + $VersionSuffix} else {$Version}
-$TPB_FullVersion = $FullVersion
+$TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } else { $Version }
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
 $TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
@@ -170,8 +167,8 @@ function Invoke-Build
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Build: Source: $TPB_Solution"
-    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_FullVersion -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
-    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_FullVersion -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
     Write-Log ".. .. Build: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -347,8 +344,8 @@ function Create-NugetPackages
             $additionalArgs = "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $FullVersion -Properties Version=$FullVersion $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $FullVersion -Properties Version=$FullVersion`;Runtime=$TPB_TargetRuntime $additionalArgs
+        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     # package them from projectOutputDir
