@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<Process, string> ErrorReceivedCallback => ((process, data) => 
         {
-            if (data != null)
+            if (!string.IsNullOrEmpty(data))
             {
                 // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
                 if (data.Length > this.testHostProcessStdError.MaxCapacity)

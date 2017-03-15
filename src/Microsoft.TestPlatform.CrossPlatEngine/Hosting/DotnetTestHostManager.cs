@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<Process, string> ErrorReceivedCallback => ((process, data) =>
         {
-            if (data != null)
+            if (!string.IsNullOrEmpty(data))
             {
                 // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
                 if (data.Length > this.testHostProcessStdError.MaxCapacity)
@@ -118,6 +118,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.dotnetHostHelper = dotnetHostHelper;
+
+            (this.testHostLauncher as DefaultTestHostLauncher)?.SetErrorCallBack(this.ErrorReceivedCallback);
         }
 
         /// <summary>
@@ -150,7 +152,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private int LaunchHost(TestProcessStartInfo testHostStartInfo)
         {
             this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-            testHostStartInfo.ErrorReceivedCallback = this.ErrorReceivedCallback;
             var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
             this.testHostProcess = Process.GetProcessById(processId);
 
@@ -361,6 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     public class DefaultTestHostLauncher : ITestHostLauncher
     {
         private readonly IProcessHelper processHelper;
+        private Action<Process, string> errorCallback;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostLauncher"/> class.
@@ -378,6 +380,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.processHelper = processHelper;
         }
 
+        public void SetErrorCallBack(Action<Process, string> errorCallback)
+        {
+            this.errorCallback = errorCallback;
+        }
+
         /// <inheritdoc/>
         public bool IsDebug => false;
 
@@ -388,7 +395,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     defaultTestHostStartInfo.FileName,
                     defaultTestHostStartInfo.Arguments,
                     defaultTestHostStartInfo.WorkingDirectory,
-                    defaultTestHostStartInfo.ErrorReceivedCallback).Id;
+                    this.errorCallback).Id;
         }
     }
 }
