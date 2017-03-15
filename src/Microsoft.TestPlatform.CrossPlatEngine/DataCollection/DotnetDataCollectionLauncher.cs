@@ -74,8 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             string dataCollectorFileName = null;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
-            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
-
             var currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
 
             if (EqtTrace.IsVerboseEnabled)
