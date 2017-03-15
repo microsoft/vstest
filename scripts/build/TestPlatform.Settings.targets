@@ -4,9 +4,13 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
   </PropertyGroup>
   <PropertyGroup>
-    <!-- Versioning is defined from the build script. Use a default dev build if it's not defined. -->
-    <Version Condition="'$(Version)' == ''">15.1.0</Version>
-    <VersionSuffix Condition="'$(VersionSuffix)' == ''">dev</VersionSuffix>
+    <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
+         Sets the AssemblyVersion, AssemblyFileVersion and AssemblyInformationalVersion -->
+    <Version Condition="'$(Version)' == ''">15.1.0-dev</Version>
+
+    <!-- Override the AssemblyVersion as 15.0.0 since protocol depends on this version for
+         serialization. This is also defined in build script. -->
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PublicSign Condition="'$(CIBuild)' == '' or '$(CIBuild)' == 'false'">true</PublicSign>
