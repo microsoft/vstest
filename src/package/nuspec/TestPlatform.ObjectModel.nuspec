@@ -26,7 +26,7 @@
         <dependency id="System.Runtime.Loader" version="[4.3.0, )" />
         <dependency id="System.Runtime.Serialization.Primitives" version="[4.3.0, )" />
         <dependency id="System.Runtime.Serialization.Json" version="[4.3.0, )" />
-        <dependency id="System.Xml.XPath.XmlDocument" version="[4.3.0, )" />
+        <dependency id="System.Xml.XPath.XmlDocument" version="[4.1.0, )" />
 
         <!-- Dependencies for core utilities -->
         <dependency id="System.Diagnostics.Process" version="[4.3.0, )" />

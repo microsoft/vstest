@@ -357,8 +357,8 @@ function Create-NugetPackages
         $projectName = [System.IO.Path]::GetFileNameWithoutExtension($file);
         $projectOutputDir = Join-Path $env:TP_ROOT_DIR "src\$projectName\bin\$TPB_Configuration"
         Copy-Item $tpNuspecDir\$file $projectOutputDir -Force
-        Write-Verbose "$nugetExe pack $projectOutputDir\$file -OutputDirectory $stagingDir -Version=$Version-$VersionSuffix -Properties Version=$Version-$VersionSuffix $additionalArgs"
-		& $nugetExe pack $projectOutputDir\$file -OutputDirectory $packageOutputDir -Version $FullVersion -Properties Version=$FullVersion`;Runtime=$TPB_TargetRuntime $additionalArgs
+        Write-Verbose "$nugetExe pack $projectOutputDir\$file -OutputDirectory $stagingDir -Version $TPB_Version -Properties Version=$TPB_Version;Runtime=$TPB_TargetRuntime $additionalArgs"
+		& $nugetExe pack $projectOutputDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"

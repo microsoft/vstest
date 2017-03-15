@@ -17,9 +17,9 @@
     <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     
-    <file src="net46\$Runtime$\**\*.*" target="tools\net46\" />
-    <file src="netcoreapp2.0\**\*.*" target="tools\netcoreapp2.0\" />
-    <file src="netcoreapp2.0\**\*.*" target="lib\netcoreapp2.0\" />
+    <file src="net46\$Runtime$\**\*.*" exclude="**\*.pdb" target="tools\net46\" />
+    <file src="netcoreapp2.0\**\*.*" exclude="**\*.pdb" target="tools\netcoreapp2.0\" />
+    <file src="netcoreapp2.0\**\*.*" exclude="**\*.pdb" target="lib\netcoreapp2.0\" />
     <file src="_._" target="lib\net46\" />
   </files>
 </package>
