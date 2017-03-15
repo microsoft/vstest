@@ -159,7 +159,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var port = this.dataCollectionRequestSender.InitializeCommunication();
 
             // Warn the user that execution will wait for debugger attach.
-
             var processId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
 
             var dataCollectorDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_DATACOLLECTOR_DEBUG");
@@ -174,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 this.connectionTimeout = 5 * this.connectionTimeout;
             }
 
-            this.dataCollectionRequestSender.WaitForRequestHandlerConnection(connectionTimeout: 5000);
+            this.dataCollectionRequestSender.WaitForRequestHandlerConnection(this.connectionTimeout);
         }
 
         private void InvokeDataCollectionServiceAction(Action action, ITestMessageEventHandler runEventsHandler)

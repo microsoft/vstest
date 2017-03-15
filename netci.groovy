@@ -15,6 +15,7 @@ def branch = GithubBranchName
         // Define your build/test strings here
         def buildString = """call build.cmd -c ${configuration}"""
         def testString = """call test.cmd -c ${configuration}"""
+        def platformtestString = """call test.cmd -c ${configuration} -p platformtests"""
         def smoketestString = """call test.cmd -c ${configuration} -p smoke"""
         def acceptancetestString = """call test.cmd -c ${configuration} -p AcceptanceTests"""
 
@@ -23,6 +24,7 @@ def branch = GithubBranchName
             steps {
                 batchFile(buildString)
                 batchFile(testString)
+                batchFile(platformtestString)
                 batchFile(smoketestString)
                 batchFile(acceptancetestString)
             }
