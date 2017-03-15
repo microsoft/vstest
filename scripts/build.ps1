@@ -136,7 +136,7 @@ function Install-DotNetCli
 
     # Uncomment to pull in additional shared frameworks.
     # This is added to get netcoreapp1.1 shared components.
-    #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
