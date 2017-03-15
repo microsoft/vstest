@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 {
+    using System;
     using System.Diagnostics;
 
     using Microsoft.TestPlatform.TestUtilities;
@@ -38,7 +39,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-            Assert.AreEqual(12, diaNavigationData.MinLineNumber, "Incorrect min line number");
+            this.ValidateMinLineNumber(12, diaNavigationData.MinLineNumber);
             Assert.AreEqual(14, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
@@ -56,7 +57,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-            Assert.AreEqual(17, diaNavigationData.MinLineNumber, "Incorrect min line number");
+            this.ValidateMinLineNumber(17, diaNavigationData.MinLineNumber);
             Assert.AreEqual(19, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
@@ -74,7 +75,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-            Assert.AreEqual(26, diaNavigationData.MinLineNumber, "Incorrect min line number");
+            this.ValidateMinLineNumber(26, diaNavigationData.MinLineNumber);
             Assert.AreEqual(27, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
@@ -112,12 +113,25 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\HugeMethodSet.cs");
-            Assert.AreEqual(9, diaNavigationData.MinLineNumber);
+            this.ValidateMinLineNumber(9, diaNavigationData.MinLineNumber);
             Assert.AreEqual(10, diaNavigationData.MaxLineNumber);
             var expectedTime = 150;
             Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
+        }
+
+        private void ValidateMinLineNumber(int expected, int actual)
+        {
+            // Release builds optimize code, hence min line numbers are different.
+            if (this.testEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.AreEqual(expected + 1, actual, "Incorrect min line number");
+            }
+            else
+            {
+                Assert.AreEqual(expected, actual, "Incorrect min line number");
+            }
         }
     }
 }
