@@ -49,7 +49,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void InitializeShouldPassDiagArgumentsIfDiagIsEnabled()
         {
-            System.Diagnostics.Debugger.Launch();
             // Saving the EqtTrace state
 #if NET46
             var traceLevel = EqtTrace.TraceLevel;
