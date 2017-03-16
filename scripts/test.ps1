@@ -72,10 +72,7 @@ $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
 $Script:TPT_TargetRuntime = $TargetRuntime
-$Script:TPT_SkipProjects = @("Microsoft.TestPlatform.Build.UnitTests.csproj", 
- "Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests.csproj",
- "vstest.console.UnitTests.csproj"
-  )
+$Script:TPT_SkipProjects = @("Microsoft.TestPlatform.Build.UnitTests.csproj")
 $Script:TPT_Pattern = $Pattern
 $Script:TPT_FailFast = $FailFast
 $Script:TPT_Parallel = $Parallel
@@ -113,7 +110,7 @@ function Print-FailedTests($TrxFilePath)
     $xdoc = [xml] (get-content $TrxFilePath)
     $FailedTestCaseDetailsDict = @{}
     # Get failed testcase data from UnitTestResult tag.
-    $xdoc.TestRun.Results.UnitTestResult |?{$_.GetAttribute("outcome") -eq "Failed"} | %{
+    $xdoc.TestRun.Results.UnitTestResult | ? { $_.GetAttribute("outcome") -eq "Failed" } | % {
         $FailedTestCaseDetailsDict.Add($_.testId, @{"Message" = $_.Output.ErrorInfo.Message; "StackTrace" = $_.Output.ErrorInfo.StackTrace; "StdOut"=$_.Output.StdOut});
     }
 
@@ -153,7 +150,7 @@ function Invoke-Test
             $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
             $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
             
-            $skip="False"
+            $skip = "False"
 
             foreach ($project in $Script:TPT_SkipProjects) {
                if($_.Name.Contains($project))
@@ -172,8 +169,7 @@ function Invoke-Test
             }
         }
 
-        # Invoke test for each project.json since we want a custom output
-        # path.
+        # Invoke test for each project since we want a custom output path
         foreach ($fx in $Script:TPT_TargetFrameworks) {
             Write-Log ".. Start run ($fx)"
 
@@ -187,7 +183,7 @@ function Invoke-Test
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
                 $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFramework20Core $targetRuntime) $vstestConsoleFileName
-            } else{
+            } else {
 
                 $testFrameWork = ".NETFramework,Version=v4.6"
                 $vstestConsoleFileName = "vstest.console.exe"
@@ -243,7 +239,7 @@ function Invoke-Test
                     # Fill in the framework in test containers
                     $testContainer = [System.String]::Format($_, $fx)
                     $trxLogFileName =  [System.String]::Format("{0}_{1}_{2}", ($(Get-ChildItem $testContainer).Name), $fx, $Script:TPT_DefaultTrxFileName)
-					
+
                     # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break
                     $fullTrxFilePath = Join-Path $Script:TPT_TestResultsDir $trxLogFileName
                     if([System.IO.File]::Exists($fullTrxFilePath)) {
@@ -253,15 +249,15 @@ function Invoke-Test
                     Write-Log ".. Container: $testContainer"
 
                     Set-TestEnvironment
-                    
+
                     if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
                         Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
-                        & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"  /logger:"console;verbosity=normal"
+                        & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
                     } else {
 
                         Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
-                        & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"  /logger:"console;verbosity=normal"
+                        & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
                     }
 
                     Reset-TestEnvironment

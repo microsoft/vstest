@@ -59,17 +59,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
             dataCollectionAttributes.Add("uri", "my://sample/datacollector");
-            //var codebase = Path.Combine(
-            //    this.testEnvironment.TestAssetsPath,
-            //    Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
-            //    "bin",
-            //    this.testEnvironment.BuildConfiguration,
-            //    this.testEnvironment.RunnerFramework,
-            //    "OutOfProcDataCollector.dll");
 
-            // Data collection asset should be same as the RunnerFramework (instead of TargetFramework)
-            var codebase = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll")
-                            .Replace(this.testEnvironment.TargetFramework, this.testEnvironment.RunnerFramework);
+            // Data collector needs to be targeted to same runtime as the runner framework
+            var codebase = Path.Combine(
+                this.testEnvironment.TestAssetsPath,
+                Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
+                "bin",
+                this.testEnvironment.BuildConfiguration,
+                this.testEnvironment.RunnerFramework,
+                "OutOfProcDataCollector.dll");
+            Assert.IsTrue(File.Exists(codebase), "Data collector assembly not found: " + codebase);
 
             dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(codebase)));
             dataCollectionAttributes.Add("codebase", codebase);
