@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
     using System.Collections.Generic;
 
     /// <summary>
-    /// Helper class for processing argumets passed to a process.
+    /// Helper class for processing arguments passed to a process.
     /// </summary>
     public class CommandLineArgumentsHelper
     {
@@ -18,6 +18,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
         public static IDictionary<string, string> GetArgumentsDictionary(string[] args)
         {
             var argsDictionary = new Dictionary<string, string>();
+            if (args == null)
+            {
+                return argsDictionary;
+            }
+
             for (int i = 0; i < args.Length; i++)
             {
                 if (args[i].StartsWith("-"))

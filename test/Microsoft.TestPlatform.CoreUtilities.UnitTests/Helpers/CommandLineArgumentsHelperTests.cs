@@ -39,5 +39,26 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             Assert.AreEqual("12312", argsDictionary["--port"]);
             Assert.AreEqual("2312", argsDictionary["--parentprocessid"]);
         }
+
+        [TestMethod]
+        public void GetArgumentsDictionaryShouldReturnEmptyDictionaryIfEmptyArgIsPassed()
+        {
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(null);
+            Assert.IsTrue(argsDictionary.Count == 0);
+
+            argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(new string[] { });
+            Assert.IsTrue(argsDictionary.Count == 0);
+        }
+
+        [TestMethod]
+        public void GetArgumentsDictionaryShouldTreatValueAsNullIfTwoConsecutiveKeysArePassed()
+        {
+            var args = new List<string>() { "--hello", "--world" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            Assert.IsTrue(argsDictionary.Count == 2);
+            Assert.AreEqual(null, argsDictionary["--hello"]);
+            Assert.AreEqual(null, argsDictionary["--world"]);
+        }
     }
 }
