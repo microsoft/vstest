@@ -23,18 +23,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     [TestClass]
     public class ProxyDataCollectionManagerTests
     {
-        private DummyDataCollectionRequestSender mockDataCollectionRequestSender;
+        private Mock<IDataCollectionRequestSender> mockDataCollectionRequestSender;
         private ProxyDataCollectionManager proxyDataCollectionManager;
-        private DummyDataCollectionLauncher mockDataCollectionLauncher;
+        private Mock<IDataCollectionLauncher> mockDataCollectionLauncher;
         private Mock<IProcessHelper> mockProcessHelper;
 
         [TestInitialize]
         public void Initialize()
         {
-            this.mockDataCollectionRequestSender = new DummyDataCollectionRequestSender();
-            this.mockDataCollectionLauncher = new DummyDataCollectionLauncher();
+            this.mockDataCollectionRequestSender = new Mock<IDataCollectionRequestSender>();
+            this.mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.proxyDataCollectionManager = new ProxyDataCollectionManager(string.Empty, this.mockDataCollectionRequestSender, this.mockProcessHelper.Object, this.mockDataCollectionLauncher);
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(string.Empty, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
         }
 
         [TestMethod]
@@ -42,20 +42,59 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         {
             this.proxyDataCollectionManager.Initialize();
 
-            Assert.IsTrue(this.mockDataCollectionLauncher.dataCollectorLaunched);
-            Assert.IsTrue(this.mockDataCollectionRequestSender.waitForRequestHandlerConnection);
-            Assert.AreEqual(5000, this.mockDataCollectionRequestSender.connectionTimeout);
+            this.mockDataCollectionLauncher.Verify(x => x.LaunchDataCollector(It.IsAny<IDictionary<string, string>>(), It.IsAny<IList<string>>()), Times.Once);
+            this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(5000), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeShouldPassDiagArgumentsIfDiagIsEnabled()
+        {
+            // Saving the EqtTrace state
+#if NET46
+            var traceLevel = EqtTrace.TraceLevel;
+            EqtTrace.TraceLevel = TraceLevel.Off;
+#else
+            var traceLevel = (TraceLevel)EqtTrace.TraceLevel;
+            EqtTrace.TraceLevel = (PlatformTraceLevel)TraceLevel.Off;
+#endif
+            var traceFileName = EqtTrace.LogFile;
+
+            try
+            {
+                EqtTrace.InitializeVerboseTrace("mylog.txt");
+
+                this.proxyDataCollectionManager.Initialize();
+
+                this.mockDataCollectionLauncher.Verify(
+                    x =>
+                        x.LaunchDataCollector(
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.Is<IList<string>>(list => list.Contains("--diag"))),
+                    Times.Once);
+                this.mockDataCollectionRequestSender.Verify(x => x.WaitForRequestHandlerConnection(5000), Times.Once);
+            }
+            finally
+            {
+                // Restoring to initial state for EqtTrace
+                EqtTrace.InitializeVerboseTrace(traceFileName);
+#if NET46
+                EqtTrace.TraceLevel = traceLevel;
+#else
+                EqtTrace.TraceLevel = (PlatformTraceLevel)traceLevel;
+#endif
+            }
         }
 
         [TestMethod]
         public void BeforeTestRunStartShouldReturnDataCollectorParameters()
         {
             BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
-            this.mockDataCollectionRequestSender.BeforeTestRunStartResult = res;
+            this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
 
             var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
 
-            Assert.IsTrue(this.mockDataCollectionRequestSender.sendBeforeTestRunStartAndGetResult);
+            this.mockDataCollectionRequestSender.Verify(
+                x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>()), Times.Once);
             Assert.IsNotNull(result);
             Assert.AreEqual(res.DataCollectionEventsPort, result.DataCollectionEventsPort);
             Assert.AreEqual(res.EnvironmentVariables.Count, result.EnvironmentVariables.Count);
@@ -65,13 +104,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void BeforeTestRunStartsShouldInvokeRunEventsHandlerIfExceptionIsThrown()
         {
             var mockRunEventsHandler = new Mock<ITestMessageEventHandler>();
-            this.mockDataCollectionRequestSender.sendBeforeTestRunStartAndGetResultThrowException = true;
-
-            mockRunEventsHandler.Setup(eh => eh.HandleLogMessage(TestMessageLevel.Error, "SocketException"));
+            this.mockDataCollectionRequestSender.Setup(
+                    x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>()))
+                .Throws<Exception>();
 
             var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, mockRunEventsHandler.Object);
 
-            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "SocketException"), Times.Once);
+            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
             Assert.AreEqual(result.EnvironmentVariables, null);
             Assert.AreEqual(result.AreTestCaseLevelEventsRequired, false);
             Assert.AreEqual(result.DataCollectionEventsPort, 0);
@@ -86,11 +125,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var attachmentSet = new AttachmentSet(uri, dispName);
             attachments.Add(attachmentSet);
 
-            this.mockDataCollectionRequestSender.Attachments = attachments;
+            this.mockDataCollectionRequestSender.Setup(x => x.SendAfterTestRunStartAndGetResult(It.IsAny<ITestRunEventsHandler>(), It.IsAny<bool>())).Returns(attachments);
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, null);
 
-            Assert.IsTrue(this.mockDataCollectionRequestSender.sendAfterTestRunStartAndGetResult);
             Assert.IsNotNull(result);
             Assert.AreEqual(result.Count, 1);
             Assert.IsNotNull(result[0]);
@@ -102,78 +140,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void AfterTestRunEndShouldInvokeRunEventsHandlerIfExceptionIsThrown()
         {
             var mockRunEventsHandler = new Mock<ITestMessageEventHandler>();
-            mockRunEventsHandler.Setup(eh => eh.HandleLogMessage(TestMessageLevel.Error, "SocketException"));
-            this.mockDataCollectionRequestSender.sendAfterTestRunStartAndGetResultThrowException = true;
+            this.mockDataCollectionRequestSender.Setup(
+                    x => x.SendAfterTestRunStartAndGetResult(It.IsAny<ITestMessageEventHandler>(), It.IsAny<bool>()))
+                .Throws<Exception>();
 
             var result = this.proxyDataCollectionManager.AfterTestRunEnd(false, mockRunEventsHandler.Object);
 
-            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "SocketException"), Times.Once);
+            mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
         }
-    }
-
-    internal class DummyDataCollectionRequestSender : IDataCollectionRequestSender
-    {
-        public bool waitForRequestHandlerConnection;
-        public int connectionTimeout;
-        public bool sendBeforeTestRunStartAndGetResult;
-        public bool sendAfterTestRunStartAndGetResult;
-        public bool sendAfterTestRunStartAndGetResultThrowException;
-        public bool sendBeforeTestRunStartAndGetResultThrowException;
-
-        public BeforeTestRunStartResult BeforeTestRunStartResult { get; set; }
-
-        public Collection<AttachmentSet> Attachments { get; set; }
-
-        public void Close()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int InitializeCommunication()
-        {
-            return 1;
-        }
-
-        public Collection<AttachmentSet> SendAfterTestRunStartAndGetResult(ITestMessageEventHandler handler, bool isCancelled)
-        {
-            if (sendAfterTestRunStartAndGetResultThrowException)
-            {
-                throw new Exception("SocketException");
-            }
-
-            this.sendAfterTestRunStartAndGetResult = true;
-            return Attachments;
-        }
-
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, ITestMessageEventHandler handler)
-        {
-            if (this.sendBeforeTestRunStartAndGetResultThrowException)
-            {
-                throw new Exception("SocketException");
-            }
-
-            this.sendBeforeTestRunStartAndGetResult = true;
-            return BeforeTestRunStartResult;
-        }
-
-        public bool WaitForRequestHandlerConnection(int connectionTimeout)
-        {
-            this.connectionTimeout = connectionTimeout;
-            this.waitForRequestHandlerConnection = true;
-            return true;
-        }
-    }
-
-    internal class DummyDataCollectionLauncher : IDataCollectionLauncher
-    {
-        public bool dataCollectorLaunched;
-
-        public int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
-        {
-            this.dataCollectorLaunched = true;
-            return 1;
-        }
-
-        public Process DataCollectorProcess { get; }
     }
 }

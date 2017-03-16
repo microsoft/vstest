@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.AcceptanceTests
@@ -41,13 +41,83 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string runSettings = this.GetRunsettingsFilePath();
-
+            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{this.resultsDir}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
+
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
             this.VaildateDataCollectorOutput();
+        }
+
+        private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
+        {
+            var doc = new XmlDocument();
+            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
+
+            doc.AppendChild(xmlDeclaration);
+            var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
+            doc.AppendChild(runSettingsNode);
+            var dcConfigNode = doc.CreateElement(Constants.DataCollectionRunSettingsName);
+            runSettingsNode.AppendChild(dcConfigNode);
+            var dataCollectorsNode = doc.CreateElement(Constants.DataCollectorsSettingName);
+            dcConfigNode.AppendChild(dataCollectorsNode);
+            var dataCollectorNode = doc.CreateElement(Constants.DataCollectorSettingName);
+            dataCollectorsNode.AppendChild(dataCollectorNode);
+
+            foreach (var kvp in dataCollectionAttributes)
+            {
+                dataCollectorNode.SetAttribute(kvp.Key, kvp.Value);
+            }
+
+            using (var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create))
+            {
+                doc.Save(stream);
+            }
+        }
+
+        private void VaildateDataCollectorOutput()
+        {
+            // Output of datacollection attachment.
+            this.StdOutputContains("filename.txt");
+            this.StdOutputContains("TestCaseStarted");
+            this.StdOutputContains("TestCaseEnded");
+            this.StdOutputContains("SessionEnded");
+            this.StdOutputContains("SessionStarted");
+            this.StdOutputContains("my warning");
+            this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
+
+            // Verify attachments
+            var isTestRunLevelAttachmentFound = false;
+            var testCaseLevelAttachmentsCount = 0;
+            var diaglogsFileCount = 0;
+
+            var resultFiles = Directory.GetFiles(this.resultsDir, "*.txt", SearchOption.AllDirectories);
+
+            foreach (var file in resultFiles)
+            {
+                // Test Run level attachments are logged in standard output.
+                if (file.Contains("filename.txt"))
+                {
+                    this.StdOutputContains(file);
+                    isTestRunLevelAttachmentFound = true;
+                }
+
+                if (file.Contains("testcasefilename"))
+                {
+                    testCaseLevelAttachmentsCount++;
+                }
+
+                if (file.Contains("diaglog"))
+                {
+                    diaglogsFileCount++;
+                }
+            }
+
+            Assert.IsTrue(isTestRunLevelAttachmentFound);
+            Assert.AreEqual(3, testCaseLevelAttachmentsCount);
+            Assert.AreEqual(3, diaglogsFileCount);
         }
 
         private string GetRunsettingsFilePath()
@@ -74,68 +144,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             dataCollectionAttributes.Add("codebase", codebase);
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;
-        }
-
-        public static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
-        {
-            var doc = new XmlDocument();
-            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
-
-            doc.AppendChild(xmlDeclaration);
-            var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
-            doc.AppendChild(runSettingsNode);
-            var dcConfigNode = doc.CreateElement(Constants.DataCollectionRunSettingsName);
-            runSettingsNode.AppendChild(dcConfigNode);
-            var dataCollectorsNode = doc.CreateElement(Constants.DataCollectorsSettingName);
-            dcConfigNode.AppendChild(dataCollectorsNode);
-            var dataCollectorNode = doc.CreateElement(Constants.DataCollectorSettingName);
-            dataCollectorsNode.AppendChild(dataCollectorNode);
-
-            foreach (var kvp in dataCollectionAttributes)
-            {
-                dataCollectorNode.SetAttribute(kvp.Key, kvp.Value);
-            }
-
-            using (var stream = new FileHelper().GetStream(destinationRunsettingsPath, FileMode.Create))
-            {
-                doc.Save(stream);
-            }
-        }
-
-        public void VaildateDataCollectorOutput()
-        {
-            // Output of datacollection attachment.
-            this.StdOutputContains("filename.txt");
-            this.StdOutputContains("TestCaseStarted");
-            this.StdOutputContains("TestCaseEnded");
-            this.StdOutputContains("SessionEnded");
-            this.StdOutputContains("SessionStarted");
-            this.StdOutputContains("my warning");
-            this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
-
-            // Verify attachments
-            bool isTestRunLevelAttachmentFound = false;
-            int testCaseLevelAttachmentsCount = 0;
-
-            var resultFiles = Directory.GetFiles(this.resultsDir, "*.txt", SearchOption.AllDirectories);
-
-            foreach (var file in resultFiles)
-            {
-                // Test Run level attachments are logged in standard output.
-                if (file.Contains("filename.txt"))
-                {
-                    this.StdOutputContains(file);
-                    isTestRunLevelAttachmentFound = true;
-                }
-
-                if (file.Contains("testcasefilename"))
-                {
-                    testCaseLevelAttachmentsCount++;
-                }
-            }
-
-            Assert.IsTrue(isTestRunLevelAttachmentFound);
-            Assert.AreEqual(3, testCaseLevelAttachmentsCount);
         }
     }
 }
