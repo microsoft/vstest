@@ -178,7 +178,7 @@ function Invoke-Test
         # Invoke test for each project since we want a custom output path
         foreach ($fx in $Script:TPT_TargetFrameworks) {
             Write-Log ".. Start run ($fx)"
-            if ($fx -ne $Script:TPT_TargetFramework) {
+            if ($Script:TPT_TargetFramework -ne "" -and $fx -ne $Script:TPT_TargetFramework) {
                 Write-Log ".. . Skipped framework based on user setting."
                 continue;
             }
