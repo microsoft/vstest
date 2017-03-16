@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Callback on process exit
         /// </summary>
-        private Action<Process, string> ErrorReceivedCallback => ((process, data) => 
+        private Action<Process, string> ErrorReceivedCallback => ((process, data) =>
         {
             if (data != null)
             {
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), process.ExitCode));
             }
         });
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 if (this.customTestHostLauncher == null)
                 {
-                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, this.ErrorReceivedCallback);
+                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback);
                 }
                 else
                 {
