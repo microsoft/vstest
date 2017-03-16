@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
 
@@ -356,14 +357,25 @@ namespace Microsoft.TestPlatform.TestUtilities
                 vstestconsole.StartInfo.RedirectStandardOutput = true;
                 vstestconsole.StartInfo.CreateNoWindow = true;
 
+                var stdoutBuffer = new StringBuilder();
+                var stderrBuffer = new StringBuilder();
+                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data);
+                vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data);
+
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
                 Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);
 
                 vstestconsole.Start();
-                stdError = vstestconsole.StandardError.ReadToEnd();
-                stdOut = vstestconsole.StandardOutput.ReadToEnd();
+                vstestconsole.BeginOutputReadLine();
+                vstestconsole.BeginErrorReadLine();
+                if (!vstestconsole.WaitForExit(80 * 1000))
+                {
+                    Console.WriteLine("IntegrationTestBase.Execute: Timed out waiting for vstest.console.exe. Terminating the process.");
+                    vstestconsole.Kill();
+                }
 
-                vstestconsole.WaitForExit(60 * 1000);
+                stdError = stderrBuffer.ToString();
+                stdOut = stdoutBuffer.ToString();
                 Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
             }
         }
