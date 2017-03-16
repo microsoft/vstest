@@ -320,8 +320,7 @@ function Create-NugetPackages
     $tpNuspecDir = Join-Path $env:TP_PACKAGE_PROJ_DIR "nuspec"
 
     # Copy over the nuspecs to the staging directory
-    $nuspecFiles = @( "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "Microsoft.Net.Test.Sdk.nuspec")
-    $nuspec2Files = @("Microsoft.TestPlatform.ObjectModel.nuspec", "Microsoft.TestPlatform.VsTestConsole.TranslationLayer.nuspec", "Microsoft.TestPlatform.Build.nuspec")
+    $nuspecFiles = @("TestPlatform.TranslationLayer.nuspec", "TestPlatform.ObjectModel.nuspec", "TestPlatform.TestHost.nuspec", "TestPlatform.nuspec", "TestPlatform.CLI.nuspec", "TestPlatform.Build.nuspec", "Microsoft.Net.Test.Sdk.nuspec")
     $targetFiles = @("Microsoft.Net.Test.Sdk.targets")
     # Nuget pack analysis emits warnings if binaries are packaged as content. It is intentional for the below packages.
     $skipAnalysis = @("TestPlatform.CLI.nuspec")
@@ -345,20 +344,7 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime $additionalArgs
-    }
-
-    # package them from projectOutputDir
-    foreach ($file in $nuspec2Files) {
-        $additionalArgs = ""
-        if ($skipAnalysis -contains $file) {
-            $additionalArgs = "-NoPackageAnalysis"
-        }
-        $projectName = [System.IO.Path]::GetFileNameWithoutExtension($file);
-        $projectOutputDir = Join-Path $env:TP_ROOT_DIR "src\$projectName\bin\$TPB_Configuration"
-        Copy-Item $tpNuspecDir\$file $projectOutputDir -Force
-        Write-Verbose "$nugetExe pack $projectOutputDir\$file -OutputDirectory $stagingDir -Version $TPB_Version -Properties Version=$TPB_Version;Runtime=$TPB_TargetRuntime $additionalArgs"
-		& $nugetExe pack $projectOutputDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20 $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -589,12 +575,12 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
-Restore-Package
-Update-LocalizedResources
-Invoke-Build
-Publish-Package
-Create-VsixPackage
+#Install-DotNetCli
+#Restore-Package
+#Update-LocalizedResources
+#Invoke-Build
+#Publish-Package
+#Create-VsixPackage
 Create-NugetPackages
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }
