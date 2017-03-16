@@ -91,9 +91,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 0, 0);
         }
 
-        //[CustomDataTestMethod]
-        //[NET46TargetFramework]
-        //[NETCORETargetFramework]
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
         public void ShouldGetErrorMessageOnTesthostExitWithError(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
