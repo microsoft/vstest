@@ -13,6 +13,11 @@ Param(
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
 
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("netcoreapp1.0", "net46")]
+    [Alias("f")]
+    [System.String] $TargetFramework,
+
     # Only test sources matching the pattern are run.
     # Use End2End to run E2E tests. Or to run any one assembly tests, use the 
     # assembly name. E.g. test -p Microsoft.TestPlatform.CoreUtilities.UnitTests 
@@ -71,6 +76,7 @@ Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
+$Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("Microsoft.TestPlatform.Build.UnitTests.csproj")
 $Script:TPT_Pattern = $Pattern
@@ -172,6 +178,10 @@ function Invoke-Test
         # Invoke test for each project since we want a custom output path
         foreach ($fx in $Script:TPT_TargetFrameworks) {
             Write-Log ".. Start run ($fx)"
+            if ($fx -ne $Script:TPT_TargetFramework) {
+                Write-Log ".. . Skipped framework based on user setting."
+                continue;
+            }
 
             # Tests are only built for x86 at the moment, though we don't have architecture requirement
             $testAdapterPath = Get-TestAdapterPath

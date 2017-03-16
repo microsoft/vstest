@@ -373,6 +373,11 @@ namespace Microsoft.TestPlatform.TestUtilities
                     Console.WriteLine("IntegrationTestBase.Execute: Timed out waiting for vstest.console.exe. Terminating the process.");
                     vstestconsole.Kill();
                 }
+                else
+                {
+                    // Ensure async buffers are flushed
+                    vstestconsole.WaitForExit();
+                }
 
                 stdError = stderrBuffer.ToString();
                 stdOut = stdoutBuffer.ToString();
