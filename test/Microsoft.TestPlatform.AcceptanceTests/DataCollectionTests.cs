@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.AcceptanceTests
@@ -8,15 +8,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.IO;
     using System.Xml;
 
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class DataCollectionTests : AcceptanceTestBase
     {
-        private string resultsDir;
+        private readonly string resultsDir;
 
         public DataCollectionTests()
         {
@@ -26,7 +26,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestCleanup]
         public void Cleanup()
         {
-            Directory.Delete(this.resultsDir, true);
+            if (Directory.Exists(this.resultsDir))
+            {
+                Directory.Delete(this.resultsDir, true);
+            }
         }
 
         [CustomDataTestMethod]
@@ -34,14 +37,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NETCORETargetFramework]
         public void ExecuteTestsWithDataCollection(string runnerFramework, string targetFramework, string targetRuntime)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string runSettings = this.GetRunsettingsFilePath();
             string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
-
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
+
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
@@ -126,6 +129,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
             dataCollectionAttributes.Add("uri", "my://sample/datacollector");
+
+            // Data collector needs to be targeted to same runtime as the runner framework
             var codebase = Path.Combine(
                 this.testEnvironment.TestAssetsPath,
                 Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
@@ -133,10 +138,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.testEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework,
                 "OutOfProcDataCollector.dll");
+            Assert.IsTrue(File.Exists(codebase), "Data collector assembly not found: " + codebase);
 
-            var outOfProcAssemblyPath = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll");
-
-            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(outOfProcAssemblyPath)));
+            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(codebase)));
             dataCollectionAttributes.Add("codebase", codebase);
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;

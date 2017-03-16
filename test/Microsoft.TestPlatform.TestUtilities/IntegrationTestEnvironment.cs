@@ -221,29 +221,6 @@ namespace Microsoft.TestPlatform.TestUtilities
             return packagePath;
         }
 
-        /// <summary>
-        /// Gets the path to <c>vstest.console.exe</c>.
-        /// </summary>
-        /// <returns>
-        /// Full path to test runner
-        /// </returns>
-        public string GetConsoleRunnerPath()
-        {
-            string consoleRunnerPath = string.Empty;
-
-            if (string.Equals(this.RunnerFramework, "net46"))
-            {
-                consoleRunnerPath = Path.Combine(this.PublishDirectory, "vstest.console.exe");
-            }
-            else if (string.Equals(this.RunnerFramework, "netcoreapp1.0"))
-            {
-                consoleRunnerPath = Path.Combine(this.ToolsDirectory, @"dotnet\dotnet.exe");
-            }
-
-            Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
-            return consoleRunnerPath;
-        }
-
         private static Dictionary<string, string> GetDependencies(string testPlatformRoot)
         {
             var dependencyPropsFile = Path.Combine(testPlatformRoot, @"scripts\build\TestPlatform.Dependencies.props");

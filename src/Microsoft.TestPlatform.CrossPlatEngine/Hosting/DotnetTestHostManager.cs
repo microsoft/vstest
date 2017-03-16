@@ -84,7 +84,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
 
                 this.testHostProcessStdError.Append(data);
-                this.messageLogger.SendMessage(TestMessageLevel.Warning, this.testHostProcessStdError.ToString());
+                var message = this.testHostProcessStdError.ToString();
+                if (!string.IsNullOrWhiteSpace(message))
+                {
+                    this.messageLogger.SendMessage(TestMessageLevel.Warning, message);
+                }
             }
 
             if (process.HasExited && process.ExitCode != 0)

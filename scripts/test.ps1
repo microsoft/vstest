@@ -1,5 +1,5 @@
 # Copyright (c) Microsoft. All rights reserved.
-# Build script for Test Platform.
+# Test script for Test Platform.
 
 [CmdletBinding()]
 Param(
@@ -12,6 +12,11 @@ Param(
     [ValidateSet("win7-x64", "win7-x86")]
     [Alias("r")]
     [System.String] $TargetRuntime = "win7-x64",
+
+    [Parameter(Mandatory=$false)]
+    [ValidateSet("netcoreapp1.0", "net46")]
+    [Alias("f")]
+    [System.String] $TargetFramework,
 
     # Only test sources matching the pattern are run.
     # Use End2End to run E2E tests. Or to run any one assembly tests, use the 
@@ -66,10 +71,12 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 $TPT_TargetFrameworkFullCLR = "net46"
 $TPT_TargetFrameworkCore = "netcoreapp1.0"
+$TPT_TargetFramework20Core = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."
 $Script:TPT_Configuration = $Configuration
 $Script:TPT_SourceFolders =  @("test")
 $Script:TPT_TargetFrameworks =@($TPT_TargetFrameworkCore, $TPT_TargetFrameworkFullCLR)
+$Script:TPT_TargetFramework = $TargetFramework
 $Script:TPT_TargetRuntime = $TargetRuntime
 $Script:TPT_SkipProjects = @("Microsoft.TestPlatform.Build.UnitTests.csproj")
 $Script:TPT_Pattern = $Pattern
@@ -109,12 +116,13 @@ function Print-FailedTests($TrxFilePath)
     $xdoc = [xml] (get-content $TrxFilePath)
     $FailedTestCaseDetailsDict = @{}
     # Get failed testcase data from UnitTestResult tag.
-    $xdoc.TestRun.Results.UnitTestResult |?{$_.GetAttribute("outcome") -eq "Failed"} | %{
+    $xdoc.TestRun.Results.UnitTestResult | ? { $_.GetAttribute("outcome") -eq "Failed" } | % {
         $FailedTestCaseDetailsDict.Add($_.testId, @{"Message" = $_.Output.ErrorInfo.Message; "StackTrace" = $_.Output.ErrorInfo.StackTrace; "StdOut"=$_.Output.StdOut});
     }
 
-    if ($FailedTestCaseDetailsDict)
+    if ($FailedTestCaseDetailsDict.Count -ne 0)
     {
+        Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
         # Print failed test details.
         $count = 1
         $nl = [Environment]::NewLine
@@ -124,6 +132,12 @@ function Print-FailedTests($TrxFilePath)
             Write-Log (".. .. .. .StackTrace: $nl" + $FailedTestCaseDetailsDict[$_.id]["StackTrace"]) $Script:TPT_ErrorMsgColor
             Write-Log (".. .. .. .StdOut: $nl" + $FailedTestCaseDetailsDict[$_.id]["StdOut"]) $Script:TPT_ErrorMsgColor
             $count++
+        }
+
+        Set-ScriptFailed
+        if ($Script:TPT_FailFast) {
+            Write-Log ".. Stop execution since fail fast is enabled."
+            continue
         }
     }
 }
@@ -142,7 +156,7 @@ function Invoke-Test
             $testOutputPath = Join-Path $_.Directory.FullName "bin/$($Script:TPT_Configuration)/{0}"
             $testContainerPath = Join-Path $testOutputPath "$($testContainerName).dll"
             
-            $skip="False"
+            $skip = "False"
 
             foreach ($project in $Script:TPT_SkipProjects) {
                if($_.Name.Contains($project))
@@ -161,10 +175,13 @@ function Invoke-Test
             }
         }
 
-        # Invoke test for each project.json since we want a custom output
-        # path.
+        # Invoke test for each project since we want a custom output path
         foreach ($fx in $Script:TPT_TargetFrameworks) {
             Write-Log ".. Start run ($fx)"
+            if ($Script:TPT_TargetFramework -ne "" -and $fx -ne $Script:TPT_TargetFramework) {
+                Write-Log ".. . Skipped framework based on user setting."
+                continue;
+            }
 
             # Tests are only built for x86 at the moment, though we don't have architecture requirement
             $testAdapterPath = Get-TestAdapterPath
@@ -175,14 +192,15 @@ function Invoke-Test
                 $testFrameWork = ".NETCoreApp,Version=v1.0"
                 $vstestConsoleFileName = "vstest.console.dll"
                 $targetRunTime = ""
-            } else{
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFramework20Core $targetRuntime) $vstestConsoleFileName
+            } else {
 
                 $testFrameWork = ".NETFramework,Version=v4.6"
                 $vstestConsoleFileName = "vstest.console.exe"
                 $targetRunTime = $Script:TPT_TargetRuntime
+                $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkFullCLR $targetRuntime) $vstestConsoleFileName
             }
 
-            $vstestConsolePath = Join-Path (Get-PackageDirectory $fx $targetRuntime) $vstestConsoleFileName
             if (!(Test-Path $vstestConsolePath)) {
                 Write-Log "Unable to find $vstestConsoleFileName at $vstestConsolePath. Did you run build.cmd?"
                 Write-Error "Test aborted."
@@ -231,7 +249,7 @@ function Invoke-Test
                     # Fill in the framework in test containers
                     $testContainer = [System.String]::Format($_, $fx)
                     $trxLogFileName =  [System.String]::Format("{0}_{1}_{2}", ($(Get-ChildItem $testContainer).Name), $fx, $Script:TPT_DefaultTrxFileName)
-					
+
                     # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break
                     $fullTrxFilePath = Join-Path $Script:TPT_TestResultsDir $trxLogFileName
                     if([System.IO.File]::Exists($fullTrxFilePath)) {
@@ -241,32 +259,19 @@ function Invoke-Test
                     Write-Log ".. Container: $testContainer"
 
                     Set-TestEnvironment
-                    
+
                     if($fx -eq $TPT_TargetFrameworkFullCLR) {
 
                         Write-Verbose "$vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
-                        $output = & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
+                        & $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
                     } else {
 
                         Write-Verbose "$dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:$testAdapterPath /logger:`"trx;LogFileName=$trxLogFileName`""
-                        $output = & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
+                        & $dotNetPath $vstestConsolePath $testContainer /platform:$testArchitecture /framework:$testFrameWork /testAdapterPath:"$testAdapterPath" /logger:"trx;LogFileName=$trxLogFileName"
                     }
 
                     Reset-TestEnvironment
-                    if ($output[-3].Contains("Test Run Successful.")) {
-                        Write-Log ".. . $($output[-4])"
-                    } else {
-                        Write-Log ".. . $($output[-3])"
-                        Write-Log ".. . Failed tests:" $Script:TPT_ErrorMsgColor
-                        Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
-
-                        Set-ScriptFailed
-
-                        if ($Script:TPT_FailFast) {
-                            Write-Log ".. Stop execution since fail fast is enabled."
-                            continue
-                        }
-                    }
+                    Print-FailedTests (Join-Path $Script:TPT_TestResultsDir $trxLogFileName)
                 }
             }
 
@@ -322,7 +327,7 @@ function Reset-TestEnvironment
 
 # Execute build
 $timer = Start-Timer
-Write-Log "Build started: args = '$args'"
+Write-Log "Test started: args = '$args'"
 Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 
@@ -331,6 +336,6 @@ Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPT_") } | Forma
 
 Invoke-Test
 
-Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
+Write-Log "Test complete. {$(Get-ElapsedTime($timer))}"
 
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }

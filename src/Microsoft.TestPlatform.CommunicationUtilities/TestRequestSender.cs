@@ -291,7 +291,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
             testRunEventsHandler.HandleRawMessage(rawMessage);
 
-            // notify test run abort to vstest console wrapper
+            // notify test run abort to vstest console wrapper.
             var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
             var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
             rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
