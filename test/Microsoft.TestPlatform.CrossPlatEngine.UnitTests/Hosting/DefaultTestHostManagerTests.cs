@@ -62,8 +62,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
 
-            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<Process, string>>())).
-                Callback<string, string, string, Action<Process, string>>((var1, var2, var3, errorCallback) =>
+            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<Process, string>>())).
+                Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>((var1, var2, var3, dictionary, errorCallback) =>
                 {
                     var process = Process.GetCurrentProcess();
 
@@ -163,7 +163,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
-            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Action<Process, string>>())).
+            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<Process, string>>())).
                 Returns(Process.GetCurrentProcess());
 
             var testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
