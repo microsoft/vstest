@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 {
     using System;
     using System.Diagnostics;
+    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
 
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <param name="errorCallback"></param>
         /// <returns>The process spawned.</returns>
         /// <exception cref="Exception">Throws any exception that could result as part of the launch.</exception>
-        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process, string> errorCallback)
+        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<Process, string> errorCallback)
         {
             var process = new Process();
             try
@@ -38,6 +39,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 process.StartInfo.Arguments = arguments;
                 process.StartInfo.RedirectStandardError = true;
                 process.EnableRaisingEvents = true;
+
+                if (envVariables != null)
+                {
+                    foreach (var kvp in envVariables)
+                    {
+                        process.StartInfo.Environment.Add(kvp.Key, kvp.Value);
+                    }
+                }
 
                 if (errorCallback != null)
                 {

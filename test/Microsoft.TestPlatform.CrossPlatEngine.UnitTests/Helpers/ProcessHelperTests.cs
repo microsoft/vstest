@@ -111,9 +111,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         private class TestableTestHostManager : DefaultTestHostManager
         {
             public TestableTestHostManager(
-                Architecture architecture, 
-                Framework framework, 
-                IProcessHelper processHelper, 
+                Architecture architecture,
+                Framework framework,
+                IProcessHelper processHelper,
                 bool shared,
                 int errorLength) : base(architecture, framework, processHelper, shared)
             {
@@ -150,7 +150,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 throw new NotImplementedException();
             }
 
-            public Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process, string> errorCallback)
+            public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<Process, string> errorCallback)
             {
                 var process = Process.GetCurrentProcess();
 
@@ -158,7 +158,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 errorCallback(process, this.ErrorMessage);
                 errorCallback(process, this.ErrorMessage);
                 errorCallback(process, this.ErrorMessage);
-                
+
                 return process;
             }
 

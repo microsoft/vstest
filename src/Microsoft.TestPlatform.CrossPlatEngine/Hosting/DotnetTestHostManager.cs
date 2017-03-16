@@ -386,6 +386,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     defaultTestHostStartInfo.FileName,
                     defaultTestHostStartInfo.Arguments,
                     defaultTestHostStartInfo.WorkingDirectory,
+                    defaultTestHostStartInfo.EnvironmentVariables,
                     defaultTestHostStartInfo.ErrorReceivedCallback).Id;
         }
     }
