@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestCleanup]
         public void Cleanup()
         {
-            Directory.Delete(resultsDir, true);
+            Directory.Delete(this.resultsDir, true);
         }
 
         [CustomDataTestMethod]
@@ -37,42 +37,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = GetRunsettingsFilePath();
+            string runSettings = this.GetRunsettingsFilePath();
+            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
             this.VaildateDataCollectorOutput();
         }
 
-        private string GetRunsettingsFilePath()
-        {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
-            var dataCollectionAttributes = new Dictionary<string, string>();
-
-            dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
-            dataCollectionAttributes.Add("uri", "my://sample/datacollector");
-            var codebase = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
-                Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
-                "bin",
-                this.testEnvironment.BuildConfiguration,
-                this.testEnvironment.RunnerFramework,
-                "OutOfProcDataCollector.dll");
-
-            var outOfProcAssemblyPath = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll");
-
-            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(outOfProcAssemblyPath)));
-            dataCollectionAttributes.Add("codebase", codebase);
-            CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
-            return runsettingsPath;
-        }
-
-        public static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
+        private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
         {
             var doc = new XmlDocument();
             var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
@@ -98,7 +74,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        public void VaildateDataCollectorOutput()
+        private void VaildateDataCollectorOutput()
         {
             // Output of datacollection attachment.
             this.StdOutputContains("filename.txt");
@@ -110,8 +86,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
 
             // Verify attachments
-            bool isTestRunLevelAttachmentFound = false;
-            int testCaseLevelAttachmentsCount = 0;
+            var isTestRunLevelAttachmentFound = false;
+            var testCaseLevelAttachmentsCount = 0;
+            var diaglogsFileCount = 0;
 
             var resultFiles = Directory.GetFiles(this.resultsDir, "*.txt", SearchOption.AllDirectories);
 
@@ -128,10 +105,41 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 {
                     testCaseLevelAttachmentsCount++;
                 }
+
+                if (file.Contains("diaglog"))
+                {
+                    diaglogsFileCount++;
+                }
             }
 
             Assert.IsTrue(isTestRunLevelAttachmentFound);
             Assert.AreEqual(3, testCaseLevelAttachmentsCount);
+            Assert.AreEqual(3, diaglogsFileCount);
+        }
+
+        private string GetRunsettingsFilePath()
+        {
+            var runsettingsPath = Path.Combine(
+                Path.GetTempPath(),
+                "test_" + Guid.NewGuid() + ".runsettings");
+            var dataCollectionAttributes = new Dictionary<string, string>();
+
+            dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
+            dataCollectionAttributes.Add("uri", "my://sample/datacollector");
+            var codebase = Path.Combine(
+                this.testEnvironment.TestAssetsPath,
+                Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
+                "bin",
+                this.testEnvironment.BuildConfiguration,
+                this.testEnvironment.RunnerFramework,
+                "OutOfProcDataCollector.dll");
+
+            var outOfProcAssemblyPath = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll");
+
+            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(outOfProcAssemblyPath)));
+            dataCollectionAttributes.Add("codebase", codebase);
+            CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
+            return runsettingsPath;
         }
     }
 }
