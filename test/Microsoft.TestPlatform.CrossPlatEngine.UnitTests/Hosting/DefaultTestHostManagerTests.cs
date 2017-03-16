@@ -116,7 +116,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
             var mockProcessHelper = new TestableProcessHelper();
-            
+
             var testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, mockProcessHelper, true);
             var startInfo = testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
@@ -127,7 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 processId.Wait();
             }
             catch (AggregateException) { }
-            
+
             Assert.AreEqual(Process.GetCurrentProcess().Id, processId.Result);
         }
 
@@ -157,7 +157,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 pid.Wait(new CancellationTokenSource(3000).Token);
             }
             catch (Exception) { }
-            
+
             mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
             Assert.AreEqual(currentProcess.Id, pid.Result);
         }
@@ -185,7 +185,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 throw new NotImplementedException();
             }
 
-            public Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process, string> errorCallback, IDictionary<string,string> environmentVariables)
+            public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<Process, string> errorCallback)
             {
                 return Process.GetCurrentProcess();
             }

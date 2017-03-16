@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Callback on process exit
         /// </summary>
-        private Action<Process, string> ErrorReceivedCallback => ((process, data) => 
+        private Action<Process, string> ErrorReceivedCallback => ((process, data) =>
         {
             if (data != null)
             {
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), process.ExitCode));
             }
         });
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
@@ -148,15 +148,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
                 EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
 
-            if (this.customTestHostLauncher == null)
-            {
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, this.ErrorReceivedCallback, testHostStartInfo.EnvironmentVariables);
-            }
-            else
-            {
-                int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
-                this.testHostProcess = Process.GetProcessById(processId);
-            }
+                if (this.customTestHostLauncher == null)
+                {
+                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback);
+                }
+                else
+                {
+                    int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
+                    this.testHostProcess = Process.GetProcessById(processId);
+                }
 
             }
             catch (OperationCanceledException ex)

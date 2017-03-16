@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <param name="errorCallback"></param>
         /// <returns>The process spawned.</returns>
         /// <exception cref="Exception">Throws any exception that could result as part of the launch.</exception>
-        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process, string> errorCallback, IDictionary<string, string> envVariables)
+        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<Process, string> errorCallback)
         {
             var process = new Process();
             try
@@ -42,10 +42,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
                 if (envVariables != null)
                 {
-                    var readonlyEnvVar = process.StartInfo.Environment;
                     foreach (var kvp in envVariables)
                     {
-                        readonlyEnvVar.Add(kvp.Key, kvp.Value);
+                        process.StartInfo.Environment.Add(kvp.Key, kvp.Value);
                     }
                 }
 
