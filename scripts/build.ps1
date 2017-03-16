@@ -208,7 +208,7 @@ function Publish-Package
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
-    #Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     # Publish testhost
     

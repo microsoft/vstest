@@ -8,15 +8,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.IO;
     using System.Xml;
 
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class DataCollectionTests : AcceptanceTestBase
     {
-        private string resultsDir;
+        private readonly string resultsDir;
 
         public DataCollectionTests()
         {
@@ -26,7 +26,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [TestCleanup]
         public void Cleanup()
         {
-            Directory.Delete(resultsDir, true);
+            if (Directory.Exists(this.resultsDir))
+            {
+                Directory.Delete(this.resultsDir, true);
+            }
         }
 
         [CustomDataTestMethod]
@@ -34,13 +37,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [NETCORETargetFramework]
         public void ExecuteTestsWithDataCollection(string runnerFramework, string targetFramework, string targetRuntime)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = GetRunsettingsFilePath();
+            string runSettings = this.GetRunsettingsFilePath();
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{this.resultsDir}");
             this.InvokeVsTest(arguments);
 
             this.ValidateSummaryStatus(1, 1, 1);
@@ -56,17 +59,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
             dataCollectionAttributes.Add("uri", "my://sample/datacollector");
-            var codebase = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
-                Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
-                "bin",
-                this.testEnvironment.BuildConfiguration,
-                this.testEnvironment.RunnerFramework,
-                "OutOfProcDataCollector.dll");
+            //var codebase = Path.Combine(
+            //    this.testEnvironment.TestAssetsPath,
+            //    Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
+            //    "bin",
+            //    this.testEnvironment.BuildConfiguration,
+            //    this.testEnvironment.RunnerFramework,
+            //    "OutOfProcDataCollector.dll");
 
-            var outOfProcAssemblyPath = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll");
+            // Data collection asset should be same as the RunnerFramework (instead of TargetFramework)
+            var codebase = this.testEnvironment.GetTestAsset("OutOfProcDataCollector.dll")
+                            .Replace(this.testEnvironment.TargetFramework, this.testEnvironment.RunnerFramework);
 
-            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(outOfProcAssemblyPath)));
+            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(codebase)));
             dataCollectionAttributes.Add("codebase", codebase);
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;
