@@ -50,8 +50,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Callback on process exit
         /// </summary>
-        private Action<Process, string> ErrorReceivedCallback => ((process, data) => 
+        private Action<Process, string> ErrorReceivedCallback => ((process, data) =>
         {
+            var exitCode = 0;
             if (!string.IsNullOrEmpty(data))
             {
                 // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
@@ -72,16 +73,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
 
                 this.testHostProcessStdError.Append(data);
-                this.messageLogger.SendMessage(TestMessageLevel.Warning, this.testHostProcessStdError.ToString());
             }
 
-            if (process.HasExited && process.ExitCode != 0)
+            if (processHelper.TryGetExitCode(process, out exitCode) && exitCode != 0)
             {
                 EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), process.ExitCode));
+                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode));
             }
         });
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+        public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
             return await Task.Run(() => LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
         }
@@ -151,7 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 if (this.customTestHostLauncher == null)
                 {
-                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, this.ErrorReceivedCallback);
+                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback);
                 }
                 else
                 {

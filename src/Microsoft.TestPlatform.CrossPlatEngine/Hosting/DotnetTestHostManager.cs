@@ -63,8 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Callback on process exit
         /// </summary>
-        private Action<Process, string> ErrorReceivedCallback => ((process, data) =>
+        public Action<Process, string> ErrorReceivedCallback => ((process, data) =>
         {
+            var exitCode = 0;
             if (!string.IsNullOrEmpty(data))
             {
                 // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
@@ -85,13 +86,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
 
                 this.testHostProcessStdError.Append(data);
-                this.messageLogger.SendMessage(TestMessageLevel.Warning, this.testHostProcessStdError.ToString());
             }
 
-            if (process.HasExited && process.ExitCode != 0)
+            if (processHelper.TryGetExitCode(process, out exitCode) && exitCode != 0)
             {
                 EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), process.ExitCode));
+                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode));
             }
         });
 
@@ -380,7 +380,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.processHelper = processHelper;
         }
 
-        public void SetErrorCallBack(Action<Process, string> errorCallback)
+        public virtual void SetErrorCallBack(Action<Process, string> errorCallback)
         {
             this.errorCallback = errorCallback;
         }
@@ -395,6 +395,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     defaultTestHostStartInfo.FileName,
                     defaultTestHostStartInfo.Arguments,
                     defaultTestHostStartInfo.WorkingDirectory,
+                    defaultTestHostStartInfo.EnvironmentVariables,
                     this.errorCallback).Id;
         }
     }

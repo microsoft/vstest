@@ -6,6 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.IO;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
@@ -24,6 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     internal class ProxyDataCollectionManager : IProxyDataCollectionManager
     {
         private const string PortOption = "--port";
+        private const string DiagOption = "--diag";
 
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
@@ -216,7 +219,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             commandlineArguments.Add(PortOption);
             commandlineArguments.Add(portNumber.ToString());
 
+            if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+            {
+                commandlineArguments.Add(DiagOption);
+                commandlineArguments.Add(this.GetTimestampedLogFile(EqtTrace.LogFile));
+            }
+
             return commandlineArguments;
+        }
+
+        private string GetTimestampedLogFile(string logFile)
+        {
+            return Path.ChangeExtension(logFile,
+                string.Format("datacollector.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                    Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile)));
         }
     }
 }
