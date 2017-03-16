@@ -6,11 +6,6 @@ namespace Microsoft.TestPlatform.SmokeTests
     using System.IO;
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-#if !NET46
-    using System.Runtime.Loader;
-#else
-    using System.Reflection;
-#endif
 
     [TestClass]
     public class DataCollectorTests : IntegrationTestBase
@@ -45,11 +40,7 @@ namespace Microsoft.TestPlatform.SmokeTests
         {
             var runSettings = Path.Combine(Path.GetDirectoryName(testEnvironment.GetTestAsset(DataCollectorTests.InProDataCollectorTestProject)), "runsettingstest.runsettings");
             var inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll");
-#if !NET46
-            var assemblyName = AssemblyLoadContext.GetAssemblyName(inprocasm);
-#else
-            var assemblyName = AssemblyName.GetAssemblyName(inprocasm);
-#endif
+
             var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>
@@ -62,7 +53,7 @@ namespace Microsoft.TestPlatform.SmokeTests
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            fileContents = string.Format(fileContents, assemblyName, inprocasm);
+            fileContents = string.Format(fileContents, AssemblyUtility.GetAssemblyName(inprocasm), inprocasm);
             File.WriteAllText(runSettings, fileContents);
 
             return runSettings;

@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
 
     /// <summary>
@@ -16,10 +17,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// </summary>
         /// <param name="processPath">The full file name of the process.</param>
         /// <param name="arguments">The command-line arguments.</param>
+        /// <param name="environmentVariables">Environment variables to set while bootstrapping the process.</param>
         /// <param name="workingDirectory">The working directory for this process.</param>
         /// <param name="exitCallback">Call back for on process exit</param>
         /// <returns>The process created.</returns>
-        Process LaunchProcess(string processPath, string arguments, string workingDirectory, Action<Process, string> errorCallback);
+        Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<Process, string> errorCallback);
 
         /// <summary>
         /// Gets the current process file path.

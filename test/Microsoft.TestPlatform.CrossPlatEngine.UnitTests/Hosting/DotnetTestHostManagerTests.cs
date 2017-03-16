@@ -10,6 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -21,7 +22,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -446,14 +446,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             var startInfo = new TestProcessStartInfo { FileName = "testhost.exe", Arguments = "a1", WorkingDirectory = "w" };
             var currentProcess = Process.GetCurrentProcess();
             var mockProcessHelper = new Mock<IProcessHelper>();
-            mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), null))
+            mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), null))
                 .Returns(currentProcess);
             var hostLauncher = new DefaultTestHostLauncher(mockProcessHelper.Object);
 
             var processId = hostLauncher.LaunchTestHost(startInfo);
 
             Assert.AreEqual(currentProcess.Id, processId);
-            mockProcessHelper.Verify(ph => ph.LaunchProcess("testhost.exe", "a1", "w", null), Times.Once);
+            mockProcessHelper.Verify(ph => ph.LaunchProcess("testhost.exe", "a1", "w", null, null), Times.Once);
         }
     }
 }
