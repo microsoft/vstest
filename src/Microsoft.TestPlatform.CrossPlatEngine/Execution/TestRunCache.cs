@@ -10,8 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using System.Linq;
     using System.Threading;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     
     /// <summary>
     /// Maintains a cache of last 'n' test results and maintains stats for the complete run.

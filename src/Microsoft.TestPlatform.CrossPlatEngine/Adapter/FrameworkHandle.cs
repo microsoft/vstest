@@ -6,8 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     using System;
     using System.Collections.Generic;
 
-    using Execution;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -49,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         /// <param name="testRunCache"> The test run cache. </param>
         /// <param name="testExecutionContext"> The test execution context. </param>
         /// <param name="testRunEventsHandler">TestRun Events Handler</param>
-        public FrameworkHandle(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache, 
+        public FrameworkHandle(ITestEventsHandler testCaseEventsHandler, ITestRunCache testRunCache,
             TestExecutionContext testExecutionContext, ITestRunEventsHandler testRunEventsHandler)
             : base(testCaseEventsHandler, testRunCache)
         {

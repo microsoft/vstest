@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             Dictionary<string, IEnumerable<string>> adapterSourceMap,
             string runSettings,
             TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler testCaseEventsHandler,
+            ITestEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler runEventsHandler)
         {
             this.testRunEventsHandler = runEventsHandler;
@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             IEnumerable<TestCase> tests,
             string runSettings,
             TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler testCaseEventsHandler,
+            ITestEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler runEventsHandler)
         {
             this.testRunEventsHandler = runEventsHandler;

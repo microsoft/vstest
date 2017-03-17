@@ -5,6 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
@@ -121,7 +122,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void UpdateTestProcessStartInfoShouldUpdateDataCollectionPortArg()
         {
-            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(DataCollectionParameters.CreateDefaultParameterInstance());
+            this.mockDataCollectionManager.Setup(x => x.BeforeTestRunStart(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<ITestMessageEventHandler>())).Returns(new DataCollectionParameters(null, 0));
 
             var testProcessStartInfo = new TestProcessStartInfo();
             testProcessStartInfo.Arguments = string.Empty;

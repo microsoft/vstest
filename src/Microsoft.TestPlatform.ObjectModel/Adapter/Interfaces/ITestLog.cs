@@ -19,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         /// test result to the framework when the test(s) is canceled. </exception>        
         void RecordResult(TestResult testResult);
 
-
         /// <summary>
         /// Notify the framework about starting of the test case. 
         /// Framework sends this event to data collectors enabled in the run. If no data collector is enabled, then the event is ignored. 
@@ -35,12 +34,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         /// <param name="outcome">outcome of the test case.</param>
         void RecordEnd(TestCase testCase, TestOutcome outcome);
 
-
         /// <summary>
         /// Notify the framework about run level attachments.
         /// </summary>
         /// <param name="attachmentSets">attachments produced in this run.</param>
         void RecordAttachments(IList<AttachmentSet> attachmentSets);
-
     }
 }

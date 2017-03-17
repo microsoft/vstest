@@ -209,8 +209,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     reader.Name));
                     }
                 }
+
                 reader.ReadEndElement();
             }
+
             return settings;
         }
 

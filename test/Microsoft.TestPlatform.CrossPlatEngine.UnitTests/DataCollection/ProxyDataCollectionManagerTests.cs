@@ -88,7 +88,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void BeforeTestRunStartShouldReturnDataCollectorParameters()
         {
-            BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
+            var res = new DataCollectionParameters(new Dictionary<string, string>(), 123);
             this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
 
             var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
@@ -111,9 +111,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, mockRunEventsHandler.Object);
 
             mockRunEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, "Exception of type 'System.Exception' was thrown."), Times.Once);
-            Assert.AreEqual(result.EnvironmentVariables, null);
-            Assert.AreEqual(result.AreTestCaseLevelEventsRequired, false);
-            Assert.AreEqual(result.DataCollectionEventsPort, 0);
+            Assert.AreEqual(result, null);
         }
 
         [TestMethod]

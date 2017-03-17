@@ -88,10 +88,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc/>
-        public BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler)
+        public DataCollectionParameters SendBeforeTestRunStartAndGetResult(string settingsXml, ITestMessageEventHandler runEventsHandler)
         {
             var isDataCollectionStarted = false;
-            BeforeTestRunStartResult result = null;
+            DataCollectionParameters result = null;
 
             this.communicationManager.SendMessage(MessageType.BeforeTestRunStart, settingsXml);
 
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 else if (message.MessageType == MessageType.BeforeTestRunStartResult)
                 {
                     isDataCollectionStarted = true;
-                    result = this.dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
+                    result = this.dataSerializer.DeserializePayload<DataCollectionParameters>(message);
                 }
             }
 

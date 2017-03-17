@@ -4,13 +4,11 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -185,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                                 this.cancellationTokenSource.Token);
                         }
 
-                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, testCaseEventsPort));
+                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new DataCollectionParameters(envVariables, testCaseEventsPort));
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : DataCollection started.");
