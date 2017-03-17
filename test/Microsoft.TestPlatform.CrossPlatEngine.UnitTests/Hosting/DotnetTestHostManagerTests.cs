@@ -33,15 +33,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
         private readonly Mock<IFileHelper> mockFileHelper;
 
-        private readonly Mock<IMessageLogger> mockLogger;
         private readonly TestRunnerConnectionInfo defaultConnectionInfo;
 
         private readonly string[] testSource = { "test.dll" };
-        private readonly string defaultSourcePath;
+
         private readonly string defaultTestHostPath;
         private readonly TestProcessStartInfo defaultTestProcessStartInfo;
 
-        private TestableDotnetTestHostManager dotnetHostManager;
+        private readonly TestableDotnetTestHostManager dotnetHostManager;
         
         private string errorMessage;
         private int errorLength = 20;
@@ -51,16 +50,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockTestHostLauncher = new Mock<ITestHostLauncher>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockFileHelper = new Mock<IFileHelper>();
-            this.mockLogger = new Mock<IMessageLogger>();
+            Mock<IMessageLogger> mockLogger = new Mock<IMessageLogger>();
             this.defaultConnectionInfo = default(TestRunnerConnectionInfo);
-            this.defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
             this.defaultTestHostPath = @"\tmp\testhost.dll";
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
                                          new DotnetHostHelper(this.mockFileHelper.Object), 
                                          this.errorLength);
-            this.dotnetHostManager.Initialize(this.mockLogger.Object);
+            this.dotnetHostManager.Initialize(mockLogger.Object);
 
             this.dotnetHostManager.HostExited += this.TestHostManagerHostExited;
 
@@ -69,14 +68,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
             this.mockFileHelper.Setup(ph => ph.Exists(this.defaultTestHostPath)).Returns(true);
 
-            this.defaultTestProcessStartInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { this.defaultSourcePath }, null, this.defaultConnectionInfo);
+            this.defaultTestProcessStartInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { defaultSourcePath }, null, this.defaultConnectionInfo);
         }
 
         public void ErrorCallBackTestHelper(string errorMessage, int exitCode)
         {
-            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<Process, string>>())).
-                Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>((var1, var2, var3, dictionary, errorCallback) =>
-                {
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
+                    (var1, var2, var3, dictionary, errorCallback) =>
+                        {
                     var process = Process.GetCurrentProcess();
 
                     errorCallback(process, errorMessage);
@@ -179,7 +186,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             Assert.IsFalse(startInfo.Arguments.Contains("--depsfile \"test.deps.json\""));
         }
-
 
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
@@ -526,7 +532,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
             : base(processHelper, fileHelper, dotnetTestHostHelper)
         {
-            base.ErrorLength = errorLength;
+            this.ErrorLength = errorLength;
         }
     }
 }

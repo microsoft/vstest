@@ -40,6 +40,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private StringBuilder testHostProcessStdError;
         private IMessageLogger messageLogger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
+        /// </summary>
+        /// <param name="architecture">Platform architecture of the host process.</param>
+        /// <param name="framework">Runtime framework for the host process.</param>
+        /// <param name="shared">can host process be shared for multiple sources.</param>
+        public DefaultTestHostManager(Architecture architecture, Framework framework, bool shared)
+            : this(architecture, framework, new ProcessHelper(), shared)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
+        /// </summary>
+        /// <param name="architecture">Platform architecture of the host process.</param>
+        /// <param name="framework">Runtime framework for the host process.</param>
+        /// <param name="processHelper">Process helper instance.</param>
+        /// <param name="shared">Share the manager for multiple sources or not</param>
+        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper, bool shared)
+        {
+            this.architecture = architecture;
+            this.framework = framework;
+            this.processHelper = processHelper;
+            this.testHostProcess = null;
+
+            this.Shared = shared;
+        }
+
         public event EventHandler<HostProviderEventArgs> HostLaunched;
 
         public event EventHandler<HostProviderEventArgs> HostExited;
@@ -50,13 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
         /// </summary>
-        public IDictionary<string, string> Properties
-        {
-            get
-            {
-                return new Dictionary<string, string>();
-            }
-        }
+        public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
         protected int ErrorLength { get; set; } = 1000;
 
@@ -97,34 +119,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         });
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
-        /// </summary>
-        /// <param name="architecture">Platform architecture of the host process.</param>
-        /// <param name="framework">Runtime framework for the host process.</param>
-        /// <param name="shared">can host process be shared for multiple sources.</param>
-        public DefaultTestHostManager(Architecture architecture, Framework framework, bool shared)
-            : this(architecture, framework, new ProcessHelper(), shared)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
-        /// </summary>
-        /// <param name="architecture">Platform architecture of the host process.</param>
-        /// <param name="framework">Runtime framework for the host process.</param>
-        /// <param name="processHelper">Process helper instance.</param>
-        /// <param name="shared">Share the manager for multiple sources or not</param>
-        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper, bool shared)
-        {
-            this.architecture = architecture;
-            this.framework = framework;
-            this.processHelper = processHelper;
-            this.testHostProcess = null;
-
-            this.Shared = shared;
-        }
-
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
@@ -132,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+        public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
             return await Task.Run(() => this.LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
         }

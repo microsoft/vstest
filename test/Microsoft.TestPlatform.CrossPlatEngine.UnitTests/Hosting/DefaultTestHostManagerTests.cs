@@ -293,9 +293,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 int errorLength,
                 IMessageLogger logger) : base(architecture, framework, processHelper, shared)
             {
-                base.TimeOut = 30000;
-                base.ErrorLength = errorLength;
-                base.Initialize(logger);
+                this.TimeOut = 30000;
+                this.ErrorLength = errorLength;
+                this.Initialize(logger);
             }
         }
     }
