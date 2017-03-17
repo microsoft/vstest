@@ -71,30 +71,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.defaultTestProcessStartInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { defaultSourcePath }, null, this.defaultConnectionInfo);
         }
 
-        public void ErrorCallBackTestHelper(string errorMessage, int exitCode)
-        {
-            this.mockProcessHelper.Setup(
-                    ph =>
-                        ph.LaunchProcess(
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
-                    (var1, var2, var3, dictionary, errorCallback) =>
-                        {
-                    var process = Process.GetCurrentProcess();
-
-                    errorCallback(process, errorMessage);
-                    errorCallback(process, errorMessage);
-                    errorCallback(process, errorMessage);
-                    errorCallback(process, errorMessage);
-                }).Returns(Process.GetCurrentProcess());
-
-            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
-        }
-
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldThrowIfSourceIsNull()
         {
@@ -489,9 +465,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task DotNetCoreNoErrorMessageIfDataIsNullAsync()
+        [DataRow(null)]
+        [DataRow("")]
+        public async Task DotNetCoreErrorReceivedCallbackShouldNotLogNullOrEmptyData(string errorData)
         {
-            this.ErrorCallBackTestHelper(null, -1);
+            this.ErrorCallBackTestHelper(errorData, -1);
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
@@ -499,10 +477,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task DotNetCoreNoErrorMessageIfDataIsEmptyAsync()
+        public async Task DotNetCoreProcessExitedButNoErrorMessageIfNoDataWritten()
         {
             string errorData = string.Empty;
-            this.ErrorCallBackTestHelper(errorData, -1);
+            this.ErrorCallBackTestHelper(errorData, 0);
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
@@ -516,6 +494,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 this.errorMessage = e.Data;
             }
         }
+
+        private void ErrorCallBackTestHelper(string errorMessage, int exitCode)
+        {
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
+                    (var1, var2, var3, dictionary, errorCallback) =>
+                    {
+                        var process = Process.GetCurrentProcess();
+
+                        errorCallback(process, errorMessage);
+                        errorCallback(process, errorMessage);
+                        errorCallback(process, errorMessage);
+                        errorCallback(process, errorMessage);
+                    }).Returns(Process.GetCurrentProcess());
+
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+        }
+
 
         private TestProcessStartInfo GetDefaultStartInfo()
         {

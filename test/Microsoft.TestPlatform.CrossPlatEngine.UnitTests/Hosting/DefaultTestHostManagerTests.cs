@@ -45,42 +45,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
 
-        public void ErrorCallBackTestHelper(string errorMessage, int exitCode)
-        {
-            this.testableTestHostManager = new TestableTestHostManager(
-                Architecture.X64,
-                Framework.DefaultFramework,
-                this.mockProcessHelper.Object,
-                true,
-                this.errorLength,
-                this.mockMessageLogger.Object);
-
-            this.testableTestHostManager.HostExited += this.TestHostManagerHostExited;
-            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
-
-            this.mockProcessHelper.Setup(
-                    ph =>
-                        ph.LaunchProcess(
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<string>(),
-                            It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
-                    (var1, var2, var3, dictionary, errorCallback) =>
-                        {
-                    var process = Process.GetCurrentProcess();
-
-                    errorCallback(process, errorMessage);
-                    errorCallback(process, errorMessage);
-                    errorCallback(process, errorMessage);
-                    errorCallback(process, errorMessage);
-                }).Returns(Process.GetCurrentProcess());
-
-            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
-        }
-
         [TestMethod]
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
@@ -250,9 +214,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task NoErrorMessageIfDataIsNullAsync()
+        [DataRow(null)]
+        [DataRow("")]
+        public async Task ErrorReceivedCallbackShouldNotLogNullOrEmptyData(string errorData)
         {
-            this.ErrorCallBackTestHelper(null, -1);
+            this.ErrorCallBackTestHelper(errorData, -1);
 
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
@@ -260,10 +226,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task NoErrorMessageIfDataIsEmpty()
+        public async Task ProcessExitedButNoErrorMessageIfNoDataWritten()
         {
             string errorData = string.Empty;
-            this.ErrorCallBackTestHelper(errorData, -1);
+            this.ErrorCallBackTestHelper(errorData, 0);
 
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
@@ -276,6 +242,42 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             {
                 this.errorMessage = e.Data;
             }
+        }
+
+        private void ErrorCallBackTestHelper(string errorMessage, int exitCode)
+        {
+            this.testableTestHostManager = new TestableTestHostManager(
+                Architecture.X64,
+                Framework.DefaultFramework,
+                this.mockProcessHelper.Object,
+                true,
+                this.errorLength,
+                this.mockMessageLogger.Object);
+
+            this.testableTestHostManager.HostExited += this.TestHostManagerHostExited;
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
+                    (var1, var2, var3, dictionary, errorCallback) =>
+                    {
+                        var process = Process.GetCurrentProcess();
+
+                        errorCallback(process, errorMessage);
+                        errorCallback(process, errorMessage);
+                        errorCallback(process, errorMessage);
+                        errorCallback(process, errorMessage);
+                    }).Returns(Process.GetCurrentProcess());
+
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
         }
 
         private TestProcessStartInfo GetDefaultStartInfo()
