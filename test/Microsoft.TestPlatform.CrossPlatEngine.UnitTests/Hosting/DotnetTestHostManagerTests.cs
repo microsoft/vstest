@@ -482,9 +482,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             string errorData = string.Empty;
             this.ErrorCallBackTestHelper(errorData, 0);
 
+            // overrite event listner
+            this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
+
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
             Assert.AreEqual(this.errorMessage, string.Empty);
+        }
+
+        private void DotnetHostManagerHostExited(object sender, HostProviderEventArgs e)
+        {
+            this.errorMessage = e.Data;
         }
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)

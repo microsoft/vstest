@@ -231,9 +231,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             string errorData = string.Empty;
             this.ErrorCallBackTestHelper(errorData, 0);
 
+            // overrite event listner
+            this.testableTestHostManager.HostExited += this.TestableTestHostManagerHostExited;
+
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
             Assert.AreEqual(this.errorMessage, string.Empty);
+        }
+
+        private void TestableTestHostManagerHostExited(object sender, HostProviderEventArgs e)
+        {
+            this.errorMessage = e.Data;
         }
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
