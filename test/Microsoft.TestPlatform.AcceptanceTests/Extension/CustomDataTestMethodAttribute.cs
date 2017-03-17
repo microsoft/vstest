@@ -9,6 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System.Text;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.TestPlatform.TestUtilities;
 
     /// <summary>
     /// The custom data test method attribute.
@@ -89,8 +90,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public NET46TargetFramework()
         {
             this.DataRows = new List<DataRowAttribute>(2);
-            this.DataRows.Add(new DataRowAttribute(AcceptanceTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(AcceptanceTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
         }
 
         /// <summary>
@@ -110,10 +111,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public NETCORETargetFramework()
         {
             this.DataRows = new List<DataRowAttribute>(4);
-            this.DataRows.Add(new DataRowAttribute(AcceptanceTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(AcceptanceTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(AcceptanceTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(AcceptanceTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
         }
 
         /// <summary>

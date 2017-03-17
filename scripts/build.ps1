@@ -73,6 +73,7 @@ Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
 $TPB_TargetFramework = "net46"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
+$TPB_TargetFrameworkCore20 = "netcoreapp2.0"
 $TPB_Configuration = $Configuration
 $TPB_TargetRuntime = $TargetRuntime
 # Version suffix is empty for RTM releases
@@ -108,7 +109,7 @@ function Install-DotNetCli
 {
     $timer = Start-Timer
     Write-Log "Install-DotNetCli: Get dotnet-install.ps1 script..."
-    $dotnetInstallRemoteScript = "https://raw.githubusercontent.com/dotnet/cli/rel/1.0.0/scripts/obtain/dotnet-install.ps1"
+    $dotnetInstallRemoteScript = "https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.ps1"
     $dotnetInstallScript = Join-Path $env:TP_TOOLS_DIR "dotnet-install.ps1"
     if (-not (Test-Path $env:TP_TOOLS_DIR)) {
         New-Item $env:TP_TOOLS_DIR -Type Directory | Out-Null
@@ -131,11 +132,11 @@ function Install-DotNetCli
     Write-Log "Install-DotNetCli: Get the latest dotnet cli toolset..."
     $dotnetInstallPath = Join-Path $env:TP_TOOLS_DIR "dotnet"
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
+    & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
     # Uncomment to pull in additional shared frameworks.
     # This is added to get netcoreapp1.1 shared components.
-    #& $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.0' -Channel 'release/1.1.0'
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.1' -Channel 'release/1.1.0'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
@@ -184,6 +185,7 @@ function Publish-Package
     $dotnetExe = Get-DotNetPath
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
+    $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
@@ -196,17 +198,17 @@ function Publish-Package
 
 
     Publish-PackageInternal $packageProject $TPB_TargetFramework $fullCLRPackageDir
-    Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-PackageInternal $packageProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     # Publish vstest.console and datacollector exclusively because *.config/*.deps.json file is not getting publish when we are publishing aforementioned project through dependency.
     
     Write-Log "Package: Publish src\vstest.console\vstest.console.csproj"
     Publish-PackageInternal $vstestConsoleProject $TPB_TargetFramework $fullCLRPackageDir
-    Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-PackageInternal $vstestConsoleProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     Write-Log "Package: Publish src\datacollector\datacollector.csproj"
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullCLRPackageDir
-    Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore $coreCLRPackageDir
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFrameworkCore20 $coreCLR20PackageDir
 
     # Publish testhost
     
@@ -222,7 +224,7 @@ function Publish-Package
 
     # Copy over the Full CLR built testhost package assemblies to the Core CLR package folder.
     $netFull_Dir = "TestHost"
-    $fullDestDir = Join-Path $coreCLRPackageDir $netFull_Dir
+    $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
 
@@ -235,12 +237,12 @@ function Publish-Package
     $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
     Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
-    Copy-Item $platformAbstractionNetCore\* $coreCLRPackageDir -Force
+    Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
     
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
     $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
-    $coreCLRExtensionsDir = Join-Path $coreCLRPackageDir $extensions_Dir
+    $coreCLRExtensionsDir = Join-Path $coreCLR20PackageDir $extensions_Dir
     # Create an extensions directory.
     New-Item -ItemType directory -Path $fullCLRExtensionsDir -Force | Out-Null
     New-Item -ItemType directory -Path $coreCLRExtensionsDir -Force | Out-Null
@@ -252,8 +254,8 @@ function Publish-Package
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
         
-        Write-Verbose "Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force"
-        Move-Item $coreCLRPackageDir\$file $coreCLRExtensionsDir -Force
+        Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
+        Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
@@ -334,6 +336,7 @@ function Create-NugetPackages
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
 
+    # package them from stagingDir
     foreach ($file in $nuspecFiles) {
         $additionalArgs = ""
         if ($skipAnalysis -contains $file) {
@@ -341,7 +344,7 @@ function Create-NugetPackages
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20 $additionalArgs
     }
 
     Write-Log "Create-NugetPackages: Complete. {$(Get-ElapsedTime($timer))}"
@@ -406,6 +409,11 @@ function Get-FullCLRPackageDirectory
 function Get-CoreCLRPackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore")
+}
+
+function Get-CoreCLR20PackageDirectory
+{
+    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20")
 }
 
 function Start-Timer
@@ -511,7 +519,7 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp1.0"), ("netcoreapp1.0", "netcoreapp1.0"))
+    $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.

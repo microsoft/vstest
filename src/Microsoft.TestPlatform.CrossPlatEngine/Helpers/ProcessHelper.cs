@@ -4,8 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 {
     using System;
-    using System.Diagnostics;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
 
@@ -23,7 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <param name="processPath">The path to the process.</param>
         /// <param name="arguments">Process arguments.</param>
         /// <param name="workingDirectory">Working directory of the process.</param>
-        /// <param name="errorCallback"></param>
+        /// <param name="envVariables">Environment variables for the process.</param>
+        /// <param name="errorCallback">"Monitor Error callback"</param>
         /// <returns>The process spawned.</returns>
         /// <exception cref="Exception">Throws any exception that could result as part of the launch.</exception>
         public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<Process, string> errorCallback)
@@ -52,6 +53,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 {
                     process.ErrorDataReceived += (sender, args) => errorCallback(sender as Process, args.Data);
                 }
+
+                process.Exited += (sender, args) => this.ProcessExited(sender as Process, args);
 
                 EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
                 process.Start();
@@ -98,15 +101,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             return Process.GetProcessById(processId).ProcessName;
         }
 
+        /// <inheritdoc/>
         public bool TryGetExitCode(Process process, out int exitCode)
         {
-            if(process.HasExited == true)
+            if (process.HasExited == true)
             {
                 exitCode = process.ExitCode;
                 return true;
             }
             exitCode = 0;
             return false;
+        }
+
+        private void ProcessExited(Process process, EventArgs e)
+        {
+            // wait for process to flush out error, & out streams
+            process.WaitForExit();
         }
     }
 }

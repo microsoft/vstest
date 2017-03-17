@@ -3,42 +3,34 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using System.Threading.Tasks;
-    using System.Threading;
-    using System;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     [TestClass]
     public class DefaultTestHostManagerTests
     {
+        private readonly TestProcessStartInfo startInfo;        
+        private readonly Mock<ITestRequestSender> mockRequestSender;
+        private readonly Mock<IMessageLogger> mockMessageLogger;
+        private readonly Mock<IProcessHelper> mockProcessHelper;
+
         private DefaultTestHostManager testHostManager;
-        private readonly TestProcessStartInfo startInfo;
-
-        private TestableProxyOperationManager testOperationManager;
-
         private TestableTestHostManager testableTestHostManager;
-
-        private Mock<ITestRequestSender> mockRequestSender;
-        private Mock<IMessageLogger> mockMessageLogger;
-        private Mock<IProcessHelper> mockProcessHelper;
-
-        private int connectionTimeout = 400;
         private int errorLength = 20;
-        
         private string errorMessage;
 
         public DefaultTestHostManagerTests()
@@ -55,16 +47,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
         public void ErrorCallBackTestHelper(string errorMessage, int exitCode)
         {
-            this.testableTestHostManager = new TestableTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, 
-                true, errorLength, this.mockMessageLogger.Object);
+            this.testableTestHostManager = new TestableTestHostManager(
+                Architecture.X64,
+                Framework.DefaultFramework,
+                this.mockProcessHelper.Object,
+                true,
+                this.errorLength,
+                this.mockMessageLogger.Object);
 
-            this.testableTestHostManager.HostExited += TestHostManager_HostExited;
+            this.testableTestHostManager.HostExited += this.TestHostManagerHostExited;
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
 
-            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<Process, string>>())).
-                Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>((var1, var2, var3, dictionary, errorCallback) =>
-                {
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
+                    (var1, var2, var3, dictionary, errorCallback) =>
+                        {
                     var process = Process.GetCurrentProcess();
 
                     errorCallback(process, errorMessage);
@@ -74,14 +79,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
-
-
-            this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.testableTestHostManager, this.connectionTimeout, this.errorLength);
-        }
-
-        private void TestHostManager_HostExited(object sender, HostProviderEventArgs e)
-        {
-            this.errorMessage = e.Data;
         }
 
         [TestMethod]
@@ -163,19 +160,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void LaunchTestHostShouldReturnTestHostProcessId()
         {
-            this.mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), It.IsAny<Action<Process, string>>())).
-                Returns(Process.GetCurrentProcess());
+            this.mockProcessHelper.Setup(
+                ph =>
+                    ph.LaunchProcess(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<Action<Process, string>>())).Returns(Process.GetCurrentProcess());
 
             var testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
             var startInfo = testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
             Task<int> processId = testHostManager.LaunchTestHostAsync(startInfo);
-
-            try
-            {
-                processId.Wait();
-            }
-            catch (AggregateException) { }
+            processId.Wait();
 
             Assert.AreEqual(Process.GetCurrentProcess().Id, processId.Result);
         }
@@ -201,93 +199,88 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
 
             Task<int> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo);
-            try
-            {
-                pid.Wait(new CancellationTokenSource(3000).Token);
-            }
-            catch (Exception) { }
-
+            pid.Wait();
             mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
             Assert.AreEqual(currentProcess.Id, pid.Result);
         }
 
         [TestMethod]
-        public void ErrorMessageShouldBeReadAsynchronously()
+        public async Task ErrorMessageShouldBeReadAsynchronously()
         {
-            string errorData = "Custom Error Strings";            
-            ErrorCallBackTestHelper(errorData, -1);
+            string errorData = "Custom Error Strings";
+            this.ErrorCallBackTestHelper(errorData, -1);
 
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
-            Assert.AreEqual(errorMessage, errorData);
+            Assert.AreEqual(this.errorMessage, errorData);
         }
 
         [TestMethod]
-        public void ErrorMessageShouldBeTruncatedToMatchErrorLength()
+        public async Task ErrorMessageShouldBeTruncatedToMatchErrorLength()
         {
             string errorData = "Long Custom Error Strings";
-            ErrorCallBackTestHelper(errorData, -1);
+            this.ErrorCallBackTestHelper(errorData, -1);
 
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
-            Assert.AreEqual(errorMessage.Length, errorLength);
-            Assert.AreEqual(errorMessage, errorData.Substring(5));
+            Assert.AreEqual(this.errorMessage.Length, this.errorLength);
+            Assert.AreEqual(this.errorMessage, errorData.Substring(5));
         }
 
         [TestMethod]
-        public void ErrorMessageShouldBeTruncatedFromBeginingShouldDisplayTrailingData()
+        public async Task ErrorMessageShouldBeTruncatedFromBeginingShouldDisplayTrailingData()
         {
             string errorData = "Error Strings";
-            ErrorCallBackTestHelper(errorData, -1);
+            this.ErrorCallBackTestHelper(errorData, -1);
 
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
-            Assert.AreEqual(errorMessage, "StringsError Strings");
+            Assert.AreEqual(this.errorMessage, "StringsError Strings");
         }
 
         [TestMethod]
-        public void NoErrorMessageIfExitCodeZero()
-        {
-            string errorData = "";
-            ErrorCallBackTestHelper(errorData, 0);
-
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
-
-            Assert.AreEqual(null, errorMessage);
-        }
-
-        [TestMethod]
-        public void NoErrorMessageIfDataIsNull()
-        {
-            string errorData = null;
-            ErrorCallBackTestHelper(errorData, -1);
-
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
-
-            Assert.AreEqual(errorMessage, "");
-        }
-
-        [TestMethod]
-        public void NoErrorMessageIfDataIsEmpty()
+        public async Task NoErrorMessageIfExitCodeZero()
         {
             string errorData = string.Empty;
-            ErrorCallBackTestHelper(errorData, -1);
+            this.ErrorCallBackTestHelper(errorData, 0);
 
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
-            Assert.AreEqual(errorMessage, "");
+            Assert.AreEqual(null, this.errorMessage);
         }
 
-        private class TestableProxyOperationManager : ProxyOperationManager
+        [TestMethod]
+        public async Task NoErrorMessageIfDataIsNullAsync()
         {
-            public TestableProxyOperationManager(
-                ITestRequestSender requestSender,
-                ITestRuntimeProvider testableTestHostManager,
-                int clientConnectionTimeout,
-                int errorLength) : base(requestSender, testableTestHostManager, clientConnectionTimeout)
+            this.ErrorCallBackTestHelper(null, -1);
+
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+
+            Assert.AreEqual(this.errorMessage, string.Empty);
+        }
+
+        [TestMethod]
+        public async Task NoErrorMessageIfDataIsEmpty()
+        {
+            string errorData = string.Empty;
+            this.ErrorCallBackTestHelper(errorData, -1);
+
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+
+            Assert.AreEqual(this.errorMessage, string.Empty);
+        }
+
+        private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
+        {
+            if (e.ErrroCode != 0)
             {
-                base.ErrorLength = errorLength;
+                this.errorMessage = e.Data;
             }
+        }
+
+        private TestProcessStartInfo GetDefaultStartInfo()
+        {
+            return new TestProcessStartInfo();
         }
 
         private class TestableTestHostManager : DefaultTestHostManager
@@ -303,11 +296,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 base.TimeOut = 30000;
                 base.ErrorLength = errorLength;
                 base.Initialize(logger);
-            }
-
-            public override TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
-            {
-                return new TestProcessStartInfo();
             }
         }
     }

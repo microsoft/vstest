@@ -9,17 +9,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.Threading.Tasks;
-    using System.Threading;
-    using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The default test host launcher for the engine.
@@ -32,20 +32,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private readonly Architecture architecture;
         private readonly Framework framework;
-        private ITestHostLauncher customTestHostLauncher;
-
-        private Process testHostProcess;
         private readonly IProcessHelper processHelper;
 
-        private CancellationTokenSource hostLaunchCTS;
+        private ITestHostLauncher customTestHostLauncher;
+        private Process testHostProcess;
+        private CancellationTokenSource hostLaunchCts;
         private StringBuilder testHostProcessStdError;
-
         private IMessageLogger messageLogger;
-        protected int ErrorLength { get; set; } = 1000;
-        protected int TimeOut { get; set; } = 10000;
 
         public event EventHandler<HostProviderEventArgs> HostLaunched;
+
         public event EventHandler<HostProviderEventArgs> HostExited;
+
+        /// <inheritdoc/>
+        public bool Shared { get; private set; }
+
+        /// <summary>
+        /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
+        /// </summary>
+        public IDictionary<string, string> Properties
+        {
+            get
+            {
+                return new Dictionary<string, string>();
+            }
+        }
+
+        protected int ErrorLength { get; set; } = 1000;
+
+        protected int TimeOut { get; set; } = 10000;
 
         /// <summary>
         /// Callback on process exit
@@ -75,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 this.testHostProcessStdError.Append(data);
             }
 
-            if (processHelper.TryGetExitCode(process, out exitCode) && exitCode != 0)
+            if (this.processHelper.TryGetExitCode(process, out exitCode))
             {
                 EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
                 this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode));
@@ -87,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         /// <param name="architecture">Platform architecture of the host process.</param>
         /// <param name="framework">Runtime framework for the host process.</param>
+        /// <param name="shared">can host process be shared for multiple sources.</param>
         public DefaultTestHostManager(Architecture architecture, Framework framework, bool shared)
             : this(architecture, framework, new ProcessHelper(), shared)
         {
@@ -110,20 +126,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public bool Shared { get; private set; }
-
-        /// <summary>
-        /// Gets the properties of the test executor launcher. These could be the targetID for emulator/phone specific scenarios.
-        /// </summary>
-        public IDictionary<string, string> Properties
-        {
-            get
-            {
-                return new Dictionary<string, string>();
-            }
-        }
-
-        /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
             this.customTestHostLauncher = customLauncher;
@@ -132,41 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
-            return await Task.Run(() => LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
-        }
-
-        /// <inheritdoc/>
-        private CancellationTokenSource GetCancellationTokenSource()
-        {
-            this.hostLaunchCTS = new CancellationTokenSource(TimeOut);
-            return this.hostLaunchCTS;
-        }
-
-        private int LaunchHost(TestProcessStartInfo testHostStartInfo)
-        {
-            try
-            {
-                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-                EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
-
-                if (this.customTestHostLauncher == null)
-                {
-                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback);
-                }
-                else
-                {
-                    int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
-                    this.testHostProcess = Process.GetProcessById(processId);
-                }
-
-            }
-            catch (OperationCanceledException ex)
-            {
-                this.OnHostExited(new HostProviderEventArgs(ex.Message, -1));
-                return -1;
-            }
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + this.testHostProcess.Id));
-            return this.testHostProcess.Id;
+            return await Task.Run(() => this.LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
         }
 
         /// <inheritdoc/>
@@ -249,6 +217,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public void Initialize(IMessageLogger logger)
         {
             this.messageLogger = logger;
+        }
+
+        /// <inheritdoc/>
+        private CancellationTokenSource GetCancellationTokenSource()
+        {
+            this.hostLaunchCts = new CancellationTokenSource(this.TimeOut);
+            return this.hostLaunchCts;
+        }
+
+        private int LaunchHost(TestProcessStartInfo testHostStartInfo)
+        {
+            try
+            {
+                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+                EqtTrace.Verbose("Launching default test Host Process {0} with arguments {1}", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+
+                if (this.customTestHostLauncher == null)
+                {
+                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback);
+                }
+                else
+                {
+                    int processId = this.customTestHostLauncher.LaunchTestHost(testHostStartInfo);
+                    this.testHostProcess = Process.GetProcessById(processId);
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                this.OnHostExited(new HostProviderEventArgs(ex.Message, -1));
+                return -1;
+            }
+
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + this.testHostProcess.Id));
+            return this.testHostProcess.Id;
         }
     }
 }

@@ -4,5 +4,10 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
   </PropertyGroup>
 
+  <!-- TODO Remove when implicit references are available for netcoreapp2.0 -->
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
+    <RuntimeFrameworkVersion>2.0.0-beta-001737-00</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" /> 
 </Project>
