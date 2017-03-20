@@ -4,14 +4,13 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;

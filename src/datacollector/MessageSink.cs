@@ -3,8 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.DataCollection.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <inheritdoc />

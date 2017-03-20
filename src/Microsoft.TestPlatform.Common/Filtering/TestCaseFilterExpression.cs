@@ -7,8 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using ObjectModel.Adapter;
-    
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
     /// <summary>
     /// Implements ITestCaseFilterExpression, providing test case filtering functionality.
     /// </summary>

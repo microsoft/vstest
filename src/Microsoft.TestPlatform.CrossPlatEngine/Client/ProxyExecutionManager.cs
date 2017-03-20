@@ -9,9 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;

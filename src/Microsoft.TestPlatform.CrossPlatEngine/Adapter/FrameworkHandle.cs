@@ -6,12 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     using System;
     using System.Collections.Generic;
 
-    using Execution;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;

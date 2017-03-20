@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -14,7 +14,7 @@
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\testhost.x86\Program.cs;..\testhost.x86\DefaultEngineInvoker.cs;..\testhost.x86\IEngineInvoker.cs;..\testhost.x86\AppDomainEngineInvoker.cs;..\testhost.x86\Friends.cs" />
+    <Compile Include="..\testhost.x86\Program.cs;..\testhost.x86\DefaultEngineInvoker.cs;..\testhost.x86\IEngineInvoker.cs;..\testhost.x86\AppDomainEngineInvoker.cs;..\testhost.x86\Friends.cs;..\testhost.x86\EventHandlers\TestCaseEventsHandler.cs;..\testhost.x86\EventHandlers\TestDiscoveryEventHandler.cs;..\testhost.x86\EventHandlers\TestRequestHandler.cs;..\testhost.x86\EventHandlers\TestRunEventsHandler.cs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>

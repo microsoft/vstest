@@ -3,9 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol
 {
-    using System;
     using System.Collections.Generic;
 
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
 

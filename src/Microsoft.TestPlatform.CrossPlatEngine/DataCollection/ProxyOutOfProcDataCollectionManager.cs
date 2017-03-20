@@ -7,8 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -18,7 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     internal class ProxyOutOfProcDataCollectionManager
     {
         private IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
-        private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
         private Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
 
         /// <summary>
@@ -32,20 +31,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataCollectionTestCaseEventSender">
         /// The data collection test case event sender.
         /// </param>
-        /// <param name="dataCollectionTestCaseEventManager">
-        /// The data collection test case event manager.
+        /// <param name="testCaseEventsHandler">
+        /// The test Case Events Handler.
         /// </param>
-        public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager)
+        public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, ITestCaseEventsHandler testCaseEventsHandler)
         {
             this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
-            this.dataCollectionTestCaseEventManager = dataCollectionTestCaseEventManager;
             this.dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
 
-            this.dataCollectionTestCaseEventManager.TestCaseStart += this.TriggerTestCaseStart;
-            this.dataCollectionTestCaseEventManager.TestCaseEnd += this.TriggerTestCaseEnd;
-            this.dataCollectionTestCaseEventManager.TestResult += TriggerSendTestResult;
-            this.dataCollectionTestCaseEventManager.SessionEnd += this.TriggerTestSessionEnd;
-            attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
+            testCaseEventsHandler.TestCaseStart += this.TriggerTestCaseStart;
+            testCaseEventsHandler.TestCaseEnd += this.TriggerTestCaseEnd;
+            testCaseEventsHandler.TestResult += this.TriggerSendTestResult;
+            testCaseEventsHandler.SessionEnd += this.TriggerTestSessionEnd;
+            this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
         }
 
         private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)

@@ -6,12 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// The test execution recorder used for recording test results and test messages.
@@ -69,6 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public void RecordResult(TestResult testResult)
         {
             var flushResult = true;
+
             // For test result, we cannot flush to cache unless the result is updated with datacollection data
             if (this.testCaseEventsHandler != null)
             {

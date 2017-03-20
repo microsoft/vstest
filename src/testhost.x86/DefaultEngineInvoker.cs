@@ -9,12 +9,14 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.TestHost.EventHandlers;
 
     internal class DefaultEngineInvoker :
 #if NET46

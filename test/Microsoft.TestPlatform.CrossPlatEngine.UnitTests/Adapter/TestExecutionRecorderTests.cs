@@ -8,6 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;

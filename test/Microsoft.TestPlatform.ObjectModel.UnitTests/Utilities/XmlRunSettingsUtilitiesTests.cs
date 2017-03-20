@@ -3,9 +3,8 @@
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
-    using System;
     using System.Collections.Generic;
-    using System.Xml;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -244,7 +243,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void GetInProcDataCollectionRunSettingsFromSettings()
         {
-            string settingsXml= @"<RunSettings>
+            string settingsXml = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>
                                             <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='TestImpactListener.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='E:\repos\MSTest\src\managed\TestPlatform\TestImpactListener.Tests\bin\Debug\TestImpactListener.Tests.dll'>
@@ -323,6 +322,34 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
         #endregion
 
+        #region IsInProcDataCollectionEnabled tests.
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnFalseIfRunSettingsIsNull()
+        {
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(null));
+        }
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionNodeIsNotPresent()
+        {
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled("<RunSettings></RunSettings>"));
+        }
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionIsDisabled()
+        {
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(this.runSettingsXmlWithDataCollectorsDisabled)));
+        }
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnTrueIfDataCollectionIsEnabled()
+        {
+            Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(this.runSettingsXmlWithDataCollectors)));
+        }
+
+        #endregion
+
         #region GetDataCollectionRunSettings tests
 
         [TestMethod]
@@ -356,5 +383,15 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         }
 
         #endregion
+
+        private string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
+        {
+            return
+                settings.Replace("DataCollectionRunSettings", "InProcDataCollectionRunSettings")
+                    .Replace("<DataCollectors>", "<InProcDataCollectors>")
+                    .Replace("</DataCollectors>", "</InProcDataCollectors>")
+                    .Replace("<DataCollector ", "<InProcDataCollector ")
+                    .Replace("</DataCollector>", "</InProcDataCollector>");
+        }
     }
 }

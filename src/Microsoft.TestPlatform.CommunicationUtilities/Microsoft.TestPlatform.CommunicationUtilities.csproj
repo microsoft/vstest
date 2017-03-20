@@ -19,7 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>8.0.3</Version>
+      <Version>9.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
