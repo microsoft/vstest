@@ -13,13 +13,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
 
     using Newtonsoft.Json.Linq;
     using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     [TestClass]
     public class DesignModeClientTests

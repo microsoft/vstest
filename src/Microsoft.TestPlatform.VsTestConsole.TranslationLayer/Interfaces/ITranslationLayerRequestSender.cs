@@ -6,9 +6,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
     using System;
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Defines contract to send test platform requests to test host

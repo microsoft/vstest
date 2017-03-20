@@ -3,23 +3,18 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
     using System;
     using System.Collections.Generic;
     using System.Threading;
     using TestPlatform.Common.UnitTests.ExtensionFramework;
-    using TestPlatform.Common.UnitTests.Utilities;
-    using ObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Tests the behaviors of the TestLoggerManager class.
