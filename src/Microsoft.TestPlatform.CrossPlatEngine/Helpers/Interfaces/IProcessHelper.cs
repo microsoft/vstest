@@ -17,11 +17,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// </summary>
         /// <param name="processPath">The full file name of the process.</param>
         /// <param name="arguments">The command-line arguments.</param>
-        /// <param name="environmentVariables">Environment variables to set while bootstrapping the process.</param>
         /// <param name="workingDirectory">The working directory for this process.</param>
-        /// <param name="exitCallback">Call back for on process exit</param>
+        /// <param name="environmentVariables">Environment variables to set while bootstrapping the process.</param>
+        /// <param name="errorCallback">Call back for to read error stream data</param>
+        /// <param name="exitCallBack">Call back for on process exit</param>
         /// <returns>The process created.</returns>
-        Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<Process, string> errorCallback);
+        Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<Process, string> errorCallback, Action<Process> exitCallBack);
 
         /// <summary>
         /// Gets the current process file path.
@@ -36,9 +37,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         string GetTestEngineDirectory();
 
         /// <summary>
-        /// Gets the pid of test engine.
+        /// Gets the process id of test engine.
         /// </summary>
-        /// <returns>pid of test engine.</returns>
+        /// <returns>process id of test engine.</returns>
         int GetCurrentProcessId();
 
         /// <summary>
@@ -49,10 +50,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         string GetProcessName(int processId);
 
         /// <summary>
-        /// checks if the process has exited, & returns exitcode.
+        /// False if process has not exited, True otherwise. Set exitCode only if process has exited.
         /// </summary>
-        /// <param name="process">process</param>
-        /// <returns>process exited</returns>
+        /// <param name="process">process parameter</param>
+        /// <param name="exitCode">return value of exitCode</param>
+        /// <returns>False if process has not exited, True otherwise</returns>
         bool TryGetExitCode(Process process, out int exitCode);
+
+        /// <summary>
+        /// Waits for process to exit as per user specified timeout.
+        /// </summary>
+        /// <param name="process">process parameter</param>
+        /// <param name="timeOut">time in ms</param>
+        void WaitForProcessExit(Process process, int timeOut);
     }
 }

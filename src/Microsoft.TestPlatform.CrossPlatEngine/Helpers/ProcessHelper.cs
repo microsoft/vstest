@@ -17,17 +17,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     /// </summary>
     internal class ProcessHelper : IProcessHelper
     {
-        /// <summary>
-        /// Launches the process with the arguments provided.
-        /// </summary>
-        /// <param name="processPath">The path to the process.</param>
-        /// <param name="arguments">Process arguments.</param>
-        /// <param name="workingDirectory">Working directory of the process.</param>
-        /// <param name="envVariables">Environment variables for the process.</param>
-        /// <param name="errorCallback">"Monitor Error callback"</param>
-        /// <returns>The process spawned.</returns>
-        /// <exception cref="Exception">Throws any exception that could result as part of the launch.</exception>
-        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<Process, string> errorCallback)
+        /// <inheritdoc/>
+        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<Process, string> errorCallback, Action<Process> exitCallBack)
         {
             var process = new Process();
             try
@@ -54,12 +45,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     process.ErrorDataReceived += (sender, args) => errorCallback(sender as Process, args.Data);
                 }
 
-                process.Exited += (sender, args) => this.ProcessExited(sender as Process, args);
-
+                if (exitCallBack != null)
+                {
+                    process.Exited += (sender, args) => exitCallBack(sender as Process);
+                }
+                
                 EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
                 process.Start();
 
-                process.BeginErrorReadLine();
+                if (errorCallback != null)
+                {
+                    process.BeginErrorReadLine();
+                }
             }
             catch (Exception exception)
             {
@@ -74,10 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
             return process;
         }
 
-        /// <summary>
-        /// Gets the current process file path.
-        /// </summary>
-        /// <returns> The current process file path. </returns>
+        /// <inheritdoc/>
         public string GetCurrentProcessFileName()
         {
             return Process.GetCurrentProcess().MainModule.FileName;
@@ -104,19 +98,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <inheritdoc/>
         public bool TryGetExitCode(Process process, out int exitCode)
         {
-            if (process.HasExited == true)
+            if (process.HasExited)
             {
                 exitCode = process.ExitCode;
                 return true;
             }
+
             exitCode = 0;
             return false;
         }
 
-        private void ProcessExited(Process process, EventArgs e)
+        /// <inheritdoc/>
+        public void WaitForProcessExit(Process process, int timeOut)
         {
-            // wait for process to flush out error, & out streams
-            process.WaitForExit();
+            process?.WaitForExit(timeOut);
         }
     }
 }

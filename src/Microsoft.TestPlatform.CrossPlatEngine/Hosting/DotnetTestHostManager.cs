@@ -53,6 +53,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private IMessageLogger messageLogger;
 
+        private bool hostExitedEventRaised;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
         /// </summary>
@@ -75,6 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.dotnetHostHelper = dotnetHostHelper;
+            this.hostExitedEventRaised = false;
         }
 
         public event EventHandler<HostProviderEventArgs> HostLaunched;
@@ -96,6 +99,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         /// <summary>
         /// Callback on process exit
+        /// </summary>
+        private Action<Process> ExitCallBack => ((process) =>
+        {
+            var exitCode = 0;
+            this.processHelper.WaitForProcessExit(process, this.TimeOut);
+            this.processHelper.TryGetExitCode(process, out exitCode);
+
+            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode));
+        });
+
+        /// <summary>
+        /// Callback to read from process error stream
         /// </summary>
         private Action<Process, string> ErrorReceivedCallback => (process, data) =>
         {
@@ -271,7 +286,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         public void OnHostExited(HostProviderEventArgs e)
         {
-            this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+            if (!this.hostExitedEventRaised)
+            {
+                this.hostExitedEventRaised = true;
+                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
+            }
         }
 
         /// <inheritdoc/>
@@ -280,7 +299,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
             if (this.testHostLauncher == null)
             {
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback);
+                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack);
             }
             else
             {

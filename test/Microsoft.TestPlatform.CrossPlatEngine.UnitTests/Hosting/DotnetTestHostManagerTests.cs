@@ -11,6 +11,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -45,6 +46,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         private string errorMessage;
         private int errorLength = 20;
 
+        private int exitCode;
+
         public DotnetTestHostManagerTests()
         {
             this.mockTestHostLauncher = new Mock<ITestHostLauncher>();
@@ -61,7 +64,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                                          this.errorLength);
             this.dotnetHostManager.Initialize(mockLogger.Object);
 
-            this.dotnetHostManager.HostExited += this.TestHostManagerHostExited;
+            this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
 
             // Setup a dummy current process for tests
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
@@ -443,17 +446,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task DotNetCoreErrorMessageShouldBeTruncatedFromBeginingShouldDisplayTrailingData()
-        {
-            string errorData = "Error Strings";
-            this.ErrorCallBackTestHelper(errorData, -1);
-
-            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
-
-            Assert.AreEqual(this.errorMessage, "StringsError Strings");
-        }
-
-        [TestMethod]
         public async Task DotNetCoreNoErrorMessageIfExitCodeZero()
         {
             string errorData = string.Empty;
@@ -477,25 +469,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task DotNetCoreProcessExitedButNoErrorMessageIfNoDataWritten()
+        [DataRow(0)]
+        [DataRow(-1)]
+        public async Task DotNetCoreProcessExitedButNoErrorMessageIfNoDataWritten(int exitCode)
         {
-            string errorData = string.Empty;
-            this.ErrorCallBackTestHelper(errorData, 0);
+            var errorData = string.Empty;
+            this.ExitCallBackTestHelper(exitCode);
 
-            // overrite event listner
-            this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
+            // override event listner
+            this.dotnetHostManager.HostExited += this.DotnetHostManagerExitCodeTesterHostExited;
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
             Assert.AreEqual(this.errorMessage, string.Empty);
+            Assert.AreEqual(this.exitCode, exitCode);
+        }
+
+        private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
+        {
+            this.errorMessage = e.Data;
+            this.exitCode = e.ErrroCode;
         }
 
         private void DotnetHostManagerHostExited(object sender, HostProviderEventArgs e)
-        {
-            this.errorMessage = e.Data;
-        }
-
-        private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
         {
             if (e.ErrroCode != 0)
             {
@@ -512,19 +508,40 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
-                    (var1, var2, var3, dictionary, errorCallback) =>
+                            It.IsAny<Action<Process, string>>(),
+                            It.IsAny<Action<Process>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
 
                         errorCallback(process, errorMessage);
-                        errorCallback(process, errorMessage);
-                        errorCallback(process, errorMessage);
-                        errorCallback(process, errorMessage);
                     }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.WaitForProcessExit(It.IsAny<Process>(), It.IsAny<int>()));
+        }
+
+        private void ExitCallBackTestHelper(int exitCode)
+        {
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>(),
+                            It.IsAny<Action<Process>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                    {
+                        var process = Process.GetCurrentProcess();
+                        exitCallback(process);
+                    }).Returns(Process.GetCurrentProcess());
+
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.WaitForProcessExit(It.IsAny<Process>(), It.IsAny<int>()));
         }
 
 

@@ -10,7 +10,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.Linq;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -24,7 +23,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     public class DefaultTestHostManagerTests
     {
         private readonly TestProcessStartInfo startInfo;        
-        private readonly Mock<ITestRequestSender> mockRequestSender;
         private readonly Mock<IMessageLogger> mockMessageLogger;
         private readonly Mock<IProcessHelper> mockProcessHelper;
 
@@ -32,6 +30,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         private TestableTestHostManager testableTestHostManager;
         private int errorLength = 20;
         private string errorMessage;
+        private int exitCode;
 
         public DefaultTestHostManagerTests()
         {
@@ -39,7 +38,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
             
             this.mockMessageLogger = new Mock<IMessageLogger>();
-            this.mockRequestSender = new Mock<ITestRequestSender>();
             
             this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
@@ -131,7 +129,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<Process, string>>())).Returns(Process.GetCurrentProcess());
+                        It.IsAny<Action<Process, string>>(),
+                        It.IsAny<Action<Process>>())).Returns(Process.GetCurrentProcess());
 
             var testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
             var startInfo = testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
@@ -192,17 +191,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task ErrorMessageShouldBeTruncatedFromBeginingShouldDisplayTrailingData()
-        {
-            string errorData = "Error Strings";
-            this.ErrorCallBackTestHelper(errorData, -1);
-
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
-
-            Assert.AreEqual(this.errorMessage, "StringsError Strings");
-        }
-
-        [TestMethod]
         public async Task NoErrorMessageIfExitCodeZero()
         {
             string errorData = string.Empty;
@@ -226,22 +214,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task ProcessExitedButNoErrorMessageIfNoDataWritten()
+        [DataRow(0)]
+        [DataRow(-1)]
+        public async Task ProcessExitedButNoErrorMessageIfNoDataWritten(int exitCode)
         {
-            string errorData = string.Empty;
-            this.ErrorCallBackTestHelper(errorData, 0);
-
-            // overrite event listner
-            this.testableTestHostManager.HostExited += this.TestableTestHostManagerHostExited;
+            this.ExitCallBackTestHelper(exitCode);
 
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
             Assert.AreEqual(this.errorMessage, string.Empty);
+
+            Assert.AreEqual(this.exitCode, exitCode);
         }
 
         private void TestableTestHostManagerHostExited(object sender, HostProviderEventArgs e)
         {
             this.errorMessage = e.Data;
+            this.exitCode = e.ErrroCode;
         }
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
@@ -263,8 +252,39 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 this.mockMessageLogger.Object);
 
             this.testableTestHostManager.HostExited += this.TestHostManagerHostExited;
-            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
+            
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>(),
+                            It.IsAny<Action<Process>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                    {
+                        var process = Process.GetCurrentProcess();
+
+                        errorCallback(process, errorMessage);
+                    }).Returns(Process.GetCurrentProcess());
+
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.WaitForProcessExit(It.IsAny<Process>(), It.IsAny<int>()));
+        }
+
+        private void ExitCallBackTestHelper(int exitCode)
+        {
+            this.testableTestHostManager = new TestableTestHostManager(
+                Architecture.X64,
+                Framework.DefaultFramework,
+                this.mockProcessHelper.Object,
+                true,
+                this.errorLength,
+                this.mockMessageLogger.Object);
+
+            this.testableTestHostManager.HostExited += this.TestableTestHostManagerHostExited;
 
             this.mockProcessHelper.Setup(
                     ph =>
@@ -273,19 +293,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>>(
-                    (var1, var2, var3, dictionary, errorCallback) =>
+                            It.IsAny<Action<Process, string>>(),
+                            It.IsAny<Action<Process>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
-
-                        errorCallback(process, errorMessage);
-                        errorCallback(process, errorMessage);
-                        errorCallback(process, errorMessage);
-                        errorCallback(process, errorMessage);
+                        exitCallback(process);
                     }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.WaitForProcessExit(It.IsAny<Process>(), It.IsAny<int>()));
         }
 
         private TestProcessStartInfo GetDefaultStartInfo()
