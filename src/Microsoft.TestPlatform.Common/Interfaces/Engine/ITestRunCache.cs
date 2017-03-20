@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
+namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine
 {
+    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using System;
 
     /// <summary>
     /// The cache for test execution information.
     /// </summary>
-    internal interface ITestRunCache : IDisposable
+    public interface ITestRunCache : IDisposable
     {
         #region Properties
 

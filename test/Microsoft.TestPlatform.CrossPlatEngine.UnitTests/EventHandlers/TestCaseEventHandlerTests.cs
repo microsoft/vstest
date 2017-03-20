@@ -1,81 +1,151 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.EventHandlers
+namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
-    using System.Collections.ObjectModel;
-    using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
-    using System.Collections.Generic;
-
-    using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Constants;
-    using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
     [TestClass]
-    public class TestCaseEventHandlerTests
+    public class TestCaseEventsHandlerTests
     {
+        private TestCaseEventsHandler testCaseEventsHandler;
+        private Mock<ITestRunCache> mockTestRunCache;
+        private int testCaseStartCalled;
+        private int testCaseEndCalled;
+        private int testResultCalled;
+        private TestCase testCase;
 
-        private Mock<ITestCaseEventsHandler> mockTestCaseEvents;
-
-        private Mock<IDataCollectionTestCaseEventManager> mockDataCollectionTestCaseEventManager;
-
-        private TestCaseEventsHandler testCasesEventsHandler;
-
-        [TestInitialize]
-        public void InitializeTests()
+        public TestCaseEventsHandlerTests()
         {
-            this.mockDataCollectionTestCaseEventManager = new Mock<IDataCollectionTestCaseEventManager>();
+            this.testCaseEventsHandler = new TestCaseEventsHandler();
+            this.mockTestRunCache = new Mock<ITestRunCache>();
+            this.testCaseEventsHandler.Initialize(this.mockTestRunCache.Object);
+            this.testCaseStartCalled = 0;
+            this.testCaseEndCalled = 0;
+            this.testResultCalled = 0;
+            this.testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
 
-            this.mockTestCaseEvents = new Mock<ITestCaseEventsHandler>();
-            this.testCasesEventsHandler = new TestCaseEventsHandler(this.mockDataCollectionTestCaseEventManager.Object, this.mockTestCaseEvents.Object);
+            // random guid
+            this.testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
+            this.testCaseEventsHandler.TestCaseStart += this.TriggerTestCaseStart;
+            this.testCaseEventsHandler.TestCaseEnd += this.TriggerTestCaseEnd;
+            this.testCaseEventsHandler.TestResult += this.TriggerTestResult;
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            this.testCaseEventsHandler.TestCaseStart -= this.TriggerTestCaseStart;
+            this.testCaseEventsHandler.TestCaseEnd -= this.TriggerTestCaseEnd;
+            this.testCaseEventsHandler.TestResult -= this.TriggerTestResult;
         }
 
         [TestMethod]
-        public void SendTestCaseStartShouldCallTriggerTestCaseStartOnInProcDataCollectionManager()
+        public void SendTestCaseStartShouldPublishTestCaseStartEvent()
         {
-            this.testCasesEventsHandler.SendTestCaseStart(new TestCase());
-            this.mockDataCollectionTestCaseEventManager.Verify(x => x.RaiseTestCaseStart(It.IsAny<TestCaseStartEventArgs>()), Times.Once);
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            Assert.AreEqual(1, this.testCaseStartCalled);
         }
 
         [TestMethod]
-        public void SendTestCaseEndShouldCallTriggerTestCaseEndOnInProcDataCollectionManager()
+        public void SendTestCaseEndShouldPublishTestCaseEndEventIfTestCaseStartWasCalledBefore()
         {
-            this.testCasesEventsHandler.SendTestCaseEnd(new TestCase(), TestOutcome.Passed);
-            this.mockDataCollectionTestCaseEventManager.Verify(x => x.RaiseTestCaseEnd(It.IsAny<TestCaseEndEventArgs>()), Times.Once);
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Passed);
+
+            Assert.AreEqual(1, this.testCaseEndCalled);
         }
 
         [TestMethod]
-        public void SendTestResultShouldCallTriggerUpdateTestResultOnInProcDataCollectionManager()
+        public void SendTestCaseEndShouldNotSendTestCaseEndEventInCaseOfAMissingTestCaseStartInDataDrivenScenario()
         {
-            this.testCasesEventsHandler.SendTestResult(new TestResult(new TestCase()));
-            this.mockDataCollectionTestCaseEventManager.Verify(x => x.RaiseTestResult(It.IsAny<TestResultEventArgs>()), Times.Once);
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Passed);
+            this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Failed);
+
+            Assert.AreEqual(1, this.testCaseEndCalled);
         }
 
         [TestMethod]
-        public void TestCaseEventsFromClientsShouldBeCalledWhenTestCaseEventsAreCalled()
+        public void SendTestCaseEndShouldtInvokeTestCaseEndMultipleTimesInDataDrivenScenario()
         {
-            var testCase = new TestCase();
-            this.testCasesEventsHandler.SendTestCaseStart(testCase);
-            this.testCasesEventsHandler.SendTestCaseEnd(testCase, TestOutcome.Passed);
-            var testResult = new TestResult(testCase);
-            this.testCasesEventsHandler.SendTestResult(testResult);
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Passed);
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Failed);
 
-            this.mockTestCaseEvents.Verify(x => x.SendTestCaseStart(testCase), Times.Once);
-            this.mockTestCaseEvents.Verify(x => x.SendTestCaseEnd(testCase, TestOutcome.Passed), Times.Once);
-            this.mockTestCaseEvents.Verify(x => x.SendTestResult(testResult), Times.Once);
+            Assert.IsTrue(this.testCaseEndCalled == 2, "TestCaseStart must only be called once");
+        }
+
+        [TestMethod]
+        public void SendTestResultShouldPublishTestCaseResultEventIfTestCaseStartAndTestCaseEndEventsAreNotPublished()
+        {
+            this.testCaseEventsHandler.SendTestResult(new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
+            Assert.AreEqual(0, this.testResultCalled);
+        }
+
+        [TestMethod]
+        public void SendTestResultShouldPublishTestCaseResultEventIfTestCaseStartAndTestCaseEndEventsArePublished()
+        {
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Passed);
+            this.testCaseEventsHandler.SendTestResult(new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
+            Assert.AreEqual(1, this.testResultCalled);
+        }
+
+        [TestMethod]
+        public void RaiseTestResultShouldFlushIfTestCaseEndWasCalledBefore()
+        {
+            var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase);
+
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Passed);
+            var allowFlush = this.testCaseEventsHandler.SendTestResult(testResult);
+
+            Assert.AreEqual(1, this.testCaseEndCalled);
+            Assert.IsTrue(allowFlush, "TestResult must be flushed");
+        }
+
+        [TestMethod]
+        public void RaiseTestResultShouldNotFlushIfTestCaseEndWasNotCalledBefore()
+        {
+            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase);
+            var allowFlush = this.testCaseEventsHandler.SendTestResult(testResult);
+
+            Assert.IsFalse(allowFlush, "TestResult must not be flushed");
+        }
+
+        [TestMethod]
+        public void FlushLastChunkResultsShouldPutTestResultsinTestRunCache()
+        {
+            this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
+            this.testCaseEventsHandler.SendTestResult(new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
+
+            this.testCaseEventsHandler.FlushLastChunkResults();
+            this.mockTestRunCache.Verify(x => x.OnNewTestResult(It.IsAny<VisualStudio.TestPlatform.ObjectModel.TestResult>()), Times.Once);
+        }
+
+        private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
+        {
+            this.testCaseStartCalled++;
+        }
+
+        private void TriggerTestCaseEnd(object sender, TestCaseEndEventArgs e)
+        {
+            this.testCaseEndCalled++;
+        }
+
+        private void TriggerTestResult(object sender, TestResultEventArgs e)
+        {
+            this.testResultCalled++;
         }
     }
 }

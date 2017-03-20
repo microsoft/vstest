@@ -3,9 +3,9 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.TestableImplementations
 {
-    using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
