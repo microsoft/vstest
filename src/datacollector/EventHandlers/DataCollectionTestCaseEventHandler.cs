@@ -3,8 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
-    using System;
-
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;

@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
+namespace testhost.UnitTests
 {
     using System;
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces.Engine;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.TestHost.EventHandlers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -88,7 +88,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendTestResultShouldPublishTestCaseResultEventIfTestCaseStartAndTestCaseEndEventsAreNotPublished()
         {
-            this.testCaseEventsHandler.SendTestResult(new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
+            this.testCaseEventsHandler.SendTestResult(new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
             Assert.AreEqual(0, this.testResultCalled);
         }
 
@@ -97,7 +97,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
             this.testCaseEventsHandler.SendTestCaseEnd(this.testCase, TestOutcome.Passed);
-            this.testCaseEventsHandler.SendTestResult(new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
+            this.testCaseEventsHandler.SendTestResult(new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
             Assert.AreEqual(1, this.testResultCalled);
         }
 
@@ -117,7 +117,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void RaiseTestResultShouldNotFlushIfTestCaseEndWasNotCalledBefore()
         {
-            var testResult = new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase);
+            var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase);
             var allowFlush = this.testCaseEventsHandler.SendTestResult(testResult);
 
             Assert.IsFalse(allowFlush, "TestResult must not be flushed");
@@ -127,10 +127,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void FlushLastChunkResultsShouldPutTestResultsinTestRunCache()
         {
             this.testCaseEventsHandler.SendTestCaseStart(this.testCase);
-            this.testCaseEventsHandler.SendTestResult(new VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
+            this.testCaseEventsHandler.SendTestResult(new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase));
 
             this.testCaseEventsHandler.FlushLastChunkResults();
-            this.mockTestRunCache.Verify(x => x.OnNewTestResult(It.IsAny<VisualStudio.TestPlatform.ObjectModel.TestResult>()), Times.Once);
+            this.mockTestRunCache.Verify(x => x.OnNewTestResult(It.IsAny<Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult>()), Times.Once);
         }
 
         private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)

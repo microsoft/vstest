@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 {
     using System;
     using System.Collections.Generic;
@@ -9,6 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -363,7 +366,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 var reason = string.IsNullOrWhiteSpace(this.clientExitErrorMessage)
                     ? CommonResources.UnableToCommunicateToTestHost
-                    : clientExitErrorMessage;
+                    : this.clientExitErrorMessage;
                 EqtTrace.Error("Unable to receive message from testhost: {0}", reason);
                 throw new IOException(reason);
             }

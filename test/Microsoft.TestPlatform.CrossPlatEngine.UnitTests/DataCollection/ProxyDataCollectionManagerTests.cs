@@ -9,7 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using System.Diagnostics;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;

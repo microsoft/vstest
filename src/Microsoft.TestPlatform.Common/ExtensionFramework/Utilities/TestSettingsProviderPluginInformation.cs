@@ -8,6 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
     using System.Linq;
     using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+
     using ObjectModel;
 
     /// <summary>

@@ -3,13 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 {
+    using System;
+    using System.Collections.ObjectModel;
+    using System.Diagnostics;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics;
 
 #if NET46
     using System.Configuration;
@@ -311,7 +312,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 
             if (args.Result.Messages.Count != 0)
             {
-                foreach (ObjectModel.TestResultMessage msg in args.Result.Messages)
+                foreach (Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResultMessage msg in args.Result.Messages)
                 {
                     if (!String.IsNullOrEmpty(msg.Text))
                         size += msg.Text.Length;
