@@ -103,7 +103,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private Action<Process> ExitCallBack => ((process) =>
         {
             var exitCode = 0;
-            this.processHelper.WaitForProcessExit(process, this.TimeOut);
             this.processHelper.TryGetExitCode(process, out exitCode);
 
             this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode));

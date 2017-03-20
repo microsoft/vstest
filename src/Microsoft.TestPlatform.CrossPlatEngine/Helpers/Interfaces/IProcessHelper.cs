@@ -56,12 +56,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <param name="exitCode">return value of exitCode</param>
         /// <returns>False if process has not exited, True otherwise</returns>
         bool TryGetExitCode(Process process, out int exitCode);
-
-        /// <summary>
-        /// Waits for process to exit as per user specified timeout.
-        /// </summary>
-        /// <param name="process">process parameter</param>
-        /// <param name="timeOut">time in ms</param>
-        void WaitForProcessExit(Process process, int timeOut);
     }
 }

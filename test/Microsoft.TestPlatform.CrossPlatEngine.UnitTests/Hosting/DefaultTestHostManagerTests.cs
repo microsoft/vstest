@@ -271,7 +271,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                     }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
-            this.mockProcessHelper.Setup(ph => ph.WaitForProcessExit(It.IsAny<Process>(), It.IsAny<int>()));
         }
 
         private void ExitCallBackTestHelper(int exitCode)
@@ -303,7 +302,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                     }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
-            this.mockProcessHelper.Setup(ph => ph.WaitForProcessExit(It.IsAny<Process>(), It.IsAny<int>()));
         }
 
         private TestProcessStartInfo GetDefaultStartInfo()

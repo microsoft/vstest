@@ -47,9 +47,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
                 if (exitCallBack != null)
                 {
-                    process.Exited += (sender, args) => exitCallBack(sender as Process);
+                    process.Exited += (sender, args) =>
+                    {
+                        // Call WaitForExit again to ensure all streams are flushed
+                        var p = sender as Process;
+                        p.WaitForExit();
+                        exitCallBack(p);
+                    };
                 }
-                
+
                 EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
                 process.Start();
 
@@ -106,12 +112,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
             exitCode = 0;
             return false;
-        }
-
-        /// <inheritdoc/>
-        public void WaitForProcessExit(Process process, int timeOut)
-        {
-            process?.WaitForExit(timeOut);
         }
     }
 }
