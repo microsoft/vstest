@@ -5,9 +5,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
@@ -29,22 +29,28 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         #endregion
 
         /// <summary>
-        /// Sets a custom launcher
-        /// </summary>
-        /// <param name="customLauncher">Custom launcher to set</param>
-        void Initialize(IMessageLogger logger);
-
-        /// <summary>
         /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
         /// is launched in a separate host process.
         /// </summary>
         bool Shared { get; }
 
         /// <summary>
+        /// Sets a Message Logger
+        /// </summary>
+        /// <param name="logger">provide logger to runtimes</param>
+        void Initialize(IMessageLogger logger);
+
+        /// <summary>
         /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
         /// is launched in a separate host process.
         /// </summary>
-        bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration);
+        /// <param name="runConfiguration">
+        /// The run Configuration.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        bool CanExecuteCurrentRunConfiguration(string runConfiguration);
 
         /// <summary>
         /// Sets a custom launcher
@@ -124,6 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
             this.Data = message;
             this.ErrroCode = errorCode;
         }
+
         public string Data { get; set; }
 
         public int ErrroCode { get; set; }

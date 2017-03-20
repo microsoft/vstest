@@ -7,8 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
-    using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -18,7 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -26,14 +25,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     public abstract class ProxyOperationManager
     {
         private readonly ITestRuntimeProvider testHostManager;
-
-        private bool initialized;
-
+        private readonly IProcessHelper processHelper;
         private readonly int connectionTimeout;
 
-        private StringBuilder testHostProcessStdError;
-
-        private readonly IProcessHelper processHelper;
+        private bool initialized;
+        private string testHostProcessStdError;
 
         #region Constructors
 
@@ -78,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (!this.initialized)
             {
-                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+                this.testHostProcessStdError = string.Empty;
 
                 var portNumber = this.RequestSender.InitializeCommunication();
                 var processId = this.processHelper.GetCurrentProcessId();
@@ -88,18 +84,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
                 
                 // Subscribe to TestHost Event
-                this.testHostManager.HostLaunched += TestHostManager_HostLaunched;
-                this.testHostManager.HostExited += TestHostManager_HostExited;
+                this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
+                this.testHostManager.HostExited += this.TestHostManagerHostExited;
 
                 this.UpdateTestProcessStartInfo(testHostStartInfo);
 
                 // Launch the test host.
-                CancellationTokenSource hostLaunchCTS = new CancellationTokenSource();
+                CancellationTokenSource hostLaunchCts = new CancellationTokenSource();
                 Task<int> hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo);
 
                 try
                 {
-                    hostLaunchedTask.Wait(hostLaunchCTS.Token);
+                    hostLaunchedTask.Wait(hostLaunchCts.Token);
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -127,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
-                if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError.ToString()))
+                if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
                 {
                     // Testhost failed with error
                     errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
@@ -135,17 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
             }
-        }
-
-        private void TestHostManager_HostLaunched(object sender, HostProviderEventArgs e)
-        {
-            EqtTrace.Verbose(e.Data);
-        }
-
-        private void TestHostManager_HostExited(object sender, HostProviderEventArgs e)
-        {
-            this.testHostProcessStdError.Clear();
-            this.testHostProcessStdError.Append(e.Data);
         }
 
         /// <summary>
@@ -161,8 +146,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             finally
             {
                 this.initialized = false;
-                this.testHostManager.HostExited -= TestHostManager_HostExited;
-                this.testHostManager.HostLaunched -= TestHostManager_HostLaunched;
+                this.testHostManager.HostExited -= this.TestHostManagerHostExited;
+                this.testHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
             }
         }
 
@@ -185,18 +170,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         protected string GetTimestampedLogFile(string logFile)
         {
-            return Path.ChangeExtension(logFile,
-                string.Format("host.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
-                    Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile)));
+            return Path.ChangeExtension(
+                logFile,
+                string.Format(
+                    "host.{0}_{1}{2}",
+                    DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
+                    Thread.CurrentThread.ManagedThreadId,
+                    Path.GetExtension(logFile)));
         }
 
-        /// <summary>
-        /// Returns the current error data in stream
-        /// Written purely for UT as of now.
-        /// </summary>
-        protected virtual string GetStandardError()
+        private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
         {
-            return testHostProcessStdError.ToString();
+            EqtTrace.Verbose(e.Data);
+        }
+
+        private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
+        {
+            this.testHostProcessStdError = e.Data;
+
+            this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
         }
     }
 }

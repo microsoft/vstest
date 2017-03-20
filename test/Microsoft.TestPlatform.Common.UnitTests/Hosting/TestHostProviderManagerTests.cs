@@ -59,10 +59,8 @@ namespace TestPlatform.Common.UnitTests.Logging
       </RunConfiguration>     
     </RunSettings> ";
 
-            RunConfiguration config = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettingsXml);
-
             var manager = TestRuntimeProviderManager.Instance;
-            Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(config));
+            Assert.IsNotNull(manager.GetTestHostManagerByRunConfiguration(runSettingsXml));
         }
 
         #region implementations
@@ -76,7 +74,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             public event EventHandler<HostProviderEventArgs> HostLaunched;
             public event EventHandler<HostProviderEventArgs> HostExited;
 
-            public bool CanExecuteCurrentRunConfiguration(RunConfiguration runConfiguration)
+            public bool CanExecuteCurrentRunConfiguration(string runConfiguration)
             {
                 return true;
             }

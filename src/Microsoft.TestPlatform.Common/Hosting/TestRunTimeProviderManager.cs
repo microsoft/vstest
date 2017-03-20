@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
             return null;
         }
 
-        public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(RunConfiguration runConfiguration)
+        public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
         {
             foreach (var testExtension in this.testHostExtensionManager.TestExtensions)
             {

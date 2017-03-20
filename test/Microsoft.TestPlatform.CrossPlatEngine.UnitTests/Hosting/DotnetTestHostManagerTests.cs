@@ -17,7 +17,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -30,8 +30,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
         private readonly Mock<ITestHostLauncher> mockTestHostLauncher;
 
-        private readonly TestableDotnetTestHostManager dotnetHostManager;
-
         private readonly Mock<IProcessHelper> mockProcessHelper;
 
         private readonly Mock<IFileHelper> mockFileHelper;
@@ -40,21 +38,40 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
         private readonly string[] testSource = { "test.dll" };
 
+        private readonly string defaultTestHostPath;
+        private readonly TestProcessStartInfo defaultTestProcessStartInfo;
+
+        private readonly TestableDotnetTestHostManager dotnetHostManager;
+        
+        private string errorMessage;
+        private int errorLength = 20;
+
+        private int exitCode;
+
         public DotnetTestHostManagerTests()
         {
             this.mockTestHostLauncher = new Mock<ITestHostLauncher>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockFileHelper = new Mock<IFileHelper>();
+            Mock<IMessageLogger> mockLogger = new Mock<IMessageLogger>();
             this.defaultConnectionInfo = default(TestRunnerConnectionInfo);
+            string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+            this.defaultTestHostPath = @"\tmp\testhost.dll";
             this.dotnetHostManager = new TestableDotnetTestHostManager(
-                                         this.mockTestHostLauncher.Object,
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object));
+                                         new DotnetHostHelper(this.mockFileHelper.Object), 
+                                         this.errorLength);
+            this.dotnetHostManager.Initialize(mockLogger.Object);
+
+            this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
 
             // Setup a dummy current process for tests
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns(DefaultDotnetPath);
             this.mockProcessHelper.Setup(ph => ph.GetTestEngineDirectory()).Returns(DefaultDotnetPath);
+            this.mockFileHelper.Setup(ph => ph.Exists(this.defaultTestHostPath)).Returns(true);
+
+            this.defaultTestProcessStartInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { defaultSourcePath }, null, this.defaultConnectionInfo);
         }
 
         [TestMethod]
@@ -149,7 +166,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             Assert.IsFalse(startInfo.Arguments.Contains("--depsfile \"test.deps.json\""));
         }
 
-
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
@@ -179,6 +195,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
             var startInfo = this.GetDefaultStartInfo();
+            this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
 
             Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
             processId.Wait();
@@ -190,6 +207,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         {
             var variables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };
             var startInfo = new TestProcessStartInfo { EnvironmentVariables = variables };
+            this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
 
             Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
             processId.Wait();
@@ -198,7 +216,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void DotnetTestHostManagedShouldNotBeShared()
+        public void DotnetTestHostManagerShouldNotBeShared()
         {
             Assert.IsFalse(this.dotnetHostManager.Shared);
         }
@@ -302,23 +320,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         }
 
         [TestMethod]
-        public void LaunchTestHostShouldLaunchProcessWithConnectionInfo()
+        public async Task LaunchTestHostShouldLaunchProcessWithConnectionInfo()
         {
-            // Absolute path to the source directory
-            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
-            string expectedTestHostPath = @"\tmp\testhost.dll";
-            this.mockFileHelper.Setup(ph => ph.Exists(expectedTestHostPath)).Returns(true);
-
-            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
-
-            var expectedArgs = "exec \"" + expectedTestHostPath + "\" --port 0 --parentprocessid 0";
-
-            Task<int> processId = this.dotnetHostManager.LaunchTestHostAsync(startInfo);
-            processId.Wait();
+            var expectedArgs = "exec \"" + this.defaultTestHostPath + "\" --port 0 --parentprocessid 0";
+            this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
+            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
             this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);
         }
-
+        
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfDepsFileNotFound()
         {
@@ -412,6 +422,127 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             Assert.IsTrue(startInfo.Arguments.Contains(testHostFullPath));
         }
 
+        [TestMethod]
+        public async Task DotNetCoreErrorMessageShouldBeReadAsynchronouslyAsync()
+        {
+            var errorData = "Custom Error Strings";
+            this.ErrorCallBackTestHelper(errorData, -1);
+
+            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
+
+            Assert.AreEqual(this.errorMessage, errorData);
+        }
+
+        [TestMethod]
+        public async Task DotNetCoreErrorMessageShouldBeTruncatedToMatchErrorLength()
+        {
+            var errorData = "Long Custom Error Strings";
+            this.ErrorCallBackTestHelper(errorData, -1);
+
+            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
+
+            Assert.AreEqual(this.errorMessage.Length, this.errorLength);
+            Assert.AreEqual(this.errorMessage, errorData.Substring(5));
+        }
+
+        [TestMethod]
+        public async Task DotNetCoreNoErrorMessageIfExitCodeZero()
+        {
+            string errorData = string.Empty;
+            this.ErrorCallBackTestHelper(errorData, 0);
+
+            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
+
+            Assert.AreEqual(null, this.errorMessage);
+        }
+
+        [TestMethod]
+        [DataRow(null)]
+        [DataRow("")]
+        public async Task DotNetCoreErrorReceivedCallbackShouldNotLogNullOrEmptyData(string errorData)
+        {
+            this.ErrorCallBackTestHelper(errorData, -1);
+
+            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
+
+            Assert.AreEqual(this.errorMessage, string.Empty);
+        }
+
+        [TestMethod]
+        [DataRow(0)]
+        [DataRow(-1)]
+        public async Task DotNetCoreProcessExitedButNoErrorMessageIfNoDataWritten(int exitCode)
+        {
+            var errorData = string.Empty;
+            this.ExitCallBackTestHelper(exitCode);
+
+            // override event listner
+            this.dotnetHostManager.HostExited += this.DotnetHostManagerExitCodeTesterHostExited;
+
+            await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
+
+            Assert.AreEqual(this.errorMessage, string.Empty);
+            Assert.AreEqual(this.exitCode, exitCode);
+        }
+
+        private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
+        {
+            this.errorMessage = e.Data;
+            this.exitCode = e.ErrroCode;
+        }
+
+        private void DotnetHostManagerHostExited(object sender, HostProviderEventArgs e)
+        {
+            if (e.ErrroCode != 0)
+            {
+                this.errorMessage = e.Data;
+            }
+        }
+
+        private void ErrorCallBackTestHelper(string errorMessage, int exitCode)
+        {
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>(),
+                            It.IsAny<Action<Process>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                    {
+                        var process = Process.GetCurrentProcess();
+
+                        errorCallback(process, errorMessage);
+                    }).Returns(Process.GetCurrentProcess());
+
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+        }
+
+        private void ExitCallBackTestHelper(int exitCode)
+        {
+            this.mockProcessHelper.Setup(
+                    ph =>
+                        ph.LaunchProcess(
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<string>(),
+                            It.IsAny<IDictionary<string, string>>(),
+                            It.IsAny<Action<Process, string>>(),
+                            It.IsAny<Action<Process>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                    (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
+                    {
+                        var process = Process.GetCurrentProcess();
+                        exitCallback(process);
+                    }).Returns(Process.GetCurrentProcess());
+
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+        }
+
+
         private TestProcessStartInfo GetDefaultStartInfo()
         {
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(
@@ -424,36 +555,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
     internal class TestableDotnetTestHostManager : DotnetTestHostManager
     {
-        public TestableDotnetTestHostManager(ITestHostLauncher testHostLauncher, IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper)
-            : base(testHostLauncher, processHelper, fileHelper, dotnetTestHostHelper)
-        { }
-    }
-
-    [TestClass]
-    public class DefaultTestHostLauncherTests
-    {
-        [TestMethod]
-        public void DefaultTestHostLauncherIsDebugShouldBeFalse()
+        public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
+            : base(processHelper, fileHelper, dotnetTestHostHelper)
         {
-            var hostLauncher = new DefaultTestHostLauncher();
-
-            Assert.IsFalse(hostLauncher.IsDebug);
-        }
-
-        [TestMethod]
-        public void DefaultTestHostLauncherShouldStartTestProcess()
-        {
-            var startInfo = new TestProcessStartInfo { FileName = "testhost.exe", Arguments = "a1", WorkingDirectory = "w" };
-            var currentProcess = Process.GetCurrentProcess();
-            var mockProcessHelper = new Mock<IProcessHelper>();
-            mockProcessHelper.Setup(ph => ph.LaunchProcess(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IDictionary<string, string>>(), null))
-                .Returns(currentProcess);
-            var hostLauncher = new DefaultTestHostLauncher(mockProcessHelper.Object);
-
-            var processId = hostLauncher.LaunchTestHost(startInfo);
-
-            Assert.AreEqual(currentProcess.Id, processId);
-            mockProcessHelper.Verify(ph => ph.LaunchProcess("testhost.exe", "a1", "w", null, null), Times.Once);
+            this.ErrorLength = errorLength;
         }
     }
 }
