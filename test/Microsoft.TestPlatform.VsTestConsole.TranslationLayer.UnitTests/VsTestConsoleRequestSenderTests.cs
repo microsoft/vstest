@@ -6,7 +6,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Linq.Expressions;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -18,6 +17,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -25,8 +25,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-
-    using VisualStudio.TestPlatform.ObjectModel.Host;
 
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
