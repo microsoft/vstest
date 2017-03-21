@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
 
@@ -20,6 +21,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestBase
     {
+        public const string DesktopRunnerFramework = "net46";
+        public const string CoreRunnerFramework = "netcoreapp2.0";
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
         private string standardTestOutput = string.Empty;
         private string standardTestError = string.Empty;
@@ -167,7 +170,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         public void StdErrorContains(string substring)
         {
-            Assert.IsTrue(this.standardTestError.Contains(substring));
+            Assert.IsTrue(this.standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", this.standardTestError, substring);
         }
 
         public void StdOutputContains(string substring)
@@ -274,6 +277,43 @@ namespace Microsoft.TestPlatform.TestUtilities
             return this.testEnvironment.GetNugetPackage(adapterRelativePath);
         }
 
+        protected bool IsDesktopRunner()
+        {
+            return this.testEnvironment.RunnerFramework == IntegrationTestBase.DesktopRunnerFramework;
+        }
+
+        protected bool IsNetCoreRunner()
+        {
+            return this.testEnvironment.RunnerFramework == IntegrationTestBase.CoreRunnerFramework;
+        }
+
+        /// <summary>
+        /// Gets the path to <c>vstest.console.exe</c>.
+        /// </summary>
+        /// <returns>
+        /// Full path to test runner
+        /// </returns>
+        public string GetConsoleRunnerPath()
+        {
+            string consoleRunnerPath = string.Empty;
+
+            if (this.IsDesktopRunner())
+            {
+                consoleRunnerPath = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.exe");
+            }
+            else if (this.IsNetCoreRunner())
+            {
+                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
+            }
+            else 
+            {
+                Assert.Fail("Unknown Runner framework - [{0}]", this.testEnvironment.RunnerFramework);
+            }
+
+            Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: {0}", consoleRunnerPath);
+            return consoleRunnerPath;
+        }
+
         /// <summary>
         /// Gets the test method name from full name.
         /// </summary>
@@ -294,7 +334,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         private void Execute(string args, out string stdOut, out string stdError)
         {
-            if (this.testEnvironment.RunnerFramework == "netcoreapp1.0")
+            if (this.IsNetCoreRunner())
             {
                 var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
                 vstestConsoleDll = EncloseInQuotes(vstestConsoleDll);
@@ -309,7 +349,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             using (Process vstestconsole = new Process())
             {
                 Console.WriteLine("IntegrationTestBase.Execute: Starting vstest.console.exe");
-                vstestconsole.StartInfo.FileName = this.testEnvironment.GetConsoleRunnerPath();
+                vstestconsole.StartInfo.FileName = this.GetConsoleRunnerPath();
                 vstestconsole.StartInfo.Arguments = args;
                 vstestconsole.StartInfo.UseShellExecute = false;
                 //vstestconsole.StartInfo.WorkingDirectory = testEnvironment.PublishDirectory;
@@ -317,14 +357,30 @@ namespace Microsoft.TestPlatform.TestUtilities
                 vstestconsole.StartInfo.RedirectStandardOutput = true;
                 vstestconsole.StartInfo.CreateNoWindow = true;
 
+                var stdoutBuffer = new StringBuilder();
+                var stderrBuffer = new StringBuilder();
+                vstestconsole.OutputDataReceived += (sender, eventArgs) => stdoutBuffer.Append(eventArgs.Data);
+                vstestconsole.ErrorDataReceived += (sender, eventArgs) => stderrBuffer.Append(eventArgs.Data);
+
                 Console.WriteLine("IntegrationTestBase.Execute: Path = {0}", vstestconsole.StartInfo.FileName);
                 Console.WriteLine("IntegrationTestBase.Execute: Arguments = {0}", vstestconsole.StartInfo.Arguments);
 
                 vstestconsole.Start();
-                stdError = vstestconsole.StandardError.ReadToEnd();
-                stdOut = vstestconsole.StandardOutput.ReadToEnd();
+                vstestconsole.BeginOutputReadLine();
+                vstestconsole.BeginErrorReadLine();
+                if (!vstestconsole.WaitForExit(80 * 1000))
+                {
+                    Console.WriteLine("IntegrationTestBase.Execute: Timed out waiting for vstest.console.exe. Terminating the process.");
+                    vstestconsole.Kill();
+                }
+                else
+                {
+                    // Ensure async buffers are flushed
+                    vstestconsole.WaitForExit();
+                }
 
-                vstestconsole.WaitForExit(60 * 1000);
+                stdError = stderrBuffer.ToString();
+                stdOut = stdoutBuffer.ToString();
                 Console.WriteLine("IntegrationTestBase.Execute: Stopped vstest.console.exe. Exit code = {0}", vstestconsole.ExitCode);
             }
         }

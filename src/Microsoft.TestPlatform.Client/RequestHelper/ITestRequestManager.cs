@@ -3,10 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using System;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Defines the contract that commandline 

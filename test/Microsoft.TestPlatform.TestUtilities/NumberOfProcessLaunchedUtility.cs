@@ -1,4 +1,5 @@
-﻿// Copyright (c) Microsoft. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace TestPlatform.TestUtilities
 {
@@ -8,7 +9,7 @@ namespace TestPlatform.TestUtilities
     using System.Threading.Tasks;
 
     /// <summary>
-    ///     The number of process launched utility.
+    /// The number of process launched utility.
     /// </summary>
     public class NumberOfProcessLaunchedUtility
     {

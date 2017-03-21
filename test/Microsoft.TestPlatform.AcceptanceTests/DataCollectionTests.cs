@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.AcceptanceTests
@@ -6,11 +6,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Reflection;
-    using System.Threading;
     using System.Xml;
 
-    using global::TestPlatform.TestUtilities;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,46 +16,42 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     [TestClass]
     public class DataCollectionTests : AcceptanceTestBase
     {
-        [Ignore] // Harsh will remove this when merging PR:https://github.com/Microsoft/vstest/pull/568
+        private readonly string resultsDir;
+
+        public DataCollectionTests()
+        {
+            this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        }
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            if (Directory.Exists(this.resultsDir))
+            {
+                Directory.Delete(this.resultsDir, true);
+            }
+        }
+
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
         public void ExecuteTestsWithDataCollection(string runnerFramework, string targetFramework, string targetRuntime)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = GetRunsettingsFilePath();
+            string runSettings = this.GetRunsettingsFilePath();
+            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
 
-            this.InvokeVsTestForExecution(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            this.InvokeVsTest(arguments);
+
             this.ValidateSummaryStatus(1, 1, 1);
             this.VaildateDataCollectorOutput();
         }
 
-        private string GetRunsettingsFilePath()
-        {
-            var runsettingsPath = Path.Combine(
-                Path.GetTempPath(),
-                "test_" + Guid.NewGuid() + ".runsettings");
-            var dataCollectionAttributes = new Dictionary<string, string>();
-
-            dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
-            dataCollectionAttributes.Add("uri", "my://sample/datacollector");
-            var codebase = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
-                Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
-                "bin",
-                this.testEnvironment.BuildConfiguration,
-                this.testEnvironment.RunnerFramework,
-                "OutOfProcDataCollector.dll");
-
-            dataCollectionAttributes.Add("assemblyQualifiedName", "OutOfProcDataCollector.SampleDataCollector, OutOfProcDataCollector, Version=15.0.0.0, Culture=neutral, PublicKeyToken=null");
-            dataCollectionAttributes.Add("codebase", codebase);
-            CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
-            return runsettingsPath;
-        }
-
-        public static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
+        private static void CreateDataCollectionRunSettingsFile(string destinationRunsettingsPath, Dictionary<string, string> dataCollectionAttributes)
         {
             var doc = new XmlDocument();
             var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
@@ -83,7 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
         }
 
-        public void VaildateDataCollectorOutput()
+        private void VaildateDataCollectorOutput()
         {
             // Output of datacollection attachment.
             this.StdOutputContains("filename.txt");
@@ -93,6 +87,63 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("SessionStarted");
             this.StdOutputContains("my warning");
             this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
+
+            // Verify attachments
+            var isTestRunLevelAttachmentFound = false;
+            var testCaseLevelAttachmentsCount = 0;
+            var diaglogsFileCount = 0;
+
+            var resultFiles = Directory.GetFiles(this.resultsDir, "*.txt", SearchOption.AllDirectories);
+
+            foreach (var file in resultFiles)
+            {
+                // Test Run level attachments are logged in standard output.
+                if (file.Contains("filename.txt"))
+                {
+                    this.StdOutputContains(file);
+                    isTestRunLevelAttachmentFound = true;
+                }
+
+                if (file.Contains("testcasefilename"))
+                {
+                    testCaseLevelAttachmentsCount++;
+                }
+
+                if (file.Contains("diaglog"))
+                {
+                    diaglogsFileCount++;
+                }
+            }
+
+            Assert.IsTrue(isTestRunLevelAttachmentFound);
+            Assert.AreEqual(3, testCaseLevelAttachmentsCount);
+            Assert.AreEqual(3, diaglogsFileCount);
+        }
+
+        private string GetRunsettingsFilePath()
+        {
+            var runsettingsPath = Path.Combine(
+                Path.GetTempPath(),
+                "test_" + Guid.NewGuid() + ".runsettings");
+            var dataCollectionAttributes = new Dictionary<string, string>();
+
+            dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
+            dataCollectionAttributes.Add("uri", "my://sample/datacollector");
+
+            // Data collector needs to be targeted to same runtime as the runner framework
+            var codebase = Path.Combine(
+                this.testEnvironment.TestAssetsPath,
+                Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
+                "bin",
+                this.testEnvironment.BuildConfiguration,
+                this.testEnvironment.RunnerFramework,
+                "OutOfProcDataCollector.dll");
+            Assert.IsTrue(File.Exists(codebase), "Data collector assembly not found: " + codebase);
+
+            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(codebase)));
+            dataCollectionAttributes.Add("codebase", codebase);
+            CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
+            return runsettingsPath;
         }
     }
 }

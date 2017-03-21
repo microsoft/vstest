@@ -3,24 +3,26 @@
 
 namespace vstest.console.UnitTests.TestPlatformHelpers
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Linq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using System.Threading.Tasks;
-    using System.Threading;
-    using System.Diagnostics;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
     using vstest.console.UnitTests.TestDoubles;
 
     [TestClass]

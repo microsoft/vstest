@@ -1,23 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
-using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 {
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq;
+    using System.Threading;
+
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+    using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     public class Program
     {
