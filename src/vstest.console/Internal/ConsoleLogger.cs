@@ -218,7 +218,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 hasData = true;
                 Output.WriteLine(CommandLineResources.ErrorMessageBanner, OutputLevel.Information);
                 string errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, result.ErrorMessage);
-                Output.WriteLine(errorMessage, OutputLevel.Information);
+                using (new ConsoleColorHelper(ConsoleColor.Red))
+                {
+                    Output.WriteLine(errorMessage, OutputLevel.Error);
+                }
             }
 
             if (!String.IsNullOrEmpty(result.ErrorStackTrace))
@@ -226,7 +229,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 hasData = true;
                 Output.WriteLine(CommandLineResources.StacktraceBanner, OutputLevel.Information);
                 string stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}", result.ErrorStackTrace);
-                Output.Write(stackTrace, OutputLevel.Information);
+                using (new ConsoleColorHelper(ConsoleColor.Red))
+                {
+                    Output.Write(stackTrace, OutputLevel.Error);
+                }
             }
 
             Collection<TestResultMessage> stdOutMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardOutCategory);
@@ -243,8 +249,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 hasData = true;
                 string stdErrMessages = GetFormattedOutput(stdErrMessagesCollection);
-                Output.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Error);
-                Output.Write(stdErrMessages, OutputLevel.Error);
+                using (new ConsoleColorHelper(ConsoleColor.Red))
+                {
+                    Output.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Error);
+                    Output.Write(stdErrMessages, OutputLevel.Error);
+                }
             }
 
             Collection<TestResultMessage> addnlInfoMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.AdditionalInfoCategory);
