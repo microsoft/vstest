@@ -55,7 +55,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             this.testRecorder.RecordStart(this.testCase);
             Assert.IsTrue(this.testableTestRunCache.TestStartedList.Contains(this.testCase));
         }
-       
+
         [TestMethod]
         public void RecordResultShouldUpdateTestRunCache()
         {
