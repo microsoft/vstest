@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     /// <summary>
     /// Factory for providing the design mode test host launchers
