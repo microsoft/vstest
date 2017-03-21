@@ -41,6 +41,15 @@
   <PropertyGroup>
     <DebugType Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">Full</DebugType>
   </PropertyGroup>
+ 
+  <!--
+     Generate config file for test project targeting .NET Framework. This config file has have binding redirect which
+	 is needed at time of running tests.
+   -->
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+  </PropertyGroup>
 
   <!--
      Note that this must run before every invocation of CoreCompile to ensure that all
