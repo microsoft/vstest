@@ -8,6 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -112,6 +114,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
             exitCode = 0;
             return false;
+        }
+
+        /// <inheritdoc/>
+        public Task WaitForParentProcessExitAsync(int parentProcessId, string requestingEntity)
+        {
+            var parentProcessExitedHandle = new AutoResetEvent(false);
+            var process = Process.GetProcessById(parentProcessId);
+
+            process.EnableRaisingEvents = true;
+            process.Exited += (sender, args) =>
+            {
+                EqtTrace.Info("{0}: ParentProcess '{1}' Exited.", requestingEntity, parentProcessId);
+                parentProcessExitedHandle.Set();
+            };
+
+            return Task.Run(() => parentProcessExitedHandle.WaitOne());
         }
     }
 }

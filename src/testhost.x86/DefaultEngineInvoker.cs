@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -61,7 +62,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 // Attach to exit of parent process
                 var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
                 EqtTrace.Info("DefaultEngineInvoker: Monitoring parent process with id: '{0}'", parentProcessId);
-                var parentProcessMonitoringTask = WaitForParentProcessExitAsync(parentProcessId);
+                var processHelper = new ProcessHelper();
+                var parentProcessMonitoringTask = processHelper.WaitForParentProcessExitAsync(parentProcessId, nameof(DefaultEngineInvoker));
 
                 // Initialize Communication
                 EqtTrace.Info("DefaultEngineInvoker: Initialize communication on port number: '{0}'", portNumber);
@@ -112,21 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     throw new TimeoutException();
                 }
             });
-        }
-
-        private static Task WaitForParentProcessExitAsync(int parentProcessId)
-        {
-            var parentProcessExitedHandle = new AutoResetEvent(false);
-            var process = Process.GetProcessById(parentProcessId);
-
-            process.EnableRaisingEvents = true;
-            process.Exited += (sender, args) =>
-            {
-                EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
-                parentProcessExitedHandle.Set();
-            };
-
-            return Task.Run(() => parentProcessExitedHandle.WaitOne());
         }
 
         /// <summary>
