@@ -27,7 +27,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Sends the test result
         /// </summary>
         /// <param name="result"> The result. </param>
-        /// <returns>True, if result can be flushed</returns>
-        bool SendTestResult(TestResult result);
+        void SendTestResult(TestResult result);
+
+        /// <summary>
+        /// Send session start event.
+        /// The purpose of this is to perform any initialization before the test case level events are sent.
+        /// </summary>
+        void SendSessionStart();
+
+        /// <summary>
+        /// Sends session end event.
+        /// The purpose of this is to perform any cleanup after the test case level events are sent.
+        /// </summary>
+        void SendSessionEnd();
     }
 }

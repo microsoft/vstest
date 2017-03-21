@@ -5,17 +5,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System.Threading;
 
     /// <summary>
     /// Utility class to fecilitate the IPC comunication. Acts as Client.
@@ -27,6 +31,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private IDataSerializer dataSerializer;
 
         private Action<Message> OnAckMessageRecieved;
+
+        private ProxyOutOfProcDataCollectionManager outOfProcDataCollectionManager;
+
+        private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
 
         /// <summary>
         /// The timeout for the client to connect to the server.
@@ -65,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void ProcessRequests(ITestHostManagerFactory testHostManagerFactory)
         {
             bool isSessionEnd = false;
-            
+
             var jobQueue = new JobQueue<Action>(
                 (action) => { action(); },
                 "TestHostOperationQueue",
@@ -73,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 25000000,
                 true,
                 (message) => EqtTrace.Error(message));
-            
+
             do
             {
                 var message = this.communicationManager.ReceiveMessage();
@@ -99,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 () =>
                                 testHostManagerFactory.GetDiscoveryManager()
                                     .DiscoverTests(discoveryCriteria, discoveryEventsHandler), 0);
-                            
+
                             break;
                         }
 
@@ -126,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                         testRunCriteriaWithSources.AdapterSourceMap,
                                         testRunCriteriaWithSources.RunSettings,
                                         testRunCriteriaWithSources.TestExecutionContext,
-                                        null,
+                                        this.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
                                         testRunEventsHandler),
                                 0);
 
@@ -135,21 +143,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     case MessageType.StartTestExecutionWithTests:
                         {
-                             EqtTrace.Info("Execution started.");
+                            EqtTrace.Info("Execution started.");
                             var testRunEventsHandler = new TestRunEventsHandler(this);
-                            
+
                             var testRunCriteriaWithTests =
                                 this.communicationManager.DeserializePayload<TestRunCriteriaWithTests>
                                     (message);
-                            
+
                             jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetExecutionManager()
                                     .StartTestRun(
                                         testRunCriteriaWithTests.Tests,
                                         testRunCriteriaWithTests.RunSettings,
-                                        testRunCriteriaWithTests.TestExecutionContext,
-                                        null,
+                                        testRunCriteriaWithTests.TestExecutionContext, 
+                                        this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
                                         testRunEventsHandler),
                                 0);
 
@@ -235,7 +243,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="message"></param>
         public void SendLog(TestMessageLevel messageLevel, string message)
         {
-            var testMessagePayload = new TestMessagePayload {MessageLevel = messageLevel,Message = message};
+            var testMessagePayload = new TestMessagePayload { MessageLevel = messageLevel, Message = message };
             this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
         }
 
@@ -253,12 +261,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             ICollection<string> executorUris)
         {
             var payload = new TestRunCompletePayload
-                              {
-                                  TestRunCompleteArgs = testRunCompleteArgs,
-                                  LastRunTests = lastChunkArgs,
-                                  RunAttachments = runContextAttachments,
-                                  ExecutorUris = executorUris
-                              };
+            {
+                TestRunCompleteArgs = testRunCompleteArgs,
+                LastRunTests = lastChunkArgs,
+                RunAttachments = runContextAttachments,
+                ExecutorUris = executorUris
+            };
 
             this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload);
         }
@@ -274,7 +282,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 LastDiscoveredTests = isAborted ? null : lastChunk,
                 IsAborted = isAborted
             };
-            
+
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload);
         }
 
@@ -297,6 +305,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             waitHandle.WaitOne();
             this.OnAckMessageRecieved = null;
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
+        }
+
+        private ITestCaseEventsHandler GetTestCaseEventsHandler(string runSettings)
+        {
+            ITestCaseEventsHandler testCaseEventsHandler = null;
+
+            if ((XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings) && DataCollectionTestCaseEventSender.Instance != null) || XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
+            {
+                testCaseEventsHandler = new TestCaseEventsHandler();
+                var testEventsPublisher = testCaseEventsHandler as ITestEventsPublisher;
+
+                if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
+                {
+                    this.outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
+                }
+
+                if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
+                {
+                    this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher);
+                }
+            }
+
+            return testCaseEventsHandler;
         }
     }
 }

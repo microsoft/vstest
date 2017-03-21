@@ -36,13 +36,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="runSettings">
         /// The run settings.
         /// </param>
-        /// <param name="testRunCache">
-        /// The test run cache.
-        /// </param>
-        /// <param name="dataCollectionTestCaseEventManager">
+        /// <param name="testEventsPublisher">
         /// The data collection test case event manager.
         /// </param>
-        public InProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager)
+        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher testEventsPublisher)
         {
             this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
@@ -52,11 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (this.IsInProcDataCollectionEnabled)
             {
-                dataCollectionTestCaseEventManager.TestCaseEnd += this.TriggerTestCaseEnd;
-                dataCollectionTestCaseEventManager.TestCaseStart += this.TriggerTestCaseStart;
-                dataCollectionTestCaseEventManager.TestResult += this.TriggerUpdateTestResult;
-                dataCollectionTestCaseEventManager.SessionStart += this.TriggerTestSessionStart;
-                dataCollectionTestCaseEventManager.SessionEnd += this.TriggerTestSessionEnd;
+                testEventsPublisher.TestCaseEnd += this.TriggerTestCaseEnd;
+                testEventsPublisher.TestCaseStart += this.TriggerTestCaseStart;
+                testEventsPublisher.TestResult += this.TriggerUpdateTestResult;
+                testEventsPublisher.SessionStart += this.TriggerTestSessionStart;
+                testEventsPublisher.SessionEnd += this.TriggerTestSessionEnd;
             }
         }
 
@@ -149,8 +146,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var dataCollectionContext = new DataCollectionContext(e.TestElement);
             var testCaseEndArgs = new TestCaseEndArgs(dataCollectionContext, e.TestOutcome);
             this.TriggerInProcDataCollectionMethods(Constants.TestCaseEndMethodName, testCaseEndArgs);
-
-            ((InProcDataCollectionSink)this.inProcDataCollectionSink).RemoveDataCollectionDataSetForTestCase(e.TestCaseId);
         }
 
         /// <summary>
@@ -166,6 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             // Just set the cached in-proc data if already exists
             this.SetInProcDataCollectionDataInTestResult(e.TestResult);
+            ((InProcDataCollectionSink)this.inProcDataCollectionSink).RemoveDataCollectionDataSetForTestCase(e.TestCaseId);
         }
 
         /// <summary>
