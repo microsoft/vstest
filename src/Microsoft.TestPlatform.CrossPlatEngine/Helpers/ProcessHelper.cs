@@ -50,12 +50,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 if (exitCallBack != null)
                 {
                     process.Exited += (sender, args) =>
-                    {
-                        // Call WaitForExit again to ensure all streams are flushed
-                        var p = sender as Process;
-                        p.WaitForExit();
-                        exitCallBack(p);
-                    };
+                        {
+                            // Call WaitForExit again to ensure all streams are flushed
+                            var p = sender as Process;
+                            p.WaitForExit();
+                            exitCallBack(p);
+                        };
                 }
 
                 EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
@@ -117,19 +117,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         }
 
         /// <inheritdoc/>
-        public Task WaitForParentProcessExitAsync(int parentProcessId, string requestingEntity)
+        public void SetExitCallback(int parentProcessId, Action callbackAction)
         {
             var parentProcessExitedHandle = new AutoResetEvent(false);
             var process = Process.GetProcessById(parentProcessId);
 
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) =>
-            {
-                EqtTrace.Info("{0}: ParentProcess '{1}' Exited.", requestingEntity, parentProcessId);
-                parentProcessExitedHandle.Set();
-            };
-
-            return Task.Run(() => parentProcessExitedHandle.WaitOne());
+                {
+                    callbackAction.Invoke();
+                };
         }
     }
 }

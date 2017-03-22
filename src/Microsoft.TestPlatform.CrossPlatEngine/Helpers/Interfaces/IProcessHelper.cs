@@ -64,10 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <param name="parentProcessId">
         /// The parent process id.
         /// </param>
-        /// <param name="requestingEntity"></param>
-        /// <returns>
-        /// The <see cref="Task"/>.
-        /// </returns>
-        Task WaitForParentProcessExitAsync(int parentProcessId, string requestingEntity);
+        /// <param name="callbackAction">
+        /// Callback on process exit.
+        /// </param>
+        void SetExitCallback(int parentProcessId, Action callbackAction);
     }
 }

@@ -76,7 +76,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             EqtTrace.Info("DataCollector: Monitoring parent process with id: '{0}'", parentProcessId);
 
             var processHelper = new ProcessHelper();
-            var parentProcessMonitoringTask = processHelper.WaitForParentProcessExitAsync(parentProcessId, "DataCollector");
+            processHelper.SetExitCallback(parentProcessId,
+                () =>
+                    {
+                        EqtTrace.Info("DataCollector: ParentProcess '{0}' Exited.", parentProcessId);
+                        Environment.Exit(1);
+                    });
 
             // Setup logging if enabled
             string logFile;
@@ -106,8 +111,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             EqtTrace.Info("DataCollector: Start Request Processing.");
             var processingTask = StartProcessingAsync(requestHandler);
 
-            // Wait for either processing to complete or parent process exit
-            Task.WaitAny(processingTask, parentProcessMonitoringTask);
+            // Wait for processing to complete.
+            Task.WaitAny(processingTask);
         }
 
         private static void WaitForDebuggerIfEnabled()

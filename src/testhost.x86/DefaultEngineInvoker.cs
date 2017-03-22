@@ -63,7 +63,12 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
                 EqtTrace.Info("DefaultEngineInvoker: Monitoring parent process with id: '{0}'", parentProcessId);
                 var processHelper = new ProcessHelper();
-                var parentProcessMonitoringTask = processHelper.WaitForParentProcessExitAsync(parentProcessId, nameof(DefaultEngineInvoker));
+                processHelper.SetExitCallback(parentProcessId,
+                    () =>
+                        {
+                            EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
+                            Environment.Exit(1);
+                        });
 
                 // Initialize Communication
                 EqtTrace.Info("DefaultEngineInvoker: Initialize communication on port number: '{0}'", portNumber);
@@ -88,8 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
                 var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
 
-                // Wait for either processing to complete or parent process exit
-                Task.WaitAny(processingTask, parentProcessMonitoringTask);
+                // Wait for processing to complete.
+                Task.WaitAny(processingTask);
 
                 if (dcPort > 0)
                 {
@@ -97,6 +102,19 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     DataCollectionTestCaseEventSender.Instance.Close();
                 }
             }
+        }
+
+        /// <summary>
+        /// Parse the value of an argument as an integer.
+        /// </summary>
+        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
+        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
+        /// <returns>Value of the argument.</returns>
+        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
+        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
+        {
+            string optionValue;
+            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
         }
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
@@ -114,19 +132,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     throw new TimeoutException();
                 }
             });
-        }
-
-        /// <summary>
-        /// Parse the value of an argument as an integer.
-        /// </summary>
-        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
-        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
-        /// <returns>Value of the argument.</returns>
-        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
-        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
-        {
-            string optionValue;
-            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
-        }
+        }       
     }
 }
