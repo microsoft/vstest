@@ -152,7 +152,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 IOutput output = ConsoleOutput.Instance;
                 output.Warning(
                     CommandLineResources.TestSettingsFrameworkMismatch,
-                    ConsoleColor.Yellow,
                     this.commandLineOptions.TargetFrameworkVersion.ToString(),
                     Framework.DefaultFramework.ToString());
             }

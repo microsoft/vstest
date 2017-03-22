@@ -21,11 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
         /// <param name="format">Format string for the error message.</param>
-        /// <param name="foregroundColor">Color in which text prints.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Error(this IOutput output, string format, ConsoleColor foregroundColor=ConsoleColor.Red, params object[] args)
+        public static void Error(this IOutput output, string format, params object[] args)
         {
-            ConsoleColorHelper.SetColorForAction(foregroundColor, () =>
+            ConsoleColorHelper.SetColorForAction(ConsoleColor.Red, () =>
             {
                 Output(output, OutputLevel.Error, DefaultFormat, format, args);
             });
@@ -36,11 +35,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
         /// <param name="format">Format string for the warning message.</param>
-        /// <param name="foregroundColor">Color in which text prints.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Warning(this IOutput output, string format, ConsoleColor foregroundColor=ConsoleColor.Yellow, params object[] args)
+        public static void Warning(this IOutput output, string format, params object[] args)
         {
-            ConsoleColorHelper.SetColorForAction(foregroundColor, () =>
+            ConsoleColorHelper.SetColorForAction(ConsoleColor.Yellow, () =>
             {
                 Output(output, OutputLevel.Warning, DefaultFormat, format, args);
             });
@@ -51,9 +49,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
         /// <param name="format">Format string for the informational message.</param>
+        /// <param name="args">Arguments to format into the format string.</param>
+        public static void Information(this IOutput output, string format, params object[] args)
+        {
+           Information(output, Console.ForegroundColor, format, args);
+        }
+
+        /// <summary>
+        /// Output a informational message.
+        /// </summary>
+        /// <param name="output">Output instance the method is being invoked with.</param>
+        /// <param name="format">Format string for the informational message.</param>
         /// <param name="foregroundColor">Color in which text prints.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Information(this IOutput output, string format, ConsoleColor foregroundColor=ConsoleColor.White, params object[] args)
+        public static void Information(this IOutput output, ConsoleColor foregroundColor, string format, params object[] args)
         {
             ConsoleColorHelper.SetColorForAction(foregroundColor, () =>
             {
