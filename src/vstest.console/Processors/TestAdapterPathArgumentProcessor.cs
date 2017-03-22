@@ -182,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             else
             {
                 // Print a warning about not finding any test adapter in provided path...
-                this.output.Warning(CommandLineResources.NoAdaptersFoundInTestAdapterPath, argument);
+                this.output.Warning(CommandLineResources.NoAdaptersFoundInTestAdapterPath, ConsoleColor.Yellow, argument);
                 this.output.WriteLine(string.Empty, OutputLevel.Information);
             }
         }

@@ -6,51 +6,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System;
 
     /// <summary>
-    /// Colors the console output and restores it when disposed.
+    /// Console color helper
     /// </summary>
-    public sealed class ConsoleColorHelper : IDisposable
+    internal sealed class ConsoleColorHelper
     {
-        private readonly ConsoleColor previousForegroundColor;
-        private bool disposed;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleColorHelper"/> class.
+        /// Set given foregroundColor to Console.ForegroundColor during given action.
         /// </summary>
-        /// <param name="foregroundColor">
-        /// Color to set the console foreground to.
-        /// </param>
-        public ConsoleColorHelper(ConsoleColor foregroundColor)
+        /// <param name="foregroundColor"></param>
+        /// <param name="action"></param>
+        public static void SetColorForAction(ConsoleColor foregroundColor, Action action)
         {
-            this.previousForegroundColor = Console.ForegroundColor;
-            Console.ForegroundColor = foregroundColor;
-        }
-
-        /// <summary>
-        /// Restores the original foreground color.
-        /// </summary>
-        public void Dispose()
-        {
-            this.Dispose(true);
-
-            // Use SupressFinalize in case a subclass
-            // of this type implements a finalizer.
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the composition container.
-        /// </summary>
-        /// <param name="disposing">True if the object is disposing.</param>
-        private void Dispose(bool disposing)
-        {
-            if (!this.disposed)
+            if(action == null)
             {
-                if (disposing)
-                {
-                    Console.ForegroundColor = this.previousForegroundColor;
-                }
+                return;
+            }
 
-                this.disposed = true;
+            var previousForegroundColor = Console.ForegroundColor;
+            try
+            {
+                Console.ForegroundColor = foregroundColor;
+                action.Invoke();
+            }
+            finally
+            {
+                Console.ForegroundColor = previousForegroundColor;
             }
         }
     }

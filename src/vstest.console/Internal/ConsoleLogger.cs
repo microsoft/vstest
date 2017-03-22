@@ -20,6 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
     /// <summary>
     /// Logger for sending output to the console.
+    /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
+    /// from adapters and test run result on failed.
     /// </summary>
     [FriendlyName(ConsoleLogger.FriendlyName)]
     [ExtensionUri(ConsoleLogger.ExtensionUri)]
@@ -217,17 +219,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (!String.IsNullOrEmpty(result.ErrorMessage))
             {
                 addAdditionalNewLine = true;
-                Output.Error(CommandLineResources.ErrorMessageBanner);
+                Output.Information(CommandLineResources.ErrorMessageBanner, foregroundColor: ConsoleColor.Red);
                 string errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, result.ErrorMessage);
-                Output.Error(errorMessage);
+                Output.Information(errorMessage, foregroundColor:ConsoleColor.Red);
             }
 
             if (!String.IsNullOrEmpty(result.ErrorStackTrace))
             {
                 addAdditionalNewLine = false;
-                Output.Error(CommandLineResources.StacktraceBanner);
+                Output.Information(CommandLineResources.StacktraceBanner, foregroundColor: ConsoleColor.Red);
                 string stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}", result.ErrorStackTrace);
-                Output.Error(stackTrace);
+                Output.Information(stackTrace, foregroundColor: ConsoleColor.Red);
             }
 
             Collection<TestResultMessage> stdOutMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardOutCategory);
@@ -244,8 +246,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 addAdditionalNewLine = false;
                 string stdErrMessages = GetFormattedOutput(stdErrMessagesCollection);
-                Output.Error(CommandLineResources.StdErrMessagesBanner);
-                Output.Error(stdErrMessages);
+                Output.Information(CommandLineResources.StdErrMessagesBanner, foregroundColor: ConsoleColor.Red);
+                Output.Information(stdErrMessages, foregroundColor: ConsoleColor.Red);
             }
 
             Collection<TestResultMessage> addnlInfoMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.AdditionalInfoCategory);
@@ -318,7 +320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 this.testOutcome = TestOutcome.Failed;
                 this.testsFailed++;
                 string output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, name);
-                Output.Error(output);
+                Output.Information(output, foregroundColor: ConsoleColor.Red);
                 DisplayFullInformation(e.Result);
             }
             else if (e.Result.Outcome == TestOutcome.Passed)
@@ -372,10 +374,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
                 else
                 {
-                    using (new ConsoleColorHelper(ConsoleColor.Green))
+                    ConsoleColorHelper.SetColorForAction(ConsoleColor.Green, () =>
                     {
                         Output.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information);
-                    }
+                    });
                 }
                 if (!e.ElapsedTimeInRunningTests.Equals(TimeSpan.Zero))
                 {

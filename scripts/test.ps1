@@ -31,11 +31,7 @@ Param(
     [Switch] $FailFast = $false,
 
     [Parameter(Mandatory=$false)]
-    [Switch] $Parallel = $false,
-
-    [Parameter(Mandatory=$false)]
-    [Alias("d")]
-    [System.String] $ConsoleLogger = '/logger:"console;verbosity=minimal"'
+    [Switch] $Parallel = $false
 )
 
 function Get-DotNetPath
@@ -337,6 +333,8 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 
 Write-Log "Test run configuration: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPT_") } | Format-Table
+
+$ConsoleLogger = if ($VerbosePreference -eq "Continue") {'/logger:"console;verbosity=normal"'} else {'/logger:"console;verbosity=minimal"'}
 
 Invoke-Test
 

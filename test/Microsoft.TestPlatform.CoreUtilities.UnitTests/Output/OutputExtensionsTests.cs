@@ -6,9 +6,10 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Moq;
+    using System;
 
     [TestClass]
-    public class OutputUtilitiesTests
+    public class OutputExtensionsTests
     {
         private Mock<IOutput> mockOutput;
 
@@ -21,42 +22,42 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         [TestMethod]
         public void OutputErrorForSimpleMessageShouldOutputTheMessageString()
         {
-            mockOutput.Object.Error("HelloError", null);
+            mockOutput.Object.Error("HelloError", ConsoleColor.Red, null);
             mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
         public void OutputErrorForMessageWithParamsShouldOutputFormattedMessage()
         {
-            mockOutput.Object.Error("HelloError {0} {1}", "Foo", "Bar");
+            mockOutput.Object.Error("HelloError {0} {1}", ConsoleColor.Red, "Foo", "Bar");
             mockOutput.Verify(o => o.WriteLine("HelloError Foo Bar", OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
         public void OutputWarningForSimpleMessageShouldOutputTheMessageString()
         {
-            mockOutput.Object.Warning("HelloWarning", null);
+            mockOutput.Object.Warning("HelloWarning", ConsoleColor.Yellow, null);
             mockOutput.Verify(o => o.WriteLine("HelloWarning", OutputLevel.Warning), Times.Once());
         }
 
         [TestMethod]
         public void OutputWarningForMessageWithParamsShouldOutputFormattedMessage()
         {
-            mockOutput.Object.Warning("HelloWarning {0} {1}", "Foo", "Bar");
+            mockOutput.Object.Warning("HelloWarning {0} {1}", ConsoleColor.Yellow, "Foo", "Bar");
             mockOutput.Verify(o => o.WriteLine("HelloWarning Foo Bar", OutputLevel.Warning), Times.Once());
         }
 
         [TestMethod]
         public void OutputInformationForSimpleMessageShouldOutputTheMessageString()
         {
-            mockOutput.Object.Information("HelloInformation", null);
+            mockOutput.Object.Information("HelloInformation", ConsoleColor.Yellow, null);
             mockOutput.Verify(o => o.WriteLine("HelloInformation", OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
         public void OutputInformationForMessageWithParamsShouldOutputFormattedMessage()
         {
-            mockOutput.Object.Information("HelloInformation {0} {1}", "Foo", "Bar");
+            mockOutput.Object.Information("HelloInformation {0} {1}", ConsoleColor.Yellow, "Foo", "Bar");
             mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
         }
     }
