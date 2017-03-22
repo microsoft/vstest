@@ -3,16 +3,21 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 {
-    using Client.Execution;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Moq;
-    using ObjectModel;
-    using ObjectModel.Client;
-    using ObjectModel.Host;
-    using ObjectModel.Engine;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
+    using Client.Execution;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using Moq;
+
+    using ObjectModel;
+    using ObjectModel.Client;
+    using ObjectModel.Engine;
+
     [TestClass]
     public class TestRunRequestTests
     {
