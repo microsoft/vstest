@@ -119,7 +119,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// <inheritdoc/>
         public void SetExitCallback(int parentProcessId, Action callbackAction)
         {
-            var parentProcessExitedHandle = new AutoResetEvent(false);
             var process = Process.GetProcessById(parentProcessId);
 
             process.EnableRaisingEvents = true;

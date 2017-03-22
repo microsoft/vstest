@@ -71,8 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             var requestHandler = DataCollectionRequestHandler.Create(new SocketCommunicationManager(), new MessageSink());
 
             // Attach to exit of parent process
-            string optionValue;
-            var parentProcessId = argsDictionary.TryGetValue(ParentProcessArgument, out optionValue) ? int.Parse(optionValue) : 0;
+            var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);
             EqtTrace.Info("DataCollector: Monitoring parent process with id: '{0}'", parentProcessId);
 
             var processHelper = new ProcessHelper();

@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -40,6 +41,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers
             }
 
             return argsDictionary;
+        }
+
+        /// <summary>
+        /// Parse the value of an argument as an integer.
+        /// </summary>
+        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
+        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
+        /// <returns>Value of the argument.</returns>
+        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
+        public static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
+        {
+            string optionValue;
+            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
         }
     }
 }

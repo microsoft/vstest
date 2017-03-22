@@ -5,12 +5,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -54,13 +53,13 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
 
             // Get port number and initialize communication
-            var portNumber = GetIntArgFromDict(argsDictionary, PortArgument);
+            var portNumber = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, PortArgument);
 
             // Start Processing of requests
             using (var requestHandler = new TestRequestHandler())
             {
                 // Attach to exit of parent process
-                var parentProcessId = GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
+                var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
                 EqtTrace.Info("DefaultEngineInvoker: Monitoring parent process with id: '{0}'", parentProcessId);
                 var processHelper = new ProcessHelper();
                 processHelper.SetExitCallback(parentProcessId,
@@ -81,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
 
                 // Initialize DataCollection Communication if data collection port is provided.
-                var dcPort = GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
+                var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
                 if (dcPort > 0)
                 {
                     var dataCollectionTestCaseEventSender = DataCollectionTestCaseEventSender.Create();
@@ -102,20 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     DataCollectionTestCaseEventSender.Instance.Close();
                 }
             }
-        }
-
-        /// <summary>
-        /// Parse the value of an argument as an integer.
-        /// </summary>
-        /// <param name="argsDictionary">Dictionary of all arguments Ex: <c>{ "--port":"12312", "--parentprocessid":"2312" }</c></param>
-        /// <param name="fullname">The full name for required argument. Ex: "--port"</param>
-        /// <returns>Value of the argument.</returns>
-        /// <exception cref="ArgumentException">Thrown if value of an argument is not an integer.</exception>
-        private static int GetIntArgFromDict(IDictionary<string, string> argsDictionary, string fullname)
-        {
-            string optionValue;
-            return argsDictionary.TryGetValue(fullname, out optionValue) ? int.Parse(optionValue) : 0;
-        }
+        }        
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
