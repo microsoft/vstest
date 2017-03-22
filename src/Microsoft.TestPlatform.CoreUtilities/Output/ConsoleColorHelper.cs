@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// <summary>
     /// Console color helper
     /// </summary>
-    internal sealed class ConsoleColorHelper
+    public sealed class ConsoleColorHelper
     {
         /// <summary>
         /// Set given foregroundColor to Console.ForegroundColor during given action.

@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
     using Microsoft.TestPlatform.Extensions.TrxLogger.XML;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using ObjectModel.Logging;
 
@@ -404,7 +405,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 {
                     var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture,
                         TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName);
-                    Console.WriteLine(overwriteWarningMsg);
+                    ConsoleColorHelper.SetColorForAction(ConsoleColor.Yellow, () => Console.WriteLine(overwriteWarningMsg));
                     EqtTrace.Warning(overwriteWarningMsg);
                 }
 
@@ -418,7 +419,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
             }
             catch (System.UnauthorizedAccessException fileWriteException)
             {
-                Console.WriteLine(fileWriteException.Message);
+                ConsoleColorHelper.SetColorForAction(ConsoleColor.Red, () => Console.WriteLine(fileWriteException.Message));
             }
         }
 
