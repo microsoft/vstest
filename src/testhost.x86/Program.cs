@@ -7,10 +7,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using System.Collections.Generic;
     using System.Diagnostics;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The program.
@@ -46,6 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private static void Run(string[] args)
         {
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
+            
             // Invoke the engine with arguments
             GetEngineInvoker(argsDictionary).Invoke(argsDictionary);
         }
