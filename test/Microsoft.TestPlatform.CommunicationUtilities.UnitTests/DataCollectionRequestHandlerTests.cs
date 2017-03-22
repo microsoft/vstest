@@ -7,7 +7,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using System.Collections.ObjectModel;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -35,7 +35,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataCollectionTestCaseEventHandler = new Mock<IDataCollectionTestCaseEventHandler>();
             this.mockDataCollectionTestCaseEventHandler.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
-
         }
 
         [TestMethod]
@@ -67,7 +66,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void InitializeCommunicationShouldInitializeCommunication()
         {
-
             requestHandler.InitializeCommunication(123);
 
             this.mockCommunicationManager.Verify(x => x.SetupClientAsync(123), Times.Once);
@@ -163,7 +161,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
 
-            requestHandler.ProcessRequests();
+            this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Once);
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
@@ -171,7 +169,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockDataCollectionManager.Verify(x => x.SessionStarted(), Times.Once);
 
-            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<DataCollectionParameters>()), Times.Once);
 
             // Verify AfterTestRun events.
             this.mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
@@ -183,7 +181,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() => { requestHandler.ProcessRequests(); });
+            Assert.ThrowsException<Exception>(() => { this.requestHandler.ProcessRequests(); });
         }
 
         [TestMethod]
@@ -197,11 +195,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(true);
 
-            requestHandler.ProcessRequests();
+            this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Once);
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Once);
-            this.mockDataCollectionTestCaseEventHandler.Verify((x => x.WaitForRequestHandlerConnection(It.IsAny<int>())), Times.Once);
+            this.mockDataCollectionTestCaseEventHandler.Verify(x => x.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
         }
 
         [TestMethod]
@@ -215,7 +213,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockDataCollectionManager.Setup(x => x.SessionStarted()).Returns(false);
 
-            requestHandler.ProcessRequests();
+            this.requestHandler.ProcessRequests();
 
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Never);
             this.mockDataCollectionTestCaseEventHandler.Verify(x => x.ProcessRequests(), Times.Never);

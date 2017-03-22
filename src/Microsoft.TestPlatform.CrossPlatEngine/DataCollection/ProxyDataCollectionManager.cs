@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.IO;
     using System.Threading;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -33,7 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IProcessHelper processHelper;
         private string settingsXml;
         private int connectionTimeout;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
@@ -120,29 +120,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// The run Events Handler.
         /// </param>
         /// <returns>
-        /// BeforeTestRunStartResult object
+        /// DataCollectionParameters object
         /// </returns>
         public DataCollectionParameters BeforeTestRunStart(
             bool resetDataCollectors,
             bool isRunStartingNow,
             ITestMessageEventHandler runEventsHandler)
         {
-            var areTestCaseLevelEventsRequired = false;
-            IDictionary<string, string> environmentVariables = null;
-
-            var dataCollectionEventsPort = 0;
+            DataCollectionParameters result = null;
             this.InvokeDataCollectionServiceAction(
             () =>
             {
-                var result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler);
-                environmentVariables = result.EnvironmentVariables;
-                dataCollectionEventsPort = result.DataCollectionEventsPort;
+                result = this.dataCollectionRequestSender.SendBeforeTestRunStartAndGetResult(this.settingsXml, runEventsHandler);
             },
                 runEventsHandler);
-            return new DataCollectionParameters(
-                            areTestCaseLevelEventsRequired,
-                            environmentVariables,
-                            dataCollectionEventsPort);
+            return result;
         }
 
         /// <summary>

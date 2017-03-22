@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;

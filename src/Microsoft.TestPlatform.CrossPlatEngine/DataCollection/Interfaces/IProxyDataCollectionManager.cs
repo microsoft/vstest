@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
     using System;
     using System.Collections.ObjectModel;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         /// The run Events Handler.
         /// </param>
         /// <returns>
-        /// BeforeTestRunStartResult object
+        /// DataCollectionParameters object
         /// </returns>
         DataCollectionParameters BeforeTestRunStart(
             bool resetDataCollectors,

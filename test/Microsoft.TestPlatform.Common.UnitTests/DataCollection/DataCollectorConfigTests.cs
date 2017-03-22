@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
+namespace Microsoft.TestPlatform.Common.UnitTests.DataCollection
 {
     using System;
     using System.Globalization;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -39,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                     },
                 string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.Resources.DataCollector_TypeIsNull,
+                    VisualStudio.TestPlatform.Common.Resources.Resources.DataCollector_TypeIsNull,
                     typeof(CustomDataCollectorWithoutUri).FullName));
         }
 
@@ -52,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                     },
                 string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.Resources.FriendlyNameIsNullOrEmpty,
+                    VisualStudio.TestPlatform.Common.Resources.Resources.FriendlyNameIsNullOrEmpty,
                     typeof(CustomDataCollectorWithEmptyFriendlyName).FullName));
         }
 
@@ -65,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                     },
                 string.Format(
                     CultureInfo.CurrentCulture,
-                    Resources.Resources.FriendlyNameIsNullOrEmpty,
+                    VisualStudio.TestPlatform.Common.Resources.Resources.FriendlyNameIsNullOrEmpty,
                     typeof(CustomDataCollectorWithoutFriendlyName).FullName));
         }
 

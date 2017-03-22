@@ -28,7 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         /// <param name="testCaseEvents"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-        void StartTestRun(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, ITestRunEventsHandler eventHandler);
+        void StartTestRun(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, TestExecutionContext testExecutionContext, ITestEventsHandler testCaseEvents, ITestRunEventsHandler eventHandler);
 
         /// <summary>
         /// Starts the test run with tests.
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         /// /// <param name="testCaseEvents"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="eventHandler"> EventHandler for handling execution events from Engine. </param>
-        void StartTestRun(IEnumerable<TestCase> tests, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEvents, ITestRunEventsHandler eventHandler);
+        void StartTestRun(IEnumerable<TestCase> tests, string runSettings, TestExecutionContext testExecutionContext, ITestEventsHandler testCaseEvents, ITestRunEventsHandler eventHandler);
 
         /// <summary>
         /// Cancel the test execution.

@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList;
 
-        public RunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+        public RunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
             : this(testCases, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
         {
         }
@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
         /// <param name="executorUriVsTestList"></param>
-        internal RunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
+        internal RunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
             : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
         {
             this.testCases = testCases;

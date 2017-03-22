@@ -143,14 +143,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             public TestableRunTestsWithTests(IEnumerable<TestCase> testCases,
                 string runSettings, TestExecutionContext testExecutionContext,
-                ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+                ITestEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
                 : base(
                     testCases, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler)
             {
             }
 
-            internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
+            internal TestableRunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
                 : base(
                     testCases, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler, executorUriVsTestList)

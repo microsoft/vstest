@@ -1,18 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
+namespace Microsoft.TestPlatform.Common.UnitTests.DataCollection
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
     using Moq.Protected;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     [TestClass]
     public class DataCollectorInformationTests

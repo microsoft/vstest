@@ -42,9 +42,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// Test message event handler for handling messages.
         /// </param>
         /// <returns>
-        /// BeforeTestRunStartResult containing environment variables
+        /// DataCollectionParameters containing environment variables
         /// </returns>
-        BeforeTestRunStartResult SendBeforeTestRunStartAndGetResult(string settingXml, ITestMessageEventHandler runEventsHandler);
+        DataCollectionParameters SendBeforeTestRunStartAndGetResult(string settingXml, ITestMessageEventHandler runEventsHandler);
 
         /// <summary>
         /// Sends the AfterTestRunStart event and waits for result

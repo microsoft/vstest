@@ -3,13 +3,11 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers
 {
-    using System;
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>

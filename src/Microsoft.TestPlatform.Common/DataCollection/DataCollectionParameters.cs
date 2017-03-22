@@ -4,16 +4,14 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
 {
     using System.Collections.Generic;
-    using System.Runtime.Serialization;
 
     /// <summary>
     /// Payload object that is used to exchange data between datacollector process and runner process.
     /// </summary>
-    [DataContract]
-    public class BeforeTestRunStartResult
+    public class DataCollectionParameters
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BeforeTestRunStartResult"/> class.
+        /// Initializes a new instance of the <see cref="DataCollectionParameters"/> class.
         /// </summary>
         /// <param name="environmentVariables">
         /// The environment variables.
@@ -21,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// <param name="dataCollectionEventsPort">
         /// The data Collection Events Port.
         /// </param>
-        public BeforeTestRunStartResult(IDictionary<string, string> environmentVariables, int dataCollectionEventsPort)
+        public DataCollectionParameters(IDictionary<string, string> environmentVariables, int dataCollectionEventsPort)
         {
             this.EnvironmentVariables = environmentVariables;
             this.DataCollectionEventsPort = dataCollectionEventsPort;
@@ -30,13 +28,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
         /// <summary>
         /// Gets the environment variable dictionary.
         /// </summary>
-        [DataMember]
         public IDictionary<string, string> EnvironmentVariables { get; private set; }
 
         /// <summary>
         /// Gets the data collection events port.
         /// </summary>
-        [DataMember]
         public int DataCollectionEventsPort { get; private set; }
     }
 }

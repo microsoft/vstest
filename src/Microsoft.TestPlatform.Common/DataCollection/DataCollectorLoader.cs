@@ -1,17 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
 {
     using System;
     using System.Reflection;
 #if !NET46
     using System.Runtime.Loader;
 #endif
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using System.Linq;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using System.Linq;
 
     /// <inheritdoc/>
     internal class DataCollectorLoader : IDataCollectorLoader

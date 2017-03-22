@@ -6,12 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Execution;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// The test execution recorder used for recording test results and test messages.
@@ -20,14 +19,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
     {
         private List<AttachmentSet> attachmentSets;
         private ITestRunCache testRunCache;
-        private ITestCaseEventsHandler testCaseEventsHandler;
+        private ITestEventsHandler testCaseEventsHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestExecutionRecorder"/> class.
         /// </summary>
         /// <param name="testCaseEventsHandler"> The test Case Events Handler. </param>
         /// <param name="testRunCache"> The test run cache.  </param>
-        public TestExecutionRecorder(ITestCaseEventsHandler testCaseEventsHandler, ITestRunCache testRunCache)
+        public TestExecutionRecorder(ITestEventsHandler testCaseEventsHandler, ITestRunCache testRunCache)
         {
             this.testRunCache = testRunCache;
             this.testCaseEventsHandler = testCaseEventsHandler;
@@ -69,6 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
         public void RecordResult(TestResult testResult)
         {
             var flushResult = true;
+
             // For test result, we cannot flush to cache unless the result is updated with datacollection data
             if (this.testCaseEventsHandler != null)
             {

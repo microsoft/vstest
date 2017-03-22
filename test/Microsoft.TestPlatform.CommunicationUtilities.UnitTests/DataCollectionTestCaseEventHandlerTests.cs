@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using System;
     using System.Collections.ObjectModel;
 
-    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;

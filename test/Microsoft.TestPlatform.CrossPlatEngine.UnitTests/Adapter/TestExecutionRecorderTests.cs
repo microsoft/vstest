@@ -53,7 +53,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void RecordStartShouldSendTestCaseEvents()
         {
             var testCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
-            var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+            var mockTestCaseEventsHandler = new Mock<ITestEventsHandler>();
             var testRecorder = new TestExecutionRecorder(mockTestCaseEventsHandler.Object, this.testableTestRunCache);
 
             testRecorder.RecordStart(testCase);
@@ -77,7 +77,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         {
             var testCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
             var testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(testCase);
-            var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+            var mockTestCaseEventsHandler = new Mock<ITestEventsHandler>();
             var testRecorder = new TestExecutionRecorder(mockTestCaseEventsHandler.Object, this.testableTestRunCache);
 
             testRecorder.RecordResult(testResult);
@@ -100,7 +100,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void RecordEndShouldSendTestCaseEvents()
         {
             var testCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
-            var mockTestCaseEventsHandler = new Mock<ITestCaseEventsHandler>();
+            var mockTestCaseEventsHandler = new Mock<ITestEventsHandler>();
             var testRecorder = new TestExecutionRecorder(mockTestCaseEventsHandler.Object, this.testableTestRunCache);
 
             testRecorder.RecordEnd(testCase, TestOutcome.Passed);

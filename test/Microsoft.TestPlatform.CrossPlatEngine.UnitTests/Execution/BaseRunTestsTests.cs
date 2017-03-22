@@ -11,6 +11,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
     using Common.UnitTests.ExtensionFramework;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Execution;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -25,7 +27,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     [TestClass]
     public class BaseRunTestsTests
@@ -620,7 +621,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             public TestableBaseRunTests(
                 string runSettings,
                 TestExecutionContext testExecutionContext,
-                ITestCaseEventsHandler testCaseEventsHandler,
+                ITestEventsHandler testCaseEventsHandler,
                 ITestRunEventsHandler testRunEventsHandler,
                 ITestPlatformEventSource testPlatformEventSource)
                 : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)

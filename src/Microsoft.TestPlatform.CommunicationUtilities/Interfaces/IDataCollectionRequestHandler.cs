@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+
     /// <summary>
     /// The DataCollectionRequestHandler interface.
     /// </summary>
@@ -25,6 +27,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// Listens to the commands from server
         /// </summary>
         void ProcessRequests();
+
+        /// <summary>
+        /// Sends datacollection message.
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        void SendDataCollectionMessage(DataCollectionMessageEventArgs args);
 
         /// <summary>
         /// Closes the connection

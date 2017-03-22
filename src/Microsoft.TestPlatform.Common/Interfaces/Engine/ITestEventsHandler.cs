@@ -1,16 +1,18 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
 {
     using System;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Execution;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
-    /// Manager for sending test case events to data collectors.
+    /// The test level events handler.
     /// </summary>
-    internal interface IDataCollectionTestCaseEventManager
+    public interface ITestEventsHandler
     {
         /// <summary>
         /// The session start event.
@@ -38,44 +40,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Int
         event EventHandler<TestResultEventArgs> TestResult;
 
         /// <summary>
-        /// The raise test case start.
+        /// Initializes TestCaseEvents Handler.
         /// </summary>
-        /// <param name="e">
-        /// Test case start event arguments.
+        /// <param name="testRunCache">
+        /// The test run cache.
         /// </param>
-        void RaiseTestCaseStart(TestCaseStartEventArgs e);
+        void Initialize(ITestRunCache testRunCache);
 
         /// <summary>
-        /// The raise test case end.
+        /// Sends session start.
         /// </summary>
-        /// <param name="e">
-        /// Test case end event arguments.
-        /// </param>
-        void RaiseTestCaseEnd(TestCaseEndEventArgs e);
+        void SendTestSessionStart();
 
         /// <summary>
-        /// The raise session start.
+        /// Sends test session end.
         /// </summary>
-        /// <param name="e">
-        /// Session start event arguments.
-        /// </param>
-        void RaiseSessionStart(SessionStartEventArgs e);
+        void SendTestSessionEnd();
 
         /// <summary>
-        /// The raise session end.
+        ///  Report start of executing a test case.
         /// </summary>
-        /// <param name="e">
-        /// Session end event arguments.
-        /// </param>
-        void RaiseSessionEnd(SessionEndEventArgs e);
+        /// <param name="testCase">Details of the test case whose execution is just started.</param>
+        void SendTestCaseStart(TestCase testCase);
 
         /// <summary>
-        /// The raise test result.
+        /// Report end of executing a test case.
         /// </summary>
-        /// <param name="e">
-        /// Test results event arguments.
-        /// </param>
-        void RaiseTestResult(TestResultEventArgs e);
+        /// <param name="testCase">Details of the test case.</param>
+        /// <param name="outcome">Result of the test case executed.</param>
+        void SendTestCaseEnd(TestCase testCase, TestOutcome outcome);
+
+        /// <summary>
+        /// Sends the test result
+        /// </summary>
+        /// <param name="result"> The result. </param>
+        /// <returns>True, if result can be flushed</returns>
+        bool SendTestResult(TestResult result);
 
         /// <summary>
         /// Flush any test results that are cached in dictionary

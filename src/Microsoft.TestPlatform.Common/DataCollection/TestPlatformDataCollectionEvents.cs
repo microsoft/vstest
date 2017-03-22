@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
+namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection
 {
     using System;
     using System.Collections.Generic;
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         internal bool AreTestCaseEventsSubscribed()
         {
             bool valueOnFailure = false;
-            return (HasEventListener(this.TestCaseStart, valueOnFailure) || HasEventListener(this.TestCaseEnd, valueOnFailure));
+            return (this.HasEventListener(this.TestCaseStart, valueOnFailure) || this.HasEventListener(this.TestCaseEnd, valueOnFailure));
         }
 
         private bool HasEventListener(MulticastDelegate eventToCheck, bool valueOnFailure)

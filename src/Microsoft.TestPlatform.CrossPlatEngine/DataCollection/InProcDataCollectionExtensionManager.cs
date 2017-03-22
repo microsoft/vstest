@@ -9,10 +9,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -36,13 +36,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="runSettings">
         /// The run settings.
         /// </param>
-        /// <param name="testRunCache">
-        /// The test run cache.
+        /// <param name="testCaseEventsHandler">
+        /// The test Case Events Handler.
         /// </param>
-        /// <param name="dataCollectionTestCaseEventManager">
-        /// The data collection test case event manager.
-        /// </param>
-        public InProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager)
+        public InProcDataCollectionExtensionManager(string runSettings, ITestEventsHandler testCaseEventsHandler)
         {
             this.InProcDataCollectors = new Dictionary<string, IInProcDataCollector>();
             this.inProcDataCollectionSink = new InProcDataCollectionSink();
@@ -52,11 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (this.IsInProcDataCollectionEnabled)
             {
-                dataCollectionTestCaseEventManager.TestCaseEnd += this.TriggerTestCaseEnd;
-                dataCollectionTestCaseEventManager.TestCaseStart += this.TriggerTestCaseStart;
-                dataCollectionTestCaseEventManager.TestResult += this.TriggerUpdateTestResult;
-                dataCollectionTestCaseEventManager.SessionStart += this.TriggerTestSessionStart;
-                dataCollectionTestCaseEventManager.SessionEnd += this.TriggerTestSessionEnd;
+                testCaseEventsHandler.TestCaseEnd += this.TriggerTestCaseEnd;
+                testCaseEventsHandler.TestCaseStart += this.TriggerTestCaseStart;
+                testCaseEventsHandler.TestResult += this.TriggerUpdateTestResult;
+                testCaseEventsHandler.SessionStart += this.TriggerTestSessionStart;
+                testCaseEventsHandler.SessionEnd += this.TriggerTestSessionEnd;
             }
         }
 
