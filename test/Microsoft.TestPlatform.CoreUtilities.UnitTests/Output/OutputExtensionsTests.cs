@@ -17,63 +17,70 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         [TestInitialize]
         public void TestInit()
         {
-            mockOutput = new Mock<IOutput>();
-            color = Console.ForegroundColor;
-            mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() =>
+            this.mockOutput = new Mock<IOutput>();
+            this.color = Console.ForegroundColor;
+            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() =>
             {
-                color = Console.ForegroundColor;
+                this.color = Console.ForegroundColor;
             });
         }
 
         [TestMethod]
         public void OutputErrorForSimpleMessageShouldOutputTheMessageStringWithColor()
         {
-            mockOutput.Object.Error("HelloError", null);
-            mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
+            this.mockOutput.Object.Error("HelloError", null);
+            this.mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
             Assert.IsTrue(this.color == ConsoleColor.Red, "Console color not set.");
         }
 
         [TestMethod]
         public void OutputErrorForMessageWithParamsShouldOutputFormattedMessage()
         {
-            mockOutput.Object.Error("HelloError {0} {1}", "Foo", "Bar");
-            mockOutput.Verify(o => o.WriteLine("HelloError Foo Bar", OutputLevel.Error), Times.Once());
+            this.mockOutput.Object.Error("HelloError {0} {1}", "Foo", "Bar");
+            this.mockOutput.Verify(o => o.WriteLine("HelloError Foo Bar", OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
         public void OutputWarningForSimpleMessageShouldOutputTheMessageStringWithColor()
         {
-            mockOutput.Object.Warning("HelloWarning", null);
-            mockOutput.Verify(o => o.WriteLine("HelloWarning", OutputLevel.Warning), Times.Once());
-            Assert.IsTrue(color == ConsoleColor.Yellow);
+            this.mockOutput.Object.Warning("HelloWarning", null);
+            this.mockOutput.Verify(o => o.WriteLine("HelloWarning", OutputLevel.Warning), Times.Once());
+            Assert.IsTrue(this.color == ConsoleColor.Yellow);
         }
 
         [TestMethod]
         public void OutputWarningForMessageWithParamsShouldOutputFormattedMessage()
         {
-            mockOutput.Object.Warning("HelloWarning {0} {1}", "Foo", "Bar");
-            mockOutput.Verify(o => o.WriteLine("HelloWarning Foo Bar", OutputLevel.Warning), Times.Once());
+            this.mockOutput.Object.Warning("HelloWarning {0} {1}", "Foo", "Bar");
+            this.mockOutput.Verify(o => o.WriteLine("HelloWarning Foo Bar", OutputLevel.Warning), Times.Once());
         }
 
         [TestMethod]
         public void OutputInformationForSimpleMessageShouldOutputTheMessageStringWithColor()
         {
-            mockOutput.Object.Information(ConsoleColor.Green, "HelloInformation");
-            mockOutput.Verify(o => o.WriteLine("HelloInformation", OutputLevel.Information), Times.Once());
-            Assert.IsTrue(color == ConsoleColor.Green);
+            this.mockOutput.Object.Information(ConsoleColor.Green, "HelloInformation", null);
+            this.mockOutput.Verify(o => o.WriteLine("HelloInformation", OutputLevel.Information), Times.Once());
+            Assert.IsTrue(this.color == ConsoleColor.Green);
         }
 
         [TestMethod]
         public void OutputInformationForMessageWithParamsShouldOutputFormattedMessage()
         {
-            ConsoleColor color1 = Console.ForegroundColor, color2 = Console.ForegroundColor == ConsoleColor.Red? ConsoleColor.Black : ConsoleColor.Red;
-            mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() =>
+            this.mockOutput.Object.Information("HelloInformation {0} {1}", "Foo", "Bar");
+            this.mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void OutputInformationShouldNotChangeConsoleOutput()
+        {
+            ConsoleColor color1 = Console.ForegroundColor, color2 = Console.ForegroundColor == ConsoleColor.Red ? ConsoleColor.Black : ConsoleColor.Red;
+            this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() =>
             {
                 color2 = Console.ForegroundColor;
             });
 
-            mockOutput.Object.Information("HelloInformation {0} {1}", "Foo", "Bar");
-            mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
+            this.mockOutput.Object.Information("HelloInformation {0} {1}", "Foo", "Bar");
+            this.mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
             Assert.IsTrue(color1 == color2);
         }
     }
