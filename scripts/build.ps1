@@ -61,7 +61,8 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "latest"
+# Dotnet build is not supporting -p: to pass arguments to msbuild. Revert to "latest" after the issue is resolved. See https://github.com/dotnet/cli/issues/6124
+$env:DOTNET_CLI_VERSION = "2.0.0-preview1-005448"
 $env:LOCATE_VS_API_VERSION = "0.2.4-beta"
 $env:MSBUILD_VERSION = "15.0"
 
