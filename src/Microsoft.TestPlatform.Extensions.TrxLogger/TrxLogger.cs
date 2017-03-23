@@ -405,7 +405,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                 {
                     var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture,
                         TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, trxFileName);
-                    ConsoleColorHelper.SetColorForAction(ConsoleColor.Yellow, () => Console.WriteLine(overwriteWarningMsg));
+                    ConsoleOutput.Instance.Warning(overwriteWarningMsg);
                     EqtTrace.Warning(overwriteWarningMsg);
                 }
 
@@ -414,12 +414,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger
                     rootElement.OwnerDocument.Save(fs);
                 }
                 String resultsFileMessage = String.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFile, trxFileName);
-                Console.WriteLine(resultsFileMessage);
+                ConsoleOutput.Instance.Information(resultsFileMessage);
                 EqtTrace.Info(resultsFileMessage);
             }
             catch (System.UnauthorizedAccessException fileWriteException)
             {
-                ConsoleColorHelper.SetColorForAction(ConsoleColor.Red, () => Console.WriteLine(fileWriteException.Message));
+                ConsoleOutput.Instance.Error(fileWriteException.Message);
             }
         }
 

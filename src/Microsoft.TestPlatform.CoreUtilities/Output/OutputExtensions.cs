@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Error(this IOutput output, string format, params object[] args)
         {
-            ConsoleColorHelper.SetColorForAction(ConsoleColor.Red, () =>
+            SetColorForAction(ConsoleColor.Red, () =>
             {
                 Output(output, OutputLevel.Error, DefaultFormat, format, args);
             });
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Warning(this IOutput output, string format, params object[] args)
         {
-            ConsoleColorHelper.SetColorForAction(ConsoleColor.Yellow, () =>
+            SetColorForAction(ConsoleColor.Yellow, () =>
             {
                 Output(output, OutputLevel.Warning, DefaultFormat, format, args);
             });
@@ -64,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Information(this IOutput output, ConsoleColor foregroundColor, string format, params object[] args)
         {
-            ConsoleColorHelper.SetColorForAction(foregroundColor, () =>
+            SetColorForAction(foregroundColor, () =>
             {
                 Output(output, OutputLevel.Information, DefaultFormat, format, args);
             });
@@ -113,6 +113,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             return string.Format(CultureInfo.CurrentCulture, messageTypeFormat, message);
+        }
+
+        private static void SetColorForAction(ConsoleColor foregroundColor, Action action)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            var previousForegroundColor = Console.ForegroundColor;
+            try
+            {
+                Console.ForegroundColor = foregroundColor;
+                action.Invoke();
+            }
+            finally
+            {
+                Console.ForegroundColor = previousForegroundColor;
+            }
         }
     }
 }
