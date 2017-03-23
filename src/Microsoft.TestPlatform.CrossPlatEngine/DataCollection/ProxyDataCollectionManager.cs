@@ -27,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     {
         private const string PortOption = "--port";
         private const string DiagOption = "--diag";
+        private const string ParentProcessIdOption = "--parentprocessid";
 
         private IDataCollectionRequestSender dataCollectionRequestSender;
         private IDataCollectionLauncher dataCollectionLauncher;
@@ -218,6 +219,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             commandlineArguments.Add(PortOption);
             commandlineArguments.Add(portNumber.ToString());
+
+            commandlineArguments.Add(ParentProcessIdOption);
+            commandlineArguments.Add(this.processHelper.GetCurrentProcessId().ToString());
 
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {

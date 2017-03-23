@@ -8,6 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -48,12 +50,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 if (exitCallBack != null)
                 {
                     process.Exited += (sender, args) =>
-                    {
-                        // Call WaitForExit again to ensure all streams are flushed
-                        var p = sender as Process;
-                        p.WaitForExit();
-                        exitCallBack(p);
-                    };
+                        {
+                            // Call WaitForExit again to ensure all streams are flushed
+                            var p = sender as Process;
+                            p.WaitForExit();
+                            exitCallBack(p);
+                        };
                 }
 
                 EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
@@ -112,6 +114,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 
             exitCode = 0;
             return false;
+        }
+
+        /// <inheritdoc/>
+        public void SetExitCallback(int parentProcessId, Action callbackAction)
+        {
+            var process = Process.GetProcessById(parentProcessId);
+
+            process.EnableRaisingEvents = true;
+            process.Exited += (sender, args) =>
+                {
+                    callbackAction.Invoke();
+                };
         }
     }
 }
