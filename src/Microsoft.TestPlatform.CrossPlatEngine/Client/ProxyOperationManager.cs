@@ -146,8 +146,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             finally
             {
                 this.initialized = false;
-                this.testHostManager.HostExited -= this.TestHostManagerHostExited;
-                this.testHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
             }
         }
 
