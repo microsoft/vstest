@@ -363,6 +363,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         }
                     }
                 }
+                
+                // Probing failed to find full path. Fallback to alternative options.
+                testHostPath = string.Empty;
             }
 
             if (string.IsNullOrEmpty(testHostPath))
