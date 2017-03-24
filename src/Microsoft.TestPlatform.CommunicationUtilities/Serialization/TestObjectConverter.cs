@@ -17,16 +17,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     public class TestObjectConverter : JsonConverter
     {
         /// <inheritdoc/>
-        public override bool CanConvert(Type objectType)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc/>
         public override bool CanRead => true;
 
         /// <inheritdoc/>
         public override bool CanWrite => false;
+
+        /// <inheritdoc/>
+        public override bool CanConvert(Type objectType)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)

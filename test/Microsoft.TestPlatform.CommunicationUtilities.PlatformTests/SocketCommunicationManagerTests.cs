@@ -108,7 +108,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             var port = this.communicationManager.HostServer();
             var acceptClientTask = this.communicationManager.AcceptClientAsync();
-            
+
             this.communicationManager.StopServer();
 
             Assert.ThrowsException<AggregateException>(() => this.tcpClient.ConnectAsync(IPAddress.Loopback, port).Wait());
@@ -219,7 +219,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var client = await this.StartServerAndWaitForConnection();
             this.WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithDummyPayload);
 
-            var message = await this.communicationManager.ReceiveMessageAsync(new CancellationToken());
+            var message = await this.communicationManager.ReceiveMessageAsync(CancellationToken.None);
 
             Assert.AreEqual(MessageType.StartDiscovery, message.MessageType);
             Assert.AreEqual(DummyPayload, message.Payload);
@@ -242,7 +242,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var client = await this.StartServerAndWaitForConnection();
             this.WriteToStream(client.GetStream(), DummyPayload);
 
-            var message = await this.communicationManager.ReceiveRawMessageAsync(new CancellationToken());
+            var message = await this.communicationManager.ReceiveRawMessageAsync(CancellationToken.None);
 
             Assert.AreEqual(DummyPayload, message);
         }

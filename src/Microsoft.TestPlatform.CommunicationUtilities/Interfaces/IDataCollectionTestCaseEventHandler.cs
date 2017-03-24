@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         bool WaitForRequestHandlerConnection(int connectionTimeout);
 
         /// <summary>
-        /// Close the handler 
+        /// Close the handler
         /// </summary>
         void Close();
 

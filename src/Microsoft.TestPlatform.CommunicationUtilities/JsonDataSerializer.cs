@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                     DateFormatHandling = DateFormatHandling.IsoDateFormat,
                                     DateParseHandling = DateParseHandling.DateTimeOffset,
                                     DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                                    TypeNameHandling = TypeNameHandling.None
+                                    TypeNameHandling = TypeNameHandling.None,
                                 });
 #if DEBUG
             // MemoryTraceWriter can help diagnose serialization issues. Enable it for
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public T DeserializePayload<T>(Message message)
         {
             T retValue = default(T);
-            
+
             // TODO: Currently we use json serializer auto only for non-testmessage types
             // CHECK: Can't we just use auto for everything
             if (MessageType.TestMessage.Equals(message.MessageType))
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public string SerializePayload(string messageType, object payload)
         {
             JToken serializedPayload = null;
-            
+
             // TODO: Currently we use json serializer auto only for non-testmessage types
             // CHECK: Can't we just use auto for everything
             if (MessageType.TestMessage.Equals(messageType))
