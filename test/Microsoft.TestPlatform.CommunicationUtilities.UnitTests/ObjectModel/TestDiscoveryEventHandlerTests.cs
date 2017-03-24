@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
+namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
 {
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -13,20 +13,20 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
     [TestClass]
     public class TestDiscoveryEventHandlerTests
     {
-        private Mock<ITestRequestHandler> mockClient;        
+        private Mock<ITestRequestHandler> mockClient;
         private TestDiscoveryEventHandler testDiscoveryEventHandler;
 
         [TestInitialize]
         public void InitializeTests()
         {
-            this.mockClient = new Mock<ITestRequestHandler>();                        
+            this.mockClient = new Mock<ITestRequestHandler>();
             this.testDiscoveryEventHandler = new TestDiscoveryEventHandler(this.mockClient.Object);
         }
 
         [TestMethod]
         public void HandleDiscoveredTestShouldSendTestCasesToClient()
-        {          
-            this.testDiscoveryEventHandler.HandleDiscoveredTests(null);        
+        {
+            this.testDiscoveryEventHandler.HandleDiscoveredTests(null);
             this.mockClient.Verify(th => th.SendTestCases(null), Times.Once);
         }
 

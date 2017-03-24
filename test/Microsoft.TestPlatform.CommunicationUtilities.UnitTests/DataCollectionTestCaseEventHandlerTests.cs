@@ -36,7 +36,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void InitializeShouldInitializeConnection()
         {
             this.mockCommunicationManager.Setup(x => x.HostServer()).Returns(1);
-            requestHandler.InitializeCommunication();
+            this.requestHandler.InitializeCommunication();
 
             this.mockCommunicationManager.Verify(x => x.HostServer(), Times.Once);
             this.mockCommunicationManager.Verify(x => x.AcceptClientAsync(), Times.Once);
@@ -48,7 +48,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.HostServer()).Throws<Exception>();
             Assert.ThrowsException<Exception>(() =>
             {
-                requestHandler.InitializeCommunication();
+                this.requestHandler.InitializeCommunication();
             });
         }
 
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.mockCommunicationManager.Setup(x => x.WaitForClientConnection(It.IsAny<int>())).Returns(true);
 
-            var result = requestHandler.WaitForRequestHandlerConnection(10);
+            var result = this.requestHandler.WaitForRequestHandlerConnection(10);
 
             Assert.IsTrue(result);
         }
@@ -69,14 +69,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             Assert.ThrowsException<Exception>(() =>
             {
-                requestHandler.WaitForRequestHandlerConnection(10);
+                this.requestHandler.WaitForRequestHandlerConnection(10);
             });
         }
 
         [TestMethod]
         public void CloseShouldStopServer()
         {
-            requestHandler.Close();
+            this.requestHandler.Close();
 
             this.mockCommunicationManager.Verify(x => x.StopServer(), Times.Once);
         }
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             Assert.ThrowsException<Exception>(
                 () =>
                 {
-                    requestHandler.Close();
+                    this.requestHandler.Close();
                 });
         }
 
@@ -141,7 +141,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.mockCommunicationManager.Setup(x => x.ReceiveMessage()).Throws<Exception>();
 
-            Assert.ThrowsException<Exception>(() => { requestHandler.ProcessRequests(); });
+            Assert.ThrowsException<Exception>(() => { this.requestHandler.ProcessRequests(); });
         }
     }
 }

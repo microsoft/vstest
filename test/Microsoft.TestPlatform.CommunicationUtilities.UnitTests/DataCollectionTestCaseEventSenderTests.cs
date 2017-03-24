@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using System;
     using System.Collections.ObjectModel;
 
+    using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
@@ -43,9 +44,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<int>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-            {
-                this.dataCollectionTestCaseEventSender.InitializeCommunication(123);
-            });
+                {
+                    this.dataCollectionTestCaseEventSender.InitializeCommunication(123);
+                });
         }
 
         [TestMethod]
@@ -62,9 +63,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.WaitForServerConnection(It.IsAny<int>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-            {
-                this.dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(123);
-            });
+                {
+                    this.dataCollectionTestCaseEventSender.WaitForRequestSenderConnection(123);
+                });
         }
 
         [TestMethod]
@@ -81,9 +82,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.StopClient()).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-            {
-                this.dataCollectionTestCaseEventSender.Close();
-            });
+                {
+                    this.dataCollectionTestCaseEventSender.Close();
+                });
         }
 
         [TestMethod]
@@ -104,9 +105,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs)).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-            {
-                this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
-            });
+                {
+                    this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
+                });
         }
 
         [TestMethod]
@@ -131,17 +132,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestEnd, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
-            {
-                this.dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
-            });
-        }
-    }
-
-    internal class TestableDataCollectionTestCaseEventSender : DataCollectionTestCaseEventSender
-    {
-        public TestableDataCollectionTestCaseEventSender(ICommunicationManager communicationManager)
-            : base(communicationManager)
-        {
+                {
+                    this.dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs);
+                });
         }
     }
 }

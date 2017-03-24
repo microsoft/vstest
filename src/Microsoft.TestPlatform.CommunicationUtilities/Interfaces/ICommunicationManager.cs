@@ -20,21 +20,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// Accepts client connection asynchronously
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         Task AcceptClientAsync();
 
         /// <summary>
         /// Waits for client to be connected to this server
-        /// Whoever hosting the server should use this method to 
+        /// Whoever hosting the server should use this method to
         /// wait for a client to connect
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for the connection</param>
         /// <returns>True, if Server got a connection from client</returns>
         bool WaitForClientConnection(int connectionTimeout);
 
-
         /// <summary>
         /// Waits for server to be connected
-        /// Whoever creating the client and trying to connect to a server 
+        /// Whoever creating the client and trying to connect to a server
         /// should use this method to wait for connection to be established with server
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for the connection</param>
@@ -49,7 +49,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// Creates a Client Channel and connects to server on given port number
         /// </summary>
-        /// <param name="portNumber"></param>
+        /// <param name="portNumber">Port number for client to connect to</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         Task SetupClientAsync(int portNumber);
 
         /// <summary>
@@ -87,13 +88,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         Task<Message> ReceiveMessageAsync(CancellationToken cancellationToken);
 
         /// <summary>
-        /// Reads message from the binary reader using read timeout 
+        /// Reads message from the binary reader using read timeout
         /// </summary>
         /// <param name="cancellationToken">
         /// The cancellation Token.
         /// </param>
         /// <returns>
-        /// Raw message string 
+        /// Raw message string
         /// </returns>
         Task<string> ReceiveRawMessageAsync(CancellationToken cancellationToken);
 
