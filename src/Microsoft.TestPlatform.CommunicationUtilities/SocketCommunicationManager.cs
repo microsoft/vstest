@@ -11,7 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -203,16 +202,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <summary>
-        /// Reads message from the binary reader
-        /// </summary>
-        /// <returns>Returns message read from the binary reader</returns>
-        public Message ReceiveMessage()
-        {
-            var rawMessage = this.ReceiveRawMessage();
-            return this.dataSerializer.DeserializeMessage(rawMessage);
-        }
-
-        /// <summary>
         ///  Writes message to the binary writer with payload
         /// </summary>
         /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
@@ -221,23 +210,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var rawMessage = this.dataSerializer.SerializePayload(messageType, payload);
             this.WriteAndFlushToChannel(rawMessage);
-        }
-
-        /// <summary>
-        /// The send hand shake message.
-        /// </summary>
-        public void SendHandShakeMessage()
-        {
-            this.SendMessage(MessageType.SessionStart);
-        }
-
-        /// <summary>
-        /// Reads message from the binary reader
-        /// </summary>
-        /// <returns> Raw message string </returns>
-        public string ReceiveRawMessage()
-        {
-            return this.binaryReader.ReadString();
         }
 
         /// <summary>
@@ -250,14 +222,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <summary>
-        /// Deserializes the Message into actual TestPlatform objects
+        /// Reads message from the binary reader
         /// </summary>
-        /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
-        /// <param name="message"> Message object </param>
-        /// <returns> TestPlatform object </returns>
-        public T DeserializePayload<T>(Message message)
+        /// <returns>Returns message read from the binary reader</returns>
+        public Message ReceiveMessage()
         {
-            return this.dataSerializer.DeserializePayload<T>(message);
+            var rawMessage = this.ReceiveRawMessage();
+            return this.dataSerializer.DeserializeMessage(rawMessage);
         }
 
         /// <summary>
@@ -281,6 +252,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <summary>
+        /// Reads message from the binary reader
+        /// </summary>
+        /// <returns> Raw message string </returns>
+        public string ReceiveRawMessage()
+        {
+            return this.binaryReader.ReadString();
+        }
+
+        /// <summary>
         /// Reads message from the binary reader using read timeout 
         /// </summary>
         /// <param name="cancellationToken">
@@ -293,6 +273,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var str = await Task.Run(() => this.TryReceiveRawMessage(cancellationToken));
             return str;
+        }
+
+        /// <summary>
+        /// Deserializes the Message into actual TestPlatform objects
+        /// </summary>
+        /// <typeparam name="T"> The type of object to deserialize to. </typeparam>
+        /// <param name="message"> Message object </param>
+        /// <returns> TestPlatform object </returns>
+        public T DeserializePayload<T>(Message message)
+        {
+            return this.dataSerializer.DeserializePayload<T>(message);
         }
 
         private string TryReceiveRawMessage(CancellationToken cancellationToken)
