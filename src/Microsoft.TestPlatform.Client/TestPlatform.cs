@@ -4,13 +4,14 @@
 namespace Microsoft.VisualStudio.TestPlatform.Client
 {
     using System;
-    using System.IO;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
@@ -20,19 +21,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 
     /// <summary>
     /// Implementation for TestPlatform
     /// </summary>
     public class TestPlatform : ITestPlatform
     {
-        private IFileHelper fileHelper;
+        private readonly TestRuntimeProviderManager testHostProviderManager;
+
+        private readonly IFileHelper fileHelper;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        public TestPlatform() : this(new TestEngine(), new FileHelper())
+        public TestPlatform() : this(new TestEngine(), new FileHelper(), TestRuntimeProviderManager.Instance)
         {
             this.testHostProviderManager = TestRuntimeProviderManager.Instance;
         }
@@ -43,18 +45,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="testEngine">
         /// The test engine.
         /// </param>
-        protected TestPlatform(ITestEngine testEngine, IFileHelper filehelper)
+        /// <param name="filehelper">
+        /// The filehelper.
+        /// </param>
+        /// <param name="testHostProviderManager">
+        /// The data.
+        /// </param>
+        internal TestPlatform(ITestEngine testEngine, IFileHelper filehelper, TestRuntimeProviderManager testHostProviderManager)
         {
             this.TestEngine = testEngine;
             this.fileHelper = filehelper;
+            this.testHostProviderManager = testHostProviderManager;
         }
 
         /// <summary>
         /// Gets or sets Test Engine instance
         /// </summary>
         private ITestEngine TestEngine { get; set; }
-
-        private TestRuntimeProviderManager testHostProviderManager;
 
         /// <summary>
         /// The create discovery request.
@@ -66,16 +73,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             if (discoveryCriteria == null)
             {
-                throw new ArgumentNullException("discoveryCriteria");
+                throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
-            UpdateTestAdapterPaths(discoveryCriteria.RunSettings);
+            this.UpdateTestAdapterPaths(discoveryCriteria.RunSettings);
 
-            var runconfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings);
-            //var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runconfiguration);
+            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             
-            var testHostManager = this.TestEngine.GetDefaultTestHostManager(runconfiguration);
-
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
             discoveryManager.Initialize();
 
@@ -92,26 +96,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             if (testRunCriteria == null)
             {
-                throw new ArgumentNullException("testRunCriteria");
+                throw new ArgumentNullException(nameof(testRunCriteria));
             }
 
-            UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
+            this.UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
-
-            //var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runConfiguration);
 
             // Update and initialize loggers only when DesignMode is false
             if (runConfiguration.DesignMode == false)
             {
-                UpdateTestLoggerPath(testRunCriteria);
+                this.UpdateTestLoggerPath(testRunCriteria);
 
                 // Initialize loggers
                 TestLoggerManager.Instance.InitializeLoggers();
             }
 
-            var testHostManager = this.TestEngine.GetDefaultTestHostManager(runConfiguration);
-            testHostManager.Initialize(TestSessionMessageLogger.Instance);
+            var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
             if (testRunCriteria.TestHostLauncher != null)
             {
@@ -159,6 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Update the test adapter paths provided through run settings to be used by the test service
         /// </summary>
+        /// <param name="runSettings">
+        /// The run Settings.
+        /// </param>
         private void UpdateTestAdapterPaths(string runSettings)
         {
             IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
@@ -175,8 +180,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                     }
 
                     List<string> adapterFiles = new List<string>(
-                        this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories)
-                        );
+                        this.fileHelper.EnumerateFiles(
+                            adapterPath,
+                            TestPlatformConstants.TestAdapterRegexPattern,
+                            SearchOption.AllDirectories));
                     if (adapterFiles.Count > 0)
                     {
                         this.UpdateExtensions(adapterFiles, true);
@@ -188,6 +195,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Update the test logger paths from source directory
         /// </summary>
+        /// <param name="testRunCriteria">
+        /// The test Run Criteria.
+        /// </param>
         private void UpdateTestLoggerPath(TestRunCriteria testRunCriteria)
         {
             IEnumerable<string> sources = testRunCriteria.Sources;

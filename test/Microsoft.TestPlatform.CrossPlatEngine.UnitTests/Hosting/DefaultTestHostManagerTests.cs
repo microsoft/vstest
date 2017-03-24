@@ -9,13 +9,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
-
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -130,8 +129,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                         It.IsAny<string>(),
                         It.IsAny<string>(),
                         It.IsAny<IDictionary<string, string>>(),
-                        It.IsAny<Action<Process, string>>(),
-                        It.IsAny<Action<Process>>())).Returns(Process.GetCurrentProcess());
+                        It.IsAny<Action<object, string>>(),
+                        It.IsAny<Action<object>>())).Returns(Process.GetCurrentProcess());
 
             var testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
             var startInfo = testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
@@ -261,9 +260,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>(),
-                            It.IsAny<Action<Process>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                            It.IsAny<Action<object, string>>(),
+                            It.IsAny<Action<object>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
                     (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
@@ -271,7 +270,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                         errorCallback(process, errorMessage);
                     }).Returns(Process.GetCurrentProcess());
 
-            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
         }
 
         private void ExitCallBackTestHelper(int exitCode)
@@ -293,16 +292,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>(),
-                            It.IsAny<Action<Process>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                            It.IsAny<Action<object, string>>(),
+                            It.IsAny<Action<object>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
                     (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
                         exitCallback(process);
                     }).Returns(Process.GetCurrentProcess());
 
-            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
         }
 
         private TestProcessStartInfo GetDefaultStartInfo()
@@ -322,7 +321,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             {
                 this.TimeOut = 30000;
                 this.ErrorLength = errorLength;
-                this.Initialize(logger);
             }
         }
     }

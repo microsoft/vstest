@@ -3,29 +3,39 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
+    using System;
     using System.Collections.Generic;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+
+    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class TestEngineTests
     {
-        private readonly ITestEngine testEngine;
+        private ITestEngine testEngine;
 
         private Mock<ITestRuntimeProvider> mockTestHostManager;
 
         public TestEngineTests()
         {
+            TestPluginCacheTests.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
             this.testEngine = new TestEngine();
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             
@@ -137,16 +147,28 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANonNullInstance()
         {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86 };
-            Assert.IsNotNull(this.testEngine.GetDefaultTestHostManager(rc));
+            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            string runSettingsXml = string.Concat(
+                @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
+<RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
+                Framework.DefaultFramework.Name,
+                "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
+
+            Assert.IsNotNull(this.testEngine.GetDefaultTestHostManager(runSettingsXml));
         }
 
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANewInstanceEverytime()
         {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86 };
-            var instance1 = this.testEngine.GetDefaultTestHostManager(rc);
-            var instance2 = this.testEngine.GetDefaultTestHostManager(rc);
+            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            string runSettingsXml = string.Concat(
+                @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
+<RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
+                Framework.DefaultFramework.Name,
+                "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
+
+            var instance1 = this.testEngine.GetDefaultTestHostManager(runSettingsXml);
+            var instance2 = this.testEngine.GetDefaultTestHostManager(runSettingsXml);
 
             Assert.AreNotEqual(instance1, instance2);
         }
@@ -154,8 +176,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsDotnetCoreHostManagerIfFrameworkIsNetCore()
         {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETCoreApp,Version=v1.0"), TargetPlatform = Architecture.X64 };
-            var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
+            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            string runSettingsXml = string.Concat(
+                @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
+<RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x64 </TargetPlatform><TargetFrameworkVersion>",
+                ".NETCoreApp,Version=v1.0",
+                "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
+
+            var testHostManager = this.testEngine.GetDefaultTestHostManager(runSettingsXml);
 
             Assert.AreEqual(typeof(DotnetTestHostManager), testHostManager.GetType());
         }
@@ -163,23 +191,197 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsASharedManagerIfDisableAppDomainIsFalse()
         {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETFramework,Version=v4.6"), TargetPlatform = Architecture.X86 };
+            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            string runSettingsXml = string.Concat(
+                @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
+<RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
+                ".NETFramework,Version=v4.6",
+                "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
-            var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
+            var testHostManager = this.testEngine.GetDefaultTestHostManager(runSettingsXml);
+            testHostManager.Initialize(null, runSettingsXml);
             Assert.IsNotNull(testHostManager);
 
             Assert.IsTrue(testHostManager.Shared, "Default TestHostManager must be shared if DisableAppDomain is false");
         }
 
         [TestMethod]
-        public void GetDefaultTestHostManagerReturnsANonSharedManagerIfDisableAppDomainIsFalse()
+        public void GetDefaultTestHostManagerReturnsANonSharedManagerIfDisableAppDomainIsTrue()
         {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETFramework,Version=v4.6"), TargetPlatform = Architecture.X86, DisableAppDomain = true };
+            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            string runSettingsXml = string.Concat(
+                @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
+<RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
+                ".NETFramework,Version=v4.6",
+                "</TargetFrameworkVersion><DisableAppDomain>true</DisableAppDomain></RunConfiguration></RunSettings> ");
 
-            var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
+            var testHostManager = this.testEngine.GetDefaultTestHostManager(runSettingsXml);
+            testHostManager.Initialize(null, runSettingsXml);
             Assert.IsNotNull(testHostManager);
 
             Assert.IsFalse(testHostManager.Shared, "Default TestHostManager must NOT be shared if DisableAppDomain is true");
         }
+
+        #region implementations
+
+        [ExtensionUri("executor://CustomTestHost")]
+        [FriendlyName("CustomHost")]
+        private class CustomTestHost : ITestRuntimeProvider
+        {
+            public event EventHandler<HostProviderEventArgs> HostLaunched;
+
+            public event EventHandler<HostProviderEventArgs> HostExited;
+
+            public bool Shared { get; private set; }
+
+
+            public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+                var framework = config.TargetFrameworkVersion;
+                this.Shared = !config.DisableAppDomain;
+
+                // This is expected to be called once every run so returning a new instance every time.
+                if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                    || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            public void DeregisterForExitNotification()
+            {
+                throw new NotImplementedException();
+            }
+
+            public CancellationTokenSource GetCancellationTokenSource()
+            {
+                throw new NotImplementedException();
+            }
+
+            public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Initialize(IMessageLogger logger, string runsettingsXml)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+                this.Shared = !config.DisableAppDomain;
+            }
+
+            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnHostExited(HostProviderEventArgs e)
+            {
+                this.HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            }
+
+            public void OnHostLaunched(HostProviderEventArgs e)
+            {
+                this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            }
+
+            public void RegisterForExitNotification(Action abortCallback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetCustomLauncher(ITestHostLauncher customLauncher)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [ExtensionUri("executor://DotnetTestHostManager")]
+        [FriendlyName("DotnetTestHostManager")]
+        private class DotnetTestHostManager : ITestRuntimeProvider
+        {
+            public event EventHandler<HostProviderEventArgs> HostLaunched;
+
+            public event EventHandler<HostProviderEventArgs> HostExited;
+
+            public bool Shared { get; private set; }
+
+
+            public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+                var framework = config.TargetFrameworkVersion;
+                this.Shared = !config.DisableAppDomain;
+
+                // This is expected to be called once every run so returning a new instance every time.
+                if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                    || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            public void DeregisterForExitNotification()
+            {
+                throw new NotImplementedException();
+            }
+
+            public CancellationTokenSource GetCancellationTokenSource()
+            {
+                throw new NotImplementedException();
+            }
+
+            public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Initialize(IMessageLogger logger, string runsettingsXml)
+            {
+                var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+                this.Shared = !config.DisableAppDomain;
+            }
+
+            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnHostExited(HostProviderEventArgs e)
+            {
+                this.HostExited.Invoke(this, new HostProviderEventArgs("Error"));
+            }
+
+            public void OnHostLaunched(HostProviderEventArgs e)
+            {
+                this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
+            }
+
+            public void RegisterForExitNotification(Action abortCallback)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void SetCustomLauncher(ITestHostLauncher customLauncher)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
     }
 }

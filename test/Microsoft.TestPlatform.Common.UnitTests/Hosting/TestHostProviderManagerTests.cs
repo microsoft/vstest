@@ -29,14 +29,14 @@ namespace TestPlatform.Common.UnitTests.Logging
         }
 
         [TestMethod]
-        public void TestHostProviderManagerShouldReturnTestHostWhenAppropriateCustomURIProvided()
+        public void TestHostProviderManagerShouldReturnTestHostWhenAppropriateCustomUriProvided()
         {
             var manager = TestRuntimeProviderManager.Instance;
             Assert.IsNotNull(manager.GetTestHostManagerByUri("executor://CustomTestHost/"));
         }
 
         [TestMethod]
-        public void TestHostProviderManagerShouldReturnNullWhenInvalidCustomURIProvided()
+        public void TestHostProviderManagerShouldReturnNullWhenInvalidCustomUriProvided()
         {
             var manager = TestRuntimeProviderManager.Instance;
             Assert.IsNull(manager.GetTestHostManagerByUri("executor://InvalidHost/"));
@@ -69,7 +69,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             public event EventHandler<HostProviderEventArgs> HostLaunched;
             public event EventHandler<HostProviderEventArgs> HostExited;
 
-            public bool CanExecuteCurrentRunConfiguration(string runConfiguration)
+            public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
             {
                 return true;
             }
@@ -94,7 +94,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public void Initialize(IMessageLogger logger)
+            public void Initialize(IMessageLogger logger, string runsettingsXml)
             {
             }
 

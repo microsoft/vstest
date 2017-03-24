@@ -39,19 +39,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// Sets a Message Logger
         /// </summary>
         /// <param name="logger">provide logger to runtimes</param>
-        void Initialize(IMessageLogger logger);
+        /// <param name="runsettingsXml">provide runsettings to runtimes for initialization</param>
+        void Initialize(IMessageLogger logger, string runsettingsXml);
 
         /// <summary>
         /// Gets a value indicating whether the test host is specific to a test source. If yes, each test source
         /// is launched in a separate host process.
         /// </summary>
-        /// <param name="runConfiguration">
+        /// <param name="runsettingsXml">
         /// The run Configuration.
         /// </param>
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        bool CanExecuteCurrentRunConfiguration(string runConfiguration);
+        bool CanExecuteCurrentRunConfiguration(string runsettingsXml);
 
         /// <summary>
         /// Sets a custom launcher

@@ -1,26 +1,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
-    using System.Threading;
-    using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers.Interfaces;
 
     /// <summary>
     /// Helper class to deal with process related functionality.
     /// </summary>
-    internal class ProcessHelper : IProcessHelper
+    public class ProcessHelper : IProcessHelper
     {
         /// <inheritdoc/>
-        public Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<Process, string> errorCallback, Action<Process> exitCallBack)
+        public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack)
         {
             var process = new Process();
             try
@@ -50,15 +47,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 if (exitCallBack != null)
                 {
                     process.Exited += (sender, args) =>
-                        {
-                            // Call WaitForExit again to ensure all streams are flushed
-                            var p = sender as Process;
-                            p.WaitForExit();
-                            exitCallBack(p);
-                        };
+                    {
+                        // Call WaitForExit again to ensure all streams are flushed
+                        var p = sender as Process;
+                        p.WaitForExit();
+                        exitCallBack(p);
+                    };
                 }
 
-                EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
+                // EqtTrace.Verbose("ProcessHelper: Starting process '{0}' with command line '{1}'", processPath, arguments);
                 process.Start();
 
                 if (errorCallback != null)
@@ -66,17 +63,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                     process.BeginErrorReadLine();
                 }
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 process.Dispose();
                 process = null;
 
-                EqtTrace.Error("TestHost Process {0} failed to launch with the following exception: {1}", processPath, exception.Message);
+                // EqtTrace.Error("TestHost Object {0} failed to launch with the following exception: {1}", processPath, exception.Message);
 
                 throw;
             }
 
-            return process;
+            return process as Object;
         }
 
         /// <inheritdoc/>
@@ -104,18 +101,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         }
 
         /// <inheritdoc/>
-        public bool TryGetExitCode(Process process, out int exitCode)
+        public bool TryGetExitCode(Object process, out int exitCode)
         {
-            if (process.HasExited)
+            var proc = process as Process;
+            if (proc.HasExited)
             {
-                exitCode = process.ExitCode;
+                exitCode = proc.ExitCode;
                 return true;
             }
 
             exitCode = 0;
             return false;
         }
-
         /// <inheritdoc/>
         public void SetExitCallback(int parentProcessId, Action callbackAction)
         {

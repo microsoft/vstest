@@ -4,10 +4,10 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
 {
     using System;
+
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Responsible for managing TestRuntimeProviderManager extensions
@@ -18,45 +18,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
 
         private static TestRuntimeProviderManager testHostManager;
 
-        /// <summary>
-        /// Gets an instance of the logger.
-        /// </summary>
-        private IMessageLogger messageLogger;
+        private readonly TestRuntimeExtensionManager testHostExtensionManager;
 
-        private TestRuntimeExtensionManager testHostExtensionManager;
-        
         #endregion
 
         #region Constructor
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="TestRuntimeProviderManager"/> class. 
         /// Default constructor.
         /// </summary>
-        protected TestRuntimeProviderManager(TestSessionMessageLogger sessionLogger)
+        /// <param name="sessionLogger">
+        /// The session Logger.
+        /// </param>
+        protected TestRuntimeProviderManager(IMessageLogger sessionLogger)
         {
-            this.messageLogger = sessionLogger;
             this.testHostExtensionManager = TestRuntimeExtensionManager.Create(sessionLogger);
         }
 
         /// <summary>
-        /// Gets the instance.
+        /// Gets the instance of TestRuntimeProviderManager
         /// </summary>
-        public static TestRuntimeProviderManager Instance
-        {
-            get
-            {
-                if (testHostManager == null)
-                {
-                    testHostManager = new TestRuntimeProviderManager(TestSessionMessageLogger.Instance);
-                }
-                return testHostManager;
-            }
-
-            protected set
-            {
-                testHostManager = value;
-            }
-        }
+        public static TestRuntimeProviderManager Instance => testHostManager
+                                                             ?? (testHostManager = new TestRuntimeProviderManager(TestSessionMessageLogger.Instance));
 
         #endregion
 
@@ -65,21 +49,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
         public ITestRuntimeProvider GetTestHostManagerByUri(string hostUri)
         {
             var host = this.testHostExtensionManager.TryGetTestExtension(hostUri);
-            if (host != null)
-            {
-                return host.Value;
-            }
-
-            return null;
+            return host?.Value;
         }
 
-        public ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
+        public virtual ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
         {
             foreach (var testExtension in this.testHostExtensionManager.TestExtensions)
             {
                 if (testExtension.Value.CanExecuteCurrentRunConfiguration(runConfiguration))
                 {
-                    return testExtension.Value;
+                    // we are creating a new Instance of ITestRuntimeProvider so that each POM gets it's own object of ITestRuntimeProvider
+                    return (ITestRuntimeProvider)Activator.CreateInstance(testExtension.Value.GetType());
                 }
             }
 

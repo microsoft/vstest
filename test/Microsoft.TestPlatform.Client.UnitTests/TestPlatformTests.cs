@@ -7,6 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -36,17 +38,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.executionManager = new Mock<IProxyExecutionManager>();
             this.hostManager = new Mock<ITestRuntimeProvider>();
             this.mockFileHelper = new Mock<IFileHelper>();
-
         }
 
         [TestMethod]
         public void CreateDiscoveryRequestShouldCreateDiscoveryRequestWithGivenCriteriaAndReturnIt()
         {
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<RunConfiguration>())).Returns(this.hostManager.Object);
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.discoveryManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetDiscoveryManager(this.hostManager.Object, It.IsAny<DiscoveryCriteria>())).Returns(this.discoveryManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
-            var tp = new TestableTestPlatform(this.testEngine.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "foo" }, 1, null);
 
             var discoveryRequest = tp.CreateDiscoveryRequest(discoveryCriteria);
@@ -66,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void UpdateExtensionsShouldUpdateTheEngineWithAdditionalExtensions()
         {
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
-            var tp = new TestableTestPlatform(this.testEngine.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var additionalExtensions = new List<string> { "e1.dll", "e2.dll" };
 
             tp.UpdateExtensions(additionalExtensions, loadOnlyWellKnownExtensions: true);
@@ -81,12 +82,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
 
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<RunConfiguration>())).Returns(this.hostManager.Object);
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
 
-            var tp = new TestableTestPlatform(this.testEngine.Object, mockFileHelper.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -108,12 +109,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
 
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<RunConfiguration>())).Returns(this.hostManager.Object);
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
 
-            var tp = new TestableTestPlatform(this.testEngine.Object, mockFileHelper.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             string settingsXml =
                 @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -131,11 +132,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateTestRunRequestShouldCreateTestRunRequestWithSpecifiedCriteria()
         {
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<RunConfiguration>())).Returns(this.hostManager.Object);
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
-            var tp = new TestableTestPlatform(this.testEngine.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10);
 
             var testRunRequest = tp.CreateTestRunRequest(testRunCriteria);
@@ -148,11 +149,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void CreateTestRunRequestShouldSetCustomHostLauncherOnEngineDefaultLauncherIfSpecified()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<RunConfiguration>())).Returns(this.hostManager.Object);
+            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
-            var tp = new TestableTestPlatform(this.testEngine.Object);
+            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
             var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 10, false, null, TimeSpan.Zero, mockCustomLauncher.Object);
 
             var testRunRequest = tp.CreateTestRunRequest(testRunCriteria);
@@ -172,12 +173,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
         private class TestableTestPlatform : TestPlatform
         {
-            public TestableTestPlatform(ITestEngine testEngine) : base(testEngine, new FileHelper())
+            public TestableTestPlatform(ITestEngine testEngine, ITestRuntimeProvider hostProvider) : base(testEngine, new FileHelper(), new TestableTestRuntimeProviderManager(hostProvider))
             {
             }
 
-            public TestableTestPlatform(ITestEngine testEngine, IFileHelper fileHelper) : base(testEngine, fileHelper)
+            public TestableTestPlatform(ITestEngine testEngine, IFileHelper fileHelper, ITestRuntimeProvider hostProvider) : base(testEngine, fileHelper, new TestableTestRuntimeProviderManager(hostProvider))
             {
+            }
+        }
+
+        private class TestableTestRuntimeProviderManager : TestRuntimeProviderManager
+        {
+            private readonly ITestRuntimeProvider hostProvider;
+
+            public TestableTestRuntimeProviderManager(ITestRuntimeProvider hostProvider)
+                : base(TestSessionMessageLogger.Instance)
+            {
+                this.hostProvider = hostProvider;
+            }
+
+            public override ITestRuntimeProvider GetTestHostManagerByRunConfiguration(string runConfiguration)
+            {
+                return this.hostProvider;
             }
         }
     }
