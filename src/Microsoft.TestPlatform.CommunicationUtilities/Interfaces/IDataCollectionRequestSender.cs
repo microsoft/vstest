@@ -21,14 +21,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         int InitializeCommunication();
 
         /// <summary>
-        /// Waits for Request Handler to be connected 
+        /// Waits for Request Handler to be connected
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <returns>True, if Handler is connected</returns>
         bool WaitForRequestHandlerConnection(int connectionTimeout);
 
         /// <summary>
-        /// Close the Sender 
+        /// Close the Sender
         /// </summary>
         void Close();
 

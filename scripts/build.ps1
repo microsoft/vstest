@@ -81,7 +81,6 @@ $TPB_TargetRuntime = $TargetRuntime
 $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } else { $Version }
 $TPB_CIBuild = $CIBuild
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
-$TPB_VSIX_DIR = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
 
 # Capture error state in any step globally to modify return code
 $Script:ScriptFailed = $false
@@ -276,6 +275,8 @@ function Create-VsixPackage
     Write-Log "Create-VsixPackage: Started."
     $timer = Start-Timer
 
+    $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
+    $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
 
     # Copy legacy dependencies
@@ -295,12 +296,16 @@ function Create-VsixPackage
     # Create vsix only when msbuild is installed.
     if(![string]::IsNullOrEmpty($msbuildPath))
     {
+        # Copy the vsix project to artifacts directory to modify manifest
+        New-Item $vsixProjectDir -Type Directory -Force
+        Copy-Item -Recurse $vsixSourceDir\* $vsixProjectDir -Force
+
         # Update version of VSIX
-        Update-VsixVersion
+        Update-VsixVersion $vsixProjectDir
 
         # Build vsix project to get TestPlatform.vsix
-        Write-Verbose "$msbuildPath\msbuild.exe $TPB_VSIX_DIR\TestPlatform.csproj -p:Configuration=$Configuration"
-        & $msbuildPath\msbuild.exe "$TPB_VSIX_DIR\TestPlatform.csproj" -p:Configuration=$Configuration
+        Write-Verbose "$msbuildPath\msbuild.exe $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
+        & $msbuildPath\msbuild.exe "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
     }
     else
     {
@@ -496,7 +501,7 @@ function Locate-LocateVsApi
   return $locateVsApi
 }
 
-function Update-VsixVersion
+function Update-VsixVersion($vsixProjectDir)
 {
     Write-Log "Update-VsixVersion: Started."
 
@@ -510,8 +515,8 @@ function Update-VsixVersion
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
     }
 
-    $manifestContentWithVersion = Get-Content "$TPB_VSIX_DIR\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
-    Set-Content -path "$TPB_VSIX_DIR\source.extension.vsixmanifest" -value $manifestContentWithVersion
+    $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
+    Set-Content -path "$vsixProjectDir\source.extension.vsixmanifest" -value $manifestContentWithVersion
 
     Write-Log "Update-VsixVersion: Completed."
 }
