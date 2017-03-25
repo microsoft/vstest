@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Warning), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, "TestName"), OutputLevel.Information), Times.Exactly(2));
         }
 
@@ -178,7 +178,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.FlushLoggerMessages();
 
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Warning), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, "TestName"), OutputLevel.Information), Times.Exactly(2));
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldWriteToNoTestResultForQuietVerbosity()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "quiet");
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultsObject(), null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, "TestName"), OutputLevel.Information), Times.Never);
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator, "TestName"), OutputLevel.Information), Times.Never);
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Warning), Times.Never);
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, "TestName"), OutputLevel.Information), Times.Never);
         }
 
         [TestMethod]

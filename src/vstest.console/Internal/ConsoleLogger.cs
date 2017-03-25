@@ -343,9 +343,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
             else
             {
-                var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, name);
-                Output.Information(output);
-                DisplayFullInformation(e.Result);
+                if (!this.verbosityLevel.Equals(Verbosity.Quiet))
+                {
+                    var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator,
+                        name);
+                    Output.Information(output);
+                    DisplayFullInformation(e.Result);
+                }
             }
         }
 

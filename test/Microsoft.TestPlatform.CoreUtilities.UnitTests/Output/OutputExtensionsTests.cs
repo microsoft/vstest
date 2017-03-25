@@ -14,8 +14,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         private Mock<IOutput> mockOutput;
         private ConsoleColor color;
 
-        [TestInitialize]
-        public void TestInit()
+        public OutputExtensionsTests()
         {
             this.mockOutput = new Mock<IOutput>();
             this.color = Console.ForegroundColor;
@@ -30,6 +29,15 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         {
             this.mockOutput.Object.Error("HelloError", null);
             this.mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
+        }
+
+        [Ignore]
+        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
+        // https://github.com/Microsoft/vstest/pull/641
+        [TestMethod]
+        public void OutputErrorForSimpleMessageShouldSetConsoleColorToRed()
+        {
+            this.mockOutput.Object.Error("HelloError", null);
             Assert.IsTrue(this.color == ConsoleColor.Red, "Console color not set.");
         }
 
@@ -45,6 +53,15 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         {
             this.mockOutput.Object.Warning("HelloWarning", null);
             this.mockOutput.Verify(o => o.WriteLine("HelloWarning", OutputLevel.Warning), Times.Once());
+        }
+
+        [Ignore]
+        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
+        // https://github.com/Microsoft/vstest/pull/641
+        [TestMethod]
+        public void OutputWarningForSimpleMessageShouldSetConsoleColorToYellow()
+        {
+            this.mockOutput.Object.Warning("HelloWarning", null);
             Assert.IsTrue(this.color == ConsoleColor.Yellow);
         }
 
@@ -63,6 +80,16 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             Assert.IsTrue(this.color == ConsoleColor.Green);
         }
 
+        [Ignore]
+        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
+        // https://github.com/Microsoft/vstest/pull/641
+        [TestMethod]
+        public void OutputInformationForSimpleMessageShouldSetConsoleColorToGivenColor()
+        {
+            this.mockOutput.Object.Information(ConsoleColor.Green, "HelloInformation", null);
+            Assert.IsTrue(this.color == ConsoleColor.Green);
+        }
+
         [TestMethod]
         public void OutputInformationForMessageWithParamsShouldOutputFormattedMessage()
         {
@@ -70,8 +97,11 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             this.mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
         }
 
+        [Ignore]
+        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
+        // https://github.com/Microsoft/vstest/pull/641
         [TestMethod]
-        public void OutputInformationShouldNotChangeConsoleOutput()
+        public void OutputInformationShouldNotChangeConsoleOutputColor()
         {
             ConsoleColor color1 = Console.ForegroundColor, color2 = Console.ForegroundColor == ConsoleColor.Red ? ConsoleColor.Black : ConsoleColor.Red;
             this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() =>
