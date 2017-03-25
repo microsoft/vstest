@@ -10,7 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -31,10 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private IDataSerializer dataSerializer;
 
         private Action<Message> onAckMessageRecieved;
-
-        private ProxyOutOfProcDataCollectionManager outOfProcDataCollectionManager;
-
-        private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
 
         /// <summary>
         /// The timeout for the client to connect to the server.
