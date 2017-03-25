@@ -24,9 +24,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         private IDataSerializer dataSerializer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionRequestSender"/> class. 
+        /// Initializes a new instance of the <see cref="DataCollectionRequestSender"/> class.
         /// </summary>
-        public DataCollectionRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
+        public DataCollectionRequestSender()
+            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
         }
 
@@ -57,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <summary>
-        /// Waits for Request Handler to be connected 
+        /// Waits for Request Handler to be connected
         /// </summary>
         /// <param name="clientConnectionTimeout">Time to wait for connection</param>
         /// <returns>True, if Handler is connected</returns>
@@ -122,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
             this.communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
 
-            // Cycle through the messages that the datacollector sends. 
+            // Cycle through the messages that the datacollector sends.
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isDataCollectionComplete)
             {

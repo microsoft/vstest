@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     using System;
@@ -22,26 +21,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         int InitializeCommunication();
 
         /// <summary>
-        /// Waits for Request Handler to be connected 
+        /// Waits for Request Handler to be connected
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <returns>True, if Handler is connected</returns>
         bool WaitForRequestHandlerConnection(int connectionTimeout);
 
         /// <summary>
-        /// Close the Sender 
+        /// Close the Sender
         /// </summary>
         void Close();
 
         /// <summary>
-        /// Initializes the Discovery 
+        /// Initializes the Discovery
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to check for additional extensions</param>
         /// <param name="loadOnlyWellKnownExtensions">Load only well only extensions</param>
         void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions);
 
         /// <summary>
-        /// Initializes the Execution 
+        /// Initializes the Execution
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Paths to check for additional extensions</param>
         /// <param name="loadOnlyWellKnownExtensions">Load only well only extensions</param>
@@ -84,9 +83,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendTestRunAbort();
 
         /// <summary>
-        /// handle client process exit
+        /// Handle client process exit
         /// </summary>
-        /// <param name="stdError"></param>
+        /// <param name="stdError">Standard error output</param>
         void OnClientProcessExit(string stdError);
     }
 }

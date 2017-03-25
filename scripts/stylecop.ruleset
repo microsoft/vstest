@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RuleSet Name="Rules for test platform tests" Description="Code analysis rules for test projects." ToolsVersion="14.0">
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
+    <!-- XML documentation checks are temporarily disabled (until we've rest of code base clean) -->
+    <Rule Id="SA1652" Action="None" />
+
     <!-- Allow use of regions -->
     <Rule Id="SA1124" Action="None" />
+
+    <!-- Don't force a trailing comma in multiline object initializers -->
+    <Rule Id="SA1413" Action="None" />
+
+    <!-- Copyright headers check is skipped (see https://github.com/dotnet/sdk/issues/989). -->
+    <Rule Id="SA1636" Action="None" />
   </Rules>
 </RuleSet>
 
