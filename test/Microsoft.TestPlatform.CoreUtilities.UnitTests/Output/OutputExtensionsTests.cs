@@ -77,7 +77,6 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         {
             this.mockOutput.Object.Information(ConsoleColor.Green, "HelloInformation", null);
             this.mockOutput.Verify(o => o.WriteLine("HelloInformation", OutputLevel.Information), Times.Once());
-            Assert.IsTrue(this.color == ConsoleColor.Green);
         }
 
         [Ignore]
