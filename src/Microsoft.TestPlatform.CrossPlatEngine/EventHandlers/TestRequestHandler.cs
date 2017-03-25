@@ -290,16 +290,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 testCaseEventsHandler = new TestCaseEventsHandler();
                 var testEventsPublisher = testCaseEventsHandler as ITestEventsPublisher;
-
-                if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(runSettings))
-                {
-                    this.outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, testEventsPublisher);
-                }
-
-                if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(runSettings))
-                {
-                    this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testEventsPublisher);
-                }
             }
 
             return testCaseEventsHandler;
