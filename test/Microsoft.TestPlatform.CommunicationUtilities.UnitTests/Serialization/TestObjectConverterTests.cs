@@ -1,12 +1,12 @@
-﻿﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
+namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
 {
     using System;
     using System.Linq;
-    using System.Runtime.Serialization;
 
+    using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -166,10 +166,5 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         {
             return JsonDataSerializer.Instance.Deserialize<T>(json);
         }
-    }
-
-    [DataContract]
-    internal class TestableTestObject : TestObject
-    {
     }
 }

@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private IDataSerializer dataSerializer;
 
-        private Action<Message> OnAckMessageRecieved;
+        private Action<Message> onAckMessageRecieved;
 
         private ProxyOutOfProcDataCollectionManager outOfProcDataCollectionManager;
 
@@ -147,8 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             var testRunEventsHandler = new TestRunEventsHandler(this);
 
                             var testRunCriteriaWithTests =
-                                this.communicationManager.DeserializePayload<TestRunCriteriaWithTests>
-                                    (message);
+                                this.communicationManager.DeserializePayload<TestRunCriteriaWithTests>(message);
 
                             jobQueue.QueueJob(
                                 () =>
@@ -170,7 +169,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         break;
 
                     case MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback:
-                        this.OnAckMessageRecieved?.Invoke(message);
+                        this.onAckMessageRecieved?.Invoke(message);
                         break;
 
                     case MessageType.AbortTestRun:
@@ -202,58 +201,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             while (!isSessionEnd);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             this.communicationManager?.StopClient();
         }
 
-        /// <summary>
-        /// Closes the connection
-        /// </summary>
+        /// <inheritdoc/>
         public void Close()
         {
             this.Dispose();
             EqtTrace.Info("Closing the connection !");
         }
 
-        /// <summary>
-        /// The send test cases.
-        /// </summary>
-        /// <param name="discoveredTestCases">
-        /// The discovered test cases.
-        /// </param>
+        /// <inheritdoc/>
         public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
         {
             this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases);
         }
 
-        /// <summary>
-        /// Sends the current test run results.
-        /// </summary>
-        /// <param name="testRunChangedArgs"></param>
+        /// <inheritdoc/>
         public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
         {
             this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs);
         }
 
-        /// <summary>
-        /// Sends the logs back to the server.
-        /// </summary>
-        /// <param name="messageLevel"></param>
-        /// <param name="message"></param>
+        /// <inheritdoc/>
         public void SendLog(TestMessageLevel messageLevel, string message)
         {
             var testMessagePayload = new TestMessagePayload { MessageLevel = messageLevel, Message = message };
             this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
         }
 
-        /// <summary>
-        /// Sends a test run complete to the client.
-        /// </summary>
-        /// <param name="testRunCompleteArgs"></param>
-        /// <param name="lastChunkArgs"></param>
-        /// <param name="runContextAttachments"></param>
-        /// <param name="executorUris"></param>
+        /// <inheritdoc/>
         public void SendExecutionComplete(
             TestRunCompleteEventArgs testRunCompleteArgs,
             TestRunChangedEventArgs lastChunkArgs,
@@ -271,9 +251,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload);
         }
 
-        /// <summary>
-        /// The discovery complete handler
-        /// </summary>
+        /// <inheritdoc/>
         public void DiscoveryComplete(long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
             var discoveryCompletePayload = new DiscoveryCompletePayload
@@ -286,15 +264,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload);
         }
 
-        /// <summary>
-        /// Sends a message to launch process under debugger
-        /// </summary>
-        /// <param name="testProcessStartInfo"></param>
+        /// <inheritdoc/>
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             var waitHandle = new AutoResetEvent(false);
             Message ackMessage = null;
-            this.OnAckMessageRecieved = (ackRawMessage) =>
+            this.onAckMessageRecieved = (ackRawMessage) =>
             {
                 ackMessage = ackRawMessage;
                 waitHandle.Set();
@@ -303,7 +278,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo);
 
             waitHandle.WaitOne();
-            this.OnAckMessageRecieved = null;
+            this.onAckMessageRecieved = null;
             return this.dataSerializer.DeserializePayload<int>(ackMessage);
         }
 
