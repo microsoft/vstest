@@ -30,7 +30,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void TestInit()
         {
             this.testableTestRunCache = new TestableTestRunCache();
-            this.testRecorder = new TestExecutionRecorder(null,this.testableTestRunCache);
+            this.testRecorder = new TestExecutionRecorder(null, this.testableTestRunCache);
 
             this.testCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
             this.testResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(this.testCase);
@@ -61,7 +61,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         {
             this.testRecorder.RecordResult(this.testResult);
             Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
-        }        
+        }
 
         [TestMethod]
         public void RecordEndShouldUpdateTestRunCache()
@@ -122,7 +122,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         [TestMethod]
         public void SendTestCaseEndShouldInovkeTestCaseEndEventIfTestCaseStartWasCalledBefore()
         {
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase,TestOutcome.Passed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
 
             this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
         }
@@ -131,8 +131,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void SendTestCaseEndShouldNotInvokeTestCaseEndEventInCaseOfAMissingTestCaseStartInDataDrivenScenario()
         {
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase,TestOutcome.Passed);
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase,TestOutcome.Failed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Failed);
 
             this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
         }
@@ -141,9 +141,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void RecordEndShouldInvokeSendTestCaseEndMultipleTimesInDataDrivenScenario()
         {
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase,TestOutcome.Passed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
             this.testRecorderWithTestEventsHandler.RecordStart(this.testCase);
-            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase,TestOutcome.Failed);
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Failed);
 
             this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
         }
@@ -173,7 +173,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
             this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
 
-            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase,TestOutcome.Passed), Times.Once);
+            this.mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(this.testCase, TestOutcome.Passed), Times.Once);
             Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
         }
 
@@ -181,8 +181,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void RecordResultShouldNotFlushIfTestCaseEndWasNotCalledBefore()
         {
             this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
-
+            this.testRecorderWithTestEventsHandler.RecordResult(this.testResult);
             Assert.IsFalse(this.testableTestRunCache.TestResultList.Contains(this.testResult));
+
+            this.testRecorderWithTestEventsHandler.RecordEnd(this.testCase, TestOutcome.Passed);
+            Assert.IsTrue(this.testableTestRunCache.TestResultList.Contains(this.testResult));
         }
         #endregion
     }

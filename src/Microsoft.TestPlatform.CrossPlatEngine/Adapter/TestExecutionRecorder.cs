@@ -39,6 +39,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             this.testCaseEventsHandler = testCaseEventsHandler;
             this.attachmentSets = new List<AttachmentSet>();
 
+            // As a framework guideline, we should get events in this order:
+            // 1. Test Case Start.
+            // 2. Test Case End.
+            // 3. Test Case Result.
+            // If that is not that case.
+            // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
             this.testResultDictionary = new Dictionary<Guid, List<TestResult>>();
             this.testCaseEndStatusMap = new HashSet<Guid>();
         }
@@ -101,8 +107,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                         // We need to wait for testcaseend before flushing
                         flushResult = false;
 
+                        // Cache results so we can flush later.
                         List<TestResult> testResults;
-                        // Cache results so we can flush later with in proc data
                         if (this.testResultDictionary.TryGetValue(testCaseId, out testResults))
                         {
                             testResults.Add(testResult);
