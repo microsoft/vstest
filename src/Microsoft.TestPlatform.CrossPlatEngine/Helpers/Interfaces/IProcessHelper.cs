@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Interface for any process related functionality. This is needed for clean unit-testing.
@@ -56,5 +57,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <param name="exitCode">return value of exitCode</param>
         /// <returns>False if process has not exited, True otherwise</returns>
         bool TryGetExitCode(Process process, out int exitCode);
+
+        /// <summary>
+        /// The wait for parent process exit async.
+        /// </summary>
+        /// <param name="parentProcessId">
+        /// The parent process id.
+        /// </param>
+        /// <param name="callbackAction">
+        /// Callback on process exit.
+        /// </param>
+        void SetExitCallback(int parentProcessId, Action callbackAction);
     }
 }

@@ -23,23 +23,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventHandler"/> class.
         /// </summary>
-        internal DataCollectionTestCaseEventHandler() : this(new SocketCommunicationManager(), DataCollectionManager.Instance)
+        internal DataCollectionTestCaseEventHandler()
+            : this(new SocketCommunicationManager(), DataCollectionManager.Instance)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventHandler"/> class.
         /// </summary>
-        /// <param name="communicationManager">
-        /// The communication manager.
-        /// </param>
+        /// <param name="communicationManager">Communication manager implementation.</param>
+        /// <param name="dataCollectionManager">Data collection manager implementation.</param>
         internal DataCollectionTestCaseEventHandler(ICommunicationManager communicationManager, IDataCollectionManager dataCollectionManager)
         {
             this.communicationManager = communicationManager;
             this.dataCollectionManager = dataCollectionManager;
         }
 
-        /// <inheritDoc />
+        /// <inheritdoc />
         public int InitializeCommunication()
         {
             var port = this.communicationManager.HostServer();
@@ -47,19 +47,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             return port;
         }
 
-        /// <inheritDoc />
+        /// <inheritdoc />
         public bool WaitForRequestHandlerConnection(int connectionTimeout)
         {
             return this.communicationManager.WaitForClientConnection(connectionTimeout);
         }
 
-        /// <inheritDoc />
+        /// <inheritdoc />
         public void Close()
         {
             this.communicationManager?.StopServer();
         }
 
-        /// <inheritDoc />
+        /// <inheritdoc />
         public void ProcessRequests()
         {
             var isSessionEnd = false;
