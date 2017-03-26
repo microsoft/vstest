@@ -153,7 +153,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                     // TestCaseEnd must always be preceded by testcasestart for a given test case id
                     if (!isTestCaseEndAlreadySent)
                     {
-                        // If dictionary contains results for this test case, update them with in-proc data and flush them
+                        // Send test case end event to handler.
+                        this.testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
+
+                        // If dictionary contains results for this test case, update them with datacollector data and flush them
                         List<TestResult> testResults;
                         if (this.testResultDictionary.TryGetValue(testCase.Id, out testResults))
                         {
@@ -161,16 +164,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                             {
                                 this.testCaseEventsHandler.SendTestResult(testResult);
 
-                                // TestResult updated with in-proc data, just flush
+                                // TestResult updated by datacollectors, just flush
                                 this.testRunCache.OnNewTestResult(testResult);
                             }
 
                             this.testResultDictionary.Remove(testCase.Id);
-                        }
-                        else
-                        {
-                            // Call all in-proc datacollectors - TestCaseEnd event
-                            this.testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
                         }
                     }
                 }

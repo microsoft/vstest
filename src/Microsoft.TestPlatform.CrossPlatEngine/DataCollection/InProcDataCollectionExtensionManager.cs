@@ -161,7 +161,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             // Just set the cached in-proc data if already exists
             this.SetInProcDataCollectionDataInTestResult(e.TestResult);
-            ((InProcDataCollectionSink)this.inProcDataCollectionSink).RemoveDataCollectionDataSetForTestCase(e.TestCaseId);
         }
 
         /// <summary>

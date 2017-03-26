@@ -53,17 +53,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             }
             else
             {
+                this.testCaseDataCollectionDataMap.Remove(testCaseId);
                 return testCaseDataCollection.CollectionData;
             }
-        }
-
-        /// <summary>
-        /// Removes data collection data stored in the in proc data collection sink.
-        /// </summary>
-        /// <param name="testCaseId">Valid test case id</param>
-        public void RemoveDataCollectionDataSetForTestCase(Guid testCaseId)
-        {
-            this.testCaseDataCollectionDataMap.Remove(testCaseId);
         }
 
         private void AddKeyValuePairToDictionary(Guid testCaseId, string key, string value)
