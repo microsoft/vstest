@@ -9,5 +9,13 @@
     <RuntimeFrameworkVersion>2.0.0-beta-001737-00</RuntimeFrameworkVersion>
   </PropertyGroup>
 
+  <!-- Static analysis dependencies -->
+  <ItemGroup Condition="$(EnableCodeAnalysis) == 'true'">
+    <PackageReference Include="StyleCop.Analyzers">
+      <Version>1.1.0-beta001</Version>
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <Import Project="$(MSBuildThisFileDirectory)TestPlatform.Localization.targets" /> 
 </Project>

@@ -35,7 +35,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private string clientExitErrorMessage;
 
-        public TestRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
+        public TestRequestSender()
+            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
         {
         }
 
@@ -45,10 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.dataSerializer = dataSerializer;
         }
 
-        /// <summary>
-        /// Creates an endpoint and listens for client connection asynchronously
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public int InitializeCommunication()
         {
             this.clientExitCancellationSource = new CancellationTokenSource();
@@ -58,50 +56,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             return port;
         }
 
+        /// <inheritdoc/>
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
             return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             this.communicationManager?.StopServer();
         }
 
-        /// <summary>
-        /// Closes the connection
-        /// </summary>
+        /// <inheritdoc/>
         public void Close()
         {
             this.Dispose();
             EqtTrace.Info("Closing the connection");
         }
 
-        /// <summary>
-        /// Initializes the extensions in the test host.
-        /// </summary>
-        /// <param name="pathToAdditionalExtensions">Path to additional extensions.</param>
-        /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
+        /// <inheritdoc/>
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
             this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions);
         }
 
-        /// <summary>
-        /// Initializes the extensions in the test host.
-        /// </summary>
-        /// <param name="pathToAdditionalExtensions">Path to additional extensions.</param>
-        /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
+        /// <inheritdoc/>
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
             this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions);
         }
 
-        /// <summary>
-        /// Discovers tests in the sources passed with the criteria specifief.
-        /// </summary>
-        /// <param name="discoveryCriteria"> The criteria for discovery. </param>
-        /// <param name="discoveryEventsHandler"> The handler for discovery events from the test host. </param>
+        /// <inheritdoc/>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler discoveryEventsHandler)
         {
             try
@@ -110,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 var isDiscoveryComplete = false;
 
-                // Cycle through the messages that the testhost sends. 
+                // Cycle through the messages that the testhost sends.
                 // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
                 while (!isDiscoveryComplete)
                 {
@@ -185,6 +171,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.StartTestRunAndListenAndReportTestResults(MessageType.StartTestExecutionWithTests, runCriteria, eventHandler);
         }
 
+        /// <summary>
+        /// Send the cancel message to test host
+        /// </summary>
+        public void SendTestRunCancel()
+        {
+            this.communicationManager.SendMessage(MessageType.CancelTestRun);
+        }
+
+        public void SendTestRunAbort()
+        {
+            this.communicationManager.SendMessage(MessageType.AbortTestRun);
+        }
+
+        public void OnClientProcessExit(string stdError)
+        {
+            this.clientExitErrorMessage = stdError;
+            this.clientExitCancellationSource.Cancel();
+        }
+
         private void StartTestRunAndListenAndReportTestResults(
             string messageType,
             object payload,
@@ -207,7 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var isTestRunComplete = false;
 
-            // Cycle through the messages that the testhost sends. 
+            // Cycle through the messages that the testhost sends.
             // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
             while (!isTestRunComplete)
             {
@@ -283,6 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
 
             var reason = string.Format(CommonResources.AbortedTestRun, exception?.Message);
+
             // log console message to vstest console
             testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, reason);
 
@@ -326,30 +332,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             };
             rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
             eventHandler.HandleRawMessage(rawMessage);
-            
+
             // Complete discovery
             eventHandler.HandleDiscoveryComplete(-1, null, true);
 
             this.CleanupCommunicationIfProcessExit();
-        }
-
-        /// <summary>
-        /// Send the cancel message to test host
-        /// </summary>
-        public void SendTestRunCancel()
-        {
-            this.communicationManager.SendMessage(MessageType.CancelTestRun);
-        }
-
-        public void SendTestRunAbort()
-        {
-            this.communicationManager.SendMessage(MessageType.AbortTestRun);
-        }
-
-        public void OnClientProcessExit(string stdError)
-        {
-            this.clientExitErrorMessage = stdError;
-            this.clientExitCancellationSource.Cancel();
         }
 
         private string TryReceiveRawMessage()
@@ -363,7 +350,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 var reason = string.IsNullOrWhiteSpace(this.clientExitErrorMessage)
                     ? CommonResources.UnableToCommunicateToTestHost
-                    : clientExitErrorMessage;
+                    : this.clientExitErrorMessage;
                 EqtTrace.Error("Unable to receive message from testhost: {0}", reason);
                 throw new IOException(reason);
             }

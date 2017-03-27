@@ -21,6 +21,9 @@
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <CopyBuildOutputToPublishDirectory>false</CopyBuildOutputToPublishDirectory>
     <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
+
+    <!-- Disable warning that there are no source files. It is intentional. -->
+    <NoWarn>$(NoWarn);2008</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>

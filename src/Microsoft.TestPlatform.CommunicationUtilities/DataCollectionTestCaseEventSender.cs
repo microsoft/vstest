@@ -12,19 +12,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSender
     {
-        private static readonly object syncObject = new object();
+        private static readonly object SyncObject = new object();
 
         private readonly ICommunicationManager communicationManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventSender"/> class. 
+        /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventSender"/> class.
         /// </summary>
-        protected DataCollectionTestCaseEventSender() : this(new SocketCommunicationManager())
+        protected DataCollectionTestCaseEventSender()
+            : this(new SocketCommunicationManager())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventSender"/> class. 
+        /// Initializes a new instance of the <see cref="DataCollectionTestCaseEventSender"/> class.
         /// </summary>
         /// <param name="communicationManager">Communication manager.</param>
         protected DataCollectionTestCaseEventSender(ICommunicationManager communicationManager)
@@ -41,11 +42,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Gets singleton instance of DataCollectionRequestHandler.
         /// </summary>
+        /// <returns>A singleton instance of <see cref="DataCollectionTestCaseEventSender"/></returns>
         public static DataCollectionTestCaseEventSender Create()
         {
             if (Instance == null)
             {
-                lock (syncObject)
+                lock (SyncObject)
                 {
                     if (Instance == null)
                     {
