@@ -62,7 +62,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "latest"
+$env:DOTNET_CLI_VERSION = "2.0.0-preview1-005448"
 $env:LOCATE_VS_API_VERSION = "0.2.4-beta"
 $env:MSBUILD_VERSION = "15.0"
 
@@ -219,12 +219,23 @@ function Publish-Package
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
 
-    # Copy over the Full CLR built testhost package assemblies to the $fullCLRPackageDir
-    Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force
+    # Binding redirection for Newtonsoft.Json.dll has been removed from testhost config file to resolve bug: https://github.com/Microsoft/vstest/issues/391
+    # Microsoft.TestPlatform.CommunicationUtilities depends on Newtonsoft.Json of version 8.0.3 and Microsoft.TestPlatform.CrossPlatEngine depends on Microsoft.Extensions.Dependencymodel which
+    # depends on Newtonsoft.Json of version 9.0.1. So at the end testhost has Newtonsoft.Json.dll of version 9.0.1 in their publish package.
+    # Since testhost uses CommunicationUtilities (and dont use that part of code of CrossPlatEngine which uses Newtonsoft.Json of version 9.0.1) so it needs Newtonsoft.Json.dll of version 8.0.3
+    # Copy Newtonsoft.Json.dll of version 8.0.3 to test $testhostFullPackageDir
 
-    # Copy over the Full CLR built testhost package assemblies to the Core CLR package folder.
+    Write-Log "Package: copy file $newtonsoft to $testhostFullPackageDir"
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\8.0.3\lib\net45\Newtonsoft.Json.dll"
+    Copy-Item $newtonsoft $testhostFullPackageDir -Force
+
+    # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CRL package folder.
     $netFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
+    New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
+
+    $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
 
