@@ -317,9 +317,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 this.testHostProcess = Process.GetProcessById(processId);
             }
 
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + this.testHostProcess.Id));
+            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
 
-            return this.testHostProcess.Id;
+            return pId
         }
 
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)

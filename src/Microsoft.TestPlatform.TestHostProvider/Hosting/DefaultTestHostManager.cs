@@ -269,8 +269,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 return -1;
             }
 
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + this.testHostProcess.Id));
-            return this.testHostProcess.Id;
+            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
+            return pId;
         }
     }
 }
