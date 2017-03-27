@@ -36,7 +36,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </summary>
         public TestPlatform() : this(new TestEngine(), new FileHelper(), TestRuntimeProviderManager.Instance)
         {
-            this.testHostProviderManager = TestRuntimeProviderManager.Instance;
         }
 
         /// <summary>
