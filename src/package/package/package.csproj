@@ -50,10 +50,6 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
-
-    <!-- For net46, testhost is packaged along with runner, include it in publish -->
-    <ProjectReference Include="$(TestPlatformRoot)src\testhost\testhost.csproj" />
-    <ProjectReference Include="$(TestPlatformRoot)src\testhost.x86\testhost.x86.csproj" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
   <Target Name="CoreCompile" />
