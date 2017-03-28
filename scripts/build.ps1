@@ -219,20 +219,13 @@ function Publish-Package
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
 
-    # Binding redirection for Newtonsoft.Json.dll has been removed from testhost config file to resolve bug: https://github.com/Microsoft/vstest/issues/391 
-    # If a user's project is taking a dependency on Newtonsoft.Json with version 6.0.5 and in test code he is using Newtonsoft API's inside an appdomain. Appdomain uses config file of the parent process
-    # if not provided any, so here it will use testhost config file which has binding redirect <bindingRedirect oldVersion="0.0.0.0-9.0.0.0" newVersion="9.0.0.0" />. Since the user's projects is dependent on Newtonsoft.Json
-    # of version 6.0.5 their tests break because of the redirection.
-    # In the TestPlatform repo: Microsoft.TestPlatform.CommunicationUtilities depends on Newtonsoft.Json(8.0.3) and Microsoft.TestPlatform.CrossPlatEngine depends on Microsoft.Extensions.Dependencymodel which
-    # depends on Newtonsoft.Json(9.0.1). So testhost ends up having Newtonsoft.Json.dll of version 9.0.1 in their publish package.
-    # Since testhost uses CommunicationUtilities (and does not use that part of CrossPlatEngine which uses Newtonsoft.Json of version 9.0.1) so it needs Newtonsoft.Json.dll of version 8.0.3 along with it.
-    # Hence, copying Newtonsoft.Json.dll of version 8.0.3 to test $testhostFullPackageDir. This is however very much dependent on the CrossPlatEngine code running in testhost to not call into APIs specific to 9.0.1.
+    # Copying Newtonsoft.Json.dll of version 8.0.3 to test $testhostFullPackageDir due to bug: https://github.com/Microsoft/vstest/issues/391#issuecomment-289776581
 
     Write-Log "Package: copy file $newtonsoft to $testhostFullPackageDir"
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\8.0.3\lib\net45\Newtonsoft.Json.dll"
     Copy-Item $newtonsoft $testhostFullPackageDir -Force
 
-    # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CRL package folder.
+    # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $netFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
