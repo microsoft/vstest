@@ -219,12 +219,19 @@ function Publish-Package
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
 
-    # Copy over the Full CLR built testhost package assemblies to the $fullCLRPackageDir
-    Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force
+    # Copying Newtonsoft.Json.dll of version 8.0.3 to test $testhostFullPackageDir due to bug: https://github.com/Microsoft/vstest/issues/391#issuecomment-289776581
 
-    # Copy over the Full CLR built testhost package assemblies to the Core CLR package folder.
+    Write-Log "Package: copy file $newtonsoft to $testhostFullPackageDir"
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\8.0.3\lib\net45\Newtonsoft.Json.dll"
+    Copy-Item $newtonsoft $testhostFullPackageDir -Force
+
+    # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $netFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
+    New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
+
+    $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
 

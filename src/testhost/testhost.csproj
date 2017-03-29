@@ -12,6 +12,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\testhost.x86\Program.cs;..\testhost.x86\DefaultEngineInvoker.cs;..\testhost.x86\IEngineInvoker.cs;..\testhost.x86\AppDomainEngineInvoker.cs;..\testhost.x86\Friends.cs" />
