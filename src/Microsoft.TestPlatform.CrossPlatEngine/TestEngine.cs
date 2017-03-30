@@ -57,8 +57,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
 
-            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator =
-                () => new ProxyDiscoveryManager(this.GetDefaultTestHostManager(discoveryCriteria.RunSettings));
+            Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
+            {
+                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+                hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
+
+                return new ProxyDiscoveryManager(hostManager);
+            };
+                
             return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
         }
 
@@ -81,8 +87,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
             {
                 // Create a new HostManager, to be associated with individual ProxyExecutionManager(&POM)
-                var hostManager = this.GetDefaultTestHostManager(testRunCriteria.TestRunSettings);
-                
+                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+                hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
+
                 if (testRunCriteria.TestHostLauncher != null)
                 {
                     hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
@@ -110,15 +117,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         public ITestExtensionManager GetExtensionManager()
         {
             return this.testExtensionManager ?? (this.testExtensionManager = new TestExtensionManager());
-        }
-
-        /// <inheritdoc/>
-        public ITestRuntimeProvider GetDefaultTestHostManager(string runSettingsXml)
-        {
-            var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(runSettingsXml);
-            hostManager?.Initialize(TestSessionMessageLogger.Instance, runSettingsXml);
-
-            return hostManager;
         }
 
         #endregion

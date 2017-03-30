@@ -43,7 +43,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateDiscoveryRequestShouldCreateDiscoveryRequestWithGivenCriteriaAndReturnIt()
         {
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.discoveryManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetDiscoveryManager(this.hostManager.Object, It.IsAny<DiscoveryCriteria>())).Returns(this.discoveryManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
@@ -82,7 +81,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
 
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
@@ -109,7 +107,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
 
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
@@ -132,7 +129,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         [TestMethod]
         public void CreateTestRunRequestShouldCreateTestRunRequestWithSpecifiedCriteria()
         {
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
@@ -149,7 +145,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         public void CreateTestRunRequestShouldSetCustomHostLauncherOnEngineDefaultLauncherIfSpecified()
         {
             var mockCustomLauncher = new Mock<ITestHostLauncher>();
-            this.testEngine.Setup(te => te.GetDefaultTestHostManager(It.IsAny<string>())).Returns(this.hostManager.Object);
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>())).Returns(this.executionManager.Object);
             this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
