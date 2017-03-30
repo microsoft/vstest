@@ -21,8 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -309,6 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
             if (this.testHostLauncher == null)
             {
+                EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
                 this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
             }
             else
@@ -320,7 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
 
-            return pId
+            return pId;
         }
 
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)

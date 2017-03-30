@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="testHostProviderManager">
         /// The data.
         /// </param>
-        internal TestPlatform(ITestEngine testEngine, IFileHelper filehelper, TestRuntimeProviderManager testHostProviderManager)
+        protected TestPlatform(ITestEngine testEngine, IFileHelper filehelper, TestRuntimeProviderManager testHostProviderManager)
         {
             this.TestEngine = testEngine;
             this.fileHelper = filehelper;

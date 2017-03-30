@@ -155,6 +155,11 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="4" adjWordcount="3.4" curWordcount="3.4"</note>
       </trans-unit>
+      <trans-unit id="NoDotnetExeFound">
+        <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
+        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

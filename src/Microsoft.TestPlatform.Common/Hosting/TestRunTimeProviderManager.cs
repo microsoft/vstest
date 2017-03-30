@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
     /// <summary>
     /// Responsible for managing TestRuntimeProviderManager extensions
     /// </summary>
-    internal class TestRuntimeProviderManager
+    public class TestRuntimeProviderManager
     {
         #region Fields
 

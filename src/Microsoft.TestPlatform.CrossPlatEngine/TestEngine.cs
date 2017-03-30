@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
         }
 
-        internal TestEngine(TestRuntimeProviderManager testHostProviderManager)
+        protected TestEngine(TestRuntimeProviderManager testHostProviderManager)
         {
             this.testHostProviderManager = testHostProviderManager;
         }

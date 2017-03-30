@@ -10,8 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
     /// The datacollection launcher.
@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var argumentsString = string.Join(" ", commandLineArguments);
 
             this.DataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, processWorkingDirectory, environmentVariables, null, null) as Process;
-            return this.DataCollectorProcess != null? this.DataCollectorProcess.Id : 0;
+            return this.DataCollectorProcess?.Id ?? 0;
         }
     }
 }

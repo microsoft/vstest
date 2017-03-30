@@ -62,6 +62,11 @@
         <source>Error getting process name.</source>
         <note></note>
       </trans-unit>
+      <trans-unit id="NoDotnetExeFound">
+        <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
+        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

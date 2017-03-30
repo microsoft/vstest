@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
+namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;

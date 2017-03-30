@@ -7,8 +7,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
-    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.CrossPlatEngine.UnitTests</AssemblyName>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>

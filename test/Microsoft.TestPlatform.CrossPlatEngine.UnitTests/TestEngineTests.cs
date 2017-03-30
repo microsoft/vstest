@@ -147,7 +147,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANonNullInstance()
         {
-            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            this.testEngine = new TestEngine();
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
@@ -160,7 +160,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANewInstanceEverytime()
         {
-            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            this.testEngine = new TestEngine();
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
@@ -176,7 +176,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsDotnetCoreHostManagerIfFrameworkIsNetCore()
         {
-            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            this.testEngine = new TestEngine();
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x64 </TargetPlatform><TargetFrameworkVersion>",
@@ -191,7 +191,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsASharedManagerIfDisableAppDomainIsFalse()
         {
-            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            this.testEngine = new TestEngine();
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
@@ -208,7 +208,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDefaultTestHostManagerReturnsANonSharedManagerIfDisableAppDomainIsTrue()
         {
-            this.testEngine = new TestEngine(TestRuntimeProviderManager.Instance);
+            this.testEngine = new TestEngine();
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",

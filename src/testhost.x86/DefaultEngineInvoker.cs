@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     internal class DefaultEngineInvoker :
 #if NET46

@@ -18,8 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -255,6 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 if (this.customTestHostLauncher == null)
                 {
+                    EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
                     this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
                 }
                 else

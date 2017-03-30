@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
     using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers
     using System.IO;
     using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
     /// Helper class to deal with process related functionality.
@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers
                 throw;
             }
 
-            return process as Object;
+            return process as object;
         }
 
         /// <inheritdoc/>
@@ -101,10 +101,10 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers
         }
 
         /// <inheritdoc/>
-        public bool TryGetExitCode(Object process, out int exitCode)
+        public bool TryGetExitCode(object process, out int exitCode)
         {
             var proc = process as Process;
-            if (proc.HasExited)
+            if (proc != null && proc.HasExited)
             {
                 exitCode = proc.ExitCode;
                 return true;
@@ -113,6 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Helpers
             exitCode = 0;
             return false;
         }
+
         /// <inheritdoc/>
         public void SetExitCallback(int parentProcessId, Action callbackAction)
         {
