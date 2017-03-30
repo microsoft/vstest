@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     internal class ProxyOutOfProcDataCollectionManager
     {
         private IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
-        private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
+        private ITestEventsPublisher testEventsPublisher;
         private Dictionary<Guid, Collection<AttachmentSet>> attachmentsCache;
 
         /// <summary>
@@ -35,17 +35,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataCollectionTestCaseEventManager">
         /// The data collection test case event manager.
         /// </param>
-        public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager)
+        public ProxyOutOfProcDataCollectionManager(IDataCollectionTestCaseEventSender dataCollectionTestCaseEventSender, ITestEventsPublisher testEventsPublisher)
         {
             this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
-            this.dataCollectionTestCaseEventManager = dataCollectionTestCaseEventManager;
+            this.testEventsPublisher = testEventsPublisher;
             this.dataCollectionTestCaseEventSender = dataCollectionTestCaseEventSender;
 
-            this.dataCollectionTestCaseEventManager.TestCaseStart += this.TriggerTestCaseStart;
-            this.dataCollectionTestCaseEventManager.TestCaseEnd += this.TriggerTestCaseEnd;
-            this.dataCollectionTestCaseEventManager.TestResult += TriggerSendTestResult;
-            this.dataCollectionTestCaseEventManager.SessionEnd += this.TriggerTestSessionEnd;
-            attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
+            this.testEventsPublisher.TestCaseStart += this.TriggerTestCaseStart;
+            this.testEventsPublisher.TestCaseEnd += this.TriggerTestCaseEnd;
+            this.testEventsPublisher.TestResult += TriggerSendTestResult;
+            this.testEventsPublisher.SessionEnd += this.TriggerTestSessionEnd;
+            this.attachmentsCache = new Dictionary<Guid, Collection<AttachmentSet>>();
         }
 
         private void TriggerTestCaseStart(object sender, TestCaseStartEventArgs e)
