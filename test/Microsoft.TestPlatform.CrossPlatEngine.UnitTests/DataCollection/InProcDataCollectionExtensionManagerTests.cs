@@ -35,13 +35,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                         </InProcDataCollectors>
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
-        private Mock<IDataCollectionTestCaseEventManager> mockDataCollectionTestCaseEventManager;
+        private Mock<ITestEventsPublisher> mockTestEventsPublisher;
         private TestableInProcDataCollectionExtensionManager inProcDataCollectionManager;
 
         public InProcDataCollectionExtensionManagerTests()
         {
-            this.mockDataCollectionTestCaseEventManager = new Mock<IDataCollectionTestCaseEventManager>();
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
+            this.mockTestEventsPublisher = new Mock<ITestEventsPublisher>();
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(this.settingsXml, this.mockTestEventsPublisher.Object);
         }
 
         [TestMethod]
@@ -77,7 +77,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
+            this.inProcDataCollectionManager = new TestableInProcDataCollectionExtensionManager(multiSettingsXml, this.mockTestEventsPublisher.Object);
             bool secondOne = false;
             DataCollectorSettings dataCollectorSettings1 = null;
             DataCollectorSettings dataCollectorSettings2 = null;
@@ -119,14 +119,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                                     </InProcDataCollectionRunSettings>
                                 </RunSettings>";
 
-            var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, null, this.mockDataCollectionTestCaseEventManager.Object);
+            var manager = new InProcDataCollectionExtensionManager(invalidSettingsXml, this.mockTestEventsPublisher.Object);
             Assert.IsFalse(manager.IsInProcDataCollectionEnabled, "InProcDataCollection must be disabled on invalid settings.");
         }
 
         [TestMethod]
         public void TriggerSessionStartShouldCallInProcDataCollector()
         {
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
+            this.mockTestEventsPublisher.Raise(x => x.SessionStart += null, new SessionStartEventArgs());
 
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 1), "TestSessionStart must be called on datacollector");
@@ -138,7 +138,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         [TestMethod]
         public void TriggerSessionEndShouldCallInProcDataCollector()
         {
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.SessionEnd += null, new SessionEndEventArgs());
+            this.mockTestEventsPublisher.Raise(x => x.SessionEnd += null, new SessionEndEventArgs());
 
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestSessionStartCalled == 0), "TestSessionEnd must NOT be called on datacollector");
@@ -153,7 +153,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
+            this.mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
 
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
 
@@ -167,19 +167,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             var testCase = new TestCase("x.y.z", new Uri("uri://dummy"), "x.dll");
             // random guid
             testCase.Id = new Guid("3871B3B0-2853-406B-BB61-1FE1764116FD");
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
-            this.mockDataCollectionTestCaseEventManager.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Failed));
+            this.mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
+            this.mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Passed));
+            this.mockTestEventsPublisher.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testCase));
+            this.mockTestEventsPublisher.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testCase, TestOutcome.Failed));
 
             var mockDataCollector = inProcDataCollectionManager.InProcDataCollectors.Values.FirstOrDefault() as MockDataCollector;
             Assert.IsTrue((mockDataCollector.TestCaseStartCalled == 2), "TestCaseStart must only be called once");
             Assert.IsTrue((mockDataCollector.TestCaseEndCalled == 2), "TestCaseEnd must only be called once");
-        }        
+        }
 
         internal class TestableInProcDataCollectionExtensionManager : InProcDataCollectionExtensionManager
         {
-            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestRunCache testRunCache, IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager) : base(runSettings, testRunCache, dataCollectionTestCaseEventManager)
+            public TestableInProcDataCollectionExtensionManager(string runSettings, ITestEventsPublisher mockTestEventsPublisher) : base(runSettings, mockTestEventsPublisher)
             {
             }
 

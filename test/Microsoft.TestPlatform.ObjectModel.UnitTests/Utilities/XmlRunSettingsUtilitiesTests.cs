@@ -323,6 +323,34 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 
         #endregion
 
+        #region IsInProcDataCollectionEnabled tests.
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnFalseIfRunSettingsIsNull()
+        {
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(null));
+        }
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionNodeIsNotPresent()
+        {
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled("<RunSettings></RunSettings>"));
+        }
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionIsDisabled()
+        {
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(this.runSettingsXmlWithDataCollectorsDisabled)));
+        }
+
+        [TestMethod]
+        public void IsInProcDataCollectionEnabledShouldReturnTrueIfDataCollectionIsEnabled()
+        {
+            Assert.IsTrue(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(this.runSettingsXmlWithDataCollectors)));
+        }
+
+        #endregion
+
         #region GetDataCollectionRunSettings tests
 
         [TestMethod]
@@ -356,5 +384,15 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         }
 
         #endregion
+
+        private string ConvertOutOfProcDataCollectionSettingsToInProcDataCollectionSettings(string settings)
+        {
+            return
+                settings.Replace("DataCollectionRunSettings", "InProcDataCollectionRunSettings")
+                    .Replace("<DataCollectors>", "<InProcDataCollectors>")
+                    .Replace("</DataCollectors>", "</InProcDataCollectors>")
+                    .Replace("<DataCollector ", "<InProcDataCollector ")
+                    .Replace("</DataCollector>", "</InProcDataCollector>");
+        }
     }
 }
