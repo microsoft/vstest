@@ -14,7 +14,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Moq;
 
     [TestClass]
@@ -36,6 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
+            this.mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Returns(true);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
         }
 
@@ -127,12 +128,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void SetupChannelShouldWaitForTestHostConnectionEvenIfConnectionIsInitialized()
+        public void SetupChannelShouldNotWaitForTestHostConnectionIfConnectionIsInitialized()
         {
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Exactly(2));
+            this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Exactly(1));
         }
 
         [TestMethod]
@@ -141,6 +142,45 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(false);
 
             Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(Enumerable.Empty<string>()));
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldCheckVersionWithTestHost()
+        {
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+            this.mockRequestSender.Verify(rs => rs.CheckVersionWithTestHost(), Times.Once);
+        }
+
+        [TestMethod]
+        public void SetupChannelShouldThrowExceptionIfVersionCheckFails()
+        {
+            // Make the version check fail
+            this.mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Returns(false);
+            Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(Enumerable.Empty<string>()));
+        }
+
+        [TestMethod]
+        public void SetupChannelForDotnetHostManagerWithIsVersionCheckRequiredFalseShouldNotCheckVersionWithTestHost()
+        {
+            var testHostManager = new Mock<DotnetTestHostManager>();
+            testHostManager.Setup(thm => thm.IsVersionCheckRequired).Returns(false);
+            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testHostManager.Object, this.connectionTimeout);
+
+            operationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockRequestSender.Verify(rs => rs.CheckVersionWithTestHost(), Times.Never);
+        }
+
+        [TestMethod]
+        public void SetupChannelForDotnetHostManagerWithIsVersionCheckRequiredTrueShouldCheckVersionWithTestHost()
+        {
+            var testHostManager = new Mock<DotnetTestHostManager>();
+            testHostManager.Setup(thm => thm.IsVersionCheckRequired).Returns(true);
+            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testHostManager.Object, this.connectionTimeout);
+
+            operationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.mockRequestSender.Verify(rs => rs.CheckVersionWithTestHost(), Times.Once);
         }
 
         [TestMethod]

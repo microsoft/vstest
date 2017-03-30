@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Runtime.Serialization;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using System.Globalization;
 
     /// <summary>
     /// Stores information about a test case.
@@ -23,6 +24,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private Object m_localExtensionData;
 #endif
         private Guid defaultId = Guid.Empty;
+
+        private string fullyQualifiedName;
+        private string displayName;
+        private Guid id;
+        private string source;
+        private Uri executerUri;
+        private string codeFilePath;
+        private int lineNumber = -1;
 
         #region Constructor
 
@@ -77,13 +86,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the id of the test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public Guid Id
         {
             get
             {
-                var id = this.GetPropertyValue<Guid>(TestCaseProperties.Id, Guid.Empty);
-                if (id == Guid.Empty)
+                if (this.id == Guid.Empty)
                 {
                     // user has not specified his own Id during ctor! We will cache Id if its empty
                     if (this.defaultId == Guid.Empty)
@@ -94,83 +102,86 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     return this.defaultId;
                 }
 
-                return id;
+                return this.id;
             }
 
             set
             {
-                this.SetPropertyValue(TestCaseProperties.Id, value);
+                var convertedValue = ConvertPropertyFrom<Guid>(TestCaseProperties.Id, CultureInfo.InvariantCulture, value);
+                this.id = (Guid)convertedValue;
             }
         }
 
         /// <summary>
         /// Gets or sets the fully qualified name of the test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string FullyQualifiedName
         {
             get
             {
-                return this.GetPropertyValue(TestCaseProperties.FullyQualifiedName, string.Empty);
+                return this.fullyQualifiedName;
             }
 
             set
             {
-                this.SetPropertyValue(TestCaseProperties.FullyQualifiedName, value);
-
-                // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
-                this.defaultId = Guid.Empty;
+                this.fullyQualifiedName = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the display name of the test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string DisplayName
         {
             get
             {
-                return this.GetPropertyValue(TestCaseProperties.DisplayName, this.FullyQualifiedName);
+                if (string.IsNullOrEmpty(this.displayName))
+                {
+                    return this.FullyQualifiedName;
+                }
+                return this.displayName;
             }
 
             set
             {
-                this.SetPropertyValue(TestCaseProperties.DisplayName, value);
+                this.displayName = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the Uri of the Executor to use for running this test.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public Uri ExecutorUri
         {
             get
             {
-                return this.GetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, null);
+                return this.executerUri;
             }
 
             set
             {
-                this.SetPropertyValue(TestCaseProperties.ExecutorUri, value);
+                var convertedValue = ConvertPropertyFrom<Uri>(TestCaseProperties.ExecutorUri, CultureInfo.InvariantCulture, value);
+                this.executerUri = (Uri)convertedValue;
             }
         }
 
         /// <summary>
         /// Gets the test container source from which the test is discovered.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string Source
         {
             get
             {
-                return this.GetPropertyValue<string>(TestCaseProperties.Source, null);
+                return source;
             }
-
-            private set
+            
+            set
             {
-                this.SetPropertyValue(TestCaseProperties.Source, value);
+                this.source = value;
 
                 // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
                 this.defaultId = Guid.Empty;
@@ -180,36 +191,38 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the source code file path of the test.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string CodeFilePath
         {
             get
             {
-                return this.GetPropertyValue<string>(TestCaseProperties.CodeFilePath, null);
+                return this.codeFilePath;
             }
 
             set
             {
-                this.SetPropertyValue(TestCaseProperties.CodeFilePath, value);
+                this.codeFilePath = value;
             }
         }
 
         /// <summary>
         /// Gets or sets the line number of the test.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public int LineNumber
         {
             get
             {
-                return this.GetPropertyValue(TestCaseProperties.LineNumber, -1);
+                return this.lineNumber;
             }
 
             set
             {
-                this.SetPropertyValue(TestCaseProperties.LineNumber, value);
+                var convertedValue = ConvertPropertyFrom<int>(TestCaseProperties.LineNumber, CultureInfo.InvariantCulture, value);
+                this.lineNumber = (int)convertedValue;
             }
         }
+
 
         /// <inheritdoc/>
         public override string ToString()

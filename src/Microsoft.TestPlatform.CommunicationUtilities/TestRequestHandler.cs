@@ -28,6 +28,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private Action<Message> OnAckMessageRecieved;
 
+        private int highestSupportedVersion = 2;
+
+        // Set default to 1, if protocol version check does not happen
+        // that implies runner is using version 1
+        private int protocolVersion = 1;
+
         /// <summary>
         /// The timeout for the client to connect to the server.
         /// </summary>
@@ -72,13 +78,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 500,
                 25000000,
                 true,
-                (message) => EqtTrace.Error(message));
-            
+                (errorMessage) => EqtTrace.Error(errorMessage));
+
             do
             {
                 var message = this.communicationManager.ReceiveMessage();
+
                 switch (message.MessageType)
                 {
+                    case MessageType.VersionCheck:
+                        var version = this.dataSerializer.DeserializePayload<int>(message);
+                        this.protocolVersion = Math.Min(version, highestSupportedVersion);
+                        this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolVersion);
+
+                        break;
+
                     case MessageType.DiscoveryInitialize:
                         {
                             EqtTrace.Info("Discovery Session Initialize.");
@@ -216,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </param>
         public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
         {
-            this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases);
+            this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases, protocolVersion);
         }
 
         /// <summary>
@@ -225,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="testRunChangedArgs"></param>
         public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
         {
-            this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs);
+            this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs, protocolVersion);
         }
 
         /// <summary>
@@ -236,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendLog(TestMessageLevel messageLevel, string message)
         {
             var testMessagePayload = new TestMessagePayload {MessageLevel = messageLevel,Message = message};
-            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, protocolVersion);
         }
 
         /// <summary>
@@ -260,7 +274,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                   ExecutorUris = executorUris
                               };
 
-            this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload);
+            this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload, protocolVersion);
         }
 
         /// <summary>
@@ -275,7 +289,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 IsAborted = isAborted
             };
             
-            this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload);
+            this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, protocolVersion);
         }
 
         /// <summary>
@@ -292,7 +306,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 waitHandle.Set();
             };
 
-            this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo);
+            this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo, protocolVersion);
 
             waitHandle.WaitOne();
             this.OnAckMessageRecieved = null;

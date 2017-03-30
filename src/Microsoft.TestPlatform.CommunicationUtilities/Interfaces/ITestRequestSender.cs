@@ -22,6 +22,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         int InitializeCommunication();
 
         /// <summary>
+        /// Used for protocol version check with TestHost
+        /// </summary>
+        /// <returns></returns>
+        bool CheckVersionWithTestHost();
+
+        /// <summary>
         /// Waits for Request Handler to be connected 
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>

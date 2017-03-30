@@ -31,7 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <returns>True, if Server got a connection from client</returns>
         bool WaitForClientConnection(int connectionTimeout);
 
-
         /// <summary>
         /// Waits for server to be connected
         /// Whoever creating the client and trying to connect to a server 
@@ -103,6 +102,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
         /// <param name="payload">payload to be sent</param>
         void SendMessage(string messageType, object payload);
+
+        /// <summary>
+        ///  Writes message to the binary writer with payload
+        /// </summary>
+        /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
+        /// <param name="payload">payload to be sent</param>
+        /// <param name="version">version to be sent</param>
+        void SendMessage(string messageType, object payload, int version);
 
         /// <summary>
         /// Send serialized raw message

@@ -224,6 +224,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <summary>
+        ///  Writes message to the binary writer with payload
+        /// </summary>
+        /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
+        /// <param name="payload">payload to be sent</param>
+        /// <param name="version">version to be sent</param>
+        public void SendMessage(string messageType, object payload, int version)
+        {
+            var rawMessage = this.dataSerializer.SerializePayload(messageType, payload, version);
+            this.WriteAndFlushToChannel(rawMessage);
+        }
+
+        /// <summary>
         /// The send hand shake message.
         /// </summary>
         public void SendHandShakeMessage()

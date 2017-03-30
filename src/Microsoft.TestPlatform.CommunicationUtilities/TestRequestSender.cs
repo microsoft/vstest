@@ -28,6 +28,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private IDataSerializer dataSerializer;
 
+        // TODO:sasin Change the version to 2
+        private int highestNegotiatedVersion = 1;
+
         /// <summary>
         /// Use to cancel blocking tasks associated with testhost process
         /// </summary>
@@ -77,6 +80,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             EqtTrace.Info("Closing the connection");
         }
 
+        /// <inheritdoc/>
+        public bool CheckVersionWithTestHost()
+        {
+            var success = false;
+            this.communicationManager.SendMessage(MessageType.VersionCheck, payload: highestNegotiatedVersion);
+
+            var message = this.communicationManager.ReceiveMessage();
+
+            if (message.MessageType == MessageType.VersionCheck)
+            {
+                var protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
+
+                // TODO: Should we check if this is valid ?
+                highestNegotiatedVersion = protocolVersion;
+                success = true;
+
+            }
+            else if (message.MessageType == MessageType.ProtocolError)
+            {
+                EqtTrace.Error("TestRequestSender: VersionCheck Failed");
+            }
+            else
+            {
+                EqtTrace.Error("TestRequestSender: VersionCheck Message Expected but different message received: Received MessageType: {0}", message.MessageType);
+            }
+
+            return success;
+        }
+
         /// <summary>
         /// Initializes the extensions in the test host.
         /// </summary>
@@ -84,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions);
+            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions, version: highestNegotiatedVersion);
         }
 
         /// <summary>
@@ -94,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="loadOnlyWellKnownExtensions">Flag to indicate if only well known extensions are to be loaded.</param>
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions);
+            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions, version: highestNegotiatedVersion);
         }
 
         /// <summary>
@@ -106,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria);
+                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria, version: highestNegotiatedVersion);
 
                 var isDiscoveryComplete = false;
 
@@ -192,7 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(messageType, payload);
+                this.communicationManager.SendMessage(messageType, payload, version: highestNegotiatedVersion);
 
                 // This needs to happen asynchronously.
                 Task.Run(() => this.ListenAndReportTestResults(eventHandler));
@@ -251,7 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                         this.communicationManager.SendMessage(
                             MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
-                            processId);
+                            processId, version: highestNegotiatedVersion);
                     }
                 }
                 catch (IOException exception)

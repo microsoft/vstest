@@ -27,4 +27,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             return "(" + MessageType + ") -> " + (Payload == null ? "null" : Payload.ToString(Formatting.Indented));
         }
     }
+
+    public class VersionedMessage : Message
+    {
+        /// <summary>
+        /// Gets or sets the version of the message
+        /// </summary>
+        public int Version { get; set; }
+    }
 }

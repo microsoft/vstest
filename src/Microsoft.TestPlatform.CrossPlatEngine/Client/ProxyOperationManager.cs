@@ -18,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -114,22 +115,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // Increase connection timeout when debugging is enabled.
                     connTimeout = 5 * this.connectionTimeout;
                 }
-                
-                this.initialized = true;
-            }
 
-            // Wait for a timeout for the client to connect.
-            if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
-            {
-                var errorMsg = CrossPlatEngineResources.InitializationFailed;
-
-                if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
+                // Wait for a timeout for the client to connect.
+                if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
                 {
-                    // Testhost failed with error
-                    errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
+                    var errorMsg = CrossPlatEngineResources.InitializationFailed;
+
+                    if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError.ToString()))
+                    {
+                        // Testhost failed with error
+                        errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
+                    }
+
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
                 }
 
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+                // Handling special case for dotnet core projects with older test hosts
+                // Older test hosts are not aware of protocol version check
+                // Hence we should not be sending VersionCheck message to these test hosts
+                var dotnetHostManager = this.testHostManager as DotnetTestHostManager;
+                if (dotnetHostManager == null || dotnetHostManager.IsVersionCheckRequired)
+                {
+                    if (!this.RequestSender.CheckVersionWithTestHost())
+                    {
+                        throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, "Protocol version check failed"));
+                    }
+                }
+
+                this.initialized = true;
             }
         }
 

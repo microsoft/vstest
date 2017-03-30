@@ -20,6 +20,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
                                                new Uri("executor://sampleTestExecutor"),
                                                "sampleTest.dll");
 
+        private static DateTimeOffset startTime = new DateTimeOffset(new DateTime(2007, 3, 10, 0, 0, 0));
         private static TestResult testResult = new TestResult(testCase)
                                                    {
                                                        // Attachments = ?
@@ -30,9 +31,11 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
                                                        DisplayName = "sampleTestResult",
                                                        ComputerName = "sampleComputerName",
                                                        Duration = TimeSpan.MaxValue,
-                                                       StartTime = DateTimeOffset.MinValue,
+                                                       StartTime = startTime,
                                                        EndTime = DateTimeOffset.MaxValue
                                                    };
+
+        #region v1 tests
 
         [TestMethod]
         public void TestResultJsonShouldContainAllPropertiesOnSerialization()
@@ -57,7 +60,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
 
             // By default json.net converts DateTimes to current time zone
             Assert.AreEqual("TestResult.StartTime", properties[6]["Key"]["Id"].Value);
-            Assert.AreEqual(DateTimeOffset.MinValue.Year, ((DateTimeOffset)properties[6]["Value"].Value).Year);
+            Assert.AreEqual(startTime.Year, ((DateTimeOffset)properties[6]["Value"].Value).Year);
             Assert.AreEqual("TestResult.EndTime", properties[7]["Key"]["Id"].Value);
             Assert.AreEqual(DateTimeOffset.MaxValue.Year, ((DateTimeOffset)properties[7]["Value"].Value).Year);
         }
@@ -65,7 +68,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         [TestMethod]
         public void TestResultObjectShouldContainAllPropertiesOnDeserialization()
         {
-            var json = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"}]},\"Attachments\":[],\"Messages\":[],\"Properties\":[{\"Key\":{\"Id\":\"TestResult.Outcome\",\"Label\":\"Outcome\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome\"},\"Value\":1},{\"Key\":{\"Id\":\"TestResult.ErrorMessage\",\"Label\":\"Error Message\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleError\"},{\"Key\":{\"Id\":\"TestResult.ErrorStackTrace\",\"Label\":\"Error Stack Trace\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleStackTrace\"},{\"Key\":{\"Id\":\"TestResult.DisplayName\",\"Label\":\"TestResult Display Name\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestResult\"},{\"Key\":{\"Id\":\"TestResult.ComputerName\",\"Label\":\"Computer Name\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleComputerName\"},{\"Key\":{\"Id\":\"TestResult.Duration\",\"Label\":\"Duration\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.TimeSpan\"},\"Value\":\"10675199.02:48:05.4775807\"},{\"Key\":{\"Id\":\"TestResult.StartTime\",\"Label\":\"Start Time\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"0001-01-01T00:00:00+00:00\"},{\"Key\":{\"Id\":\"TestResult.EndTime\",\"Label\":\"End Time\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
+            var json = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"}]},\"Attachments\":[],\"Messages\":[],\"Properties\":[{\"Key\":{\"Id\":\"TestResult.Outcome\",\"Label\":\"Outcome\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome\"},\"Value\":1},{\"Key\":{\"Id\":\"TestResult.ErrorMessage\",\"Label\":\"Error Message\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleError\"},{\"Key\":{\"Id\":\"TestResult.ErrorStackTrace\",\"Label\":\"Error Stack Trace\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleStackTrace\"},{\"Key\":{\"Id\":\"TestResult.DisplayName\",\"Label\":\"TestResult Display Name\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestResult\"},{\"Key\":{\"Id\":\"TestResult.ComputerName\",\"Label\":\"Computer Name\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleComputerName\"},{\"Key\":{\"Id\":\"TestResult.Duration\",\"Label\":\"Duration\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.TimeSpan\"},\"Value\":\"10675199.02:48:05.4775807\"},{\"Key\":{\"Id\":\"TestResult.StartTime\",\"Label\":\"Start Time\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"2007-03-10T00:00:00+05:30\"},{\"Key\":{\"Id\":\"TestResult.EndTime\",\"Label\":\"End Time\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
 
             var test = Deserialize<TestResult>(json);
 
@@ -88,8 +91,7 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
         {
             var result = new TestResult(testCase);
             result.Attachments.Add(new AttachmentSet(new Uri("http://dummyUri"), "sampleAttachment"));
-            var expectedJson = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"}]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Messages\":[],\"Properties\":[]}";
-
+            var expectedJson = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\"}]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Messages\":[],\"Properties\":[]}";
             var json = Serialize(result);
 
             Assert.AreEqual(expectedJson, json);
@@ -107,14 +109,84 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual("sampleAttachment", result.Attachments[0].DisplayName);
         }
 
-        private static string Serialize<T>(T data)
+        #endregion
+
+        #region v2 Tests
+
+        [TestMethod]
+        public void TestResultJsonShouldContainAllPropertiesOnSerializationV2()
         {
-            return JsonDataSerializer.Instance.Serialize(data);
+            var json = Serialize(testResult, 2);
+
+            // Use raw deserialization to validate basic properties
+            dynamic data = JObject.Parse(json);
+
+            Assert.AreEqual(1, data["Outcome"].Value);
+            Assert.AreEqual("sampleError", data["ErrorMessage"].Value);
+            Assert.AreEqual("sampleStackTrace", data["ErrorStackTrace"].Value);
+            Assert.AreEqual("sampleTestResult", data["DisplayName"].Value);
+            Assert.AreEqual("sampleComputerName", data["ComputerName"].Value);
+            Assert.AreEqual("10675199.02:48:05.4775807", data["Duration"].Value);
+
+            // By default json.net converts DateTimes to current time zone
+            Assert.AreEqual(startTime.Year, ((DateTimeOffset)data["StartTime"].Value).Year);
+            Assert.AreEqual(DateTimeOffset.MaxValue.Year, ((DateTimeOffset)data["EndTime"].Value).Year);
         }
 
-        private static T Deserialize<T>(string json)
+        [TestMethod]
+        public void TestResultObjectShouldContainAllPropertiesOnDeserializationV2()
         {
-            return JsonDataSerializer.Instance.Deserialize<T>(json);
+            var json = "{\"TestCase\":{\"Id\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\",\"FullyQualifiedName\":\"sampleTestClass.sampleTestCase\",\"DisplayName\":\"sampleTestClass.sampleTestCase\",\"ExecutorUri\":\"executor://sampleTestExecutor\",\"Source\":\"sampleTest.dll\",\"CodeFilePath\":null,\"LineNumber\":-1,\"Properties\":[]},\"Attachments\":[],\"Outcome\":1,\"ErrorMessage\":\"sampleError\",\"ErrorStackTrace\":\"sampleStackTrace\",\"DisplayName\":\"sampleTestResult\",\"Messages\":[],\"ComputerName\":\"sampleComputerName\",\"Duration\":\"10675199.02:48:05.4775807\",\"StartTime\":\"2007-03-10T00:00:00+05:30\",\"EndTime\":\"9999-12-31T23:59:59.9999999+00:00\",\"Properties\":[]}";
+
+            var test = Deserialize<TestResult>(json, 2);
+
+            Assert.AreEqual(testResult.TestCase.Id, test.TestCase.Id);
+            Assert.AreEqual(testResult.Attachments.Count, test.Attachments.Count);
+            Assert.AreEqual(testResult.Messages.Count, test.Messages.Count);
+
+            Assert.AreEqual(testResult.ComputerName, test.ComputerName);
+            Assert.AreEqual(testResult.DisplayName, test.DisplayName);
+            Assert.AreEqual(testResult.Duration, test.Duration);
+            Assert.AreEqual(testResult.EndTime, test.EndTime);
+            Assert.AreEqual(testResult.ErrorMessage, test.ErrorMessage);
+            Assert.AreEqual(testResult.ErrorStackTrace, test.ErrorStackTrace);
+            Assert.AreEqual(testResult.Outcome, test.Outcome);
+            Assert.AreEqual(testResult.StartTime, test.StartTime);
+        }
+
+        [TestMethod]
+        public void TestResultObjectShouldSerializeAttachmentsV2()
+        {
+            var result = new TestResult(testCase);
+            result.Attachments.Add(new AttachmentSet(new Uri("http://dummyUri"), "sampleAttachment"));
+            var expectedJson = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\"}]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Messages\":[],\"Properties\":[]}";
+            var json = Serialize(result);
+
+            Assert.AreEqual(expectedJson, json);
+        }
+
+        [TestMethod]
+        public void TestResultObjectShouldDeserializeAttachmentsV2()
+        {
+            var json = "{\"TestCase\":{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"sampleTestClass.sampleTestCase\"},{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"executor://sampleTestExecutor\"},{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"sampleTest.dll\"},{\"Key\":{\"Id\":\"TestCase.Id\",\"Label\":\"Id\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Guid\"},\"Value\":\"28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b\"}]},\"Attachments\":[{\"Uri\":\"http://dummyUri\",\"DisplayName\":\"sampleAttachment\",\"Attachments\":[]}],\"Messages\":[],\"Properties\":[]}";
+
+            var result = Deserialize<TestResult>(json);
+
+            Assert.AreEqual(1, result.Attachments.Count);
+            Assert.AreEqual(new Uri("http://dummyUri"), result.Attachments[0].Uri);
+            Assert.AreEqual("sampleAttachment", result.Attachments[0].DisplayName);
+        }
+
+        #endregion
+
+        private static string Serialize<T>(T data, int version = 1)
+        {
+            return JsonDataSerializer.Instance.Serialize(data, version);
+        }
+
+        private static T Deserialize<T>(string json, int version = 1)
+        {
+            return JsonDataSerializer.Instance.Deserialize<T>(json, version);
         }
     }
 }

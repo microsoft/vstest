@@ -10,11 +10,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     using Newtonsoft.Json.Serialization;
-
+    
     /// <summary>
     /// JSON contract resolver for mapping test platform types.
     /// </summary>
-    public class TestPlatformContractResolver : DefaultContractResolver
+    public class DefaultTestPlatformContractResolver : DefaultContractResolver
     {
         /// <inheritdoc/>
         protected override JsonContract CreateContract(Type objectType)
