@@ -6,6 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// Construct used for communication
+    /// </summary>
     public class Message
     {
         /// <summary>
@@ -26,13 +29,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             return "(" + this.MessageType + ") -> " + (this.Payload == null ? "null" : this.Payload.ToString(Formatting.Indented));
         }
-    }
-
-    public class VersionedMessage : Message
-    {
-        /// <summary>
-        /// Gets or sets the version of the message
-        /// </summary>
-        public int Version { get; set; }
     }
 }

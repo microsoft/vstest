@@ -6,19 +6,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     using System;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Newtonsoft.Json;
-    
+
+    /// <inheritdoc/>
     public class TestResultConverter : JsonConverter
     {
+        /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
         {
             return typeof(TestResult) == objectType;
         }
 
+        /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var testResult = new TestResult();
             serializer.Populate(reader, testResult);
-            
+
             testResult.Outcome = testResult.GetPropertyValue<TestOutcome>(TestResultProperties.Outcome, TestOutcome.None);
             testResult.ErrorMessage = testResult.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
             testResult.ErrorStackTrace = testResult.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
@@ -31,19 +34,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             return testResult;
         }
 
+        /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             // P2 to P1
-            var testResult = (value as TestResult);
-            if (testResult.Outcome != TestOutcome.None) testResult.SetPropertyValue<TestOutcome>(TestResultProperties.Outcome, testResult.Outcome);
-            if (!string.IsNullOrEmpty(testResult.ErrorMessage)) testResult.SetPropertyValue<string>(TestResultProperties.ErrorMessage, testResult.ErrorMessage);
-            if (!string.IsNullOrEmpty(testResult.ErrorStackTrace)) testResult.SetPropertyValue<string>(TestResultProperties.ErrorStackTrace, testResult.ErrorStackTrace);
-            if (!string.IsNullOrEmpty(testResult.DisplayName)) testResult.SetPropertyValue<string>(TestResultProperties.DisplayName, testResult.DisplayName);
-            if (!string.IsNullOrEmpty(testResult.ComputerName)) testResult.SetPropertyValue<string>(TestResultProperties.ComputerName, testResult.ComputerName);
-            if (testResult.Duration != default(TimeSpan)) testResult.SetPropertyValue<TimeSpan>(TestResultProperties.Duration, testResult.Duration);
+            var testResult = value as TestResult;
+            if (testResult.Outcome != TestOutcome.None)
+            {
+                testResult.SetPropertyValue<TestOutcome>(TestResultProperties.Outcome, testResult.Outcome);
+            }
 
-            if (testResult.StartTime != default(DateTimeOffset)) testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, testResult.StartTime);
-            if (testResult.EndTime != default(DateTimeOffset)) testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, testResult.EndTime);
+            if (!string.IsNullOrEmpty(testResult.ErrorMessage))
+            {
+                testResult.SetPropertyValue<string>(TestResultProperties.ErrorMessage, testResult.ErrorMessage);
+            }
+
+            if (!string.IsNullOrEmpty(testResult.ErrorStackTrace))
+            {
+                testResult.SetPropertyValue<string>(TestResultProperties.ErrorStackTrace, testResult.ErrorStackTrace);
+            }
+
+            if (!string.IsNullOrEmpty(testResult.DisplayName))
+            {
+                testResult.SetPropertyValue<string>(TestResultProperties.DisplayName, testResult.DisplayName);
+            }
+
+            if (!string.IsNullOrEmpty(testResult.ComputerName))
+            {
+                testResult.SetPropertyValue<string>(TestResultProperties.ComputerName, testResult.ComputerName);
+            }
+
+            if (testResult.Duration != default(TimeSpan))
+            {
+                testResult.SetPropertyValue<TimeSpan>(TestResultProperties.Duration, testResult.Duration);
+            }
+
+            if (testResult.StartTime != default(DateTimeOffset))
+            {
+                testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, testResult.StartTime);
+            }
+
+            if (testResult.EndTime != default(DateTimeOffset))
+            {
+                testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, testResult.EndTime);
+            }
 
             var properties = testResult.GetProperties();
 

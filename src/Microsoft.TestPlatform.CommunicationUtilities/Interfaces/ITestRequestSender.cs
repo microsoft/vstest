@@ -23,11 +23,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// Used for protocol version check with TestHost
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if the version check is successful</returns>
         bool CheckVersionWithTestHost();
 
         /// <summary>
-        /// Waits for Request Handler to be connected 
+        /// Waits for Request Handler to be connected
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <returns>True, if Handler is connected</returns>

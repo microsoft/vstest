@@ -3,17 +3,20 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization
 {
+    using System;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Newtonsoft.Json;
-    using System;
 
+    /// <inheritdoc/>
     public class TestCaseConverter : JsonConverter
     {
+        /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
         {
             return typeof(TestCase) == objectType;
         }
 
+        /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             var testCase = new TestCase();
@@ -29,19 +32,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             return testCase;
         }
 
+        /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             // P2 to P1
-            var testCase = (value as TestCase);
+            var testCase = value as TestCase;
 
             testCase.SetPropertyValue<string>(TestCaseProperties.FullyQualifiedName, testCase.FullyQualifiedName);
             testCase.SetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, testCase.ExecutorUri);
             testCase.SetPropertyValue<string>(TestCaseProperties.Source, testCase.Source);
             testCase.SetPropertyValue<Guid>(TestCaseProperties.Id, testCase.Id);
-            if (!testCase.DisplayName.Equals(testCase.FullyQualifiedName)) testCase.SetPropertyValue<string>(TestCaseProperties.DisplayName, testCase.DisplayName);
+            if (!testCase.DisplayName.Equals(testCase.FullyQualifiedName))
+            {
+                testCase.SetPropertyValue<string>(TestCaseProperties.DisplayName, testCase.DisplayName);
+            }
 
-            if (!string.IsNullOrEmpty(testCase.CodeFilePath)) testCase.SetPropertyValue<string>(TestCaseProperties.CodeFilePath, testCase.CodeFilePath);
-            if (testCase.LineNumber >= 0) testCase.SetPropertyValue<int>(TestCaseProperties.LineNumber, testCase.LineNumber);
+            if (!string.IsNullOrEmpty(testCase.CodeFilePath))
+            {
+                testCase.SetPropertyValue<string>(TestCaseProperties.CodeFilePath, testCase.CodeFilePath);
+            }
+
+            if (testCase.LineNumber >= 0)
+            {
+                testCase.SetPropertyValue<int>(TestCaseProperties.LineNumber, testCase.LineNumber);
+            }
 
             var properties = testCase.GetProperties();
 

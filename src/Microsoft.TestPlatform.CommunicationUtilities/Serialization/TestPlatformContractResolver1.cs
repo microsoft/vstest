@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     /// </summary>
     public class TestPlatformContractResolver1 : DefaultTestPlatformContractResolver
     {
+        /// <inheritdoc/>
         protected override JsonContract CreateContract(Type objectType)
         {
             var contract = base.CreateContract(objectType);
@@ -19,10 +20,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             {
                 contract.Converter = new TestCaseConverter();
             }
+
             if (typeof(TestResult) == objectType)
             {
                 contract.Converter = new TestResultConverter();
             }
+
             return contract;
         }
     }
