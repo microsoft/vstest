@@ -126,14 +126,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
             this.ErrroCode = 0;
         }
 
-        public HostProviderEventArgs(string message, int errorCode)
+        public HostProviderEventArgs(string message, int errorCode, int processId)
         {
             this.Data = message;
             this.ErrroCode = errorCode;
+            this.ProcessId = processId;
         }
 
         public string Data { get; set; }
 
         public int ErrroCode { get; set; }
+
+        public int ProcessId { get; set; }
     }
 }

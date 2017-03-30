@@ -18,7 +18,7 @@
      Generates Program file which contains the Main entry point
      ============================================================
   -->
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <GeneratedProgramFile Condition="'$(GeneratedProgramFile)' ==''">$(IntermediateOutputPath)$(MSBuildProjectName).Program$(DefaultLanguageSourceExtension)</GeneratedProgramFile>
     <GenerateProgramFile Condition="'$(GenerateProgramFile)' == ''">true</GenerateProgramFile>
@@ -40,6 +40,16 @@
    -->
   <PropertyGroup>
     <DebugType Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">Full</DebugType>
+  </PropertyGroup>
+ 
+  <!--
+     Generate config file for test project targeting .NET Framework. This config file has have binding redirect which is needed at time of running tests.
+     Added below two lines because msbuild has following check:
+     https://github.com/Microsoft/msbuild/blob/dd5e8bc3f86ac98bd77d8971b00a6ad14f122f1a/src/XMakeTasks/Microsoft.Common.CurrentVersion.targets#L2027 
+   -->
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <!--

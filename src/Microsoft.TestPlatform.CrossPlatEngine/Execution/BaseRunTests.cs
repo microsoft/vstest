@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private string runSettings;
         private TestExecutionContext testExecutionContext;
         private ITestRunEventsHandler testRunEventsHandler;
-        private InProcDataCollectionExtensionManager inProcDataCollectionExtensionManager;
+        private ITestEventsPublisher testEventsPublisher;
         private ITestRunCache testRunCache;
 
         /// <summary>
@@ -61,8 +61,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private ICollection<string> executorUrisThatRanTests;
         private ITestPlatformEventSource testPlatformEventSource;
-        private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
-        private ProxyOutOfProcDataCollectionManager outOfProcDataCollectionManager;
 
         #endregion
 
@@ -71,12 +69,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
         /// </summary>
-        /// <param name="runSettings"> The run settings. </param>
-        /// <param name="testExecutionContext"> The test execution context. </param>
-        /// <param name="testCaseEventsHandler"> The test case events handler. </param>
-        /// <param name="testRunEventsHandler"> The test run events handler. </param>
-        /// <param name="testPlatformEventSource"></param>
-        protected BaseRunTests(string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, ITestPlatformEventSource testPlatformEventSource)
+        /// <param name="runSettings">The run settings.</param>
+        /// <param name="testExecutionContext">The test execution context.</param>
+        /// <param name="testCaseEventsHandler">The test case events handler.</param>
+        /// <param name="testRunEventsHandler">The test run events handler.</param>
+        /// <param name="testPlatformEventSource">Test platform event source.</param>
+        protected BaseRunTests(string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, ITestPlatformEventSource testPlatformEventSource) :
+            this(
+                runSettings,
+                testExecutionContext,
+                testCaseEventsHandler,
+                testRunEventsHandler,
+                testPlatformEventSource,
+                testCaseEventsHandler as ITestEventsPublisher)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
+        /// </summary>
+        /// <param name="runSettings"> The run settings.</param>
+        /// <param name="testExecutionContext">The test execution context.</param>
+        /// <param name="testCaseEventsHandler">The test case events handler.</param>
+        /// <param name="testRunEventsHandler">The test run events handler.</param>
+        /// <param name="testPlatformEventSource">Test platform event source.</param>
+        /// <param name="testEventsPublisher">Publisher for test events.</param>
+        protected BaseRunTests(string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, ITestPlatformEventSource testPlatformEventSource, ITestEventsPublisher testEventsPublisher)
         {
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;
@@ -85,30 +103,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
             this.isCancellationRequested = false;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.testEventsPublisher = testEventsPublisher;
             this.SetContext();
         }
 
         private void SetContext()
         {
-            this.testRunCache = new TestRunCache(this.testExecutionContext.FrequencyOfRunStatsChangeEvent, testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
-            this.dataCollectionTestCaseEventManager = new DataCollectionTestCaseEventManager(testRunCache);
+            this.testRunCache = new TestRunCache(this.testExecutionContext.FrequencyOfRunStatsChangeEvent, this.testExecutionContext.RunStatsChangeEventTimeout, this.OnCacheHit);
 
-            this.inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(runSettings, testRunCache, this.dataCollectionTestCaseEventManager);
-
-            if (DataCollectionTestCaseEventSender.Instance != null)
+            // Initialize data collectors if declared in run settings.
+            if (DataCollectionTestCaseEventSender.Instance != null && XmlRunSettingsUtilities.IsDataCollectionEnabled(this.runSettings))
             {
-                this.outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, this.dataCollectionTestCaseEventManager);
+                var outOfProcDataCollectionManager = new ProxyOutOfProcDataCollectionManager(DataCollectionTestCaseEventSender.Instance, this.testEventsPublisher);
             }
 
-            if (!inProcDataCollectionExtensionManager.IsInProcDataCollectionEnabled)
+            if (XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(this.runSettings))
             {
-                // No need to call any methods on this, if inproc-datacollection is not enabled
-                inProcDataCollectionExtensionManager = null;
-            }
-
-            if (inProcDataCollectionExtensionManager != null || DataCollectionTestCaseEventSender.Instance != null)
-            {
-                this.testCaseEventsHandler = new TestCaseEventsHandler(this.dataCollectionTestCaseEventManager, this.testCaseEventsHandler);
+                var inProcDataCollectionExtensionManager = new InProcDataCollectionExtensionManager(this.runSettings, this.testEventsPublisher);
             }
 
             this.runContext = new RunContext();
@@ -181,12 +192,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 try
                 {
                     // Call Session-Start event on in-proc datacollectors
-                    this.dataCollectionTestCaseEventManager.RaiseSessionStart(new SessionStartEventArgs());
+                    this.testCaseEventsHandler?.SendSessionStart();
 
                     elapsedTime = this.RunTestsInternal();
-
-                    // Flush any results cached by in-proc manager
-                    this.dataCollectionTestCaseEventManager?.FlushLastChunkResults();
 
                     // Check the adapter setting for shutting down this process after run
                     shutdownAfterRun = this.frameworkHandle.EnableShutdownAfterTestRun;
@@ -205,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 finally
                 {
                     // Trigger Session End on in-proc datacollectors
-                    this.dataCollectionTestCaseEventManager?.RaiseSessionEnd(new SessionEndEventArgs());
+                    this.testCaseEventsHandler?.SendSessionEnd();
 
                     try
                     {

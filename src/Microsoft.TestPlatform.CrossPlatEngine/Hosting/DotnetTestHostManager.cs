@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var exitCode = 0;
             this.processHelper.TryGetExitCode(process, out exitCode);
 
-            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode));
+            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, process.Id));
         });
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (this.processHelper.TryGetExitCode(process, out exitCode))
             {
                 EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode));
+                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, process.Id));
             }
         };
 

@@ -83,20 +83,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             T retValue = default(T);
 
             var versionedMessage = message as VersionedMessage;
-            
             var serializer = versionedMessage?.Version == 2 ? payloadSerializer2 : payloadSerializer;
 
-            // TODO: Currently we use json serializer auto only for non-testmessage types
-            // CHECK: Can't we just use auto for everything
-            //if (MessageType.TestMessage.Equals(message.MessageType))
-            //{
-            //    retValue = message.Payload.ToObject<T>();
-            //}
-            //else
-            //{
             retValue = message.Payload.ToObject<T>(serializer);
-            //}
-
             return retValue;
         }
 
@@ -104,6 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Deserialize raw JSON to an object using the default serializer.
         /// </summary>
         /// <param name="json">JSON string.</param>
+        /// <param name="version">Version of serializer to be used.</param>
         /// <typeparam name="T">Target type to deserialize.</typeparam>
         /// <returns>An instance of <see cref="T"/>.</returns>
         public T Deserialize<T>(string json, int version = 1)
@@ -135,9 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload)
         {
-            JToken serializedPayload = null;
-
-            serializedPayload = JToken.FromObject(payload, payloadSerializer);
+            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
             return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });
         }
@@ -151,20 +139,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload, int version)
         {
-            JToken serializedPayload = null;
-
             var serializer = version == 2 ? payloadSerializer2 : payloadSerializer;
-
-            // TODO: Currently we use json serializer auto only for non-testmessage types
-            // CHECK: Can't we just use auto for everything
-            //if (MessageType.TestMessage.Equals(messageType))
-            //{
-            //    serializedPayload = JToken.FromObject(payload);
-            //}
-            //else
-            //{
-            serializedPayload = JToken.FromObject(payload, serializer);
-            //}
+            var serializedPayload = JToken.FromObject(payload, serializer);
 
             var message = version == 1 ?
                 new Message { MessageType = messageType, Payload = serializedPayload } :
@@ -178,6 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         /// <typeparam name="T">Type of object to serialize.</typeparam>
         /// <param name="data">Instance of the object to serialize.</param>
+        /// <param name="version">Version to be stamped.</param>
         /// <returns>JSON string.</returns>
         public string Serialize<T>(T data, int version = 1)
         {

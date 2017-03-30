@@ -40,13 +40,6 @@
 
   <!-- Common dependencies for all projects -->
   <ItemGroup>
-    <!--<PackageReference Include="StyleCop.Analyzers">-->
-      <!--<Version>1.0.0</Version>-->
-      <!--<PrivateAssets>All</PrivateAssets>-->
-    <!--</PackageReference>-->
-  </ItemGroup>
-
-  <ItemGroup>
     <AdditionalFiles Include="$(TestPlatformRoot)scripts\stylecop.json">
       <Link>stylecop.json</Link>
     </AdditionalFiles>
@@ -98,7 +91,11 @@
 
   <!-- Code analysis settings -->
   <PropertyGroup>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <!-- Disable code analysis by default. Ignore SA0001 until we've xml documentation enabled for
+         all projects -->
+    <EnableCodeAnalysis>false</EnableCodeAnalysis>
+    <NoWarn>$(NoWarn);SA0001</NoWarn>
+
     <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSet Condition="$(TestProject) == 'true'">$(TestPlatformRoot)scripts/stylecop.test.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>

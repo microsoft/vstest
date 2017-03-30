@@ -109,12 +109,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string GetTestRunnerProcessStartInfoForRunSelected = "TestExecution.GetTestRunnerProcessStartInfoForRunSelected";
 
         /// <summary>
-        /// CustomTestHostLaunch 
+        /// CustomTestHostLaunch
         /// </summary>
         public const string CustomTestHostLaunch = "TestExecution.CustomTestHostLaunch";
 
         /// <summary>
-        /// Custom Test Host launch callback 
+        /// Custom Test Host launch callback
         /// </summary>
         public const string CustomTestHostLaunchCallback = "TestExecution.CustomTestHostLaunchCallback";
 
@@ -124,7 +124,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string ExtensionsInitialize = "Extensions.Initialize";
 
         /// <summary>
-        /// Start Test Run All Sources 
+        /// Start Test Run All Sources
         /// </summary>
         public const string TestRunAllSourcesWithDefaultHost = "TestExecution.RunAllWithDefaultHost";
 
@@ -171,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string AfterTestRunEndResult = "DataCollection.AfterTestRunEndResult";
 
         /// <summary>
-        /// Event message type send to datacollector process before test case execution starts. 
+        /// Event message type send to datacollector process before test case execution starts.
         /// </summary>
         public const string DataCollectionTestStart = "DataCollection.TestStart";
 

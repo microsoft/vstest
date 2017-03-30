@@ -1,7 +1,7 @@
-﻿﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
+namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
 {
     using System;
 
@@ -16,15 +16,16 @@ namespace TestPlatform.CommunicationUtilities.UnitTests.Serialization
     [TestClass]
     public class TestResultSerializationTests
     {
-        private static TestCase testCase = new TestCase("sampleTestClass.sampleTestCase", 
-                                               new Uri("executor://sampleTestExecutor"),
-                                               "sampleTest.dll");
+        private static TestCase testCase = new TestCase(
+            "sampleTestClass.sampleTestCase",
+            new Uri("executor://sampleTestExecutor"),
+            "sampleTest.dll");
 
         private static DateTimeOffset startTime = new DateTimeOffset(new DateTime(2007, 3, 10, 0, 0, 0));
         private static TestResult testResult = new TestResult(testCase)
                                                    {
                                                        // Attachments = ?
-                                                       // Messages = ? 
+                                                       // Messages = ?
                                                        Outcome = TestOutcome.Passed,
                                                        ErrorMessage = "sampleError",
                                                        ErrorStackTrace = "sampleStackTrace",

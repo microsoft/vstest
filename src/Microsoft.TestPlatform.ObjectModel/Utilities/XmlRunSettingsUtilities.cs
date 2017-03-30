@@ -206,6 +206,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         }
 
         /// <summary>
+        /// Returns whether in proc data collection is enabled in the parameter settings xml or not
+        /// </summary>
+        /// <param name="runSettingsXml"> The run Settings Xml. </param>
+        /// <returns> True if data collection is enabled. </returns>
+        public static bool IsInProcDataCollectionEnabled(string runSettingsXml)
+        {
+            var dataCollectionRunSettings = GetInProcDataCollectionRunSettings(runSettingsXml);
+
+            if (dataCollectionRunSettings == null || !dataCollectionRunSettings.IsCollectionEnabled)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Get DataCollection Run settings from the settings XML.
         /// </summary>
         /// <param name="runSettingsXml"> The run Settings Xml. </param>

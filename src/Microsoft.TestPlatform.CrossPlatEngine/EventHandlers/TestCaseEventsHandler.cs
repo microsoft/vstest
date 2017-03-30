@@ -3,81 +3,62 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
 {
+    using System;
 #if !NET46
     using System.Runtime.Loader;
 #endif
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The test case events handler.
     /// </summary>
-    internal class TestCaseEventsHandler : ITestCaseEventsHandler
+    internal class TestCaseEventsHandler : ITestCaseEventsHandler, ITestEventsPublisher
     {
-        private IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager;
-        private ITestCaseEventsHandler testCaseEvents;
+        public event EventHandler<SessionStartEventArgs> SessionStart;
+        public event EventHandler<SessionEndEventArgs> SessionEnd;
+        public event EventHandler<TestCaseStartEventArgs> TestCaseStart;
+        public event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+        public event EventHandler<TestResultEventArgs> TestResult;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestCaseEventsHandler"/> class.
         /// </summary>
-        /// <param name="dataCollectionTestCaseEventManager">
-        /// The data Collection Test Case Event Manager.
-        /// </param>
-        /// <param name="testCaseEvents">
-        /// The test Case Events.
-        /// </param>
-        public TestCaseEventsHandler(IDataCollectionTestCaseEventManager dataCollectionTestCaseEventManager, ITestCaseEventsHandler testCaseEvents)
+        public TestCaseEventsHandler()
         {
-            this.dataCollectionTestCaseEventManager = dataCollectionTestCaseEventManager;
-            this.testCaseEvents = testCaseEvents;
         }
 
-        /// <summary>
-        /// The send test case start.
-        /// </summary>
-        /// <param name="testCase">
-        /// The test case.
-        /// </param>
+        /// <inheritdoc />
         public void SendTestCaseStart(TestCase testCase)
         {
-            this.dataCollectionTestCaseEventManager.RaiseTestCaseStart(new TestCaseStartEventArgs(testCase));
-            this.testCaseEvents?.SendTestCaseStart(testCase);
+            this.TestCaseStart.SafeInvoke(this, new TestCaseStartEventArgs(testCase), "TestCaseEventsHandler.RaiseTestCaseStart");
         }
 
-        /// <summary>
-        /// The send test case end.
-        /// </summary>
-        /// <param name="testCase">
-        /// The test case.
-        /// </param>
-        /// <param name="outcome">
-        /// The outcome.
-        /// </param>
+        /// <inheritdoc />
         public void SendTestCaseEnd(TestCase testCase, TestOutcome outcome)
         {
-            this.dataCollectionTestCaseEventManager.RaiseTestCaseEnd(new TestCaseEndEventArgs(testCase, outcome));
-            this.testCaseEvents?.SendTestCaseEnd(testCase, outcome);
+            this.TestCaseEnd.SafeInvoke(this, new TestCaseEndEventArgs(testCase, outcome), "TestCaseEventsHandler.RaiseTestCaseEnd");
         }
 
-        /// <summary>
-        /// The send test result.
-        /// </summary>
-        /// <param name="result">
-        /// The result.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        public bool SendTestResult(TestResult result)
+        /// <inheritdoc />
+        public void SendTestResult(TestResult result)
         {
-            this.dataCollectionTestCaseEventManager.RaiseTestResult(new TestResultEventArgs(result));
-            var flushResult = result.GetPropertyValue<bool>(DataCollectionTestCaseEventManager.FlushResultTestResultPoperty, true);
-            this.testCaseEvents?.SendTestResult(result);
+            this.TestResult.SafeInvoke(this, new TestResultEventArgs(result), "TestCaseEventsHandler.RaiseTestCaseEnd");
+        }
 
-            return flushResult;
+        /// <inheritdoc />
+        public void SendSessionStart()
+        {
+            this.SessionStart.SafeInvoke(this, new SessionStartEventArgs(), "TestCaseEventsHandler.RaiseSessionStart");
+        }
+
+        /// <inheritdoc />
+        public void SendSessionEnd()
+        {
+            this.SessionEnd.SafeInvoke(this, new SessionEndEventArgs(), "TestCaseEventsHandler.RaiseSessionEnd");
         }
     }
 }
