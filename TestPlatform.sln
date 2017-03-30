@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.4
+VisualStudioVersion = 15.0.26227.2
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED0C35EB-7F31-4841-A24F-8EB708FFA959}"
 EndProject
@@ -59,7 +59,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Utilities.UnitTests", "test\Microsoft.TestPlatform.Utilities.UnitTests\Microsoft.TestPlatform.Utilities.UnitTests.csproj", "{D3E8A13B-92EE-45A8-BB24-40EC3CC9DB34}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests", "test\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests.csproj", "{8FD97A6B-5C83-4985-9432-08347A2C2A47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TranslationLayer.UnitTests", "test\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests\TranslationLayer.UnitTests.csproj", "{8FD97A6B-5C83-4985-9432-08347A2C2A47}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "testhost.UnitTests", "test\testhost.UnitTests\testhost.UnitTests.csproj", "{9EFCEFB5-253E-4DE2-8A70-821D7B8189DF}"
 EndProject
