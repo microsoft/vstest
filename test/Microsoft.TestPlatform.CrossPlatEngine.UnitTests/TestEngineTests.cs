@@ -3,29 +3,39 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests
 {
+    using System;
     using System.Collections.Generic;
+    using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+
+    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class TestEngineTests
     {
-        private readonly ITestEngine testEngine;
+        private ITestEngine testEngine;
 
         private Mock<ITestRuntimeProvider> mockTestHostManager;
 
         public TestEngineTests()
         {
+            TestPluginCacheTests.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
             this.testEngine = new TestEngine();
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             
@@ -132,54 +142,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         public void GetExtensionManagerShouldReturnANonNullInstance()
         {
             Assert.IsNotNull(this.testEngine.GetExtensionManager());
-        }
-
-        [TestMethod]
-        public void GetDefaultTestHostManagerReturnsANonNullInstance()
-        {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86 };
-            Assert.IsNotNull(this.testEngine.GetDefaultTestHostManager(rc));
-        }
-
-        [TestMethod]
-        public void GetDefaultTestHostManagerReturnsANewInstanceEverytime()
-        {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.DefaultFramework, TargetPlatform = Architecture.X86 };
-            var instance1 = this.testEngine.GetDefaultTestHostManager(rc);
-            var instance2 = this.testEngine.GetDefaultTestHostManager(rc);
-
-            Assert.AreNotEqual(instance1, instance2);
-        }
-
-        [TestMethod]
-        public void GetDefaultTestHostManagerReturnsDotnetCoreHostManagerIfFrameworkIsNetCore()
-        {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETCoreApp,Version=v1.0"), TargetPlatform = Architecture.X64 };
-            var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
-
-            Assert.AreEqual(typeof(DotnetTestHostManager), testHostManager.GetType());
-        }
-
-        [TestMethod]
-        public void GetDefaultTestHostManagerReturnsASharedManagerIfDisableAppDomainIsFalse()
-        {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETFramework,Version=v4.6"), TargetPlatform = Architecture.X86 };
-
-            var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
-            Assert.IsNotNull(testHostManager);
-
-            Assert.IsTrue(testHostManager.Shared, "Default TestHostManager must be shared if DisableAppDomain is false");
-        }
-
-        [TestMethod]
-        public void GetDefaultTestHostManagerReturnsANonSharedManagerIfDisableAppDomainIsFalse()
-        {
-            var rc = new RunConfiguration() { TargetFrameworkVersion = Framework.FromString(".NETFramework,Version=v4.6"), TargetPlatform = Architecture.X86, DisableAppDomain = true };
-
-            var testHostManager = this.testEngine.GetDefaultTestHostManager(rc);
-            Assert.IsNotNull(testHostManager);
-
-            Assert.IsFalse(testHostManager.Shared, "Default TestHostManager must NOT be shared if DisableAppDomain is true");
         }
     }
 }

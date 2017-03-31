@@ -6,9 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 
     /// <summary>
