@@ -218,7 +218,7 @@
       Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: minimal, normal.
+      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
@@ -229,7 +229,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;URI или понятное имя средства ведения журналов&gt;
+        <target state="new">--logger|/logger:&lt;URI или понятное имя средства ведения журналов&gt;
       Укажите средство ведения журналов для результатов тестирования. Например, для записи результатов
       в файл результатов теста Visual Studio (TRX) используйте/logger:trx [;LogFileName=&lt;умолчание: уникальное имя файла&gt;].
       Создает файл в каталоге TestResults с указанным LogFileName.
@@ -242,7 +242,7 @@
                 [;Platform=&lt;по умолчанию используется значение Any CPU (Любой ЦП)&gt;];
                 [;Flavor=&lt;по умолчанию имеет значение Debug (Отладка)&gt;];
                 [;RunTitle=&lt;заголовок&gt;].</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--средства ведения журнала | / logger: &lt; Uri средство ведения журнала и FriendlyName &gt;
       Укажите средство ведения журнала для результатов тестов.  Например для регистрации результатов в Visual Studio теста результаты файла (TRX) используется /logger:trx.

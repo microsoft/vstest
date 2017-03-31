@@ -218,7 +218,7 @@
       Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: minimal, normal.
+      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
@@ -229,7 +229,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
+        <target state="new">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
       Určuje protokolovač pro výsledky testu. Pokud třeba chcete protokolovat výsledky 
       do souboru výsledků testování nástroje Visual Studio (TRX), použijte /logger:trx [;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
       Vytvoří soubor v adresáři TestResults s daným názvem LogFileName.
@@ -242,7 +242,7 @@
                 [;Platform=&lt;výchozí hodnota je Any CPU&gt;]
                 [;Flavor=&lt;výchozí hodnotou je Debug&gt;]
                 [;RunTitle=&lt;nadpis&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--protokoly | / logger: &lt; Uri/FriendlyName protokolovacího nástroje &gt;
       Zadejte protokolovací nástroj pro výsledky testů.  Výsledky do Visual Studio testovací výsledky souboru (TRX) použijte k přihlášení /logger:trx.
