@@ -11,6 +11,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     public class TestCaseConverter : JsonConverter
     {
         /// <inheritdoc/>
+        public override bool CanRead => false;
+
+        /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
         {
             return typeof(TestCase) == objectType;
@@ -19,17 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var testCase = new TestCase();
-            serializer.Populate(reader, testCase);
-
-            testCase.Id = testCase.GetPropertyValue<Guid>(TestCaseProperties.Id, Guid.Empty);
-            testCase.FullyQualifiedName = testCase.GetPropertyValue<string>(TestCaseProperties.FullyQualifiedName, null);
-            testCase.DisplayName = testCase.GetPropertyValue<string>(TestCaseProperties.DisplayName, null);
-            testCase.Source = testCase.GetPropertyValue<string>(TestCaseProperties.Source, null);
-            testCase.ExecutorUri = testCase.GetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, null);
-            testCase.CodeFilePath = testCase.GetPropertyValue<string>(TestCaseProperties.CodeFilePath, null);
-            testCase.LineNumber = testCase.GetPropertyValue<int>(TestCaseProperties.LineNumber, -1);
-            return testCase;
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
@@ -37,26 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         {
             // P2 to P1
             var testCase = value as TestCase;
-
-            testCase.SetPropertyValue<string>(TestCaseProperties.FullyQualifiedName, testCase.FullyQualifiedName);
-            testCase.SetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, testCase.ExecutorUri);
-            testCase.SetPropertyValue<string>(TestCaseProperties.Source, testCase.Source);
-            testCase.SetPropertyValue<Guid>(TestCaseProperties.Id, testCase.Id);
-            if (!testCase.DisplayName.Equals(testCase.FullyQualifiedName))
-            {
-                testCase.SetPropertyValue<string>(TestCaseProperties.DisplayName, testCase.DisplayName);
-            }
-
-            if (!string.IsNullOrEmpty(testCase.CodeFilePath))
-            {
-                testCase.SetPropertyValue<string>(TestCaseProperties.CodeFilePath, testCase.CodeFilePath);
-            }
-
-            if (testCase.LineNumber >= 0)
-            {
-                testCase.SetPropertyValue<int>(TestCaseProperties.LineNumber, testCase.LineNumber);
-            }
-
             var properties = testCase.GetProperties();
 
             writer.WriteStartObject();

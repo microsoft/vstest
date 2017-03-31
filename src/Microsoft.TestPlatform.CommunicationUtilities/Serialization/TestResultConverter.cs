@@ -11,6 +11,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     public class TestResultConverter : JsonConverter
     {
         /// <inheritdoc/>
+        public override bool CanRead => false;
+
+        /// <inheritdoc/>
         public override bool CanConvert(Type objectType)
         {
             return typeof(TestResult) == objectType;
@@ -19,19 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var testResult = new TestResult();
-            serializer.Populate(reader, testResult);
-
-            testResult.Outcome = testResult.GetPropertyValue<TestOutcome>(TestResultProperties.Outcome, TestOutcome.None);
-            testResult.ErrorMessage = testResult.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
-            testResult.ErrorStackTrace = testResult.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
-            testResult.DisplayName = testResult.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
-            testResult.ComputerName = testResult.GetPropertyValue<string>(TestResultProperties.ComputerName, null);
-            testResult.Duration = testResult.GetPropertyValue<TimeSpan>(TestResultProperties.Duration, TimeSpan.Zero);
-            testResult.StartTime = testResult.GetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, DateTimeOffset.Now);
-            testResult.EndTime = testResult.GetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, DateTimeOffset.Now);
-
-            return testResult;
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
@@ -39,46 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         {
             // P2 to P1
             var testResult = value as TestResult;
-            if (testResult.Outcome != TestOutcome.None)
-            {
-                testResult.SetPropertyValue<TestOutcome>(TestResultProperties.Outcome, testResult.Outcome);
-            }
-
-            if (!string.IsNullOrEmpty(testResult.ErrorMessage))
-            {
-                testResult.SetPropertyValue<string>(TestResultProperties.ErrorMessage, testResult.ErrorMessage);
-            }
-
-            if (!string.IsNullOrEmpty(testResult.ErrorStackTrace))
-            {
-                testResult.SetPropertyValue<string>(TestResultProperties.ErrorStackTrace, testResult.ErrorStackTrace);
-            }
-
-            if (!string.IsNullOrEmpty(testResult.DisplayName))
-            {
-                testResult.SetPropertyValue<string>(TestResultProperties.DisplayName, testResult.DisplayName);
-            }
-
-            if (!string.IsNullOrEmpty(testResult.ComputerName))
-            {
-                testResult.SetPropertyValue<string>(TestResultProperties.ComputerName, testResult.ComputerName);
-            }
-
-            if (testResult.Duration != default(TimeSpan))
-            {
-                testResult.SetPropertyValue<TimeSpan>(TestResultProperties.Duration, testResult.Duration);
-            }
-
-            if (testResult.StartTime != default(DateTimeOffset))
-            {
-                testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.StartTime, testResult.StartTime);
-            }
-
-            if (testResult.EndTime != default(DateTimeOffset))
-            {
-                testResult.SetPropertyValue<DateTimeOffset>(TestResultProperties.EndTime, testResult.EndTime);
-            }
-
             var properties = testResult.GetProperties();
 
             writer.WriteStartObject();

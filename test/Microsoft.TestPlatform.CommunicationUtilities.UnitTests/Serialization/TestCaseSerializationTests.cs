@@ -49,12 +49,12 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual("executor://sampleTestExecutor", properties[2]["Value"].Value);
             Assert.AreEqual("TestCase.Source", properties[3]["Key"]["Id"].Value);
             Assert.AreEqual("sampleTest.dll", properties[3]["Value"].Value);
-            Assert.AreEqual("TestCase.Id", properties[4]["Key"]["Id"].Value);
-            Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", properties[4]["Value"].Value);
+            Assert.AreEqual("TestCase.CodeFilePath", properties[4]["Key"]["Id"].Value);
+            Assert.AreEqual("/user/src/testFile.cs", properties[4]["Value"].Value);
             Assert.AreEqual("TestCase.DisplayName", properties[5]["Key"]["Id"].Value);
             Assert.AreEqual("sampleTestCase", properties[5]["Value"].Value);
-            Assert.AreEqual("TestCase.CodeFilePath", properties[6]["Key"]["Id"].Value);
-            Assert.AreEqual("/user/src/testFile.cs", properties[6]["Value"].Value);
+            Assert.AreEqual("TestCase.Id", properties[6]["Key"]["Id"].Value);
+            Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", properties[6]["Value"].Value);
             Assert.AreEqual("TestCase.LineNumber", properties[7]["Key"]["Id"].Value);
             Assert.AreEqual(999, properties[7]["Value"].Value);
         }

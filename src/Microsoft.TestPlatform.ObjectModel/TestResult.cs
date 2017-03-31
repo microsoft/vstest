@@ -15,15 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     [DataContract]
     public sealed class TestResult : TestObject
     {
-        private TestOutcome outcome;
-        private string errorMessage;
-        private string errorStackTrace;
-        private string displayName;
-        private string computerName;
-        private TimeSpan duration;
-        private DateTimeOffset startTime;
-        private DateTimeOffset endTime;
-
         #region Constructor
 
         /// <summary>
@@ -75,13 +66,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.outcome;
+                return this.GetPropertyValue(TestResultProperties.Outcome, TestOutcome.None);
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<TestOutcome>(TestResultProperties.Outcome, CultureInfo.InvariantCulture, value);
-                this.outcome = (TestOutcome)convertedValue;
+                this.SetLocalPropertyValue(TestResultProperties.Outcome, value);
             }
         }
 
@@ -93,12 +83,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.errorMessage;
+                return this.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
             }
 
             set
             {
-                this.errorMessage = value;
+                this.SetLocalPropertyValue(TestResultProperties.ErrorMessage, value);
             }
         }
 
@@ -110,12 +100,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.errorStackTrace;
+                return this.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
             }
 
             set
             {
-                this.errorStackTrace = value;
+                this.SetLocalPropertyValue(TestResultProperties.ErrorStackTrace, value);
             }
         }
 
@@ -127,12 +117,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.displayName;
+                return this.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
             }
 
             set
             {
-                this.displayName = value;
+                this.SetLocalPropertyValue(TestResultProperties.DisplayName, value);
             }
         }
 
@@ -154,13 +144,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.computerName;
+                return this.GetPropertyValue(TestResultProperties.ComputerName, string.Empty);
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<string>(TestResultProperties.ComputerName, CultureInfo.InvariantCulture, value);
-                this.computerName = (string)convertedValue;
+                this.SetLocalPropertyValue(TestResultProperties.ComputerName, value);
             }
         }
 
@@ -172,13 +161,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.duration;
+                return this.GetPropertyValue(TestResultProperties.Duration, TimeSpan.Zero);
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<TimeSpan>(TestResultProperties.Duration, CultureInfo.InvariantCulture, value);
-                this.duration = (TimeSpan)convertedValue;
+                this.SetLocalPropertyValue(TestResultProperties.Duration, value);
             }
         }
 
@@ -190,17 +178,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.startTime == default(DateTimeOffset))
-                //{
-                //    this.startTime = DateTimeOffset.Now;
-                //}
-                return this.startTime;
+                return this.GetPropertyValue(TestResultProperties.StartTime, DateTimeOffset.Now);
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<DateTimeOffset>(TestResultProperties.StartTime, CultureInfo.InvariantCulture, value);
-                this.startTime = (DateTimeOffset)convertedValue;
+                this.SetLocalPropertyValue(TestResultProperties.StartTime, value);
             }
         }
 
@@ -212,17 +195,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                //if (this.endTime == default(DateTimeOffset))
-                //{
-                //    this.endTime = DateTimeOffset.Now;
-                //}
-                return this.endTime;
+                return this.GetPropertyValue(TestResultProperties.EndTime, DateTimeOffset.Now);
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<DateTimeOffset>(TestResultProperties.EndTime, CultureInfo.InvariantCulture, value);
-                this.endTime = (DateTimeOffset)convertedValue;
+                this.SetLocalPropertyValue(TestResultProperties.EndTime, value);
             }
         }
 
@@ -361,7 +339,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", "TestResult Display Name", typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", "Computer Name", string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", "Computer Name", typeof(string), TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", "Outcome", string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
@@ -385,7 +363,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", Resources.Resources.TestResultPropertyDisplayNameLabel, typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.Resources.TestResultPropertyComputerNameLabel, string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.Resources.TestResultPropertyComputerNameLabel, typeof(string), TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", Resources.Resources.TestResultPropertyOutcomeLabel, string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
@@ -405,12 +383,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", Resources.Resources.TestResultPropertyErrorStackTraceLabel, typeof(string), typeof(TestResult));
 #endif
-
-        private static bool ValidateComputerName(object value)
-        {
-            return !string.IsNullOrWhiteSpace((string)value);
-        }
-
+        
         private static bool ValidateOutcome(object value)
         {
             return (TestOutcome)value <= TestOutcome.NotFound && (TestOutcome)value >= TestOutcome.None;

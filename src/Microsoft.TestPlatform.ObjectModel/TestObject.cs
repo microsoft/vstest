@@ -29,6 +29,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private readonly Dictionary<TestProperty, object> store;
 
         /// <summary>
+        /// The store for all the local properties registered.
+        /// </summary>
+        private readonly Dictionary<TestProperty, object> localStore;
+
+        /// <summary>
         /// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
         /// by default doesn't provide the required object representation. <c>List of KeyValuePair</c> on the
         /// other hand provides a clean Key, Value entries for <c>TestProperty</c> and it's value.
@@ -70,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <returns></returns>
         public List<KeyValuePair<TestProperty, object>> GetProperties()
         {
-            return this.store.ToList();
+            return this.store.Concat(this.localStore).ToList();
         }
 
         #endregion Fields
@@ -79,7 +84,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         protected TestObject()
         {
-            this.store = new Dictionary<TestProperty, object>();            
+            this.store = new Dictionary<TestProperty, object>();
+            this.localStore = new Dictionary<TestProperty, object>();
         }
 
         [OnSerializing]
@@ -113,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public IEnumerable<TestProperty> Properties
         {
-            get { return this.store.Keys; }
+            get { return this.store.Keys.Concat(this.localStore.Keys); }
         }
 
         /// <summary>
@@ -177,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue(TestProperty property, object value)
         {
-            this.PrivateSetPropertyValue(property, value);
+            this.PrivateSetPropertyValue(property, value, store);
         }
 
         /// <summary>
@@ -220,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue);
+            this.PrivateSetPropertyValue(property, objValue, store);
         }
 
         /// <summary>
@@ -233,7 +239,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue);
+            this.PrivateSetPropertyValue(property, objValue, store);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value to the specified value T.
+        /// </summary>
+        protected void SetLocalPropertyValue<T>(TestProperty property, T value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            object objValue = ConvertPropertyFrom<T>(property, CultureInfo.InvariantCulture, value);
+            this.PrivateSetPropertyValue(property, objValue, localStore);
         }
 
         #endregion Property Values
@@ -249,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
 
             object value;
-            if (!this.store.TryGetValue(property, out value))
+            if (!this.store.TryGetValue(property, out value) && !this.localStore.TryGetValue(property, out value))
             {
                 value = defaultValue;
             }
@@ -260,13 +277,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Set TestProperty's value
         /// </summary>
-        private void PrivateSetPropertyValue(TestProperty property, object value)
+        private void PrivateSetPropertyValue(TestProperty property, object value, Dictionary<TestProperty, object> dictionary)
         {
             ValidateArg.NotNull(property, "property");
 
             if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
             {
-                this.store[property] = value;
+                dictionary[property] = value;
             }
             else
             {

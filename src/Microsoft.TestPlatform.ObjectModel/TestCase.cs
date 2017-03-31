@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Runtime.Serialization;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
-    using System.Globalization;
 
     /// <summary>
     /// Stores information about a test case.
@@ -24,14 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private Object m_localExtensionData;
 #endif
         private Guid defaultId = Guid.Empty;
-
-        private string fullyQualifiedName;
-        private string displayName;
-        private Guid id;
-        private string source;
-        private Uri executerUri;
-        private string codeFilePath;
-        private int lineNumber = -1;
 
         #region Constructor
 
@@ -91,7 +82,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                if (this.id == Guid.Empty)
+                var id = this.GetPropertyValue<Guid>(TestCaseProperties.Id, Guid.Empty);
+                if (id == Guid.Empty)
                 {
                     // user has not specified his own Id during ctor! We will cache Id if its empty
                     if (this.defaultId == Guid.Empty)
@@ -102,13 +94,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     return this.defaultId;
                 }
 
-                return this.id;
+                return id;
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<Guid>(TestCaseProperties.Id, CultureInfo.InvariantCulture, value);
-                this.id = (Guid)convertedValue;
+                this.SetLocalPropertyValue(TestCaseProperties.Id, value);
             }
         }
 
@@ -120,12 +111,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.fullyQualifiedName;
+                return this.GetPropertyValue(TestCaseProperties.FullyQualifiedName, string.Empty);
             }
 
             set
             {
-                this.fullyQualifiedName = value;
+                this.SetLocalPropertyValue(TestCaseProperties.FullyQualifiedName, value);
+
+                // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
+                this.defaultId = Guid.Empty;
             }
         }
 
@@ -137,16 +131,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                if (string.IsNullOrEmpty(this.displayName))
-                {
-                    return this.FullyQualifiedName;
-                }
-                return this.displayName;
+                return this.GetPropertyValue(TestCaseProperties.DisplayName, this.FullyQualifiedName);
             }
 
             set
             {
-                this.displayName = value;
+                this.SetLocalPropertyValue(TestCaseProperties.DisplayName, value);
             }
         }
 
@@ -158,13 +148,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.executerUri;
+                return this.GetPropertyValue<Uri>(TestCaseProperties.ExecutorUri, null);
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<Uri>(TestCaseProperties.ExecutorUri, CultureInfo.InvariantCulture, value);
-                this.executerUri = (Uri)convertedValue;
+                this.SetLocalPropertyValue(TestCaseProperties.ExecutorUri, value);
             }
         }
 
@@ -176,12 +165,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return source;
+                return this.GetPropertyValue<string>(TestCaseProperties.Source, null);
             }
-            
-            set
+
+            private set
             {
-                this.source = value;
+                this.SetLocalPropertyValue(TestCaseProperties.Source, value);
 
                 // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
                 this.defaultId = Guid.Empty;
@@ -196,12 +185,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.codeFilePath;
+                return this.GetPropertyValue<string>(TestCaseProperties.CodeFilePath, null);
             }
 
             set
             {
-                this.codeFilePath = value;
+                this.SetLocalPropertyValue(TestCaseProperties.CodeFilePath, value);
             }
         }
 
@@ -213,16 +202,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get
             {
-                return this.lineNumber;
+                return this.GetPropertyValue(TestCaseProperties.LineNumber, -1);
             }
 
             set
             {
-                var convertedValue = ConvertPropertyFrom<int>(TestCaseProperties.LineNumber, CultureInfo.InvariantCulture, value);
-                this.lineNumber = (int)convertedValue;
+                this.SetLocalPropertyValue(TestCaseProperties.LineNumber, value);
             }
         }
-
 
         /// <inheritdoc/>
         public override string ToString()
