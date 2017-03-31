@@ -16,9 +16,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     {
         private readonly DataCollectorLoader dataCollectionLoader;
 
-
-        private readonly string dummyDataCollectorTypeName;
-
         public DataCollectorLoaderTests()
         {
             this.dataCollectionLoader = new DataCollectorLoader();

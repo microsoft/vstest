@@ -40,14 +40,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = this.GetRunsettingsFilePath();
-            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
             string extensionsPath = Path.Combine(
                 this.testEnvironment.TestAssetsPath,
                 "OutOfProcDataCollector",
                 "bin",
                 this.testEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
+
+            string runSettings = this.GetRunsettingsFilePath(extensionsPath);
+            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" -- RunConfiguration.ExtensionsPath={extensionsPath}");
