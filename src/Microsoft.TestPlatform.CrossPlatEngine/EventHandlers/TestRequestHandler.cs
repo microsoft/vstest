@@ -94,6 +94,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         this.protocolVersion = Math.Min(version, highestSupportedVersion);
                         this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolVersion);
 
+                        // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
+                        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+                        {
+                            this.SendLog(TestMessageLevel.Informational, string.Format("Logging TestHost Diagnostics in file: {0}", EqtTrace.LogFile));
+                        }
                         break;
 
                     case MessageType.DiscoveryInitialize:
