@@ -25,6 +25,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
     using Moq;
 
+#pragma warning disable SA1600
+
     [TestClass]
     public class DotnetTestHostManagerTests
     {
@@ -44,7 +46,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestProcessStartInfo defaultTestProcessStartInfo;
 
         private readonly TestableDotnetTestHostManager dotnetHostManager;
-        
+
         private string errorMessage;
         private int errorLength = 20;
 
@@ -62,9 +64,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object), 
+                                         new DotnetHostHelper(this.mockFileHelper.Object),
                                          this.errorLength);
-            
+
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
 
             // Setup a dummy current process for tests
@@ -329,7 +331,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);
         }
-        
+
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfDepsFileNotFound()
         {
@@ -543,7 +545,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
         }
 
-
         private TestProcessStartInfo GetDefaultStartInfo()
         {
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(
@@ -552,14 +553,15 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 this.defaultConnectionInfo);
             return startInfo;
         }
-    }
 
-    internal class TestableDotnetTestHostManager : DotnetTestHostManager
-    {
-        public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
-            : base(processHelper, fileHelper, dotnetTestHostHelper)
+        internal class TestableDotnetTestHostManager : DotnetTestHostManager
         {
-            this.ErrorLength = errorLength;
+            public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
+                : base(processHelper, fileHelper, dotnetTestHostHelper)
+            {
+                this.ErrorLength = errorLength;
+            }
         }
     }
+#pragma warning restore SA1600
 }

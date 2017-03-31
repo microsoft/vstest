@@ -47,6 +47,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private IMessageLogger messageLogger;
         private bool hostExitedEventRaised;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
+        /// </summary>
         public DefaultTestHostManager()
         {
         }
@@ -68,8 +71,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.hostExitedEventRaised = false;
         }
 
+        /// <inheritdoc/>
         public event EventHandler<HostProviderEventArgs> HostLaunched;
 
+        /// <inheritdoc/>
         public event EventHandler<HostProviderEventArgs> HostExited;
 
         /// <inheritdoc/>
@@ -80,25 +85,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
+        /// <summary>
+        /// Gets or sets the error length for runtime error stream.
+        /// </summary>
         protected int ErrorLength { get; set; } = 1000;
 
+        /// <summary>
+        /// Gets or sets the Timeout for runtime to initialize.
+        /// </summary>
         protected int TimeOut { get; set; } = 10000;
 
         /// <summary>
-        /// Callback on process exit
+        /// Gets callback on process exit
         /// </summary>
-        private Action<object> ExitCallBack => ((process) =>
+        private Action<object> ExitCallBack => (process) =>
         {
             var exitCode = 0;
             this.processHelper.TryGetExitCode(process, out exitCode);
 
             this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
-        });
+        };
 
         /// <summary>
-        /// Callback to read from process error stream
+        /// Gets callback to read from process error stream
         /// </summary>
-        private Action<object, string> ErrorReceivedCallback => ((process, data) =>
+        private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
             var exitCode = 0;
             if (!string.IsNullOrEmpty(data))
@@ -128,8 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
                 this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
             }
-        });
-
+        };
 
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -211,18 +221,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return true;
         }
 
+        /// <summary>
+        /// Raises HostLaunched event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
         public void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
         }
 
+        /// <summary>
+        /// Raises HostExited event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
         public void OnHostExited(HostProviderEventArgs e)
         {
             if (!this.hostExitedEventRaised)
             {
                 this.hostExitedEventRaised = true;
                 this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
-            }   
+            }
         }
 
         /// <inheritdoc/>
@@ -239,7 +257,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.hostExitedEventRaised = false;
         }
 
-        /// <inheritdoc/>
         private CancellationTokenSource GetCancellationTokenSource()
         {
             this.hostLaunchCts = new CancellationTokenSource(this.TimeOut);

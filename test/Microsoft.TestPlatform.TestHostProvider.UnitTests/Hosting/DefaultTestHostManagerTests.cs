@@ -19,10 +19,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
     using Moq;
 
+#pragma warning disable SA1600
     [TestClass]
     public class DefaultTestHostManagerTests
     {
-        private readonly TestProcessStartInfo startInfo;        
+        private readonly TestProcessStartInfo startInfo;
         private readonly Mock<IMessageLogger> mockMessageLogger;
         private readonly Mock<IProcessHelper> mockProcessHelper;
 
@@ -36,9 +37,9 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
-            
+
             this.mockMessageLogger = new Mock<IMessageLogger>();
-            
+
             this.testHostManager = new DefaultTestHostManager(Architecture.X64, Framework.DefaultFramework, this.mockProcessHelper.Object, true);
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
@@ -252,7 +253,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 this.mockMessageLogger.Object);
 
             this.testableTestHostManager.HostExited += this.TestHostManagerHostExited;
-            
+
             this.mockProcessHelper.Setup(
                     ph =>
                         ph.LaunchProcess(
@@ -317,11 +318,13 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 IProcessHelper processHelper,
                 bool shared,
                 int errorLength,
-                IMessageLogger logger) : base(architecture, framework, processHelper, shared)
+                IMessageLogger logger)
+                : base(architecture, framework, processHelper, shared)
             {
                 this.TimeOut = 30000;
                 this.ErrorLength = errorLength;
             }
         }
     }
+#pragma warning restore SA1600
 }

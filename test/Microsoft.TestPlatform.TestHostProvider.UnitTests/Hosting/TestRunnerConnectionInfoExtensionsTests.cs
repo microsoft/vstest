@@ -9,6 +9,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable SA1600
     [TestClass]
     public class TestRunnerConnectionInfoExtensionsTests
     {
@@ -35,7 +36,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void ToCommandLineOptionsShouldIncludeDiagnosticsOptionIfEnabled()
         {
-            var connectionInfo = new TestRunnerConnectionInfo();
+            var connectionInfo = default(TestRunnerConnectionInfo);
 
             var options = connectionInfo.ToCommandLineOptions();
 
@@ -52,4 +53,5 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             StringAssert.EndsWith(options, "--diag log.txt");
         }
     }
+#pragma warning restore SA1600
 }
