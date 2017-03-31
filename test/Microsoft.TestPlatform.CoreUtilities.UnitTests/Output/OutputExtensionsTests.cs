@@ -13,9 +13,21 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
     {
         private Mock<IOutput> mockOutput;
         private ConsoleColor color;
+        private ConsoleColor previousColor;
+        private ConsoleColor newColor;
 
         public OutputExtensionsTests()
         {
+            // Setting Console.ForegroundColor to newColor which will be used to determine whether
+            // test command output is redirecting to file or writting to console.
+            // If command output is redirecting to file, then Console.ForegroundColor can't be modified.
+            // So that tests which assert Console.ForegroundColor should not run.
+            this.previousColor = Console.ForegroundColor;
+            this.newColor = previousColor == ConsoleColor.Gray
+                ? ConsoleColor.Black
+                : ConsoleColor.Blue;
+            Console.ForegroundColor = this.newColor;
+
             this.mockOutput = new Mock<IOutput>();
             this.color = Console.ForegroundColor;
             this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() =>
@@ -24,19 +36,27 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             });
         }
 
+        [TestCleanup]
+        public void CleanUp()
+        {
+            Console.ForegroundColor = previousColor;
+        }
+
         [TestMethod]
-        public void OutputErrorForSimpleMessageShouldOutputTheMessageStringWithColor()
+        public void OutputErrorForSimpleMessageShouldOutputTheMessageString()
         {
             this.mockOutput.Object.Error("HelloError", null);
             this.mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
         }
 
-        //[Ignore]
-        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
-        // https://github.com/Microsoft/vstest/pull/641
         [TestMethod]
         public void OutputErrorForSimpleMessageShouldSetConsoleColorToRed()
         {
+            if (CanNotSetConsoleForegroundColor())
+            {
+                return;
+            }
+
             this.mockOutput.Object.Error("HelloError", null);
             Assert.IsTrue(this.color == ConsoleColor.Red, "Console color not set.");
         }
@@ -49,18 +69,20 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         }
 
         [TestMethod]
-        public void OutputWarningForSimpleMessageShouldOutputTheMessageStringWithColor()
+        public void OutputWarningForSimpleMessageShouldOutputTheMessageString()
         {
             this.mockOutput.Object.Warning("HelloWarning", null);
             this.mockOutput.Verify(o => o.WriteLine("HelloWarning", OutputLevel.Warning), Times.Once());
         }
 
-        //[Ignore]
-        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
-        // https://github.com/Microsoft/vstest/pull/641
         [TestMethod]
         public void OutputWarningForSimpleMessageShouldSetConsoleColorToYellow()
         {
+            if (CanNotSetConsoleForegroundColor())
+            {
+                return;
+            }
+
             this.mockOutput.Object.Warning("HelloWarning", null);
             Assert.IsTrue(this.color == ConsoleColor.Yellow);
         }
@@ -73,18 +95,20 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         }
 
         [TestMethod]
-        public void OutputInformationForSimpleMessageShouldOutputTheMessageStringWithColor()
+        public void OutputInformationForSimpleMessageShouldOutputTheMessageString()
         {
             this.mockOutput.Object.Information(ConsoleColor.Green, "HelloInformation", null);
             this.mockOutput.Verify(o => o.WriteLine("HelloInformation", OutputLevel.Information), Times.Once());
         }
 
-        [Ignore]
-        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
-        // https://github.com/Microsoft/vstest/pull/641
         [TestMethod]
         public void OutputInformationForSimpleMessageShouldSetConsoleColorToGivenColor()
         {
+            if (CanNotSetConsoleForegroundColor())
+            {
+                return;
+            }
+
             this.mockOutput.Object.Information(ConsoleColor.Green, "HelloInformation", null);
             Assert.IsTrue(this.color == ConsoleColor.Green);
         }
@@ -96,12 +120,14 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             this.mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
         }
 
-        [Ignore]
-        // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
-        // https://github.com/Microsoft/vstest/pull/641
         [TestMethod]
         public void OutputInformationShouldNotChangeConsoleOutputColor()
         {
+            if (CanNotSetConsoleForegroundColor())
+            {
+                return;
+            }
+
             ConsoleColor color1 = Console.ForegroundColor, color2 = Console.ForegroundColor == ConsoleColor.Red ? ConsoleColor.Black : ConsoleColor.Red;
             this.mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() =>
             {
@@ -111,6 +137,16 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             this.mockOutput.Object.Information("HelloInformation {0} {1}", "Foo", "Bar");
             this.mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
             Assert.IsTrue(color1 == color2);
+        }
+
+        private bool CanNotSetConsoleForegroundColor()
+        {
+            if (Console.ForegroundColor != this.newColor)
+            {
+                Assert.Inconclusive("Can't set Console foreground color. Might be because process output redirect to file.");
+                return true;
+            }
+            return false;
         }
     }
 }
