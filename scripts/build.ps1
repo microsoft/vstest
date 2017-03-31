@@ -264,6 +264,16 @@ function Publish-Package
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
+	
+	# Note Note: If there are some dependencies for the TestHostProvider assemblies, those need to be moved too. 
+    $runtimeproviders = @("Microsoft.TestPlatform.TestHostProvider.dll", "Microsoft.TestPlatform.TestHostProvider.pdb")
+    foreach($file in $runtimeproviders) {
+        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
+        
+        Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
+        Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
+    }
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"

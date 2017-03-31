@@ -1,17 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
+namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Interface for any process related functionality. This is needed for clean unit-testing.
     /// </summary>
-    internal interface IProcessHelper
+    public interface IProcessHelper
     {
         /// <summary>
         /// Launches the process with the given arguments.
@@ -23,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <param name="errorCallback">Call back for to read error stream data</param>
         /// <param name="exitCallBack">Call back for on process exit</param>
         /// <returns>The process created.</returns>
-        Process LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<Process, string> errorCallback, Action<Process> exitCallBack);
+        object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> environmentVariables, Action<object, string> errorCallback, Action<object> exitCallBack);
 
         /// <summary>
         /// Gets the current process file path.
@@ -56,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
         /// <param name="process">process parameter</param>
         /// <param name="exitCode">return value of exitCode</param>
         /// <returns>False if process has not exited, True otherwise</returns>
-        bool TryGetExitCode(Process process, out int exitCode);
+        bool TryGetExitCode(object process, out int exitCode);
 
         /// <summary>
         /// The wait for parent process exit async.

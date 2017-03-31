@@ -3,12 +3,13 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
 {
+    using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Manages loading and provides access to testhost extensions implementing the
@@ -17,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
     internal class TestRuntimeExtensionManager : TestExtensionManager<ITestRuntimeProvider, ITestRuntimeCapabilities>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="TestRuntimeExtensionManager"/> class. 
         /// Default constructor.
         /// </summary>
         /// <param name="unfilteredTestExtensions">
@@ -60,5 +62,4 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
             return new TestRuntimeExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
         }
     }
-
 }

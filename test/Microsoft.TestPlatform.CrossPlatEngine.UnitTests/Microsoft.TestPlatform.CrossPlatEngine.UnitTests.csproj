@@ -7,8 +7,8 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
-    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.CrossPlatEngine.UnitTests</AssemblyName>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
     <!-- It has dependency on two version of Newtonsoft.Json(8 and 9) and binding redirect of Newtonsoft.Json has been removed from testhost config file, hence we need it here -->
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CrossPlatEngine\Microsoft.TestPlatform.CrossPlatEngine.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj" />
+	<ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.Common.UnitTests\Microsoft.TestPlatform.Common.UnitTests.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj">
       <FromP2P>true</FromP2P>
