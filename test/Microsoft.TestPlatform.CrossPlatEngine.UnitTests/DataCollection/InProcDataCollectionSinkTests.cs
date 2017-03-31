@@ -68,23 +68,5 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
             Assert.ThrowsException<ArgumentNullException>(
                 () => this.dataCollectionSink.SendData(this.dataCollectionContext, "DummyKey", "DummyValue"));
         }
-
-        [TestMethod]
-        public void RemoveDataCollectionDataSetForTestCaseShouldRemoveTestCaseAfterRetunredTheData()
-        {
-            this.testCase.SetPropertyValue(TestCaseProperties.Id, Guid.NewGuid());
-            this.dataCollectionSink.SendData(this.dataCollectionContext, "DummyKey", "DummyValue");
-
-            var dict = ((InProcDataCollectionSink)this.dataCollectionSink).GetDataCollectionDataSetForTestCase(this.testCase.Id);
-            Assert.AreEqual<string>(dict["DummyKey"].ToString(), "DummyValue");
-
-            var emptyDict = ((InProcDataCollectionSink)this.dataCollectionSink).GetDataCollectionDataSetForTestCase(this.testCase.Id);
-            Assert.AreEqual<int>(emptyDict.Keys.Count, 1);
-
-            ((InProcDataCollectionSink)this.dataCollectionSink).RemoveDataCollectionDataSetForTestCase(this.testCase.Id);
-
-            emptyDict = ((InProcDataCollectionSink)this.dataCollectionSink).GetDataCollectionDataSetForTestCase(this.testCase.Id);
-            Assert.AreEqual<int>(emptyDict.Keys.Count, 0);
-        }
     }
 }
