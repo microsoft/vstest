@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             this.mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
         }
 
-        [Ignore]
+        //[Ignore]
         // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
         // https://github.com/Microsoft/vstest/pull/641
         [TestMethod]
@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             this.mockOutput.Verify(o => o.WriteLine("HelloWarning", OutputLevel.Warning), Times.Once());
         }
 
-        [Ignore]
+        //[Ignore]
         // Should be removed once "removal of CreateNoWindow=true in VSTestForwardingApp.cs merged in dotnet cli repo"
         // https://github.com/Microsoft/vstest/pull/641
         [TestMethod]
