@@ -42,8 +42,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string runSettings = this.GetRunsettingsFilePath();
             string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
+            string extensionsPath = Path.Combine(
+                this.testEnvironment.TestAssetsPath,
+                "OutOfProcDataCollector",
+                "bin",
+                this.testEnvironment.BuildConfiguration,
+                this.testEnvironment.RunnerFramework);
+
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" -- RunConfiguration.ExtensionsPath={extensionsPath}");
 
             this.InvokeVsTest(arguments);
 
@@ -120,7 +127,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.AreEqual(3, diaglogsFileCount);
         }
 
-        private string GetRunsettingsFilePath()
+        private string GetRunsettingsFilePath(string extensionsPath)
         {
             var runsettingsPath = Path.Combine(
                 Path.GetTempPath(),
@@ -130,18 +137,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             dataCollectionAttributes.Add("friendlyName", "SampleDataCollector");
             dataCollectionAttributes.Add("uri", "my://sample/datacollector");
 
-            // Data collector needs to be targeted to same runtime as the runner framework
-            var codebase = Path.Combine(
-                this.testEnvironment.TestAssetsPath,
-                Path.GetFileNameWithoutExtension("OutOfProcDataCollector"),
-                "bin",
-                this.testEnvironment.BuildConfiguration,
-                this.testEnvironment.RunnerFramework,
-                "OutOfProcDataCollector.dll");
-            Assert.IsTrue(File.Exists(codebase), "Data collector assembly not found: " + codebase);
-
-            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(codebase)));
-            dataCollectionAttributes.Add("codebase", codebase);
+            dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(Path.Combine(extensionsPath, "OutOfProcDataCollector.dll"))));
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;
         }

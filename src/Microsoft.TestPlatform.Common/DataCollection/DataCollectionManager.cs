@@ -7,7 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -15,6 +17,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Manages data collection.
@@ -59,12 +63,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private IDataCollectorLoader dataCollectorLoader;
 
         /// <summary>
+        /// File helper to perform file operations.
+        /// </summary>
+        private IFileHelper fileHelper;
+
+        /// <summary>
+        /// Cache of data collectors loaded from extensions path.
+        /// </summary>
+        private Dictionary<string, Type> dataCollectorCache;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectorLoader())
+        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectorLoader(), new TestPlatform.Utilities.Helpers.FileHelper())
         {
         }
 
@@ -80,10 +94,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="dataCollectorLoader">
         /// The data Collector Loader.
         /// </param>
+        /// <param name="fileHelper">
+        /// The file Helper.
+        /// </param>
         /// <remarks>
         /// The constructor is not public because the factory method should be used to get instances of this class.
         /// </remarks>
-        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader)
+        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader, IFileHelper fileHelper)
         {
             this.attachmentManager = datacollectionAttachmentManager;
             this.messageSink = messageSink;
@@ -91,6 +108,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             this.events = new TestPlatformDataCollectionEvents();
 
             this.RunDataCollectors = new Dictionary<Type, DataCollectorInformation>();
+
+            this.fileHelper = fileHelper;
+            this.dataCollectorCache = new Dictionary<string, Type>();
         }
 
         /// <summary>
@@ -144,6 +164,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
             var resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+
+            // Initialize Data Collector Cache.
+            var extensionsPath = runConfiguration.ExtensionsPath;
+            this.InitializeDataCollectorCache(extensionsPath);
 
             this.attachmentManager.Initialize(sessionId, resultsDirectory, this.messageSink);
 
@@ -334,7 +358,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             try
             {
-                var dataCollector = this.dataCollectorLoader.Load(dataCollectorSettings.CodeBase, dataCollectorSettings.AssemblyQualifiedName);
+                Type type = null;
+                if (!this.dataCollectorCache.TryGetValue(dataCollectorSettings.FriendlyName, out type))
+                {
+                    return;
+                }
+
+                var dataCollector = this.dataCollectorLoader.CreateInstance(type);
 
                 if (dataCollector == null)
                 {
@@ -625,6 +655,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         entry.Uri,
                         file.Description,
                         file.Uri);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Initializes the Data Collector Cache.
+        /// </summary>
+        /// <param name="extensionsPath">Extensions path.</param>
+        private void InitializeDataCollectorCache(string extensionsPath)
+        {
+            var extpaths = string.IsNullOrWhiteSpace(extensionsPath) ? new List<string>() : extensionsPath.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            // add current directory and extensions folder path. 
+            // todo : remove this once extensions path starts coming from vstest.console.
+            var currentDir = Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location);
+            var extDir = Path.Combine(currentDir, "Extensions");
+
+            extpaths.Add(currentDir);
+            extpaths.Add(extDir);
+
+            foreach (var extPath in extpaths)
+            {
+                if (!string.IsNullOrEmpty(extPath) && this.fileHelper.DirectoryExists(extPath))
+                {
+                    var extensions = this.fileHelper.EnumerateFiles(extPath, TestPlatformConstants.DataCollectorRegexPattern, SearchOption.TopDirectoryOnly);
+
+                    foreach (var extension in extensions)
+                    {
+                        var dataCollectors = this.dataCollectorLoader.FindDataCollectors(extension);
+
+                        foreach (var datacollector in dataCollectors)
+                        {
+                            this.dataCollectorCache[datacollector.Item1] = datacollector.Item2;
+                        }
+                    }
                 }
             }
         }

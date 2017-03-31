@@ -8,11 +8,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
     using Moq.Protected;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     [TestClass]
     public class DataCollectorInformationTests
