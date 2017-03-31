@@ -13,27 +13,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// The default test host launcher for the engine.
     /// This works for Desktop local scenarios
     /// </summary>
+    [ExtensionUri(DefaultTestHostUri)]
+    [FriendlyName(DefaultTestHostFriendltName)]
     public class DefaultTestHostManager : ITestRuntimeProvider
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
 
-        private readonly Architecture architecture;
-        private readonly Framework framework;
-        private readonly IProcessHelper processHelper;
+        private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
+        private const string DefaultTestHostFriendltName = "DefaultTestHost";
+
+        private Architecture architecture;
+
+        private IProcessHelper processHelper;
 
         private ITestHostLauncher customTestHostLauncher;
         private Process testHostProcess;
@@ -45,11 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
-        /// <param name="architecture">Platform architecture of the host process.</param>
-        /// <param name="framework">Runtime framework for the host process.</param>
-        /// <param name="shared">can host process be shared for multiple sources.</param>
-        public DefaultTestHostManager(Architecture architecture, Framework framework, bool shared)
-            : this(architecture, framework, new ProcessHelper(), shared)
+        public DefaultTestHostManager()
         {
         }
 
@@ -63,7 +64,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper, bool shared)
         {
             this.architecture = architecture;
-            this.framework = framework;
             this.processHelper = processHelper;
             this.testHostProcess = null;
 
@@ -71,8 +71,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.hostExitedEventRaised = false;
         }
 
+        /// <inheritdoc/>
         public event EventHandler<HostProviderEventArgs> HostLaunched;
 
+        /// <inheritdoc/>
         public event EventHandler<HostProviderEventArgs> HostExited;
 
         /// <inheritdoc/>
@@ -83,25 +85,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         public IDictionary<string, string> Properties => new Dictionary<string, string>();
 
+        /// <summary>
+        /// Gets or sets the error length for runtime error stream.
+        /// </summary>
         protected int ErrorLength { get; set; } = 1000;
 
+        /// <summary>
+        /// Gets or sets the Timeout for runtime to initialize.
+        /// </summary>
         protected int TimeOut { get; set; } = 10000;
 
         /// <summary>
-        /// Callback on process exit
+        /// Gets callback on process exit
         /// </summary>
-        private Action<Process> ExitCallBack => ((process) =>
+        private Action<object> ExitCallBack => (process) =>
         {
             var exitCode = 0;
             this.processHelper.TryGetExitCode(process, out exitCode);
 
-            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, process.Id));
-        });
+            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
+        };
 
         /// <summary>
-        /// Callback to read from process error stream
+        /// Gets callback to read from process error stream
         /// </summary>
-        private Action<Process, string> ErrorReceivedCallback => ((process, data) =>
+        private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
             var exitCode = 0;
             if (!string.IsNullOrEmpty(data))
@@ -129,10 +137,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (this.processHelper.TryGetExitCode(process, out exitCode))
             {
                 EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, process.Id));
+                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
             }
-        });
-
+        };
 
         /// <inheritdoc/>
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
@@ -154,7 +161,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         {
             // Default test host manager supports shared test sources
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location);
+            var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
@@ -198,9 +205,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return Enumerable.Empty<string>();
         }
 
-        public bool CanExecuteCurrentRunConfiguration(string runConfiguration)
+        /// <inheritdoc/>
+        public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
         {
-            RunConfiguration config = XmlRunSettingsUtilities.GetRunConfigurationNode(runConfiguration);
+            var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             var framework = config.TargetFrameworkVersion;
 
             // This is expected to be called once every run so returning a new instance every time.
@@ -213,26 +221,42 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return true;
         }
 
+        /// <summary>
+        /// Raises HostLaunched event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
         public void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
         }
 
+        /// <summary>
+        /// Raises HostExited event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
         public void OnHostExited(HostProviderEventArgs e)
         {
             if (!this.hostExitedEventRaised)
             {
                 this.hostExitedEventRaised = true;
                 this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
-            }   
-        }
-
-        public void Initialize(IMessageLogger logger)
-        {
-            this.messageLogger = logger;
+            }
         }
 
         /// <inheritdoc/>
+        public void Initialize(IMessageLogger logger, string runsettingsXml)
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+
+            this.messageLogger = logger;
+            this.architecture = runConfiguration.TargetPlatform;
+            this.processHelper = new ProcessHelper();
+            this.testHostProcess = null;
+
+            this.Shared = !runConfiguration.DisableAppDomain;
+            this.hostExitedEventRaised = false;
+        }
+
         private CancellationTokenSource GetCancellationTokenSource()
         {
             this.hostLaunchCts = new CancellationTokenSource(this.TimeOut);
@@ -248,7 +272,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
                 if (this.customTestHostLauncher == null)
                 {
-                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack);
+                    EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
                 }
                 else
                 {
@@ -262,8 +287,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 return -1;
             }
 
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + this.testHostProcess.Id));
-            return this.testHostProcess.Id;
+            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
+            return pId;
         }
     }
 }

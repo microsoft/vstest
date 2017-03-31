@@ -50,6 +50,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
+	  <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostProvider.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Common.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Resource.dll" />
@@ -73,6 +74,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)datacollector.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)vstest.console.exe" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
+	  <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostProvider.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
@@ -101,6 +103,7 @@
 
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" />
+	  <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.TestPlatform.TestHostProvider.dll" />
 
       <!-- Localized resources -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)%(ResxLang.Identity)\*.*" />

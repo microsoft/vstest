@@ -3,16 +3,17 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System;
     using System.IO;
     using System.Runtime.InteropServices;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 
-    internal class DotnetHostHelper : IDotnetHostHelper
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
+    public class DotnetHostHelper : IDotnetHostHelper
     {
         private readonly IFileHelper fileHelper;
 
@@ -58,7 +59,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
                 }
             }
 
-            string errorMessage = String.Format(Resources.NoDotnetExeFound, dotnetExeName);
+            string errorMessage = string.Format(Resources.NoDotnetExeFound, dotnetExeName);
+
             EqtTrace.Error(errorMessage);
             throw new FileNotFoundException(errorMessage);
         }

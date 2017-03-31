@@ -14,8 +14,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
-        /// <param name="testHostManager">Test host manager for the current test discovery.</param>
-        /// <returns>ITestDiscoveryManager object that can do discovery</returns>
+        /// <param name="testHostManager">
+        /// Test host manager for the current test discovery.
+        /// </param>
+        /// <param name="discoveryCriteria">
+        /// The discovery Criteria.
+        /// </param>
+        /// <returns>
+        /// ITestDiscoveryManager object that can do discovery
+        /// </returns>
         IProxyDiscoveryManager GetDiscoveryManager(ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria);
 
         /// <summary>
@@ -32,13 +39,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// </summary>
         /// <returns>ITestExtensionManager object that helps with extensibility</returns>
         ITestExtensionManager GetExtensionManager();
-
-        /// <summary>
-        /// Fetches the Test Host manager for this engine. This manager would provide extensibility
-        /// features that this engine supports.
-        /// </summary>
-        /// <param name="runConfiguration">RunConfiguration information which contains info like Architecture, Framework for the test run.</param>
-        /// <returns>Launcher for the test host process</returns>
-        ITestRuntimeProvider GetDefaultTestHostManager(RunConfiguration runConfiguration);
     }
 }

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
+namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 {
     using System;
 
@@ -9,6 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#pragma warning disable SA1600
     [TestClass]
     public class TestRunnerConnectionInfoExtensionsTests
     {
@@ -35,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         [TestMethod]
         public void ToCommandLineOptionsShouldIncludeDiagnosticsOptionIfEnabled()
         {
-            var connectionInfo = new TestRunnerConnectionInfo();
+            var connectionInfo = default(TestRunnerConnectionInfo);
 
             var options = connectionInfo.ToCommandLineOptions();
 
@@ -52,4 +53,5 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             StringAssert.EndsWith(options, "--diag log.txt");
         }
     }
+#pragma warning restore SA1600
 }

@@ -6,12 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using System;
     using System.Linq;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -25,9 +25,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     {
         #region Private Fields
 
+        private readonly TestRuntimeProviderManager testHostProviderManager;
         private ITestExtensionManager testExtensionManager;
 
         #endregion
+
+        public TestEngine() : this(TestRuntimeProviderManager.Instance)
+        {
+        }
+
+        protected TestEngine(TestRuntimeProviderManager testHostProviderManager)
+        {
+            this.testHostProviderManager = testHostProviderManager;
+        }
 
         #region ITestEngine implementation
 
@@ -49,12 +59,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
             {
-                // Create a new HostProvider, to be associated with individual ProxyDiscoveryManager(&POM)
-                var hostManager = this.GetDefaultTestHostManager(XmlRunSettingsUtilities.GetRunConfigurationNode(discoveryCriteria.RunSettings));
-                hostManager.Initialize(TestSessionMessageLogger.Instance);
+                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
+                hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
                 return new ProxyDiscoveryManager(hostManager);
             };
+                
             return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
         }
 
@@ -77,8 +87,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
             {
                 // Create a new HostManager, to be associated with individual ProxyExecutionManager(&POM)
-                var hostManager = this.GetDefaultTestHostManager(XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings));
-                hostManager.Initialize(TestSessionMessageLogger.Instance);
+                var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
+                hostManager?.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
                 if (testRunCriteria.TestHostLauncher != null)
                 {
@@ -107,31 +117,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         public ITestExtensionManager GetExtensionManager()
         {
             return this.testExtensionManager ?? (this.testExtensionManager = new TestExtensionManager());
-        }
-
-        /// <summary>
-        /// Retrieves the default test host manager for this engine.
-        /// </summary>
-        /// <param name="runConfiguration">
-        /// The run Configuration.
-        /// </param>
-        /// <returns>
-        /// An instance of the test host manager.
-        /// </returns>
-        public ITestRuntimeProvider GetDefaultTestHostManager(RunConfiguration runConfiguration)
-        {
-            var framework = runConfiguration.TargetFrameworkVersion;
-
-            // This is expected to be called once every run so returning a new instance every time.
-            if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
-            {
-                return new DotnetTestHostManager();
-            }
-
-            // Only share the manager if DisableAppDomain is "false"
-            // meaning AppDomain is enabled and we can reuse the host for multiple sources
-            return new DefaultTestHostManager(runConfiguration.TargetPlatform, framework, shared: !runConfiguration.DisableAppDomain);
         }
 
         #endregion
