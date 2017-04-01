@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// <summary>
     /// Utility Methods for sending output to IOutput.
     /// </summary>
-    public static class OutputUtilities
+    public static class OutputExtensions
     {
         private const string DefaultFormat = "{0}";
 
@@ -24,10 +24,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Error(this IOutput output, string format, params object[] args)
         {
-            using (new ConsoleColorHelper(ConsoleColor.Red))
+            SetColorForAction(ConsoleColor.Red, () =>
             {
                 Output(output, OutputLevel.Error, DefaultFormat, format, args);
-            }
+            });
         }
 
         /// <summary>
@@ -38,10 +38,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Warning(this IOutput output, string format, params object[] args)
         {
-            using (new ConsoleColorHelper(ConsoleColor.Yellow))
+            SetColorForAction(ConsoleColor.Yellow, () =>
             {
                 Output(output, OutputLevel.Warning, DefaultFormat, format, args);
-            }
+            });
         }
 
         /// <summary>
@@ -52,7 +52,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Information(this IOutput output, string format, params object[] args)
         {
-            Output(output, OutputLevel.Information, DefaultFormat, format, args);
+           Information(output, Console.ForegroundColor, format, args);
+        }
+
+        /// <summary>
+        /// Output a informational message.
+        /// </summary>
+        /// <param name="output">Output instance the method is being invoked with.</param>
+        /// <param name="format">Format string for the informational message.</param>
+        /// <param name="foregroundColor">Color in which text prints.</param>
+        /// <param name="args">Arguments to format into the format string.</param>
+        public static void Information(this IOutput output, ConsoleColor foregroundColor, string format, params object[] args)
+        {
+            SetColorForAction(foregroundColor, () =>
+            {
+                Output(output, OutputLevel.Information, DefaultFormat, format, args);
+            });
         }
 
         /// <summary>
@@ -98,6 +113,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             }
 
             return string.Format(CultureInfo.CurrentCulture, messageTypeFormat, message);
+        }
+
+        private static void SetColorForAction(ConsoleColor foregroundColor, Action action)
+        {
+            if (action == null)
+            {
+                return;
+            }
+
+            var previousForegroundColor = Console.ForegroundColor;
+            try
+            {
+                Console.ForegroundColor = foregroundColor;
+                action.Invoke();
+            }
+            finally
+            {
+                Console.ForegroundColor = previousForegroundColor;
+            }
         }
     }
 }

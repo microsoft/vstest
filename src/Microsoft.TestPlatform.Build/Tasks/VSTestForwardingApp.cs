@@ -33,9 +33,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
                                       FileName = hostExe,
                                       Arguments = string.Join(" ", this.allArgs),
                                       UseShellExecute = false,
-                                      CreateNoWindow = true,
-                                      RedirectStandardError = true,
-                                      RedirectStandardOutput = true
                                   };
 
             Tracing.Trace("VSTest: Starting vstest.console...");
@@ -43,13 +40,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             using (var activeProcess = new Process { StartInfo = processInfo })
             {
-                activeProcess.OutputDataReceived += (sender, args) => Console.WriteLine(args.Data);
-                activeProcess.ErrorDataReceived += (sender, args) => Console.WriteLine(args.Data);
-
                 activeProcess.Start();
                 this.activeProcessId = activeProcess.Id;
-                activeProcess.BeginOutputReadLine();
-                activeProcess.BeginErrorReadLine();
 
                 activeProcess.WaitForExit();
                 Tracing.Trace("VSTest: Exit code: " + activeProcess.ExitCode);
