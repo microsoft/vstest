@@ -11,6 +11,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using VisualStudio.TestPlatform.ObjectModel;
+    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class MSTestSettingsUtilitiesTests
@@ -53,7 +54,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                     GetXPathNavigable(xmlDocument),
                     Architecture.X86,
                     FrameworkVersion.Framework45);
-            ExceptionUtilities.ThrowsException<XmlException>(action, "Unexpected settings file specified.");
+            Assert.That.Throws<XmlException>(action).WithMessage("Unexpected settings file specified.");
         }
 
         [TestMethod]
@@ -70,7 +71,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
                     GetXPathNavigable(xmlDocument),
                     Architecture.X86,
                     FrameworkVersion.Framework45);
-            ExceptionUtilities.ThrowsException<XmlException>(action, "Could not find 'RunSettings' node.");
+            Assert.That.Throws<XmlException>(action).WithMessage("Could not find 'RunSettings' node.");
         }
 
         [TestMethod]

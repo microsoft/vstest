@@ -85,6 +85,9 @@
         <PackageReference Include="Moq">
           <Version>4.6.38-*</Version>
         </PackageReference>
+        <PackageReference Include="MSTest.Assert.Extensions">
+          <Version>1.0.1-preview</Version>
+        </PackageReference>
       </ItemGroup>
     </When>
   </Choose>
