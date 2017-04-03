@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System.IO;
+    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class CommandLineOptionsTests
@@ -86,8 +87,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             this.fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
 
             CommandLineOptions.Instance.AddSource(testFilePath);
-            var ex = Assert.ThrowsException<CommandLineException>(() => CommandLineOptions.Instance.AddSource(testFilePath));
-            Assert.AreEqual("Duplicate source " + testFilePath + " specified.", ex.Message);
+            Assert.That.Throws<CommandLineException>(() => CommandLineOptions.Instance.AddSource(testFilePath))
+                .WithExactMessage("Duplicate source " + testFilePath + " specified.");
         }
 
         [TestMethod]

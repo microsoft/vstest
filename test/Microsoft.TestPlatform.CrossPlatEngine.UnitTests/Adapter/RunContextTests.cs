@@ -9,6 +9,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class RunContextTests
@@ -47,9 +48,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         {
             this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
 
-            var exception = Assert.ThrowsException<TestPlatformFormatException>(() => this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; }));
-
-            StringAssert.Contains(exception.Message, "No tests matched the filter because it contains one or more properties that are not valid (highlyunlikelyproperty). Specify filter expression containing valid properties (TestCategory) and try again.");
+            Assert.That.Throws<TestPlatformFormatException>(() => 
+                        this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; }))
+                    .WithMessage("No tests matched the filter because it contains one or more properties that are not valid (highlyunlikelyproperty). Specify filter expression containing valid properties (TestCategory) and try again.");
         }
 
         [TestMethod]
