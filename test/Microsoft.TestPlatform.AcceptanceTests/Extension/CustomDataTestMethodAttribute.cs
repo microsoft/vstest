@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (dataRows.Count == 0)
             {
-                return new TestResult[] { new TestResult() { Outcome = UnitTestOutcome.Failed, TestFailureException = new Exception(FrameworkMessages.NoDataRow) } };
+                return new TestResult[] { new TestResult() { Outcome = UnitTestOutcome.Failed, TestFailureException = new Exception("No DataRowAttribute specified. Atleast one DataRowAttribute is required with DataTestMethodAttribute.") } };
             }
 
             return RunDataDrivenTest(testMethod, dataRows.ToArray());
@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 }
                 else
                 {
-                    result.DisplayName = string.Format(CultureInfo.CurrentCulture, FrameworkMessages.DataDrivenResultDisplayName, testMethod.TestMethodName, string.Join(",", dataRow.Data));
+                    result.DisplayName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testMethod.TestMethodName, string.Join(",", dataRow.Data));
                 }
 
                 results.Add(result);
