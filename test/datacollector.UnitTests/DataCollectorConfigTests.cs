@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using System.Globalization;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class DataCollectorConfigTests
@@ -33,46 +34,40 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void ConstructorShouldThrowExceptionIfUriIsNotSpecifiedInDataCollector()
         {
-            ThrowsExceptionWithMessage<ArgumentException>(() =>
-            {
+            Assert.That.Throws<ArgumentException>(() =>
+                    {
                         new DataCollectorConfig(typeof(CustomDataCollectorWithoutUri));
-                    },
-                string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.Resources.DataCollector_TypeIsNull,
-                    typeof(CustomDataCollectorWithoutUri).FullName));
+                    })
+                    .WithMessage(string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.Resources.DataCollector_TypeIsNull,
+                            typeof(CustomDataCollectorWithoutUri).FullName));
         }
 
         [TestMethod]
         public void ConstructorShouldThrowExceptionIfFriendlyNameIsEmpty()
         {
-            ThrowsExceptionWithMessage<ArgumentException>(() =>
-            {
+            Assert.That.Throws<ArgumentException>(() =>
+                    {
                         new DataCollectorConfig(typeof(CustomDataCollectorWithEmptyFriendlyName));
-                    },
-                string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.Resources.FriendlyNameIsNullOrEmpty,
-                    typeof(CustomDataCollectorWithEmptyFriendlyName).FullName));
+                    })
+                    .WithMessage(string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.Resources.FriendlyNameIsNullOrEmpty,
+                            typeof(CustomDataCollectorWithEmptyFriendlyName).FullName));
         }
 
         [TestMethod]
         public void ConstructorShouldThrowExceptionIfFriendlyNameIsNotSpecified()
         {
-            ThrowsExceptionWithMessage<ArgumentException>(() =>
-            {
+            Assert.That.Throws<ArgumentException>(() =>
+                    {
                         new DataCollectorConfig(typeof(CustomDataCollectorWithoutFriendlyName));
-                    },
-                string.Format(
-                    CultureInfo.CurrentCulture,
-                    Resources.Resources.FriendlyNameIsNullOrEmpty,
-                    typeof(CustomDataCollectorWithoutFriendlyName).FullName));
-        }
-
-        public static void ThrowsExceptionWithMessage<T>(Action action, string message) where T : Exception
-        {
-            var exception = Assert.ThrowsException<T>(action);
-            StringAssert.Contains(exception.Message, message);
+                    }).
+                    WithMessage(string.Format(
+                            CultureInfo.CurrentCulture,
+                            Resources.Resources.FriendlyNameIsNullOrEmpty,
+                            typeof(CustomDataCollectorWithoutFriendlyName).FullName));
         }
     }
 }
