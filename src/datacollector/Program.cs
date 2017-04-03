@@ -12,9 +12,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -75,7 +75,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             EqtTrace.Info("DataCollector: Monitoring parent process with id: '{0}'", parentProcessId);
 
             var processHelper = new ProcessHelper();
-            processHelper.SetExitCallback(parentProcessId,
+            processHelper.SetExitCallback(
+                parentProcessId,
                 () =>
                     {
                         EqtTrace.Info("DataCollector: ParentProcess '{0}' Exited.", parentProcessId);

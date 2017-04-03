@@ -51,7 +51,6 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
-$env:TP_SRC_DIR = Join-Path $env:TP_ROOT_DIR "src"
 
 #
 # Dotnet configuration
@@ -251,6 +250,16 @@ function Publish-Package
     # Ideally we should just be publishing the loggers to the Extensions folder.
     $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
     foreach($file in $loggers) {
+        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
+        
+        Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
+        Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
+    }
+	
+	# Note Note: If there are some dependencies for the TestHostProvider assemblies, those need to be moved too. 
+    $runtimeproviders = @("Microsoft.TestPlatform.TestHostProvider.dll", "Microsoft.TestPlatform.TestHostProvider.pdb")
+    foreach($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
         
@@ -529,7 +538,7 @@ function Build-SpecificProjects
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.
-    Get-ChildItem -Recurse -Path $env:TP_SRC_DIR -Include *.csproj | ForEach-Object {
+    Get-ChildItem -Recurse -Path $env:TP_ROOT_DIR -Include *.csproj | ForEach-Object {
         foreach ($ProjectNamePattern in $ProjectNamePatterns) {
             if($_.FullName -match  $ProjectNamePattern) {
                 $ProjectsToBuild += ,"$_"
@@ -549,6 +558,11 @@ function Build-SpecificProjects
         PrintAndExit-OnError $output
         $output = & $dotnetPath build $ProjectToBuild
         PrintAndExit-OnError $output
+
+        if (-Not ($ProjectToBuild.FullName -contains "$($env:TP_ROOT_DIR)$([IO.Path]::DirectorySeparatorChar)src")) {
+            # Don't copy artifacts for non src folders.
+            continue;
+        }
 
         # Copy artifacts
         $ProjectDir = [System.IO.Path]::GetDirectoryName($ProjectToBuild)

@@ -16,6 +16,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Moq;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class ProxyOperationManagerTests
@@ -162,9 +163,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelForDotnetHostManagerWithIsVersionCheckRequiredFalseShouldNotCheckVersionWithTestHost()
         {
-            var testHostManager = new Mock<DotnetTestHostManager>();
-            testHostManager.Setup(thm => thm.IsVersionCheckRequired).Returns(false);
-            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testHostManager.Object, this.connectionTimeout);
+            var testHostManager = new TestableDotnetTestHostManager(false);
+            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testHostManager, this.connectionTimeout);
 
             operationManager.SetupChannel(Enumerable.Empty<string>());
 
@@ -174,9 +174,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelForDotnetHostManagerWithIsVersionCheckRequiredTrueShouldCheckVersionWithTestHost()
         {
-            var testHostManager = new Mock<DotnetTestHostManager>();
-            testHostManager.Setup(thm => thm.IsVersionCheckRequired).Returns(true);
-            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testHostManager.Object, this.connectionTimeout);
+            var testHostManager = new TestableDotnetTestHostManager(true);
+            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testHostManager, this.connectionTimeout);
 
             operationManager.SetupChannel(Enumerable.Empty<string>());
 
@@ -225,6 +224,30 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 ITestRuntimeProvider testHostManager,
                 int clientConnectionTimeout) : base(requestSender, testHostManager, clientConnectionTimeout)
             {
+            }
+        }
+
+        private class TestableDotnetTestHostManager : DotnetTestHostManager
+        {
+            private bool isVersionCheckRequired;
+
+            public TestableDotnetTestHostManager(bool checkRequired)
+            {
+                this.isVersionCheckRequired = checkRequired;
+            }
+
+            internal override bool IsVersionCheckRequired => this.isVersionCheckRequired;
+
+            public override TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources,
+            IDictionary<string, string> environmentVariables,
+            TestRunnerConnectionInfo connectionInfo)
+            {
+                return new TestProcessStartInfo();
+            }
+
+            public override async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            {
+                return await Task.Run(() => { return 0; });
             }
         }
     }

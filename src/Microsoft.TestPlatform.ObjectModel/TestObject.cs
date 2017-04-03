@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue(TestProperty property, object value)
         {
-            this.PrivateSetPropertyValue(property, value, store);
+            this.PrivateSetPropertyValue(property, value, this.store);
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue, store);
+            this.PrivateSetPropertyValue(property, objValue, this.store);
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue, store);
+            this.PrivateSetPropertyValue(property, objValue, this.store);
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
 
             object objValue = ConvertPropertyFrom<T>(property, CultureInfo.InvariantCulture, value);
-            this.PrivateSetPropertyValue(property, objValue, localStore);
+            this.PrivateSetPropertyValue(property, objValue, this.localStore);
         }
 
         #endregion Property Values

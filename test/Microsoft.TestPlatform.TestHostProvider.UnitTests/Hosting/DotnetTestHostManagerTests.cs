@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
+namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 {
     using System;
     using System.Collections.Generic;
@@ -19,10 +19,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+
+#pragma warning disable SA1600
 
     [TestClass]
     public class DotnetTestHostManagerTests
@@ -43,7 +46,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
         private readonly TestProcessStartInfo defaultTestProcessStartInfo;
 
         private readonly TestableDotnetTestHostManager dotnetHostManager;
-        
+
         private string errorMessage;
         private int errorLength = 20;
 
@@ -61,9 +64,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object), 
+                                         new DotnetHostHelper(this.mockFileHelper.Object),
                                          this.errorLength);
-            this.dotnetHostManager.Initialize(mockLogger.Object);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
 
@@ -329,7 +331,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
 
             this.mockTestHostLauncher.Verify(thl => thl.LaunchTestHost(It.Is<TestProcessStartInfo>(x => x.Arguments.Equals(expectedArgs))), Times.Once);
         }
-        
+
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfDepsFileNotFound()
         {
@@ -509,9 +511,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>(),
-                            It.IsAny<Action<Process>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                            It.IsAny<Action<object, string>>(),
+                            It.IsAny<Action<object>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
                     (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
@@ -519,7 +521,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                         errorCallback(process, errorMessage);
                     }).Returns(Process.GetCurrentProcess());
 
-            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
         }
 
         private void ExitCallBackTestHelper(int exitCode)
@@ -531,18 +533,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                             It.IsAny<string>(),
                             It.IsAny<string>(),
                             It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<Action<Process, string>>(),
-                            It.IsAny<Action<Process>>()))
-                .Callback<string, string, string, IDictionary<string, string>, Action<Process, string>, Action<Process>>(
+                            It.IsAny<Action<object, string>>(),
+                            It.IsAny<Action<object>>()))
+                .Callback<string, string, string, IDictionary<string, string>, Action<object, string>, Action<object>>(
                     (var1, var2, var3, dictionary, errorCallback, exitCallback) =>
                     {
                         var process = Process.GetCurrentProcess();
                         exitCallback(process);
                     }).Returns(Process.GetCurrentProcess());
 
-            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<Process>(), out exitCode)).Returns(true);
+            this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
         }
-
 
         private TestProcessStartInfo GetDefaultStartInfo()
         {
@@ -552,14 +553,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Hosting
                 this.defaultConnectionInfo);
             return startInfo;
         }
-    }
 
-    internal class TestableDotnetTestHostManager : DotnetTestHostManager
-    {
-        public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
-            : base(processHelper, fileHelper, dotnetTestHostHelper)
+        internal class TestableDotnetTestHostManager : DotnetTestHostManager
         {
-            this.ErrorLength = errorLength;
+            public TestableDotnetTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetTestHostHelper, int errorLength)
+                : base(processHelper, fileHelper, dotnetTestHostHelper)
+            {
+                this.ErrorLength = errorLength;
+            }
         }
     }
+#pragma warning restore SA1600
 }

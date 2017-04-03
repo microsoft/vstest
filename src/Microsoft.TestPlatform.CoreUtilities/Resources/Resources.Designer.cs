@@ -195,5 +195,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources {
                 return ResourceManager.GetString("Utility_ProcessNameWhenCannotGetIt", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find {0}. Make sure that the dotnet is installed on the machine..
+        /// </summary>
+        internal static string NoDotnetExeFound
+        {
+            get
+            {
+                return ResourceManager.GetString("NoDotnetExeFound", resourceCulture);
+            }
+        }
     }
 }

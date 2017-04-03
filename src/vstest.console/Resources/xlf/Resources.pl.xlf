@@ -218,7 +218,7 @@
       Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: minimal, normal.
+      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
@@ -229,7 +229,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;identyfikator URI/przyjazna nazwa rejestratora&gt;
+        <target state="new">--logger|/logger:&lt;identyfikator URI/przyjazna nazwa rejestratora&gt;
       Określa rejestrator dla wyników testu. Aby na przykład rejestrować wyniki testu 
       do pliku wyników testu (TRX) programu Visual Studio, użyj parametru /logger:trx [;LogFileName=&lt;wartość domyślna to unikatowa nazwa pliku&gt;]
       Tworzy w katalogu TestResults plik z podaną nazwą LogFileName.
@@ -242,7 +242,7 @@
                 [;Platform=&lt;wartość domyślna to „Any CPU”&gt;]
                 [;Flavor=&lt;wartość domyślna to „Debug”&gt;]
                 [;RunTitle=&lt;tytuł&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--rejestratora | / rejestratora: &lt; identyfikator Uri rejestratora/FriendlyName &gt;
       Określ Rejestrator dla wyników badań.  Na przykład do rejestrowania wyników do programu Visual Studio Test wyniki pliku (TRX) używać/Logger: trx.

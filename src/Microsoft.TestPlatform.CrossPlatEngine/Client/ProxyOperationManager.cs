@@ -11,14 +11,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+    using System.Reflection;
+    using System.Linq;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -31,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private bool initialized;
         private string testHostProcessStdError;
-
+        private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         #region Constructors
 
         /// <summary>
@@ -133,8 +134,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Handling special case for dotnet core projects with older test hosts
                 // Older test hosts are not aware of protocol version check
                 // Hence we should not be sending VersionCheck message to these test hosts
-                var dotnetHostManager = this.testHostManager as DotnetTestHostManager;
-                if (dotnetHostManager == null || dotnetHostManager.IsVersionCheckRequired)
+                bool checkRequired = true;
+                var property = this.testHostManager.GetType().GetRuntimeProperties().FirstOrDefault(p => string.Equals(p.Name, versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
+                if (property != null)
+                {
+                    checkRequired = (bool)property.GetValue(this.testHostManager);
+                }
+
+                if (checkRequired)
                 {
                     if (!this.RequestSender.CheckVersionWithTestHost())
                     {
