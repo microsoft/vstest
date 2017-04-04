@@ -58,6 +58,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Regex pattern used to find the data collector.
         /// </summary>
         public const string DataCollectorRegexPattern = @".*Collector.dll";
-
     }
 }

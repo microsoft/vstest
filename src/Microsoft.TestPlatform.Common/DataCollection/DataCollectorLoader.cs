@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <inheritdoc/>
         public IEnumerable<Tuple<string, Type>> FindDataCollectors(string location)
         {
-            List<Tuple<string, Type>> typeList = new List<Tuple<string, Type>>();
+            var typeList = new List<Tuple<string, Type>>();
             if (string.IsNullOrWhiteSpace(location))
             {
                 return typeList;
@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(location);
 #endif
 
-                foreach (Type type in assembly.GetTypes())
+                foreach (var type in assembly.GetTypes())
                 {
                     if (type.GetTypeInfo().IsSubclassOf(typeof(DataCollector)) && !type.GetTypeInfo().IsAbstract)
                     {
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectorLoader.FindDataCollectors: Failed to fidn datacollectors from assembly at location : {0}. Error : ", location, ex.Message);
+                    EqtTrace.Error("DataCollectorLoader.FindDataCollectors: Failed to find datacollectors from assembly at location : {0}. Error {1}: ", location, ex.Message);
                 }
             }
 

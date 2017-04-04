@@ -4,14 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System;
-    using System.Diagnostics;
-    using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// The data collector config.
@@ -28,6 +23,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataCollectorConfig"/> class.
+        /// </summary>
+        /// <param name="type">
+        /// The type.
+        /// </param>
+        /// <param name="dataCollectorLoader">
+        /// The data collector loader.
+        /// </param>
         internal DataCollectorConfig(Type type, IDataCollectorLoader dataCollectorLoader)
         {
             ValidateArg.NotNull(type, nameof(type));

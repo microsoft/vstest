@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectorLoader(), new TestPlatform.Utilities.Helpers.FileHelper())
+        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectorLoader(), new FileHelper())
         {
         }
 
@@ -401,7 +401,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", collectorTypeName, ex);
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", collectorTypeName, ex.Message);
                 }
 
                 // No data collector info, so send the error with no direct association to the collector.
@@ -422,7 +422,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0}: " + ex, collectorTypeName);
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0}: " + ex.Message, collectorTypeName);
                 }
 
                 // Log error.
@@ -547,7 +547,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("DataCollectionManager.GetEnvironmentVariables: Failed to get variable for Collector '{0}': {1}", dataCollectorType, ex);
+                        EqtTrace.Error("DataCollectionManager.GetEnvironmentVariables: Failed to get variable for Collector '{0}': {1}", dataCollectorType, ex.Message);
                     }
                 }
             }

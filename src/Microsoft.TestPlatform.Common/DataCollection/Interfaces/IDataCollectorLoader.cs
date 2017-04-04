@@ -3,9 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using System;
     using System.Collections.Generic;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// Loads datacollector.
