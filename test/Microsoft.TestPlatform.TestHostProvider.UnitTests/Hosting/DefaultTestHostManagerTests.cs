@@ -64,7 +64,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeFileNameFromSubFolderTestHostWhenCurrentProcessIsDotnet()
         {
             string subFoler = "TestHost";
-            this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("dotnet.exe");
 
             var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
