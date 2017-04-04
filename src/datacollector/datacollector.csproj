@@ -11,6 +11,7 @@
     <AssemblyName>datacollector</AssemblyName>
     <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' != 'net46' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
     <PlatformTarget Condition="'$(TargetFramework)' == 'net46'">AnyCPU</PlatformTarget>
     <OutputType>Exe</OutputType>
   </PropertyGroup>
