@@ -218,7 +218,7 @@
       Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
       Creates file in TestResults directory with given LogFileName.
 
-      Change the verbosity level for console logger. Allowed values for verbosity: minimal, normal.
+      Change the verbosity level for console logger. Allowed values for verbosity: quiet, minimal and normal.
       Example: /logger:console;verbosity=&lt;Defaults to "minimal"&gt;
 
       To publish test results to Team Foundation Server, use TfsPublisher as shown below
@@ -229,7 +229,7 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
       为测试结果指定记录器。例如，若要将结果记录到 
       Visual Studio 测试结果文件 (TRX)，请使用 /logger:trx [;LogFileName=&lt;默认为唯一文件名&gt;]
       使用给定 LogFileName 在 TestResults 目录中创建文件。
@@ -241,7 +241,7 @@
                 [;Platform=&lt;默认为“任何 CPU”&gt;]
                 [;Flavor=&lt;默认为“调试”&gt;]
                 [;RunTitle=&lt;标题&gt;]</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-记录器 | / 记录器︰ &lt; 记录器 Uri/友好 &gt;
       指定记录器的测试结果。 例如，要记录结果到 Visual Studio 测试结果文件 (TRX) 使用 /logger:trx。

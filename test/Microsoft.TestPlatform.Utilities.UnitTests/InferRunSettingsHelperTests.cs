@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class InferRunSettingsHelperTests
@@ -24,10 +25,9 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
-            ExceptionUtilities.ThrowsException<XmlException>(
-                action,
-                "An error occurred while loading the settings.  Error: {0}.",
-                "Could not find 'RunSettings' node.");
+            Assert.That.Throws<XmlException>(action)
+                        .WithMessage(string.Format("An error occurred while loading the settings.  Error: {0}.",
+                                            "Could not find 'RunSettings' node."));
         }
 
         [TestMethod]
@@ -38,10 +38,12 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
-            ExceptionUtilities.ThrowsException<XmlException>(
-                action,
-                "An error occurred while loading the settings.  Error: {0}.",
-                string.Format("Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'", "RunConfiguration", "foo", "TargetPlatform"));
+            Assert.That.Throws<XmlException>(action)
+                        .WithMessage(string.Format("An error occurred while loading the settings.  Error: {0}.",
+                                        string.Format("Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'",
+                                            "RunConfiguration",
+                                            "foo",
+                                            "TargetPlatform")));
         }
 
         [TestMethod]
@@ -52,10 +54,12 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.X86, Framework.DefaultFramework, "temp");
 
-            ExceptionUtilities.ThrowsException<XmlException>(
-                action,
-                "An error occurred while loading the settings.  Error: {0}.",
-                string.Format("Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'", "RunConfiguration", "foo", "TargetFrameworkVersion"));
+            Assert.That.Throws<XmlException>(action)
+                        .WithMessage(string.Format("An error occurred while loading the settings.  Error: {0}.",
+                                        string.Format("Invalid setting '{0}'. Invalid value '{1}' specified for '{2}'",
+                                        "RunConfiguration",
+                                        "foo",
+                                        "TargetFrameworkVersion")));
         }
 
         [TestMethod]
@@ -203,11 +207,11 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Action action = () => InferRunSettingsHelper.UpdateRunSettingsWithUserProvidedSwitches(navigator, Architecture.ARM, Framework.DefaultFramework, "temp");
 
-            ExceptionUtilities.ThrowsException<SettingsException>(
-                action,
-                "Incompatible Target platform settings '{0}' with system architecture '{1}'.",
-                "ARM",
-                XmlRunSettingsUtilities.OSArchitecture.ToString());
+            Assert.That.Throws<SettingsException>(action)
+                .WithMessage(string.Format(
+                        "Incompatible Target platform settings '{0}' with system architecture '{1}'.",
+                        "ARM",
+                        XmlRunSettingsUtilities.OSArchitecture.ToString()));
         }
 
         [TestMethod]
