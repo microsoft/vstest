@@ -163,14 +163,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var testHostProcessName = (this.architecture == Architecture.X86) ? X86TestHostProcessName : X64TestHostProcessName;
             var currentWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(DefaultTestHostManager).GetTypeInfo().Assembly.Location), "..//");
             var argumentsString = " " + connectionInfo.ToCommandLineOptions();
-            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
-            if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
-                || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-            {
-                // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies inside Core CLR package folder.
-                testHostProcessName = Path.Combine("TestHost", testHostProcessName);
-            }
+            // "TestHost" is the name of the folder which contain Full CLR built testhost package assemblies.
+            testHostProcessName = Path.Combine("TestHost", testHostProcessName);
 
             if (!this.Shared)
             {
