@@ -11,9 +11,6 @@
     <AssemblyName>Microsoft.TestPlatform.CommunicationUtilities.UnitTests</AssemblyName>
     <EnableCodeAnalysis>true</EnableCodeAnalysis>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
-    <!-- It has dependency on two version of Newtonsoft.Json(8 and 9) and binding redirect of Newtonsoft.Json has been removed from testhost config file, hence we need it here -->
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CommunicationUtilities\Microsoft.TestPlatform.CommunicationUtilities.csproj" />
