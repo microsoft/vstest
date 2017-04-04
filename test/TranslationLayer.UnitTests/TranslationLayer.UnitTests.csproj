@@ -8,8 +8,11 @@
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' != 'net46' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
-    <AssemblyName>Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests</AssemblyName>
+    <AssemblyName>TranslationLayer.UnitTests</AssemblyName>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
+    <!-- It has dependency on two version of Newtonsoft.Json(8 and 9) and binding redirect of Newtonsoft.Json has been removed from testhost config file, hence we need it here -->
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.VsTestConsole.TranslationLayer\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />

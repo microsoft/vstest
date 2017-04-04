@@ -51,7 +51,6 @@ $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
 $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
-$env:TP_SRC_DIR = Join-Path $env:TP_ROOT_DIR "src"
 
 #
 # Dotnet configuration
@@ -218,12 +217,13 @@ function Publish-Package
     Write-Log "Package: Publish testhost.x86\testhost.x86.csproj"
     Publish-PackageInternal $testHostx86Project $TPB_TargetFramework $testhostFullPackageDir
 
-    # Copy over the Full CLR built testhost package assemblies to the $fullCLRPackageDir
-    Copy-Item $testhostFullPackageDir\* $fullCLRPackageDir -Force
-
-    # Copy over the Full CLR built testhost package assemblies to the Core CLR package folder.
+    # Copy over the Full CLR built testhost package assemblies to the Core CLR and Full CLR package folder.
     $netFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
+    New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
+
+    $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
 
@@ -266,6 +266,15 @@ function Publish-Package
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
+
+    # Copy dependency of Microsoft.TestPlatform.TestHostProvider
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\net45\Newtonsoft.Json.dll"
+    Write-Verbose "Copy-Item $newtonsoft $fullCLRPackageDir -Force"
+    Copy-Item $newtonsoft $fullCLRPackageDir -Force
+
+    $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\netstandard1.0\Newtonsoft.Json.dll"
+    Write-Verbose "Copy-Item $newtonsoft $coreCLR20PackageDir -Force"
+    Copy-Item $newtonsoft $coreCLR20PackageDir -Force
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
@@ -538,7 +547,7 @@ function Build-SpecificProjects
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.
-    Get-ChildItem -Recurse -Path $env:TP_SRC_DIR -Include *.csproj | ForEach-Object {
+    Get-ChildItem -Recurse -Path $env:TP_ROOT_DIR -Include *.csproj | ForEach-Object {
         foreach ($ProjectNamePattern in $ProjectNamePatterns) {
             if($_.FullName -match  $ProjectNamePattern) {
                 $ProjectsToBuild += ,"$_"
@@ -558,6 +567,11 @@ function Build-SpecificProjects
         PrintAndExit-OnError $output
         $output = & $dotnetPath build $ProjectToBuild
         PrintAndExit-OnError $output
+
+        if (-Not ($ProjectToBuild.FullName -contains "$($env:TP_ROOT_DIR)$([IO.Path]::DirectorySeparatorChar)src")) {
+            # Don't copy artifacts for non src folders.
+            continue;
+        }
 
         # Copy artifacts
         $ProjectDir = [System.IO.Path]::GetDirectoryName($ProjectToBuild)

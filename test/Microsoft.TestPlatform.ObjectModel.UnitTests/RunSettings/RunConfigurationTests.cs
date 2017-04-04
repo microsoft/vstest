@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using MSTest.TestFramework.AssertExtensions;
 
     [TestClass]
     public class RunConfigurationTests
@@ -106,10 +107,10 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var ex = Assert.ThrowsException<SettingsException>(
-              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml)
-            );
-            Assert.AreEqual(ex.Message, "Invalid settings 'RunConfiguration'.  Invalid value 'Foo' specified for 'BatchSize'.");
+            
+            Assert.That.Throws<SettingsException>(
+                    () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+                    .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'Foo' specified for 'BatchSize'.");
         }
 
         [TestMethod]
@@ -123,10 +124,9 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                      </RunConfiguration>
                 </RunSettings>";
 
-            var ex = Assert.ThrowsException<SettingsException>(
-              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml)
-            );
-            Assert.AreEqual(ex.Message, "Invalid settings 'RunConfiguration'.  Invalid value '-10' specified for 'BatchSize'.");
+            Assert.That.Throws<SettingsException>(
+              () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+              .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '-10' specified for 'BatchSize'.");
         }
 
         [DataRow(true)]
