@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Imports Common TestAssets props like TargetFrameworks. -->
-  <Import Project="..\TestAssets.props" />
+  <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>

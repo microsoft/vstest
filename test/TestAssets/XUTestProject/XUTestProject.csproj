@@ -3,7 +3,7 @@
   <!-- Package dependency versions -->
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
   <!-- Imports Common TestAssets props like TargetFrameworks. -->
-  <Import Project="..\TestAssets.props" />
+  <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <AssemblyName>XUTestProject</AssemblyName>
   </PropertyGroup>
