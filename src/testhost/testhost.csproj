@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
@@ -8,7 +8,7 @@
     <AssemblyName>testhost</AssemblyName>
     <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net46</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
+    <PackageTargetFallback Condition=" '$(TargetFramework)' != 'net46' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp1.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
