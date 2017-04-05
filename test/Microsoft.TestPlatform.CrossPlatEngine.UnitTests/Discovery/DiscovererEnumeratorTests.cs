@@ -57,7 +57,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                 l =>
                 l.SendMessage(
                     TestMessageLevel.Warning,
-                    "No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again."),
+                    "No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed."),
                 Times.Once);
         }
 

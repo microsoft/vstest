@@ -43,7 +43,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
+        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="NoMatchingExecutor">
@@ -69,11 +69,6 @@
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
         <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="new">Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">

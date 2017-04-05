@@ -111,9 +111,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="translated">未注册测试发现器来执行发现测试用例的操作。请注册测试发现器并重试。</target>
-        <note />
+        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed.</source>
+        <target state="new">未注册测试发现器来执行发现测试用例的操作。请注册测试发现器并重试。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">没有测试 discoverer 注册要执行的测试用例发现。注册测试 discoverer，然后重试。</target>
         </alt-trans>
@@ -164,11 +164,6 @@
           <target state-qualifier="mt-suggestion">没有测试匹配筛选器，因为它包含一个或多个属性无效 ({0})。指定筛选器表达式，其中包含有效的属性 ({1})，然后重试。</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="translated">找不到源“{0}”的 testhost.dll。请确保测试项目具有包 "microsoft.testplatform.testhost" 的 nuget 引用。</target>
-        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>

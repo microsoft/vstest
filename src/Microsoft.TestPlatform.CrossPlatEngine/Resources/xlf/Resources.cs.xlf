@@ -111,9 +111,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="translated">Není zaregistrovaný žádný nástroj zjišťování testů, který by mohl zjišťovat testovací případy. Zaregistrujte nástroj zjišťování testů a zkuste to znovu.</target>
-        <note />
+        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed.</source>
+        <target state="new">Není zaregistrovaný žádný nástroj zjišťování testů, který by mohl zjišťovat testovací případy. Zaregistrujte nástroj zjišťování testů a zkuste to znovu.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Provést zjišťování testových případů je registrován žádný test discoverer. Test discoverer registrovat a akci opakujte.</target>
         </alt-trans>
@@ -164,11 +164,6 @@
           <target state-qualifier="mt-suggestion">Žádné zkoušky odpovídá filtru, protože obsahuje jednu nebo více vlastností, které nejsou platné ({0}). Zadejte výraz filtru obsahující platné vlastnosti ({1}) a akci opakujte.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="translated">Nejde najít testhost.dll pro zdroj {0}. Ujistěte se, že testovací projekt má odkaz na balíček nuget microsoft.testplatform.testhost.</target>
-        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>

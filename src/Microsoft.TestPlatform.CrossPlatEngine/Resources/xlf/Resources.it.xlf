@@ -111,9 +111,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="translated">Non sono stati registrati agenti di individuazione test per eseguire l'individuazione di test case. Registrare un agente di individuazione test e riprovare.</target>
-        <note />
+        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed.</source>
+        <target state="new">Non sono stati registrati agenti di individuazione test per eseguire l'individuazione di test case. Registrare un agente di individuazione test e riprovare.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nessun discoverer di test è registrato per eseguire l'individuazione dei test case. Registrare un discoverer di test e riprovare.</target>
         </alt-trans>
@@ -164,11 +164,6 @@
           <target state-qualifier="mt-suggestion">Nessun test corrisponde al filtro perché contiene una o più proprietà che non sono validi ({0}). Specificare l'espressione di filtro contenente proprietà valida ({1}) e riprovare.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="translated">Il file testhost.dll per l'origine '{0}' non è stato trovato. Assicurarsi che il progetto di test includa un riferimento NuGet del pacchetto "microsoft.testplatform.testhost".</target>
-        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>

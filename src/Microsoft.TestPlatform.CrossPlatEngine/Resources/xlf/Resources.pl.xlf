@@ -111,9 +111,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="translated">Żaden wykrywacz testów nie został zarejestrowany na potrzeby wykrywania przypadków testowych. Zarejestruj wykrywacz testów i spróbuj ponownie.</target>
-        <note />
+        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed.</source>
+        <target state="new">Żaden wykrywacz testów nie został zarejestrowany na potrzeby wykrywania przypadków testowych. Zarejestruj wykrywacz testów i spróbuj ponownie.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Nie discoverer test jest zarejestrowany do wykrywania przypadków testowych. Zarejestruj test discoverer i spróbuj ponownie.</target>
         </alt-trans>
@@ -164,11 +164,6 @@
           <target state-qualifier="mt-suggestion">Żadne testy dopasowane filtru, ponieważ zawiera jeden lub więcej obiektów, które nie są prawidłowe ({0}). Określ wyrażenie filtru zawierające prawidłowe właściwości ({1}) i spróbuj ponownie.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="translated">Nie można znaleźć pliku testhost.dll dla źródła „{0}”. Upewnij się, że projekt testowy ma odwołanie nuget do pakietu „microsoft.testplatform.testhost”.</target>
-        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>

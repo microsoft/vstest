@@ -111,9 +111,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
       <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="translated">테스트 사례 검색을 수행하기 위한 테스트 Discoverer가 등록되지 않았습니다. 테스트 Discoverer를 등록하고 다시 시도하세요.</target>
-        <note />
+        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed.</source>
+        <target state="new">테스트 사례 검색을 수행하기 위한 테스트 Discoverer가 등록되지 않았습니다. 테스트 Discoverer를 등록하고 다시 시도하세요.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트 사례에 대 한 검색을 수행할 수 없는 테스트 discoverer 등록 됩니다. 테스트 discoverer를 등록 하 고 다시 시도 하십시오.</target>
         </alt-trans>
@@ -164,11 +164,6 @@
           <target state-qualifier="mt-suggestion">테스트가 잘못 되었습니다 ({0}) 없는 하나 이상의 속성을 포함 하기 때문에 필터를 일치 합니다. 유효한 속성 ({1})을 포함 하는 필터 식을 지정 하 고 다시 시도 하십시오.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="translated">소스 '{0}'에 대해 testhost.dll을 찾을 수 없습니다. 테스트 프로젝트에 패키지 "microsoft.testplatform.testhost"의 NuGet 참조가 있는지 확인하세요.</target>
-        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>

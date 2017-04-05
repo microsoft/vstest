@@ -11,8 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.Extensions.DependencyModel;
+    using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -26,7 +26,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -247,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                string message = string.Format(sourcePath);
+                string message = string.Format(Resources.NoTestHostFileExist, sourcePath);
                 EqtTrace.Verbose("DotnetTestHostmanager: " + message);
                 throw new FileNotFoundException(message);
             }

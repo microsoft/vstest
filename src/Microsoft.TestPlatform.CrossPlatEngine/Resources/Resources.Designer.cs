@@ -161,9 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("LaunchDebugProcessNotAllowedForANonDebugRun", resourceCulture);
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again..
+        ///   Looks up a localized string similar to No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed..
         /// </summary>
         internal static string NoDiscovererRegistered {
             get {
@@ -186,15 +186,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string NoMatchingExecutor {
             get {
                 return ResourceManager.GetString("NoMatchingExecutor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find testhost.dll for source &apos;{0}&apos;. Make sure test project has a nuget reference of package &quot;microsoft.testplatform.testhost&quot;..
-        /// </summary>
-        internal static string NoTestHostFileExist {
-            get {
-                return ResourceManager.GetString("NoTestHostFileExist", resourceCulture);
             }
         }
         
