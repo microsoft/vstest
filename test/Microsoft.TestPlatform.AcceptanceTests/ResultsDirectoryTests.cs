@@ -30,9 +30,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.IsTrue(File.Exists(trxFilePath), $"Expected Trx file: {trxFilePath} not created in results directory");
         }
 
-        //Getting Current directory C:\Windows\system32  https://github.com/Microsoft/vstest/issues/311
-        //Failed to create relative directory
-        [Ignore]
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
@@ -50,7 +47,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             if (Directory.Exists(resultsDirectory))
             {
-                Directory.Delete(resultsDirectory);
+                Directory.Delete(resultsDirectory, true);
             }
 
             this.InvokeVsTest(arguments);

@@ -426,6 +426,73 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostProcessStartInfoShouldIncludeTestHostPathFromSourceDirectoryIfNugetpathDoesntExist()
+        {
+            // Absolute path to the source directory
+            var sourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
+
+            string runtimeConfigFileContent =
+@"{
+    ""runtimeOptions"": {
+        ""additionalProbingPaths"": [
+            ""C:\\packages""
+            ]
+        }
+}";
+
+            string depsFileContent =
+@"{
+    ""runtimeTarget"": {
+        ""name"": "".NETCoreApp,Version=v1.0"",
+        ""signature"": ""8f25843f8e35a3e80ef4ae98b95117ea5c468b3f""
+    },
+    ""compilationOptions"": {},
+    ""targets"": {
+        "".NETCoreApp,Version=v1.0"": {
+            ""microsoft.testplatform.testhost/15.0.0-Dev"": {
+                ""dependencies"": {
+                    ""Microsoft.TestPlatform.ObjectModel"": ""15.0.0-Dev"",
+                    ""Newtonsoft.Json"": ""9.0.1""
+                },
+                ""runtime"": {
+                    ""lib/netstandard1.5/Microsoft.TestPlatform.CommunicationUtilities.dll"": { },
+                    ""lib/netstandard1.5/Microsoft.TestPlatform.CrossPlatEngine.dll"": { },
+                    ""lib/netstandard1.5/Microsoft.VisualStudio.TestPlatform.Common.dll"": { },
+                    ""lib/netstandard1.5/testhost.dll"": { }
+                }
+            }
+        }
+    },
+    ""libraries"": {
+        ""microsoft.testplatform.testhost/15.0.0-Dev"": {
+        ""type"": ""package"",
+        ""serviceable"": true,
+        ""sha512"": ""sha512-enO8sZmjbhXOfiZ6hV2ncaknaHnQbrGVsHUJzzu2Dmoh4fHFro4BF1Y4+sb4LOQhu4b3DFYPRj1ncd1RQK6HmQ=="",
+        ""path"": ""microsoft.testplatform.testhost/15.0.0-Dev"",
+        ""hashPath"": ""microsoft.testplatform.testhost.15.0.0-Dev""
+        }
+    }
+}";
+
+            MemoryStream runtimeConfigStream = new MemoryStream(Encoding.UTF8.GetBytes(runtimeConfigFileContent));
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.runtimeconfig.dev.json", FileMode.Open, FileAccess.ReadWrite)).Returns(runtimeConfigStream);
+            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.runtimeconfig.dev.json")).Returns(true);
+
+            MemoryStream depsFileStream = new MemoryStream(Encoding.UTF8.GetBytes(depsFileContent));
+            this.mockFileHelper.Setup(ph => ph.GetStream("\\tmp\\test.deps.json", FileMode.Open, FileAccess.ReadWrite)).Returns(depsFileStream);
+            this.mockFileHelper.Setup(ph => ph.Exists("\\tmp\\test.deps.json")).Returns(true);
+
+            string testHostFullPath = @"C:\packages\microsoft.testplatform.testhost/15.0.0-Dev\lib/netstandard1.5/testhost.dll";
+            this.mockFileHelper.Setup(ph => ph.Exists(testHostFullPath)).Returns(false);
+
+            string testHostPath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "testhost.dll");
+
+            var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, this.defaultConnectionInfo);
+
+            Assert.IsTrue(startInfo.Arguments.Contains(testHostPath));
+        }
+
+        [TestMethod]
         public async Task DotNetCoreErrorMessageShouldBeReadAsynchronouslyAsync()
         {
             var errorData = "Custom Error Strings";
