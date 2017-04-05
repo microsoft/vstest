@@ -71,12 +71,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void GetTypeUriShouldReturnThrowIfTypeIsNull()
+        public void GetTypeUriShouldThrowIfTypeIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
                 var uri = this.dataCollectionLoader.GetTypeUri(null);
-                });
+            });
         }
 
         [TestMethod]
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
                 var uri = this.dataCollectionLoader.GetFriendlyName(null);
-                });
+            });
         }
 
         [TestMethod]

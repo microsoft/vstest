@@ -378,7 +378,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     return;
                 }
 
-                dataCollectorConfig = new DataCollectorConfig(dataCollector.GetType());
+                dataCollectorConfig = new DataCollectorConfig(dataCollector.GetType(), this.dataCollectorLoader);
 
                 // Attempt to get the data collector information verifying that all of the required metadata for the collector is available.
                 dataCollectorInfo = new DataCollectorInformation(
