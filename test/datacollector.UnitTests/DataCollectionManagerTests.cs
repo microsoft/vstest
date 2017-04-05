@@ -53,6 +53,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             this.dataCollectorSettingsDisabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
             this.mockMessageSink = new Mock<IMessageSink>();
             this.mockDataCollectorLoader = new Mock<IDataCollectorLoader>();
+            this.mockDataCollectorLoader.Setup(x => x.GetFriendlyName(It.IsAny<Type>())).Returns("CustomDataCollector");
+            this.mockDataCollectorLoader.Setup(x => x.GetTypeUri(It.IsAny<Type>())).Returns(new Uri("my://custom/datacollector"));
 
             this.mockDataCollectorLoader.Setup(x => x.CreateInstance(this.mockDataCollector.Object.GetType())).Returns(this.mockDataCollector.Object);
             this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
