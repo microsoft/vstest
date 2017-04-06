@@ -5,16 +5,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -87,9 +86,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc/>
-        public bool CheckVersionWithTestHost()
+        public void CheckVersionWithTestHost()
         {
-            var success = false;
             this.communicationManager.SendMessage(MessageType.VersionCheck, payload: this.highestNegotiatedVersion);
 
             var message = this.communicationManager.ReceiveMessage();
@@ -97,21 +95,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (message.MessageType == MessageType.VersionCheck)
             {
                 var protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
-
-                // TODO: Should we check if this is valid ?
                 this.highestNegotiatedVersion = protocolVersion;
-                success = true;
+
+                EqtTrace.Info("TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.highestNegotiatedVersion);
             }
             else if (message.MessageType == MessageType.ProtocolError)
             {
-                EqtTrace.Error("TestRequestSender: VersionCheck Failed");
+                // TODO : Payload for ProtocolError needs to finalized.
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
             }
             else
             {
-                EqtTrace.Error("TestRequestSender: VersionCheck Message Expected but different message received: Received MessageType: {0}", message.MessageType);
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.UnexpectedMessage, MessageType.VersionCheck, message.MessageType));
             }
-
-            return success;
         }
 
         /// <inheritdoc/>

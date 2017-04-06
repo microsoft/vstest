@@ -143,10 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 if (checkRequired)
                 {
-                    if (!this.RequestSender.CheckVersionWithTestHost())
-                    {
-                        throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, "Protocol version check failed"));
-                    }
+                    this.RequestSender.CheckVersionWithTestHost();
                 }
 
                 this.initialized = true;

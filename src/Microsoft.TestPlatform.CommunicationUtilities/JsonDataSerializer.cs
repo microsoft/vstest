@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             T retValue = default(T);
 
             var versionedMessage = message as VersionedMessage;
-            var serializer = versionedMessage?.Version == 2 ? payloadSerializer2 : payloadSerializer;
+            var serializer = this.GetPayloadSerializer(versionedMessage?.Version);
 
             retValue = message.Payload.ToObject<T>(serializer);
             return retValue;
@@ -98,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>An instance of <see cref="T"/>.</returns>
         public T Deserialize<T>(string json, int version = 1)
         {
-            var serializer = version == 2 ? payloadSerializer2 : payloadSerializer;
+            var serializer = this.GetPayloadSerializer(version);
 
             using (var stringReader = new StringReader(json))
             using (var jsonReader = new JsonTextReader(stringReader))
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload, int version)
         {
-            var serializer = version == 2 ? payloadSerializer2 : payloadSerializer;
+            var serializer = this.GetPayloadSerializer(version);
             var serializedPayload = JToken.FromObject(payload, serializer);
 
             var message = version == 1 ?
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>JSON string.</returns>
         public string Serialize<T>(T data, int version = 1)
         {
-            var serializer = version == 2 ? payloadSerializer2 : payloadSerializer;
+            var serializer = this.GetPayloadSerializer(version);
 
             using (var stringWriter = new StringWriter())
             using (var jsonWriter = new JsonTextWriter(stringWriter))
@@ -167,6 +167,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 return stringWriter.ToString();
             }
+        }
+
+        private JsonSerializer GetPayloadSerializer(int? version)
+        {
+            return version == 2 ? payloadSerializer2 : payloadSerializer;
         }
     }
 }

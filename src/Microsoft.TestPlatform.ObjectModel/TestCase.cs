@@ -99,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.Id, value);
+                this.SetPropertyValue(TestCaseProperties.Id, value);
             }
         }
 
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.FullyQualifiedName, value);
+                this.SetPropertyValue(TestCaseProperties.FullyQualifiedName, value);
 
                 // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
                 this.defaultId = Guid.Empty;
@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.DisplayName, value);
+                this.SetPropertyValue(TestCaseProperties.DisplayName, value);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.ExecutorUri, value);
+                this.SetPropertyValue(TestCaseProperties.ExecutorUri, value);
             }
         }
 
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             private set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.Source, value);
+                this.SetPropertyValue(TestCaseProperties.Source, value);
 
                 // Id is based on Name/Source, will nulll out guid and it gets calc next time we access it.
                 this.defaultId = Guid.Empty;
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.CodeFilePath, value);
+                this.SetPropertyValue(TestCaseProperties.CodeFilePath, value);
             }
         }
 
@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestCaseProperties.LineNumber, value);
+                this.SetPropertyValue(TestCaseProperties.LineNumber, value);
             }
         }
 
@@ -241,6 +241,55 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;
             return EqtHash.GuidFromString(testcaseFullName);
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Return TestProperty's value
+        /// </summary>
+        /// <returns></returns>
+        protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            if (this.localStore.TryGetValue(property, out var value))
+            {
+                return value;
+            }
+
+            return base.ProtectedGetPropertyValue(property, defaultValue);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value
+        /// </summary>
+        protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestCase.Id":
+                case "TestCase.ExecutorUri":
+                case "TestCase.FullyQualifiedName":
+                case "TestCase.DisplayName":
+                case "TestCase.Source":
+                case "TestCase.CodeFilePath":
+                case "TestCase.LineNumber":
+                    if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
+                    {
+                        this.localStore[property] = value;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(property.Label);
+                    }
+                    return;
+            }
+            base.ProtectedSetPropertyValue(property, value);
         }
 
         #endregion

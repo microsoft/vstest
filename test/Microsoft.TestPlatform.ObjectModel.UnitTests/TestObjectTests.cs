@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
+    using System.Linq;
 
     [TestClass]
     public class TestObjectTests
@@ -39,8 +40,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var kvp = new KeyValuePair<TestProperty, object>(tp, 123);
             testCase.SetPropertyValue(kvp.Key, kvp.Value);
 
-            var properties = testCase.GetProperties();
-            properties.Contains(kvp);
+            var properties = testCase.GetProperties().ToList();
+            Assert.IsTrue(properties.Contains(kvp));
         }
     }
 }

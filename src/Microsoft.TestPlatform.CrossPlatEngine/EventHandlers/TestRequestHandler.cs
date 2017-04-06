@@ -231,20 +231,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
         {
-            this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases, protocolVersion);
+            this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases, this.protocolVersion);
         }
 
         /// <inheritdoc/>
         public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
         {
-            this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs, protocolVersion);
+            this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs, this.protocolVersion);
         }
 
         /// <inheritdoc/>
         public void SendLog(TestMessageLevel messageLevel, string message)
         {
             var testMessagePayload = new TestMessagePayload {MessageLevel = messageLevel,Message = message};
-            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, protocolVersion);
+            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -262,7 +262,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 ExecutorUris = executorUris
             };
 
-            this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload, protocolVersion);
+            this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload, this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -275,7 +275,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 IsAborted = isAborted
             };
 
-            this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, protocolVersion);
+            this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -289,7 +289,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 waitHandle.Set();
             };
 
-            this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo, protocolVersion);
+            this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo, this.protocolVersion);
 
             waitHandle.WaitOne();
             this.onAckMessageRecieved = null;

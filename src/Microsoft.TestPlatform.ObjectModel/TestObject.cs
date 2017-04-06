@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The store for all the local properties registered.
         /// </summary>
-        private readonly Dictionary<TestProperty, object> localStore;
+        protected readonly Dictionary<TestProperty, object> localStore;
 
         /// <summary>
         /// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
@@ -73,9 +73,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Returns the list of testproperties associated with the test object
         /// </summary>
         /// <returns></returns>
-        public List<KeyValuePair<TestProperty, object>> GetProperties()
+        public IEnumerable<KeyValuePair<TestProperty, object>> GetProperties()
         {
-            return this.store.Concat(this.localStore).ToList();
+            return this.localStore.Concat(this.store);
         }
 
         #endregion Fields
@@ -119,7 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public IEnumerable<TestProperty> Properties
         {
-            get { return this.store.Keys.Concat(this.localStore.Keys); }
+            get { return this.localStore.Keys.Concat(this.store.Keys); }
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 defaultValue = Activator.CreateInstance(valueType);
             }
 
-            return this.PrivateGetPropertyValue(property, defaultValue);
+            return this.ProtectedGetPropertyValue(property, defaultValue);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue(TestProperty property, object value)
         {
-            this.PrivateSetPropertyValue(property, value, this.store);
+            this.ProtectedSetPropertyValue(property, value);
         }
 
         /// <summary>
@@ -201,7 +201,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-
         /// <summary>
         /// Returns TestProperty's value 
         /// </summary>
@@ -211,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");
 
-            object objValue = this.PrivateGetPropertyValue(property, defaultValue);
+            object objValue = this.ProtectedGetPropertyValue(property, defaultValue);
 
             return ConvertPropertyTo<T>(property, culture, objValue);
         }
@@ -226,7 +225,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue, this.store);
+            this.ProtectedSetPropertyValue(property, objValue);
         }
 
         /// <summary>
@@ -239,18 +238,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue, this.store);
-        }
-
-        /// <summary>
-        /// Set TestProperty's value to the specified value T.
-        /// </summary>
-        protected void SetLocalPropertyValue<T>(TestProperty property, T value)
-        {
-            ValidateArg.NotNull(property, "property");
-
-            object objValue = ConvertPropertyFrom<T>(property, CultureInfo.InvariantCulture, value);
-            this.PrivateSetPropertyValue(property, objValue, this.localStore);
+            this.ProtectedSetPropertyValue(property, objValue);
         }
 
         #endregion Property Values
@@ -261,12 +249,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Return TestProperty's value
         /// </summary>
         /// <returns></returns>
-        private object PrivateGetPropertyValue(TestProperty property, object defaultValue)
+        protected virtual object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
         {
             ValidateArg.NotNull(property, "property");
 
             object value;
-            if (!this.store.TryGetValue(property, out value) && !this.localStore.TryGetValue(property, out value))
+            if (!this.store.TryGetValue(property, out value) )
             {
                 value = defaultValue;
             }
@@ -277,13 +265,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Set TestProperty's value
         /// </summary>
-        private void PrivateSetPropertyValue(TestProperty property, object value, Dictionary<TestProperty, object> dictionary)
+        protected virtual void ProtectedSetPropertyValue(TestProperty property, object value)
         {
             ValidateArg.NotNull(property, "property");
 
             if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
             {
-                dictionary[property] = value;
+                this.store[property] = value;
             }
             else
             {
@@ -295,7 +283,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Convert passed in value from TestProperty's specified value type.
         /// </summary>
         /// <returns>Converted object</returns>
-        internal static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
+        private static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
         {
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");

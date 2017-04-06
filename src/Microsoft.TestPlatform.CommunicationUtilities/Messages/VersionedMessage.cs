@@ -4,7 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     /// <summary>
-    /// New construct with version used for communication
+    /// Construct with version used for communication
+    /// Introduced in 15.1.0 version and default message protocol v2 onwards.
     /// </summary>
     public class VersionedMessage : Message
     {

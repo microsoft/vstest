@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.Outcome, value);
+                this.SetPropertyValue(TestResultProperties.Outcome, value);
             }
         }
 
@@ -88,7 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.ErrorMessage, value);
+                this.SetPropertyValue(TestResultProperties.ErrorMessage, value);
             }
         }
 
@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.ErrorStackTrace, value);
+                this.SetPropertyValue(TestResultProperties.ErrorStackTrace, value);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.DisplayName, value);
+                this.SetPropertyValue(TestResultProperties.DisplayName, value);
             }
         }
 
@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.ComputerName, value);
+                this.SetPropertyValue(TestResultProperties.ComputerName, value);
             }
         }
 
@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.Duration, value);
+                this.SetPropertyValue(TestResultProperties.Duration, value);
             }
         }
 
@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.StartTime, value);
+                this.SetPropertyValue(TestResultProperties.StartTime, value);
             }
         }
 
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             set
             {
-                this.SetLocalPropertyValue(TestResultProperties.EndTime, value);
+                this.SetPropertyValue(TestResultProperties.EndTime, value);
             }
         }
 
@@ -263,6 +263,56 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             return result.ToString();
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Return TestProperty's value
+        /// </summary>
+        /// <returns></returns>
+        protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            if (this.localStore.TryGetValue(property, out var value))
+            {
+                return value;
+            }
+
+            return base.ProtectedGetPropertyValue(property, defaultValue);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value
+        /// </summary>
+        protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestResult.DisplayName":
+                case "TestResult.ComputerName":
+                case "TestResult.Outcome":
+                case "TestResult.Duration":
+                case "TestResult.StartTime":
+                case "TestResult.EndTime":
+                case "TestResult.ErrorMessage":
+                case "TestResult.ErrorStackTrace":
+                    if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
+                    {
+                        this.localStore[property] = value;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(property.Label);
+                    }
+                    return;
+            }
+            base.ProtectedSetPropertyValue(property, value);
         }
 
         #endregion

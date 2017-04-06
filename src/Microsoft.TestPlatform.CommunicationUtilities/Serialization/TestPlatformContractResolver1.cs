@@ -20,8 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             {
                 contract.Converter = new TestCaseConverter();
             }
-
-            if (typeof(TestResult) == objectType)
+            else if (typeof(TestResult) == objectType)
             {
                 contract.Converter = new TestResultConverter();
             }

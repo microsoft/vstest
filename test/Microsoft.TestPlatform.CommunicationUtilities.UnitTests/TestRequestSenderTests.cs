@@ -77,29 +77,30 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.version };
             this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
-            var success = this.testRequestSender.CheckVersionWithTestHost();
+
+            this.testRequestSender.CheckVersionWithTestHost();
+
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
-            Assert.IsTrue(success);
         }
 
         [TestMethod]
-        public void VersionCheckWithTestHostShouldBeAbleToReceiveProtocolErrorAndReturnFalse()
+        public void VersionCheckWithTestHostShouldBeAbleToReceiveProtocolErrorAndThrowException()
         {
             var message = new Message() { MessageType = MessageType.ProtocolError, Payload = this.version };
             this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
-            var success = this.testRequestSender.CheckVersionWithTestHost();
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
-            Assert.IsFalse(success);
+
+            var ex = Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
+            Assert.AreEqual("Protocol version check failed. Make sure test runner and host are compatible.", ex.Message);
         }
 
         [TestMethod]
-        public void VersionCheckWithTestHostForInvalidMessageShouldReturnFalse()
+        public void VersionCheckWithTestHostForInvalidMessageShouldThrowException()
         {
             var message = new Message() { MessageType = MessageType.TestCasesFound, Payload = null };
             this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
-            var success = this.testRequestSender.CheckVersionWithTestHost();
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.version), Times.Once);
-            Assert.IsFalse(success);
+
+            var ex = Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
+            Assert.AreEqual("Unexpected message received. Expected MessageType : ProtocolVersion Actual MessageType: TestDiscovery.TestFound", ex.Message);
         }
 
         [TestMethod]

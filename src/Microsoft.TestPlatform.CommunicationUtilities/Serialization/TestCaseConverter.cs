@@ -7,7 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Newtonsoft.Json;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Converter used by v1 protocol serializer to serialize TestCase object to and from v1 json
+    /// </summary>
     public class TestCaseConverter : JsonConverter
     {
         /// <inheritdoc/>
@@ -22,6 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         /// <inheritdoc/>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
+            // We do not need this as SetPropetyValue inside StoreKvpList will
+            // set the properties as expected.
             throw new NotImplementedException();
         }
 
