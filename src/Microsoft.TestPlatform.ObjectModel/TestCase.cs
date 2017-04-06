@@ -77,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the id of the test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public Guid Id
         {
             get
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the fully qualified name of the test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string FullyQualifiedName
         {
             get
@@ -126,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the display name of the test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string DisplayName
         {
             get
@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the Uri of the Executor to use for running this test.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public Uri ExecutorUri
         {
             get
@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets the test container source from which the test is discovered.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string Source
         {
             get
@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the source code file path of the test.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string CodeFilePath
         {
             get
@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the line number of the test.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public int LineNumber
         {
             get
@@ -241,6 +241,55 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             string testcaseFullName = this.ExecutorUri + source + this.FullyQualifiedName;
             return EqtHash.GuidFromString(testcaseFullName);
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Return TestProperty's value
+        /// </summary>
+        /// <returns></returns>
+        protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            if (this.localStore.TryGetValue(property, out var value))
+            {
+                return value;
+            }
+
+            return base.ProtectedGetPropertyValue(property, defaultValue);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value
+        /// </summary>
+        protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestCase.Id":
+                case "TestCase.ExecutorUri":
+                case "TestCase.FullyQualifiedName":
+                case "TestCase.DisplayName":
+                case "TestCase.Source":
+                case "TestCase.CodeFilePath":
+                case "TestCase.LineNumber":
+                    if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
+                    {
+                        this.localStore[property] = value;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(property.Label);
+                    }
+                    return;
+            }
+            base.ProtectedSetPropertyValue(property, value);
         }
 
         #endregion

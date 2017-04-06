@@ -22,6 +22,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
         private const string TestDiscoveryStartMessageWithDummyPayload = "{\"MessageType\":\"TestDiscovery.Start\",\"Payload\":\"Dummy Payload\"}";
 
+        private const string TestDiscoveryStartMessageWithVersionAndPayload = "{\"Version\":2,\"MessageType\":\"TestDiscovery.Start\",\"Payload\":\"Dummy Payload\"}";
+
         private const string DummyPayload = "Dummy Payload";
 
         private readonly SocketCommunicationManager communicationManager;
@@ -188,6 +190,16 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         }
 
         [TestMethod]
+        public async Task SendMessageWithPayloadShouldSerializeAndSendThePayloadWithVersionStamped()
+        {
+            var client = await this.StartServerAndWaitForConnection();
+
+            this.communicationManager.SendMessage(MessageType.StartDiscovery, DummyPayload, 2);
+
+            Assert.AreEqual(TestDiscoveryStartMessageWithVersionAndPayload, this.ReadFromStream(client.GetStream()));
+        }
+
+        [TestMethod]
         public async Task SendMessageWithRawMessageShouldNotSerializeThePayload()
         {
             var client = await this.StartServerAndWaitForConnection();
@@ -217,12 +229,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public async Task ReceiveMessageAsyncShouldReceiveDeserializedMessage()
         {
             var client = await this.StartServerAndWaitForConnection();
-            this.WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithDummyPayload);
+            this.WriteToStream(client.GetStream(), TestDiscoveryStartMessageWithVersionAndPayload);
 
             var message = await this.communicationManager.ReceiveMessageAsync(CancellationToken.None);
-
-            Assert.AreEqual(MessageType.StartDiscovery, message.MessageType);
-            Assert.AreEqual(DummyPayload, message.Payload);
+            var versionedMessage = message as VersionedMessage;
+            Assert.AreEqual(MessageType.StartDiscovery, versionedMessage.MessageType);
+            Assert.AreEqual(DummyPayload, versionedMessage.Payload);
+            Assert.AreEqual(2, versionedMessage.Version);
         }
 
         [TestMethod]

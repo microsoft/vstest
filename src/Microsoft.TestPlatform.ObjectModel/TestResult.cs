@@ -61,7 +61,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the outcome of a test case.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public TestOutcome Outcome
         {
             get
@@ -78,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the exception message.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string ErrorMessage
         {
             get
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the exception stack trace.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string ErrorStackTrace
         {
             get
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the TestResult Display name. Used for Data Driven Test (i.e. Data Driven Test. E.g. InlineData in xUnit)
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string DisplayName
         {
             get
@@ -139,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets test result ComputerName.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public string ComputerName
         {
             get
@@ -156,7 +156,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the test result Duration.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public TimeSpan Duration
         {
             get
@@ -173,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the test result StartTime.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public DateTimeOffset StartTime
         {
             get
@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets test result EndTime.
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember]
         public DateTimeOffset EndTime
         {
             get
@@ -207,7 +207,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         #endregion
 
         #region Methods
-        
+
 
         /// <inheritdoc/>
         public override string ToString()
@@ -263,6 +263,56 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             return result.ToString();
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Return TestProperty's value
+        /// </summary>
+        /// <returns></returns>
+        protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            if (this.localStore.TryGetValue(property, out var value))
+            {
+                return value;
+            }
+
+            return base.ProtectedGetPropertyValue(property, defaultValue);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value
+        /// </summary>
+        protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestResult.DisplayName":
+                case "TestResult.ComputerName":
+                case "TestResult.Outcome":
+                case "TestResult.Duration":
+                case "TestResult.StartTime":
+                case "TestResult.EndTime":
+                case "TestResult.ErrorMessage":
+                case "TestResult.ErrorStackTrace":
+                    if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
+                    {
+                        this.localStore[property] = value;
+                    }
+                    else
+                    {
+                        throw new ArgumentException(property.Label);
+                    }
+                    return;
+            }
+            base.ProtectedSetPropertyValue(property, value);
         }
 
         #endregion
@@ -339,7 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", "TestResult Display Name", typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", "Computer Name", string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", "Computer Name", typeof(string), TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", "Outcome", string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
@@ -363,7 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", Resources.Resources.TestResultPropertyDisplayNameLabel, typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.Resources.TestResultPropertyComputerNameLabel, string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.Resources.TestResultPropertyComputerNameLabel, typeof(string), TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", Resources.Resources.TestResultPropertyOutcomeLabel, string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
@@ -383,12 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", Resources.Resources.TestResultPropertyErrorStackTraceLabel, typeof(string), typeof(TestResult));
 #endif
-
-        private static bool ValidateComputerName(object value)
-        {
-            return !string.IsNullOrWhiteSpace((string)value);
-        }
-
+        
         private static bool ValidateOutcome(object value)
         {
             return (TestOutcome)value <= TestOutcome.NotFound && (TestOutcome)value >= TestOutcome.None;
