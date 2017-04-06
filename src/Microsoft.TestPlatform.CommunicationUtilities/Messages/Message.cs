@@ -6,6 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// Construct used for communication
+    /// </summary>
     public class Message
     {
         /// <summary>
