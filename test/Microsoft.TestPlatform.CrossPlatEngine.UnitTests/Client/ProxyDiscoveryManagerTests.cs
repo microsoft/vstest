@@ -38,7 +38,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
-            this.mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Returns(true);
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,

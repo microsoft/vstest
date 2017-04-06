@@ -37,7 +37,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
-            this.mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Returns(true);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
         }
 
@@ -156,7 +155,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelShouldThrowExceptionIfVersionCheckFails()
         {
             // Make the version check fail
-            this.mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Returns(false);
+            this.mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Throws(new TestPlatformException("Version check failed"));
             Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(Enumerable.Empty<string>()));
         }
 
