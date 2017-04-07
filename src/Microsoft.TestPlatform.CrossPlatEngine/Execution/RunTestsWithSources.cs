@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     TestMessageLevel.Warning,
                     string.Format(
                         CultureInfo.CurrentUICulture,
-                        CrossPlatEngineResources.TestRunFailed_NoTestsAreAvailableInTheSources,
+                        CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources,
                         sourcesString));
             }
         }
