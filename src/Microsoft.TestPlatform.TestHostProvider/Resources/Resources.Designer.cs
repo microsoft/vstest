@@ -62,7 +62,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Could not find testhost.dll for source &apos;{0}&apos;. Make sure test project has a nuget reference of package &quot;Microsoft.NET.Test.Sdk&quot;. And also check the framework argument passed..
+        ///   Looks up a localized string similar to No test is available in {0}. Make sure test project has a nuget reference of package &quot;Microsoft.NET.Test.Sdk&quot; and framework version settings are appropriate and try again..
         /// </summary>
         internal static string NoTestHostFileExist {
             get {

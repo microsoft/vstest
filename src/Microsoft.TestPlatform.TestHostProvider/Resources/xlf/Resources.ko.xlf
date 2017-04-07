@@ -3,7 +3,7 @@
   <file datatype="xml" source-language="en" target-language="ko" original="../Resources.resx" build-num="1470250083">
     <body>
       <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk". And also check the framework argument passed.</source>
+        <source>No test is available in {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate and try again.</source>
         <target state="new">Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdkt". And also check the framework passed when running test.</target>
         <note></note>
       </trans-unit>

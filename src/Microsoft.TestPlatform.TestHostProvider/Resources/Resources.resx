@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="NoTestHostFileExist" xml:space="preserve">
-    <value>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk". And also check the framework argument passed.</value>
+    <value>No test is available in {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate and try again.</value>
   </data>
 </root>

@@ -152,9 +152,6 @@
   <data name="LaunchDebugProcessNotAllowedForANonDebugRun" xml:space="preserve">
     <value>This operation is not allowed in the context of a non-debug run.</value>
   </data>
-  <data name="NoDiscovererRegistered" xml:space="preserve">
-    <value>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again. And also check the framework argument passed.</value>
-  </data>
   <data name="NoDotnetExeFound" xml:space="preserve">
     <value>Could not find {0}. Make sure that the dotnet is installed on the machine.</value>
   </data>
@@ -171,8 +168,8 @@
   <data name="TestHostExitedWithError" xml:space="preserve">
     <value>Testhost process exited with error: {0}</value>
   </data>
-  <data name="TestRunFailed_NoTestsAreAvailableInTheSources" xml:space="preserve">
-    <value>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</value>
+  <data name="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources" xml:space="preserve">
+    <value>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</value>
   </data>
   <data name="UnsupportedPropertiesInTestCaseFilter" xml:space="preserve">
     <value>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</value>
