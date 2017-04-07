@@ -38,7 +38,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             TestDiscoveryExtensionManager.Destroy();
         }
-        
+
         [TestMethod]
         public void LoadTestsShouldReportWarningOnNoDiscoverers()
         {
@@ -53,12 +53,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             this.discovererEnumerator.LoadTests(extensionSourceMap, new Mock<IRunSettings>().Object, mockLogger.Object);
 
+            var messageFormat =
+                "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
+            var message = string.Format(messageFormat, string.Join(" ", sources));
+
             mockLogger.Verify(
                 l =>
-                l.SendMessage(
-                    TestMessageLevel.Warning,
-                    "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again."),
-                Times.Once);
+                l.SendMessage(TestMessageLevel.Warning, message), Times.Once);
         }
 
         [TestMethod]
@@ -97,12 +98,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
                 var settings = new Mock<IRunSettings>().Object;
                 var logger = new Mock<IMessageLogger>().Object;
-                
+
                 this.discovererEnumerator.LoadTests(extensionSourceMap, settings, logger);
 
                 Assert.IsTrue(DllTestDiscoverer.IsDiscoverTestCalled);
                 Assert.IsFalse(JsonTestDiscoverer.IsDiscoverTestCalled);
-                
+
                 // Also validate that the right set of arguments were passed on to the discoverer.
                 CollectionAssert.AreEqual(sources, DllTestDiscoverer.Sources.ToList());
                 Assert.AreEqual(settings, DllTestDiscoverer.DiscoveryContext.RunSettings);
@@ -217,7 +218,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
                                       "test1.cs",
                                       typeof(DiscoveryResultCacheTests).GetTypeInfo().Assembly.Location
                                   };
-                
+
                 var extensionSourceMap = new Dictionary<string, IEnumerable<string>>();
                 extensionSourceMap.Add("_none_", sources);
 
@@ -276,8 +277,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
             }
             finally
             {
-             this.ResetDiscoverers();   
-            }            
+                this.ResetDiscoverers();
+            }
         }
 
         [TestMethod]
