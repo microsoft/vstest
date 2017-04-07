@@ -37,5 +37,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <param name="payload">Payload of the message</param>
         /// <returns>Raw Serialized message</returns>
         string SerializePayload(string messageType, object payload);
+
+        /// <summary>
+        /// Serializes and creates a raw message given a message type and the object payload
+        /// </summary>
+        /// <param name="messageType">Message Type</param>
+        /// <param name="payload">Payload of the message</param>
+        /// <param name="version">version to be sent</param>
+        /// <returns>Raw Serialized message</returns>
+        string SerializePayload(string messageType, object payload, int version);
     }
 }

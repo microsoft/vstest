@@ -960,7 +960,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     JsonSerializer.Create(
                         new JsonSerializerSettings
                         {
-                            ContractResolver = new TestPlatformContractResolver(),
+                            ContractResolver = new DefaultTestPlatformContractResolver(),
                             TypeNameHandling = TypeNameHandling.None
                         }))
             };
