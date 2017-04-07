@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.Runtime.Serialization;
@@ -40,6 +41,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.TestCase = testCase;
             this.Messages = new Collection<TestResultMessage>();
             this.Attachments = new Collection<AttachmentSet>();
+            this.StartTime = DateTime.Now;
+            this.EndTime = DateTime.Now;
         }
 
         #endregion
@@ -56,158 +59,76 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Gets the list of attachment sets for this TestResult.
         /// </summary>
         [DataMember]
-        public Collection<AttachmentSet> Attachments { get; private set; }
+        public Collection<AttachmentSet> Attachments { get; set; }
 
         /// <summary>
         /// Gets or sets the outcome of a test case.
         /// </summary>
         [DataMember]
-        public TestOutcome Outcome
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.Outcome, TestOutcome.None);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.Outcome, value);
-            }
-        }
+        public TestOutcome Outcome { get; set; }
 
         /// <summary>
         /// Gets or sets the exception message.
         /// </summary>
         [DataMember]
-        public string ErrorMessage
-        {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.ErrorMessage, value);
-            }
-        }
+        public string ErrorMessage { get; set; }
 
         /// <summary>
         /// Gets or sets the exception stack trace.
         /// </summary>
         [DataMember]
-        public string ErrorStackTrace
-        {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.ErrorStackTrace, value);
-            }
-        }
+        public string ErrorStackTrace { get; set; }
 
         /// <summary>
         /// Gets or sets the TestResult Display name. Used for Data Driven Test (i.e. Data Driven Test. E.g. InlineData in xUnit)
         /// </summary>
         [DataMember]
-        public string DisplayName
-        {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.DisplayName, value);
-            }
-        }
+        public string DisplayName { get; set; }
 
         /// <summary>
         /// Gets the test messages.
         /// </summary>
         [DataMember]
-        public Collection<TestResultMessage> Messages
-        {
-            get;
-            private set;
-        }
+        public Collection<TestResultMessage> Messages { get; set; }
 
         /// <summary>
         /// Gets or sets test result ComputerName.
         /// </summary>
         [DataMember]
-        public string ComputerName
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.ComputerName, string.Empty);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.ComputerName, value);
-            }
-        }
+        public string ComputerName { get; set; }
 
         /// <summary>
         /// Gets or sets the test result Duration.
         /// </summary>
         [DataMember]
-        public TimeSpan Duration
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.Duration, TimeSpan.Zero);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.Duration, value);
-            }
-        }
+        public TimeSpan Duration { get; set; }
 
         /// <summary>
         /// Gets or sets the test result StartTime.
         /// </summary>
         [DataMember]
-        public DateTimeOffset StartTime
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.StartTime, DateTimeOffset.Now);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.StartTime, value);
-            }
-        }
+        public DateTimeOffset StartTime { get; set; }
 
         /// <summary>
         /// Gets or sets test result EndTime.
         /// </summary>
         [DataMember]
-        public DateTimeOffset EndTime
+        public DateTimeOffset EndTime { get; set; }
+
+        /// <summary>
+        /// Returns the TestProperties currently specified in this TestObject.
+        /// </summary>
+        public override IEnumerable<TestProperty> Properties
         {
             get
             {
-                return this.GetPropertyValue(TestResultProperties.EndTime, DateTimeOffset.Now);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.EndTime, value);
+                return TestResultProperties.Properties.Concat(base.Properties);
             }
         }
 
         #endregion
 
         #region Methods
-
 
         /// <inheritdoc/>
         public override string ToString()
@@ -277,9 +198,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             ValidateArg.NotNull(property, "property");
 
-            if (this.localStore.TryGetValue(property, out var value))
+            switch (property.Id)
             {
-                return value;
+                case "TestResult.DisplayName":
+                    return this.DisplayName;
+                case "TestResult.ComputerName":
+                    return this.ComputerName;
+                case "TestResult.Outcome":
+                    return this.Outcome;
+                case "TestResult.Duration":
+                    return this.Duration;
+                case "TestResult.CodeFilePath":
+                    return this.StartTime;
+                case "TestResult.EndTime":
+                    return this.EndTime;
+                case "TestResult.ErrorMessage":
+                    return this.ErrorMessage;
+                case "TestResult.ErrorStackTrace":
+                    return this.ErrorStackTrace;
             }
 
             return base.ProtectedGetPropertyValue(property, defaultValue);
@@ -295,22 +231,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             switch (property.Id)
             {
                 case "TestResult.DisplayName":
+                    this.DisplayName = (string)value; return;
                 case "TestResult.ComputerName":
+                    this.ComputerName = (string)value; return;
                 case "TestResult.Outcome":
+                    this.Outcome = (TestOutcome)value; return;
                 case "TestResult.Duration":
+                    this.Duration = (TimeSpan)value; return;
                 case "TestResult.StartTime":
+                    this.StartTime = (DateTimeOffset)value; return;
                 case "TestResult.EndTime":
+                    this.EndTime = (DateTimeOffset)value; return;
                 case "TestResult.ErrorMessage":
+                    this.ErrorMessage = (string)value; return;
                 case "TestResult.ErrorStackTrace":
-                    if (property.ValidateValueCallback == null || property.ValidateValueCallback(value))
-                    {
-                        this.localStore[property] = value;
-                    }
-                    else
-                    {
-                        throw new ArgumentException(property.Label);
-                    }
-                    return;
+                    this.ErrorStackTrace = (string)value; return;
             }
             base.ProtectedSetPropertyValue(property, value);
         }
@@ -384,6 +319,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public static class TestResultProperties
     {
+        private static List<TestProperty> properties = new List<TestProperty>
+                {
+                    DisplayName,
+                    ComputerName,
+                    Outcome,
+                    Duration,
+                    DisplayName,
+                    StartTime,
+                    EndTime,
+                    ErrorMessage,
+                    ErrorStackTrace
+        };
+
 #if !FullCLR
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", "TestResult Display Name", typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
@@ -433,7 +381,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", Resources.Resources.TestResultPropertyErrorStackTraceLabel, typeof(string), typeof(TestResult));
 #endif
-        
+        internal static List<TestProperty> Properties => properties;
+
         private static bool ValidateOutcome(object value)
         {
             return (TestOutcome)value <= TestOutcome.NotFound && (TestOutcome)value >= TestOutcome.None;
