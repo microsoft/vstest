@@ -37,7 +37,7 @@ function Verify-Signature
     $artifactsDirectory = Join-Path $env:TP_OUT_DIR $TPB_Configuration
     foreach ($pattern in $TPB_AssembliesPattern) {
         Write-Log "... Pattern: $pattern"
-        Get-ChildItem -Recurse -Include $pattern $artifactsDirectory | Where-Object { -not $_.PSIsContainer } | % {
+        Get-ChildItem -Recurse -Include $pattern $artifactsDirectory | Where-Object { (!$_.PSIsContainer) -and !($($_.FullName).Contains('VSIX\obj')) } | % {
             $signature = Get-AuthenticodeSignature -FilePath $_.FullName
 
             if ($signature.Status -eq "Valid") {
