@@ -226,6 +226,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private bool DiscoverTestsAndSelectSpecified(IEnumerable<string> sources)
         {
             this.output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
+            if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+            {
+                this.output.WriteLine(string.Format(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile), OutputLevel.Information);
+            }
+
             return this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = sources, RunSettings = this.effectiveRunSettings }, this.discoveryEventsRegistrar);
         }

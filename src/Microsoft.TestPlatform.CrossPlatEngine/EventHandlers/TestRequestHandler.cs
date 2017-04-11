@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Utility class to fecilitate the IPC comunication. Acts as Client.
@@ -97,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
                         if (!string.IsNullOrEmpty(EqtTrace.LogFile))
                         {
-                            this.SendLog(TestMessageLevel.Informational, string.Format("Logging TestHost Diagnostics in file: {0}", EqtTrace.LogFile));
+                            this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
                         }
                         break;
 

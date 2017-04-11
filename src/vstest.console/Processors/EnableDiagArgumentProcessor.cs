@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
@@ -127,12 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(CommandLineResources.EnableDiagUsage);
             }
 
-            // Checking if the file is readonly
-            if (this.fileHelper.Exists(argument) && this.IsFileReadOnly(argument))
-            {
-                throw new CommandLineException(string.Format(CommandLineResources.LoggerFileIsReadOnly, argument));
-            }
-            else if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
+            if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
             {
                 // Throwing error if the argument is just path and not a file
                 throw new CommandLineException(CommandLineResources.EnableDiagUsage);
@@ -144,6 +140,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (!string.IsNullOrEmpty(logDirectory) && !this.fileHelper.DirectoryExists(logDirectory))
             {
                 this.fileHelper.CreateDirectory(logDirectory);
+            }
+
+            // Find full path and send this to testhost so that vstest and testhost create logs at same location.
+            argument = Path.GetFullPath(argument);
+
+            try
+            {
+                // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of creating file.
+                using (this.fileHelper.Open(argument, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)) { }
+            }
+            catch (Exception e)
+            {
+                throw new CommandLineException(e.Message);
             }
 
             EqtTrace.InitializeVerboseTrace(argument);

@@ -78,10 +78,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorThrowsIfFileIsReadOnly()
+        public void EnableDiagArgumentProcessorExecutorThrowsIfFileDotOpenThrow()
         {
-            this.mockFileHelper.Setup(fh => fh.Exists(this.dummyFilePath)).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.GetFileAttributes(this.dummyFilePath)).Returns(FileAttributes.ReadOnly);
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
+            this.mockFileHelper.Setup(fh => fh.Open(Path.GetFullPath(this.dummyFilePath), FileMode.Append, FileAccess.Write, FileShare.ReadWrite)).Throws(new System.UnauthorizedAccessException());
 
             Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath));
         }

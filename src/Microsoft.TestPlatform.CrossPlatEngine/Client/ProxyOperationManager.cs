@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using System.Reflection;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -80,11 +81,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 var portNumber = this.RequestSender.InitializeCommunication();
                 var processId = this.processHelper.GetCurrentProcessId();
-                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
+
+                var logFileName = this.GetTimestampedLogFile(EqtTrace.LogFile);
+                try
+                {
+                    if (!string.IsNullOrEmpty(logFileName))
+                    {
+                        // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of creating file.
+                        using (new FileHelper().Open(logFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)) { }
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new TestPlatformException(e.Message);
+                }
+
+                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = string.IsNullOrWhiteSpace(logFileName) ? null : AddDoubleQuotes(logFileName) };
 
                 // Get the test process start info
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
-                
+
                 // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
                 this.testHostManager.HostExited += this.TestHostManagerHostExited;
@@ -206,6 +222,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostProcessStdError = e.Data;
 
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
+        }
+
+        private string AddDoubleQuotes(string x)
+        {
+            return "\"" + x + "\"";
         }
     }
 }
