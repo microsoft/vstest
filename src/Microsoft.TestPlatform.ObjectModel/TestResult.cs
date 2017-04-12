@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.Linq;
     using System.Runtime.Serialization;
     using System.Text;
 

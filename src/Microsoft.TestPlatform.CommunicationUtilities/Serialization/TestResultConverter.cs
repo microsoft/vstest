@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-    
+
     /// <summary>
     /// Converter used by v1 protocol serializer to serialize TestResult object to and from v1 json
     /// </summary>
