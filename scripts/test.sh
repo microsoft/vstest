@@ -53,6 +53,7 @@ done
 #
 TP_ROOT_DIR=$(cd "$(dirname "$0")"; pwd -P)
 TP_TOOLS_DIR="$TP_ROOT_DIR/tools"
+TP_PACKAGES_DIR="$TP_ROOT_DIR/packages"
 TP_OUT_DIR="$TP_ROOT_DIR/artifacts"
 
 #
