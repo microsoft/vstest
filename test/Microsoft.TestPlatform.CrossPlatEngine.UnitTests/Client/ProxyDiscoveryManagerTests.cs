@@ -72,6 +72,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 // Setup Mocks.
                 TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "c:\\e1.dll", "c:\\e2.dll" });
 
                 this.testDiscoveryManager.Initialize();
 
@@ -95,7 +96,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             {
                 TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.dll" });
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });
 
                 this.testDiscoveryManager.Initialize();
 
@@ -138,7 +139,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
         {
-            // System.Diagnostics.Debugger.Launch();
             // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
             Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();

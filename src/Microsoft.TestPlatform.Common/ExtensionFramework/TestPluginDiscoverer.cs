@@ -13,9 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 #if !NET46
     using System.Runtime.Loader;
 #endif
@@ -50,35 +47,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Gets information about each of the test extensions available.
         /// </summary>
-        /// <param name="pathToExtensions"> The path to the extensions. </param>
-        /// <param name="loadOnlyWellKnownExtensions"> Should load only well known extensions or all. </param>
-        /// <returns> The <see cref="TestExtensions"/>. </returns>
-        public TestExtensions GetTestExtensionsInformation(
-            IEnumerable<string> pathToExtensions,
-            bool loadOnlyWellKnownExtensions)
+        /// <param name="extensionPaths">
+        /// The path to the extensions.
+        /// </param>
+        /// <param name="loadOnlyWellKnownExtensions">
+        /// Should load only well known extensions or all. 
+        /// </param>
+        /// <returns>
+        /// The <see cref="Dictionary"/>` of assembly qualified name and testplugin information.
+        /// </returns>
+        public Dictionary<string, TPluginInfo> GetTestExtensionsInformation<TPluginInfo, TExtension>(
+            IEnumerable<string> extensionPaths,
+            bool loadOnlyWellKnownExtensions) where TPluginInfo : TestPluginInformation
         {
-            Debug.Assert(pathToExtensions != null);
+            Debug.Assert(extensionPaths != null);
 
-            var testExtensions = new TestExtensions
-            {
-                TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>(StringComparer.OrdinalIgnoreCase),
-                TestExecutors = new Dictionary<string, TestExecutorPluginInformation>(StringComparer.OrdinalIgnoreCase),
-                TestSettingsProviders = new Dictionary<string, TestSettingsProviderPluginInformation>(StringComparer.OrdinalIgnoreCase),
-                TestLoggers = new Dictionary<string, TestLoggerPluginInformation>(StringComparer.OrdinalIgnoreCase),
-                TestHosts = new Dictionary<string, TestRuntimePluginInformation>(StringComparer.OrdinalIgnoreCase)
-            };
-
+            var pluginInfos = new Dictionary<string, TPluginInfo>();
 
 #if !WINDOWS_UAP
 
-            this.GetTestExtensionsFromFiles(
-                pathToExtensions.ToArray(),
-                loadOnlyWellKnownExtensions,
-                testExtensions.TestDiscoverers,
-                testExtensions.TestExecutors,
-                testExtensions.TestSettingsProviders,
-                testExtensions.TestLoggers,
-                testExtensions.TestHosts);
+            this.GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), loadOnlyWellKnownExtensions, pluginInfos);
 
 #else
             var fileSearchTask = Windows.ApplicationModel.Package.Current.InstalledLocation.GetFilesAsync().AsTask();
@@ -94,31 +82,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                                 ).
                                 Select<IStorageFile, string>(file => file.Name);
 
-            GetTestExtensionsFromFiles(
-                    binaries.ToArray(),
-                    loadOnlyWellKnownExtensions,
-                    testDiscoverers,
-                    testExecutors,
-                    testSettingsProviders,
-                    testLoggers);
+            GetTestExtensionsFromFiles<TPluginInfo, TExtension>(binaries.ToArray(), loadOnlyWellKnownExtensions, pluginInfos);
 
             // In Release mode - managed dlls are packaged differently
             // So, file search will not find them - do it manually
             if (testDiscoverers.Count < 1)
             {
-                GetTestExtensionsFromFiles(
+                GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
                         new string[3] {
                         "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll",
                         "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll",
                         "Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll",},
                         loadOnlyWellKnownExtensions,
-                        testDiscoverers,
-                        testExecutors,
-                        testSettingsProviders,
-                        testLoggers);
+                        pluginInfos);
             }
 #endif
-            return testExtensions;
+            return pluginInfos;
         }
 
         #endregion
@@ -128,28 +107,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Gets test extension information from the given colletion of files.
         /// </summary>
-        /// <param name="files">List of dll's to check for test extension availability</param>
-        /// <param name="loadOnlyWellKnownExtensions">Should load only well known extensions or all.</param>
-        /// <param name="testDiscoverers">Test discoverers collection to add to.</param>
-        /// <param name="testExecutors">Test executors collection to add to.</param>
-        /// <param name="testSettingsProviders">Test settings providers collection to add to.</param>
-        /// <param name="testLoggers">Test loggers collection to add to.</param>
+        /// <typeparam name="TPluginInfo">
+        /// Type of Test Plugin Information.
+        /// </typeparam>
+        /// <typeparam name="TExtension">
+        /// Type of extension.
+        /// </typeparam>
+        /// <param name="files">
+        /// List of dll's to check for test extension availability
+        /// </param>
+        /// <param name="loadOnlyWellKnownExtensions">
+        /// Should load only well known extensions or all.
+        /// </param>
+        /// <param name="pluginInfos">
+        /// Test plugins collection to add to.
+        /// </param>
         [SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We would like to continue discovering all plugins even if some dll in Extensions folder is not able to be load properly")]
-        private void GetTestExtensionsFromFiles(
-                        string[] files,
-                        bool loadOnlyWellKnownExtensions,
-                        Dictionary<string, TestDiscovererPluginInformation> testDiscoverers,
-                        Dictionary<string, TestExecutorPluginInformation> testExecutors,
-                        Dictionary<string, TestSettingsProviderPluginInformation> testSettingsProviders,
-                        Dictionary<string, TestLoggerPluginInformation> testLoggers,
-                        Dictionary<string, TestRuntimePluginInformation> testHosts)
+        private void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
+            string[] files,
+            bool loadOnlyWellKnownExtensions,
+            Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
         {
             Debug.Assert(files != null, "null files");
-            Debug.Assert(testDiscoverers != null, "null testDiscoverers");
-            Debug.Assert(testExecutors != null, "null testExecutors");
-            Debug.Assert(testSettingsProviders != null, "null testSettingsProviders");
-            Debug.Assert(testLoggers != null, "null testLoggers");
+            Debug.Assert(pluginInfos != null, "null pluginInfos");
 
             // TODO: Do not see why loadOnlyWellKnowExtensions is still needed.
             //AssemblyName executingAssemblyName = null;
@@ -166,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 {
                     var assemblyName = Path.GetFileNameWithoutExtension(file);
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
-                    
+
                     // Check whether this assembly is known or not. 
                     //if (loadOnlyWellKnownExtensions && assembly != null)
                     //{
@@ -186,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 if (assembly != null)
                 {
-                    this.GetTestExtensionsFromAssembly(assembly, testDiscoverers, testExecutors, testSettingsProviders, testLoggers, testHosts);
+                    this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
                 }
             }
         }
@@ -195,25 +176,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets test extensions from a given assembly.
         /// </summary>
         /// <param name="assembly">Assembly to check for test extension availability</param>
-        /// <param name="testDiscoverers">Test discoverers collection to add to.</param>
-        /// <param name="testExecutors">Test executors collection to add to.</param>
-        /// <param name="testSettingsProviders">Test settings providers collection to add to.</param>
-        /// <param name="testLoggers">Test loggers collection to add to.</param>
-        private void GetTestExtensionsFromAssembly(
-                        Assembly assembly,
-                        Dictionary<string, TestDiscovererPluginInformation> testDiscoverers,
-                        Dictionary<string, TestExecutorPluginInformation> testExecutors,
-                        Dictionary<string, TestSettingsProviderPluginInformation> testSettingsProviders,
-                        Dictionary<string, TestLoggerPluginInformation> testLoggers,
-                        Dictionary<string, TestRuntimePluginInformation> testHosts)
+        /// <param name="pluginInfos">Test extensions collection to add to.</param>
+        /// <typeparam name="TPluginInfo">
+        /// Type of Test Plugin Information.
+        /// </typeparam>
+        /// <typeparam name="TExtension">
+        /// Type of Extensions.
+        /// </typeparam>
+        private void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos) where TPluginInfo : TestPluginInformation
         {
             Debug.Assert(assembly != null, "null assembly");
-            Debug.Assert(testDiscoverers != null, "null testDiscoverers");
-            Debug.Assert(testExecutors != null, "null testExecutors");
-            Debug.Assert(testSettingsProviders != null, "null testSettingsProviders");
-            Debug.Assert(testLoggers != null, "null testLoggers");
+            Debug.Assert(pluginInfos != null, "null pluginInfos");
 
-            Type[] types = null;
+            Type[] types;
             try
             {
                 types = assembly.GetTypes();
@@ -239,11 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 {
                     if (type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract)
                     {
-                        this.GetTestExtensionFromType<TestDiscovererPluginInformation>(type, typeof(ITestDiscoverer), testDiscoverers);
-                        this.GetTestExtensionFromType<TestExecutorPluginInformation>(type, typeof(ITestExecutor), testExecutors);
-                        this.GetTestExtensionFromType<TestLoggerPluginInformation>(type, typeof(ITestLogger), testLoggers);
-                        this.GetTestExtensionFromType<TestSettingsProviderPluginInformation>(type, typeof(ISettingsProvider), testSettingsProviders);
-                        this.GetTestExtensionFromType<TestRuntimePluginInformation>(type, typeof(ITestRuntimeProvider), testHosts);
+                        this.GetTestExtensionFromType(type, typeof(TExtension), pluginInfos);
                     }
                 }
             }
@@ -252,21 +223,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Attempts to find a test extension from given type.
         /// </summary>
-        /// <typeparam name="TPluginInfo">Data type of the test plugin information</typeparam>
-        /// <param name="type">Type to inspect for being test extension</param>
-        /// <param name="extensionType">Test extension type to look for.</param>
-        /// <param name="extensionCollection">Test extensions collection to add to.</param>
-        /// <returns>True if test extension is found, false otherwise.</returns>
+        /// <typeparam name="TPluginInfo">
+        /// Type of the test plugin information
+        /// </typeparam>
+        /// <param name="type">
+        /// Type to inspect for being test extension
+        /// </param>
+        /// <param name="extensionType">
+        /// Test extension type to look for.
+        /// </param>
+        /// <param name="extensionCollection">
+        /// Test extensions collection to add to.
+        /// </param>
         private void GetTestExtensionFromType<TPluginInfo>(
-                                                    Type type,
-                                                    Type extensionType,
-                                                    Dictionary<string, TPluginInfo> extensionCollection)
-                                                    where TPluginInfo : TestPluginInformation
+            Type type,
+            Type extensionType,
+            Dictionary<string, TPluginInfo> extensionCollection)
+            where TPluginInfo : TestPluginInformation
         {
             if (extensionType.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
-                var dataObject = Activator.CreateInstance(typeof(TPluginInfo), type);
-                var pluginInfo = (TPluginInfo)dataObject;
+                var rawPluginInfo = Activator.CreateInstance(typeof(TPluginInfo), type);
+                var pluginInfo = (TPluginInfo)rawPluginInfo;
 
                 if (extensionCollection.ContainsKey(pluginInfo.IdentifierData))
                 {

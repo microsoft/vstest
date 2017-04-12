@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testPlatformEventSource.AdapterSearchStart();
 
             // Start using these additional extensions
-            TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
+            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
             this.LoadExtensions();
 
             this.testPlatformEventSource.AdapterSearchStop();

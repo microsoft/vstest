@@ -13,8 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
@@ -119,11 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var sourceList = sources.ToList();
-            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList).ToList();
-            if (TestPluginCache.Instance.PathToAdditionalExtensions != null)
-            {
-                extensions.AddRange(TestPluginCache.Instance.PathToAdditionalExtensions);
-            }
+            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.PathToAdditionalExtensions).ToList();
 
             // Only send this if needed.
             if (extensions.Count > 0)

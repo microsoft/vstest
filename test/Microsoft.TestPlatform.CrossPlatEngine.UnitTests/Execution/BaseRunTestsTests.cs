@@ -63,12 +63,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 null,
                 this.mockTestRunEventsHandler.Object,
                 this.mockTestPlatformEventSource.Object);
+
+            TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
         }
 
         [TestCleanup]
         public void Cleanup()
         {
             TestExecutorExtensionManager.Destroy();
+            TestPluginCacheTests.ResetExtensionsCache();
         }
 
         #region Constructor tests
@@ -99,7 +102,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         #endregion
-        
+
         #region RunTests tests
 
         [TestMethod]
@@ -192,7 +195,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsShouldAbortIfExecutorUriExtensionMapIsNull()
         {
-            TestRunCompleteEventArgs receivedCompleteArgs = null; 
+            TestRunCompleteEventArgs receivedCompleteArgs = null;
 
             // Setup mocks.
             this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return null; };
@@ -223,7 +226,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void RunTestsShouldInvokeTheTestExecutorIfAdapterAssemblyIsKnown()
         {
-            var assemblyLocation = typeof (BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
             var executorUriExtensionMap = new List<Tuple<Uri, string>>
             {
                 new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
@@ -237,7 +240,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 {
                     receivedExecutor = executor;
                 };
-            
+
             this.runTestsInstance.RunTests();
 
             Assert.IsNotNull(receivedExecutor);
@@ -260,9 +263,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 {
                     receivedExecutor = executor;
                 };
-            TestPluginCacheTests.SetupMockExtensions(
-                new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location },
-                () => { });
 
             this.runTestsInstance.RunTests();
 
@@ -274,7 +274,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void RunTestsShouldInstrumentExecutionStart()
         {
             this.runTestsInstance.RunTests();
-                    
+
             this.mockTestPlatformEventSource.Verify(x => x.ExecutionStart(), Times.Once);
         }
 
@@ -284,8 +284,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.SetupExecutorUriMock();
 
-            this.runTestsInstance.RunTests();     
-                   
+            this.runTestsInstance.RunTests();
+
             this.mockTestPlatformEventSource.Verify(x => x.ExecutionStop(It.IsAny<long>()), Times.Once);
         }
 
@@ -339,7 +339,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 runtimeVersion);
             this.mockTestRunEventsHandler.Verify(
                 treh => treh.HandleLogMessage(TestMessageLevel.Warning, expectedWarningMessage), Times.Once);
-            
+
             // Should not have been called.
             Assert.IsNull(receivedExecutor);
         }
@@ -355,7 +355,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             // Setup mocks.
             this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
-            
+
             this.runTestsInstance.RunTests();
 
             Assert.AreEqual(0, this.runTestsInstance.GetExecutorUrisThatRanTests.Count);
@@ -382,7 +382,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             this.runTestsInstance.RunTests();
 
-            var expectedUris = new string[] {BaseRunTestsExecutorUri.ToLower()};
+            var expectedUris = new string[] { BaseRunTestsExecutorUri.ToLower() };
             CollectionAssert.AreEqual(expectedUris, this.runTestsInstance.GetExecutorUrisThatRanTests.ToArray());
         }
 
@@ -607,9 +607,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 {
                     receivedExecutor = executor;
                 };
-            TestPluginCacheTests.SetupMockExtensions(
-                new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location },
-                () => { });
         }
         #endregion
 
@@ -634,7 +631,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             public
                 Action
                     <LazyExtension<ITestExecutor, ITestExecutorCapabilities>, Tuple<Uri, string>, RunContext,
-                        IFrameworkHandle> InvokeExecutorCallback { get; set; }
+                        IFrameworkHandle> InvokeExecutorCallback
+            { get; set; }
 
             /// <summary>
             /// Gets the run settings.
@@ -685,17 +683,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             public void Cancel()
             {
-                
+
             }
 
             public void RunTests(IEnumerable<string> sources, IRunContext runContext, IFrameworkHandle frameworkHandle)
             {
-                
+
             }
 
             public void RunTests(IEnumerable<TestCase> tests, IRunContext runContext, IFrameworkHandle frameworkHandle)
             {
-                
+
             }
         }
 

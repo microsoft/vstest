@@ -27,16 +27,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -195,6 +198,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // Initialize Runsettings with defaults
             RunSettingsManager.Instance.AddDefaultRunSettings();
 
+            // Default extensions path is required because RunTests argument processor has dependency on TestEngine, which further has dependency on TestRuntimeExtensionManager, which currently loads runtimeprovider from extensions folder.
+            this.UpdateDefaultExtensions();
+
             // Ensure we have an action argument.
             this.EnsureActionArgumentIsPresent(processors, processorFactory);
 
@@ -337,6 +343,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
             this.Output.WriteLine(string.Empty, OutputLevel.Information);
+        }
+
+        private void UpdateDefaultExtensions()
+        {
+            var fileHelper = new FileHelper();
+            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(Executor).GetTypeInfo().Assembly.Location), "Extensions");
+            var defaultExtensionPaths = new List<string>();
+            if (fileHelper.DirectoryExists(extensionsFolder))
+            {
+                var dlls = fileHelper.EnumerateFiles(extensionsFolder, ".*.dll", SearchOption.TopDirectoryOnly);
+                defaultExtensionPaths.AddRange(dlls);
+                var exes = fileHelper.EnumerateFiles(extensionsFolder, ".*.exe", SearchOption.TopDirectoryOnly);
+                defaultExtensionPaths.AddRange(exes);
+
+                TestPluginCache.Instance.UpdateExtensions(defaultExtensionPaths, true);
+            }
         }
 
         #endregion

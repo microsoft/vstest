@@ -14,10 +14,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     /// <summary>
     /// Responsible for managing the Test Discoverer extensions which are available.
     /// </summary>
-    internal class TestDiscoveryExtensionManager 
+    internal class TestDiscoveryExtensionManager
     {
         #region Fields
-        
+
         private static TestDiscoveryExtensionManager testDiscoveryExtensionManager;
 
         #endregion
@@ -79,7 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
                 TestPluginManager.Instance
-                    .GetTestExtensions<ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+                    .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+                        TestPlatformConstants.TestAdapterRegexPattern,
                         out unfilteredTestExtensions,
                         out testExtensions);
 
@@ -106,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
             TestPluginManager.Instance
-                .GetTestExtensions<ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+                .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     extensionAssembly,
                     out unfilteredTestExtensions,
                     out testExtensions);

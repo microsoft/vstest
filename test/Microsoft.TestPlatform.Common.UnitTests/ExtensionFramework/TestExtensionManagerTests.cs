@@ -1,20 +1,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
-using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
+    using System;
+    using System.Collections.Generic;
+
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     [TestClass]
     public class TestExtensionManagerTests
     {
@@ -29,11 +29,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             TestPluginCacheTests.SetupMockExtensions();
             messageLogger = TestSessionMessageLogger.Instance;
-            TestPluginManager.Instance.GetTestExtensions<ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>
-                                            (out unfilteredTestExtensions, out filteredTestExtensions);
-
-
-
+            TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>
+                (TestPlatformConstants.TestLoggerRegexPattern, out unfilteredTestExtensions, out filteredTestExtensions);
         }
 
         [TestCleanup]
@@ -46,10 +43,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void TestExtensionManagerConstructorShouldThrowExceptionIfMessageLoggerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, null);
-            }
-                );
+                    {
+                        testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, null);
+                    }
+            );
         }
 
         [TestMethod]
@@ -69,10 +66,10 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
             TestPluginCacheTests.SetupMockAdditionalPathExtensions();
             Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                var result = testExtensionManager.TryGetTestExtension(default(Uri));
-            }
-        );
+                    {
+                        var result = testExtensionManager.TryGetTestExtension(default(Uri));
+                    }
+            );
         }
 
         [TestMethod]
@@ -100,6 +97,5 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public DummyTestExtensionManager(IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions, IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> testExtensions, IMessageLogger logger) : base(unfilteredTestExtensions, testExtensions, logger)
         {
         }
-
     }
 }

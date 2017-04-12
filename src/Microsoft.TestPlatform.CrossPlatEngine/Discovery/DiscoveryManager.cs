@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             this.testPlatformEventSource.AdapterSearchStart();
 
             // Start using these additional extensions
-            TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
+            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
 
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);

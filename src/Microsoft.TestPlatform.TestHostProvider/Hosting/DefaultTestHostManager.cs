@@ -10,9 +10,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -21,6 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// The default test host launcher for the engine.
@@ -193,8 +196,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
         {
+            var fileHelper = new FileHelper();
+            if (extensions != null && extensions.Count() > 0)
+            {
+                var adapters = new List<string>();
+                var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
+                return extensions.Where(ext => regex.IsMatch(ext)).ToList();
+            }
+
             // Default test host manager doesn't provide custom acquisition or discovery of
             // test platform extensions.
             return Enumerable.Empty<string>();
