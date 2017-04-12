@@ -221,11 +221,11 @@ function Publish-Package
     $netFull_Dir = "TestHost"
     $fullDestDir = Join-Path $coreCLR20PackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
 
     $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
-    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force
+    Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
 
     if ($lastExitCode -ne 0) {
         Set-ScriptFailed

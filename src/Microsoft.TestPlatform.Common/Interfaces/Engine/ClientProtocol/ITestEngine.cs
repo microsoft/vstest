@@ -14,24 +14,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// <summary>
         /// Fetches the DiscoveryManager for this engine. This manager would provide all functionality required for discovery.
         /// </summary>
-        /// <param name="testHostManager">
-        /// Test host manager for the current test discovery.
-        /// </param>
-        /// <param name="discoveryCriteria">
-        /// The discovery Criteria.
-        /// </param>
+        /// <param name="testHostManager">Test host manager for the current test discovery.</param>
+        /// <param name="discoveryCriteria">The discovery Criteria.</param>
+        /// <param name="protocolConfig">Protocol related information.</param>
         /// <returns>
         /// ITestDiscoveryManager object that can do discovery
         /// </returns>
-        IProxyDiscoveryManager GetDiscoveryManager(ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria);
+        IProxyDiscoveryManager GetDiscoveryManager(ITestRuntimeProvider testHostManager, DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Fetches the ExecutionManager for this engine. This manager would provide all functionality required for execution.
         /// </summary>
         /// <param name="testHostManager">Test host manager for current test run.</param>
         /// <param name="testRunCriteria">TestRunCriteria of the current test run</param>
+        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>ITestExecutionManager object that can do execution</returns>
-        IProxyExecutionManager GetExecutionManager(ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria);
+        IProxyExecutionManager GetExecutionManager(ITestRuntimeProvider testHostManager, TestRunCriteria testRunCriteria, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Fetches the extension manager for this engine. This manager would provide extensibility

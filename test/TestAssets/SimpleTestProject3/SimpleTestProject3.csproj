@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- Imports Common TestAssets props like TargetFrameworks. -->
+  <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <!-- Package dependency versions -->
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
 
   <PropertyGroup>
     <AssemblyName>SimpleTestProject3</AssemblyName>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net46</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework">

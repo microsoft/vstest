@@ -163,15 +163,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again..
-        /// </summary>
-        internal static string NoDiscovererRegistered {
-            get {
-                return ResourceManager.GetString("NoDiscovererRegistered", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Could not find {0}. Make sure that the dotnet is installed on the machine..
         /// </summary>
         internal static string NoDotnetExeFound {
@@ -186,15 +177,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string NoMatchingExecutor {
             get {
                 return ResourceManager.GetString("NoMatchingExecutor", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find testhost.dll for source &apos;{0}&apos;. Make sure test project has a nuget reference of package &quot;microsoft.testplatform.testhost&quot;..
-        /// </summary>
-        internal static string NoTestHostFileExist {
-            get {
-                return ResourceManager.GetString("NoTestHostFileExist", resourceCulture);
             }
         }
         
@@ -228,11 +210,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again..
+        ///   Looks up a localized string similar to No test is available in {0}. Make sure that test discoverers &amp; executors are registered and platform &amp; framework version settings are appropriate and try again..
         /// </summary>
-        internal static string TestRunFailed_NoTestsAreAvailableInTheSources {
+        internal static string TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources
+        {
             get {
-                return ResourceManager.GetString("TestRunFailed_NoTestsAreAvailableInTheSources", resourceCulture);
+                return ResourceManager.GetString("TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources", resourceCulture);
             }
         }
         

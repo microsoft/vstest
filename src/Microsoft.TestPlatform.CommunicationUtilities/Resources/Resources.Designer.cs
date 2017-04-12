@@ -107,5 +107,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
                 return ResourceManager.GetString("DataCollectorUriForLogMessage", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}.
+        /// </summary>
+        internal static string UnexpectedMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("UnexpectedMessage", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Protocol version check failed. Make sure test runner and host are compatible..
+        /// </summary>
+        internal static string VersionCheckFailed
+        {
+            get
+            {
+                return ResourceManager.GetString("VersionCheckFailed", resourceCulture);
+            }
+        }
     }
 }

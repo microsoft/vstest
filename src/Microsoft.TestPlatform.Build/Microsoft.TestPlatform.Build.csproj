@@ -10,17 +10,17 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.3' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>
   </PropertyGroup>
-  <ItemGroup >
+  <ItemGroup>
     <Content Include="Microsoft.TestPlatform.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework">
-      <Version>14.3.0</Version>
+      <Version>15.1.548</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Utilities.Core">
-      <Version>14.3.0</Version>
+      <Version>15.1.548</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />

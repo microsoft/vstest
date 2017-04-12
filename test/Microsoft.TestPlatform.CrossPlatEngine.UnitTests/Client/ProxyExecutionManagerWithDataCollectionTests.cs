@@ -47,7 +47,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.testableClientConnectionTimeout);
             this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            this.proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var mockDataCollectionLauncher = new Mock<IDataCollectionLauncher>();
             var proxyDataCollectonManager = new ProxyDataCollectionManager(string.Empty, mockRequestSender.Object, this.mockProcessHelper.Object, mockDataCollectionLauncher.Object);
 
-            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, proxyDataCollectonManager);
+            var proxyExecutionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, proxyDataCollectonManager);
             proxyExecutionManager.Initialize();
             Assert.IsNotNull(proxyExecutionManager.DataCollectionRunEventsHandler.Messages);
             Assert.AreEqual(TestMessageLevel.Error, proxyExecutionManager.DataCollectionRunEventsHandler.Messages[0].Item1);
@@ -126,7 +126,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var testProcessStartInfo = new TestProcessStartInfo();
             testProcessStartInfo.Arguments = string.Empty;
 
-            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            var proxyExecutionManager = new TestableProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
             proxyExecutionManager.UpdateTestProcessStartInfoWrapper(testProcessStartInfo);
 
             Assert.IsTrue(testProcessStartInfo.Arguments.Contains("--datacollectionport 0"));
@@ -135,7 +135,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
     internal class TestableProxyExecutionManagerWithDataCollection : ProxyExecutionManagerWithDataCollection
     {
-        public TestableProxyExecutionManagerWithDataCollection(ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager, proxyDataCollectionManager)
+        public TestableProxyExecutionManagerWithDataCollection(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testRequestSender, testHostManager, proxyDataCollectionManager)
         {
         }
 
