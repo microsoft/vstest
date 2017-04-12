@@ -81,7 +81,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         public void EnableDiagArgumentProcessorExecutorDoesNotThrowsIfFileDotOpenThrow()
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.Open(Path.GetFullPath(this.dummyFilePath), FileMode.Append, FileAccess.Write, FileShare.ReadWrite)).Throws(new System.UnauthorizedAccessException());
 
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
         }
@@ -113,7 +112,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void EnableDiagArgumentProcessorExecutorShouldDisableVerboseLoggingIfEqtTraceThowException()
         {
-            System.Diagnostics.Debugger.Launch();
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
 
