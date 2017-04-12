@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -32,6 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         private readonly Mock<ICommunicationManager> mockCommunicationManager;
 
         private readonly DesignModeClient designModeClient;
+
+        private readonly int protocolVersion = 1;
 
         public DesignModeClientTests()
         {
@@ -56,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [TestMethod]
         public void DesignModeClientConnectShouldSetupChannel()
         {
-            var verCheck = new Message { MessageType = MessageType.VersionCheck };
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -66,13 +69,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.Verify(cm => cm.SetupClientAsync(PortNumber), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Once());
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>()), Times.Once());
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once());
         }
 
         [TestMethod]
         public void DesignModeClientConnectShouldNotSendConnectedIfServerConnectionTimesOut()
         {
-            var verCheck = new Message { MessageType = MessageType.VersionCheck };
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };
             var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
@@ -83,6 +86,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.SessionConnected), Times.Never);
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>()), Times.Never);
+        }
+
+        [TestMethod]
+        public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsGreaterThanSupportedVersion()
+        {
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 3 };
+            var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+            
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once());
+        }
+
+        [TestMethod]
+        public void DesignModeClientDuringConnectShouldHighestCommonVersionWhenReceivedVersionIsSmallerThanSupportedVersion()
+        {
+            var verCheck = new Message { MessageType = MessageType.VersionCheck, Payload = 1 };
+            var sessionEnd = new Message { MessageType = MessageType.SessionEnd };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, 1), Times.Once());
         }
 
         [TestMethod]
@@ -115,15 +144,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                         trm.RunTests(
                             It.IsAny<TestRunRequestPayload>(),
                             It.IsAny<ITestHostLauncher>(),
-                            It.IsAny<ITestRunEventsRegistrar>()))
+                            It.IsAny<ITestRunEventsRegistrar>(),
+                            It.IsAny<ProtocolConfig>()))
                 .Callback(
                     (TestRunRequestPayload trp,
                      ITestHostLauncher testHostManager,
-                     ITestRunEventsRegistrar testRunEventsRegistrar) =>
+                     ITestRunEventsRegistrar testRunEventsRegistrar,
+                     ProtocolConfig config) =>
                         {
                             allTasksComplete.Set();
                             receivedTestRunPayload = trp;
-                        });
+                        }
+                    );
 
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
                 .Returns(getProcessStartInfoMessage)
@@ -175,11 +207,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 trm.RunTests(
                     It.IsAny<TestRunRequestPayload>(),
                     It.IsAny<ITestHostLauncher>(),
-                    It.IsAny<ITestRunEventsRegistrar>()))
+                    It.IsAny<ITestRunEventsRegistrar>(),
+                    It.IsAny<ProtocolConfig>()))
                 .Callback(
                     (TestRunRequestPayload trp,
                      ITestHostLauncher testHostManager,
-                     ITestRunEventsRegistrar testRunEventsRegistrar) =>
+                     ITestRunEventsRegistrar testRunEventsRegistrar,
+                     ProtocolConfig config) =>
                     {
                         allTasksComplete.Set();
                         receivedTestRunPayload = trp;

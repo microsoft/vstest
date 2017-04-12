@@ -33,8 +33,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// </summary>
+        /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
-        public ProxyExecutionManager(ITestRuntimeProvider testHostManager) : this(new TestRequestSender(), testHostManager, Constants.ClientConnectionTimeout)
+        public ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestSender, testHostManager, Constants.ClientConnectionTimeout)
         {
         }
 
