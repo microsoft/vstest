@@ -78,12 +78,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorThrowsIfFileDotOpenThrow()
+        public void EnableDiagArgumentProcessorExecutorDoesNotThrowsIfFileDotOpenThrow()
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
             this.mockFileHelper.Setup(fh => fh.Open(Path.GetFullPath(this.dummyFilePath), FileMode.Append, FileAccess.Write, FileShare.ReadWrite)).Throws(new System.UnauthorizedAccessException());
 
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath));
+            this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
         }
 
         [TestMethod]
@@ -111,11 +111,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorShouldEnableVerboseLogging()
+        public void EnableDiagArgumentProcessorExecutorShouldDisableVerboseLoggingIfEqtTraceThowException()
         {
+            System.Diagnostics.Debugger.Launch();
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
 
-            Assert.IsTrue(EqtTrace.IsVerboseEnabled);
+            Assert.IsTrue(!EqtTrace.IsVerboseEnabled);
 #if NET46
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else

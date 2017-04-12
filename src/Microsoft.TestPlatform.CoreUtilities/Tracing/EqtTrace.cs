@@ -72,6 +72,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        public static string ErrorOnInitialization
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Gets a value indicating whether tracing error statements is enabled.
         /// </summary>

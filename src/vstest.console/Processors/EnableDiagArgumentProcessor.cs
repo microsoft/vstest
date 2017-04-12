@@ -147,15 +147,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             try
             {
-                // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of creating file.
-                using (this.fileHelper.Open(argument, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)) { }
+                // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of initialization.
+                EqtTrace.InitializeVerboseTrace(argument);
             }
             catch (Exception e)
             {
-                throw new CommandLineException(e.Message);
+                ConsoleOutput.Instance.Warning(e.Message);
             }
-
-            EqtTrace.InitializeVerboseTrace(argument);
         }
 
         /// <summary>

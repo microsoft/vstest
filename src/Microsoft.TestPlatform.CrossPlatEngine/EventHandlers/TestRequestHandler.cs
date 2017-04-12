@@ -100,6 +100,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         {
                             this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
                         }
+                        else if(!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                        {
+                            this.SendLog(TestMessageLevel.Warning, EqtTrace.ErrorOnInitialization);
+                        }
                         break;
 
                     case MessageType.DiscoveryInitialize:

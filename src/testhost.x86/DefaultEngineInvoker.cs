@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class DefaultEngineInvoker :
 #if NET46
@@ -41,7 +42,14 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             string logFile;
             if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
             {
-                EqtTrace.InitializeVerboseTrace(logFile);
+                try
+                {
+                    EqtTrace.InitializeVerboseTrace(logFile);
+                }
+                catch(Exception e)
+                {
+                    EqtTrace.ErrorOnInitialization = e.Message;
+                }
             }
 
 #if NET46

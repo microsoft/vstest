@@ -151,6 +151,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             LogFile = customLogFile;
             TraceLevel = TraceLevel.Verbose;
             Source.Switch.Level = SourceLevels.All;
+            try
+            {
+                // Ensure trace is initlized
+                EnsureTraceIsInitialized();
+            }
+            catch
+            {
+                this.UnInitializeVerboseTrace();
+                throw;
+            }
         }
 
         /// <inheritdoc/>
@@ -285,9 +295,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(message != null, "message != null");
             Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
 
-            // Ensure trace is initlized
-            EnsureTraceIsInitialized();
-
             // The format below is a CSV so that Excel could be used easily to
             // view/filter the logs.
             var log = string.Format(
@@ -321,10 +328,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             Debug.Assert(e != null, "e != null");
 
-            EnsureTraceIsInitialized();
-
             try
             {
+                EnsureTraceIsInitialized();
+
                 // Note: Debug.WriteLine may throw if there is a problem in .config file.
                 Debug.WriteLine("Ignore exception: " + e);
             }
@@ -363,6 +370,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Debug.Fail("Should never get here!");
                     return TraceLevel.Verbose;
             }
+        }
+
+        private void UnInitializeVerboseTrace()
+        {
+            isInitialized = false;
+
+            LogFile = null;
+            TraceLevel = TraceLevel.Off;
+            Source.Switch.Level = SourceLevels.Off;
         }
     }
 }

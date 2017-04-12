@@ -58,11 +58,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return new FileInfo(path).Attributes;
         }
-
-        /// <inheritdoc/>
-        public FileStream Open(string path, FileMode mode, FileAccess access, FileShare share)
-        {
-            return File.Open(path, mode, access, share);
-        }
     }
 }

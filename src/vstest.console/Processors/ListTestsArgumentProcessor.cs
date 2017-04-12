@@ -19,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Argument Executor for the "-lt|--ListTests|/lt|/ListTests" command line argument.
@@ -211,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                this.output.WriteLine(string.Format(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile), OutputLevel.Information);
+                this.output.Information(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;

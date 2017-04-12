@@ -83,18 +83,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var processId = this.processHelper.GetCurrentProcessId();
 
                 var logFileName = this.GetTimestampedLogFile(EqtTrace.LogFile);
-                try
-                {
-                    if (!string.IsNullOrEmpty(logFileName))
-                    {
-                        // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of creating file.
-                        using (new FileHelper().Open(logFileName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite)) { }
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new TestPlatformException(e.Message);
-                }
 
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = string.IsNullOrWhiteSpace(logFileName) ? null : AddDoubleQuotes(logFileName) };
 
