@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
 
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Defines the contract that commandline 
@@ -29,8 +30,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// </summary>
         /// <param name="discoveryPayload">Discovery payload</param>
         /// <param name="disoveryEventsRegistrar">Discovery events registrar - registers and unregisters discovery events</param>
+        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>True, if successful</returns>
-        bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar disoveryEventsRegistrar);
+        bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar disoveryEventsRegistrar, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Run Tests with given a test of sources
@@ -38,8 +40,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.RequestHelper
         /// <param name="testRunRequestPayLoad">Test Run Request payload</param>
         /// <param name="customTestHostLauncher">Custom testHostLauncher for the run</param>
         /// <param name="testRunEventsRegistrar">RunEvents registrar</param>
+        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>True, if sucessful</returns>
-        bool RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar);
+        bool RunTests(TestRunRequestPayload testRunRequestPayLoad, ITestHostLauncher customTestHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Cancel the current TestRun request
