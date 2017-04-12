@@ -197,7 +197,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             var keepAlive = false;
 
             var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive };
-            var result = this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar);
+            var result = this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
 
             if (EqtTrace.IsInfoEnabled)
             {

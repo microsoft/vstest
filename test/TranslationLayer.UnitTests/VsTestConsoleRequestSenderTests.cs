@@ -37,6 +37,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private int WaitTimeout = 2000;
 
+        private int protocolVersion = 1;
+        private IDataSerializer serializer = JsonDataSerializer.Instance;
+
         public VsTestConsoleRequestSenderTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
@@ -54,7 +57,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Exactly(2));
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once);
         }
 
         [TestMethod]
@@ -121,7 +124,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Once);
 
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>()), Times.Never);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Never);
         }
 
         [TestMethod]
@@ -136,7 +139,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(sessionConnected);
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck)).Throws(new Exception("Fail"));
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion)).Throws(new Exception("Fail"));
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
@@ -149,11 +152,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Once);
 
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Once);
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(It.IsAny<string>()), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once);
         }
 
         [TestMethod]
-        public void InitializeCommunicationShouldFailConnectionIfVersionIsWrong()
+        public void InitializeCommunicationShouldFailConnectionIfProtocolIsNotCompatible()
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer()).Returns(dummyPortInput);
@@ -165,14 +168,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
 
             // Give wrong version
-            var versionCheck = new Message()
+            var protocolError = new Message()
                                    {
-                                       MessageType = MessageType.VersionCheck,
-                                       Payload = JToken.FromObject("2")
+                                       MessageType = MessageType.ProtocolError,
+                                       Payload = null
                                    };
 
             Action changedMessage =
-                () => { this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(versionCheck); };
+                () => { this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(protocolError); };
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(sessionConnected);
             this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck)).Callback(changedMessage);
@@ -188,7 +191,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Once);
 
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Exactly(2));
-            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once);
         }
 
         #endregion
@@ -270,7 +273,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     (IEnumerable<TestCase> tests) =>
                         {
                             receivedTestCases = tests?.ToList();
-                            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(discoveryComplete));
+                            this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult((discoveryComplete)));
                         });
 
             this.requestSender.DiscoverTests(new List<string>() { "1.dll" }, null, mockHandler.Object);
@@ -546,7 +549,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once, "Custom TestHostLauncher must be called");
         }
-
+        
         [TestMethod]
         public void StartTestRunWithCustomHostShouldNotAbortAndSendErrorToVstestConsoleInErrorScenario()
         {
@@ -576,22 +579,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var mpayload = new TestMessagePayload() { MessageLevel = TestMessageLevel.Informational, Message = "Hello" };
             var message = CreateMessage(MessageType.TestMessage, mpayload);
 
-            var runprocessInfoPayload = new Message()
+            Message runprocessInfoPayload = new VersionedMessage()
             {
                 MessageType = MessageType.CustomTestHostLaunch,
                 Payload = JToken.FromObject(new TestProcessStartInfo())
             };
 
             var mockLauncher = new Mock<ITestHostLauncher>();
-            mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Callback
-                (() =>
-                {
-                    throw new Exception("BadError");
-                });
+            mockLauncher.Setup(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Throws(new Exception("BadError"));
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runprocessInfoPayload));
 
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>())).
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(It.IsAny<string>(), It.IsAny<object>(), this.protocolVersion)).
                 Callback(() => this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(runComplete)));
 
             this.requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
@@ -904,7 +903,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var payload = new TestRunRequestPayload { Sources = sources, RunSettings = null };
             var exception = new IOException();
             
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload)).Throws(exception);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.TestRunAllSourcesWithDefaultHost, payload, this.protocolVersion)).Throws(exception);
 
             this.requestSender.StartTestRun(sources, null, mockHandler.Object);
 
@@ -950,21 +949,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         #region private methods
 
-        private static Message CreateMessage<T>(string messageType, T payload)
+        /// <summary>
+        /// Serialize and Deserialize message as it would happen for real.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="messageType"></param>
+        /// <param name="payload"></param>
+        /// <returns></returns>
+        private Message CreateMessage<T>(string messageType, T payload)
         {
-            var message = new Message()
-            {
-                MessageType = messageType,
-                Payload = JToken.FromObject(
-                    payload,
-                    JsonSerializer.Create(
-                        new JsonSerializerSettings
-                        {
-                            ContractResolver = new DefaultTestPlatformContractResolver(),
-                            TypeNameHandling = TypeNameHandling.None
-                        }))
-            };
-            return message;
+            return this.serializer.DeserializeMessage(this.serializer.SerializePayload(messageType, payload, this.protocolVersion));
         }
 
         private void InitializeCommunication()
@@ -977,7 +971,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                 .Callback((int timeout) => Task.Delay(200).Wait());
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
-            var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = JToken.FromObject("1") };
+            var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };
 
             Action changedMessage = () =>
             {
@@ -985,7 +979,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             };
 
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Returns(sessionConnected);
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck)).Callback(changedMessage);
+            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion)).Callback(changedMessage);
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.AreEqual(dummyPortInput, portOutput, "Port number must return without changes.");
