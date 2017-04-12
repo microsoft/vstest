@@ -12,6 +12,7 @@
     <XUnitFrameworkVersion>2.2.0</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.2.0</XUnitAdapterVersion>
 
+    <NUnit3FrameworkVersion>3.6.1</NUnit3FrameworkVersion>
     <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
     <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
 
