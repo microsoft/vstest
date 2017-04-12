@@ -6,9 +6,10 @@
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <NETTestSdkPreviousVersion>15.0.0</NETTestSdkPreviousVersion>
 
-    <MSTestFrameworkVersion>1.1.11</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>1.1.11</MSTestAdapterVersion>
-
+    <MSTestFrameworkVersion>1.1.14</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>1.1.14</MSTestAdapterVersion>
+    <MSTestAssertExtensionVersion>1.0.2-preview</MSTestAssertExtensionVersion>
+    
     <XUnitFrameworkVersion>2.2.0</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.2.0</XUnitAdapterVersion>
 

@@ -26,12 +26,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        [Ignore]
+        [Ignore] // https://github.com/Microsoft/vstest/issues/689
         [CustomDataTestMethod]
         [NET46TargetFramework]
         public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            if (runnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("CPP adapter not available for netcore runner in Extensions folder.");
+                return;
+            }
 
             var assemblyRelativePath =
                 @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";

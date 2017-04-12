@@ -106,6 +106,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         void SendMessage(string messageType, object payload);
 
         /// <summary>
+        ///  Writes message to the binary writer with payload
+        /// </summary>
+        /// <param name="messageType">Type of Message to be sent, for instance TestSessionStart</param>
+        /// <param name="payload">payload to be sent</param>
+        /// <param name="version">version to be sent</param>
+        void SendMessage(string messageType, object payload, int version);
+
+        /// <summary>
         /// Send serialized raw message
         /// </summary>
         /// <param name="rawMessage">serialized message</param>

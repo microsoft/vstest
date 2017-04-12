@@ -23,6 +23,16 @@
         <target state="new">Diagnostic data adapter ('{0}') message: {1}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="UnexpectedMessage">
+        <source>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</source>
+        <target state="new">Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="VersionCheckFailed">
+        <source>Protocol version check failed. Make sure test runner and host are compatible.</source>
+        <target state="new">Protocol version check failed. Make sure test runner and host are compatible.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

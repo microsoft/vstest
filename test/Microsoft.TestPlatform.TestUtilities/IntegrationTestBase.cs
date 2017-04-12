@@ -239,7 +239,9 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 var flag = this.standardTestOutput.Contains(test)
                            || this.standardTestOutput.Contains(GetTestMethodName(test));
-                Assert.IsTrue(flag, "Test {0} does not appear in discovered tests list.", test);
+                Assert.IsTrue(flag, $"Test {test} does not appear in discovered tests list." +
+                                    $"{System.Environment.NewLine}Std Output: {this.standardTestOutput}" +
+                                    $"{System.Environment.NewLine}Std Error: { this.standardTestError}");
             }
         }
 

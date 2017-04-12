@@ -80,7 +80,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.runTestsInstance.CallBeforeRaisingTestRunComplete(false);
 
             var messageFormat =
-                "No test is available in {0}. Make sure that installed test discoverers & executors, platform & framework version settings are appropriate and try again.";
+                "No test is available in {0}. Make sure that test discoverer & executors are registered and platform & framework version settings are appropriate and try again.";
             var message = string.Format(messageFormat, "a aa b ab");
             this.mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Warning, message),
                 Times.Once);

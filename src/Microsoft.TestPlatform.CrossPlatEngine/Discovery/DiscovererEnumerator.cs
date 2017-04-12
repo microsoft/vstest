@@ -185,10 +185,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             if (allDiscoverers == null || !allDiscoverers.Any())
             {
+                var sourcesString = string.Join(" ", sources);
                 // No discoverer available, log a warning
                 logger.SendMessage(
                     TestMessageLevel.Warning,
-                    String.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.NoDiscovererRegistered));
+                    String.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources, sourcesString));
 
                 return null;
             }

@@ -132,4 +132,10 @@
   <data name="UnableToCommunicateToTestHost" xml:space="preserve">
     <value>Unable to communicate with test host process.</value>
   </data>
+  <data name="UnexpectedMessage" xml:space="preserve">
+    <value>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</value>
+  </data>
+  <data name="VersionCheckFailed" xml:space="preserve">
+    <value>Protocol version check failed. Make sure test runner and host are compatible.</value>
+  </data>
 </root>

@@ -110,15 +110,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
-      <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="translated">未注册测试发现器来执行发现测试用例的操作。请注册测试发现器并重试。</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">没有测试 discoverer 注册要执行的测试用例发现。注册测试 discoverer，然后重试。</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
-      </trans-unit>
       <trans-unit id="NoMatchingExecutor">
         <source>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</source>
         <target state="translated">找不到 URI 为“{0}”的测试执行器。请确保安装了测试执行器且该执行器支持.net 运行时版本 {1}。</target>
@@ -147,15 +138,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
-      <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
-        <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">{0} 中没有可用的测试。确保安装的测试发现器和执行器以及平台和框架版本设置适当，然后重试。</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">没有测试位于 {0}。请确保安装的测试平台与框架版本设置的相应 discoverers &amp; 执行器，并再试一次。</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
-      </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
         <target state="translated">没有与筛选器匹配的测试，因为该筛选器包含一个或多个无效属性 ({0})。请指定包含有效属性 ({1}) 的筛选器表达式，然后重试。</target>
@@ -164,11 +146,6 @@
           <target state-qualifier="mt-suggestion">没有测试匹配筛选器，因为它包含一个或多个属性无效 ({0})。指定筛选器表达式，其中包含有效的属性 ({1})，然后重试。</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="translated">找不到源“{0}”的 testhost.dll。请确保测试项目具有包 "microsoft.testplatform.testhost" 的 nuget 引用。</target>
-        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
@@ -183,6 +160,11 @@
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
         <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
+        <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
+        <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
         <note></note>
       </trans-unit>
     </body>

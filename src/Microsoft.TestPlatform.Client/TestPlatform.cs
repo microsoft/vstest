@@ -66,9 +66,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// The create discovery request.
         /// </summary>
         /// <param name="discoveryCriteria"> The discovery criteria. </param>
+        /// <param name="protocolConfig"> Protocol related information.  </param>
         /// <returns> The <see cref="IDiscoveryRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria)
+        public IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig)
         {
             if (discoveryCriteria == null)
             {
@@ -79,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             
-            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria);
+            var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
             return new DiscoveryRequest(discoveryCriteria, discoveryManager);
@@ -89,9 +90,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// The create test run request.
         /// </summary>
         /// <param name="testRunCriteria"> The test run criteria.  </param>
+        /// <param name="protocolConfig"> Protocol related information.  </param>
         /// <returns> The <see cref="ITestRunRequest"/>. </returns>
         /// <exception cref="ArgumentNullException"> Throws if parameter is null. </exception>
-        public ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria)
+        public ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria, ProtocolConfig protocolConfig)
         {
             if (testRunCriteria == null)
             {
@@ -119,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
             }
 
-            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria);
+            var executionManager = this.TestEngine.GetExecutionManager(testHostManager, testRunCriteria, protocolConfig);
             executionManager.Initialize();
 
             return new TestRunRequest(testRunCriteria, executionManager);
