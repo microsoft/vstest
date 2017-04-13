@@ -103,14 +103,53 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             writer.WritePropertyName("Properties");
             writer.WriteStartArray();
 
-            this.AddProperty(writer, TestResultProperties.Outcome, testResult.Outcome, serializer);
-            this.AddProperty(writer, TestResultProperties.ErrorMessage, testResult.ErrorMessage, serializer);
-            this.AddProperty(writer, TestResultProperties.ErrorStackTrace, testResult.ErrorStackTrace, serializer);
-            this.AddProperty(writer, TestResultProperties.DisplayName, testResult.DisplayName, serializer);
-            this.AddProperty(writer, TestResultProperties.ComputerName, testResult.ComputerName, serializer);
-            this.AddProperty(writer, TestResultProperties.Duration, testResult.Duration, serializer);
-            this.AddProperty(writer, TestResultProperties.StartTime, testResult.StartTime, serializer);
-            this.AddProperty(writer, TestResultProperties.EndTime, testResult.EndTime, serializer);
+            // TestResult.Outcome
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.Outcome, serializer);
+            writer.WriteValue((int)testResult.Outcome);
+            writer.WriteEndObject();
+
+            // TestResult.ErrorMessage
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.ErrorMessage, serializer);
+            writer.WriteValue(testResult.ErrorMessage);
+            writer.WriteEndObject();
+
+            // TestResult.ErrorStackTrace
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.ErrorStackTrace, serializer);
+            writer.WriteValue(testResult.ErrorStackTrace);
+            writer.WriteEndObject();
+
+            // TestResult.DisplayName
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.DisplayName, serializer);
+            writer.WriteValue(testResult.DisplayName);
+            writer.WriteEndObject();
+
+            // TestResult.ComputerName
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.ComputerName, serializer);
+            writer.WriteValue(testResult.ComputerName);
+            writer.WriteEndObject();
+
+            // TestResult.Duration
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.Duration, serializer);
+            writer.WriteValue(testResult.Duration.ToString());
+            writer.WriteEndObject();
+
+            // TestResult.StartTime
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.StartTime, serializer);
+            writer.WriteValue(testResult.StartTime);
+            writer.WriteEndObject();
+
+            // TestResult.EndTime
+            writer.WriteStartObject();
+            AddProperty(writer, TestResultProperties.EndTime, serializer);
+            writer.WriteValue(testResult.EndTime);
+            writer.WriteEndObject();
 
             foreach (var property in testResult.GetProperties())
             {
@@ -118,30 +157,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             }
 
             writer.WriteEndArray();
-
             writer.WriteEndObject();
         }
 
-        private void AddProperty(JsonWriter writer, TestProperty property, object value, JsonSerializer serializer)
+        private static void AddProperty(JsonWriter writer, TestProperty property, JsonSerializer serializer)
         {
-            writer.WriteStartObject();
             writer.WritePropertyName("Key");
             serializer.Serialize(writer, property);
             writer.WritePropertyName("Value");
-            if (value is TestOutcome)
-            {
-                writer.WriteValue((int)value);
-            }
-            else if (value is DateTimeOffset)
-            {
-                writer.WriteValue((DateTimeOffset)value);
-            }
-            else
-            {
-                writer.WriteValue(value?.ToString());
-            }
-
-            writer.WriteEndObject();
         }
     }
 }

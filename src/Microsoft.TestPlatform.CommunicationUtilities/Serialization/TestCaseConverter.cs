@@ -89,16 +89,49 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             writer.WritePropertyName("Properties");
             writer.WriteStartArray();
 
-            this.AddProperty(writer, TestCaseProperties.FullyQualifiedName, testCase.FullyQualifiedName, serializer);
-            this.AddProperty(writer, TestCaseProperties.ExecutorUri, testCase.ExecutorUri, serializer);
-            this.AddProperty(writer, TestCaseProperties.Source, testCase.Source, serializer);
-            this.AddProperty(writer, TestCaseProperties.CodeFilePath, testCase.CodeFilePath, serializer);
-            this.AddProperty(writer, TestCaseProperties.DisplayName, testCase.DisplayName, serializer);
-            this.AddProperty(writer, TestCaseProperties.Id, testCase.Id, serializer);
-            this.AddProperty(writer, TestCaseProperties.LineNumber, testCase.LineNumber, serializer);
+            // TestCase.FullyQualifiedName
+            writer.WriteStartObject();
+            AddProperty(writer, TestCaseProperties.FullyQualifiedName, serializer);
+            writer.WriteValue(testCase.FullyQualifiedName);
+            writer.WriteEndObject();
 
-            var properties = testCase.GetProperties();
-            foreach (var property in properties)
+            // TestCase.ExecutorUri
+            writer.WriteStartObject();
+            AddProperty(writer, TestCaseProperties.ExecutorUri, serializer);
+            writer.WriteValue(testCase.ExecutorUri.ToString());
+            writer.WriteEndObject();
+
+            // TestCase.Source
+            writer.WriteStartObject();
+            AddProperty(writer, TestCaseProperties.Source, serializer);
+            writer.WriteValue(testCase.Source);
+            writer.WriteEndObject();
+
+            // TestCase.CodeFilePath
+            writer.WriteStartObject();
+            AddProperty(writer, TestCaseProperties.CodeFilePath, serializer);
+            writer.WriteValue(testCase.CodeFilePath);
+            writer.WriteEndObject();
+
+            // TestCase.DisplayName
+            writer.WriteStartObject();
+            AddProperty(writer, TestCaseProperties.DisplayName, serializer);
+            writer.WriteValue(testCase.DisplayName);
+            writer.WriteEndObject();
+
+            // TestCase.DisplayName
+            writer.WriteStartObject();
+            AddProperty(writer, TestCaseProperties.Id, serializer);
+            writer.WriteValue(testCase.Id.ToString());
+            writer.WriteEndObject();
+
+            // TestCase.LineNumber
+            writer.WriteStartObject();
+            AddProperty(writer, TestCaseProperties.LineNumber, serializer);
+            writer.WriteValue(testCase.LineNumber);
+            writer.WriteEndObject();
+
+            foreach (var property in testCase.GetProperties())
             {
                 serializer.Serialize(writer, property);
             }
@@ -107,22 +140,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             writer.WriteEndObject();
         }
 
-        private void AddProperty(JsonWriter writer, TestProperty property, object value, JsonSerializer serializer)
+        private static void AddProperty(JsonWriter writer, TestProperty property, JsonSerializer serializer)
         {
-            writer.WriteStartObject();
             writer.WritePropertyName("Key");
             serializer.Serialize(writer, property);
             writer.WritePropertyName("Value");
-            if (value is int)
-            {
-                writer.WriteValue((int)value);
-            }
-            else
-            {
-                writer.WriteValue(value?.ToString());
-            }
-
-            writer.WriteEndObject();
         }
     }
 }
