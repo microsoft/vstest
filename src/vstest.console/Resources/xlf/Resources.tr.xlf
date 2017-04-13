@@ -1529,6 +1529,11 @@
         <target state="new">Not Run  {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="VstestDiagLogOutputPath">
+        <source>Logging Vstest Diagnostics in file: {0}</source>
+        <target state="new">Logging Vstest Diagnostics in file: {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
     using System.Reflection;
     using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -80,11 +81,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 var portNumber = this.RequestSender.InitializeCommunication();
                 var processId = this.processHelper.GetCurrentProcessId();
+
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Get the test process start info
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
-                
+
                 // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
                 this.testHostManager.HostExited += this.TestHostManagerHostExited;
@@ -187,13 +189,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         protected string GetTimestampedLogFile(string logFile)
         {
-            return Path.ChangeExtension(
+            if (string.IsNullOrWhiteSpace(logFile))
+                return null;
+
+            return "\"" + Path.ChangeExtension(
                 logFile,
                 string.Format(
                     "host.{0}_{1}{2}",
                     DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     Thread.CurrentThread.ManagedThreadId,
-                    Path.GetExtension(logFile)));
+                    Path.GetExtension(logFile))) + "\"";
         }
 
         private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
