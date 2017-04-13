@@ -127,9 +127,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// And overrides if any trace is set before
         /// </summary>
         /// <param name="customLogFile">A custom log file for trace messages.</param>
-        public static void InitializeVerboseTrace(string customLogFile)
+        public static bool InitializeVerboseTrace(string customLogFile)
         {
-            traceImpl.InitializeVerboseTrace(customLogFile);
+            if(!traceImpl.InitializeVerboseTrace(customLogFile))
+            {
+                ErrorOnInitialization = PlatformEqtTrace.ErrorOnInitialization;
+                return false;
+            }
+            return true;
         }
 
 

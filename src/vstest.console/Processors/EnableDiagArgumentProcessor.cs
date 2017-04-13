@@ -145,14 +145,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // Find full path and send this to testhost so that vstest and testhost create logs at same location.
             argument = Path.GetFullPath(argument);
 
-            try
+            // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of initialization.
+            if (!EqtTrace.InitializeVerboseTrace(argument))
             {
-                // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of initialization.
-                EqtTrace.InitializeVerboseTrace(argument);
-            }
-            catch (Exception e)
-            {
-                ConsoleOutput.Instance.Warning(e.Message);
+                if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                    ConsoleOutput.Instance.Warning(EqtTrace.ErrorOnInitialization);
             }
         }
 

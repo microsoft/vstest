@@ -82,9 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var portNumber = this.RequestSender.InitializeCommunication();
                 var processId = this.processHelper.GetCurrentProcessId();
 
-                var logFileName = this.GetTimestampedLogFile(EqtTrace.LogFile);
-
-                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = string.IsNullOrWhiteSpace(logFileName) ? null : AddDoubleQuotes(logFileName) };
+                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Get the test process start info
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
@@ -191,13 +189,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         protected string GetTimestampedLogFile(string logFile)
         {
-            return Path.ChangeExtension(
+            if (string.IsNullOrWhiteSpace(logFile))
+                return null;
+
+            return "\"" + Path.ChangeExtension(
                 logFile,
                 string.Format(
                     "host.{0}_{1}{2}",
                     DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     Thread.CurrentThread.ManagedThreadId,
-                    Path.GetExtension(logFile)));
+                    Path.GetExtension(logFile))) + "\"";
         }
 
         private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
@@ -210,11 +211,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostProcessStdError = e.Data;
 
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
-        }
-
-        private string AddDoubleQuotes(string x)
-        {
-            return "\"" + x + "\"";
         }
     }
 }

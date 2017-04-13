@@ -42,14 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             string logFile;
             if (argsDictionary.TryGetValue(LogFileArgument, out logFile))
             {
-                try
-                {
-                    EqtTrace.InitializeVerboseTrace(logFile);
-                }
-                catch(Exception e)
-                {
-                    EqtTrace.ErrorOnInitialization = e.Message;
-                }
+                EqtTrace.InitializeVerboseTrace(logFile);
             }
 
 #if NET46
@@ -104,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     DataCollectionTestCaseEventSender.Instance.Close();
                 }
             }
-        }        
+        }
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
@@ -121,6 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     throw new TimeoutException();
                 }
             });
-        }       
+        }
     }
 }
