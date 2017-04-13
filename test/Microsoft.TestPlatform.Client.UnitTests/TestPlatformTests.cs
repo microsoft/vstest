@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
-        public void CreateDiscoveryRequestShouldCreateDiscoveryRequestWithGivenCriteriaAndReturnIt()
+        public void CreateDiscoveryRequestShouldInitializeManagersAndCreateDiscoveryRequestWithGivenCriteriaAndReturnIt()
         {
             this.discoveryManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetDiscoveryManager(this.hostManager.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.discoveryManager.Object);
@@ -51,6 +51,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 
             var discoveryRequest = tp.CreateDiscoveryRequest(discoveryCriteria, It.IsAny<ProtocolConfig>());
 
+            this.hostManager.Verify(hm => hm.Initialize(It.IsAny<TestSessionMessageLogger>(), It.IsAny<string>()), Times.Once);
+            this.discoveryManager.Verify(dm => dm.Initialize(), Times.Once);
             Assert.AreEqual(discoveryCriteria, discoveryRequest.DiscoveryCriteria);
         }
 
@@ -127,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
-        public void CreateTestRunRequestShouldCreateTestRunRequestWithSpecifiedCriteria()
+        public void CreateTestRunRequestShouldInitializeManagersAndCreateTestRunRequestWithSpecifiedCriteria()
         {
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
@@ -138,6 +140,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var testRunRequest = tp.CreateTestRunRequest(testRunCriteria, It.IsAny<ProtocolConfig>());
 
             var actualTestRunRequest = testRunRequest as TestRunRequest;
+
+            this.hostManager.Verify(hm => hm.Initialize(It.IsAny<TestSessionMessageLogger>(), It.IsAny<string>()), Times.Once);
+            this.executionManager.Verify(em => em.Initialize(), Times.Once);
             Assert.AreEqual(testRunCriteria, actualTestRunRequest.TestRunCriteria);
         }
 
