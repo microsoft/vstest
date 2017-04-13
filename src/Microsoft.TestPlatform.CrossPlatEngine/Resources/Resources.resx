@@ -165,6 +165,9 @@
   <data name="StringSeperator" xml:space="preserve">
     <value>, </value>
   </data>
+  <data name="TesthostDiagLogOutputFile" xml:space="preserve">
+    <value>Logging TestHost Diagnostics in file: {0}</value>
+  </data>
   <data name="TestHostExitedWithError" xml:space="preserve">
     <value>Testhost process exited with error: {0}</value>
   </data>
