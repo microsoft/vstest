@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
     /// <summary>
     /// The proxy execution manager with data collection.
@@ -24,13 +25,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManagerWithDataCollection"/> class. 
         /// </summary>
+        /// <param name="testRequestSender">
+        /// Test request sender instance.
+        /// </param>
         /// <param name="testHostManager">
         /// Test host manager for this operation.
         /// </param>
         /// <param name="proxyDataCollectionManager">
         /// The proxy Data Collection Manager.
         /// </param>
-        public ProxyExecutionManagerWithDataCollection(ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) : base(testHostManager)
+        public ProxyExecutionManagerWithDataCollection(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IProxyDataCollectionManager proxyDataCollectionManager) 
+            : base(requestSender, testHostManager)
         {
             this.ProxyDataCollectionManager = proxyDataCollectionManager;
             this.DataCollectionRunEventsHandler = new DataCollectionRunEventsHandler();
