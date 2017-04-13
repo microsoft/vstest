@@ -167,6 +167,11 @@
         <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TesthostDiagLogOutputFile">
+        <source>Logging TestHost Diagnostics in file: {0}</source>
+        <target state="new">Logging TestHost Diagnostics in file: {0}</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

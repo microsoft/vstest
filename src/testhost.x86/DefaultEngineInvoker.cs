@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class DefaultEngineInvoker :
 #if NET46
@@ -96,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     DataCollectionTestCaseEventSender.Instance.Close();
                 }
             }
-        }        
+        }
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
@@ -113,6 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     throw new TimeoutException();
                 }
             });
-        }       
+        }
     }
 }
