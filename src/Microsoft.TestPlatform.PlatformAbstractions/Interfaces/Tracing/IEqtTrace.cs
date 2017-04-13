@@ -45,7 +45,7 @@
         /// And overrides if any trace is set before
         /// </summary>
         /// <param name="customLogFile">A custom log file for trace messages.</param>
-        void InitializeVerboseTrace(string customLogFile);
+        bool InitializeVerboseTrace(string customLogFile);
 
         /// <summary>
         /// Gets a value indicating if tracing is enabled for a trace level.

@@ -1263,7 +1263,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("SupportedFileTypesIndicator", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to  {0}.
         /// </summary>
@@ -1272,7 +1272,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("SupportedFileWithoutSeparator", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Logging Vstest Diagnostics in file: {0}.
+        /// </summary>
+        public static string VstestDiagLogOutputPath
+        {
+            get
+            {
+                return ResourceManager.GetString("VstestDiagLogOutputPath", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to  {0},.
         /// </summary>
