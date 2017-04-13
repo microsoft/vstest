@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.Loader;
     using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -19,6 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 #if NET46
     using System.Threading;
 #else
+    using System.Runtime.Loader;
 #endif
 
     /// <summary>
