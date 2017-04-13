@@ -98,9 +98,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         internal TestExtensions TestExtensions { get; private set; }
 
         /// <summary>
-        /// Path to additional extensions
+        /// Path to extensions
         /// </summary>
-        public IEnumerable<string> PathToAdditionalExtensions
+        public IEnumerable<string> PathToExtensions
         {
             get
             {
@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             where TPluginInfo : TestPluginInformation
         {
             // Return the cached value if cache is valid.
-            if (this.TestExtensions.AreTestExtensionsCached<TPluginInfo>())
+            if (this.TestExtensions != null && this.TestExtensions.AreTestExtensionsCached<TPluginInfo>())
             {
                 return this.TestExtensions.GetTestExtensionCache<TPluginInfo>();
             }
@@ -172,19 +172,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     allExtensionPaths.AddRange(this.pathToExtensions);
                 }
 
-                var filtedExtensions = this.GetFilteredExtensions(allExtensionPaths, regexPattern);
+                var filteredExtensions = this.GetFilteredExtensions(allExtensionPaths, regexPattern);
 
                 // Discover the test extensions from candidate assemblies.
-                pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(filtedExtensions);
+                pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(filteredExtensions);
 
                 if (this.TestExtensions == null)
                 {
                     this.TestExtensions = new TestExtensions();
                 }
-                else
-                {
-                    this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
-                }
+
+                this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
+
+                // Set the cache bool to true.
+                this.TestExtensions.SetTestExtensionsCache<TPluginInfo>();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -283,7 +284,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 // any one tries to get the additional extensions, we rediscover. 
                 this.pathToExtensions = newExtensionPaths;
 
-                this.TestExtensions.InvalidateCache();
+                this.TestExtensions?.InvalidateCache();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -341,47 +342,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             var regex = new Regex(searchPattern, RegexOptions.IgnoreCase);
             return extensions.Where(ext => regex.IsMatch(ext)).ToList();
-        }
+        }        
 
         /// <summary>
-        /// Gets the test extensions defined in the extension assembly list.
+        /// The get test extensions.
         /// </summary>
+        /// <param name="extensionAssembly">
+        /// The extension assembly.
+        /// </param>
         /// <typeparam name="TPluginInfo">
-        /// Type of PluginInfo.
         /// </typeparam>
         /// <typeparam name="TExtension">
-        /// Type of Extension.
         /// </typeparam>
-        /// <param name="extensionPaths">
-        /// Extension assembly paths.
-        /// </param>
         /// <returns>
-        /// List of extensions.
+        /// The <see cref="Dictionary"/>.
         /// </returns>
-        /// <remarks>
-        /// Added to mock out dependency from the actual test plugin discovery as such.
-        /// </remarks>
-        internal virtual Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
-        {
-            foreach (var extensionPath in extensionPaths)
-            {
-                this.SetupAssemblyResolver(extensionPath);
-            }
-
-            var discoverer = new TestPluginDiscoverer();
-
-            var pluginInfos = discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths, this.loadOnlyWellKnownExtensions);
-
-            // Add extensions discovered to the cache.
-            if (this.TestExtensions == null)
-            {
-                this.TestExtensions = new TestExtensions();
-            }
-
-            this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
-            return pluginInfos;
-        }
-
         internal virtual Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly) where TPluginInfo : TestPluginInformation
         {
             // Check if extensions from this assembly have already been discovered.
@@ -392,8 +367,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 return extensions;
             }
 
-            this.GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
-            return this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(this.TestExtensions.GetTestExtensionCache<TPluginInfo>(), extensionAssembly);
+            var pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
+            
+            // Add extensions discovered to the cache.
+            if (this.TestExtensions == null)
+            {
+                this.TestExtensions = new TestExtensions();
+            }
+
+            this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
+            return pluginInfos;
         }
 
         /// <summary>
@@ -440,6 +423,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
 
             return resolutionPaths;
+        }
+
+        /// <summary>
+        /// Gets the test extensions defined in the extension assembly list.
+        /// </summary>
+        /// <typeparam name="TPluginInfo">
+        /// Type of PluginInfo.
+        /// </typeparam>
+        /// <typeparam name="TExtension">
+        /// Type of Extension.
+        /// </typeparam>
+        /// <param name="extensionPaths">
+        /// Extension assembly paths.
+        /// </param>
+        /// <returns>
+        /// List of extensions.
+        /// </returns>
+        /// <remarks>
+        /// Added to mock out dependency from the actual test plugin discovery as such.
+        /// </remarks>
+        private Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
+        {
+            foreach (var extensionPath in extensionPaths)
+            {
+                this.SetupAssemblyResolver(extensionPath);
+            }
+
+            var discoverer = new TestPluginDiscoverer();
+
+            return discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths, this.loadOnlyWellKnownExtensions);
         }
 
         private void SetupAssemblyResolver(string extensionAssembly)

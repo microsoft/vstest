@@ -53,7 +53,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void PathToAdditionalExtensionsShouldBeNullByDefault()
         {
-            Assert.IsNull(TestPluginCache.Instance.PathToAdditionalExtensions);
+            Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
         }
 
         [TestMethod]
@@ -77,14 +77,14 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void UpdateAdditionalExtensionsShouldNotThrowIfExtenionPathIsNull()
         {
             TestPluginCache.Instance.UpdateExtensions(null, true);
-            Assert.IsNull(TestPluginCache.Instance.PathToAdditionalExtensions);
+            Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
         }
 
         [TestMethod]
         public void UpdateAdditionalExtensionsShouldNotThrowIfExtensionPathIsEmpty()
         {
             TestPluginCache.Instance.UpdateExtensions(new List<string>(), true);
-            Assert.IsNull(TestPluginCache.Instance.PathToAdditionalExtensions);
+            Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
         }
 
         [TestMethod]
@@ -92,7 +92,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             var additionalExtensions = new List<string> { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
-            var updatedExtensions = TestPluginCache.Instance.PathToAdditionalExtensions;
+            var updatedExtensions = TestPluginCache.Instance.PathToExtensions;
 
             Assert.IsNotNull(updatedExtensions);
             CollectionAssert.AreEqual(additionalExtensions, updatedExtensions.ToList());
@@ -107,7 +107,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                                                typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location
                                            };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
-            var updatedExtensions = TestPluginCache.Instance.PathToAdditionalExtensions.ToList();
+            var updatedExtensions = TestPluginCache.Instance.PathToExtensions.ToList();
 
             Assert.IsNotNull(updatedExtensions);
             Assert.AreEqual(1, updatedExtensions.Count);
@@ -119,7 +119,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             var additionalExtensions = new List<string> { "foo.dll" };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
-            var updatedExtensions = TestPluginCache.Instance.PathToAdditionalExtensions;
+            var updatedExtensions = TestPluginCache.Instance.PathToExtensions;
 
             Assert.IsNotNull(updatedExtensions);
             Assert.AreEqual(1, updatedExtensions.Count());
@@ -270,13 +270,12 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         #endregion
 
-        #region DiscoverAllTestExtensions tests
+        #region DiscoverTestExtensions tests
 
         [TestMethod]
         public void DiscoverTestExtensionsShouldDiscoverExtensionsFromExtensionsFolder()
         {
-            // Setup the testable instance.
-            TestPluginCache.Instance = this.testablePluginCache;
+            SetupMockAdditionalPathExtensions();
 
             TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
 
@@ -287,16 +286,14 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         }
 
         [TestMethod]
-        public void DiscoverTestExtensionsShouldDiscoverExtensionsFromAdditionalExtensionsFolder()
+        public void DiscoverTestExtensionsShouldSetCachedBoolToTrue()
         {
             SetupMockAdditionalPathExtensions();
 
             TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
 
-            Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
-
-            // Validate the discoverers to be absolutely certain.
-            Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestDiscoverers.Count > 0);
+            Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
+            Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestExtensionsCached<TestDiscovererPluginInformation>());
         }
 
         #endregion
@@ -346,6 +343,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             var testableTestPluginCache = new TestableTestPluginCache(mockFileHelper.Object, extensions.ToList());
             testableTestPluginCache.Action = callback;
+
             // Setup the testable instance.
             TestPluginCache.Instance = testableTestPluginCache;
         }
@@ -385,3 +383,4 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
     #endregion 
 }
+

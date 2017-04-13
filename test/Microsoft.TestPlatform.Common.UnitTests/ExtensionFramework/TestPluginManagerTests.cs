@@ -112,8 +112,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsNotNull(testExtensions);
             Assert.IsTrue(testExtensions.Count() > 0);
 
-            // todo : fix this after implementing caching logic so that dicovery isn't get triggered again and again when additional paths are not updated.
-            Assert.AreEqual(2, discoveryCount);
+            Assert.AreEqual(1, discoveryCount);
         }
 
         [TestMethod]

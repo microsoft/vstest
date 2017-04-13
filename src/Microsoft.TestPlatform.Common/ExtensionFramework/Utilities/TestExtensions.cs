@@ -216,6 +216,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         }
 
         /// <summary>
+        /// The set test extensions cache.
+        /// </summary>
+        /// <typeparam name="TPluginInfo">
+        /// </typeparam>
+        internal void SetTestExtensionsCache<TPluginInfo>() where TPluginInfo : TestPluginInformation
+        {
+            if (typeof(TPluginInfo) == typeof(TestDiscovererPluginInformation))
+            {
+                this.AreTestDiscoverersCached = true;
+            }
+            else if (typeof(TPluginInfo) == typeof(TestExecutorPluginInformation))
+            {
+                this.AreTestExecutorsCached = true;
+            }
+            else if (typeof(TPluginInfo) == typeof(TestLoggerPluginInformation))
+            {
+                this.AreTestLoggersCached = true;
+            }
+            else if (typeof(TPluginInfo) == typeof(TestSettingsProviderPluginInformation))
+            {
+                this.AreTestSettingsProvidersCached = true;
+            }
+            else if (typeof(TPluginInfo) == typeof(TestRuntimePluginInformation))
+            {
+                this.AreTestHostsCached = true;
+            }
+        }
+
+        /// <summary>
         /// The invalidate cache of plugin infos.
         /// </summary>
         internal void InvalidateCache()

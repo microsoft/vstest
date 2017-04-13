@@ -119,10 +119,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var sourceList = sources.ToList();
-            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.PathToAdditionalExtensions).ToList();
+            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.PathToExtensions);
 
             // Only send this if needed.
-            if (extensions.Count > 0)
+            if (extensions.Count() > 0)
             {
                 this.SetupChannel(sourceList);
 

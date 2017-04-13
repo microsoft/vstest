@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <remarks>
         /// Dependency resolution for .net core projects are pivoted by the test project. Hence each test
         /// project must be launched in a separate test host process.
-        /// </remarks>InitializeExtensions
+        /// </remarks>
         public bool Shared => false;
 
         /// <summary>
