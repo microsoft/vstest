@@ -180,11 +180,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         continue;
                     }
 
-                    List<string> adapterFiles = new List<string>(
-                        this.fileHelper.EnumerateFiles(
-                            adapterPath,
-                            TestPlatformConstants.TestAdapterRegexPattern,
-                            SearchOption.AllDirectories));
+                    List<string> adapterFiles = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories));
+                    adapterFiles.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories));
+                    adapterFiles.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.RunTimeRegexPattern, SearchOption.AllDirectories));
+                    adapterFiles.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.SettingsProviderRegexPattern, SearchOption.AllDirectories));
+
                     if (adapterFiles.Count > 0)
                     {
                         this.UpdateExtensions(adapterFiles, true);

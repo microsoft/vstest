@@ -39,6 +39,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Common;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using System.IO;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.
@@ -195,6 +198,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             // Initialize Runsettings with defaults
             RunSettingsManager.Instance.AddDefaultRunSettings();
 
+            // Update cache with Extension Folder's files
+            this.UpdateDefaultExtensions();
+
             // Ensure we have an action argument.
             this.EnsureActionArgumentIsPresent(processors, processorFactory);
 
@@ -337,6 +343,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
             this.Output.WriteLine(string.Empty, OutputLevel.Information);
+        }
+
+        private void UpdateDefaultExtensions()
+        {
+            var fileHelper = new FileHelper();
+            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(Executor).GetTypeInfo().Assembly.Location), "Extensions");
+            var defaultExtensionPaths = new List<string>();
+            if (fileHelper.DirectoryExists(extensionsFolder))
+            {
+                var dlls = fileHelper.EnumerateFiles(extensionsFolder, ".*.dll", SearchOption.TopDirectoryOnly);
+                defaultExtensionPaths.AddRange(dlls);
+                var exes = fileHelper.EnumerateFiles(extensionsFolder, ".*.exe", SearchOption.TopDirectoryOnly);
+                defaultExtensionPaths.AddRange(exes);
+                TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
+            }
         }
 
         #endregion

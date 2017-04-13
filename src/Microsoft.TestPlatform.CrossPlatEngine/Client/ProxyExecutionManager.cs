@@ -20,6 +20,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
+    using System.Text.RegularExpressions;
+    using Microsoft.VisualStudio.TestPlatform.Common;
 
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
@@ -160,10 +162,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var sourceList = sources.ToList();
-            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList).ToList();
+            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.DefaultExtensionPaths).ToList();
             if (TestPluginCache.Instance.PathToAdditionalExtensions != null)
             {
-                extensions.AddRange(TestPluginCache.Instance.PathToAdditionalExtensions);
+                var adapters = new List<string>();
+                var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
+
+                extensions.AddRange(TestPluginCache.Instance.PathToAdditionalExtensions.Where(ext => (regex.IsMatch(ext))));
             }
 
             // Only send this if needed.
