@@ -78,12 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorThrowsIfFileIsReadOnly()
+        public void EnableDiagArgumentProcessorExecutorDoesNotThrowsIfFileDotOpenThrow()
         {
-            this.mockFileHelper.Setup(fh => fh.Exists(this.dummyFilePath)).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.GetFileAttributes(this.dummyFilePath)).Returns(FileAttributes.ReadOnly);
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
 
-            Assert.ThrowsException<CommandLineException>(() => this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath));
+            this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
         }
 
         [TestMethod]
@@ -111,11 +110,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void EnableDiagArgumentProcessorExecutorShouldEnableVerboseLogging()
+        public void EnableDiagArgumentProcessorExecutorShouldDisableVerboseLoggingIfEqtTraceThowException()
         {
+            this.mockFileHelper.Setup(fh => fh.DirectoryExists(Path.GetDirectoryName(this.dummyFilePath))).Returns(true);
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
 
-            Assert.IsTrue(EqtTrace.IsVerboseEnabled);
+            Assert.IsTrue(!EqtTrace.IsVerboseEnabled);
 #if NET46
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else

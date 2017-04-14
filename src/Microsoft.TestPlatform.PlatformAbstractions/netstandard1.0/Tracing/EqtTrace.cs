@@ -21,12 +21,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class PlatformEqtTrace : IPlatformEqtTrace
     {
+        public static string ErrorOnInitialization { get; set; }
+
         public void WriteLine(PlatformTraceLevel level, string message)
         {
             throw new NotImplementedException();
         }
 
-        public void InitializeVerboseTrace(string customLogFile)
+        public bool InitializeVerboseTrace(string customLogFile)
         {
             throw new NotImplementedException();
         }
