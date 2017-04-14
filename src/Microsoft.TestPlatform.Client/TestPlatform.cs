@@ -79,7 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             this.UpdateTestAdapterPaths(discoveryCriteria.RunSettings);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
-            
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
+
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 

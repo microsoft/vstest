@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
@@ -27,11 +27,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The store for all the properties registered.
         /// </summary>
         private readonly Dictionary<TestProperty, object> store;
-
-        /// <summary>
-        /// The store for all the local properties registered.
-        /// </summary>
-        protected readonly Dictionary<TestProperty, object> localStore;
 
         /// <summary>
         /// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
@@ -69,13 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        /// <summary>
-        /// Returns the list of testproperties associated with the test object
-        /// </summary>
-        /// <returns></returns>
         public IEnumerable<KeyValuePair<TestProperty, object>> GetProperties()
         {
-            return this.localStore.Concat(this.store);
+            return this.store;
         }
 
         #endregion Fields
@@ -85,7 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         protected TestObject()
         {
             this.store = new Dictionary<TestProperty, object>();
-            this.localStore = new Dictionary<TestProperty, object>();
         }
 
         [OnSerializing]
@@ -117,9 +107,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Returns the TestProperties currently specified in this TestObject.
         /// </summary>
-        public IEnumerable<TestProperty> Properties
+        public virtual IEnumerable<TestProperty> Properties
         {
-            get { return this.localStore.Keys.Concat(this.store.Keys); }
+            get { return this.store.Keys; }
         }
 
         /// <summary>
@@ -200,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.store.Remove(property);
             }
         }
-
+ 
         /// <summary>
         /// Returns TestProperty's value 
         /// </summary>
@@ -254,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
 
             object value;
-            if (!this.store.TryGetValue(property, out value) )
+            if (!this.store.TryGetValue(property, out value))
             {
                 value = defaultValue;
             }
@@ -395,5 +385,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return this.traits;
             }
         }
-    } 
+    }
 }
