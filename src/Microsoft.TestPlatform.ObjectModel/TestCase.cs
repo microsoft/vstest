@@ -250,9 +250,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             switch (property.Id)
             {
                 case "TestCase.Id":
-                    this.Id = Guid.Parse((string)value); return;
+                    this.Id = value is Guid ? (Guid)value : Guid.Parse((string)value); return;
                 case "TestCase.ExecutorUri":
-                    this.ExecutorUri = new Uri((string)value); return;
+                    this.ExecutorUri = value as Uri ?? new Uri((string)value); return;
                 case "TestCase.FullyQualifiedName":
                     this.FullyQualifiedName = (string)value; return;
                 case "TestCase.DisplayName":
