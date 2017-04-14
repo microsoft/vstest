@@ -22,7 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">
-      <Version>15.0.0</Version>
+      <Version>15.1.0-preview-678431</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Client\Microsoft.TestPlatform.Client.csproj" />
