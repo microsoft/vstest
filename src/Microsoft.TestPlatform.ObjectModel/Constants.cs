@@ -62,10 +62,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string TraceLogMaxFileSizeInKB = "TraceLogMaxFileSizeInKb";
 
         public const string EmptyRunSettings = @"<RunSettings></RunSettings>";
-        
 
         public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM ? Architecture.ARM : Architecture.X86;
-        
+
         /// <summary>
         /// Default option for parallel execution
         /// </summary>
