@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     [TestClass]
     public class EnableDiagArgumentProcessorTests
     {
-        private string dummyFilePath = Path.Combine(Path.DirectorySeparatorChar.ToString(), "tmp", "foo.txt");
+        private string dummyFilePath = Path.Combine(Path.DirectorySeparatorChar.ToString(), $"{System.Guid.NewGuid()}", $"{System.Guid.NewGuid()}.txt");
 
         private readonly EnableDiagArgumentProcessor diagProcessor;
 
