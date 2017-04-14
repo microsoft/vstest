@@ -190,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.store.Remove(property);
             }
         }
-        
+ 
         /// <summary>
         /// Returns TestProperty's value 
         /// </summary>
@@ -273,7 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Convert passed in value from TestProperty's specified value type.
         /// </summary>
         /// <returns>Converted object</returns>
-        protected static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
+        private static object ConvertPropertyFrom<T>(TestProperty property, CultureInfo culture, object value)
         {
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");

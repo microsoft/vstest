@@ -236,6 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     return this.LineNumber;
             }
 
+            // It is a custom test case property. Should be retrieved from the TestObject store.
             return base.ProtectedGetPropertyValue(property, defaultValue);
         }
 
@@ -249,20 +250,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             switch (property.Id)
             {
                 case "TestCase.Id":
-                    this.Id = (Guid)ConvertPropertyFrom<Guid>(property, CultureInfo.InvariantCulture, value); return;
+                    this.Id = Guid.Parse((string)value); return;
                 case "TestCase.ExecutorUri":
-                    this.ExecutorUri = (Uri)ConvertPropertyFrom<Uri>(property, CultureInfo.InvariantCulture, value); return;
+                    this.ExecutorUri = new Uri((string)value); return;
                 case "TestCase.FullyQualifiedName":
-                    this.FullyQualifiedName = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                    this.FullyQualifiedName = (string)value; return;
                 case "TestCase.DisplayName":
-                    this.DisplayName = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                    this.DisplayName = (string)value; return;
                 case "TestCase.Source":
-                    this.Source = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                    this.Source = (string)value; return;
                 case "TestCase.CodeFilePath":
-                    this.CodeFilePath = (string)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                    this.CodeFilePath = (string)value; return;
                 case "TestCase.LineNumber":
-                    this.LineNumber = (int)ConvertPropertyFrom<string>(property, CultureInfo.InvariantCulture, value); return;
+                    this.LineNumber = (int)value; return;
             }
+
+            // It is a custom test case property. Should be set in the TestObject store.
             base.ProtectedSetPropertyValue(property, value);
         }
 
