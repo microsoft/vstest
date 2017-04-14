@@ -42,8 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.TestCase = testCase;
             this.Messages = new Collection<TestResultMessage>();
             this.Attachments = new Collection<AttachmentSet>();
-            this.StartTime = DateTime.Now;
-            this.EndTime = DateTime.Now;
+            this.StartTime = default(DateTimeOffset);
+            this.EndTime = default(DateTimeOffset);
         }
 
         #endregion
@@ -320,19 +320,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public static class TestResultProperties
     {
-        private static List<TestProperty> properties = new List<TestProperty>
-                {
-                    DisplayName,
-                    ComputerName,
-                    Outcome,
-                    Duration,
-                    DisplayName,
-                    StartTime,
-                    EndTime,
-                    ErrorMessage,
-                    ErrorStackTrace
-        };
-
 #if !FullCLR
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", "TestResult Display Name", typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
@@ -382,7 +369,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", Resources.Resources.TestResultPropertyErrorStackTraceLabel, typeof(string), typeof(TestResult));
 #endif
-        internal static List<TestProperty> Properties => properties;
+        internal static TestProperty[] Properties { get; } =
+        {
+            DisplayName,
+            ComputerName,
+            Outcome,
+            Duration,
+            DisplayName,
+            StartTime,
+            EndTime,
+            ErrorMessage,
+            ErrorStackTrace
+        };
 
         private static bool ValidateOutcome(object value)
         {

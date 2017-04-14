@@ -90,7 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
         {
             // P2 to P1
             var testResult = value as TestResult;
-            var properties = testResult.GetProperties();
 
             writer.WriteStartObject();
             writer.WritePropertyName("TestCase");
@@ -102,6 +101,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 
             writer.WritePropertyName("Properties");
             writer.WriteStartArray();
+
+            // Version Note: In 15.0.0, if some properties in TestResult were not set, they were not serialized.
+            // Starting 15.1.0, test platform sends in default values for properties that were not set. This is not
+            // a breaking change.
 
             // TestResult.Outcome
             writer.WriteStartObject();
@@ -136,7 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             // TestResult.Duration
             writer.WriteStartObject();
             AddProperty(writer, TestResultProperties.Duration, serializer);
-            writer.WriteValue(testResult.Duration.ToString());
+            writer.WriteValue(testResult.Duration);
             writer.WriteEndObject();
 
             // TestResult.StartTime

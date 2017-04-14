@@ -89,6 +89,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             writer.WritePropertyName("Properties");
             writer.WriteStartArray();
 
+            // Version Note: In 15.0.0, if some properties in TestCase were not set, they were not serialized.
+            // Starting 15.1.0, test platform sends in default values for properties that were not set. This is not
+            // a breaking change.
+
             // TestCase.FullyQualifiedName
             writer.WriteStartObject();
             AddProperty(writer, TestCaseProperties.FullyQualifiedName, serializer);
@@ -98,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             // TestCase.ExecutorUri
             writer.WriteStartObject();
             AddProperty(writer, TestCaseProperties.ExecutorUri, serializer);
-            writer.WriteValue(testCase.ExecutorUri.ToString());
+            writer.WriteValue(testCase.ExecutorUri.OriginalString);
             writer.WriteEndObject();
 
             // TestCase.Source
@@ -119,10 +123,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             writer.WriteValue(testCase.DisplayName);
             writer.WriteEndObject();
 
-            // TestCase.DisplayName
+            // TestCase.Id
             writer.WriteStartObject();
             AddProperty(writer, TestCaseProperties.Id, serializer);
-            writer.WriteValue(testCase.Id.ToString());
+            writer.WriteValue(testCase.Id);
             writer.WriteEndObject();
 
             // TestCase.LineNumber

@@ -288,17 +288,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private const string FilePathLabel = "File Path";
         private const string LineNumberLabel = "Line Number";
 
-        private static List<TestProperty> properties = new List<TestProperty>
-                {
-                    Id,
-                    CodeFilePath,
-                    ExecutorUri,
-                    FullyQualifiedName,
-                    DisplayName,
-                    Id,
-                    LineNumber,
-                    Source
-        };
         #endregion
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
@@ -322,7 +311,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty LineNumber = TestProperty.Register("TestCase.LineNumber", LineNumberLabel, typeof(int), TestPropertyAttributes.Hidden, typeof(TestCase));
 
-        internal static List<TestProperty> Properties => properties;
+        internal static TestProperty[] Properties { get; } =
+        {
+            Id,
+            CodeFilePath,
+            ExecutorUri,
+            FullyQualifiedName,
+            DisplayName,
+            LineNumber,
+            Source
+        };
 
         private static bool ValidateName(object value)
         {
