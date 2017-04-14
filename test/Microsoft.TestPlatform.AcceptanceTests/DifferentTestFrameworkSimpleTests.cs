@@ -26,6 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
+        [Ignore] // https://github.com/Microsoft/vstest/issues/689
         [CustomDataTestMethod]
         [NET46TargetFramework]
         public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
