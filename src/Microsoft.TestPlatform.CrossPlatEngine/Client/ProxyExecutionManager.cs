@@ -165,9 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.DefaultExtensionPaths).ToList();
             if (TestPluginCache.Instance.PathToAdditionalExtensions != null)
             {
-                var adapters = new List<string>();
                 var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
-
                 extensions.AddRange(TestPluginCache.Instance.PathToAdditionalExtensions.Where(ext => (regex.IsMatch(ext))));
             }
 
