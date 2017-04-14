@@ -68,7 +68,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             try
             {
-                var extensions = new[] { "c:\\e1.dll", "c:\\e2.dll" };
+                var extensions = new[] { "c:\\e1.TestAdapter.dll", "c:\\e2.TestAdapter.dll" };
                 TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 
@@ -104,13 +104,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance = null;
             try
             {
-                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.dll" });
+                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.TestAdapter.dll" });
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
 
                 this.testExecutionManager.Initialize();
 
-                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }, true), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.TestAdapter.dll" }, true), Times.Once);
             }
             finally
             {
@@ -145,7 +145,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldInitializeExtensionsIfTestHostIsNotShared()
         {
             TestPluginCache.Instance = null;
-            TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "x.dll" });
+            TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "x.TestAdapter.dll" });
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
 

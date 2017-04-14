@@ -31,14 +31,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         /// <summary>
         /// Priority of UseVsixArgumentProcessor.
-        /// The priority of useVsix processor is more than the logger because logger initialization 
+        /// The priority of useVsix processor is more than the logger because logger initialization
         /// loads the extensions which are incomplete if vsix processor is enabled
         /// </summary>
         VsixExtensions = 5,
 
         /// <summary>
         /// Priority of TestAdapterPathArgumentProcessor.
-        /// The priority of TestAdapterPath processor is more than the logger because logger initialization 
+        /// The priority of TestAdapterPath processor is more than the logger because logger initialization
         /// loads the extensions which are incomplete if custom test adapter is enabled
         /// </summary>
         TestAdapterPath = 6,
