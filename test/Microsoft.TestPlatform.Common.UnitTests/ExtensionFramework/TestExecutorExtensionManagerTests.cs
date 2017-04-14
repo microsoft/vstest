@@ -31,15 +31,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void CreateShouldCacheDiscoveredExtensions()
         {
-            var discoveryCount = 0;
-            TestPluginCacheTests.SetupMockExtensions(() => { discoveryCount++; });
+            TestPluginCacheTests.SetupMockExtensions(() => { });
 
             var extensionManager = TestExecutorExtensionManager.Create();
             TestExecutorExtensionManager.Create();
 
             Assert.IsNotNull(extensionManager.TestExtensions);
             Assert.IsTrue(extensionManager.TestExtensions.Count() > 0);
-            Assert.AreEqual(1, discoveryCount);
         }
 
         [TestMethod]

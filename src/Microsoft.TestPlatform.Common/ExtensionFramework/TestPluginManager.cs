@@ -160,7 +160,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         #endregion
 
         #region Private Methods
-        
 
         /// <summary>
         /// Prepares a List of TestPluginInformation&gt;

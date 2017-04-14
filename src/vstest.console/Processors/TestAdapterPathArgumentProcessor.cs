@@ -72,7 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
         }
     }
-    
+
     /// <summary>
     /// The argument capabilities.
     /// </summary>
@@ -204,10 +204,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns> The list of test adapter and logger assemblies. </returns>
         internal virtual IEnumerable<string> GetTestAdaptersFromDirectory(string directory)
         {
-            List<string> adapterAndLogger = new List<string>(); 
-            adapterAndLogger.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories).ToList());
-            adapterAndLogger.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories).ToList());
-            return adapterAndLogger;
+            // TODO this code is DRY violation with TestPlatform.AddExtensionAssemblies, require cleanup. This argument processor
+            // should update the run settings.
+            var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories));
+            extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories));
+            extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.RunTimeRegexPattern, SearchOption.AllDirectories));
+            extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(directory, TestPlatformConstants.SettingsProviderRegexPattern, SearchOption.AllDirectories));
+
+            return extensionAssemblies;
         }
 
         #endregion

@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Specify the path to additional extensions
         /// </summary>
         private IEnumerable<string> pathToAdditionalExtensions;
-        
+
         /// <summary>
         /// Specifies whether we should load only well known extensions or not. Default is "load all".
         /// </summary>
@@ -53,9 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         private static TestPluginCache instance;
 
-        private List<string> defaultExtensionPaths;
-
-        private const string DefaultExtensionsFolder = "Extensions";
+        private List<string> defaultExtensionPaths = new List<string>();
 
         #endregion
 
@@ -154,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 EqtTrace.Verbose("TestPluginCache: Discovering the extensions using extension path.");
 
                 extensions = this.GetTestExtensions(new List<string> { extensionAssembly });
-                
+
                 // Add extensions discovered to the cache.
                 if (this.TestExtensions == null)
                 {
@@ -201,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         public void DiscoverAllTestExtensions()
         {
             this.SetupAssemblyResolver(null);
-            
+
             // Some times TestPlatform.core.dll assembly fails to load in the current appdomain (from devenv.exe).
             // Reason for failures are not known. Below handler, again calls assembly.load() in failing assembly
             // and that succeeds.
@@ -215,7 +213,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             try
             {
                 EqtTrace.Verbose("TestPluginCache: Discovering the extensions using extension path.");
-                
+
                 // Combine all the possible extensions - both default and additional
                 var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
                 if (this.pathToAdditionalExtensions != null)
@@ -360,27 +358,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             get
             {
-                if (this.defaultExtensionPaths == null)
-                {
-                    var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location), DefaultExtensionsFolder);
-
-                    if (!this.DoesDirectoryExist(extensionsFolder))
-                    {
-                        EqtTrace.Error("Default extensions folder does not exist");
-                        // Initialize and bail out.
-                        this.defaultExtensionPaths = new List<string>();
-                    }
-                    else
-                    {
-                        // Scan all of the DLL's and EXE's
-                        var dlls = this.GetFilesInDirectory(extensionsFolder, ".*.dll");
-                        this.defaultExtensionPaths = new List<string>(dlls);
-                        var exes = this.GetFilesInDirectory(extensionsFolder, ".*.exe");
-                        this.defaultExtensionPaths.AddRange(exes);
-                    }
-                }
-
                 return this.defaultExtensionPaths;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    this.defaultExtensionPaths.AddRange(value);
+                }
             }
         }
 
@@ -449,30 +434,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         internal IList<string> GetDefaultResolutionPaths()
         {
             var resolutionPaths = new List<string>();
-            
+
             var extensionDirectories = this.pathToAdditionalExtensions?.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
             if (extensionDirectories != null && extensionDirectories.Any())
             {
                 resolutionPaths.AddRange(extensionDirectories);
             }
 
+            extensionDirectories = this.defaultExtensionPaths?.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
+            if (extensionDirectories != null && extensionDirectories.Any())
+            {
+                resolutionPaths.AddRange(extensionDirectories);
+            }
+
             var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
-            
+
             if (!resolutionPaths.Contains(currentDirectory))
             {
                 resolutionPaths.Add(currentDirectory);
             }
 
-            var defaultExtensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location), DefaultExtensionsFolder);
-
-            if (this.DoesDirectoryExist(defaultExtensionsFolder) && !resolutionPaths.Contains(defaultExtensionsFolder))
-            {
-                resolutionPaths.Add(defaultExtensionsFolder);
-            }
-
             return resolutionPaths;
         }
-        
+
         private void SetupAssemblyResolver(string extensionAssembly)
         {
             IList<string> resolutionPaths;
@@ -537,7 +521,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
             }
         }
-        
+
         /// <summary>
         /// Log the extensions
         /// </summary>
