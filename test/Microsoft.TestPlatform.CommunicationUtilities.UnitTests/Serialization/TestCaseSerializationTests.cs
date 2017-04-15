@@ -119,8 +119,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
             // Use raw deserialization to validate basic properties
             dynamic data = JObject.Parse(json);
             dynamic properties = data["Properties"];
-            Assert.AreEqual(@"TestObject.Traits", properties[3]["Key"]["Id"].Value);
-            Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[3]["Value"].ToString(Formatting.None));
+            Assert.AreEqual(@"TestObject.Traits", properties[7]["Key"]["Id"].Value);
+            Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[7]["Value"].ToString(Formatting.None));
         }
 
         #endregion

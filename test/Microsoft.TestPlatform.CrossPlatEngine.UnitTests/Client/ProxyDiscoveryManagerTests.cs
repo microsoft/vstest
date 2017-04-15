@@ -67,7 +67,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             try
             {
-                var extensions = new[] { "c:\\e1.dll", "c:\\e2.dll" };
+                var extensions = new[] { "c:\\e1.TestAdapter.dll", "c:\\e2.TestAdapter.dll" };
 
                 // Setup Mocks.
                 TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
@@ -93,13 +93,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance = null;
             try
             {
-                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.dll" });
+                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.TestAdapter.dll" });
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
 
                 this.testDiscoveryManager.Initialize();
 
-                this.mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.dll" }, true), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(new[] { "he1.dll", "c:\\e1.TestAdapter.dll" }, true), Times.Once);
             }
             finally
             {
@@ -138,7 +138,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
         {
-            // System.Diagnostics.Debugger.Launch();
             // Setup mocks.
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
             Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();

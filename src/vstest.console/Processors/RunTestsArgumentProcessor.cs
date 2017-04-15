@@ -163,6 +163,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.output.WriteLine(CommandLineResources.StartingExecution, OutputLevel.Information);
+            if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+            {
+                this.output.Information(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+            }
 
             var success = true;
             if (this.commandLineOptions.Sources.Any())

@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
-            this.testPlatform.Initialize(pathToAdditionalExtensions, false, true);
+            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, false);
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 
