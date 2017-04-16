@@ -132,8 +132,11 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
-    # Uncomment to pull in additional shared frameworks.
-    # This is added to get netcoreapp1.1 shared components.
+    # Pull in additional shared frameworks.
+    # Get netcoreapp1.0 shared components.
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.0.4' -Channel 'preview'
+    
+    # Get netcoreapp1.1 shared components.
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.1' -Channel 'release/1.1.0'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
