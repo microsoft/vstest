@@ -39,6 +39,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
     using Microsoft.VisualStudio.TestPlatform.Common;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using System.IO;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     /// <summary>
     /// Performs the execution based on the arguments provided.

@@ -14,7 +14,7 @@ namespace SampleUnitTestProject2
         /// The passing test.
         /// </summary>
         [TestMethod]
-        public void PassingTest()
+        public void PassingTest2()
         {
             Assert.AreEqual(2, 2);
         }
@@ -23,7 +23,7 @@ namespace SampleUnitTestProject2
         /// The failing test.
         /// </summary>
         [TestMethod]
-        public void FailingTest()
+        public void FailingTest2()
         {
             Assert.AreEqual(2, 3);
         }
@@ -33,7 +33,7 @@ namespace SampleUnitTestProject2
         /// </summary>
         [Ignore]
         [TestMethod]
-        public void SkippingTest()
+        public void SkippingTest2()
         {
         }
     }

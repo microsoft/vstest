@@ -86,29 +86,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         }
 
         [TestMethod]
-        public void GetTestExtensionsShouldDiscoverExtensionsOnlyOnce()
-        {
-            var discoveryCount = 0;
-            TestPluginCacheTests.SetupMockExtensions(() => { discoveryCount++; });
-
-            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
-            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
-
-            TestPluginManager.Instance.GetTestExtensions<ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                    out unfilteredTestExtensions,
-                    out testExtensions);
-            
-            // Call this again to verify that discovery is not called again.
-            TestPluginManager.Instance.GetTestExtensions<ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                    out unfilteredTestExtensions,
-                    out testExtensions);
-            
-            Assert.IsNotNull(testExtensions);
-            Assert.IsTrue(testExtensions.Count() > 0);
-            Assert.AreEqual(1, discoveryCount);
-        }
-
-        [TestMethod]
         public void GetTestExtensionsForAnExtensionAssemblyShouldReturnExtensionsInThatAssembly()
         {
             IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;

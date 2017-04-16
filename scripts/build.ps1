@@ -249,7 +249,7 @@ function Publish-Package
 
     # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
     # Ideally we should just be publishing the loggers to the Extensions folder.
-    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
+    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
     foreach($file in $loggers) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
@@ -258,8 +258,8 @@ function Publish-Package
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 	
-	# Note Note: If there are some dependencies for the TestHostProvider assemblies, those need to be moved too. 
-    $runtimeproviders = @("Microsoft.TestPlatform.TestHostProvider.dll", "Microsoft.TestPlatform.TestHostProvider.pdb")
+	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
@@ -268,7 +268,7 @@ function Publish-Package
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 
-    # Copy dependency of Microsoft.TestPlatform.TestHostProvider
+    # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\net45\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $fullCLRPackageDir -Force"
     Copy-Item $newtonsoft $fullCLRPackageDir -Force
@@ -299,7 +299,7 @@ function Create-VsixPackage
     $packageDir = Get-FullCLRPackageDirectory
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-678431\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over

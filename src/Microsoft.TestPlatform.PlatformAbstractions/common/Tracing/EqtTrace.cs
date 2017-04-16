@@ -144,13 +144,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <inheritdoc/>
-        public void InitializeVerboseTrace(string customLogFile)
+        public bool InitializeVerboseTrace(string customLogFile)
         {
             isInitialized = false;
 
             LogFile = customLogFile;
             TraceLevel = TraceLevel.Verbose;
             Source.Switch.Level = SourceLevels.All;
+
+            // Ensure trace is initlized
+            return EnsureTraceIsInitialized();
         }
 
         /// <inheritdoc/>
@@ -180,21 +183,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return LogFile;
         }
 
+        public static string ErrorOnInitialization
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Ensure the trace is initialized
         /// </summary>
-        private static void EnsureTraceIsInitialized()
+        private static bool EnsureTraceIsInitialized()
         {
             if (isInitialized)
             {
-                return;
+                return true;
             }
 
             lock (isInitializationLock)
             {
                 if (isInitialized)
                 {
-                    return;
+                    return true;
                 }
 
                 string logsDirectory = Path.GetTempPath();
@@ -214,9 +223,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 // Add a default listener
                 traceFileSize = defaultTraceFileSize;
-                Source.Listeners.Add(new RollingFileTraceListener(LogFile, ListenerName, traceFileSize));
+                try
+                {
+                    Source.Listeners.Add(new RollingFileTraceListener(LogFile, ListenerName, traceFileSize));
+                }
+                catch (Exception e)
+                {
+                    UnInitializeVerboseTrace();
+                    ErrorOnInitialization = e.Message;
+                    return false;
+                }
 
                 isInitialized = true;
+                return true;
             }
         }
 
@@ -285,31 +304,31 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Debug.Assert(message != null, "message != null");
             Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
 
-            // Ensure trace is initlized
-            EnsureTraceIsInitialized();
-
-            // The format below is a CSV so that Excel could be used easily to
-            // view/filter the logs.
-            var log = string.Format(
-                CultureInfo.InvariantCulture,
-                "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
-                ProcessId,
-                Thread.CurrentThread.ManagedThreadId,
-                DateTime.Now,
-                ProcessName,
-                message,
-                Stopwatch.GetTimestamp());
-
-            try
+            if (EnsureTraceIsInitialized())
             {
-                Source.TraceEvent(TraceLevelEventTypeMap[MapPlatformTraceToTrace(level)], 0, log);
-                Source.Flush();
-            }
-            catch (Exception e)
-            {
-                // valid suppress
-                // Log exception from tracing into event viewer.
-                LogIgnoredException(e);
+                // The format below is a CSV so that Excel could be used easily to
+                // view/filter the logs.
+                var log = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
+                    ProcessId,
+                    Thread.CurrentThread.ManagedThreadId,
+                    DateTime.Now,
+                    ProcessName,
+                    message,
+                    Stopwatch.GetTimestamp());
+
+                try
+                {
+                    Source.TraceEvent(TraceLevelEventTypeMap[MapPlatformTraceToTrace(level)], 0, log);
+                    Source.Flush();
+                }
+                catch (Exception e)
+                {
+                    // valid suppress
+                    // Log exception from tracing into event viewer.
+                    LogIgnoredException(e);
+                }
             }
         }
 
@@ -321,10 +340,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             Debug.Assert(e != null, "e != null");
 
-            EnsureTraceIsInitialized();
-
             try
             {
+                EnsureTraceIsInitialized();
+
                 // Note: Debug.WriteLine may throw if there is a problem in .config file.
                 Debug.WriteLine("Ignore exception: " + e);
             }
@@ -363,6 +382,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     Debug.Fail("Should never get here!");
                     return TraceLevel.Verbose;
             }
+        }
+
+        private static void UnInitializeVerboseTrace()
+        {
+            isInitialized = false;
+
+            LogFile = null;
+            TraceLevel = TraceLevel.Off;
+            Source.Switch.Level = SourceLevels.Off;
         }
     }
 }
