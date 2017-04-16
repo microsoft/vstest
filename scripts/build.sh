@@ -94,7 +94,7 @@ TPB_VersionSuffix=$VERSION_SUFFIX
 TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
-TPB_HasMono=$(hash mono 2> /dev/null)
+TPB_HasMono=$(command -v mono > /dev/null && echo true || echo false)
 
 #
 # Logging
@@ -272,6 +272,15 @@ function publish_package()
         log "Package: Publish $projectToPackage"
         $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
     done
+
+    # Copy TestHost for desktop targets if we've built net46
+    # packages with mono
+    if $TPB_HasMono; then
+        local testhost=$coreCLRPackageDir/TestHost
+        mkdir -p $testhost
+        cp -r src/testhost/bin/$TPB_Configuration/net46/win7-x64/* $testhost
+        cp -r src/testhost.x86/bin/$TPB_Configuration/net46/win7-x64/* $testhost
+    fi
     
     # Copy over the logger assemblies to the Extensions folder.
     coreCLRExtensionsDir="$coreCLRPackageDir/Extensions"
@@ -280,10 +289,18 @@ function publish_package()
 
     # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
     # Ideally we should just be publishing the loggers to the Extensions folder.
-    loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
+    loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
     for i in ${loggers[@]}; do
         mv $coreCLRPackageDir/${i} $coreCLRExtensionsDir
     done
+
+    # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    runtimeproviders=("Microsoft.TestPlatform.TestHostRuntimeProvider.dll" "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
+    for i in ${runtimeproviders[@]}; do
+        mv $coreCLRPackageDir/${i} $coreCLRExtensionsDir
+    done
+    newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
+    cp $newtonsoft $coreCLRExtensionsDir
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
