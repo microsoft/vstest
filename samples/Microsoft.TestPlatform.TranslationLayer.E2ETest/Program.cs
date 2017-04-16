@@ -208,7 +208,6 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
         public void HandleTestRunComplete(
             TestRunCompleteEventArgs testRunCompleteArgs,
             TestRunChangedEventArgs lastChunkArgs,
-            ICollection<AttachmentSet> runContextAttachments,
             ICollection<string> executorUris)
         {
             if (lastChunkArgs != null && lastChunkArgs.NewTestResults != null)

@@ -224,7 +224,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             var completeArgs = new TestRunCompleteEventArgs(new
                                 TestRunStatistics(5, stats), isCanceled, isAborted, null, runAttachments, timespan);
-                            handler.HandleTestRunComplete(completeArgs, null, runAttachments, executorUris);
+                            handler.HandleTestRunComplete(completeArgs, null, executorUris);
                         });
             }
 
@@ -233,10 +233,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockHandler.Setup(m => m.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(),
-                It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>())).Callback
-                <TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-                (completeArgs, runChangedArgs, runAttachments, executorUris) =>
+                <TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<string>>(
+                (completeArgs, runChangedArgs, executorUris) =>
                 {
                     try
                     {
@@ -244,7 +243,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                             "Time should be max of all");
                         Assert.AreEqual(2, completeArgs.AttachmentSets.Count,
                             "All Complete Arg attachments should return");
-                        Assert.AreEqual(2, runAttachments.Count, "All RunContextAttachments should return");
+                        Assert.AreEqual(2, completeArgs.AttachmentSets.Count, "All RunContextAttachments should return");
 
                         Assert.IsTrue(completeArgs.IsAborted, "Aborted value must be OR of all values");
                         Assert.IsTrue(completeArgs.IsCanceled, "Canceled value must be OR of all values");
@@ -283,10 +282,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
-                .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<AttachmentSet>, ICollection<string>>(
-                    (testRunCompleteArgs, testRunChangedEventArgs, attachmentSets, executorUris) => { completeEvent.Set(); });
+                .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs, ICollection<string>>(
+                    (testRunCompleteArgs, testRunChangedEventArgs, executorUris) => { completeEvent.Set(); });
         }
 
         private void AssertMissingAndDuplicateSources(List<string> processedSources)
@@ -362,7 +360,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             // Duplicated testRunCriteria should match the actual one.
                             Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
-                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(), null, null, null);
+                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(), null, null);
                         });
             }
         }
@@ -396,7 +394,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                             // Duplicated testRunCriteria should match the actual one.
                             Assert.AreEqual(testRunCriteria, criteria, "Mismastch in testRunCriteria");
-                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(isCanceled, isAborted), null, null, null);
+                            handler.HandleTestRunComplete(CreateTestRunCompleteArgs(isCanceled, isAborted), null, null);
                         });
             }
         }
