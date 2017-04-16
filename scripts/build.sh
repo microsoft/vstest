@@ -300,7 +300,7 @@ function publish_package()
         mv $coreCLRPackageDir/${i} $coreCLRExtensionsDir
     done
     newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
-    cp $newtonsoft $coreCLRExtensionsDir
+    cp $newtonsoft $coreCLRPackageDir
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
