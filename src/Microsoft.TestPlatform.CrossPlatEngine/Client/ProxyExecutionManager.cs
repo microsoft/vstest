@@ -135,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
+                eventHandler.HandleTestRunComplete(completeArgs, null, null);
             }
 
             return 0;

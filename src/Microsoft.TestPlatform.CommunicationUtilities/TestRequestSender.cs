@@ -283,7 +283,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         testRunEventsHandler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
                             testRunCompletePayload.LastRunTests,
-                            testRunCompletePayload.RunAttachments,
                             testRunCompletePayload.ExecutorUris);
                         isTestRunComplete = true;
                     }
@@ -350,7 +349,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             testRunEventsHandler.HandleRawMessage(rawMessage);
 
             // notify of a test run complete and bail out.
-            testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+            testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null);
 
             this.CleanupCommunicationIfProcessExit();
         }

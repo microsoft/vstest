@@ -8,7 +8,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Collections.ObjectModel;
     using System.Linq;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -22,6 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     {
         private IProxyDataCollectionManager proxyDataCollectionManager;
         private ITestRunEventsHandler testRunEventsHandler;
+        private IDataSerializer dataSerializer;
+        private Collection<AttachmentSet> dataCollectionAttachmentSets;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionTestRunEventsHandler"/> class.
@@ -29,13 +33,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="baseTestRunEventsHandler">
         /// The base test run events handler.
         /// </param>
-        /// <param name="proxyExecutionManager">
-        /// The proxy execution manager.
+        /// <param name="proxyDataCollectionManager">
+        /// The proxy Data Collection Manager.
         /// </param>
         public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager)
+            : this(baseTestRunEventsHandler, proxyDataCollectionManager, JsonDataSerializer.Instance)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataCollectionTestRunEventsHandler"/> class.
+        /// </summary>
+        /// <param name="baseTestRunEventsHandler">
+        /// The base test run events handler.
+        /// </param>
+        /// <param name="proxyDataCollectionManager">
+        /// The proxy Data Collection Manager.
+        /// </param>
+        /// <param name="dataSerializer">
+        /// The data Serializer.
+        /// </param>
+        public DataCollectionTestRunEventsHandler(ITestRunEventsHandler baseTestRunEventsHandler, IProxyDataCollectionManager proxyDataCollectionManager, IDataSerializer dataSerializer)
         {
             this.proxyDataCollectionManager = proxyDataCollectionManager;
             this.testRunEventsHandler = baseTestRunEventsHandler;
+            this.dataSerializer = dataSerializer;
         }
 
         /// <summary>
@@ -60,6 +82,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </param>
         public void HandleRawMessage(string rawMessage)
         {
+            // In case of data collection, data collection attachments should be attached to raw message for ExecutionComplete 
+            var message = this.dataSerializer.DeserializeMessage(rawMessage);
+
+            if (string.Equals(MessageType.ExecutionComplete, message.MessageType))
+            {
+                this.dataCollectionAttachmentSets = this.proxyDataCollectionManager?.AfterTestRunEnd(false, this);
+                
+                if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
+                {
+                    var testRunCompletePayload =
+                            this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+
+                    GetCombinedAttachmentSets(
+                        testRunCompletePayload.TestRunCompleteArgs.AttachmentSets,
+                        this.dataCollectionAttachmentSets);
+
+                    rawMessage = this.dataSerializer.SerializePayload(
+                        MessageType.ExecutionComplete,
+                        testRunCompletePayload);
+                }
+            }
+
             this.testRunEventsHandler.HandleRawMessage(rawMessage);
         }
 
@@ -78,11 +122,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="executorUris">
         /// The executor uris.
         /// </param>
-        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
+        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<string> executorUris)
         {
-            var attachmentSet = this.proxyDataCollectionManager?.AfterTestRunEnd(false, this);
-            attachmentSet = DataCollectionTestRunEventsHandler.GetCombinedAttachmentSets(attachmentSet, runContextAttachments);
-            this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, attachmentSet, executorUris);
+            if (this.dataCollectionAttachmentSets != null && this.dataCollectionAttachmentSets.Any())
+            {
+                GetCombinedAttachmentSets(testRunCompleteArgs.AttachmentSets, this.dataCollectionAttachmentSets);
+            }
+
+            this.testRunEventsHandler.HandleTestRunComplete(testRunCompleteArgs, lastChunkArgs, executorUris);
         }
 
         /// <summary>
@@ -110,33 +157,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// The get combined attachment sets.
         /// </summary>
-        /// <param name="runAttachments">
+        /// <param name="originalAttachmentSets">
         /// The run attachments.
         /// </param>
-        /// <param name="runcontextAttachments">
+        /// <param name="newAttachments">
         /// The runcontext attachments.
         /// </param>
         /// <returns>
         /// The <see cref="Collection"/>.
         /// </returns>
-        internal static Collection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> runAttachments, ICollection<AttachmentSet> runcontextAttachments)
+        internal static Collection<AttachmentSet> GetCombinedAttachmentSets(Collection<AttachmentSet> originalAttachmentSets, ICollection<AttachmentSet> newAttachments)
         {
-            if (null == runcontextAttachments || runcontextAttachments.Count == 0)
+            if (null == newAttachments || newAttachments.Count == 0)
             {
-                return runAttachments;
+                return originalAttachmentSets;
             }
 
-            if (null == runAttachments)
+            if (null == originalAttachmentSets)
             {
-                return new Collection<AttachmentSet>(runcontextAttachments.ToList());
+                return new Collection<AttachmentSet>(newAttachments.ToList());
             }
 
-            foreach (var attachmentSet in runcontextAttachments)
+            foreach (var attachmentSet in newAttachments)
             {
-                var attSet = runAttachments.Where(item => Uri.Equals(item.Uri, attachmentSet.Uri)).FirstOrDefault();
+                var attSet = originalAttachmentSets.Where(item => Uri.Equals(item.Uri, attachmentSet.Uri)).FirstOrDefault();
                 if (null == attSet)
                 {
-                    runAttachments.Add(attachmentSet);
+                    originalAttachmentSets.Add(attachmentSet);
                 }
                 else
                 {
@@ -147,7 +194,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                 }
             }
 
-            return runAttachments;
+            return originalAttachmentSets;
         }
     }
 }

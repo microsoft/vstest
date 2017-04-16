@@ -170,7 +170,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
-            mockTestRunEventsHandler.Verify(s => s.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null));
+            mockTestRunEventsHandler.Verify(s => s.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null));
         }
 
         [TestMethod]

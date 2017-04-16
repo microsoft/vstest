@@ -114,12 +114,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 treh.HandleTestRunComplete(
                     It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
                     (TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
                         {
                             receivedCompleteArgs = complete;
@@ -142,12 +140,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 treh.HandleTestRunComplete(
                     It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
                     (TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
                     {
                         receivedCompleteArgs = complete;
@@ -171,12 +167,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 treh.HandleTestRunComplete(
                     It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
                     (TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
                     {
                         receivedCompleteArgs = complete;
@@ -201,12 +195,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 treh.HandleTestRunComplete(
                     It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
                     (TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
                     {
                         receivedCompleteArgs = complete;
@@ -414,7 +406,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.mockTestRunEventsHandler.Verify(
                 treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()), Times.Once);
         }
 
@@ -482,7 +473,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             TestRunCompleteEventArgs receivedRunCompleteArgs = null;
             TestRunChangedEventArgs receivedRunStatusArgs = null;
-            ICollection<AttachmentSet> receivedattachments = null;
             ICollection<string> receivedExecutorUris = null;
 
             var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
@@ -506,17 +496,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 treh.HandleTestRunComplete(
                     It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
                     (TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
                     {
                         receivedRunCompleteArgs = complete;
                         receivedRunStatusArgs = stats;
-                        receivedattachments = attachments;
                         receivedExecutorUris = executorUris;
                     });
 
@@ -535,9 +522,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             Assert.IsNotNull(receivedRunStatusArgs.NewTestResults);
             Assert.IsTrue(receivedRunStatusArgs.NewTestResults.Count() > 0);
             Assert.IsTrue(receivedRunStatusArgs.ActiveTests == null || receivedRunStatusArgs.ActiveTests.Count() == 0);
-
-            // Attachments
-            Assert.IsNotNull(receivedattachments);
 
             // Executor Uris
             var expectedUris = new string[] { BadBaseRunTestsExecutorUri.ToLower(), BaseRunTestsExecutorUri.ToLower() };
