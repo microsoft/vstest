@@ -426,7 +426,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRun(new List<string>() { "1.dll" }, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), 
-                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+                It.IsAny<TestRunChangedEventArgs>(), null), Times.Once, "Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Never, "RunChangedArgs must not be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
@@ -481,7 +481,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRun(new List<string>() { "1.dll" }, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+                It.IsAny<TestRunChangedEventArgs>(), null), Times.Once, "Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once, "TestMessage event must be called");
         }
@@ -544,7 +544,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+                It.IsAny<TestRunChangedEventArgs>(), null), Times.Once, "Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once, "Custom TestHostLauncher must be called");
@@ -596,7 +596,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRunWithCustomHost(new List<string>() { "1.dll" }, null, mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+                It.IsAny<TestRunChangedEventArgs>(), null), Times.Once, "Run Complete must be called");
         }
 
         [TestMethod]
@@ -621,7 +621,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRun(new List<TestCase>(), null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+                It.IsAny<TestRunChangedEventArgs>(), null), Times.Once, "Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Never, "RunChangedArgs must not be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Never, "TestMessage event must not be called");
         }
@@ -675,7 +675,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRun(testCaseList, null, mockHandler.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+                It.IsAny<TestRunChangedEventArgs>(), null), Times.Once, "Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once, "TestMessage event must be called");
         }
@@ -714,12 +714,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             mockHandler.Setup(mh => mh.HandleTestRunComplete(
                     It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
-                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()))
                 .Callback(
                     (TestRunCompleteEventArgs complete,
                      TestRunChangedEventArgs stats,
-                     ICollection<AttachmentSet> attachments,
                      ICollection<string> executorUris) =>
                     {
                         receivedChangeEventArgs = stats;
@@ -850,7 +848,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.requestSender.StartTestRunWithCustomHost(testCaseList, null, mockHandler.Object, mockLauncher.Object);
 
             mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(), null, null), Times.Once, "Run Complete must be called");
+                It.IsAny<TestRunChangedEventArgs>(), null), Times.Once, "Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once, "RunChangedArgs must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(It.IsAny<TestMessageLevel>(), It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             mockLauncher.Verify(ml => ml.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once, "Custom TestHostLauncher must be called");
@@ -907,7 +905,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.requestSender.StartTestRun(sources, null, mockHandler.Object);
 
-            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once, "Test Run Complete must be called");
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null), Times.Once, "Test Run Complete must be called");
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once, "TestMessage event must be called");
             this.mockCommunicationManager.Verify(cm => cm.StopServer(), Times.Never);
         }
@@ -936,7 +934,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
                     Assert.IsTrue(c.IsCancellationRequested);
                 }).Returns(Task.FromResult((Message)null));
 
-            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(() => manualEvent.Set());
+            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null)).Callback(() => manualEvent.Set());
 
             this.requestSender.StartTestRun(sources, null, mockHandler.Object);
 
