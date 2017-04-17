@@ -86,11 +86,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
+            // Update cache with Extension Folder's files
             this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
-            
+
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
@@ -147,19 +148,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
-        /// The initialize.
-        /// </summary>
-        /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
-        /// <param name="loadOnlyWellKnownExtensions"> The load only well known extensions. </param>
-        /// <param name="forceX86Discoverer"> The force x86 discoverer. </param>
-        public void Initialize(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions, bool forceX86Discoverer)
-        {
-            // TODO: ForceX86Discoverer options
-            this.TestEngine.GetExtensionManager()
-                 .UseAdditionalExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
-        }
-
-        /// <summary>
         /// The update extensions.
         /// </summary>
         /// <param name="pathToAdditionalExtensions"> The path to additional extensions. </param>
@@ -191,14 +179,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         continue;
                     }
 
-                    List<string> adapterFiles = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories));
-                    adapterFiles.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories));
-                    adapterFiles.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.RunTimeRegexPattern, SearchOption.AllDirectories));
-                    adapterFiles.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.SettingsProviderRegexPattern, SearchOption.AllDirectories));
+                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories));
+                    extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories));
+                    extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.RunTimeRegexPattern, SearchOption.AllDirectories));
+                    extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.SettingsProviderRegexPattern, SearchOption.AllDirectories));
 
-                    if (adapterFiles.Count > 0)
+                    if (extensionAssemblies.Count > 0)
                     {
-                        this.UpdateExtensions(adapterFiles, true);
+                        this.UpdateExtensions(extensionAssemblies, true);
                     }
                 }
             }
@@ -219,7 +207,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 sources = testRunCriteria.Tests.Select(tc => tc.Source).Distinct();
             }
 
-            List<string> loggersToUpdate = new List<string>();
+            // Currently we support discovering loggers only from Source directory
+            var loggersToUpdate = new List<string>();
 
             foreach (var source in sources)
             {

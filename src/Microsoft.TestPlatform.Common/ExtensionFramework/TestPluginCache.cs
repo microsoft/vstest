@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 EqtTrace.Verbose("TestPluginCache: Discovering the extensions using extension path.");
 
                 // Combine all the possible extensions - both default and additional
-                var allExtensionPaths = new List<string>();
+                var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
                 if (this.pathToExtensions != null)
                 {
                     allExtensionPaths.AddRange(this.pathToExtensions);
@@ -349,17 +349,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         }
 
         /// <summary>
-        /// Gets files in a directory.
+        /// Get the files which match the regex pattern
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="searchPattern"></param>
-        /// <returns></returns>
-        /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
+        /// <param name="extensions">
+        /// The extensions.
+        /// </param>
+        /// <param name="searchPattern">
+        /// Regex search pattern of extension.
+        /// </param>
+        /// <returns>
+        /// The list of files which match the regex pattern
+        /// </returns>
         internal virtual List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
         {
             var regex = new Regex(searchPattern, RegexOptions.IgnoreCase);
             return extensions.Where(ext => regex.IsMatch(ext)).ToList();
-        }        
+        }
 
         /// <summary>
         /// The get test extensions.
@@ -368,8 +373,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// The extension assembly.
         /// </param>
         /// <typeparam name="TPluginInfo">
+        /// Type of Test plugin info.
         /// </typeparam>
         /// <typeparam name="TExtension">
+        /// Type of extension.
         /// </typeparam>
         /// <returns>
         /// The <see cref="Dictionary"/>.
@@ -385,7 +392,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
 
             var pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
-            
+
             // Add extensions discovered to the cache.
             if (this.TestExtensions == null)
             {
@@ -542,7 +549,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
             }
         }
-        
+
         /// <summary>
         /// Log the extensions
         /// </summary>

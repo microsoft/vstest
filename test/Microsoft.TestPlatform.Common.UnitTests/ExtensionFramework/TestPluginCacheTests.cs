@@ -31,7 +31,9 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             // Reset the singleton.
             TestPluginCache.Instance = null;
             this.mockFileHelper = new Mock<IFileHelper>();
-            this.testablePluginCache = new TestableTestPluginCache(this.mockFileHelper.Object, new List<string>() { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
+            this.testablePluginCache = new TestableTestPluginCache(
+                this.mockFileHelper.Object,
+                new List<string>() { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location });
 
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
         }
@@ -168,6 +170,21 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             Assert.IsNotNull(resolutionPaths);
             CollectionAssert.AreEqual(expectedExtensions, resolutionPaths.ToList());
+        }
+
+        [TestMethod]
+        public void GetDefaultResolutionPathsShouldReturnDirectoryFromDefaultExtensionsPath()
+        {
+            // Setup the testable instance.		
+            TestPluginCache.Instance = this.testablePluginCache;
+
+            var defaultExtensionsFile = typeof(TestPluginCache).GetTypeInfo().Assembly.Location;
+            this.testablePluginCache.DefaultExtensionPaths = new List<string>() { defaultExtensionsFile };
+
+            var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();
+
+            Assert.IsNotNull(resolutionPaths);
+            Assert.IsTrue(resolutionPaths.Contains(Path.GetDirectoryName(defaultExtensionsFile)));
         }
 
         #endregion

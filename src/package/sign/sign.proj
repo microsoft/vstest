@@ -50,7 +50,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
-	  <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TeHostRuntimeProvider.dll" />
+	  <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Common.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Resource.dll" />
