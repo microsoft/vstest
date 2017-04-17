@@ -7,10 +7,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -30,6 +32,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         private readonly TestRuntimeProviderManager testHostProviderManager;
 
         private readonly IFileHelper fileHelper;
+
+        static TestPlatform()
+        {
+            // TODO This is not the right away to force initialization of default extensions. Test runtime providers
+            // require this today. They're getting initialized even before test adapter paths are provided, which is
+            // incorrect.
+            AddExtensionAssembliesFromExtensionDirectory();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
@@ -76,10 +86,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(discoveryCriteria));
             }
 
-            this.UpdateTestAdapterPaths(discoveryCriteria.RunSettings);
+            this.AddExtensionAssemblies(discoveryCriteria.RunSettings);
 
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
-
+            testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
+            
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
@@ -100,14 +111,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testRunCriteria));
             }
 
-            this.UpdateTestAdapterPaths(testRunCriteria.TestRunSettings);
+            this.AddExtensionAssemblies(testRunCriteria.TestRunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
 
             // Update and initialize loggers only when DesignMode is false
             if (runConfiguration.DesignMode == false)
             {
-                this.UpdateTestLoggerPath(testRunCriteria);
+                this.AddExtensionAssembliesFromSource(testRunCriteria);
 
                 // Initialize loggers
                 TestLoggerManager.Instance.InitializeLoggers();
@@ -165,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="runSettings">
         /// The run Settings.
         /// </param>
-        private void UpdateTestAdapterPaths(string runSettings)
+        private void AddExtensionAssemblies(string runSettings)
         {
             IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
 
@@ -199,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="testRunCriteria">
         /// The test Run Criteria.
         /// </param>
-        private void UpdateTestLoggerPath(TestRunCriteria testRunCriteria)
+        private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
         {
             IEnumerable<string> sources = testRunCriteria.Sources;
             if (testRunCriteria.HasSpecificTests)
@@ -222,6 +233,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             if (loggersToUpdate.Count > 0)
             {
                 this.UpdateExtensions(loggersToUpdate, true);
+            }
+        }
+
+        /// <summary>
+        /// Find all test platform extensions from the `.\Extensions` directory. This is used to load the inbox extensions like
+        /// Trx logger and legacy test extensions like mstest v1, mstest c++ etc..
+        /// </summary>
+        private static void AddExtensionAssembliesFromExtensionDirectory()
+        {
+            var fileHelper = new FileHelper();
+            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
+            var defaultExtensionPaths = new List<string>();
+            if (fileHelper.DirectoryExists(extensionsFolder))
+            {
+                var dlls = fileHelper.EnumerateFiles(extensionsFolder, ".*.dll", SearchOption.TopDirectoryOnly);
+                defaultExtensionPaths.AddRange(dlls);
+                var exes = fileHelper.EnumerateFiles(extensionsFolder, ".*.exe", SearchOption.TopDirectoryOnly);
+                defaultExtensionPaths.AddRange(exes);
+                TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
             }
         }
     }

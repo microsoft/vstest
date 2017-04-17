@@ -54,6 +54,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         private static TestPluginCache instance;
 
+        private List<string> defaultExtensionPaths = new List<string>();
+
         #endregion
 
         #region Constructor
@@ -308,6 +310,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         #region Utility methods
 
+        internal IEnumerable<string> DefaultExtensionPaths
+        {
+            get
+            {
+                return this.defaultExtensionPaths;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    this.defaultExtensionPaths.AddRange(value);
+                }
+            }
+        }
+
         /// <summary>
         ///  Checks if a directory exists
         /// </summary>
@@ -410,6 +427,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             var resolutionPaths = new List<string>();
 
             var extensionDirectories = this.pathToExtensions?.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
+            if (extensionDirectories != null && extensionDirectories.Any())
+            {
+                resolutionPaths.AddRange(extensionDirectories);
+            }
+
+            extensionDirectories = this.defaultExtensionPaths?.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
             if (extensionDirectories != null && extensionDirectories.Any())
             {
                 resolutionPaths.AddRange(extensionDirectories);
@@ -519,7 +542,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
             }
         }
-
+        
         /// <summary>
         /// Log the extensions
         /// </summary>

@@ -6,7 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -119,7 +121,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private void InitializeExtensions(IEnumerable<string> sources)
         {
             var sourceList = sources.ToList();
-            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.PathToExtensions);
+            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.DefaultExtensionPaths).ToList();
+            if (TestPluginCache.Instance.PathToExtensions != null)
+            {
+                var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => regex.IsMatch(ext)));
+            }
 
             // Only send this if needed.
             if (extensions.Count() > 0)

@@ -170,20 +170,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             CollectionAssert.AreEqual(expectedExtensions, resolutionPaths.ToList());
         }
 
-        [TestMethod]
-        public void GetDefaultResolutionPathsShouldReturnDefaultExtensionsDirectoryIfPresent()
-        {
-            // Setup the testable instance.
-            TestPluginCache.Instance = this.testablePluginCache;
-
-            var resolutionPaths = TestPluginCache.Instance.GetDefaultResolutionPaths();
-
-            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
-
-            Assert.IsNotNull(resolutionPaths);
-            CollectionAssert.AreEqual(new List<string> { currentDirectory }, resolutionPaths.ToList());
-        }
-
         #endregion
 
         #region GetResolutionPaths tests

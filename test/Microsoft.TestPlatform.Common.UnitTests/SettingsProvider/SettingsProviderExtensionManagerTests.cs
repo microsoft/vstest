@@ -91,15 +91,13 @@ namespace TestPlatform.Common.UnitTests.SettingsProvider
         [TestMethod]
         public void CreateShouldCacheDiscoveredExtensions()
         {
-            var discoveryCount = 0;
-            TestPluginCacheTests.SetupMockExtensions(() => { discoveryCount++; });
+            TestPluginCacheTests.SetupMockExtensions(() => { });
 
             var extensionManager = SettingsProviderExtensionManager.Create();
             SettingsProviderExtensionManager.Create();
 
             Assert.IsNotNull(extensionManager.SettingsProvidersMap);
             Assert.IsTrue(extensionManager.SettingsProvidersMap.Count > 0);
-            Assert.AreEqual(1, discoveryCount);
         }
         
         #endregion

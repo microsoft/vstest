@@ -96,7 +96,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var paths = new List<string>() { "a", "b" };
             this.testRequestManager.InitializeExtensions(paths);
 
-            this.mockTestPlatform.Verify(mt => mt.Initialize(paths, false, true), Times.Once);
+            this.mockTestPlatform.Verify(mt => mt.UpdateExtensions(paths, false), Times.Once);
         }
 
         [TestMethod]
