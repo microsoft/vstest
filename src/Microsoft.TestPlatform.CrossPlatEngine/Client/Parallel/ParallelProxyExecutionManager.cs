@@ -133,7 +133,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             IProxyExecutionManager proxyExecutionManager,
             TestRunCompleteEventArgs testRunCompleteArgs,
             TestRunChangedEventArgs lastChunkArgs,
-            ICollection<AttachmentSet> runContextAttachments,
             ICollection<string> executorUris)
         {
             var allRunsCompleted = false;

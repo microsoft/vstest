@@ -256,14 +256,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void SendExecutionComplete(
             TestRunCompleteEventArgs testRunCompleteArgs,
             TestRunChangedEventArgs lastChunkArgs,
-            ICollection<AttachmentSet> runContextAttachments,
             ICollection<string> executorUris)
         {
             var payload = new TestRunCompletePayload
             {
                 TestRunCompleteArgs = testRunCompleteArgs,
                 LastRunTests = lastChunkArgs,
-                RunAttachments = runContextAttachments,
                 ExecutorUris = executorUris
             };
 
