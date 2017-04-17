@@ -22,15 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Initializes a new instance of the <see cref="TestResult"/> class.
         /// </summary>
-        /// <remarks>This constructor doesn't perform any parameter validation, it is meant to be used for serialization."/></remarks>
-        public TestResult()
-        {
-            // Default constructor for Serialization.
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestResult"/> class. 
-        /// </summary>
         /// <param name="testCase">The test case the result is for.</param>
         public TestResult(TestCase testCase)
         {
@@ -42,8 +33,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.TestCase = testCase;
             this.Messages = new Collection<TestResultMessage>();
             this.Attachments = new Collection<AttachmentSet>();
-            this.StartTime = default(DateTimeOffset);
-            this.EndTime = default(DateTimeOffset);
+
+            // Default start and end time values for a test result are initialized to current timestamp
+            // to maintain compatibility.
+            this.StartTime = DateTimeOffset.Now;
+            this.EndTime = DateTimeOffset.Now;
         }
 
         #endregion
@@ -60,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Gets the list of attachment sets for this TestResult.
         /// </summary>
         [DataMember]
-        public Collection<AttachmentSet> Attachments { get; set; }
+        public Collection<AttachmentSet> Attachments { get; private set; }
 
         /// <summary>
         /// Gets or sets the outcome of a test case.
@@ -90,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Gets the test messages.
         /// </summary>
         [DataMember]
-        public Collection<TestResultMessage> Messages { get; set; }
+        public Collection<TestResultMessage> Messages { get; private set; }
 
         /// <summary>
         /// Gets or sets test result ComputerName.
