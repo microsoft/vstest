@@ -101,9 +101,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private Action<object> ExitCallBack => (process) =>
         {
             var exitCode = 0;
+            var testHostProcessStdErrorStr = this.testHostProcessStdError.ToString();
+
             this.processHelper.TryGetExitCode(process, out exitCode);
 
-            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
+            if (exitCode != 0)
+            {
+                EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
+                this.messageLogger.SendMessage(TestMessageLevel.Error, testHostProcessStdErrorStr);
+            }
+
+            this.OnHostExited(new HostProviderEventArgs(testHostProcessStdErrorStr, exitCode, (process as Process).Id));
         };
 
         /// <summary>
@@ -111,9 +119,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
-            var exitCode = 0;
             if (!string.IsNullOrEmpty(data))
             {
+                EqtTrace.Warning("Test host standard error line: {0}", data);
+                data += Environment.NewLine;
+
                 // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
                 if (data.Length > this.testHostProcessStdError.MaxCapacity)
                 {
@@ -132,12 +142,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 }
 
                 this.testHostProcessStdError.Append(data);
-            }
-
-            if (this.processHelper.TryGetExitCode(process, out exitCode))
-            {
-                EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
             }
         };
 
