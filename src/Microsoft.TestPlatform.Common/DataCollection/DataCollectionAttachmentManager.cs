@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         {
             this.cancellationTokenSource = new CancellationTokenSource();
             this.attachmentTasks = new Dictionary<DataCollectionContext, List<Task>>();
-            this.AttachmentSets = new Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>>();
+            this.AttachmentSets = new Dictionary<DataCollectionContext, Dictionary<string, AttachmentSet>>();
         }
 
         #endregion
@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// Gets the attachment sets for the given datacollection context.
         /// </summary>
-        internal Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>> AttachmentSets
+        internal Dictionary<DataCollectionContext, Dictionary<string, AttachmentSet>> AttachmentSets
         {
             get; private set;
         }
@@ -120,10 +120,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             List<AttachmentSet> attachments = new List<AttachmentSet>();
 
-            Dictionary<Uri, AttachmentSet> uriAttachmentSetMap;
-            if (this.AttachmentSets.TryGetValue(dataCollectionContext, out uriAttachmentSetMap))
+            Dictionary<string, AttachmentSet> friendlyNameAttachmentSetMap;
+            if (this.AttachmentSets.TryGetValue(dataCollectionContext, out friendlyNameAttachmentSetMap))
             {
-                attachments = uriAttachmentSetMap.Values.ToList();
+                attachments = friendlyNameAttachmentSetMap.Values.ToList();
                 this.attachmentTasks.Remove(dataCollectionContext);
                 this.AttachmentSets.Remove(dataCollectionContext);
             }
@@ -149,9 +149,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             if (!this.AttachmentSets.ContainsKey(fileTransferInfo.Context))
             {
-                var uriAttachmentSetMap = new Dictionary<Uri, AttachmentSet>();
-                uriAttachmentSetMap.Add(uri, new AttachmentSet(uri, friendlyName));
-                this.AttachmentSets.Add(fileTransferInfo.Context, uriAttachmentSetMap);
+                var friendlyNameAttachmentSetMap = new Dictionary<string, AttachmentSet>();
+                friendlyNameAttachmentSetMap.Add(friendlyName, new AttachmentSet(uri, friendlyName));
+                this.AttachmentSets.Add(fileTransferInfo.Context, friendlyNameAttachmentSetMap);
                 this.attachmentTasks.Add(fileTransferInfo.Context, new List<Task>());
             }
 
@@ -292,7 +292,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     {
                         if (t.Exception == null)
                         {
-                            this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
+                            this.AttachmentSets[fileTransferInfo.Context][friendlyName].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
                         }
 
                         if (sendFileCompletedCallback != null)

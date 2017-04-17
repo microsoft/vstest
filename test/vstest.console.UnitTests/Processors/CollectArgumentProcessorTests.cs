@@ -82,6 +82,9 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldCreateEntryForDataCollectorInRunSettingsIfNotAlreadyPresent()
         {
+            var runsettingsString = string.Format(DefaultRunSettings, "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" />");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
             this.executor.Initialize("MyDataCollector");
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);

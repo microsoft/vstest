@@ -360,10 +360,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                                     this.events,
                                                     this.messageSink);
 
-                if (!dataCollectorInfo.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
+                if (!dataCollectorInfo.DataCollectorConfig.FriendlyName.Equals(dataCollectorSettings.FriendlyName))
                 {
                     // If the data collector was not found, send an error.
-                    this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.Uri));
+                    this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.FriendlyName));
                     return;
                 }
             }
@@ -415,11 +415,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (settings.IsEnabled)
                 {
-                    if (runEnabledDataCollectors.Any(dcSettings => dcSettings.Uri.Equals(settings.Uri)
+                    if (runEnabledDataCollectors.Any(dcSettings => dcSettings.FriendlyName.Equals(settings.FriendlyName)
                         || string.Equals(dcSettings.AssemblyQualifiedName, settings.AssemblyQualifiedName, StringComparison.OrdinalIgnoreCase)))
                     {
-                        // If Uri or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
-                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.AssemblyQualifiedName, settings.Uri));
+                        // If friendlyName or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
+                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.AssemblyQualifiedName, settings.FriendlyName));
                         continue;
                     }
 
