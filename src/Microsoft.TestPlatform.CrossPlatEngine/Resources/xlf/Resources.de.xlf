@@ -110,15 +110,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="12" adjWordcount="10.2" curWordcount="10.2"</note>
       </trans-unit>
-      <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <target state="translated">Es ist kein Testdiscoverer zum Ausführen der Ermittlung von Testfällen registriert. Registrieren Sie einen Testdiscoverer, und versuchen Sie es erneut.</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Ermittlung der Testfälle ausführen ist kein Test Entdecker registriert. Test Entdecker registrieren, und versuchen Sie es erneut.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="18" adjWordcount="15.3" curWordcount="15.3"</note>
-      </trans-unit>
       <trans-unit id="NoMatchingExecutor">
         <source>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</source>
         <target state="translated">Der Testexecutor mit dem URI "{0}" wurde nicht gefunden. Stellen Sie sicher, dass der Testexecutor installiert ist und .NET Runtime-Version {1} unterstützt.</target>
@@ -147,15 +138,6 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
-      <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
-        <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="translated">In {0} ist kein Test verfügbar. Stellen Sie sicher, dass die installierten Versionseinstellungen für Testdiscoverer und -executor, Plattform und Framework richtig sind, und versuchen Sie es erneut.</target>
-        <note />
-        <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
-          <target state-qualifier="mt-suggestion">Kein Test ist verfügbar in {0}. Sicher installierten test Entdecker &amp; Executors Platform &amp; Framework Version sind geeignete und versuchen Sie es erneut.</target>
-        </alt-trans>
-        <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
-      </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
         <target state="translated">Keine Tests stimmten mit dem Filter überein, weil er mindestens eine Eigenschaft enthält, die ungültig ist ({0}). Geben Sie einen Filterausdruck mit gültigen Eigenschaften ({1}) an, und versuchen Sie es erneut.</target>
@@ -164,11 +146,6 @@
           <target state-qualifier="mt-suggestion">Keine Tests entsprach dem Filter, da es eine oder mehrere Eigenschaften enthält, die nicht gültig ({0}). Filterausdruck mit gültigen Eigenschaften ({1}) und versuchen Sie es erneut.</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="27" adjWordcount="22.95" curWordcount="22.95"</note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="translated">testhost.dll für die Quelle "{0}" wurde nicht gefunden. Stellen Sie sicher, dass das Testprojekt über einen NuGet-Verweis des Pakets "microsoft.testplatform.testhost" verfügt.</target>
-        <note />
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
@@ -183,6 +160,16 @@
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
         <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
+        <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
+        <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TesthostDiagLogOutputFile">
+        <source>Logging TestHost Diagnostics in file: {0}</source>
+        <target state="new">Logging TestHost Diagnostics in file: {0}</target>
         <note></note>
       </trans-unit>
     </body>

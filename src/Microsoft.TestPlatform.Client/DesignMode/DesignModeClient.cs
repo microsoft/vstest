@@ -29,6 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
         private object ackLockObject = new object();
 
+        ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
+
         /// <summary>
         /// The timeout for the client to connect to the server.
         /// </summary>
@@ -126,12 +128,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     {
                         case MessageType.VersionCheck:
                             {
-                                // At this point, we cannot add stuff to object model like "ProtocolVersionMessage"
-                                // as that cannot be acessed from testwindow which still uses TP-V1
-                                // we are sending a version number as an integer for now
-                                // TODO: Find a better way without breaking TW which using TP-V1
-                                var payload = 1;
-                                this.communicationManager.SendMessage(MessageType.VersionCheck, payload);
+                                var version = this.dataSerializer.DeserializePayload<int>(message);
+                                this.protocolConfig.Version = Math.Min(version, this.protocolConfig.Version);
+                                this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolConfig.Version);
                                 break;
                             }
 
@@ -145,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         case MessageType.StartDiscovery:
                             {
                                 var discoveryPayload = message.Payload.ToObject<DiscoveryRequestPayload>();
-                                testRequestManager.DiscoverTests(discoveryPayload, new DesignModeTestEventsRegistrar(this));
+                                testRequestManager.DiscoverTests(discoveryPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                                 break;
                             }
 
@@ -274,7 +273,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                     var customLauncher = skipTestHostLaunch ?
                         DesignModeTestHostLauncherFactory.GetCustomHostLauncherForTestRun(this, testRunPayload) : null;
 
-                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this));
+                    testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                 }
                 catch(Exception ex)
                 {

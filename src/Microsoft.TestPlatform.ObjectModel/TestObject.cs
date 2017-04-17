@@ -1,4 +1,4 @@
-﻿﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
@@ -64,13 +64,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        public IEnumerable<KeyValuePair<TestProperty, object>> GetProperties()
+        {
+            return this.store;
+        }
+
         #endregion Fields
 
         #region Constructors
 
         protected TestObject()
         {
-            this.store = new Dictionary<TestProperty, object>();            
+            this.store = new Dictionary<TestProperty, object>();
         }
 
         [OnSerializing]
@@ -102,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Returns the TestProperties currently specified in this TestObject.
         /// </summary>
-        public IEnumerable<TestProperty> Properties
+        public virtual IEnumerable<TestProperty> Properties
         {
             get { return this.store.Keys; }
         }
@@ -124,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 defaultValue = Activator.CreateInstance(valueType);
             }
 
-            return this.PrivateGetPropertyValue(property, defaultValue);
+            return this.ProtectedGetPropertyValue(property, defaultValue);
         }
 
         /// <summary>
@@ -168,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="value">value to be set</param>
         public void SetPropertyValue(TestProperty property, object value)
         {
-            this.PrivateSetPropertyValue(property, value);
+            this.ProtectedSetPropertyValue(property, value);
         }
 
         /// <summary>
@@ -185,8 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 this.store.Remove(property);
             }
         }
-
-
+ 
         /// <summary>
         /// Returns TestProperty's value 
         /// </summary>
@@ -196,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNull(property, "property");
             ValidateArg.NotNull(culture, "culture");
 
-            object objValue = this.PrivateGetPropertyValue(property, defaultValue);
+            object objValue = this.ProtectedGetPropertyValue(property, defaultValue);
 
             return ConvertPropertyTo<T>(property, culture, objValue);
         }
@@ -211,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue);
+            this.ProtectedSetPropertyValue(property, objValue);
         }
 
         /// <summary>
@@ -224,7 +228,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             object objValue = ConvertPropertyFrom<T>(property, culture, value);
 
-            this.PrivateSetPropertyValue(property, objValue);
+            this.ProtectedSetPropertyValue(property, objValue);
         }
 
         #endregion Property Values
@@ -235,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Return TestProperty's value
         /// </summary>
         /// <returns></returns>
-        private object PrivateGetPropertyValue(TestProperty property, object defaultValue)
+        protected virtual object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
         {
             ValidateArg.NotNull(property, "property");
 
@@ -251,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Set TestProperty's value
         /// </summary>
-        private void PrivateSetPropertyValue(TestProperty property, object value)
+        protected virtual void ProtectedSetPropertyValue(TestProperty property, object value)
         {
             ValidateArg.NotNull(property, "property");
 
@@ -381,5 +385,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 return this.traits;
             }
         }
-    } 
+    }
 }

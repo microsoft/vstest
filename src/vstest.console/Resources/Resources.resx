@@ -643,4 +643,7 @@
   <data name="NotRunTestIndicator" xml:space="preserve">
     <value>Not Run  {0}</value>
   </data>
+  <data name="VstestDiagLogOutputPath" xml:space="preserve">
+    <value>Logging Vstest Diagnostics in file: {0}</value>
+  </data>
 </root>

@@ -9,15 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
     public interface ITestPlatform : IDisposable
     {
         /// <summary>
-        /// Initialize the test platform with the path to additional unit test extensions. 
-        /// If no additional extension is available, then specify null or empty list. 
-        /// </summary>
-        /// <param name="additionalUnitTestExtensions">Specifies the path to unit test extensions.</param>
-        /// <param name="loadOnlyWellKnownExtensions">Specifies whether only well known extensions should be loaded.</param>
-        /// <param name="forceX86Discoverer">Forces test discovery in x86 Discoverer process.</param>
-        void Initialize(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions, bool forceX86Discoverer);
-
-        /// <summary>
         /// Update the extensions to be used by the test service
         /// </summary>
         /// <param name="pathToAdditionalExtensions">
@@ -31,14 +22,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Creates a discovery request
         /// </summary>
         /// <param name="discoveryCriteria">Specifies the discovery parameters</param>
+        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>DiscoveryRequest object</returns>
-        IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria);
+        IDiscoveryRequest CreateDiscoveryRequest(DiscoveryCriteria discoveryCriteria, ProtocolConfig protocolConfig);
 
         /// <summary>
         /// Creates a test run request.
         /// </summary>
         /// <param name="testRunCriteria">Specifies the test run criteria</param>
+        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>RunRequest object</returns>
-        ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria);
+        ITestRunRequest CreateTestRunRequest(TestRunCriteria testRunCriteria, ProtocolConfig protocolConfig);
     }
 }

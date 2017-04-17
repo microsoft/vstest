@@ -42,10 +42,6 @@
         <source>This operation is not allowed in the context of a non-debug run.</source>
         <note></note>
       </trans-unit>
-      <trans-unit id="NoDiscovererRegistered">
-        <source>No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again.</source>
-        <note></note>
-      </trans-unit>
       <trans-unit id="NoMatchingExecutor">
         <source>Could not find test executor with URI '{0}'.  Make sure that the test executor is installed and supports .net runtime version {1}.</source>
         <note>{0} - Executor uri String {1}-  Version - .net Version Eg:-2.0.50727.00</note>
@@ -58,10 +54,6 @@
         <source>, </source>
         <note></note>
       </trans-unit>
-      <trans-unit id="TestRunFailed_NoTestsAreAvailableInTheSources">
-        <source>No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again.</source>
-        <note></note>
-      </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
         <note></note>
@@ -69,11 +61,6 @@
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
         <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="NoTestHostFileExist">
-        <source>Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</source>
-        <target state="new">Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "microsoft.testplatform.testhost".</target>
         <note></note>
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
@@ -84,6 +71,16 @@
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
         <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
+        <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
+        <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TesthostDiagLogOutputFile">
+        <source>Logging TestHost Diagnostics in file: {0}</source>
+        <target state="new">Logging TestHost Diagnostics in file: {0}</target>
         <note></note>
       </trans-unit>
     </body>

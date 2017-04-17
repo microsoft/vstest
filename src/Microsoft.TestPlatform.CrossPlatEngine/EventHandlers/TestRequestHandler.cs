@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
     /// Utility class to fecilitate the IPC comunication. Acts as Client.
@@ -30,6 +31,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private IDataSerializer dataSerializer;
 
         private Action<Message> onAckMessageRecieved;
+
+        private int highestSupportedVersion = 2;
+
+        // Set default to 1, if protocol version check does not happen
+        // that implies runner is using version 1
+        private int protocolVersion = 1;
 
         /// <summary>
         /// The timeout for the client to connect to the server.
@@ -80,8 +87,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             do
             {
                 var message = this.communicationManager.ReceiveMessage();
+
                 switch (message.MessageType)
                 {
+                    case MessageType.VersionCheck:
+                        var version = this.dataSerializer.DeserializePayload<int>(message);
+                        this.protocolVersion = Math.Min(version, highestSupportedVersion);
+                        this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolVersion);
+
+                        // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
+                        if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+                        {
+                            this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
+                        }
+                        else if(!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                        {
+                            this.SendLog(TestMessageLevel.Warning, EqtTrace.ErrorOnInitialization);
+                        }
+                        break;
+
                     case MessageType.DiscoveryInitialize:
                         {
                             EqtTrace.Info("Discovery Session Initialize.");
@@ -212,20 +236,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void SendTestCases(IEnumerable<TestCase> discoveredTestCases)
         {
-            this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases);
+            this.communicationManager.SendMessage(MessageType.TestCasesFound, discoveredTestCases, this.protocolVersion);
         }
 
         /// <inheritdoc/>
         public void SendTestRunStatistics(TestRunChangedEventArgs testRunChangedArgs)
         {
-            this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs);
+            this.communicationManager.SendMessage(MessageType.TestRunStatsChange, testRunChangedArgs, this.protocolVersion);
         }
 
         /// <inheritdoc/>
         public void SendLog(TestMessageLevel messageLevel, string message)
         {
-            var testMessagePayload = new TestMessagePayload { MessageLevel = messageLevel, Message = message };
-            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+            var testMessagePayload = new TestMessagePayload {MessageLevel = messageLevel,Message = message};
+            this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -243,7 +267,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 ExecutorUris = executorUris
             };
 
-            this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload);
+            this.communicationManager.SendMessage(MessageType.ExecutionComplete, payload, this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -256,7 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 IsAborted = isAborted
             };
 
-            this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload);
+            this.communicationManager.SendMessage(MessageType.DiscoveryComplete, discoveryCompletePayload, this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -270,7 +294,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 waitHandle.Set();
             };
 
-            this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo);
+            this.communicationManager.SendMessage(MessageType.LaunchAdapterProcessWithDebuggerAttached, testProcessStartInfo, this.protocolVersion);
 
             waitHandle.WaitOne();
             this.onAckMessageRecieved = null;

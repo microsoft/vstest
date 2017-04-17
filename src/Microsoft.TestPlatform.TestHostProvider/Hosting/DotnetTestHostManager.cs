@@ -11,8 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.Extensions.DependencyModel;
+    using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -26,7 +26,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -61,6 +60,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private IMessageLogger messageLogger;
 
         private bool hostExitedEventRaised;
+
+        private string hostPackageVersion = "15.0.0";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetTestHostManager"/> class.
@@ -101,6 +102,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// project must be launched in a separate test host process.
         /// </remarks>
         public bool Shared => false;
+
+        /// <summary>
+        /// Gets a value indicating whether the test host supports protocol version check
+        /// </summary>
+        internal virtual bool IsVersionCheckRequired => !this.hostPackageVersion.StartsWith("15.0.0");
 
         /// <summary>
         /// Gets or sets the error length for runtime error stream.
@@ -175,7 +181,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+        public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
             return await Task.Run(() => this.LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
         }
@@ -247,7 +253,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                string message = string.Format(sourcePath);
+                string message = string.Format(Resources.NoTestHostFileExist, sourcePath);
                 EqtTrace.Verbose("DotnetTestHostmanager: " + message);
                 throw new FileNotFoundException(message);
             }
@@ -271,7 +277,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> defaultExtensions)
         {
             var sourceDirectory = Path.GetDirectoryName(sources.Single());
 
@@ -371,6 +377,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         }
 
                         testHostPath = Path.Combine(testhostPackage.Path, testHostPath);
+                        this.hostPackageVersion = testhostPackage.Version;
                         EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
                     }
                 }

@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class DefaultEngineInvoker :
 #if NET46
@@ -74,12 +75,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 EqtTrace.Info("DefaultEngineInvoker: Initialize communication on port number: '{0}'", portNumber);
                 requestHandler.InitializeCommunication(portNumber);
 
-                // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
-                if (!string.IsNullOrEmpty(EqtTrace.LogFile))
-                {
-                    requestHandler.SendLog(TestMessageLevel.Informational, string.Format("Logging TestHost Diagnostics in file: {0}", EqtTrace.LogFile));
-                }
-
                 // Initialize DataCollection Communication if data collection port is provided.
                 var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);
                 if (dcPort > 0)
@@ -102,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     DataCollectionTestCaseEventSender.Instance.Close();
                 }
             }
-        }        
+        }
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
@@ -119,6 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     throw new TimeoutException();
                 }
             });
-        }       
+        }
     }
 }

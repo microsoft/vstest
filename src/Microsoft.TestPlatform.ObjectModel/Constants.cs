@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
     /// <summary>
     /// Defines the defaults/constants used across different components.
@@ -61,10 +62,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public const string TraceLogMaxFileSizeInKB = "TraceLogMaxFileSizeInKb";
 
         public const string EmptyRunSettings = @"<RunSettings></RunSettings>";
-        
 
         public static readonly Architecture DefaultPlatform = XmlRunSettingsUtilities.OSArchitecture == Architecture.ARM ? Architecture.ARM : Architecture.X86;
-        
+
         /// <summary>
         /// Default option for parallel execution
         /// </summary>
@@ -74,6 +74,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The default batch size.
         /// </summary>
         public const long DefaultBatchSize = 10;
+
+        /// <summary>
+        /// The default protocol version
+        /// </summary>
+        public static readonly ProtocolConfig DefaultProtocolConfig = new ProtocolConfig { Version = 1 };
 
         /// <summary>
         /// Name of the results directory

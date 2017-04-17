@@ -5,16 +5,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -28,6 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private IDataSerializer dataSerializer;
 
+        // TODO:sasin Change the version to 2
+        private int highestNegotiatedVersion = 1;
+
         /// <summary>
         /// Use to cancel blocking tasks associated with testhost process
         /// </summary>
@@ -35,13 +37,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private string clientExitErrorMessage;
 
-        public TestRequestSender()
-            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
+        /// </summary>
+        /// <param name="protocolConfig">Protocol related information</param>
+        public TestRequestSender(ProtocolConfig protocolConfig)
+            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance, protocolConfig)
         {
         }
 
-        internal TestRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
+        /// </summary>
+        /// <param name="communicationManager">Communication Manager for sending and receiving messages.</param>
+        /// <param name="dataSerializer">Serializer for serialization and deserialization of the messages.</param>
+        /// <param name="protocolConfig">Protocol related information</param>
+        internal TestRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer, ProtocolConfig protocolConfig)
         {
+            this.highestNegotiatedVersion = protocolConfig.Version;
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
         }
@@ -76,15 +89,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         }
 
         /// <inheritdoc/>
+        public void CheckVersionWithTestHost()
+        {
+            this.communicationManager.SendMessage(MessageType.VersionCheck, payload: this.highestNegotiatedVersion);
+
+            var message = this.communicationManager.ReceiveMessage();
+
+            if (message.MessageType == MessageType.VersionCheck)
+            {
+                var protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
+                this.highestNegotiatedVersion = protocolVersion;
+
+                EqtTrace.Info("TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.highestNegotiatedVersion);
+            }
+            else if (message.MessageType == MessageType.ProtocolError)
+            {
+                // TODO : Payload for ProtocolError needs to finalized.
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
+            }
+            else
+            {
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.UnexpectedMessage, MessageType.VersionCheck, message.MessageType));
+            }
+        }
+
+        /// <inheritdoc/>
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions);
+            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions, version: this.highestNegotiatedVersion);
         }
 
         /// <inheritdoc/>
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions);
+            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions, version: this.highestNegotiatedVersion);
         }
 
         /// <inheritdoc/>
@@ -92,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria);
+                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria, version: this.highestNegotiatedVersion);
 
                 var isDiscoveryComplete = false;
 
@@ -179,11 +217,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.communicationManager.SendMessage(MessageType.CancelTestRun);
         }
 
+        /// <summary>
+        /// Send the Abort test run message
+        /// </summary>
         public void SendTestRunAbort()
         {
             this.communicationManager.SendMessage(MessageType.AbortTestRun);
         }
 
+        /// <summary>
+        /// Handles exit of the client process.
+        /// </summary>
+        /// <param name="stdError">Standard Error.</param>
         public void OnClientProcessExit(string stdError)
         {
             this.clientExitErrorMessage = stdError;
@@ -197,7 +242,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(messageType, payload);
+                this.communicationManager.SendMessage(messageType, payload, version: this.highestNegotiatedVersion);
 
                 // This needs to happen asynchronously.
                 Task.Run(() => this.ListenAndReportTestResults(eventHandler));
@@ -256,7 +301,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                         this.communicationManager.SendMessage(
                             MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
-                            processId);
+                            processId,
+                            version: this.highestNegotiatedVersion);
                     }
                 }
                 catch (IOException exception)

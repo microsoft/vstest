@@ -33,6 +33,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
+        private int protocolVersion = 1;
+
         /// <summary>
         /// Use to cancel blocking tasks associated with vstest.console process
         /// </summary>
@@ -103,7 +105,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="pathToAdditionalExtensions">Paths to check for additional extensions</param>
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.ExtensionsInitialize, pathToAdditionalExtensions);
+            this.communicationManager.SendMessage(MessageType.ExtensionsInitialize, pathToAdditionalExtensions, this.protocolVersion);
         }
 
         /// <summary>
@@ -250,17 +252,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             var message = this.communicationManager.ReceiveMessage();
             if (message.MessageType == MessageType.SessionConnected)
             {
-                this.communicationManager.SendMessage(MessageType.VersionCheck);
+                this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolVersion);
                 message = this.communicationManager.ReceiveMessage();
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
-                    var testPlatformVersion = this.dataSerializer.DeserializePayload<int>(message);
-                    success = testPlatformVersion == 1;
-                    if (!success)
-                    {
-                        EqtTrace.Error("VsTestConsoleRequestSender: VersionCheck Failed. TestPlatform Version: {0}", testPlatformVersion);
-                    }
+                    this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
+                    success = true;
+                }
+                else if (message.MessageType == MessageType.ProtocolError)
+                {
+                    // TODO : Payload for ProtocolError needs to finalized.
+                    EqtTrace.Error("VsTestConsoleRequestSender: Version Check failed. ProtolError was revceived from the runner");
                 }
                 else
                 {
@@ -281,7 +284,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 this.communicationManager.SendMessage(
                             MessageType.StartDiscovery,
-                            new DiscoveryRequestPayload() { Sources = sources, RunSettings = runSettings });
+                            new DiscoveryRequestPayload() { Sources = sources, RunSettings = runSettings },
+                            this.protocolVersion);
                 var isDiscoveryComplete = false;
 
                 // Cycle through the messages that the vstest.console sends. 
@@ -329,7 +333,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             try
             {
-                this.communicationManager.SendMessage(messageType, payload);
+                this.communicationManager.SendMessage(messageType, payload, this.protocolVersion);
                 var isTestRunComplete = false;
 
                 // Cycle through the messages that the testhost sends. 
@@ -423,7 +427,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             finally
             {
                 // Always unblock the Vstest.console thread which is indefintitely waiting on this ACK
-                this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload);
+                this.communicationManager.SendMessage(MessageType.CustomTestHostLaunchCallback, ackPayload, this.protocolVersion);
             }
         }
     }

@@ -58,5 +58,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Regex pattern used to find the data collector.
         /// </summary>
         public const string DataCollectorRegexPattern = @".*Collector.dll";
+
+        /// <summary>
+        /// Regex pattern used to find the run time provider.
+        /// </summary>
+        public const string RunTimeRegexPattern = @".*RuntimeProvider.dll";
+
+        /// <summary>
+        /// Regex pattern used to find the settings provider.
+        /// </summary>
+        public const string SettingsProviderRegexPattern = @".*SettingsProvider.dll";
     }
 }

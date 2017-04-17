@@ -106,10 +106,58 @@
       <VSIXSubPath>Extensions\CppUnitFramework</VSIXSubPath>
     </VsixSourceItem>
 
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\*.*" Exclude="$(VsixInputFileLocation)\TestHost\*.pdb" >
+      <VSIXSubPath>TestHost</VSIXSubPath>
+    </VsixSourceItem>
+    <!-- Testhost localized resources -->
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\cs\*.dll">
+      <VSIXSubPath>TestHost\cs</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\de\*.dll">
+      <VSIXSubPath>TestHost\de</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\es\*.dll">
+      <VSIXSubPath>TestHost\es</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\fr\*.dll">
+      <VSIXSubPath>TestHost\fr</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\it\*.dll">
+      <VSIXSubPath>TestHost\it</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\ja\*.dll">
+      <VSIXSubPath>TestHost\ja</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\ko\*.dll">
+      <VSIXSubPath>TestHost\ko</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\pl\*.dll">
+      <VSIXSubPath>TestHost\pl</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\pt-BR\*.dll">
+      <VSIXSubPath>TestHost\pt-BR</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\ru\*.dll">
+      <VSIXSubPath>TestHost\ru</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\tr\*.dll">
+      <VSIXSubPath>TestHost\tr</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\zh-Hans\*.dll">
+      <VSIXSubPath>TestHost\zh-Hans</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\zh-Hant\*.dll">
+      <VSIXSubPath>TestHost\zh-Hant</VSIXSubPath>
+    </VsixSourceItem>
+
     <VsixSourceItem Include="$(VsixInputFileLocation)\*.*" Exclude="$(VsixInputFileLocation)\*.pdb" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License.rtf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="testplatform.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

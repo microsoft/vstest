@@ -23,6 +23,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     {
         private DataCollectionTestCaseEventSender dataCollectionTestCaseEventSender;
         private Mock<ICommunicationManager> mockCommunicationManager;
+        private TestCase testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
 
         public DataCollectionTestCaseEventSenderTests()
         {
@@ -90,8 +91,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendTestCaseStartShouldSendMessageThroughCommunicationManager()
         {
-            var testCase = new TestCase();
-            var testcaseStartEventArgs = new TestCaseStartEventArgs(testCase);
+            var testcaseStartEventArgs = new TestCaseStartEventArgs(this.testCase);
             this.dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
 
             this.mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
@@ -100,8 +100,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendTestCaseStartShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            var testCase = new TestCase();
-            var testcaseStartEventArgs = new TestCaseStartEventArgs(testCase);
+            var testcaseStartEventArgs = new TestCaseStartEventArgs(this.testCase);
             this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs)).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
@@ -126,7 +125,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void SendTestCaseCompletedShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            var testCase = new TestCase();
             var testCaseEndEventArgs = new TestCaseEndEventArgs();
 
             this.mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestEnd, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();

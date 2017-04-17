@@ -39,6 +39,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public const string VersionCheck = "ProtocolVersion";
 
         /// <summary>
+        /// Protocol Error
+        /// </summary>
+        public const string ProtocolError = "ProtocolError";
+
+        /// <summary>
         /// The session start.
         /// </summary>
         public const string DiscoveryInitialize = "TestDiscovery.Initialize";

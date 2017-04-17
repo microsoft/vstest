@@ -18,6 +18,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using System.Reflection;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -30,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private bool initialized;
         private string testHostProcessStdError;
-
+        private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         #region Constructors
 
         /// <summary>
@@ -78,11 +81,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 var portNumber = this.RequestSender.InitializeCommunication();
                 var processId = this.processHelper.GetCurrentProcessId();
+
                 var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Get the test process start info
                 var testHostStartInfo = this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo);
-                
+
                 // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
                 this.testHostManager.HostExited += this.TestHostManagerHostExited;
@@ -114,22 +118,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // Increase connection timeout when debugging is enabled.
                     connTimeout = 5 * this.connectionTimeout;
                 }
-                
-                this.initialized = true;
-            }
 
-            // Wait for a timeout for the client to connect.
-            if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
-            {
-                var errorMsg = CrossPlatEngineResources.InitializationFailed;
-
-                if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
+                // Wait for a timeout for the client to connect.
+                if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
                 {
-                    // Testhost failed with error
-                    errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
+                    var errorMsg = CrossPlatEngineResources.InitializationFailed;
+
+                    if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError.ToString()))
+                    {
+                        // Testhost failed with error
+                        errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
+                    }
+
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
                 }
 
-                throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, errorMsg));
+                // Handling special case for dotnet core projects with older test hosts
+                // Older test hosts are not aware of protocol version check
+                // Hence we should not be sending VersionCheck message to these test hosts
+                bool checkRequired = true;
+                var property = this.testHostManager.GetType().GetRuntimeProperties().FirstOrDefault(p => string.Equals(p.Name, versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
+                if (property != null)
+                {
+                    checkRequired = (bool)property.GetValue(this.testHostManager);
+                }
+
+                if (checkRequired)
+                {
+                    this.RequestSender.CheckVersionWithTestHost();
+                }
+
+                this.initialized = true;
             }
         }
 
@@ -170,13 +189,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         protected string GetTimestampedLogFile(string logFile)
         {
-            return Path.ChangeExtension(
+            if (string.IsNullOrWhiteSpace(logFile))
+                return null;
+
+            return "\"" + Path.ChangeExtension(
                 logFile,
                 string.Format(
                     "host.{0}_{1}{2}",
                     DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     Thread.CurrentThread.ManagedThreadId,
-                    Path.GetExtension(logFile)));
+                    Path.GetExtension(logFile))) + "\"";
         }
 
         private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)

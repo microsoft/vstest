@@ -8,11 +8,12 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
+namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources
+{
     using System;
     using System.Reflection;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,103 +24,125 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
-        
+    internal class Resources
+    {
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Resources()
+        {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
-            get {
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Exception occurred while instantiating discoverer : {0}.
         /// </summary>
-        internal static string DiscovererInstantiationException {
-            get {
+        internal static string DiscovererInstantiationException
+        {
+            get
+            {
                 return ResourceManager.GetString("DiscovererInstantiationException", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Multiple test adapters with the same uri &apos;{0}&apos; were found. Ignoring adapter &apos;{1}&apos;. Please uninstall the conflicting adapter(s) to avoid this warning..
         /// </summary>
-        internal static string DuplicateAdaptersFound {
-            get {
+        internal static string DuplicateAdaptersFound
+        {
+            get
+            {
                 return ResourceManager.GetString("DuplicateAdaptersFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Ignoring the specified duplicate source &apos;{0}&apos;..
         /// </summary>
-        internal static string DuplicateSource {
-            get {
+        internal static string DuplicateSource
+        {
+            get
+            {
                 return ResourceManager.GetString("DuplicateSource", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to An exception occurred while test discoverer &apos;{0}&apos; was loading tests. Exception: {1}.
         /// </summary>
-        internal static string ExceptionFromLoadTests {
-            get {
+        internal static string ExceptionFromLoadTests
+        {
+            get
+            {
                 return ResourceManager.GetString("ExceptionFromLoadTests", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to An exception occurred while invoking executor &apos;{0}&apos;: {1}.
         /// </summary>
-        internal static string ExceptionFromRunTests {
-            get {
+        internal static string ExceptionFromRunTests
+        {
+            get
+            {
                 return ResourceManager.GetString("ExceptionFromRunTests", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not find file {0}..
         /// </summary>
-        internal static string FileNotFound {
-            get {
+        internal static string FileNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("FileNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Host debugging is enabled. Please attach debugger to testhost process to continue..
         /// </summary>
-        internal static string HostDebuggerWarning {
-            get {
+        internal static string HostDebuggerWarning
+        {
+            get
+            {
                 return ResourceManager.GetString("HostDebuggerWarning", resourceCulture);
             }
         }
@@ -138,80 +161,87 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Ignoring the test executor corresponding to test discoverer {0} because the discoverer does not have the DefaultExecutorUri attribute . You might need to re-install the test adapter add-in..
         /// </summary>
-        internal static string IgnoringExecutorAsNoDefaultExecutorUriAttribute {
-            get {
+        internal static string IgnoringExecutorAsNoDefaultExecutorUriAttribute
+        {
+            get
+            {
                 return ResourceManager.GetString("IgnoringExecutorAsNoDefaultExecutorUriAttribute", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Logging TestHost Diagnostics in file: {0}.
+        /// </summary>
+        internal static string TesthostDiagLogOutputFile
+        {
+            get
+            {
+                return ResourceManager.GetString("TesthostDiagLogOutputFile", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Failed to initialize client proxy: could not connect to test process..
         /// </summary>
-        internal static string InitializationFailed {
-            get {
+        internal static string InitializationFailed
+        {
+            get
+            {
                 return ResourceManager.GetString("InitializationFailed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to This operation is not allowed in the context of a non-debug run..
         /// </summary>
-        internal static string LaunchDebugProcessNotAllowedForANonDebugRun {
-            get {
+        internal static string LaunchDebugProcessNotAllowedForANonDebugRun
+        {
+            get
+            {
                 return ResourceManager.GetString("LaunchDebugProcessNotAllowedForANonDebugRun", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to No test discoverer is registered to perform discovery of test cases. Register a test discoverer and try again..
-        /// </summary>
-        internal static string NoDiscovererRegistered {
-            get {
-                return ResourceManager.GetString("NoDiscovererRegistered", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not find {0}. Make sure that the dotnet is installed on the machine..
         /// </summary>
-        internal static string NoDotnetExeFound {
-            get {
+        internal static string NoDotnetExeFound
+        {
+            get
+            {
                 return ResourceManager.GetString("NoDotnetExeFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not find test executor with URI &apos;{0}&apos;.  Make sure that the test executor is installed and supports .net runtime version {1}..
         /// </summary>
-        internal static string NoMatchingExecutor {
-            get {
+        internal static string NoMatchingExecutor
+        {
+            get
+            {
                 return ResourceManager.GetString("NoMatchingExecutor", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Could not find testhost.dll for source &apos;{0}&apos;. Make sure test project has a nuget reference of package &quot;microsoft.testplatform.testhost&quot;..
-        /// </summary>
-        internal static string NoTestHostFileExist {
-            get {
-                return ResourceManager.GetString("NoTestHostFileExist", resourceCulture);
-            }
-        }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to None of the specified source(s) &apos;{0}&apos; is valid. Fix the above errors/warnings and then try again. .
         /// </summary>
-        internal static string NoValidSourceFoundForDiscovery {
-            get {
+        internal static string NoValidSourceFoundForDiscovery
+        {
+            get
+            {
                 return ResourceManager.GetString("NoValidSourceFoundForDiscovery", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to , .
         /// </summary>
-        internal static string StringSeperator {
-            get {
+        internal static string StringSeperator
+        {
+            get
+            {
                 return ResourceManager.GetString("StringSeperator", resourceCulture);
             }
         }
@@ -228,19 +258,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again..
+        ///   Looks up a localized string similar to No test is available in {0}. Make sure that test discoverers &amp; executors are registered and platform &amp; framework version settings are appropriate and try again..
         /// </summary>
-        internal static string TestRunFailed_NoTestsAreAvailableInTheSources {
-            get {
-                return ResourceManager.GetString("TestRunFailed_NoTestsAreAvailableInTheSources", resourceCulture);
+        internal static string TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources
+        {
+            get
+            {
+                return ResourceManager.GetString("TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again..
         /// </summary>
-        internal static string UnsupportedPropertiesInTestCaseFilter {
-            get {
+        internal static string UnsupportedPropertiesInTestCaseFilter
+        {
+            get
+            {
                 return ResourceManager.GetString("UnsupportedPropertiesInTestCaseFilter", resourceCulture);
             }
         }

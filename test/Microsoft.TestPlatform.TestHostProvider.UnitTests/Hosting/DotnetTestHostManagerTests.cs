@@ -296,7 +296,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryDoesNotExist()
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" });
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, new List<string>());
 
             Assert.AreEqual(0, extensions.Count());
         }
@@ -306,7 +306,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.TestAdapter.dll" });
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" });
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, new List<string>());
 
             CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
         }
@@ -317,7 +317,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Parent directory is empty since the input source is file "test.dll"
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.dll" });
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource);
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, new List<string>());
 
             Assert.AreEqual(0, extensions.Count());
         }

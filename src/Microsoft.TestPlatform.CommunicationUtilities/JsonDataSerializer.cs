@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
     using Newtonsoft.Json;
@@ -20,26 +19,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     {
         private static JsonDataSerializer instance;
 
-        private static JsonSerializer serializer;
+        private static JsonSerializer payloadSerializer;
+        private static JsonSerializer payloadSerializer2;
 
         /// <summary>
         /// Prevents a default instance of the <see cref="JsonDataSerializer"/> class from being created.
         /// </summary>
         private JsonDataSerializer()
         {
-            serializer = JsonSerializer.Create(
-                            new JsonSerializerSettings
-                                {
-                                    ContractResolver = new TestPlatformContractResolver(),
-                                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                                    DateParseHandling = DateParseHandling.DateTimeOffset,
-                                    DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                                    TypeNameHandling = TypeNameHandling.None
-                                });
+            var jsonSettings = new JsonSerializerSettings
+            {
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateParseHandling = DateParseHandling.DateTimeOffset,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                TypeNameHandling = TypeNameHandling.None
+            };
+
+            payloadSerializer = JsonSerializer.Create(jsonSettings);
+            payloadSerializer2 = JsonSerializer.Create(jsonSettings);
+
+            payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
+            payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
+
 #if DEBUG
             // MemoryTraceWriter can help diagnose serialization issues. Enable it for
             // debug builds only.
-            serializer.TraceWriter = new MemoryTraceWriter();
+            payloadSerializer.TraceWriter = new MemoryTraceWriter();
+            payloadSerializer2.TraceWriter = new MemoryTraceWriter();
 #endif
         }
 
@@ -61,7 +67,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Message"/> instance.</returns>
         public Message DeserializeMessage(string rawMessage)
         {
-            return JsonConvert.DeserializeObject<Message>(rawMessage);
+            // Convert to VersionedMessage
+            // Message can be deserialized to VersionedMessage where version will be 0
+            return JsonConvert.DeserializeObject<VersionedMessage>(rawMessage);
         }
 
         /// <summary>
@@ -74,17 +82,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             T retValue = default(T);
 
-            // TODO: Currently we use json serializer auto only for non-testmessage types
-            // CHECK: Can't we just use auto for everything
-            if (MessageType.TestMessage.Equals(message.MessageType))
-            {
-                retValue = message.Payload.ToObject<T>();
-            }
-            else
-            {
-                retValue = message.Payload.ToObject<T>(serializer);
-            }
+            var versionedMessage = message as VersionedMessage;
+            var serializer = this.GetPayloadSerializer(versionedMessage?.Version);
 
+            retValue = message.Payload.ToObject<T>(serializer);
             return retValue;
         }
 
@@ -92,10 +93,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Deserialize raw JSON to an object using the default serializer.
         /// </summary>
         /// <param name="json">JSON string.</param>
+        /// <param name="version">Version of serializer to be used.</param>
         /// <typeparam name="T">Target type to deserialize.</typeparam>
         /// <returns>An instance of <see cref="T"/>.</returns>
-        public T Deserialize<T>(string json)
+        public T Deserialize<T>(string json, int version = 1)
         {
+            var serializer = this.GetPayloadSerializer(version);
+
             using (var stringReader = new StringReader(json))
             using (var jsonReader = new JsonTextReader(stringReader))
             {
@@ -121,20 +125,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Serialized message.</returns>
         public string SerializePayload(string messageType, object payload)
         {
-            JToken serializedPayload = null;
-
-            // TODO: Currently we use json serializer auto only for non-testmessage types
-            // CHECK: Can't we just use auto for everything
-            if (MessageType.TestMessage.Equals(messageType))
-            {
-                serializedPayload = JToken.FromObject(payload);
-            }
-            else
-            {
-                serializedPayload = JToken.FromObject(payload, serializer);
-            }
+            var serializedPayload = JToken.FromObject(payload, payloadSerializer);
 
             return JsonConvert.SerializeObject(new Message { MessageType = messageType, Payload = serializedPayload });
+        }
+
+        /// <summary>
+        /// Serialize a message with payload.
+        /// </summary>
+        /// <param name="messageType">Type of the message.</param>
+        /// <param name="payload">Payload for the message.</param>
+        /// <param name="version">Version for the message.</param>
+        /// <returns>Serialized message.</returns>
+        public string SerializePayload(string messageType, object payload, int version)
+        {
+            var serializer = this.GetPayloadSerializer(version);
+            var serializedPayload = JToken.FromObject(payload, serializer);
+
+            var message = version > 1 ?
+            new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload } :
+            new Message { MessageType = messageType, Payload = serializedPayload };
+
+            return JsonConvert.SerializeObject(message);
         }
 
         /// <summary>
@@ -142,9 +154,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         /// <typeparam name="T">Type of object to serialize.</typeparam>
         /// <param name="data">Instance of the object to serialize.</param>
+        /// <param name="version">Version to be stamped.</param>
         /// <returns>JSON string.</returns>
-        public string Serialize<T>(T data)
+        public string Serialize<T>(T data, int version = 1)
         {
+            var serializer = this.GetPayloadSerializer(version);
+
             using (var stringWriter = new StringWriter())
             using (var jsonWriter = new JsonTextWriter(stringWriter))
             {
@@ -152,6 +167,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 return stringWriter.ToString();
             }
+        }
+
+        private JsonSerializer GetPayloadSerializer(int? version)
+        {
+            return version == 2 ? payloadSerializer2 : payloadSerializer;
         }
     }
 }

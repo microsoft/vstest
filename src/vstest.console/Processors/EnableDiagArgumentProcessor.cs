@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class EnableDiagArgumentProcessor : IArgumentProcessor
     {
@@ -127,12 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 throw new CommandLineException(CommandLineResources.EnableDiagUsage);
             }
 
-            // Checking if the file is readonly
-            if (this.fileHelper.Exists(argument) && this.IsFileReadOnly(argument))
-            {
-                throw new CommandLineException(string.Format(CommandLineResources.LoggerFileIsReadOnly, argument));
-            }
-            else if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
+            if (string.IsNullOrWhiteSpace(Path.GetExtension(argument)))
             {
                 // Throwing error if the argument is just path and not a file
                 throw new CommandLineException(CommandLineResources.EnableDiagUsage);
@@ -146,7 +142,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 this.fileHelper.CreateDirectory(logDirectory);
             }
 
-            EqtTrace.InitializeVerboseTrace(argument);
+            // Find full path and send this to testhost so that vstest and testhost create logs at same location.
+            argument = Path.GetFullPath(argument);
+
+            // Catch exception(UnauthorizedAccessException, PathTooLongException...) if there is any at time of initialization.
+            if (!EqtTrace.InitializeVerboseTrace(argument))
+            {
+                if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                    ConsoleOutput.Instance.Warning(EqtTrace.ErrorOnInitialization);
+            }
         }
 
         /// <summary>

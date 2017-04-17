@@ -4,8 +4,10 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.Linq;
     using System.Runtime.Serialization;
     using System.Text;
 
@@ -20,15 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Initializes a new instance of the <see cref="TestResult"/> class.
         /// </summary>
-        /// <remarks>This constructor doesn't perform any parameter validation, it is meant to be used for serialization."/></remarks>
-        public TestResult()
-        {
-            // Default constructor for Serialization.
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestResult"/> class. 
-        /// </summary>
         /// <param name="testCase">The test case the result is for.</param>
         public TestResult(TestCase testCase)
         {
@@ -40,6 +33,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.TestCase = testCase;
             this.Messages = new Collection<TestResultMessage>();
             this.Attachments = new Collection<AttachmentSet>();
+
+            // Default start and end time values for a test result are initialized to current timestamp
+            // to maintain compatibility.
+            this.StartTime = DateTimeOffset.Now;
+            this.EndTime = DateTimeOffset.Now;
         }
 
         #endregion
@@ -61,153 +59,71 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the outcome of a test case.
         /// </summary>
-        [IgnoreDataMember]
-        public TestOutcome Outcome
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.Outcome, TestOutcome.None);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.Outcome, value);
-            }
-        }
+        [DataMember]
+        public TestOutcome Outcome { get; set; }
 
         /// <summary>
         /// Gets or sets the exception message.
         /// </summary>
-        [IgnoreDataMember]
-        public string ErrorMessage
-        {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorMessage, null);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.ErrorMessage, value);
-            }
-        }
+        [DataMember]
+        public string ErrorMessage { get; set; }
 
         /// <summary>
         /// Gets or sets the exception stack trace.
         /// </summary>
-        [IgnoreDataMember]
-        public string ErrorStackTrace
-        {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.ErrorStackTrace, null);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.ErrorStackTrace, value);
-            }
-        }
+        [DataMember]
+        public string ErrorStackTrace { get; set; }
 
         /// <summary>
         /// Gets or sets the TestResult Display name. Used for Data Driven Test (i.e. Data Driven Test. E.g. InlineData in xUnit)
         /// </summary>
-        [IgnoreDataMember]
-        public string DisplayName
-        {
-            get
-            {
-                return this.GetPropertyValue<string>(TestResultProperties.DisplayName, null);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.DisplayName, value);
-            }
-        }
+        [DataMember]
+        public string DisplayName { get; set; }
 
         /// <summary>
         /// Gets the test messages.
         /// </summary>
         [DataMember]
-        public Collection<TestResultMessage> Messages
-        {
-            get;
-            private set;
-        }
+        public Collection<TestResultMessage> Messages { get; private set; }
 
         /// <summary>
         /// Gets or sets test result ComputerName.
         /// </summary>
-        [IgnoreDataMember]
-        public string ComputerName
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.ComputerName, string.Empty);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.ComputerName, value);
-            }
-        }
+        [DataMember]
+        public string ComputerName { get; set; }
 
         /// <summary>
         /// Gets or sets the test result Duration.
         /// </summary>
-        [IgnoreDataMember]
-        public TimeSpan Duration
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.Duration, TimeSpan.Zero);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.Duration, value);
-            }
-        }
+        [DataMember]
+        public TimeSpan Duration { get; set; }
 
         /// <summary>
         /// Gets or sets the test result StartTime.
         /// </summary>
-        [IgnoreDataMember]
-        public DateTimeOffset StartTime
-        {
-            get
-            {
-                return this.GetPropertyValue(TestResultProperties.StartTime, DateTimeOffset.Now);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.StartTime, value);
-            }
-        }
+        [DataMember]
+        public DateTimeOffset StartTime { get; set; }
 
         /// <summary>
         /// Gets or sets test result EndTime.
         /// </summary>
-        [IgnoreDataMember]
-        public DateTimeOffset EndTime
+        [DataMember]
+        public DateTimeOffset EndTime { get; set; }
+
+        /// <summary>
+        /// Returns the TestProperties currently specified in this TestObject.
+        /// </summary>
+        public override IEnumerable<TestProperty> Properties
         {
             get
             {
-                return this.GetPropertyValue(TestResultProperties.EndTime, DateTimeOffset.Now);
-            }
-
-            set
-            {
-                this.SetPropertyValue(TestResultProperties.EndTime, value);
+                return TestResultProperties.Properties.Concat(base.Properties);
             }
         }
 
         #endregion
 
         #region Methods
-        
 
         /// <inheritdoc/>
         public override string ToString()
@@ -263,6 +179,70 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
 
             return result.ToString();
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Return TestProperty's value
+        /// </summary>
+        /// <returns></returns>
+        protected override object ProtectedGetPropertyValue(TestProperty property, object defaultValue)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestResult.DisplayName":
+                    return this.DisplayName;
+                case "TestResult.ComputerName":
+                    return this.ComputerName;
+                case "TestResult.Outcome":
+                    return this.Outcome;
+                case "TestResult.Duration":
+                    return this.Duration;
+                case "TestResult.CodeFilePath":
+                    return this.StartTime;
+                case "TestResult.EndTime":
+                    return this.EndTime;
+                case "TestResult.ErrorMessage":
+                    return this.ErrorMessage;
+                case "TestResult.ErrorStackTrace":
+                    return this.ErrorStackTrace;
+            }
+
+            return base.ProtectedGetPropertyValue(property, defaultValue);
+        }
+
+        /// <summary>
+        /// Set TestProperty's value
+        /// </summary>
+        protected override void ProtectedSetPropertyValue(TestProperty property, object value)
+        {
+            ValidateArg.NotNull(property, "property");
+
+            switch (property.Id)
+            {
+                case "TestResult.DisplayName":
+                    this.DisplayName = (string)value; return;
+                case "TestResult.ComputerName":
+                    this.ComputerName = (string)value; return;
+                case "TestResult.Outcome":
+                    this.Outcome = (TestOutcome)value; return;
+                case "TestResult.Duration":
+                    this.Duration = (TimeSpan)value; return;
+                case "TestResult.StartTime":
+                    this.StartTime = (DateTimeOffset)value; return;
+                case "TestResult.EndTime":
+                    this.EndTime = (DateTimeOffset)value; return;
+                case "TestResult.ErrorMessage":
+                    this.ErrorMessage = (string)value; return;
+                case "TestResult.ErrorStackTrace":
+                    this.ErrorStackTrace = (string)value; return;
+            }
+            base.ProtectedSetPropertyValue(property, value);
         }
 
         #endregion
@@ -339,7 +319,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", "TestResult Display Name", typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", "Computer Name", string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", "Computer Name", typeof(string), TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", "Outcome", string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
@@ -363,7 +343,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public static readonly TestProperty DisplayName = TestProperty.Register("TestResult.DisplayName", Resources.Resources.TestResultPropertyDisplayNameLabel, typeof(string), TestPropertyAttributes.Hidden, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
-        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.Resources.TestResultPropertyComputerNameLabel, string.Empty, string.Empty, typeof(string), ValidateComputerName, TestPropertyAttributes.None, typeof(TestResult));
+        public static readonly TestProperty ComputerName = TestProperty.Register("TestResult.ComputerName", Resources.Resources.TestResultPropertyComputerNameLabel, typeof(string), TestPropertyAttributes.None, typeof(TestResult));
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Outcome = TestProperty.Register("TestResult.Outcome", Resources.Resources.TestResultPropertyOutcomeLabel, string.Empty, string.Empty, typeof(TestOutcome), ValidateOutcome, TestPropertyAttributes.None, typeof(TestResult));
@@ -383,11 +363,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ErrorStackTrace = TestProperty.Register("TestResult.ErrorStackTrace", Resources.Resources.TestResultPropertyErrorStackTraceLabel, typeof(string), typeof(TestResult));
 #endif
-
-        private static bool ValidateComputerName(object value)
+        internal static TestProperty[] Properties { get; } =
         {
-            return !string.IsNullOrWhiteSpace((string)value);
-        }
+            DisplayName,
+            ComputerName,
+            Outcome,
+            Duration,
+            DisplayName,
+            StartTime,
+            EndTime,
+            ErrorMessage,
+            ErrorStackTrace
+        };
 
         private static bool ValidateOutcome(object value)
         {
