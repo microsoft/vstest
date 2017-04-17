@@ -28,8 +28,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             var testCase = data["TestCase"].ToObject<TestCase>(serializer);
             var testResult = new TestResult(testCase);
 
-            testResult.Attachments = data["Attachments"].ToObject<Collection<AttachmentSet>>(serializer);
-            testResult.Messages = data["Messages"].ToObject<Collection<TestResultMessage>>(serializer);
+            // Add attachments for the result
+            var attachments = data["Attachments"];
+            if (attachments != null && attachments.HasValues)
+            {
+                foreach (var attachment in attachments.Values<JToken>())
+                {
+                    if (attachment.Type != JTokenType.Null)
+                    {
+                        testResult.Attachments.Add(attachment.ToObject<AttachmentSet>(serializer));
+                    }
+                }
+            }
+
+            // Add messages for the result
+            var messages = data["Messages"];
+            if (messages != null && messages.HasValues)
+            {
+                foreach (var message in messages.Values<JToken>())
+                {
+                    if (message.Type != JTokenType.Null)
+                    {
+                        testResult.Messages.Add(message.ToObject<TestResultMessage>(serializer));
+                    }
+                }
+            }
+
             JToken properties = data["Properties"];
             if (properties != null && properties.HasValues)
             {
@@ -62,7 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
                         case "TestResult.DisplayName":
                             testResult.DisplayName = propertyData; break;
                         case "TestResult.ComputerName":
-                            testResult.ComputerName = propertyData; break;
+                            testResult.ComputerName = propertyData ?? string.Empty; break;
                         case "TestResult.Outcome":
                             testResult.Outcome = (TestOutcome)Enum.Parse(typeof(TestOutcome), propertyData); break;
                         case "TestResult.Duration":
@@ -133,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
             // TestResult.ComputerName
             writer.WriteStartObject();
             AddProperty(writer, TestResultProperties.ComputerName, serializer);
-            writer.WriteValue(testResult.ComputerName);
+            writer.WriteValue(testResult.ComputerName ?? string.Empty);
             writer.WriteEndObject();
 
             // TestResult.Duration
