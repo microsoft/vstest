@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// CLIRunSettingsArgumentProcessor Help
         /// </summary>
-        CLIRunSettingsArgumentProcessorHelpPriority,        
+        CLIRunSettingsArgumentProcessorHelpPriority,
 
         /// <summary>
         /// ListTestsArgumentExecutor Help

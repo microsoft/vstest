@@ -1536,7 +1536,7 @@
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data diagnostic adapter(s) in the test run. Default 
-      settings are used if not specified using settings file.</source>
+      settings are used if not specified using settings file. More info here : https://aka.ms/fpzskr</source>
         <target state="new">CollectArgumentHelp</target>
         <note></note>
       </trans-unit>

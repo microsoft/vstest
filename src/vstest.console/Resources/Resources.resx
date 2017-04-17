@@ -649,6 +649,6 @@
   <data name="CollectArgumentHelp" xml:space="preserve">
     <value>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data diagnostic adapter(s) in the test run. Default 
-      settings are used if not specified using settings file.</value>
+      settings are used if not specified using settings file. More info here : https://aka.ms/fpzskr</value>
   </data>
 </root>
