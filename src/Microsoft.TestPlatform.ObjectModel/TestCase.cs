@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCase"/> class. 
+        /// Initializes a new instance of the <see cref="TestCase"/> class.
         /// </summary>
         /// <param name="fullyQualifiedName">
         /// Fully qualified name of the test case.
@@ -192,9 +192,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             // To generate id hash "ExecutorUri + source + Name";
 
-            // If source is a file name then just use the filename for the identifier since the 
+            // If source is a file name then just use the filename for the identifier since the
             // file might have moved between discovery and execution (in appx mode for example)
-            // This is not elegant because the Source contents should be a black box to the framework. For example in the database adapter case this is not a file path.
+            // This is not elegant because the Source contents should be a black box to the framework.
+            // For example in the database adapter case this is not a file path.
             string source = this.Source;
 
             if (File.Exists(source))
