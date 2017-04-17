@@ -187,7 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
 
                 // Set the cache bool to true.
-                this.TestExtensions.SetTestExtensionsCache<TPluginInfo>();
+                this.TestExtensions.SetTestExtensionsCacheStatus<TPluginInfo>();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
