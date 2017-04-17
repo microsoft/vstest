@@ -302,6 +302,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             mockHandler.Setup(mh => mh.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(),
+                It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>())).Callback(() => waitHandle.Set());
 
             this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
@@ -422,6 +423,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             mockHandler.Setup(mh => mh.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(),
+                It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>())).Callback(() => waitHandle.Set());
 
             this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
@@ -453,6 +455,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             mockHandler.Setup(mh => mh.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
                 It.IsAny<TestRunChangedEventArgs>(),
+                It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>())).Callback(() => waitHandle.Set());
 
             this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
@@ -461,7 +464,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.StartTestExecutionWithTests, runCriteria, this.protocolConfig.Version), Times.Once);
             this.mockDataSerializer.Verify(ds => ds.DeserializeMessage(rawMessage), Times.Once);
-            mockHandler.Verify(mh => mh.HandleTestRunComplete(null, null, null), Times.Once);
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(null, null, null, null), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(rawMessage), Times.Once);
         }
 
@@ -512,7 +515,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                     md => md.SerializePayload(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()))
                 .Returns(testCompleteRawMessage);
             var waitHandle = new AutoResetEvent(false);
-            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null)).Callback(() => waitHandle.Set());
+            mockHandler.Setup(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null)).Callback(() => waitHandle.Set());
 
             this.testRequestSender.InitializeCommunication();
             this.testRequestSender.StartTestRun(runCriteria, mockHandler.Object);
@@ -520,7 +523,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.EndSession();
 
             mockHandler.Verify(mh => mh.HandleLogMessage(TestMessageLevel.Error, string.Format(CommunicationUtilitiesResources.AbortedTestRun, errorMessage)), Times.Once);
-            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null), Times.Once);
+            mockHandler.Verify(mh => mh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
             mockHandler.Verify(mh => mh.HandleRawMessage(testCompleteRawMessage), Times.Once);
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.SessionEnd), Times.Never);
         }

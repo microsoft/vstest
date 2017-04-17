@@ -102,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
              TimeSpan elapsedTime,
              bool isAborted,
              bool isCanceled,
+             ICollection<AttachmentSet> runContextAttachments,
              Collection<AttachmentSet> runCompleteArgsAttachments)
         {
             lock (dataUpdateSyncObject)
@@ -110,6 +111,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 this.IsCanceled = this.IsCanceled || isCanceled;
 
                 ElapsedTime = TimeSpan.FromMilliseconds(Math.Max(ElapsedTime.TotalMilliseconds, elapsedTime.TotalMilliseconds));
+                if (runContextAttachments != null)
+                {
+                    foreach (var attachmentSet in runContextAttachments)
+                    {
+                        RunContextAttachments.Add(attachmentSet);
+                    }
+                }
 
                 if (runCompleteArgsAttachments != null) RunCompleteArgsAttachments.AddRange(runCompleteArgsAttachments);
                 if (exception != null) Exceptions.Add(exception);

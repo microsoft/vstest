@@ -16,8 +16,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// </summary>
         /// <param name="testRunCompleteArgs">TestRunCompletion Data</param>
         /// <param name="lastChunkArgs">Last set of test results</param>
+        /// <param name="runContextAttachments">Attachments of the test run</param>
         /// <param name="executorUris">ExecutorURIs of the adapters involved in test run</param>
-        void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<string> executorUris);
+        void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris);
 
         /// <summary>
         /// Handle a change in TestRun i.e. new testresults and stats

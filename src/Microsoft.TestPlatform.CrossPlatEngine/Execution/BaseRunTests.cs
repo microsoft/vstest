@@ -469,6 +469,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 this.testRunEventsHandler.HandleTestRunComplete(
                     testRunCompleteEventArgs,
                     testRunChangedEventArgs,
+                    attachments,
                     this.executorUrisThatRanTests);
             }
             else

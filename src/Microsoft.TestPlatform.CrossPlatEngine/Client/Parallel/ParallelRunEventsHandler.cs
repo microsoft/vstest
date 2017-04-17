@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public ParallelRunEventsHandler(IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
-            ParallelRunDataAggregator runDataAggregator) :
+            ParallelRunDataAggregator runDataAggregator) : 
             this(proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
@@ -57,6 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public void HandleTestRunComplete(
             TestRunCompleteEventArgs testRunCompleteArgs,
             TestRunChangedEventArgs lastChunkArgs,
+            ICollection<AttachmentSet> runContextAttachments,
             ICollection<string> executorUris)
         {
             // we get run complete events from each executor process
@@ -77,6 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 testRunCompleteArgs.ElapsedTimeInRunningTests,
                 testRunCompleteArgs.IsAborted,
                 testRunCompleteArgs.IsCanceled,
+                runContextAttachments,
                 testRunCompleteArgs.AttachmentSets);
 
             // Do not send TestRunComplete to actual test run handler
@@ -85,10 +87,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     this.proxyExecutionManager,
                     testRunCompleteArgs,
                     null, // lastChunk should be null as we already sent this data above
+                    runContextAttachments,
                     executorUris);
 
             if (parallelRunComplete)
             {
+                // todo : Merge Code Coverage files here
                 var completedArgs = new TestRunCompleteEventArgs(runDataAggregator.GetAggregatedRunStats(),
                     runDataAggregator.IsCanceled,
                     runDataAggregator.IsAborted,
@@ -111,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
                 // send actual test runcomplete to clients
                 this.actualRunEventsHandler.HandleTestRunComplete(
-                   completedArgs, null, runDataAggregator.ExecutorUris);
+                   completedArgs, null, runDataAggregator.RunContextAttachments, runDataAggregator.ExecutorUris);
             }
         }
 
@@ -123,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             var message = this.dataSerializer.DeserializeMessage(rawMessage);
 
             // Do not deserialize further - just send if not execution complete
-            if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
+            if(!string.Equals(MessageType.ExecutionComplete, message.MessageType))
             {
                 this.actualRunEventsHandler.HandleRawMessage(rawMessage);
             }

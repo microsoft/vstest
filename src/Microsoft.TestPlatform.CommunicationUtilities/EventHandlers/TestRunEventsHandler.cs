@@ -43,11 +43,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         /// </summary>
         /// <param name="testRunCompleteArgs"> The test run complete args. </param>
         /// <param name="lastChunkArgs"> The last chunk args. </param>
+        /// <param name="runContextAttachments"> The run context attachments. </param>
         /// <param name="executorUris"> The executor uris. </param>
-        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<string> executorUris)
+        public void HandleTestRunComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris)
         {
             EqtTrace.Info("Sending test run complete");
-            this.requestHandler.SendExecutionComplete(testRunCompleteArgs, lastChunkArgs, executorUris);
+            this.requestHandler.SendExecutionComplete(testRunCompleteArgs, lastChunkArgs, runContextAttachments, executorUris);
         }
 
         /// <summary>

@@ -184,6 +184,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.mockTestRunEventsHandler.Verify(
                 treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
+                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()), Times.Once);
         }
 

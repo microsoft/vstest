@@ -122,6 +122,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             mockTestRunEventsHandler.Verify(
                 treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
+                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()), Times.Once);
 
             // Also verify that run stats are passed through.
@@ -172,6 +173,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             mockTestRunEventsHandler.Verify(
                 treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(),
                     It.IsAny<TestRunChangedEventArgs>(),
+                    It.IsAny<ICollection<AttachmentSet>>(),
                     It.IsAny<ICollection<string>>()), Times.Once);
 
             // Also verify that run stats are passed through.

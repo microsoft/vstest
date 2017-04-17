@@ -356,6 +356,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                         eventHandler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,
                             testRunCompletePayload.LastRunTests,
+                            testRunCompletePayload.RunAttachments,
                             testRunCompletePayload.ExecutorUris);
                         isTestRunComplete = true;
                     }
@@ -375,7 +376,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 EqtTrace.Error("Aborting Test Run Operation: {0}", exception);
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsRun);
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
-                eventHandler.HandleTestRunComplete(completeArgs, null, null);
+                eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
                 this.CleanupCommunicationIfProcessExit();
             }
         }

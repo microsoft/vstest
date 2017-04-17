@@ -50,7 +50,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             string payload = "RunStats";
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(It.IsAny<string>()))
                 .Returns(new Message() { MessageType = MessageType.TestRunStatsChange, Payload = payload });
-
+           
             this.parallelRunEventsHandler.HandleRawMessage(payload);
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
@@ -86,7 +86,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             string log = "Hello";
             this.parallelRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, log);
 
-            this.mockTestRunEventsHandler.Verify(mt =>
+            this.mockTestRunEventsHandler.Verify(mt => 
                 mt.HandleLogMessage(TestMessageLevel.Error, log), Times.Once);
         }
 
@@ -113,10 +113,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
 
-            this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
-                   this.mockProxyExecutionManager.Object, completeArgs, null, null)).Returns(false);
+             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
+                    this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(false);
 
-            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null);
+            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
             // Raw message must be sent 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Never);
@@ -124,7 +124,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(null), Times.Never);
 
             this.mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
-                this.mockProxyExecutionManager.Object, completeArgs, null, null), Times.Once);
+                this.mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
         }
 
         [TestMethod]
@@ -138,9 +138,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 .Returns(payload);
 
             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
-                    this.mockProxyExecutionManager.Object, completeArgs, null, null)).Returns(false);
+                    this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(false);
 
-            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, lastChunk, null);
+            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, lastChunk, null, null);
 
             // Raw message must be sent 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(payload), Times.Once);
@@ -148,7 +148,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(lastChunk), Times.Once);
 
             this.mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
-                this.mockProxyExecutionManager.Object, completeArgs, null, null), Times.Once);
+                this.mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
         }
 
         [TestMethod]
@@ -158,22 +158,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var completeArgs = new TestRunCompleteEventArgs(null, false, false, null, null, TimeSpan.Zero);
 
             this.mockParallelProxyExecutionManager.Setup(mp => mp.HandlePartialRunComplete(
-                    this.mockProxyExecutionManager.Object, completeArgs, null, null)).Returns(true);
+                    this.mockProxyExecutionManager.Object, completeArgs, null, null, null)).Returns(true);
 
             this.mockDataSerializer.Setup(mds => mds.SerializeMessage(MessageType.ExecutionComplete)).Returns(payload);
 
-            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null);
+            this.parallelRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunStatsChange(null), Times.Never);
 
             this.mockParallelProxyExecutionManager.Verify(mp => mp.HandlePartialRunComplete(
-                this.mockProxyExecutionManager.Object, completeArgs, null, null), Times.Once);
+                this.mockProxyExecutionManager.Object, completeArgs, null, null, null), Times.Once);
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleRawMessage(It.IsAny<string>()), Times.Once);
 
             this.mockTestRunEventsHandler.Verify(mt => mt.HandleTestRunComplete(
                 It.IsAny<TestRunCompleteEventArgs>(),
-                It.IsAny<TestRunChangedEventArgs>(),
+                It.IsAny<TestRunChangedEventArgs>(), 
+                It.IsAny<ICollection<AttachmentSet>>(),
                 It.IsAny<ICollection<string>>()), Times.Once);
         }
     }

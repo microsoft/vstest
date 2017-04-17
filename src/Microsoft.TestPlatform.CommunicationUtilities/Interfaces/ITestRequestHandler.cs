@@ -63,8 +63,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// </summary>
         /// <param name="testRunCompleteArgs"> The test run complete args. </param>
         /// <param name="lastChunkArgs"> The last chunk args. </param>
+        /// <param name="runContextAttachments"> The run context attachments. </param>
         /// <param name="executorUris"> The executor uris. </param>
-        void SendExecutionComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<string> executorUris);
+        void SendExecutionComplete(TestRunCompleteEventArgs testRunCompleteArgs, TestRunChangedEventArgs lastChunkArgs, ICollection<AttachmentSet> runContextAttachments, ICollection<string> executorUris);
 
         /// <summary>
         /// The discovery complete handler

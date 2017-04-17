@@ -33,8 +33,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.ObjectModel
         [TestMethod]
         public void HandleTestRunCompleteShouldInformClient()
         {
-            this.testRunEventHandler.HandleTestRunComplete(null, null, null);
-            this.mockClient.Verify(th => th.SendExecutionComplete(null, null, null), Times.Once);
+            this.testRunEventHandler.HandleTestRunComplete(null, null, null, null);
+            this.mockClient.Verify(th => th.SendExecutionComplete(null, null, null, null), Times.Once);
         }
 
         [TestMethod]
