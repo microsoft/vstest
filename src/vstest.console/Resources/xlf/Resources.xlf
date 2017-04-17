@@ -685,6 +685,13 @@
         <target state="new">Logging Vstest Diagnostics in file: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="CollectArgumentHelp">
+        <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
+      Enables data diagnostic adapter(s) in the test run. Default 
+      settings are used if not specified using settings file.</source>
+        <target state="new">CollectArgumentHelp</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

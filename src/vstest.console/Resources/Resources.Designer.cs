@@ -1481,5 +1481,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("InIsolationDeprecated", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   CollectArgumentHelp
+        /// </summary>
+        public static string CollectArgumentHelp
+        {
+            get
+            {
+                return ResourceManager.GetString("CollectArgumentHelp", resourceCulture);
+            }
+        }
     }
 }

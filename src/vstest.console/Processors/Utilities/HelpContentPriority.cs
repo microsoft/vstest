@@ -75,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// CLIRunSettingsArgumentProcessor Help
         /// </summary>
-        CLIRunSettingsArgumentProcessorHelpPriority,
+        CLIRunSettingsArgumentProcessorHelpPriority,        
 
         /// <summary>
         /// ListTestsArgumentExecutor Help
@@ -126,6 +126,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// EnableCodeCoverageArgumentProcessor Help
         /// </summary>
         EnableCodeCoverageArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// CollectArgumentProcessor Help
+        /// </summary>
+        CollectArgumentProcessorHelpPriority,
 
         /// <summary>
         /// InIsolationArgumentProcessor Help

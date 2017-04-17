@@ -40,10 +40,29 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            string runSettings = this.GetRunsettingsFilePath();
+            string runSettings = this.GetRunsettingsFilePath("True");
             string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}");
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 1, 1);
+            this.VaildateDataCollectorOutput();
+        }
+
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void ExecuteTestsWithDataCollectionUsingCollectArgument(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+            string runSettings = this.GetRunsettingsFilePath("False");
+            string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector");
 
             this.InvokeVsTest(arguments);
 
@@ -120,7 +139,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             Assert.AreEqual(3, diaglogsFileCount);
         }
 
-        private string GetRunsettingsFilePath()
+        private string GetRunsettingsFilePath(string enabled)
         {
             var runsettingsPath = Path.Combine(
                 Path.GetTempPath(),
@@ -142,6 +161,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             dataCollectionAttributes.Add("assemblyQualifiedName", string.Format("OutOfProcDataCollector.SampleDataCollector, {0}", AssemblyUtility.GetAssemblyName(codebase)));
             dataCollectionAttributes.Add("codebase", codebase);
+            dataCollectionAttributes.Add("enabled", enabled);
             CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
             return runsettingsPath;
         }

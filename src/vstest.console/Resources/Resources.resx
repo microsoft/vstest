@@ -646,4 +646,9 @@
   <data name="VstestDiagLogOutputPath" xml:space="preserve">
     <value>Logging Vstest Diagnostics in file: {0}</value>
   </data>
+  <data name="CollectArgumentHelp" xml:space="preserve">
+    <value>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
+      Enables data diagnostic adapter(s) in the test run. Default 
+      settings are used if not specified using settings file.</value>
+  </data>
 </root>
