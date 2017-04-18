@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
     using ObjectModelCommonResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.CommonResources;
@@ -30,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     public class SettingsProviderExtensionManager
     {
         #region Fields
-        
+
         private static SettingsProviderExtensionManager settingsProviderExtensionManager;
         private static object synclock = new object();
 
@@ -116,17 +115,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
                         IEnumerable<LazyExtension<ISettingsProvider, ISettingsProviderCapabilities>> testExtensions;
 
                         TestPluginManager.Instance
-                            .GetTestExtensions
-                            <ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
+                            .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
+                                TestPlatformConstants.SettingsProviderRegexPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
-                        
+
                         settingsProviderExtensionManager = new SettingsProviderExtensionManager(
-                                                            testExtensions, unfilteredTestExtensions, TestSessionMessageLogger.Instance);
+                            testExtensions, unfilteredTestExtensions, TestSessionMessageLogger.Instance);
                     }
                 }
             }
-            
+
             return settingsProviderExtensionManager;
         }
 

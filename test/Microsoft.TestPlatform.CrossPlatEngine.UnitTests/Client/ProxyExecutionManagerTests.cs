@@ -68,16 +68,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             try
             {
-                var extensions = new[] { "c:\\e1.TestAdapter.dll", "c:\\e2.TestAdapter.dll" };
-                TestPluginCacheTests.SetupMockAdditionalPathExtensions(extensions);
+                var extensions = new List<string>() { "C:\\foo.dll" };
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-
+                this.mockTestHostManager.Setup(x => x.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>()))
+                    .Returns(extensions);
                 this.testExecutionManager.Initialize();
 
                 // Also verify that we have waited for client connection.
                 this.mockRequestSender.Verify(s => s.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
                 this.mockRequestSender.Verify(
-                    s => s.InitializeExecution(extensions, true),
+                    s => s.InitializeExecution(extensions, false),
                     Times.Once);
             }
             finally
@@ -104,13 +104,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             TestPluginCache.Instance = null;
             try
             {
-                TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "c:\\e1.TestAdapter.dll" });
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll" });
+                this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "he1.dll", "c:\\e1.dll" });
 
                 this.testExecutionManager.Initialize();
 
-                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.TestAdapter.dll" }, true), Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(new[] { "he1.dll", "c:\\e1.dll" }, false), Times.Once);
             }
             finally
             {
@@ -145,9 +144,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldInitializeExtensionsIfTestHostIsNotShared()
         {
             TestPluginCache.Instance = null;
-            TestPluginCacheTests.SetupMockAdditionalPathExtensions(new[] { "x.TestAdapter.dll" });
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(false);
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new[] { "x.dll" });
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
