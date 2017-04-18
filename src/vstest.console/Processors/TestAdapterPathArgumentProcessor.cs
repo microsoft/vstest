@@ -155,48 +155,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestAdapterPathValueRequired));
             }
 
-            string fullPathTestAdapterPathsString = string.Empty;
-            var fullPathTestAdapterPaths = new List<string>();
+            string customAdaptersPath;
 
             try
             {
                 // Remove leading and trailing ' " ' chars...
                 argument = argument.Trim().Trim(new char[] { '\"' });
 
-                var testadapterPaths = argument.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                customAdaptersPath = Path.GetFullPath(argument);
+                if (!fileHelper.DirectoryExists(customAdaptersPath))
+                {
+                    throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
+                }
 
                 // Get testadapter paths from RunSettings.
                 var testAdapterPathsInRunSettings = this.runSettingsManager.QueryRunSettingsNode("RunConfiguration.TestAdaptersPaths");
 
                 if (!string.IsNullOrWhiteSpace(testAdapterPathsInRunSettings))
                 {
+                    var testAdapterFullPaths = new List<string>();
                     var testAdapterPathsInRunSettingsArray = testAdapterPathsInRunSettings.Split(
                         new[] { ';' },
                         StringSplitOptions.RemoveEmptyEntries);
 
-                    if (testAdapterPathsInRunSettingsArray.Length > 0)
+                    foreach (var testadapterPath in testAdapterPathsInRunSettingsArray)
                     {
-                        testadapterPaths.AddRange(testAdapterPathsInRunSettingsArray);
-                    }
-                }
+                        var testAdapterFullPath = Path.GetFullPath(testadapterPath);
 
-                foreach (var testadapterPath in testadapterPaths)
-                {
-                    var customAdaptersPath = Path.GetFullPath(testadapterPath);
+                        if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
+                        {
+                            throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
+                        }
 
-                    if (!this.fileHelper.DirectoryExists(customAdaptersPath))
-                    {
-                        throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
+                        testAdapterFullPaths.Add(testAdapterFullPath);
                     }
 
-                    fullPathTestAdapterPaths.Add(customAdaptersPath);
+                    testAdapterFullPaths.Add(customAdaptersPath);
+                    testAdapterFullPaths = testAdapterFullPaths.Distinct().ToList();
+                    customAdaptersPath = string.Join(";", testAdapterFullPaths.ToArray());
                 }
 
-                fullPathTestAdapterPaths = fullPathTestAdapterPaths.Distinct().ToList();
-
-                fullPathTestAdapterPathsString = string.Join(";", fullPathTestAdapterPaths.ToArray());
-
-                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", fullPathTestAdapterPathsString);
+                this.runSettingsManager.UpdateRunSettingsNode("RunConfiguration.TestAdaptersPaths", customAdaptersPath);
             }
             catch (Exception e)
             {
@@ -204,14 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, argument, e.Message));
             }
 
-            this.commandLineOptions.TestAdapterPath = fullPathTestAdapterPathsString;
-
-            if (fullPathTestAdapterPaths.Count <= 0)
-            {
-                // Print a warning about not finding any test adapter in provided path...
-                this.output.Warning(CommandLineResources.NoAdaptersFoundInTestAdapterPath, argument);
-                this.output.WriteLine(string.Empty, OutputLevel.Information);
-            }
+            this.commandLineOptions.TestAdapterPath = customAdaptersPath;
         }
 
         /// <summary>

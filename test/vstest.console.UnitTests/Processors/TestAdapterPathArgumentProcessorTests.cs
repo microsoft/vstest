@@ -168,39 +168,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             var currentAssemblyPath = typeof(TestAdapterPathArgumentExecutor).GetTypeInfo().Assembly.Location;
             var currentFolder = Path.GetDirectoryName(currentAssemblyPath);
 
-            var testadapterPaths = string.Concat("C:\\;", currentFolder);
-            executor.Initialize(testadapterPaths);
+            executor.Initialize(currentFolder);
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
-            Assert.AreEqual(testadapterPaths, runConfiguration.TestAdaptersPaths);
-        }
-
-        [TestMethod]
-        public void InitializeShouldReportIfNoTestAdaptersFoundInPath()
-        {
-            var mockRunSettingsProvider = new Mock<IRunSettingsProvider>();
-            var mockFileHelper = new Mock<IFileHelper>();
-            mockFileHelper.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(false);
-            var mockOutput = new Mock<IOutput>();
-            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, mockRunSettingsProvider.Object, mockOutput.Object, mockFileHelper.Object);
-
-            var currentAssemblyPath = typeof(TestAdapterPathArgumentExecutor).GetTypeInfo().Assembly.Location;
-            var currentFolder = Path.GetDirectoryName(currentAssemblyPath);
-
-            executor.Initialize(";");
-
-            mockOutput.Verify(
-                o =>
-                o.WriteLine(
-                    string.Format(
-                        "The path '{0}' specified in the 'TestAdapterPath' does not contain any test adapters, provide a valid path and try again.",
-                        ";"),
-                    OutputLevel.Warning));
+            Assert.AreEqual(currentFolder, runConfiguration.TestAdaptersPaths);
         }
 
         [TestMethod]
         public void InitializeShouldMergeTestAdapterPathsInRunSettings()
         {
-            var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
+            var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;f:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
             var runSettings = new RunSettings();
             runSettings.LoadSettingsXml(runSettingsXml);
             RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
@@ -210,15 +186,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             mockFileHelper.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
-            executor.Initialize("c:\\users;d:\\users");
+            executor.Initialize("c:\\users");
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
-            Assert.AreEqual("c:\\users;d:\\users;f:\\users", runConfiguration.TestAdaptersPaths);
+            Assert.AreEqual("d:\\users;f:\\users;c:\\users", runConfiguration.TestAdaptersPaths);
         }
 
         [TestMethod]
         public void InitializeShouldMergeTestAdapterPathsInRunSettingsIgnoringDuplicatePaths()
         {
-            var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>c:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
+            var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users;c:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
             var runSettings = new RunSettings();
             runSettings.LoadSettingsXml(runSettingsXml);
             RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
@@ -228,9 +204,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             mockFileHelper.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
 
-            executor.Initialize("c:\\users;d:\\users");
+            executor.Initialize("c:\\users");
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
-            Assert.AreEqual("c:\\users;d:\\users", runConfiguration.TestAdaptersPaths);
+            Assert.AreEqual("d:\\users;c:\\users", runConfiguration.TestAdaptersPaths);
         }
 
         #endregion
