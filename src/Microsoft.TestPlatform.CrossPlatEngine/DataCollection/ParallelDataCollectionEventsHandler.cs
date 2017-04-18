@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reflection;
-#if !NET46
-using System.Runtime.Loader;
-#endif
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
-
-        private readonly IDataSerializer dataSerializer;
 
         public ParallelDataCollectionEventsHandler(IProxyExecutionManager proxyExecutionManager, 
             ITestRunEventsHandler actualRunEventsHandler, 
@@ -39,7 +35,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             base(proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, dataSerializer)
         {
             this.runDataAggregator = runDataAggregator;
-            this.dataSerializer = dataSerializer;
         }
 
         /// <summary>
@@ -55,31 +50,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             
             if (parallelRunComplete)
             {
-                // todo : Merge Code Coverage files here
-                // todo: Iterate over avaible datacollecter attachement handlers get final list of attachments
-                // ICollection<AttachmentSet>  attachments = new List<AttachmentSet>();
+                var coverageHandler = new CodeCoverageDataAttachmentsHandler();
+                var attachments = coverageHandler.HandleDataCollectionAttachmentSets(runDataAggregator.RunContextAttachments);
+
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    new Collection<AttachmentSet>(new List<AttachmentSet>().ToArray()),
+                    new Collection<AttachmentSet>(attachments.ToArray()),
                     runDataAggregator.ElapsedTime);
 
                 HandleParallelTestRunComplete(completedArgs);
-            }
-        }
-
-        public override void HandleRawMessage(string rawMessage)
-        {
-            // In case of parallel - we can send everything but handle complete
-            // HandleComplete is not true-end of the overall execution as we only get completion of one executor here
-            // Always aggregate data, deserialize and raw for complete events
-            var message = this.dataSerializer.DeserializeMessage(rawMessage);
-
-            // Do not deserialize further - just send if not execution complete
-            if (!string.Equals(MessageType.ExecutionComplete, message.MessageType))
-            {
-                base.HandleRawMessage(rawMessage);
             }
         }
     }

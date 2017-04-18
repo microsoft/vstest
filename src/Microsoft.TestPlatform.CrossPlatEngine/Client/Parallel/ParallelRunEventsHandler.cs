@@ -129,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 completedArgs, null, this.runDataAggregator.RunContextAttachments, this.runDataAggregator.ExecutorUris);
         }
 
-        public virtual void HandleRawMessage(string rawMessage)
+        public void HandleRawMessage(string rawMessage)
         {
             // In case of parallel - we can send everything but handle complete
             // HandleComplete is not true-end of the overall execution as we only get completion of one executor here
@@ -143,17 +143,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             }
         }
 
-        public virtual void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
+        public void HandleTestRunStatsChange(TestRunChangedEventArgs testRunChangedArgs)
         {
             this.actualRunEventsHandler.HandleTestRunStatsChange(testRunChangedArgs);
         }
 
-        public virtual void HandleLogMessage(TestMessageLevel level, string message)
+        public void HandleLogMessage(TestMessageLevel level, string message)
         {
             this.actualRunEventsHandler.HandleLogMessage(level, message);
         }
 
-        public virtual int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
+        public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             return this.actualRunEventsHandler.LaunchProcessWithDebuggerAttached(testProcessStartInfo);
         }
