@@ -25,6 +25,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
     using TestableImplementations;
 
+    using TestPlatform.Common.UnitTests.ExtensionFramework;
+
     [TestClass]
     public class RunTestsWithSourcesTests
     {
@@ -51,12 +53,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                                             isDebug: false,
                                             testCaseFilter: null);
             this.mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location },
+                () => { });
+
+            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(".*.TestAdapter.dll");
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(".*.TestAdapter.dll");
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
             RunTestWithSourcesExecutor.RunTestsWithSourcesCallback = null;
+            TestPluginCacheTests.ResetExtensionsCache();
         }
 
         [TestMethod]

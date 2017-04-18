@@ -4,21 +4,24 @@
 namespace TestPlatform.Common.UnitTests.ExtensionFramework
 {
     using System;
-
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using System.Collections.Generic;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using System.Reflection;
-    using System.Linq;
+
     [TestClass]
     public class TestPluginManagerTests
     {
@@ -64,7 +67,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void InstanceShouldReturnCachedTestPluginManagerInstance()
         {
             var instance = TestPluginManager.Instance;
-            
+
             Assert.AreEqual(instance, TestPluginManager.Instance);
         }
 
@@ -76,13 +79,40 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
-            TestPluginManager.Instance.GetTestExtensions<ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                    out unfilteredTestExtensions,
-                    out testExtensions);
+            TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+                TestPlatformConstants.TestAdapterRegexPattern,
+                out unfilteredTestExtensions,
+                out testExtensions);
 
             Assert.IsNotNull(unfilteredTestExtensions);
             Assert.IsNotNull(testExtensions);
             Assert.IsTrue(testExtensions.Count() > 0);
+        }
+
+        [TestMethod]
+        public void GetTestExtensionsShouldDiscoverExtensionsOnlyOnce()
+        {
+            var discoveryCount = 0;
+            TestPluginCacheTests.SetupMockExtensions(() => { discoveryCount++; });
+
+            IEnumerable<LazyExtension<ITestDiscoverer, Dictionary<string, object>>> unfilteredTestExtensions;
+            IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
+
+            TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+                TestPlatformConstants.TestAdapterRegexPattern,
+                out unfilteredTestExtensions,
+                out testExtensions);
+
+            // Call this again to verify that discovery is not called again.
+            TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+                TestPlatformConstants.TestAdapterRegexPattern,
+                out unfilteredTestExtensions,
+                out testExtensions);
+
+            Assert.IsNotNull(testExtensions);
+            Assert.IsTrue(testExtensions.Count() > 0);
+
+            Assert.AreEqual(1, discoveryCount);
         }
 
         [TestMethod]
@@ -92,7 +122,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
             TestPluginManager.Instance
-                .GetTestExtensions<ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
+                .GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
                     typeof(TestPluginManagerTests).GetTypeInfo().Assembly.Location,
                     out unfilteredTestExtensions,
                     out testExtensions);
