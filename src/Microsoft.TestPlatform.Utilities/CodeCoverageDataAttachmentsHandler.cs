@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.IO;
     using System.Reflection;
 #if !NET46
@@ -28,22 +29,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
         {
-            IList<string> coverageAttachmentSet = new List<string>();
-            foreach (var dataCollectionAttachment in dataCollectionAttachments)
+            var coverageAttachments = dataCollectionAttachments
+                .Where(dataCollectionAttachment => CodeCoverageDataCollectorUri.Equals(dataCollectionAttachment.Uri)).ToArray();
+
+            if (coverageAttachments.Any())
             {
-                if (CodeCoverageDataCollectorUri.Equals(dataCollectionAttachment.Uri))
-                {
-                    foreach (var file in dataCollectionAttachment.Attachments)
-                    {
-                        coverageAttachmentSet.Add(file.Uri.LocalPath);
-                    }
-                }
+                var codeCoverageFiles = coverageAttachments.Select((o) => o.Attachments[0].Uri.LocalPath).ToArray();
+                var outputFile = MergeCodeCoverageFiles(codeCoverageFiles);
+
+                var existingAttachmentSet = coverageAttachments[0];
+
+                var attachmentSet = new AttachmentSet(existingAttachmentSet.Uri, existingAttachmentSet.DisplayName);
+                attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), existingAttachmentSet.Attachments[0].Description));
+
+                return new Collection<AttachmentSet>{ attachmentSet };
             }
 
-            return MergeCodeCoverageFiles(coverageAttachmentSet);
+            return new Collection<AttachmentSet>();
         }
 
-        private ICollection<AttachmentSet> MergeCodeCoverageFiles(IList<string> files)
+        private string MergeCodeCoverageFiles(IList<string> files)
         {
             string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CoverageFileExtension);
             string outputfileName = files[0];
@@ -78,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                         File.Delete(fileName);
                     }
-                    return new Collection<AttachmentSet> { new AttachmentSet(CodeCoverageDataCollectorUri, outputfileName) };
+                    return outputfileName;
                 }
                 catch (Exception ex)
                 {
@@ -89,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
             }
 
-            return new Collection<AttachmentSet>();
+            return string.Empty;
         }
     }
 }
