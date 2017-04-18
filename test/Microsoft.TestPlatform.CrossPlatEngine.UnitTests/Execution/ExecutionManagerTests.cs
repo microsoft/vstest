@@ -36,7 +36,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             this.executionManager = new ExecutionManager();
 
-            TestPluginCache.Instance = null;            
+            TestPluginCache.Instance = null;
         }
 
         [TestCleanup]

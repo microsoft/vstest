@@ -175,7 +175,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         [TestMethod]
         public void GetDefaultResolutionPathsShouldReturnDirectoryFromDefaultExtensionsPath()
         {
-            // Setup the testable instance.		
+            // Setup the testable instance.
             TestPluginCache.Instance = this.testablePluginCache;
 
             var defaultExtensionsFile = typeof(TestPluginCache).GetTypeInfo().Assembly.Location;

@@ -43,9 +43,9 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         public void TestExtensionManagerConstructorShouldThrowExceptionIfMessageLoggerIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
-                    {
-                        testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, null);
-                    }
+                {
+                    testExtensionManager = new DummyTestExtensionManager(unfilteredTestExtensions, filteredTestExtensions, null);
+                }
             );
         }
 
