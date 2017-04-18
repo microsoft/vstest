@@ -11,7 +11,7 @@ def branch = GithubBranchName
         ['Debug', 'Release'].each { configuration ->
 
             // Determine the name for the new job. A _prtest suffix is appended if isPR is true.
-            def newJobName = Utilities.getFullJobName(project, configuration, isPR)
+            def newJobName = Utilities.getFullJobName(project, "${osName}_${configuration}", isPR)
             def newJob = job(newJobName) {
                 description("")
             }
