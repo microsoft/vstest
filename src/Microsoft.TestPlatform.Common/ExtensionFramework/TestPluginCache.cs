@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Specify the path to extensions
         /// </summary>
-        private IEnumerable<string> pathToExtensions;
+        private List<string> pathToExtensions;
 
         /// <summary>
         /// Specifies whether we should load only well known extensions or not. Default is "load all".
@@ -171,13 +171,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
                 if (this.pathToExtensions != null)
                 {
-                    allExtensionPaths.AddRange(this.pathToExtensions);
+                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, regexPattern);
+                    allExtensionPaths.AddRange(filteredExtensions);
                 }
 
-                var filteredExtensions = this.GetFilteredExtensions(allExtensionPaths, regexPattern);
-
                 // Discover the test extensions from candidate assemblies.
-                pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(filteredExtensions);
+                pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
 
                 if (this.TestExtensions == null)
                 {

@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             this.testPlatformEventSource.AdapterSearchStart();
 
             // Start using these additional extensions
-            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, shouldLoadOnlyWellKnownExtensions: false);
+            TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
 
             // Load and Initialize extensions.
             TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
@@ -84,10 +84,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             try
             {
                 EqtTrace.Info("TestDiscoveryManager.DoDiscovery: Background test discovery started.");
-                
+
 
                 this.testDiscoveryEventsHandler = eventHandler;
-                
+
                 var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
                 // Validate the sources 
@@ -113,12 +113,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             {
                 // Discovery complete. Raise the DiscoveryCompleteEvent.
                 EqtTrace.Verbose("TestDiscoveryManager.DoDiscovery: Background Test Discovery complete.");
-                
+
                 var totalDiscoveredTestCount = discoveryResultCache.TotalDiscoveredTests;
                 var lastChunk = discoveryResultCache.Tests;
 
                 EqtTrace.Verbose("TestDiscoveryManager.DiscoveryComplete: Calling DiscoveryComplete callback.");
-                
+
                 if (eventHandler != null)
                 {
                     eventHandler.HandleDiscoveryComplete(totalDiscoveredTestCount, lastChunk, false);
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     EqtTrace.Warning(
                         "DiscoveryManager: Could not pass the discovery complete message as the callback is null.");
                 }
-                                
+
                 EqtTrace.Verbose("TestDiscoveryManager.DiscoveryComplete: Called DiscoveryComplete callback.");
 
                 this.testDiscoveryEventsHandler = null;
@@ -167,7 +167,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         {
             Debug.Assert(sources != null, "sources");
             var verifiedSources = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            
+
             foreach (string source in sources)
             {
                 if (!File.Exists(source))
@@ -198,7 +198,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 return verifiedSources;
             }
-            
+
             // Log the sources from where tests are being discovered
             if (EqtTrace.IsInfoEnabled)
             {
