@@ -3,6 +3,9 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
 {
+    using System;
+    using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
@@ -11,17 +14,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
     internal interface IDataCollectorLoader
     {
         /// <summary>
-        /// Loads datacollector from specified assembly using assembly qualified name. 
+        /// Creates instance of data collector.
         /// </summary>
-        /// <param name="location">
-        /// Location of datacollector assembly.
-        /// </param>
-        /// <param name="assemblyQualifiedName">
-        /// The assembly qualified name of datacollector.
+        /// <param name="type">
+        /// Data collector type.
         /// </param>
         /// <returns>
         /// The <see cref="DataCollector"/>.
         /// </returns>
-        DataCollector Load(string location, string assemblyQualifiedName);
+        DataCollector CreateInstance(Type type);
+
+        /// <summary>
+        /// Finds DataCollectors in a given assembly.
+        /// </summary>
+        /// <param name="assemblyLocation">
+        /// Location of data collector assembly.
+        /// </param>
+        /// <returns>List of data collector friendly name and type.</returns>
+        IEnumerable<Tuple<string, Type>> FindDataCollectors(string assemblyLocation);
+
+        /// <summary>
+        /// Gets the Type Uri for the data collector.
+        /// </summary>
+        /// <param name="dataCollectorType">The data collector to get the Type URI for.</param>
+        /// <returns>Type Uri of the data collector.</returns>
+        Uri GetTypeUri(Type dataCollectorType);
+
+        /// <summary>
+        /// Gets the friendly name for the data collector.
+        /// </summary>
+        /// <param name="dataCollectorType">The data collector to get the Type URI for.</param>
+        /// <returns>Friendly name of the data collector.</returns>
+        string GetFriendlyName(Type dataCollectorType);
     }
 }

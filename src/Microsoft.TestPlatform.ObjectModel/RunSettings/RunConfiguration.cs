@@ -63,6 +63,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private bool designMode;
 
+        /// <summary>
+        /// Extensions path.
+        /// </summary>
+        private string extensionsPath;
+
         #endregion
 
         #region Constructor
@@ -85,6 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.disableAppDomain = false;
             this.disableParallelization = false;
             this.designMode = false;
+            this.extensionsPath = null;
         }
 
         #endregion
@@ -265,6 +271,26 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets the ExtensionsPath.
+        /// </summary>
+        public string ExtensionsPath
+        {
+            get
+            {
+                return this.extensionsPath;
+            }
+
+            set
+            {
+                this.extensionsPath = value;
+                if (this.extensionsPath != null)
+                {
+                    this.ExtensionsPathSet = true;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether target platform set.
         /// </summary>
         public bool TargetPlatformSet
@@ -346,6 +372,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets a value indicating whether extensions path is set.
+        /// </summary>
+        public bool ExtensionsPathSet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets the binaries root.
         /// </summary>
         public string BinariesRoot { get; private set; }
@@ -409,6 +444,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 XmlElement binariesRoot = doc.CreateElement("BinariesRoot");
                 binariesRoot.InnerXml = this.BinariesRoot;
                 root.AppendChild(binariesRoot);
+            }
+
+            if (this.ExtensionsPath != null)
+            {
+                var extensionsPath = doc.CreateElement("ExtensionsPath");
+                extensionsPath.InnerXml = this.TargetFrameworkVersion.ToString();
+                root.AppendChild(targetFrameworkVersion);
             }
 
             return root;
@@ -623,6 +665,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "BinariesRoot":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.BinariesRoot = reader.ReadElementContentAsString();
+                            break;
+
+                        case "ExtensionsPath":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            runConfiguration.ExtensionsPath = reader.ReadElementContentAsString();
                             break;
 
                         default:

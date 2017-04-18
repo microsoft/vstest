@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// string in the vstest.console.exe.config that specifies the bound on no of jobs in the job queue.
         /// </summary>
         public const string MaxNumberOfEventsLoggerEventQueueCanHold = "MaxNumberOfEventsLoggerEventQueueCanHold";
-        
+
         /// <summary>
         /// Default bound on the job queue.
         /// </summary>

@@ -1,10 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
+namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Reflection;
     using System.Xml;
 
@@ -13,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -28,10 +30,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private string dataCollectorSettingsWithWrongUri, dataCollectorSettingsWithoutUri, dataCollectorSettingsEnabled, dataCollectorSettingsDisabled;
 
         private Mock<IMessageSink> mockMessageSink;
-        private Mock<IDataCollectorLoader> dataCollectorLoader;
+        private Mock<IDataCollectorLoader> mockDataCollectorLoader;
         private Mock<DataCollector2> mockDataCollector;
         private List<KeyValuePair<string, string>> envVarList;
         private Mock<IDataCollectionAttachmentManager> mockDataCollectionAttachmentManager;
+        private Mock<IFileHelper> mockFileHelper;
+        private List<Tuple<string, Type>> dataCollectorsCache;
 
         public DataCollectionManagerTests()
         {
@@ -48,13 +52,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorSettingsEnabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"true\""));
             this.dataCollectorSettingsDisabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
             this.mockMessageSink = new Mock<IMessageSink>();
-            this.dataCollectorLoader = new Mock<IDataCollectorLoader>();
+            this.mockDataCollectorLoader = new Mock<IDataCollectorLoader>();
+            this.mockDataCollectorLoader.Setup(x => x.GetFriendlyName(It.IsAny<Type>())).Returns("CustomDataCollector");
+            this.mockDataCollectorLoader.Setup(x => x.GetTypeUri(It.IsAny<Type>())).Returns(new Uri("my://custom/datacollector"));
 
-            this.dataCollectorLoader.Setup(x => x.Load(typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, this.mockDataCollector.Object.GetType().AssemblyQualifiedName)).Returns(this.mockDataCollector.Object);
+            this.mockDataCollectorLoader.Setup(x => x.CreateInstance(this.mockDataCollector.Object.GetType())).Returns(this.mockDataCollector.Object);
             this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
             this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
+            this.mockFileHelper = new Mock<IFileHelper>();
 
-            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.dataCollectorLoader.Object);
+            this.dataCollectorsCache = new List<Tuple<string, Type>>();
+            this.dataCollectorsCache.Add(new Tuple<string, Type>("CustomDataCollector", this.mockDataCollector.Object.GetType()));
+
+            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.mockDataCollectorLoader.Object, this.mockFileHelper.Object);
         }
 
         [TestMethod]
@@ -78,31 +88,38 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorsShouldLoadDataCollector()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
-            this.dataCollectorLoader.Verify();
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
 
         [TestMethod]
         public void InitializeShouldNotAddDataCollectorIfItIsDisabled()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsDisabled);
 
             Assert.AreEqual(0, this.dataCollectionManager.RunDataCollectors.Count);
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
         }
 
         [TestMethod]
         public void InitializeShouldAddDataCollectorIfItIsEnabled()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsEnabled);
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
-
 
         [TestMethod]
         public void InitializeDataCollectorsShouldNotLoadDataCollectorIfUriIsNotCorrect()
@@ -113,14 +130,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
         }
 
+        [TestMethod]
         public void InitializeDataCollectorsShouldNotAddSameDataCollectorMoreThanOnce()
         {
-            var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings + this.dataCollectorSettings);
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
+            var dcRunSettings = string.Format(this.defaultDataCollectionSettings, "CustomDataCollector", "my://custom/datacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty);
+            var runSettings = string.Format(this.defaultRunSettings, dcRunSettings + dcRunSettings);
 
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
-            this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
 
         [TestMethod]
@@ -135,6 +157,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorsShouldLoadDataCollectorAndReturnEnvironmentVariables()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
 
             var result = this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
@@ -145,6 +171,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorsShouldLogExceptionToMessageSinkIfInitializationFails()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             this.mockDataCollector.Setup(
                 x =>
                     x.Initialize(
@@ -163,6 +193,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void InitializeDataCollectorsShouldReturnFirstEnvironmentVariableIfMoreThanOneVariablesWithSameKeyIsSpecified()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
             this.envVarList.Add(new KeyValuePair<string, string>("key", "value1"));
 
@@ -185,6 +219,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SessionStartedShouldSendEventToDataCollector()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             var isStartInvoked = false;
             this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
             {
@@ -202,6 +240,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SessionStartedShouldReturnTrueIfTestCaseStartIsSubscribed()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) =>
             {
                 b.TestCaseStart += (sender, eventArgs) => { };
@@ -316,6 +358,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void TestCaseStartedShouldSendEventToDataCollector()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             var isStartInvoked = false;
             this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseStart += (sender, eventArgs) => isStartInvoked = true; });
 
@@ -341,6 +387,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void TestCaseEndedShouldSendEventToDataCollector()
         {
+            this.mockFileHelper.Setup(x => x.DirectoryExists(Path.GetDirectoryName(typeof(DataCollectionManager).GetTypeInfo().Assembly.Location))).Returns(true);
+            this.mockFileHelper.Setup(x => x.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<SearchOption>())).Returns(new List<string>() { string.Empty });
+            this.mockDataCollectorLoader.Setup(x => x.FindDataCollectors(It.IsAny<string>())).Returns(this.dataCollectorsCache);
+
             var isEndInvoked = false;
             this.SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => { b.TestCaseEnd += (sender, eventArgs) => isEndInvoked = true; });
 
@@ -385,7 +435,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
     internal class TestableDataCollectionManager : DataCollectionManager
     {
-        internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader) : base(datacollectionAttachmentManager, messageSink, dataCollectorLoader)
+        internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader, IFileHelper fileHelper) : base(datacollectionAttachmentManager, messageSink, dataCollectorLoader, fileHelper)
         {
         }
     }
