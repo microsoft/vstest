@@ -4,6 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Globalization;
+
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -76,7 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Collect;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
         public override string HelpContentResourceName => CommandLineResources.CollectArgumentHelp;
 
@@ -100,7 +102,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // if argument is null or doesn't contain any element, don't do anything.
             if (string.IsNullOrWhiteSpace(argument))
             {
-                return;
+                throw new CommandLineException(
+                string.Format(
+                    CultureInfo.CurrentUICulture,
+                    CommandLineResources.DataCollectorFriendlyNameInvalid,
+                    argument));
             }
 
             var args = argument.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);

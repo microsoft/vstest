@@ -3,8 +3,10 @@
 
 namespace vstest.console.UnitTests.Processors
 {
+    using System;
+
+    using Microsoft.VisualStudio.TestPlatform.CommandLine;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -22,14 +24,14 @@ namespace vstest.console.UnitTests.Processors
         }
 
         [TestMethod]
-        public void GetMetadataShouldReturnRunSettingsArgumentProcessorCapabilities()
+        public void GetMetadataShouldReturnCollectArgumentProcessorCapabilities()
         {
             var processor = new CollectArgumentProcessor();
             Assert.IsTrue(processor.Metadata.Value is CollectArgumentProcessorCapabilities);
         }
 
         [TestMethod]
-        public void GetExecuterShouldReturnRunSettingsArgumentProcessorCapabilities()
+        public void GetExecuterShouldReturnCollectArgumentProcessorCapabilities()
         {
             var processor = new CollectArgumentProcessor();
             Assert.IsTrue(processor.Executor.Value is CollectArgumentExecutor);
@@ -43,11 +45,11 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CollectArgumentProcessorCapabilities();
 
             Assert.AreEqual("/Collect", capabilities.CommandName);
-            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\n      Enables data diagnostic adapter(s) in the test run. Default \n      settings are used if not specified using settings file. More info here : https://aka.ms/fpzskr", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\n      Enables data diagnostic adapter(s) in the test run. Default \n      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.CollectArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
-            Assert.AreEqual(ArgumentProcessorPriority.Collect, capabilities.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
             Assert.AreEqual(false, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
@@ -59,24 +61,21 @@ namespace vstest.console.UnitTests.Processors
         #region CollectArgumentExecutor tests
 
         [TestMethod]
-        public void InitializeShouldNotThrowIfArguemntIsNull()
+        public void InitializeShouldThrowIfArguemntIsNull()
         {
-            this.executor.Initialize(null);
-            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
+            Assert.ThrowsException<CommandLineException>(() => { this.executor.Initialize(null); });
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowIfArgumentIsEmpty()
         {
-            this.executor.Initialize(string.Empty);
-            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
+            Assert.ThrowsException<CommandLineException>(() => { this.executor.Initialize(String.Empty); });
         }
 
         [TestMethod]
         public void InitializeShouldNotThrowIfArgumentIsWhiteSpace()
         {
-            this.executor.Initialize(" ");
-            Assert.IsNull(this.settingsProvider.ActiveRunSettings);
+            Assert.ThrowsException<CommandLineException>(() => { this.executor.Initialize(" "); });
         }
 
         [TestMethod]

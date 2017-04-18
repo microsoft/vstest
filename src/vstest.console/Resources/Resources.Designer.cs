@@ -8,7 +8,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
+namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
+{
     using System;
     using System.Reflection;
 
@@ -23,371 +24,451 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
-        
+    public class Resources
+    {
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        public Resources() {
+        public Resources()
+        {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
-            get {
-                if (object.ReferenceEquals(resourceMan, null)) {
+        public static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if (object.ReferenceEquals(resourceMan, null))
+                {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("vstest.console.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
-            get {
+        public static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
                 return resourceCulture;
             }
-            set {
+            set
+            {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Additional Information Messages:.
         /// </summary>
-        public static string AddnlInfoMessagesBanner {
-            get {
+        public static string AddnlInfoMessagesBanner
+        {
+            get
+            {
                 return ResourceManager.GetString("AddnlInfoMessagesBanner", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not start test run for unit tests for Windows Store app: {0}..
         /// </summary>
-        public static string AppContainerTestPrerequisiteFail {
-            get {
+        public static string AppContainerTestPrerequisiteFail
+        {
+            get
+            {
                 return ResourceManager.GetString("AppContainerTestPrerequisiteFail", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to No test found in the specified test containers. Additionally, Microsoft Windows Store Unit test adapter does not support .appxbundle files. Create an appx (set Generate App bundle option to Never) when creating App Package and try again..
         /// </summary>
-        public static string AppxBundleSourceWarning {
-            get {
+        public static string AppxBundleSourceWarning
+        {
+            get
+            {
                 return ResourceManager.GetString("AppxBundleSourceWarning", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Unable to find the assembly under test. Please make sure that the project is built..
         /// </summary>
-        public static string AssemblyPathInvalid {
-            get {
+        public static string AssemblyPathInvalid
+        {
+            get
+            {
                 return ResourceManager.GetString("AssemblyPathInvalid", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to   {0}.
         /// </summary>
-        public static string AttachmentOutputFormat {
-            get {
+        public static string AttachmentOutputFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("AttachmentOutputFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Attachments:.
         /// </summary>
-        public static string AttachmentsBanner {
-            get {
+        public static string AttachmentsBanner
+        {
+            get
+            {
                 return ResourceManager.GetString("AttachmentsBanner", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The following Test Discovery Add-Ins are available:.
         /// </summary>
-        public static string AvailableDiscoverersHeaderMessage {
-            get {
+        public static string AvailableDiscoverersHeaderMessage
+        {
+            get
+            {
                 return ResourceManager.GetString("AvailableDiscoverersHeaderMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The following Test Execution Add-Ins are available:.
         /// </summary>
-        public static string AvailableExecutorsHeaderMessage {
-            get {
+        public static string AvailableExecutorsHeaderMessage
+        {
+            get
+            {
                 return ResourceManager.GetString("AvailableExecutorsHeaderMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to     {0}.
         /// </summary>
-        public static string AvailableExtensionFormat {
-            get {
+        public static string AvailableExtensionFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("AvailableExtensionFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to         {0}: {1}.
         /// </summary>
-        public static string AvailableExtensionsMetadataFormat {
-            get {
+        public static string AvailableExtensionsMetadataFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("AvailableExtensionsMetadataFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The following Test Logger Add-Ins are available:.
         /// </summary>
-        public static string AvailableLoggersHeaderMessage {
-            get {
+        public static string AvailableLoggersHeaderMessage
+        {
+            get
+            {
                 return ResourceManager.GetString("AvailableLoggersHeaderMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The following Settings Providers Add-Ins are available:.
         /// </summary>
-        public static string AvailableSettingsProvidersHeaderMessage {
-            get {
+        public static string AvailableSettingsProvidersHeaderMessage
+        {
+            get
+            {
                 return ResourceManager.GetString("AvailableSettingsProvidersHeaderMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to     {0}.
         /// </summary>
-        public static string AvailableTestsFormat {
-            get {
+        public static string AvailableTestsFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("AvailableTestsFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /BatchSize argument requires the size of the batch.  Example:  /BatchSize:10.
         /// </summary>
-        public static string BatchSizeRequired {
-            get {
+        public static string BatchSizeRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("BatchSizeRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
         ///      The directory containing the temporary outputs..
         /// </summary>
-        public static string BuildBasePathArgumentHelp {
-            get {
+        public static string BuildBasePathArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("BuildBasePathArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The BuildBasePath was not found, provide a valid path and try again..
         /// </summary>
-        public static string BuildBasePathNotFound {
-            get {
+        public static string BuildBasePathNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("BuildBasePathNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Cannot be null or empty.
         /// </summary>
-        public static string CannotBeNullOrEmpty {
-            get {
+        public static string CannotBeNullOrEmpty
+        {
+            get
+            {
                 return ResourceManager.GetString("CannotBeNullOrEmpty", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Args:
         ///      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments..
         /// </summary>
-        public static string CLIRunSettingsArgumentHelp {
-            get {
+        public static string CLIRunSettingsArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("CLIRunSettingsArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Error: {0}.
         /// </summary>
-        public static string CommandLineError {
-            get {
+        public static string CommandLineError
+        {
+            get
+            {
                 return ResourceManager.GetString("CommandLineError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Information: {0}.
         /// </summary>
-        public static string CommandLineInformational {
-            get {
+        public static string CommandLineInformational
+        {
+            get
+            {
                 return ResourceManager.GetString("CommandLineInformational", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Warning: {0}.
         /// </summary>
-        public static string CommandLineWarning {
-            get {
+        public static string CommandLineWarning
+        {
+            get
+            {
                 return ResourceManager.GetString("CommandLineWarning", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to , {0}.
         /// </summary>
-        public static string CommaSeparatedFormat {
-            get {
+        public static string CommaSeparatedFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("CommaSeparatedFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to -c|--Configuration|/c|/Configuration:&lt;Configuration&gt;
         ///      The configuration the project is built for i.e. Debug/Release.
         /// </summary>
-        public static string ConfigurationArgumentHelp {
-            get {
+        public static string ConfigurationArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ConfigurationArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Copyright (c) Microsoft Corporation.  All rights reserved..
         /// </summary>
-        public static string CopyrightCommandLineTitle {
-            get {
+        public static string CopyrightCommandLineTitle
+        {
+            get
+            {
                 return ResourceManager.GetString("CopyrightCommandLineTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Days.
         /// </summary>
-        public static string Days {
-            get {
+        public static string Days
+        {
+            get
+            {
                 return ResourceManager.GetString("Days", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Timeout to connect or process request for DesignModeClient on port: {0}.
         /// </summary>
-        public static string DesignModeClientTimeoutError {
-            get {
+        public static string DesignModeClientTimeoutError
+        {
+            get
+            {
                 return ResourceManager.GetString("DesignModeClientTimeoutError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run..
         /// </summary>
-        public static string DisablingCodeCoverageInAppContainerTestExecution {
-            get {
+        public static string DisablingCodeCoverageInAppContainerTestExecution
+        {
+            get
+            {
                 return ResourceManager.GetString("DisablingCodeCoverageInAppContainerTestExecution", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Code coverage is not available for Windows Phone apps. Code coverage analysis skipped for this test run..
         /// </summary>
-        public static string DisablingCodeCoverageInPhoneAppContainerTestExecution {
-            get {
+        public static string DisablingCodeCoverageInPhoneAppContainerTestExecution
+        {
+            get
+            {
                 return ResourceManager.GetString("DisablingCodeCoverageInPhoneAppContainerTestExecution", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Diagnostic data adapters are not supported when running unit tests for Windows Store apps. Remove diagnostic data adapters settings from settings..
         /// </summary>
-        public static string DisablingDataCollectionInAppContainerTestExecution {
-            get {
+        public static string DisablingDataCollectionInAppContainerTestExecution
+        {
+            get
+            {
                 return ResourceManager.GetString("DisablingDataCollectionInAppContainerTestExecution", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Diagnostic data adapters are not supported when running unit tests for Windows Phone apps. Remove diagnostic data adapters settings from settings..
         /// </summary>
-        public static string DisablingDataCollectionInPhoneAppContainerTestExecution {
-            get {
+        public static string DisablingDataCollectionInPhoneAppContainerTestExecution
+        {
+            get
+            {
                 return ResourceManager.GetString("DisablingDataCollectionInPhoneAppContainerTestExecution", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Reading diagnostic data adapter settings threw an running &apos;{0}&apos;. All diagnostic data adapters will be skipped in this run..
         /// </summary>
-        public static string DisablingDCOnExceptionWhileParsingDCInfo {
-            get {
+        public static string DisablingDCOnExceptionWhileParsingDCInfo
+        {
+            get
+            {
                 return ResourceManager.GetString("DisablingDCOnExceptionWhileParsingDCInfo", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Discovery failed for given sources. Exception : {0}.
         /// </summary>
-        public static string DiscoveryFailed {
-            get {
+        public static string DiscoveryFailed
+        {
+            get
+            {
                 return ResourceManager.GetString("DiscoveryFailed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The parameter &quot;{0}&quot; should be provided only once..
         /// </summary>
-        public static string DuplicateArgumentError {
-            get {
+        public static string DuplicateArgumentError
+        {
+            get
+            {
                 return ResourceManager.GetString("DuplicateArgumentError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Duplicate source {0} specified..
         /// </summary>
-        public static string DuplicateSource {
-            get {
+        public static string DuplicateSource
+        {
+            get
+            {
                 return ResourceManager.GetString("DuplicateSource", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to /EnableCodeCoverage
         ///      Enables data diagnostic adapter &apos;CodeCoverage&apos; in the test run. Default 
         ///      settings are used if not specified using settings file..
         /// </summary>
-        public static string EnableCodeCoverageArgumentProcessorHelp {
-            get {
+        public static string EnableCodeCoverageArgumentProcessorHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("EnableCodeCoverageArgumentProcessorHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --Diag|/Diag:&lt;Path to log file&gt;
         ///      Enable verbose logs for test platform.
         ///      Logs are written to the provided file..
         /// </summary>
-        public static string EnableDiagUsage {
-            get {
+        public static string EnableDiagUsage
+        {
+            get
+            {
                 return ResourceManager.GetString("EnableDiagUsage", resourceCulture);
             }
         }
@@ -403,21 +484,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         ///
         ///      To publish test results to Team Foun [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string EnableLoggersArgumentHelp {
-            get {
+        public static string EnableLoggersArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("EnableLoggersArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Error Message:.
         /// </summary>
-        public static string ErrorMessageBanner {
-            get {
+        public static string ErrorMessageBanner
+        {
+            get
+            {
                 return ResourceManager.GetString("ErrorMessageBanner", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to   To run tests in the same process:
         ///    &gt;vstest.console.exe tests.dll 
@@ -426,222 +511,270 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         ///  To run tests with additional settings such as  data collectors:
         ///    &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings.
         /// </summary>
-        public static string Examples {
-            get {
+        public static string Examples
+        {
+            get
+            {
                 return ResourceManager.GetString("Examples", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Exception occurred when instantiating extension &apos;{0}&apos;: {1}.
         /// </summary>
-        public static string ExceptionFromExtension {
-            get {
+        public static string ExceptionFromExtension
+        {
+            get
+            {
                 return ResourceManager.GetString("ExceptionFromExtension", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Test execution time: {0:0.0000} {1}.
         /// </summary>
-        public static string ExecutionTimeFormatString {
-            get {
+        public static string ExecutionTimeFormatString
+        {
+            get
+            {
                 return ResourceManager.GetString("ExecutionTimeFormatString", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to         Uri: {0}.
         /// </summary>
-        public static string ExtensionUriFormat {
-            get {
+        public static string ExtensionUriFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("ExtensionUriFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Failed   {0}.
         /// </summary>
-        public static string FailedTestIndicator {
-            get {
+        public static string FailedTestIndicator
+        {
+            get
+            {
                 return ResourceManager.GetString("FailedTestIndicator", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &apos;{0}&apos; not found..
         /// </summary>
-        public static string FileNotFound {
-            get {
+        public static string FileNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("FileNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --Framework|/Framework:&lt;Framework Version&gt;
         ///      Target .Net Framework version to be used for test execution. 
         ///      Valid values are &quot;.NETFramework,Version=v4.6&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
         ///      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10..
         /// </summary>
-        public static string FrameworkArgumentHelp {
-            get {
+        public static string FrameworkArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("FrameworkArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:&quot;.NETFramework,Version=v4.6&quot;.
         /// </summary>
-        public static string FrameworkVersionRequired {
-            get {
+        public static string FrameworkVersionRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("FrameworkVersionRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to -?|--Help|/?|/Help
         ///      Display this usage message..
         /// </summary>
-        public static string HelpArgumentHelp {
-            get {
+        public static string HelpArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("HelpArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Arguments:.
         /// </summary>
-        public static string HelpArgumentsText {
-            get {
+        public static string HelpArgumentsText
+        {
+            get
+            {
                 return ResourceManager.GetString("HelpArgumentsText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Description: Runs tests from the specified files..
         /// </summary>
-        public static string HelpDescriptionText {
-            get {
+        public static string HelpDescriptionText
+        {
+            get
+            {
                 return ResourceManager.GetString("HelpDescriptionText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Options:.
         /// </summary>
-        public static string HelpOptionsText {
-            get {
+        public static string HelpOptionsText
+        {
+            get
+            {
                 return ResourceManager.GetString("HelpOptionsText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]].
         /// </summary>
-        public static string HelpUsageText {
-            get {
+        public static string HelpUsageText
+        {
+            get
+            {
                 return ResourceManager.GetString("HelpUsageText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Hours.
         /// </summary>
-        public static string Hours {
-            get {
+        public static string Hours
+        {
+            get
+            {
                 return ResourceManager.GetString("Hours", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to /InIsolation
         ///      Runs the tests in an isolated process. This makes vstest.console.exe 
         ///      process less likely to be stopped on an error in the tests, but tests 
         ///      may run slower..
         /// </summary>
-        public static string InIsolationHelp {
-            get {
+        public static string InIsolationHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("InIsolationHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Invalid batch size {0}. The batch size should be greater than zero. Example:  /BatchSize:10.
         /// </summary>
-        public static string InvalidBatchSize {
-            get {
+        public static string InvalidBatchSize
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidBatchSize", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The given configuration is invalid..
         /// </summary>
-        public static string InvalidConfiguration {
-            get {
+        public static string InvalidConfiguration
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidConfiguration", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Argument {0} is not expected in the &apos;EnableCodeCoverage&apos; command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again..
         /// </summary>
-        public static string InvalidEnableCodeCoverageCommand {
-            get {
+        public static string InvalidEnableCodeCoverageCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidEnableCodeCoverageCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45..
         /// </summary>
-        public static string InvalidFrameworkVersion {
-            get {
+        public static string InvalidFrameworkVersion
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidFrameworkVersion", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Argument {0} is not expected in the &apos;InIsolation&apos; command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again..
         /// </summary>
-        public static string InvalidInIsolationCommand {
-            get {
+        public static string InvalidInIsolationCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidInIsolationCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Argument {0} is not expected in the &apos;Parallel&apos; command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /Parallel) and try again..
         /// </summary>
-        public static string InvalidParallelCommand {
-            get {
+        public static string InvalidParallelCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidParallelCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The --ParentProcessId|/ParentProcessId argument requires the process id which is an integer. Specify the process id of the parent process that launched this process..
         /// </summary>
-        public static string InvalidParentProcessIdArgument {
-            get {
+        public static string InvalidParentProcessIdArgument
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidParentProcessIdArgument", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Invalid platform type:{0}. Valid platform types are x86, x64 and Arm..
         /// </summary>
-        public static string InvalidPlatformType {
-            get {
+        public static string InvalidPlatformType
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidPlatformType", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The --Port|/Port argument requires the port number which is an integer. Specify the port for socket connection and receiving the event messages..
         /// </summary>
-        public static string InvalidPortArgument {
-            get {
+        public static string InvalidPortArgument
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidPortArgument", resourceCulture);
             }
         }
@@ -660,247 +793,301 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;TestAdapterPath&apos; is invalid. Error: {1}.
         /// </summary>
-        public static string InvalidTestAdapterPathCommand {
-            get {
+        public static string InvalidTestAdapterPathCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidTestAdapterPathCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /TestCaseFilter argument cannot be specified with /Tests. Filtering of test cases is not applicable when tests are specified..
         /// </summary>
-        public static string InvalidTestCaseFilterValueForSpecificTests {
-            get {
+        public static string InvalidTestCaseFilterValueForSpecificTests
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidTestCaseFilterValueForSpecificTests", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Argument {0} is not expected in the &apos;UseVsixExtensions&apos; command. Specify the command indicating whether the vsix extensions should be used or skipped (Example: vstest.console.exe myTests.dll /UseVsixExtensions:true) and try again..
         /// </summary>
-        public static string InvalidUseVsixExtensionsCommand {
-            get {
+        public static string InvalidUseVsixExtensionsCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("InvalidUseVsixExtensionsCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to /ListDiscoverers
         ///      Lists installed test discoverers..
         /// </summary>
-        public static string ListDiscoverersHelp {
-            get {
+        public static string ListDiscoverersHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ListDiscoverersHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to /ListExecutors
         ///      Lists installed test executors..
         /// </summary>
-        public static string ListExecutorsHelp {
-            get {
+        public static string ListExecutorsHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ListExecutorsHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to /ListLoggers
         ///      Lists installed test loggers..
         /// </summary>
-        public static string ListLoggersHelp {
-            get {
+        public static string ListLoggersHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ListLoggersHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to /ListSettingsProviders
         ///      Lists installed test settings providers..
         /// </summary>
-        public static string ListSettingsProvidersHelp {
-            get {
+        public static string ListSettingsProvidersHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ListSettingsProvidersHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The following Tests are available:.
         /// </summary>
-        public static string ListTestsHeaderMessage {
-            get {
+        public static string ListTestsHeaderMessage
+        {
+            get
+            {
                 return ResourceManager.GetString("ListTestsHeaderMessage", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to -lt|--ListTests|/lt|/ListTests:&lt;File Name&gt;
         ///      Lists discovered tests from the given test container..
         /// </summary>
-        public static string ListTestsHelp {
-            get {
+        public static string ListTestsHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ListTestsHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The file {0} provided is read only.
         /// </summary>
-        public static string LoggerFileIsReadOnly {
-            get {
+        public static string LoggerFileIsReadOnly
+        {
+            get
+            {
                 return ResourceManager.GetString("LoggerFileIsReadOnly", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to         FriendlyName: {0}.
         /// </summary>
-        public static string LoggerFriendlyNameFormat {
-            get {
+        public static string LoggerFriendlyNameFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("LoggerFriendlyNameFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not find a test logger with URI or FriendlyName &apos;{0}&apos;..
         /// </summary>
-        public static string LoggerNotFound {
-            get {
+        public static string LoggerNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("LoggerNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to         Uri: {0}.
         /// </summary>
-        public static string LoggerUriFormat {
-            get {
+        public static string LoggerUriFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("LoggerUriFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Test Logger URI &apos;{0}&apos; is not valid.  The Test Logger will be ignored..
         /// </summary>
-        public static string LoggerUriInvalid {
-            get {
+        public static string LoggerUriInvalid
+        {
+            get
+            {
                 return ResourceManager.GetString("LoggerUriInvalid", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Settings file provided do not confirm to required format. .
         /// </summary>
-        public static string MalformedRunSettingsFile {
-            get {
+        public static string MalformedRunSettingsFile
+        {
+            get
+            {
                 return ResourceManager.GetString("MalformedRunSettingsFile", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to One or more runsettings provided contain invalid token.
         /// </summary>
-        public static string MalformedRunSettingsKey {
-            get {
+        public static string MalformedRunSettingsKey
+        {
+            get
+            {
                 return ResourceManager.GetString("MalformedRunSettingsKey", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Microsoft (R) Test Execution Command Line Tool Version {0}.
         /// </summary>
-        public static string MicrosoftCommandLineTitle {
-            get {
+        public static string MicrosoftCommandLineTitle
+        {
+            get
+            {
                 return ResourceManager.GetString("MicrosoftCommandLineTitle", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Minutes.
         /// </summary>
-        public static string Minutes {
-            get {
+        public static string Minutes
+        {
+            get
+            {
                 return ResourceManager.GetString("Minutes", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to No test source files were specified..
         /// </summary>
-        public static string MissingTestSourceFile {
-            get {
+        public static string MissingTestSourceFile
+        {
+            get
+            {
                 return ResourceManager.GetString("MissingTestSourceFile", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The path &apos;{0}&apos; specified in the &apos;TestAdapterPath&apos; does not contain any test adapters, provide a valid path and try again..
         /// </summary>
-        public static string NoAdaptersFoundInTestAdapterPath {
-            get {
+        public static string NoAdaptersFoundInTestAdapterPath
+        {
+            get
+            {
                 return ResourceManager.GetString("NoAdaptersFoundInTestAdapterPath", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Unrecognized parameter &quot;{0}&quot;..
         /// </summary>
-        public static string NoArgumentProcessorFound {
-            get {
+        public static string NoArgumentProcessorFound
+        {
+            get
+            {
                 return ResourceManager.GetString("NoArgumentProcessorFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to No arguments were specified..
         /// </summary>
-        public static string NoArgumentsProvided {
-            get {
+        public static string NoArgumentsProvided
+        {
+            get
+            {
                 return ResourceManager.GetString("NoArgumentsProvided", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to {0} is built for {1}/{2}. The test assemblies specified in a run should have a common target .Net framework and platform..
         /// </summary>
-        public static string NonDefaultFrameworkAndOrArchDetected {
-            get {
+        public static string NonDefaultFrameworkAndOrArchDetected
+        {
+            get
+            {
                 return ResourceManager.GetString("NonDefaultFrameworkAndOrArchDetected", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to App package &apos;{0}&apos; does not has test executor entry point. For running unit tests for Windows Store apps, create app package using Windows Store app Unit Test Library project..
         /// </summary>
-        public static string NoTestEntryPoint {
-            get {
+        public static string NoTestEntryPoint
+        {
+            get
+            {
                 return ResourceManager.GetString("NoTestEntryPoint", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to A total of {0} tests were discovered but no test matches the specified selection criteria({1}). Use right value(s) and try again..
         /// </summary>
-        public static string NoTestsAvailableAfterFiltering {
-            get {
+        public static string NoTestsAvailableAfterFiltering
+        {
+            get
+            {
                 return ResourceManager.GetString("NoTestsAvailableAfterFiltering", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to No test is available in {0}. Make sure that installed test discoverers &amp; executors, platform &amp; framework version settings are appropriate and try again..
         /// </summary>
-        public static string NoTestsAvailableInSources {
-            get {
+        public static string NoTestsAvailableInSources
+        {
+            get
+            {
                 return ResourceManager.GetString("NoTestsAvailableInSources", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to {0} {1}.
         /// </summary>
-        public static string NoTestsFoundWarningMessageWithSuggestionToUseVsix {
-            get {
+        public static string NoTestsFoundWarningMessageWithSuggestionToUseVsix
+        {
+            get
+            {
                 return ResourceManager.GetString("NoTestsFoundWarningMessageWithSuggestionToUseVsix", resourceCulture);
             }
         }
@@ -915,110 +1102,132 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
                 return ResourceManager.GetString("NotRunTestIndicator", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to -o|--Output|/o|/Output:&lt;Output&gt;
         ///      The directory containing the binaries to run..
         /// </summary>
-        public static string OutputArgumentHelp {
-            get {
+        public static string OutputArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("OutputArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Output path was not found, provide a valid path and try again..
         /// </summary>
-        public static string OutputPathNotFound {
-            get {
+        public static string OutputPathNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("OutputPathNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --Parallel|/Parallel
         ///      Specifies that the tests be executed in parallel. By default up
         ///      to all available cores on the machine may be used.
         ///      The number of cores to use may be configured using a settings file..
         /// </summary>
-        public static string ParallelArgumentProcessorHelp {
-            get {
+        public static string ParallelArgumentProcessorHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ParallelArgumentProcessorHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --ParentProcessId|/ParentProcessId:&lt;ParentProcessId&gt;
         ///      Process Id of the Parent Process responsible for launching current process..
         /// </summary>
-        public static string ParentProcessIdArgumentHelp {
-            get {
+        public static string ParentProcessIdArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("ParentProcessIdArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Passed   {0}.
         /// </summary>
-        public static string PassedTestIndicator {
-            get {
+        public static string PassedTestIndicator
+        {
+            get
+            {
                 return ResourceManager.GetString("PassedTestIndicator", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not start test run for the tests for Windows Phone app: {0}..
         /// </summary>
-        public static string PhoneAppContainerTestPrerequisiteFail {
-            get {
+        public static string PhoneAppContainerTestPrerequisiteFail
+        {
+            get
+            {
                 return ResourceManager.GetString("PhoneAppContainerTestPrerequisiteFail", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to App package &apos;{0}&apos; does not has test executor entry point. For running unit tests for Windows Phone apps, create app package using Windows Phone Unit Test App project..
         /// </summary>
-        public static string PhoneNoTestEntryPoint {
-            get {
+        public static string PhoneNoTestEntryPoint
+        {
+            get
+            {
                 return ResourceManager.GetString("PhoneNoTestEntryPoint", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --Platform|/Platform:&lt;Platform type&gt;
         ///      Target platform architecture to be used for test execution. 
         ///      Valid values are x86, x64 and ARM..
         /// </summary>
-        public static string PlatformArgumentHelp {
-            get {
+        public static string PlatformArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("PlatformArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86.
         /// </summary>
-        public static string PlatformTypeRequired {
-            get {
+        public static string PlatformTypeRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("PlatformTypeRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --Port|/Port:&lt;Port&gt;
         ///      The Port for socket connection and receiving the event messages..
         /// </summary>
-        public static string PortArgumentHelp {
-            get {
+        public static string PortArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("PortArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Path {0} does not exist..
         /// </summary>
-        public static string ProjectPathNotFound {
-            get {
+        public static string ProjectPathNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("ProjectPathNotFound", resourceCulture);
             }
         }
@@ -1051,39 +1260,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         ///   Looks up a localized string similar to --Settings|/Settings:&lt;Settings File&gt;
         ///      Settings to use when running tests..
         /// </summary>
-        public static string RunSettingsArgumentHelp {
-            get {
+        public static string RunSettingsArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("RunSettingsArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Settings file &apos;{0}&apos; could not be found..
         /// </summary>
-        public static string RunSettingsFileNotFound {
-            get {
+        public static string RunSettingsFileNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("RunSettingsFileNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /Settings parameter requires a settings file to be provided..
         /// </summary>
-        public static string RunSettingsRequired {
-            get {
+        public static string RunSettingsRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("RunSettingsRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Only one app package (.appx file) can be specified for running tests..
         /// </summary>
-        public static string RunSingleAppContainerSource {
-            get {
+        public static string RunSingleAppContainerSource
+        {
+            get
+            {
                 return ResourceManager.GetString("RunSingleAppContainerSource", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --Tests|/Tests:&lt;Test Names&gt;
         ///      Run tests with names that match the provided values. To provide multiple
@@ -1091,12 +1308,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         ///      Examples: /Tests:TestMethod1
         ///                /Tests:TestMethod1,testMethod2.
         /// </summary>
-        public static string RunSpecificTestsHelp {
-            get {
+        public static string RunSpecificTestsHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("RunSpecificTestsHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to [TestFileNames]
         ///      Run tests from the specified files. Separate multiple test file names
@@ -1104,162 +1323,198 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         ///      Examples: mytestproject.dll
         ///                mytestproject.dll myothertestproject.exe.
         /// </summary>
-        public static string RunTestsArgumentHelp {
-            get {
+        public static string RunTestsArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("RunTestsArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to ,.
         /// </summary>
-        public static string SearchStringDelimiter {
-            get {
+        public static string SearchStringDelimiter
+        {
+            get
+            {
                 return ResourceManager.GetString("SearchStringDelimiter", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Seconds.
         /// </summary>
-        public static string Seconds {
-            get {
+        public static string Seconds
+        {
+            get
+            {
                 return ResourceManager.GetString("Seconds", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to         SettingName: {0}.
         /// </summary>
-        public static string SettingFormat {
-            get {
+        public static string SettingFormat
+        {
+            get
+            {
                 return ResourceManager.GetString("SettingFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Skipped  {0}.
         /// </summary>
-        public static string SkippedTestIndicator {
-            get {
+        public static string SkippedTestIndicator
+        {
+            get
+            {
                 return ResourceManager.GetString("SkippedTestIndicator", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to A total of {0} tests were discovered but some tests do not match the specified selection criteria({1}). Use right value(s) and try again..
         /// </summary>
-        public static string SomeTestsUnavailableAfterFiltering {
-            get {
+        public static string SomeTestsUnavailableAfterFiltering
+        {
+            get
+            {
                 return ResourceManager.GetString("SomeTestsUnavailableAfterFiltering", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /Tests argument requires one or more specific test names or their substrings.
         ///       Examples: /Tests:TestsMethod1, /Tests:TestMethod1,method2 .
         /// </summary>
-        public static string SpecificTestsRequired {
-            get {
+        public static string SpecificTestsRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("SpecificTestsRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Stack Trace:.
         /// </summary>
-        public static string StacktraceBanner {
-            get {
+        public static string StacktraceBanner
+        {
+            get
+            {
                 return ResourceManager.GetString("StacktraceBanner", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Starting test discovery, please wait....
         /// </summary>
-        public static string StartingDiscovery {
-            get {
+        public static string StartingDiscovery
+        {
+            get
+            {
                 return ResourceManager.GetString("StartingDiscovery", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Starting test execution, please wait....
         /// </summary>
-        public static string StartingExecution {
-            get {
+        public static string StartingExecution
+        {
+            get
+            {
                 return ResourceManager.GetString("StartingExecution", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Standard Error Messages:.
         /// </summary>
-        public static string StdErrMessagesBanner {
-            get {
+        public static string StdErrMessagesBanner
+        {
+            get
+            {
                 return ResourceManager.GetString("StdErrMessagesBanner", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Standard Output Messages:.
         /// </summary>
-        public static string StdOutMessagesBanner {
-            get {
+        public static string StdOutMessagesBanner
+        {
+            get
+            {
                 return ResourceManager.GetString("StdOutMessagesBanner", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Additionally, you can try specifying &apos;/UseVsixExtensions&apos; command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true.
         /// </summary>
-        public static string SuggestUseVsixExtensionsIfNoTestsIsFound {
-            get {
+        public static string SuggestUseVsixExtensionsIfNoTestsIsFound
+        {
+            get
+            {
                 return ResourceManager.GetString("SuggestUseVsixExtensionsIfNoTestsIsFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Test Discovery Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
         /// </summary>
-        public static string SuggestUseVsixExtensionsInListDiscoverersCommand {
-            get {
+        public static string SuggestUseVsixExtensionsInListDiscoverersCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("SuggestUseVsixExtensionsInListDiscoverersCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Test Executor Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
         /// </summary>
-        public static string SuggestUseVsixExtensionsInListExecutorsCommand {
-            get {
+        public static string SuggestUseVsixExtensionsInListExecutorsCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("SuggestUseVsixExtensionsInListExecutorsCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Test Logger Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
         /// </summary>
-        public static string SuggestUseVsixExtensionsInListLoggersCommand {
-            get {
+        public static string SuggestUseVsixExtensionsInListLoggersCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("SuggestUseVsixExtensionsInListLoggersCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The Settings Providers Add-Ins installed through a VSIX installation are ignored. Use the /UseVsixExtensions parameter to include them, if your installation supports vsix extensions. Example: vstest.console.exe {0} /UseVsixExtensions:true.
         /// </summary>
-        public static string SuggestUseVsixExtensionsInListSettingsProviderCommand {
-            get {
+        public static string SuggestUseVsixExtensionsInListSettingsProviderCommand
+        {
+            get
+            {
                 return ResourceManager.GetString("SuggestUseVsixExtensionsInListSettingsProviderCommand", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to         Supported File Types:.
         /// </summary>
-        public static string SupportedFileTypesIndicator {
-            get {
+        public static string SupportedFileTypesIndicator
+        {
+            get
+            {
                 return ResourceManager.GetString("SupportedFileTypesIndicator", resourceCulture);
             }
         }
@@ -1267,8 +1522,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         /// <summary>
         ///   Looks up a localized string similar to  {0}.
         /// </summary>
-        public static string SupportedFileWithoutSeparator {
-            get {
+        public static string SupportedFileWithoutSeparator
+        {
+            get
+            {
                 return ResourceManager.GetString("SupportedFileWithoutSeparator", resourceCulture);
             }
         }
@@ -1287,78 +1544,94 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         /// <summary>
         ///   Looks up a localized string similar to  {0},.
         /// </summary>
-        public static string SupportedFileWithSeparator {
-            get {
+        public static string SupportedFileWithSeparator
+        {
+            get
+            {
                 return ResourceManager.GetString("SupportedFileWithSeparator", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Using Isolation mode to run unit tests for Windows Store apps. Use the /InIsolation parameter to suppress this warning..
         /// </summary>
-        public static string SwitchToIsolationInAppContainerMode {
-            get {
+        public static string SwitchToIsolationInAppContainerMode
+        {
+            get
+            {
                 return ResourceManager.GetString("SwitchToIsolationInAppContainerMode", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Using Isolation mode to run tests as required by effective Platform:{0} and .Net Framework:{1} settings for test run. Use the /inIsolation parameter to suppress this warning..
         /// </summary>
-        public static string SwitchToIsolationInMultiTargetingMode {
-            get {
+        public static string SwitchToIsolationInMultiTargetingMode
+        {
+            get
+            {
                 return ResourceManager.GetString("SwitchToIsolationInMultiTargetingMode", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Using Isolation mode to run unit tests for Windows Phone apps. Use the /InIsolation parameter to suppress this warning..
         /// </summary>
-        public static string SwitchToIsolationInPhoneAppContainerMode {
-            get {
+        public static string SwitchToIsolationInPhoneAppContainerMode
+        {
+            get
+            {
                 return ResourceManager.GetString("SwitchToIsolationInPhoneAppContainerMode", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Using Isolation mode to run the tests as diagnostic data adapters were enabled in the runsettings. Use the /inIsolation parameter to suppress this warning..
         /// </summary>
-        public static string SwitchToNoIsolation {
-            get {
+        public static string SwitchToNoIsolation
+        {
+            get
+            {
                 return ResourceManager.GetString("SwitchToNoIsolation", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The custom test adapter search path provided was not found, provide a valid path and try again..
         /// </summary>
-        public static string TestAdapterPathDoesNotExist {
-            get {
+        public static string TestAdapterPathDoesNotExist
+        {
+            get
+            {
                 return ResourceManager.GetString("TestAdapterPathDoesNotExist", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --TestAdapterPath|/TestAdapterPath
         ///      This makes vstest.console.exe process use custom test adapters
         ///      from a given path (if any) in the test run. 
         ///      Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;.
         /// </summary>
-        public static string TestAdapterPathHelp {
-            get {
+        public static string TestAdapterPathHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("TestAdapterPathHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /TestAdapterPath parameter requires a value, which is path of a location containing custom test adapters. Example:  /TestAdapterPath:c:\MyCustomAdapters.
         /// </summary>
-        public static string TestAdapterPathValueRequired {
-            get {
+        public static string TestAdapterPathValueRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("TestAdapterPathValueRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to --TestCaseFilter|/TestCaseFilter:&lt;Expression&gt;
         ///      Run tests that match the given expression.
@@ -1370,103 +1643,125 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         ///                /TestCaseFilter:&quot;(FullyQualifiedName~Nightly
         ///             [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string TestCaseFilterArgumentHelp {
-            get {
+        public static string TestCaseFilterArgumentHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("TestCaseFilterArgumentHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /TestCaseFilter argument requires the filter value.
         ///        Filter value can be &lt;property&gt;=&lt;value&gt; type.
         ///        Examples: &quot;Priority=1&quot;, &quot;TestCategory=Nightly&quot;.
         /// </summary>
-        public static string TestCaseFilterValueRequired {
-            get {
+        public static string TestCaseFilterValueRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("TestCaseFilterValueRequired", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Test Run Failed..
         /// </summary>
-        public static string TestRunFailed {
-            get {
+        public static string TestRunFailed
+        {
+            get
+            {
                 return ResourceManager.GetString("TestRunFailed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Test Run Successful..
         /// </summary>
-        public static string TestRunSuccessful {
-            get {
+        public static string TestRunSuccessful
+        {
+            get
+            {
                 return ResourceManager.GetString("TestRunSuccessful", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}..
         /// </summary>
-        public static string TestRunSummary {
-            get {
+        public static string TestRunSummary
+        {
+            get
+            {
                 return ResourceManager.GetString("TestRunSummary", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning..
         /// </summary>
-        public static string TestSettingsFrameworkMismatch {
-            get {
+        public static string TestSettingsFrameworkMismatch
+        {
+            get
+            {
                 return ResourceManager.GetString("TestSettingsFrameworkMismatch", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The test source file &quot;{0}&quot; provided was not found..
         /// </summary>
-        public static string TestSourceFileNotFound {
-            get {
+        public static string TestSourceFileNotFound
+        {
+            get
+            {
                 return ResourceManager.GetString("TestSourceFileNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Time elapsed :.
         /// </summary>
-        public static string TimeElapsed {
-            get {
+        public static string TimeElapsed
+        {
+            get
+            {
                 return ResourceManager.GetString("TimeElapsed", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to         Default Executor Uri: {0}.
         /// </summary>
-        public static string UriOfDefaultExecutor {
-            get {
+        public static string UriOfDefaultExecutor
+        {
+            get
+            {
                 return ResourceManager.GetString("UriOfDefaultExecutor", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to /UseVsixExtensions
         ///      This makes vstest.console.exe process use or skip the VSIX extensions 
         ///      installed(if any) in the test run. 
         ///      Example  /UseVsixExtensions:true.
         /// </summary>
-        public static string UseVsixExtensionsHelp {
-            get {
+        public static string UseVsixExtensionsHelp
+        {
+            get
+            {
                 return ResourceManager.GetString("UseVsixExtensionsHelp", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The /UseVsixExtensions parameter requires a value. If &apos;true&apos;, the installed VSIX extensions (if any) will be used in the test run. If false, they will be ignored.   Example:  /UseVsixExtensions:true.
         /// </summary>
-        public static string UseVsixExtensionsValueRequired {
-            get {
+        public static string UseVsixExtensionsValueRequired
+        {
+            get
+            {
                 return ResourceManager.GetString("UseVsixExtensionsValueRequired", resourceCulture);
             }
         }
@@ -1490,6 +1785,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
             get
             {
                 return ResourceManager.GetString("CollectArgumentHelp", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   DataCollectorFriendlyNameInvalid
+        /// </summary>
+        public static string DataCollectorFriendlyNameInvalid
+        {
+            get
+            {
+                return ResourceManager.GetString("DataCollectorFriendlyNameInvalid", resourceCulture);
             }
         }
     }

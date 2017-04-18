@@ -59,11 +59,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         CLIRunSettings = 12,
 
         /// <summary>
-        /// Priority of processor for enabling data collection.
-        /// </summary>
-        Collect = 13,
-
-        /// <summary>
         /// Priority of processors related to logging.
         /// </summary>
         Logging = 20,

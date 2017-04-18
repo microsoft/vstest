@@ -1537,8 +1537,13 @@ Standardeinstellungen werden verwendet, wenn die Verwendung der Einstellungsdate
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data diagnostic adapter(s) in the test run. Default 
-      settings are used if not specified using settings file. More info here : https://aka.ms/fpzskr</source>
+      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</source>
         <target state="new">CollectArgumentHelp</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorFriendlyNameInvalid">
+        <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
+        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
         <note></note>
       </trans-unit>
     </body>
