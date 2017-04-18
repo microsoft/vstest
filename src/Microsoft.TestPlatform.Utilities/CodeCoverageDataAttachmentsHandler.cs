@@ -20,29 +20,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string CoverageUri = "datacollector://microsoft/CodeCoverage/2.0";
         private const string CoverageFileExtension = ".coverage";
         private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
+        private const string CoverageFriendlyName = "Code Coverage";
 
         private const string CodeCoverageAnalysisAssemblyName = "Microsoft.VisualStudio.Coverage.Analysis";
         private const string MergeMethodName = "MergeCoverageFiles";
         private const string CoverageInfoTypeName = "CoverageInfo";
 
-        private static readonly string[] SupportedFileExtensions = new string[] { ".dll", ".exe" };
+        private static readonly string[] SupportedFileExtensions = { ".dll", ".exe" };
 
         public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
         {
+            if (dataCollectionAttachments == null)
+                return new Collection<AttachmentSet>();
+
             var coverageAttachments = dataCollectionAttachments
                 .Where(dataCollectionAttachment => CodeCoverageDataCollectorUri.Equals(dataCollectionAttachment.Uri)).ToArray();
 
             if (coverageAttachments.Any())
             {
-                var codeCoverageFiles = coverageAttachments.Select((o) => o.Attachments[0].Uri.LocalPath).ToArray();
+                var codeCoverageFiles = coverageAttachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
                 var outputFile = MergeCodeCoverageFiles(codeCoverageFiles);
+                var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
-                var existingAttachmentSet = coverageAttachments[0];
-
-                var attachmentSet = new AttachmentSet(existingAttachmentSet.Uri, existingAttachmentSet.DisplayName);
-                attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), existingAttachmentSet.Attachments[0].Description));
-
-                return new Collection<AttachmentSet>{ attachmentSet };
+                if (!string.IsNullOrEmpty(outputFile))
+                {
+                    attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), CoverageFriendlyName));
+                    return new Collection<AttachmentSet> { attachmentSet };
+                }
+                // In case merging fails(esp in dotnet core we cannot merge), so return filtered list of Code Coverage Attachments
+                return coverageAttachments;
             }
 
             return new Collection<AttachmentSet>();
