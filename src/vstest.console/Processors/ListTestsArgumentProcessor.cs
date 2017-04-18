@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -207,12 +208,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
+            if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+            {
+                this.output.Information(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+            }
 
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;
 
             var success = this.testRequestManager.DiscoverTests(
                 new DiscoveryRequestPayload() { Sources = this.commandLineOptions.Sources, RunSettings = runSettings },
-                this.discoveryEventsRegistrar);
+                this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
 
             return success ? ArgumentProcessorResult.Success : ArgumentProcessorResult.Fail;
         }

@@ -61,8 +61,7 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-# Dotnet build is not supporting -p: to pass arguments to msbuild. Revert to "latest" after the issue is resolved. See https://github.com/dotnet/cli/issues/6124
-$env:DOTNET_CLI_VERSION = "2.0.0-preview1-005448"
+$env:DOTNET_CLI_VERSION = "latest"
 $env:LOCATE_VS_API_VERSION = "0.2.4-beta"
 $env:MSBUILD_VERSION = "15.0"
 
@@ -133,8 +132,11 @@ function Install-DotNetCli
     New-Item -ItemType directory -Path $dotnetInstallPath -Force | Out-Null
     & $dotnetInstallScript -Channel "master" -InstallDir $dotnetInstallPath -NoPath -Version $env:DOTNET_CLI_VERSION
 
-    # Uncomment to pull in additional shared frameworks.
-    # This is added to get netcoreapp1.1 shared components.
+    # Pull in additional shared frameworks.
+    # Get netcoreapp1.0 shared components.
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.0.4' -Channel 'preview'
+    
+    # Get netcoreapp1.1 shared components.
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.1' -Channel 'release/1.1.0'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
@@ -249,7 +251,7 @@ function Publish-Package
 
     # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
     # Ideally we should just be publishing the loggers to the Extensions folder.
-    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.pdb")
+    $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
     foreach($file in $loggers) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
@@ -258,8 +260,8 @@ function Publish-Package
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 	
-	# Note Note: If there are some dependencies for the TestHostProvider assemblies, those need to be moved too. 
-    $runtimeproviders = @("Microsoft.TestPlatform.TestHostProvider.dll", "Microsoft.TestPlatform.TestHostProvider.pdb")
+	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
     foreach($file in $runtimeproviders) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
@@ -268,7 +270,7 @@ function Publish-Package
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
 
-    # Copy dependency of Microsoft.TestPlatform.TestHostProvider
+    # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\net45\Newtonsoft.Json.dll"
     Write-Verbose "Copy-Item $newtonsoft $fullCLRPackageDir -Force"
     Copy-Item $newtonsoft $fullCLRPackageDir -Force
@@ -299,7 +301,7 @@ function Create-VsixPackage
     $packageDir = Get-FullCLRPackageDirectory
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.0.0\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-678431\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over

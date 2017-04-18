@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         public void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)
         {
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions started.");
-            this.testPlatform.Initialize(pathToAdditionalExtensions, false, true);
+            this.testPlatform.UpdateExtensions(pathToAdditionalExtensions, false);
             EqtTrace.Info("TestRequestManager.InitializeExtensions: Initialize extensions completed.");
         }
 
@@ -123,8 +123,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// </summary>
         /// <param name="discoveryPayload">Discovery payload</param>
         /// <param name="discoveryEventsRegistrar">EventHandler for discovered tests</param>
+        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>True, if successful</returns>
-        public bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar)
+        public bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar, ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
@@ -142,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
 
-            using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria))
+            using (IDiscoveryRequest discoveryRequest = this.testPlatform.CreateDiscoveryRequest(criteria, protocolConfig))
             {
                 try
                 {
@@ -191,8 +192,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <param name="testRunRequestPayload">TestRun request Payload</param>
         /// <param name="testHostLauncher">TestHost Launcher for the run</param>
         /// <param name="testRunEventsRegistrar">event registrar for run events</param>
+        /// <param name="protocolConfig">Protocol related information</param>
         /// <returns>True, if successful</returns>
-        public bool RunTests(TestRunRequestPayload testRunRequestPayload, ITestHostLauncher testHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar)
+        public bool RunTests(TestRunRequestPayload testRunRequestPayload, ITestHostLauncher testHostLauncher, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
         {
             EqtTrace.Info("TestRequestManager.RunTests: run tests started.");
 
@@ -228,7 +230,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                                   testHostLauncher);
             }
 
-            var success = this.RunTests(runCriteria, testRunEventsRegistrar);
+            var success = this.RunTests(runCriteria, testRunEventsRegistrar, protocolConfig);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
             return success;
         }
@@ -287,7 +289,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             return true;
         }
 
-        private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar)
+        private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
             // TranslationLayer can process faster as it directly gets the raw unserialized messages whereas 
@@ -296,7 +298,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             lock (syncobject)
             {
                 bool success = true;
-                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria))
+                using (ITestRunRequest testRunRequest = this.testPlatform.CreateTestRunRequest(testRunCriteria, protocolConfig))
                 {
                     this.currentTestRunRequest = testRunRequest;
                     this.runRequestCreatedEventHandle.Set();

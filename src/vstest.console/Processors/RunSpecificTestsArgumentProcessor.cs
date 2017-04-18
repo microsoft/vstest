@@ -226,8 +226,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         private bool DiscoverTestsAndSelectSpecified(IEnumerable<string> sources)
         {
             this.output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
+            if (!string.IsNullOrEmpty(EqtTrace.LogFile))
+            {
+                this.output.Information(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+            }
+
             return this.testRequestManager.DiscoverTests(
-                new DiscoveryRequestPayload() { Sources = sources, RunSettings = this.effectiveRunSettings }, this.discoveryEventsRegistrar);
+                new DiscoveryRequestPayload() { Sources = sources, RunSettings = this.effectiveRunSettings }, this.discoveryEventsRegistrar, Constants.DefaultProtocolConfig);
         }
 
         /// <summary>
@@ -250,7 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 EqtTrace.Verbose("RunSpecificTestsArgumentProcessor:Execute: Test run is queued.");
                 var runRequestPayload = new TestRunRequestPayload() { TestCases = this.selectedTestCases.ToList(), RunSettings = this.effectiveRunSettings, KeepAlive = keepAlive };
-                result &= this.testRequestManager.RunTests(runRequestPayload, null, null);
+                result &= this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
             }
             else
             {

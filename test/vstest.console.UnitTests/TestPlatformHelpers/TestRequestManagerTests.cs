@@ -50,10 +50,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             this.testRequestManager = new TestRequestManager(this.commandLineOptions, this.mockTestPlatform.Object,
                 mockLoggerManager, testRunResultAggregator, mockTestPlatformEventSource.Object);
-
-            this.mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>()))
+            this.mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>()))
                 .Returns(this.mockDiscoveryRequest.Object);
-            this.mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>()))
+            this.mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>()))
                 .Returns(this.mockRunRequest.Object);
         }
 
@@ -97,7 +96,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var paths = new List<string>() { "a", "b" };
             this.testRequestManager.InitializeExtensions(paths);
 
-            this.mockTestPlatform.Verify(mt => mt.Initialize(paths, false, true), Times.Once);
+            this.mockTestPlatform.Verify(mt => mt.UpdateExtensions(paths, false), Times.Once);
         }
 
         [TestMethod]
@@ -128,13 +127,13 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             DiscoveryCriteria actualDiscoveryCriteria = null;
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>())).Callback<DiscoveryCriteria>(
-                (discoveryCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (DiscoveryCriteria discoveryCriteria, ProtocolConfig config) =>
                 {
                     actualDiscoveryCriteria = discoveryCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object);
+            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
             Assert.AreEqual(15, actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent);
         }
 
@@ -149,15 +148,15 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var createDiscoveryRequestCalled = 0;
             DiscoveryCriteria actualDiscoveryCriteria = null;
             var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>())).Callback<DiscoveryCriteria>(
-                (discoveryCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (DiscoveryCriteria discoveryCriteria, ProtocolConfig config) =>
                 {
                     createDiscoveryRequestCalled++;
                     actualDiscoveryCriteria = discoveryCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
             var mockDiscoveryRegistrar = new Mock<ITestDiscoveryEventsRegistrar>();
-            var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object);
+            var success = this.testRequestManager.DiscoverTests(payload, mockDiscoveryRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsTrue(success, "DiscoverTests call must succeed");
 
@@ -196,9 +195,9 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             long cancelRequestTime = 0;
 
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (runCriteria) =>
-                {
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+               (TestRunCriteria runCriteria, ProtocolConfig config) =>
+               {
                     Thread.Sleep(1);
                     createRunRequestTime = sw.ElapsedMilliseconds;
                     observedCriteria = runCriteria;
@@ -214,7 +213,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
             var cancelTask = Task.Run(() => this.testRequestManager.CancelTestRun());
-            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object));
+            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>()));
 
             Task.WaitAll(cancelTask, runTask);
 
@@ -239,8 +238,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             long cancelRequestTime = 0;
 
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (runCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                 {
                     Thread.Sleep(1);
                     createRunRequestTime = sw.ElapsedMilliseconds;
@@ -257,7 +256,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
             var cancelTask = Task.Run(() => this.testRequestManager.AbortTestRun());
-            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object));
+            var runTask = Task.Run(() => this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>()));
 
             Task.WaitAll(cancelTask, runTask);
 
@@ -281,13 +280,13 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             TestRunCriteria actualTestRunCriteria = null;
             var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (criteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                 {
-                    actualTestRunCriteria = criteria;
+                    actualTestRunCriteria = runCriteria;
                 }).Returns(mockDiscoveryRequest.Object);
 
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object);
+            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
             Assert.AreEqual(15, actualTestRunCriteria.FrequencyOfRunStatsChangeEvent);
         }
 
@@ -302,8 +301,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var createRunRequestCalled = 0;
             TestRunCriteria observedCriteria = null;
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (runCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                 {
                     createRunRequestCalled++;
                     observedCriteria = runCriteria;
@@ -320,7 +319,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 TestRunResultAggregator.Instance,
                 this.mockTestPlatformEventSource.Object);
 
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object);
+            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsTrue(success, "RunTests call must succeed");
 
@@ -356,7 +355,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             };
 
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>()))
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>()))
                 .Returns(mockRunRequest.Object);
 
             var mockRunEventsRegistrar1 = new Mock<ITestRunEventsRegistrar>();
@@ -398,11 +397,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
             var task1 = Task.Run(() =>
             {
-                this.testRequestManager.RunTests(payload1, mockCustomlauncher.Object, mockRunEventsRegistrar1.Object);
+                this.testRequestManager.RunTests(payload1, mockCustomlauncher.Object, mockRunEventsRegistrar1.Object, It.IsAny<ProtocolConfig>());
             });
             var task2 = Task.Run(() =>
             {
-                this.testRequestManager.RunTests(payload2, mockCustomlauncher.Object, mockRunEventsRegistrar2.Object);
+                this.testRequestManager.RunTests(payload2, mockCustomlauncher.Object, mockRunEventsRegistrar2.Object, It.IsAny<ProtocolConfig>());
             });
 
             Task.WaitAll(task1, task2);
@@ -432,8 +431,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var createRunRequestCalled = 0;
             TestRunCriteria observedCriteria = null;
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (runCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                 {
                     createRunRequestCalled++;
                     observedCriteria = runCriteria;
@@ -444,7 +443,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object);
+            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsFalse(success, "RunTests call must fail due to exception");
         }
@@ -460,8 +459,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var createRunRequestCalled = 0;
             TestRunCriteria observedCriteria = null;
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (runCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                 {
                     createRunRequestCalled++;
                     observedCriteria = runCriteria;
@@ -472,7 +471,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object);
+            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsFalse(success, "RunTests call must fail due to exception");
         }
@@ -488,8 +487,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var createRunRequestCalled = 0;
             TestRunCriteria observedCriteria = null;
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (runCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                 {
                     createRunRequestCalled++;
                     observedCriteria = runCriteria;
@@ -500,7 +499,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
-            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object);
+            var success = this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
 
             Assert.IsFalse(success, "RunTests call must fail due to exception");
         }
@@ -517,8 +516,8 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var createRunRequestCalled = 0;
             TestRunCriteria observedCriteria = null;
             var mockRunRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>())).Callback<TestRunCriteria>(
-                (runCriteria) =>
+            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
+                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                 {
                     createRunRequestCalled++;
                     observedCriteria = runCriteria;
@@ -529,7 +528,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var mockRunEventsRegistrar = new Mock<ITestRunEventsRegistrar>();
             var mockCustomlauncher = new Mock<ITestHostLauncher>();
 
-            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object);
+            this.testRequestManager.RunTests(payload, mockCustomlauncher.Object, mockRunEventsRegistrar.Object, It.IsAny<ProtocolConfig>());
         }
 
         [DataTestMethod]
@@ -541,11 +540,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var discoveryPayload = CreateDiscoveryPayload(runsettings);
             this.commandLineOptions.IsDesignMode = designModeValue;
 
-            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object);
+            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
 
             var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
             this.mockTestPlatform.Verify(
-                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode))));
+                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
         }
 
         [TestMethod]
@@ -555,11 +554,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var discoveryPayload = CreateDiscoveryPayload(runsettings);
             this.commandLineOptions.IsDesignMode = true;
 
-            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object);
+            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
 
             var designmode = "<DesignMode>False</DesignMode>";
             this.mockTestPlatform.Verify(
-                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode))));
+                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
         }
 
         [TestMethod]
@@ -568,11 +567,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var runsettings = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             var discoveryPayload = CreateDiscoveryPayload(runsettings);
 
-            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object);
+            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
 
             var designmode = "DesignMode";
             this.mockTestPlatform.Verify(
-                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => !dc.RunSettings.Contains(designmode))));
+                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => !dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
         }
 
         [TestMethod]
@@ -581,11 +580,11 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var runsettings = "<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETCoreApp,Version=v1.0</TargetFrameworkVersion></RunConfiguration></RunSettings>";
             var discoveryPayload = CreateDiscoveryPayload(runsettings);
 
-            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object);
+            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
 
             var designmode = "DesignMode";
             this.mockTestPlatform.Verify(
-                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => !dc.RunSettings.Contains(designmode))));
+                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => !dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
         }
 
         [DataTestMethod]
@@ -602,10 +601,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             };
             this.commandLineOptions.IsDesignMode = designModeValue;
 
-            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object);
+            this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
 
             var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
-            this.mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.Is<TestRunCriteria>(rc => rc.TestRunSettings.Contains(designmode))));
+            this.mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.Is<TestRunCriteria>(rc => rc.TestRunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
         }
 
         private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)

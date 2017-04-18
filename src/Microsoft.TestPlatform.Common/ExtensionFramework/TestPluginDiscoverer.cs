@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 {
                     var assemblyName = Path.GetFileNameWithoutExtension(file);
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
-                    
+
                     // Check whether this assembly is known or not. 
                     //if (loadOnlyWellKnownExtensions && assembly != null)
                     //{

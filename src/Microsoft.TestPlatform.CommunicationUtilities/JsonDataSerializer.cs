@@ -142,9 +142,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             var serializer = this.GetPayloadSerializer(version);
             var serializedPayload = JToken.FromObject(payload, serializer);
 
-            var message = version == 1 ?
-                new Message { MessageType = messageType, Payload = serializedPayload } :
-            new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload };
+            var message = version > 1 ?
+            new VersionedMessage { MessageType = messageType, Version = version, Payload = serializedPayload } :
+            new Message { MessageType = messageType, Payload = serializedPayload };
 
             return JsonConvert.SerializeObject(message);
         }

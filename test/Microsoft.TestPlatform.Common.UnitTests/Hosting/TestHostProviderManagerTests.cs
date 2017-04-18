@@ -177,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+            public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> defaultExtensions)
             {
                 throw new NotImplementedException();
             }
@@ -256,7 +256,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources)
+            public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> defaultExtensions)
             {
                 throw new NotImplementedException();
             }

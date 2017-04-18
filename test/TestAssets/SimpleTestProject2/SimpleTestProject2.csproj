@@ -5,12 +5,13 @@
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
     <TestProject>true</TestProject>
   </PropertyGroup>
-  <!-- Imports Common TestAssets props like TargetFrameworks. -->
+  <!-- Imports Common TestAssets props. -->
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   
   <PropertyGroup>
     <AssemblyName>SimpleTestProject2</AssemblyName>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net46</TargetFrameworks>
     <OutputType Condition="$(NetCoreAppTargetFrameWork) == 'true' ">Exe</OutputType>
   </PropertyGroup>
   

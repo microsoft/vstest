@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// </summary>
         /// <param name="sources">List of test sources.</param>
         /// <returns>List of paths to extension assemblies.</returns>
-        IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources);
+        IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> defaultExtensions);
     }
 
     /// <summary>

@@ -72,6 +72,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        public static string ErrorOnInitialization
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Gets a value indicating whether tracing error statements is enabled.
         /// </summary>
@@ -121,9 +127,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// And overrides if any trace is set before
         /// </summary>
         /// <param name="customLogFile">A custom log file for trace messages.</param>
-        public static void InitializeVerboseTrace(string customLogFile)
+        public static bool InitializeVerboseTrace(string customLogFile)
         {
-            traceImpl.InitializeVerboseTrace(customLogFile);
+            if(!traceImpl.InitializeVerboseTrace(customLogFile))
+            {
+                ErrorOnInitialization = PlatformEqtTrace.ErrorOnInitialization;
+                return false;
+            }
+            return true;
         }
 
 
