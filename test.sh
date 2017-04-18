@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Copyright (c) Microsoft. All rights reserved.
-# Build script for test platform.
+# Test script for test platform.
 
 set -e
 
-source "scripts/build.sh" "$@"
+source "scripts/test.sh" "$@"
 
 if [[ $? -ne 0 ]]; then
     exit 1
