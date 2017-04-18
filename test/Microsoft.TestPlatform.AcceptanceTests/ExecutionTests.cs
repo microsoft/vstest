@@ -106,7 +106,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " /tests:ExitwithUnhandleException");
+            arguments = string.Concat(arguments, " /tests:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
             this.InvokeVsTest(arguments);
@@ -129,7 +129,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
-        public void UnhandleExceptionExceptionShouldBeLoggedToConsoleAndDiagLogFile(string runnerFramework, string targetFramework, string targetRuntime)
+        public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
@@ -144,9 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.InvokeVsTest(arguments);
             var errorFirstLine = "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
-            var errorLastLine = "Test host standard error line:    at System.Threading.ThreadHelper.ThreadStart()";
-            FileAssert.Contains(diagLogFilePath, errorFirstLine, errorLastLine);
-            this.StdErrorContains("The active test run was aborted.");
+            FileAssert.Contains(diagLogFilePath, errorFirstLine);
             File.Delete(diagLogFilePath);
         }
     }

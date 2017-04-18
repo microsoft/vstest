@@ -29,12 +29,7 @@ namespace SampleUnitTestProject3
         [TestMethod]
         public void ExitWithStackoverFlow()
         {
-            f1();
-        }
-
-        private void f1()
-        {
-            f1();
+            ExitWithStackoverFlow();
         }
     }
 }
