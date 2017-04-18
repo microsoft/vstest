@@ -113,7 +113,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             Assert.IsTrue(File.Exists(Path.Combine(System.AppContext.BaseDirectory, filename)));
             Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][friendlyName].Attachments.Count);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
         }
 
         [TestMethod]
@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             // Wait for file operations to complete
             waitHandle.WaitOne();
 
-            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][friendlyName].Attachments.Count);
+            Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
             Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
             Assert.IsFalse(File.Exists(Path.Combine(AppContext.BaseDirectory, filename)));
         }

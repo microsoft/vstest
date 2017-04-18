@@ -136,7 +136,7 @@
     <value>Diagnostic data adapter ('{0}') message: {1}.</value>
   </data>
   <data name="DataCollectorNotFound" xml:space="preserve">
-    <value>Could not find diagnostic data adapter of type '{0}' and friendlyName '{1}'</value>
+    <value>Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</value>
   </data>
   <data name="DataCollectorRequestedDuplicateEnvironmentVariable" xml:space="preserve">
     <value>The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</value>
@@ -172,7 +172,7 @@
     <value>Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type '{0}' is null or empty.</value>
   </data>
   <data name="IgnoredDuplicateConfiguration" xml:space="preserve">
-    <value>There are multiple configurations that have diagnostic data adapter  type '{0}' or friendlyName '{1}'. Duplicate configurations will be ignored in the test run.</value>
+    <value>There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</value>
   </data>
   <data name="InvalidCondition" xml:space="preserve">
     <value>Error: Invalid Condition '{0}'</value>

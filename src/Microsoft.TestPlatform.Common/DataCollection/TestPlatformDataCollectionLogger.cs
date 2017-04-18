@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 EqtTrace.Error(
                     "Data collector '{0}' logged the following error: {1}",
-                    this.dataCollectorConfig.FriendlyName,
+                    this.dataCollectorConfig.TypeUri,
                     text);
             }
 
@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         "Description:            {1}" + Environment.NewLine +
                         "Exception type:         {2}" + Environment.NewLine + "Exception message:      {3}"
                     + Environment.NewLine + "Exception stack trace:  {4}",
-                    this.dataCollectorConfig.FriendlyName,
+                    this.dataCollectorConfig.TypeUri,
                     text,
                     exception.GetType(),
                     exception.Message,
@@ -107,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             ValidateArg.NotNull(text, "text");
             EqtTrace.Warning(
                     "Data collector '{0}' logged the following warning: {1}",
-                    this.dataCollectorConfig.FriendlyName,
+                    this.dataCollectorConfig.TypeUri,
                 text);
 
             this.SendTextMessage(context, text, TestMessageLevel.Warning);
