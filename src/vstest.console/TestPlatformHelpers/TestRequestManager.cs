@@ -23,10 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using System.Reflection;
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -144,8 +140,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            runsettings = UpdateDefaultExtensionsPathInRunSettings(runsettings);
-
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
 
@@ -213,8 +207,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 runsettings = updatedRunsettings;
             }
-
-            runsettings = UpdateDefaultExtensionsPathInRunSettings(runsettings);
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
@@ -352,29 +344,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 return success;
             }
-        }
-
-        /// <summary>
-        /// Find all test platform extensions from the `.\Extensions` directory. This is used to load the inbox extensions like
-        /// Trx logger and legacy test extensions like mstest v1, mstest c++ etc..
-        /// </summary>
-        private static string UpdateDefaultExtensionsPathInRunSettings(string runSettings)
-        {
-            var fileHelper = new FileHelper();
-            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
-            var runsettings = new RunSettings();
-            runsettings.LoadSettingsXml(runSettings);
-            var runConfig = (RunConfiguration)runsettings.GetSettings("RunConfiguration");
-            if (string.IsNullOrWhiteSpace(runConfig.TestAdaptersPaths))
-            {
-                runConfig.TestAdaptersPaths = extensionsFolder;
-            }
-            else
-            {
-                runConfig.TestAdaptersPaths = string.Concat(runConfig.TestAdaptersPaths, ';', extensionsFolder);
-            }
-
-            return runsettings.SettingsXml;
         }
     }
 }
