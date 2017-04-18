@@ -10,15 +10,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
     using Common.UnitTests.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+
+    using TestPlatform.Common.UnitTests.Utilities;
 
     using static RunTestsWithSourcesTests;
 
@@ -49,8 +53,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void InitializeShouldLoadAndInitializeAllExtension()
         {
-            var assemblyLocation = typeof(TestDiscoveryExtensionManagerTests).GetTypeInfo().Assembly.Location;
-            this.executionManager.Initialize(new List<string> { assemblyLocation });
+            var commonAssemblyLocation = typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location;
+
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { commonAssemblyLocation },
+                () => { });
+
+
+            this.executionManager.Initialize(new List<string> { commonAssemblyLocation });
 
             Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
@@ -86,6 +96,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void StartTestRunShouldRunTestsInTheProvidedSources()
         {
             var assemblyLocation = typeof(ExecutionManagerTests).GetTypeInfo().Assembly.Location;
+            TestPluginCacheTests.SetupMockExtensions(
+                new string[] { assemblyLocation },
+                () => { });
+            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(".*.TestAdapter.dll");
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(".*.TestAdapter.dll");
+
 
             var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             adapterSourceMap.Add(assemblyLocation, new List<string> { assemblyLocation });
