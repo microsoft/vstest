@@ -10,6 +10,9 @@
     <!-- Don't force a trailing comma in multiline object initializers -->
     <Rule Id="SA1413" Action="None" />
 
+    <!-- Documentation is not required for test projects -->
+    <Rule Id="SA1600" Action="None" />
+
     <!-- Copyright headers check is skipped (see https://github.com/dotnet/sdk/issues/989). -->
     <Rule Id="SA1636" Action="None" />
   </Rules>
