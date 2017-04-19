@@ -46,20 +46,6 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
-        public void CreateArgumentShouldSetConsoleLoggerVerbosityIfConsoleLoggerIsNotGivenInArgs()
-        {
-            var vstestTask = new VSTestTask { VSTestVerbosity = "diag" };
-
-            // Add values for required properties.
-            vstestTask.TestFileFullPath = "abc";
-            vstestTask.VSTestFramework = "abc";
-
-            var allArguments = vstestTask.CreateArgument().ToArray();
-
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
-        }
-
-        [TestMethod]
         public void CreateArgumentShouldNotSetConsoleLoggerVerbosityIfConsoleLoggerIsGivenInArgs()
         {
             var vstestTask = new VSTestTask { VSTestVerbosity = "diag" };
@@ -73,6 +59,146 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
             Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToNormalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsn()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "n" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToNormalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsnormal()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "normal" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToNormalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsd()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "d" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToNormalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsdetailed()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "detailed" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToNormalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsdiag()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "diag" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToNormalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsdiagnostic()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "diagnostic" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+        [TestMethod]
+
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToQuietIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsq()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "q" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToQuietIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsquiet()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "quiet" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToMinimalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsm()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "m" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=minimal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityToMinimalIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsminimal()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "minimal" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=minimal")));
         }
     }
 }

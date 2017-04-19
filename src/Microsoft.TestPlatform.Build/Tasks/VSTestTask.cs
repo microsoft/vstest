@@ -188,19 +188,19 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
 
             if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) &&
-                (string.IsNullOrEmpty(this.VSTestLogger) || this.VSTestLogger.IndexOf("console", StringComparison.OrdinalIgnoreCase) < 0))
+                (string.IsNullOrEmpty(this.VSTestLogger) || this.VSTestLogger.StartsWith("console", StringComparison.OrdinalIgnoreCase)))
             {
                 var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
-                var minimalTestLogging = new List<string>() { "m", "minimal" };
+                var quietTestLogging = new List<string>() { "q", "quiet" };
 
-                string vsTestVerbosity = "quiet";
+                string vsTestVerbosity = "minimal";
                 if (normalTestLogging.Contains(this.VSTestVerbosity))
                 {
                     vsTestVerbosity = "normal";
                 }
-                else if (minimalTestLogging.Contains(this.VSTestVerbosity))
+                else if (quietTestLogging.Contains(this.VSTestVerbosity))
                 {
-                    vsTestVerbosity = "minimal";
+                    vsTestVerbosity = "quiet";
                 }
 
                 allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
