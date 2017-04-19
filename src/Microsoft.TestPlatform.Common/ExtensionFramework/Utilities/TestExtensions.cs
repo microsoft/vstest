@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
     using System.Linq;
     using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
@@ -60,12 +61,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
         /// <summary>
         /// Gets or sets test logger extensions.
         /// </summary>
-        internal Dictionary<string, TestRuntimePluginInformation> TestHosts { get; set; }
+        internal Dictionary<string, TestRuntimePluginInformation> TestHosts { get; set; }        
 
         /// <summary>
         /// Gets or sets a value indicating whether are test hosts cached.
         /// </summary>
         internal bool AreTestHostsCached { get; set; }
+
+        /// <summary>
+        /// Gets or sets data collectors extensions.
+        /// </summary>
+        internal Dictionary<string, DataCollectorConfig> DataCollectors { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether are test hosts cached.
+        /// </summary>
+        internal bool AreDataCollectorsCached { get; set; }
 
         #endregion
 
@@ -144,9 +155,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 this.GetExtensionsDiscoveredFromAssembly<TestRuntimePluginInformation>(
                     this.TestHosts,
                     extensionAssembly);
+            testExtensions.DataCollectors =
+                this.GetExtensionsDiscoveredFromAssembly<DataCollectorConfig>(
+                    this.DataCollectors,
+                    extensionAssembly);                    
 
             if (testExtensions.TestDiscoverers.Any() || testExtensions.TestExecutors.Any() || testExtensions.TestSettingsProviders.Any() ||
-                testExtensions.TestLoggers.Any() || testExtensions.TestHosts.Any())
+                testExtensions.TestLoggers.Any() || testExtensions.TestHosts.Any() || testExtensions.DataCollectors.Any())
             {
                 // This extension has already been discovered.
                 return testExtensions;
@@ -176,6 +191,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             else if (typeof(TPluginInfo) == typeof(TestRuntimePluginInformation))
             {
                 return (Dictionary<string, TPluginInfo>)(object)this.TestHosts;
+            }
+            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            {
+                return (Dictionary<string, TPluginInfo>)(object)this.DataCollectors;
             }
 
             return null;
@@ -211,6 +230,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             {
                 return this.AreTestHostsCached;
             }
+            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            {
+                return this.AreDataCollectorsCached;
+            }
 
             return false;
         }
@@ -242,6 +265,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             {
                 this.AreTestHostsCached = true;
             }
+            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            {
+                this.AreDataCollectorsCached = true;
+            }
         }
 
         /// <summary>
@@ -254,6 +281,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             this.AreTestLoggersCached = false;
             this.AreTestSettingsProvidersCached = false;
             this.AreTestHostsCached = false;
+            this.AreDataCollectorsCached = false;
         }
 
         /// <summary>
@@ -314,6 +342,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
             else if (typeof(TPluginInfo) == typeof(TestRuntimePluginInformation))
             {
                 this.TestHosts = (Dictionary<string, TestRuntimePluginInformation>)(object)testPluginInfos;
+            }
+            else if (typeof(TPluginInfo) == typeof(DataCollectorConfig))
+            {
+                this.DataCollectors = (Dictionary<string, DataCollectorConfig>)(object)testPluginInfos;
             }
         }
 

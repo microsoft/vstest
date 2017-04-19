@@ -10,12 +10,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
+    /// <summary>
     /// <summary>
     /// Manages data collection.
     /// </summary>
@@ -54,9 +57,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         private bool disposed;
 
         /// <summary>
-        /// Load datacollectors.
+        /// Extension manager for data collectors.
         /// </summary>
-        private IDataCollectorLoader dataCollectorLoader;
+        private DataCollectorExtensionManager dataCollectorExtensionManager;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
@@ -64,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink, new DataCollectorLoader())
+        internal DataCollectionManager(IMessageSink messageSink) : this(new DataCollectionAttachmentManager(), messageSink)
         {
         }
 
@@ -77,19 +81,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        /// <param name="dataCollectorLoader">
-        /// The data Collector Loader.
-        /// </param>
         /// <remarks>
         /// The constructor is not public because the factory method should be used to get instances of this class.
         /// </remarks>
-        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader)
+        protected DataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink)
         {
             this.attachmentManager = datacollectionAttachmentManager;
             this.messageSink = messageSink;
-            this.dataCollectorLoader = dataCollectorLoader;
             this.events = new TestPlatformDataCollectionEvents();
-
+            this.dataCollectorExtensionManager = null;
             this.RunDataCollectors = new Dictionary<Type, DataCollectorInformation>();
         }
 
@@ -102,6 +102,23 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Gets cache of data collectors associated with the run.
         /// </summary>
         internal Dictionary<Type, DataCollectorInformation> RunDataCollectors { get; private set; }
+
+        /// <summary>
+        /// Gets the data collector extension manager.
+        /// </summary>
+        private DataCollectorExtensionManager DataCollectorExtensionManager
+        {
+            get
+            {
+                if (this.dataCollectorExtensionManager == null)
+                {
+                    // todo : change IMessageSink and use IMessageLogger instead.
+                    this.dataCollectorExtensionManager = DataCollectorExtensionManager.Create(TestSessionMessageLogger.Instance);
+                }
+
+                return this.dataCollectorExtensionManager;
+            }
+        }
 
         /// <summary>
         /// Creates an instance of the TestLoggerExtensionManager.
@@ -222,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex.Message);
+                    EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex);
                 }
 
                 return new Collection<AttachmentSet>(result);
@@ -286,7 +303,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments : {0}", ex.Message);
+                    EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments : {0}", ex);
                 }
 
                 return new Collection<AttachmentSet>(result);
@@ -321,24 +338,68 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         #region Load and Initialize DataCollectors
 
         /// <summary>
-        /// Loads and initializes datacollector using datacollector settings.
+        /// Tries to get uri of the data collector corresponding to the friendly name. If no such data collector exists return null.
+        /// </summary>
+        /// <param name="friendlyName">The friendly Name.</param>
+        /// <param name="dataCollectorUri">The data collector Uri.</param>
+        /// <returns><see cref="bool"/></returns>
+        protected virtual bool TryGetUriFromFriendlyName(string friendlyName, out string dataCollectorUri)
+        {
+            var extensionManager = this.dataCollectorExtensionManager;
+            foreach (var extension in extensionManager.TestExtensions)
+            {
+                if (string.Compare(friendlyName, extension.Metadata.FriendlyName, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    dataCollectorUri = extension.Metadata.ExtensionUri;
+                    return true;
+                }
+            }
+
+            dataCollectorUri = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the extension using uri.
+        /// </summary>
+        /// <param name="extensionUri">
+        /// The extension uri.
+        /// </param>
+        /// <returns>
+        /// The <see cref="DataCollector"/>.
+        /// </returns>
+        protected virtual DataCollector TryGetTestExtension(string extensionUri)
+        {
+            return this.DataCollectorExtensionManager.TryGetTestExtension(extensionUri).Value;
+        }
+
+        /// <summary>
+        /// Loads and initializes data collector using data collector settings.
         /// </summary>
         /// <param name="dataCollectorSettings">
         /// The data collector settings.
         /// </param>
         private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
         {
-            var collectorTypeName = dataCollectorSettings.AssemblyQualifiedName;
             DataCollectorInformation dataCollectorInfo;
             DataCollectorConfig dataCollectorConfig;
 
             try
             {
-                var dataCollector = this.dataCollectorLoader.Load(dataCollectorSettings.CodeBase, dataCollectorSettings.AssemblyQualifiedName);
+                // Look up the extension and initialize it if one is found.
+                var extensionManager = this.DataCollectorExtensionManager;
+                var dataCollectorUri = string.Empty;
+                this.TryGetUriFromFriendlyName(dataCollectorSettings.FriendlyName, out dataCollectorUri);
+
+                DataCollector dataCollector = null;
+                if (!string.IsNullOrWhiteSpace(dataCollectorUri))
+                {
+                    dataCollector = this.TryGetTestExtension(dataCollectorUri);
+                }
 
                 if (dataCollector == null)
                 {
-                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, collectorTypeName, string.Empty));
+                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, dataCollectorSettings.FriendlyName));
                     return;
                 }
 
@@ -359,23 +420,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                                     this.attachmentManager,
                                                     this.events,
                                                     this.messageSink);
-
-                if (!dataCollectorInfo.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
-                {
-                    // If the data collector was not found, send an error.
-                    this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.Uri));
-                    return;
-                }
             }
             catch (Exception ex)
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", collectorTypeName, ex);
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
                 }
 
                 // No data collector info, so send the error with no direct association to the collector.
-                this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, collectorTypeName, ex.Message));
+                this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, dataCollectorSettings.FriendlyName, ex));
                 return;
             }
 
@@ -392,7 +446,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0}: " + ex, collectorTypeName);
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
                 }
 
                 // Log error.
@@ -415,11 +469,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (settings.IsEnabled)
                 {
-                    if (runEnabledDataCollectors.Any(dcSettings => dcSettings.Uri.Equals(settings.Uri)
-                        || string.Equals(dcSettings.AssemblyQualifiedName, settings.AssemblyQualifiedName, StringComparison.OrdinalIgnoreCase)))
+                    if (runEnabledDataCollectors.Any(dcSettings => string.Equals(dcSettings.FriendlyName, settings.FriendlyName, StringComparison.OrdinalIgnoreCase)))
                     {
                         // If Uri or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
-                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.AssemblyQualifiedName, settings.Uri));
+                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.FriendlyName));
                         continue;
                     }
 
@@ -479,7 +532,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 {
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector {1} : {2}.", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName, ex.Message);
+                        EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector {1} : {2}.", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName, ex);
                     }
                 }
             }
@@ -618,7 +671,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 foreach (var file in entry.Attachments)
                 {
-
                     EqtTrace.Verbose(
                         "Test Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
                         entry.DisplayName,
