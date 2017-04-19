@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System.Collections.Generic;
@@ -50,14 +52,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             
             if (parallelRunComplete)
             {
-                var coverageHandler = new CodeCoverageDataAttachmentsHandler();
-                var attachments = coverageHandler.HandleDataCollectionAttachmentSets(runDataAggregator.RunContextAttachments);
+                var finalAttachmentSet = new Collection<AttachmentSet>();
+
+                // todo: use TestPluginCache to iterate over all IDataCollectorAttachments
+                {
+                    var coverageHandler = new CodeCoverageDataAttachmentsHandler();
+                    Uri attachementUri = coverageHandler.GetAttachmentUri();
+                    if (attachementUri != null)
+                    {
+                        var coverageAttachments = runDataAggregator.RunContextAttachments
+                            .Where(dataCollectionAttachment => attachementUri.Equals(dataCollectionAttachment.Uri)).ToArray();
+
+                        foreach (var coverageAttachment in coverageAttachments)
+                        {
+                            runDataAggregator.RunContextAttachments.Remove(coverageAttachment);
+                        }
+
+                        ICollection<AttachmentSet> attachments = coverageHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(coverageAttachments));
+                        foreach (var attachment in attachments)
+                        {
+                            finalAttachmentSet.Add(attachment);
+                        }
+                    }
+                }
+
+                // add remaning attachments like trx.
+                foreach (var attachment in runDataAggregator.RunContextAttachments)
+                {
+                    finalAttachmentSet.Add(attachment);
+                }
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    new Collection<AttachmentSet>(attachments.ToArray()),
+                    new Collection<AttachmentSet>(finalAttachmentSet),
                     runDataAggregator.ElapsedTime);
 
                 HandleParallelTestRunComplete(completedArgs);

@@ -26,19 +26,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string MergeMethodName = "MergeCoverageFiles";
         private const string CoverageInfoTypeName = "CoverageInfo";
 
-        private static readonly string[] SupportedFileExtensions = { ".dll", ".exe" };
+        public Uri GetAttachmentUri()
+        {
+            return CodeCoverageDataCollectorUri;
+        }
 
         public ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments)
         {
-            if (dataCollectionAttachments == null)
-                return new Collection<AttachmentSet>();
-
-            var coverageAttachments = dataCollectionAttachments
-                .Where(dataCollectionAttachment => CodeCoverageDataCollectorUri.Equals(dataCollectionAttachment.Uri)).ToArray();
-
-            if (coverageAttachments.Any())
+            if (dataCollectionAttachments != null && dataCollectionAttachments.Any())
             {
-                var codeCoverageFiles = coverageAttachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
+                var codeCoverageFiles = dataCollectionAttachments.Select(coverageAttachment => coverageAttachment.Attachments[0].Uri.LocalPath).ToArray();
                 var outputFile = MergeCodeCoverageFiles(codeCoverageFiles);
                 var attachmentSet = new AttachmentSet(CodeCoverageDataCollectorUri, CoverageFriendlyName);
 
@@ -48,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     return new Collection<AttachmentSet> { attachmentSet };
                 }
                 // In case merging fails(esp in dotnet core we cannot merge), so return filtered list of Code Coverage Attachments
-                return coverageAttachments;
+                return dataCollectionAttachments;
             }
 
             return new Collection<AttachmentSet>();
@@ -61,42 +58,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
             File.Create(fileName).Dispose();
 
-            foreach (var extension in SupportedFileExtensions)
+            var assemblyPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), CodeCoverageAnalysisAssemblyName + ".dll");
+
+            try
             {
-                var assemblyPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), CodeCoverageAnalysisAssemblyName + extension);
-
-                try
-                {
-                    Assembly assembly = null;
+                Assembly assembly = null;
 #if NET46
-                    assembly = Assembly.LoadFrom(assemblyPath);
+                assembly = Assembly.LoadFrom(assemblyPath);
 #else
-                    assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+                assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
 #endif
-                    var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
+                var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
 
-                    var methodInfo = type?.GetMethod(MergeMethodName);
+                var methodInfo = type?.GetMethod(MergeMethodName);
 
-                    if (methodInfo != null)
-                    {
-                        for (int i = 1; i < files.Count; i++)
-                        {
-                            methodInfo.Invoke(null, new object[] { files[i], outputfileName, fileName, true });
-                            File.Copy(fileName, outputfileName, true);
-
-                            File.Delete(files[i]);
-                        }
-
-                        File.Delete(fileName);
-                    }
-                    return outputfileName;
-                }
-                catch (Exception ex)
+                if (methodInfo != null)
                 {
-                    if (EqtTrace.IsErrorEnabled)
+                    for (int i = 1; i < files.Count; i++)
                     {
-                        EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector of type : {0} from location : {1}. Error : ", CodeCoverageAnalysisAssemblyName, assemblyPath, ex.Message);
+                        methodInfo.Invoke(null, new object[] { files[i], outputfileName, fileName, true });
+                        File.Copy(fileName, outputfileName, true);
+
+                        File.Delete(files[i]);
                     }
+
+                    File.Delete(fileName);
+                }
+                return outputfileName;
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to load datacollector of type : {0} from location : {1}. Error : ", CodeCoverageAnalysisAssemblyName, assemblyPath, ex.Message);
                 }
             }
 

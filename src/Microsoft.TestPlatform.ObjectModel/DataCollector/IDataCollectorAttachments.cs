@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -15,5 +16,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// </summary>
         /// <returns>Gets the attachment set after Test Run Session</returns>
         ICollection<AttachmentSet> HandleDataCollectionAttachmentSets(ICollection<AttachmentSet> dataCollectionAttachments);
+
+        /// <summary>
+        /// Gets the attachment Uri, which is handled by current Collector
+        /// </summary>
+        Uri GetAttachmentUri();
     }
 }
