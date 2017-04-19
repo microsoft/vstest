@@ -100,6 +100,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
 
+            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase)
+                && targetFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
+                return;
+            }
+
             var diagLogFilePath = Path.Combine(Path.GetTempPath(), $"std_error_log_{Guid.NewGuid()}.txt");
             File.Delete(diagLogFilePath);
 
