@@ -248,7 +248,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.loadOnlyWellKnownExtensions = shouldLoadOnlyWellKnownExtensions;
 
-                IList<string> extensions = additionalExtensionsPath?.ToList();
+                List<string> extensions = additionalExtensionsPath?.ToList();
                 if (extensions == null || extensions.Count == 0)
                 {
                     return;
@@ -274,16 +274,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 // directory. The path to nuget directory is automatically setup for CLR to resolve.
                 // Test platform tries to load every extension by assembly name. If it is not resolved, we don't
                 // an error.
-                var newExtensionPaths = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
                 if (this.pathToExtensions != null)
                 {
-                    newExtensionPaths.AddRange(this.pathToExtensions);
+                    extensions.AddRange(this.pathToExtensions);
                 }
+
+                extensions = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
                 // Use the new paths and set the extensions discovered to false so that the next time 
                 // any one tries to get the additional extensions, we rediscover. 
-                this.pathToExtensions = newExtensionPaths;
+                this.pathToExtensions = extensions;
 
                 this.TestExtensions?.InvalidateCache();
 

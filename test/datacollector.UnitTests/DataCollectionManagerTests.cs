@@ -28,7 +28,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private string dataCollectorSettingsWithWrongUri, dataCollectorSettingsWithoutUri, dataCollectorSettingsEnabled, dataCollectorSettingsDisabled;
 
         private Mock<IMessageSink> mockMessageSink;
-        private Mock<IDataCollectorLoader> dataCollectorLoader;
         private Mock<DataCollector2> mockDataCollector;
         private List<KeyValuePair<string, string>> envVarList;
         private Mock<IDataCollectionAttachmentManager> mockDataCollectionAttachmentManager;
@@ -48,13 +47,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectorSettingsEnabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"true\""));
             this.dataCollectorSettingsDisabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
             this.mockMessageSink = new Mock<IMessageSink>();
-            this.dataCollectorLoader = new Mock<IDataCollectorLoader>();
-
-            this.dataCollectorLoader.Setup(x => x.Load(typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, this.mockDataCollector.Object.GetType().AssemblyQualifiedName)).Returns(this.mockDataCollector.Object);
             this.mockDataCollectionAttachmentManager = new Mock<IDataCollectionAttachmentManager>();
             this.mockDataCollectionAttachmentManager.SetReturnsDefault<List<AttachmentSet>>(new List<AttachmentSet>());
 
-            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.dataCollectorLoader.Object);
+            this.dataCollectionManager = new TestableDataCollectionManager(this.mockDataCollectionAttachmentManager.Object, this.mockMessageSink.Object, this.mockDataCollector.Object);
         }
 
         [TestMethod]
@@ -81,7 +77,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettings);
 
             Assert.IsTrue(this.dataCollectionManager.RunDataCollectors.ContainsKey(this.mockDataCollector.Object.GetType()));
-            this.dataCollectorLoader.Verify();
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Once);
         }
 
@@ -113,9 +108,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.mockDataCollector.Verify(x => x.Initialize(It.IsAny<XmlElement>(), It.IsAny<DataCollectionEvents>(), It.IsAny<DataCollectionSink>(), It.IsAny<DataCollectionLogger>(), It.IsAny<DataCollectionEnvironmentContext>()), Times.Never);
         }
 
+        [TestMethod]
         public void InitializeDataCollectorsShouldNotAddSameDataCollectorMoreThanOnce()
         {
-            var runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings + this.dataCollectorSettings);
+            var datacollecterSettings = string.Format(this.defaultDataCollectionSettings, "CustomDataCollector", "my://custom/datacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled =\"true\"");
+            var runSettings = string.Format(this.defaultRunSettings, datacollecterSettings + datacollecterSettings);
 
             this.dataCollectionManager.InitializeDataCollectors(runSettings);
 
@@ -385,8 +382,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
     internal class TestableDataCollectionManager : DataCollectionManager
     {
-        internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, IDataCollectorLoader dataCollectorLoader) : base(datacollectionAttachmentManager, messageSink, dataCollectorLoader)
+        DataCollector dataCollector;
+
+        public TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink, DataCollector dataCollector) : this(datacollectionAttachmentManager, messageSink)
         {
+            this.dataCollector = dataCollector;
+        }
+
+        internal TestableDataCollectionManager(IDataCollectionAttachmentManager datacollectionAttachmentManager, IMessageSink messageSink) : base(datacollectionAttachmentManager, messageSink)
+        {
+        }
+
+        protected override bool TryGetUriFromFriendlyName(string friendlyName, out string dataCollectorUri)
+        {
+            dataCollectorUri = "my://custom/datacollector";
+            return true;
+        }
+
+        protected override DataCollector TryGetTestExtension(string extensionUri)
+        {
+            return dataCollector;
         }
     }
 
@@ -394,6 +409,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [DataCollectorTypeUri("my://custom/datacollector")]
     public abstract class DataCollector2 : DataCollector
     {
-
     }
 }
