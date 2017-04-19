@@ -23,7 +23,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AddExtensionsShouldNotThrowIfExtensionsIsNull()
         {
-            this.testExtensions.AddExtensions(null);
+            this.testExtensions.AddExtension<TestPluginInformation>(null);
 
             // Validate that the default state does not change.
             Assert.IsNull(this.testExtensions.TestDiscoverers);
@@ -32,18 +32,16 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AddExtensionsShouldNotThrowIfExistingExtensionCollectionIsNull()
         {
-            var newTestExtensions = new TestExtensions();
-            newTestExtensions.TestDiscoverers =
-                new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
+            var testDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
 
-            newTestExtensions.TestDiscoverers.Add(
+            testDiscoverers.Add(
                 "td",
                 new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
 
-            this.testExtensions.AddExtensions(newTestExtensions);
-            
+            this.testExtensions.AddExtension<TestDiscovererPluginInformation>(testDiscoverers);
+
             Assert.IsNotNull(this.testExtensions.TestDiscoverers);
-            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers, newTestExtensions.TestDiscoverers);
+            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers, testDiscoverers);
 
             // Validate that the others remain same.
             Assert.IsNull(this.testExtensions.TestExecutors);
@@ -54,33 +52,23 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AddExtensionsShouldAddToExistingExtensionCollection()
         {
-            var newTestExtensions = new TestExtensions();
-            newTestExtensions.TestDiscoverers =
-                new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
+            var testDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
 
-            newTestExtensions.TestDiscoverers.Add(
-                "td1",
-                new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
-            newTestExtensions.TestDiscoverers.Add(
-                "td2",
-                new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
+            testDiscoverers.Add("td1", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
+            testDiscoverers.Add("td2", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
 
-            this.testExtensions.TestDiscoverers =
-                new Dictionary<string, TestDiscovererPluginInformation>();
-
-            this.testExtensions.TestDiscoverers.Add(
-                "td",
-                new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
+            this.testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>();
+            this.testExtensions.TestDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
 
             // Act.
-            this.testExtensions.AddExtensions(newTestExtensions);
+            this.testExtensions.AddExtension<TestDiscovererPluginInformation>(testDiscoverers);
 
             // Validate.
             var expectedTestExtensions = new Dictionary<string, TestDiscovererPluginInformation>();
             expectedTestExtensions.Add("td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
             expectedTestExtensions.Add("td1", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
             expectedTestExtensions.Add("td2", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
-            
+
             CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers.Keys, expectedTestExtensions.Keys);
 
             // Validate that the others remain same.
@@ -92,55 +80,24 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         [TestMethod]
         public void AddExtensionsShouldNotAddAnAlreadyExistingExtensionToTheCollection()
         {
-            var newTestExtensions = new TestExtensions();
-            newTestExtensions.TestDiscoverers =
-                new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
+            var testDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
 
-            newTestExtensions.TestDiscoverers.Add(
-                "td",
-                new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
+            testDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
 
-            this.testExtensions.TestDiscoverers =
-                new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
+            this.testExtensions.TestDiscoverers = new System.Collections.Generic.Dictionary<string, TestDiscovererPluginInformation>();
 
-            this.testExtensions.TestDiscoverers.Add(
-                "td",
-                new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
+            this.testExtensions.TestDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
 
             // Act.
-            this.testExtensions.AddExtensions(newTestExtensions);
-            
+            this.testExtensions.AddExtension<TestDiscovererPluginInformation>(testDiscoverers);
+
             // Validate.
-            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers.Keys, newTestExtensions.TestDiscoverers.Keys);
+            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers.Keys, testDiscoverers.Keys);
 
             // Validate that the others remain same.
             Assert.IsNull(this.testExtensions.TestExecutors);
             Assert.IsNull(this.testExtensions.TestSettingsProviders);
             Assert.IsNull(this.testExtensions.TestLoggers);
-        }
-
-        [TestMethod]
-        public void AddExtensionsShouldAddAllExtensions()
-        {
-            var newTestExtensions = new TestExtensions();
-            newTestExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>();
-            newTestExtensions.TestExecutors = new Dictionary<string, TestExecutorPluginInformation>();
-            newTestExtensions.TestSettingsProviders = new Dictionary<string, TestSettingsProviderPluginInformation>();
-            newTestExtensions.TestLoggers = new Dictionary<string, TestLoggerPluginInformation>();
-
-            newTestExtensions.TestDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
-            newTestExtensions.TestExecutors.Add("te", new TestExecutorPluginInformation(typeof(TestExtensionsTests)));
-            newTestExtensions.TestSettingsProviders.Add("tsp", new TestSettingsProviderPluginInformation(typeof(TestExtensionsTests)));
-            newTestExtensions.TestLoggers.Add("tl", new TestLoggerPluginInformation(typeof(TestExtensionsTests)));
-            
-            // Act.
-            this.testExtensions.AddExtensions(newTestExtensions);
-
-            // Validate.
-            CollectionAssert.AreEqual(this.testExtensions.TestDiscoverers.Keys, newTestExtensions.TestDiscoverers.Keys);
-            CollectionAssert.AreEqual(this.testExtensions.TestExecutors.Keys, newTestExtensions.TestExecutors.Keys);
-            CollectionAssert.AreEqual(this.testExtensions.TestSettingsProviders.Keys, newTestExtensions.TestSettingsProviders.Keys);
-            CollectionAssert.AreEqual(this.testExtensions.TestLoggers.Keys, newTestExtensions.TestLoggers.Keys);
         }
 
         [TestMethod]
@@ -155,7 +112,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework.Utilities
         public void GetExtensionsDiscoveredFromAssemblyShouldNotThrowIfExtensionAssemblyIsNull()
         {
             this.testExtensions.TestDiscoverers = new Dictionary<string, TestDiscovererPluginInformation>();
-            
+
             this.testExtensions.TestDiscoverers.Add("td", new TestDiscovererPluginInformation(typeof(TestExtensionsTests)));
 
             Assert.IsNull(this.testExtensions.GetExtensionsDiscoveredFromAssembly(null));

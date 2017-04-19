@@ -9,7 +9,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -34,7 +33,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
                 this.testExtensionManager.UseAdditionalExtensions(extensions, true);
 
                 Assert.IsTrue(TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
-                CollectionAssert.AreEqual(extensions, TestPluginCache.Instance.PathToAdditionalExtensions.ToList());
+                CollectionAssert.AreEqual(extensions, TestPluginCache.Instance.PathToExtensions.ToList());
             }
             finally
             {

@@ -107,7 +107,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
-        <source>Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</source>
+        <source>Could not find diagnostic data adapter of FriendlyName '{0}'</source>
         <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
         <note></note>
       </trans-unit>
@@ -147,7 +147,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
-        <source>There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</source>
+        <source>There are multiple configurations that have diagnostic data adapter FriendlyName '{0}'. Duplicate configurations will be ignored in the test run.</source>
         <target state="new">There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</target>
         <note></note>
       </trans-unit>

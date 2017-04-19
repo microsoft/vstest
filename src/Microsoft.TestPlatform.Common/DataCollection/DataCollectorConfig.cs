@@ -4,18 +4,19 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using System.Linq;
     using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
     /// <summary>
     /// The data collector config.
     /// </summary>
-    public class DataCollectorConfig
+    internal class DataCollectorConfig : TestExtensionPluginInformation
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectorConfig"/> class.
@@ -24,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// The type.
         /// </param>
         public DataCollectorConfig(Type type)
+            : base(type)
         {
             ValidateArg.NotNull(type, nameof(type));
 
@@ -47,6 +49,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </summary>
         public string FriendlyName { get; private set; }
 
+        /// <inheritdoc />
+        public override string IdentifierData
+        {
+            get
+            {
+                return this.TypeUri?.ToString();
+            }
+        }
+
+        /// <inheritdoc />
+        public override ICollection<Object> Metadata
+        {
+            get
+            {
+                return new object[] { this.TypeUri.ToString(), this.FriendlyName };
+            }
+        }
+
         /// <summary>
         /// Gets the Type Uri for the data collector.
         /// </summary>
@@ -54,24 +74,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <returns>Type Uri of the data collector.</returns>
         private static Uri GetTypeUri(Type dataCollectorType)
         {
-            DataCollectorTypeUriAttribute typeUriAttribute = null;
-            try
+            Uri typeUri = null;
+            var typeUriAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorTypeUriAttribute));
+            if (typeUriAttributes != null && typeUriAttributes.Length > 0)
             {
-                var typeUriAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorTypeUriAttribute));
-                typeUriAttribute = (DataCollectorTypeUriAttribute)typeUriAttributes[0];
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollector_TypeIsNull, dataCollectorType.FullName));
-            }
-
-            // The type uri can not be null or empty.
-            if (string.IsNullOrEmpty(typeUriAttribute.TypeUri))
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollector_TypeIsNull, dataCollectorType.FullName));
+                var typeUriAttribute = (DataCollectorTypeUriAttribute)typeUriAttributes[0];
+                if (!string.IsNullOrWhiteSpace(typeUriAttribute.TypeUri))
+                {
+                    typeUri = new Uri(typeUriAttribute.TypeUri);
+                }
             }
 
-            return new Uri(typeUriAttribute.TypeUri);
+            return typeUri;
         }
 
         /// <summary>
@@ -81,30 +95,22 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <returns>Friendly name of the data collector.</returns>
         private static string GetFriendlyName(Type dataCollectorType)
         {
-            Debug.Assert(dataCollectorType != null, "null dataCollectorType");
-
-            DataCollectorFriendlyNameAttribute friendlyNameAttribute = null;
+            string friendlyName = string.Empty;
 
             // Get the friendly name from the attribute.
-            try
+            var friendlyNameAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorFriendlyNameAttribute));
+            if (friendlyNameAttributes != null && friendlyNameAttributes.Length > 0)
             {
-                var friendlyNameAttributes = GetAttributes(dataCollectorType, typeof(DataCollectorFriendlyNameAttribute));
-                friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FriendlyNameIsNullOrEmpty, dataCollectorType.FullName));
-            }
-
-            // Verify that the friendly name provided is not null or empty.
-            if (string.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
-            {
-                throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, Resources.Resources.FriendlyNameIsNullOrEmpty, dataCollectorType.FullName));
+                var friendlyNameAttribute = (DataCollectorFriendlyNameAttribute)friendlyNameAttributes[0];
+                if (!string.IsNullOrEmpty(friendlyNameAttribute.FriendlyName))
+                {
+                    friendlyName = friendlyNameAttribute.FriendlyName;
+                }
             }
 
-            return friendlyNameAttribute.FriendlyName;
+            return friendlyName;
         }
-
+        
         /// <summary>
         /// Gets the attributes of the specified type from the data collector type.
         /// </summary>

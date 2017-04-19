@@ -68,6 +68,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// Regex pattern used to find the settings provider.
         /// </summary>
         public const string SettingsProviderRegexPattern = @".*SettingsProvider.dll";
-
     }
 }

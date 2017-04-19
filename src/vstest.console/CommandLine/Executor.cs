@@ -334,8 +334,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         private void PrintSplashScreen()
         {
-            var version = typeof(Executor).GetTypeInfo().Assembly.GetName().Version;
-            string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, version.ToString());
+            var assembly = typeof(Executor).GetTypeInfo().Assembly;
+            string assemblyVersion = string.Empty;
+
+#if NETCOREAPP1_0
+            assemblyVersion = assembly.GetName().Version.ToString();
+#else
+            assemblyVersion = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
+#endif
+            string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
 
             this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);

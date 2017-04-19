@@ -3,12 +3,13 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 {
+    using System.Collections.Generic;
+
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Manages loading and provides access to logging extensions implementing the
@@ -17,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     internal class TestLoggerExtensionManager : TestExtensionManager<ITestLogger, ITestLoggerCapabilities>
     {
         /// <summary>
-        /// Default constructor.
+        /// Initializes a new instance of the <see cref="TestLoggerExtensionManager"/> class. 
         /// </summary>
         /// <param name="unfilteredTestExtensions">
         /// The unfiltered Test Extensions.
@@ -53,12 +54,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             IEnumerable<LazyExtension<ITestLogger, ITestLoggerCapabilities>> filteredTestExtensions;
             IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions;
 
-            TestPluginManager.Instance.GetTestExtensions<ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>(
+            TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>(
+                TestPlatformConstants.TestLoggerRegexPattern,
                 out unfilteredTestExtensions,
                 out filteredTestExtensions);
 
             return new TestLoggerExtensionManager(unfilteredTestExtensions, filteredTestExtensions, messageLogger);
         }
     }
-
 }

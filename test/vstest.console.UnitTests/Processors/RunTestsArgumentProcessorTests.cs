@@ -9,12 +9,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
-    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -23,10 +23,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using vstest.console.UnitTests.Processors;
 
     using Moq;
+
+    using vstest.console.UnitTests.Processors;
 
     /// <summary>
     /// Tests for RunTestsArgumentProcessor
@@ -310,20 +310,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     {
         public TestableTestPluginCache(IFileHelper fileHelper) : base(fileHelper)
         {
-        }
-
-        public Func<IEnumerable<string>, TestExtensions> TestExtensionsSetter { get; set; }
-
-        internal override TestExtensions GetTestExtensions(IEnumerable<string> extensions)
-        {
-            if (this.TestExtensionsSetter == null)
-            {
-                return base.GetTestExtensions(extensions);
-            }
-            else
-            {
-                return this.TestExtensionsSetter.Invoke(extensions);
-            }
         }
     }
 

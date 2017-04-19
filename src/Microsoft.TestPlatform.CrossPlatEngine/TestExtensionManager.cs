@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     {
         public void UseAdditionalExtensions(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            TestPluginCache.Instance.UpdateAdditionalExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
+            TestPluginCache.Instance.UpdateExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
         }
     }
 }

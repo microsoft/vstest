@@ -16,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.1.0",
+    [System.String] $Version = "15.3.0",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -301,7 +301,7 @@ function Create-VsixPackage
     $packageDir = Get-FullCLRPackageDirectory
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-678431\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-686192\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
