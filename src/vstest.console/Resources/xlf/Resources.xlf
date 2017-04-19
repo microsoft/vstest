@@ -198,10 +198,8 @@
         <note></note>
       </trans-unit>
       <trans-unit id="Examples">
-        <source>  To run tests in the same process:
+        <source>  To run tests:
     &gt;vstest.console.exe tests.dll 
-  To run tests in a separate process:
-    &gt;vstest.console.exe /inIsolation tests.dll
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
         <note></note>

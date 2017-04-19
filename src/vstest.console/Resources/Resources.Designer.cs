@@ -504,10 +504,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to   To run tests in the same process:
-        ///    &gt;vstest.console.exe tests.dll 
-        ///  To run tests in a separate process:
-        ///    &gt;vstest.console.exe /inIsolation tests.dll
+        ///   Looks up a localized string similar to   To run tests:
+        ///    &gt;vstest.console.exe tests.dll
         ///  To run tests with additional settings such as  data collectors:
         ///    &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings.
         /// </summary>

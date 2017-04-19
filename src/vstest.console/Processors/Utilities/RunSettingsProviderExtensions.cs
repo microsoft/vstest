@@ -79,6 +79,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             return node?.InnerText;
         }
 
+        internal static XmlNode GetXmlNode(XmlDocument xmlDocument, string key)
+        {
+            var xPath = key.Replace('.', '/');
+            var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
+            return node;
+        }
+
+        internal static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string data)
+        {
+            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
+            node.InnerText = data;
+        }
+
         /// <summary>
         /// Gets the effective run settings adding the default run settings if not already present.
         /// </summary>
@@ -118,14 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
 
             return node;
-        }
-
-        private static XmlNode GetXmlNode(XmlDocument xmlDocument, string key)
-        {
-            var xPath = key.Replace('.', '/');
-            var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
-            return node;
-        }
+        }        
 
         private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider)
         {
@@ -144,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 #else
                 using (
                     var reader = XmlReader.Create(new StringReader(settingsXml),
-                        new XmlReaderSettings() {CloseInput = true, DtdProcessing = DtdProcessing.Prohibit}))
+                        new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
 #endif
                     doc.Load(reader);
@@ -160,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                         XmlReader.Create(
                             new StringReader(
                                 XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator().OuterXml),
-                            new XmlReaderSettings() {CloseInput = true, DtdProcessing = DtdProcessing.Prohibit}))
+                            new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
                     doc.Load(reader);
                 }
@@ -168,13 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
             return doc;
         }
-
-        private static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string data)
-        {
-            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
-            node.InnerText = data;
-        }
-
+         
         private static void UpdateRunSettingsXmlDocumentInnerXml(XmlDocument xmlDocument, string key, string data)
         {
             var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
