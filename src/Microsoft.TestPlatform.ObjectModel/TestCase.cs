@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private Guid defaultId = Guid.Empty;
         private Guid id;
         private string displayName;
+        private string fullyQualifiedName;
+        private string source;
 
         #region Constructor
 
@@ -90,10 +92,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (this.id == Guid.Empty)
                 {
-                    this.id = this.GetTestId();
+                    if (this.defaultId == Guid.Empty)
+                    {
+                        this.defaultId = this.GetTestId();
+                    }
+                    return this.defaultId;
                 }
 
-                return id;
+                return this.id;
             }
 
             set
@@ -108,7 +114,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string FullyQualifiedName
         {
-            get; set;
+            get
+            {
+                return this.fullyQualifiedName;
+            }
+            set
+            {
+                this.fullyQualifiedName = value;
+
+                // defaultId should be reset as it is based on FullyQualifiedName and Source.
+                this.defaultId = Guid.Empty;
+            }
         }
 
         /// <summary>
@@ -142,7 +158,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string Source
         {
-            get; set;
+            get
+            {
+                return this.source;
+            }
+            set
+            {
+                this.source = value;
+
+                // defaultId should be reset as it is based on FullyQualifiedName and Source.
+                this.defaultId = Guid.Empty;
+            }
         }
 
         /// <summary>
