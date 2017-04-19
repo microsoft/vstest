@@ -123,6 +123,21 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[7]["Value"].ToString(Formatting.None));
         }
 
+        [TestMethod]
+        public void TestCasePropertiesShouldGetRegisteredAsPartOfDeserialization()
+        {
+            TestProperty.TryUnregister("DummyProperty", out var property);
+            var json = "{\"Properties\":[{\"Key\":{\"Id\":\"TestCase.FullyQualifiedName\",\"Label\":\"FullyQualifiedName\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.String\"},\"Value\":\"a.b\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.ExecutorUri\",\"Label\":\"Executor Uri\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":1,\"ValueType\":\"System.Uri\"},\"Value\":\"uri://x\"},"
+                + "{\"Key\":{\"Id\":\"TestCase.Source\",\"Label\":\"Source\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"/tmp/a.b.dll\"},"
+                + "{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
+                + "{\"Key\":{\"Id\":\"TestObject.Traits\",\"Label\":\"Traits\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":5,\"ValueType\":\"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"},\"Value\":[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]}]}";
+
+            var test = Deserialize<TestCase>(json);
+
+            this.VerifyDummyPropertyIsRegistered();
+        }
+
         #endregion
 
         #region v2 Tests
@@ -204,6 +219,19 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
             Assert.AreEqual(@"C:\Test\TestAssembly.dll", test.Source);
         }
 
+        [TestMethod]
+        public void TestCasePropertiesShouldGetRegisteredAsPartOfDeserializationV2()
+        {
+            TestProperty.TryUnregister("DummyProperty", out var property);
+            var json = "{\"Id\": \"be78d6fc-61b0-4882-9d07-40d796fd96ce\",\"FullyQualifiedName\": \"sampleTestClass.sampleTestCase\",\"DisplayName\": \"sampleTestCase\",\"ExecutorUri\": \"executor://sampleTestExecutor\",\"Source\": \"sampleTest.dll\",\"CodeFilePath\": \"/user/src/testFile.cs\", \"LineNumber\": 999,"
+                + "\"Properties\": [{\"Key\":{\"Id\":\"DummyProperty\",\"Label\":\"DummyPropertyLabel\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"dummyString\"},"
+                + "{ \"Key\": { \"Id\": \"TestObject.Traits\", \"Label\": \"Traits\", \"Category\": \"\", \"Description\": \"\", \"Attributes\": 5, \"ValueType\": \"System.Collections.Generic.KeyValuePair`2[[System.String],[System.String]][]\"}, \"Value\": [{\"Key\": \"Priority\",\"Value\": \"0\"}, {\"Key\": \"Category\",\"Value\": \"unit\"}]}]}";
+
+            var test = Deserialize<TestCase>(json, 2);
+
+            this.VerifyDummyPropertyIsRegistered();
+        }
+
         #endregion
 
         #region Common Tests
@@ -235,6 +263,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.Serialization
         private static T Deserialize<T>(string json, int version = 1)
         {
             return JsonDataSerializer.Instance.Deserialize<T>(json, version);
+        }
+
+        private void VerifyDummyPropertyIsRegistered()
+        {
+            var dummyProperty = TestProperty.Find("DummyProperty");
+            Assert.IsNotNull(dummyProperty);
+            Assert.AreEqual("DummyPropertyLabel", dummyProperty.Label);
+            Assert.AreEqual("System.String", dummyProperty.ValueType);
         }
     }
 }
