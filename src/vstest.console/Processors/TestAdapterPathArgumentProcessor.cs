@@ -82,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         public override string CommandName => TestAdapterPathArgumentProcessor.CommandName;
 
-        public override bool AllowMultiple => false;
+        public override bool AllowMultiple => true;
 
         public override bool IsAction => false;
 
