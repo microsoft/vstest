@@ -50,7 +50,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
+            Assert.AreEqual(true, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
             Assert.AreEqual(false, capabilities.IsSpecialCommand);
         }
