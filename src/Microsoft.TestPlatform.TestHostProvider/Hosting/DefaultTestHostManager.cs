@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -51,24 +51,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
         public DefaultTestHostManager()
+            : this(new ProcessHelper())
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
-        /// <param name="architecture">Platform architecture of the host process.</param>
-        /// <param name="framework">Runtime framework for the host process.</param>
         /// <param name="processHelper">Process helper instance.</param>
-        /// <param name="shared">Share the manager for multiple sources or not</param>
-        internal DefaultTestHostManager(Architecture architecture, Framework framework, IProcessHelper processHelper, bool shared)
+        internal DefaultTestHostManager(IProcessHelper processHelper)
         {
-            this.architecture = architecture;
             this.processHelper = processHelper;
-            this.testHostProcess = null;
-
-            this.Shared = shared;
-            this.hostExitedEventRaised = false;
         }
 
         /// <inheritdoc/>
@@ -88,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Gets or sets the error length for runtime error stream.
         /// </summary>
-        protected int ErrorLength { get; set; } = 1000;
+        protected int ErrorLength { get; set; } = 4096;
 
         /// <summary>
         /// Gets or sets the Timeout for runtime to initialize.
@@ -100,10 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
         {
-            var exitCode = 0;
-            this.processHelper.TryGetExitCode(process, out exitCode);
-
-            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
+            TestHostManagerCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
         };
 
         /// <summary>
@@ -111,34 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
-            var exitCode = 0;
-            if (!string.IsNullOrEmpty(data))
-            {
-                // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                if (data.Length > this.testHostProcessStdError.MaxCapacity)
-                {
-                    this.testHostProcessStdError.Clear();
-                    data = data.Substring(data.Length - this.testHostProcessStdError.MaxCapacity);
-                }
-
-                // remove only what is required, from beginning of error stream
-                else
-                {
-                    int required = data.Length + this.testHostProcessStdError.Length - this.testHostProcessStdError.MaxCapacity;
-                    if (required > 0)
-                    {
-                        this.testHostProcessStdError.Remove(0, required);
-                    }
-                }
-
-                this.testHostProcessStdError.Append(data);
-            }
-
-            if (this.processHelper.TryGetExitCode(process, out exitCode))
-            {
-                EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
-            }
+            TestHostManagerCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data);
         };
 
         /// <inheritdoc/>
@@ -243,7 +206,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             this.messageLogger = logger;
             this.architecture = runConfiguration.TargetPlatform;
-            this.processHelper = new ProcessHelper();
             this.testHostProcess = null;
 
             this.Shared = !runConfiguration.DisableAppDomain;
