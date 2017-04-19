@@ -232,7 +232,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new CLIRunSettingsArgumentProcessor(),
                 new ResultsDirectoryArgumentProcessor(),
                 new InIsolationArgumentProcessor(), 
-                new CollectArgumentProcessor()
+                new CollectArgumentProcessor(),
+                new EnableCodeCoverageArgumentProcessor()
         };
 
         /// <summary>

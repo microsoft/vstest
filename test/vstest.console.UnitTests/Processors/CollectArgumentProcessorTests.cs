@@ -21,6 +21,7 @@ namespace vstest.console.UnitTests.Processors
         {
             this.settingsProvider = new TestableRunSettingsProvider();
             this.executor = new CollectArgumentExecutor(this.settingsProvider);
+            CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 
         [TestMethod]
@@ -45,13 +46,13 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CollectArgumentProcessorCapabilities();
 
             Assert.AreEqual("/Collect", capabilities.CommandName);
-            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\n      Enables data diagnostic adapter(s) in the test run. Default \n      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\n      Enables data diagnostic adapter in the test run. Default \n      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.CollectArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
             Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, capabilities.Priority);
 
-            Assert.AreEqual(false, capabilities.AllowMultiple);
+            Assert.AreEqual(true, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
             Assert.AreEqual(false, capabilities.IsSpecialCommand);
         }
@@ -81,7 +82,7 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldCreateEntryForDataCollectorInRunSettingsIfNotAlreadyPresent()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "<DataCollector friendlyName=\"MyDataCollector\" enabled=\"False\" />");
+            var runsettingsString = string.Format(DefaultRunSettings,"");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
@@ -114,18 +115,20 @@ namespace vstest.console.UnitTests.Processors
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
             this.executor.Initialize("MyDataCollector");
+            this.executor.Initialize("MyDataCollector2");
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
-        public void InitializeShouldEnableMultipleCollectors()
+        public void InitializeShouldEnableMultipleCollectorsWhenCalledMoreThanOnce()
         {
             var runsettingsString = string.Format(DefaultRunSettings, string.Empty);
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
-            this.executor.Initialize("MyDataCollector;MyDataCollector1");
+            this.executor.Initialize("MyDataCollector");
+            this.executor.Initialize("MyDataCollector1");
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }

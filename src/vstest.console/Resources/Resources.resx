@@ -648,7 +648,7 @@
   </data>
   <data name="CollectArgumentHelp" xml:space="preserve">
     <value>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      Enables data diagnostic adapter(s) in the test run. Default 
+      Enables data diagnostic adapter in the test run. Default 
       settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</value>
   </data>
   <data name="DataCollectorFriendlyNameInvalid" xml:space="preserve">

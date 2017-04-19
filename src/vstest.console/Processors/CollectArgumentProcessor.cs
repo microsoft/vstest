@@ -4,6 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Collections.Generic;
+
     using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -70,11 +72,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         }
     }
 
+    
     internal class CollectArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
         public override string CommandName => CollectArgumentProcessor.CommandName;
 
-        public override bool AllowMultiple => false;
+        public override bool AllowMultiple => true;
 
         public override bool IsAction => false;
 
@@ -85,15 +88,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public override HelpContentPriority HelpPriority => HelpContentPriority.CollectArgumentProcessorHelpPriority;
     }
 
+    /// <inheritdoc />
     internal class CollectArgumentExecutor : IArgumentExecutor
     {
         private IRunSettingsProvider runSettingsManager;
-
+        internal static List<string> EnabledDataCollectors = new List<string>();
         internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager)
         {
             this.runSettingsManager = runSettingsManager;
         }
 
+        /// <inheritdoc />
         public void Initialize(string argument)
         {
             // 1. Disable all other data collectors. Enable only those data collectors that are explicitely specified by user.
@@ -109,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     argument));
             }
 
-            var args = argument.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            EnabledDataCollectors.Add(argument.ToLower());
 
             var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
             if (settings == null)
@@ -125,43 +130,56 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
             else
             {
-                DisableAllDataCollectors(dataCollectionRunSettings);
+                // By default, all data collectors present in run settings are enabled, if enabled attribute is not specified.
+                // So explicitely disable those data collectors and enable those which are specified. 
+                DisableUnConfiguredDataCollectors(dataCollectionRunSettings);
             }
 
-            // Selectively enable data collectors as specified.
-            foreach (var arg in args)
-            {
-                DataCollectorSettings dataCollectorSettings = null;
-                if (DoesDataCollectorSettingsExist(arg, dataCollectionRunSettings, out dataCollectorSettings))
-                {
-                    dataCollectorSettings.IsEnabled = true;
-                }
-                else
-                {
-                    dataCollectorSettings = new DataCollectorSettings();
-                    dataCollectorSettings.FriendlyName = arg;
-                    dataCollectorSettings.IsEnabled = true;
-                    dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
-                }
-            }
+            // Add data collectors if not already present, enable if already present.
+            EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
 
             this.runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
         }
 
+        /// <inheritdoc />
         public ArgumentProcessorResult Execute()
         {
             return ArgumentProcessorResult.Success;
         }
 
-        internal void DisableAllDataCollectors(DataCollectionRunSettings dataCollectionRunSettings)
+        internal static void EnableDataCollectorUsingFriendlyName(string argument, DataCollectionRunSettings dataCollectionRunSettings)
         {
-            foreach (var dataCollectorSetting in dataCollectionRunSettings.DataCollectorSettingsList)
+            DataCollectorSettings dataCollectorSettings = null;
+
+            if (!DoesDataCollectorSettingsExist(argument, dataCollectionRunSettings, out dataCollectorSettings))
             {
-                dataCollectorSetting.IsEnabled = false;
+                dataCollectorSettings = new DataCollectorSettings();
+                dataCollectorSettings.FriendlyName = argument;
+                dataCollectorSettings.IsEnabled = true;
+                dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
+            }
+            else
+            {
+                dataCollectorSettings.IsEnabled = true;
             }
         }
 
-        internal static bool DoesDataCollectorSettingsExist(string friendlyName,
+        private static void DisableUnConfiguredDataCollectors(DataCollectionRunSettings dataCollectionRunSettings)
+        {
+            foreach (var dataCollectorSetting in dataCollectionRunSettings.DataCollectorSettingsList)
+            {
+                if (EnabledDataCollectors.Contains(dataCollectorSetting.FriendlyName.ToLower()))
+                {
+                    dataCollectorSetting.IsEnabled = true;
+                }
+                else
+                {
+                    dataCollectorSetting.IsEnabled = false;
+                }
+            }
+        }
+
+        private static bool DoesDataCollectorSettingsExist(string friendlyName,
             DataCollectionRunSettings dataCollectionRunSettings,
             out DataCollectorSettings dataCollectorSettings)
         {
