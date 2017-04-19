@@ -58,6 +58,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
 
+        public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider, string key, string xml)
+        {
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+            ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
+            ValidateArg.NotNull(xml, nameof(xml));
+
+            var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
+            runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
+        }
+
         public static string QueryRunSettingsNode(this IRunSettingsProvider runSettingsProvider, string key)
         {
             ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
@@ -162,6 +173,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 #endif
             }
             return doc;
+        }
+         
+        private static void UpdateRunSettingsXmlDocumentInnerXml(XmlDocument xmlDocument, string key, string data)
+        {
+            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
+            node.InnerXml = data;
         }
     }
 }

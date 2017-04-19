@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private string defaultDataCollectionSettings = "<DataCollector friendlyName=\"{0}\" uri=\"{1}\" assemblyQualifiedName=\"{2}\" codebase=\"{3}\" {4} />";
         private string dataCollectorSettings;
 
-        private string dataCollectorSettingsWithWrongUri, dataCollectorSettingsWithoutUri, dataCollectorSettingsEnabled, dataCollectorSettingsDisabled;
+        private string dataCollectorSettingsWithWrongUri, dataCollectorSettingsWithoutFriendlyName, dataCollectorSettingsEnabled, dataCollectorSettingsDisabled;
 
         private Mock<IMessageSink> mockMessageSink;
         private Mock<DataCollector2> mockDataCollector;
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
 
             this.dataCollectorSettings = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
             this.dataCollectorSettingsWithWrongUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, "my://custom1/datacollector", this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty));
-            this.dataCollectorSettingsWithoutUri = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, string.Empty, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("uri=\"\"", string.Empty));
+            this.dataCollectorSettingsWithoutFriendlyName = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, string.Empty, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, string.Empty).Replace("friendlyName=\"\"", string.Empty));
             this.dataCollectorSettingsEnabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"true\""));
             this.dataCollectorSettingsDisabled = string.Format(this.defaultRunSettings, string.Format(this.defaultDataCollectionSettings, friendlyName, uri, this.mockDataCollector.Object.GetType().AssemblyQualifiedName, typeof(DataCollectionManagerTests).GetTypeInfo().Assembly.Location, "enabled=\"false\""));
             this.mockMessageSink = new Mock<IMessageSink>();
@@ -121,11 +121,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void InitializeDataCollectorsShouldNotAddDataCollectorIfUriIsNotSpecifiedByDataCollector()
+        public void InitializeDataCollectorsShouldNotAddDataCollectorIfFriendlyNameIsNotSpecifiedByDataCollector()
         {
             Assert.ThrowsException<SettingsException>(() =>
             {
-                this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsWithoutUri);
+                this.dataCollectionManager.InitializeDataCollectors(this.dataCollectorSettingsWithoutFriendlyName);
             });
         }
 
