@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization
 {
     using System;
-    using System.Collections.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -100,6 +99,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
                         case "TestResult.ErrorStackTrace":
                             testResult.ErrorStackTrace = propertyData; break;
                         default:
+                            // No need to register member properties as they get registered as part of TestResultProperties class.
+                            TestProperty.Register(testProperty.Id, testProperty.Label, testProperty.GetValueType(), typeof(TestObject));
                             testResult.SetPropertyValue(testProperty, propertyData);
                             break;
                     }
