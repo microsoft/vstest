@@ -107,7 +107,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
-        <source>Could not find diagnostic data adapter of FriendlyName '{1}'</source>
+        <source>Could not find diagnostic data adapter of FriendlyName '{0}'</source>
         <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
         <note></note>
       </trans-unit>
