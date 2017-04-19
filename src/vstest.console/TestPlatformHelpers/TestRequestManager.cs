@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Xml;
 
@@ -140,6 +141,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
+            runsettings = UpdateExtensionsFolderInRunSettings(runsettings);
+
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
 
@@ -207,6 +210,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 runsettings = updatedRunsettings;
             }
+
+            runsettings = UpdateExtensionsFolderInRunSettings(runsettings);
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
@@ -343,6 +348,38 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 this.currentTestRunRequest = null;
 
                 return success;
+            }
+        }
+
+        /// <summary>
+        /// Update Extensions path folder in testadapterspaths in runsettings.
+        /// </summary>
+        /// <param name="settingsXml"></param>
+        private static string UpdateExtensionsFolderInRunSettings(string settingsXml)
+        {
+            if (string.IsNullOrWhiteSpace(settingsXml))
+            {
+                return settingsXml;
+            }
+
+            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
+
+            using (var stream = new StringReader(settingsXml))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+            {
+                var document = new XmlDocument();
+                document.Load(reader);
+
+                var tapNode = RunSettingsProviderExtensions.GetXmlNode(document, "RunConfiguration.TestAdaptersPaths");
+
+                if (tapNode != null && !string.IsNullOrWhiteSpace(tapNode.InnerText))
+                {
+                    extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
+                }
+
+                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
+
+                return document.OuterXml;
             }
         }
     }

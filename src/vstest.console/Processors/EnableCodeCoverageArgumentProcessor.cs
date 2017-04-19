@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 dataCollectionRunSettings = new DataCollectionRunSettings();
             }
 
-            CollectArgumentExecutor.EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
+            CollectArgumentExecutor.EnableDataCollectorUsingFriendlyName(FriendlyName, dataCollectionRunSettings);
 
             this.runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
         }
