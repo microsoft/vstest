@@ -468,19 +468,17 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="Examples">
-        <source>  To run tests in the same process:
+        <source>  To run tests:
     &gt;vstest.console.exe tests.dll 
-  To run tests in a separate process:
-    &gt;vstest.console.exe /inIsolation tests.dll
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="translated">  동일한 프로세스에서 테스트를 실행하려면 다음을 사용합니다.
+        <target state="new">  동일한 프로세스에서 테스트를 실행하려면 다음을 사용합니다.
     &gt;vstest.console.exe tests.dll 
   별도의 프로세스에서 테스트를 실행하려면 다음을 사용합니다.
     &gt;vstest.console.exe /inIsolation tests.dll
   데이터 수집기 등의 추가 설정을 사용하여 테스트를 실행하려면 다음을 사용합니다.
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">동일한 프로세스에서 테스트 실행:
     &gt; vstest.console.exe tests.dll는 별도 프로세스에서 테스트를 실행 합니다.
