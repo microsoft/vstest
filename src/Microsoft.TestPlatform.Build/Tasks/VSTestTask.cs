@@ -82,11 +82,17 @@ namespace Microsoft.TestPlatform.Build.Tasks
         [Required]
         public string VSTestConsolePath
         {
-            get; 
+            get;
             set;
         }
 
         public string VSTestResultsDirectory
+        {
+            get;
+            set;
+        }
+
+        public string VSTestVerbosity
         {
             get;
             set;
@@ -179,6 +185,25 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 {
                     allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(Path.GetDirectoryName(this.TestFileFullPath)));
                 }
+            }
+
+            if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) &&
+                (string.IsNullOrEmpty(this.VSTestLogger) || this.VSTestLogger.IndexOf("console", StringComparison.OrdinalIgnoreCase) < 0))
+            {
+                var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
+                var minimalTestLogging = new List<string>() { "m", "minimal" };
+
+                string vsTestVerbosity = "quiet";
+                if (normalTestLogging.Contains(this.VSTestVerbosity))
+                {
+                    vsTestVerbosity = "normal";
+                }
+                else if (minimalTestLogging.Contains(this.VSTestVerbosity))
+                {
+                    vsTestVerbosity = "minimal";
+                }
+
+                allArgs.Add("--logger:Console;Verbosity=" + vsTestVerbosity);
             }
 
             if (this.VSTestCLIRunSettings != null && this.VSTestCLIRunSettings.Length > 0)

@@ -44,5 +44,35 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue}\"", result[1]);
         }
+
+        [TestMethod]
+        public void CreateArgumentShouldSetConsoleLoggerVerbosityIfConsoleLoggerIsNotGivenInArgs()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "diag" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldNotSetConsoleLoggerVerbosityIfConsoleLoggerIsGivenInArgs()
+        {
+            var vstestTask = new VSTestTask { VSTestVerbosity = "diag" };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+            vstestTask.VSTestLogger = "Console;Verbosity=quiet";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+        }
     }
 }

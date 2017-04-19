@@ -468,19 +468,17 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="Examples">
-        <source>  To run tests in the same process:
+        <source>  To run tests:
     &gt;vstest.console.exe tests.dll 
-  To run tests in a separate process:
-    &gt;vstest.console.exe /inIsolation tests.dll
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="translated">  Для запуска тестов в том же процессе:
+        <target state="new">  Для запуска тестов в том же процессе:
     &gt;vstest.console.exe tests.dll 
   Для запуска тестов в отдельном процессе:
     &gt;vstest.console.exe /inIsolation tests.dll
   Для запуска тестов с дополнительными параметрами, например со сборщиками данных:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Для выполнения тестов в том же процессе:
     &gt; tests.dll vstest.console.exe для выполнения тестов в отдельном процессе:

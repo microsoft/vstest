@@ -253,10 +253,8 @@
     <value>Error Message:</value>
   </data>
   <data name="Examples" xml:space="preserve">
-    <value>  To run tests in the same process:
+    <value>  To run tests:
     &gt;vstest.console.exe tests.dll 
-  To run tests in a separate process:
-    &gt;vstest.console.exe /inIsolation tests.dll
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</value>
   </data>
