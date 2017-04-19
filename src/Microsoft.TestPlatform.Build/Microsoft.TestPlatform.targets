@@ -43,6 +43,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestCLIRunSettings="$(VSTestCLIRunSettings)"
       VSTestConsolePath="$(VSTestConsolePath)"
       VSTestResultsDirectory="$(VSTestResultsDirectory)"
+      VSTestVerbosity="$(VSTestVerbosity)"
     />
   </Target>
 
@@ -79,6 +80,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestCLIRunSettings = $(VSTestCLIRunSettings)" Importance="low" />
     <Message Text="VSTestResultsDirectory = $(VSTestResultsDirectory)" Importance="low" />
     <Message Text="VSTestConsolePath = $(VSTestConsolePath)" Importance="low" />
+    <Message Text="VSTestVerbosity = $(VSTestVerbosity)" Importance="low" />
   </Target>
 
 </Project>
