@@ -147,6 +147,47 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.U
         }
 
         [TestMethod]
+        public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfKeyIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNodeInnerXml(null, "<myxml/>"));
+        }
+
+        [TestMethod]
+        public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfKeyIsEmptyOrWhiteSpace()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("  ", "<myxml/>"));
+        }
+
+        [TestMethod]
+        public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfXmlIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("Key", null));
+        }
+
+        [TestMethod]
+        public void UpdateRunSettingsNodeInnerXmlShouldThrowExceptionIfRunSettingsProviderIsNull()
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => RunSettingsProviderExtensions.UpdateRunSettingsNodeInnerXml(null, "Key", "<myxml/>"));
+        }
+
+        [TestMethod]
+        public void UpdateRunSettingsNodeInnerXmlShouldAddNewKeyIfNotPresent()
+        {
+            this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> </RunConfiguration>  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("Key.Path", "<myxml>myxml</myxml>");
+
+            Assert.AreEqual("myxml", this.runSettingsProvider.QueryRunSettingsNode("Key.Path"));
+        }
+
+        [TestMethod]
+        public void UpdateRunSettingsNodeInnerXmlShouldUpdateKeyIfAlreadyPresent()
+        {
+            this.runSettingsProvider.UpdateRunSettings("<RunSettings>  <RunConfiguration> <MaxCpuCount>1</MaxCpuCount></RunConfiguration>  </RunSettings>");
+            this.runSettingsProvider.UpdateRunSettingsNodeInnerXml("RunConfiguration", "<MaxCpuCount>0</MaxCpuCount>");
+            Assert.AreEqual("0", this.runSettingsProvider.QueryRunSettingsNode("RunConfiguration.MaxCpuCount"));
+        }
+
+        [TestMethod]
         public void QueryRunSettingsNodeShouldThrowIfKeyIsNull()
         {
             Assert.ThrowsException<ArgumentNullException>(() => this.runSettingsProvider.QueryRunSettingsNode(null));

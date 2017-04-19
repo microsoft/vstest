@@ -239,7 +239,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex.Message);
+                    EqtTrace.Error("DataCollectionManager.SessionEnded: Failed to get attachments : {0}", ex);
                 }
 
                 return new Collection<AttachmentSet>(result);
@@ -303,7 +303,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments : {0}", ex.Message);
+                    EqtTrace.Error("DataCollectionManager.TestCaseEnded: Failed to get attachments : {0}", ex);
                 }
 
                 return new Collection<AttachmentSet>(result);
@@ -381,7 +381,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </param>
         private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
         {
-            var collectorTypeName = dataCollectorSettings.AssemblyQualifiedName;
             DataCollectorInformation dataCollectorInfo;
             DataCollectorConfig dataCollectorConfig;
 
@@ -400,7 +399,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
                 if (dataCollector == null)
                 {
-                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, collectorTypeName, string.Empty));
+                    this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorNotFound, dataCollectorSettings.FriendlyName));
                     return;
                 }
 
@@ -421,23 +420,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                                     this.attachmentManager,
                                                     this.events,
                                                     this.messageSink);
-
-                if (!dataCollectorInfo.DataCollectorConfig.TypeUri.Equals(dataCollectorSettings.Uri))
-                {
-                    // If the data collector was not found, send an error.
-                    this.LogWarning(string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorNotFound, dataCollectorConfig.DataCollectorType.FullName, dataCollectorSettings.Uri));
-                    return;
-                }
             }
             catch (Exception ex)
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", collectorTypeName, ex);
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while creating data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
                 }
 
                 // No data collector info, so send the error with no direct association to the collector.
-                this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, collectorTypeName, ex.Message));
+                this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.DataCollectorInitializationError, dataCollectorSettings.FriendlyName, ex));
                 return;
             }
 
@@ -454,7 +446,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (EqtTrace.IsErrorEnabled)
                 {
-                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0}: " + ex, collectorTypeName);
+                    EqtTrace.Error("DataCollectionManager.LoadAndInitialize: exception while initializing data collector {0} : {1}", dataCollectorSettings.FriendlyName, ex);
                 }
 
                 // Log error.
@@ -477,11 +469,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 if (settings.IsEnabled)
                 {
-                    if (runEnabledDataCollectors.Any(dcSettings => dcSettings.Uri.Equals(settings.Uri)
-                        || string.Equals(dcSettings.AssemblyQualifiedName, settings.AssemblyQualifiedName, StringComparison.OrdinalIgnoreCase)))
+                    if (runEnabledDataCollectors.Any(dcSettings => string.Equals(dcSettings.FriendlyName, settings.FriendlyName, StringComparison.OrdinalIgnoreCase)))
                     {
                         // If Uri or assembly qualified type name is repeated, consider data collector as duplicate and ignore it.
-                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.AssemblyQualifiedName, settings.Uri));
+                        this.LogWarning(string.Format(CultureInfo.CurrentUICulture, Resources.Resources.IgnoredDuplicateConfiguration, settings.FriendlyName));
                         continue;
                     }
 
@@ -541,7 +532,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 {
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector {1} : {2}.", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName, ex.Message);
+                        EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector {1} : {2}.", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName, ex);
                     }
                 }
             }
@@ -680,7 +671,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             {
                 foreach (var file in entry.Attachments)
                 {
-
                     EqtTrace.Verbose(
                         "Test Attachment Description: Collector:'{0}'  Uri:'{1}'  Description:'{2}' Uri:'{3}' ",
                         entry.DisplayName,
@@ -689,6 +679,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         file.Uri);
                 }
             }
-        }        
+        }
     }
 }
