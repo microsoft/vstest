@@ -94,7 +94,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void TestCaseGetPropertyValueForIdShouldReturnCorrectValue()
         {
-            var testId = new Guid("{7845816C-9CDB-37DH-9ADF-1B1C1FE01B7D}");
+            var testId = new Guid("{7845816C-9CDB-37DA-9ADF-1B1C1FE01B7D}");
             this.testCase.Id = testId;
 
             Assert.AreEqual(testId, this.testCase.GetPropertyValue(TestCaseProperties.Id));
@@ -122,7 +122,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void TestCaseSetPropertyValueForCodeFilePathShouldSetValue()
         {
             var testCodeFilePath = "C:\\temp\foo.cs";
-            this.testCase.GetPropertyValue(TestCaseProperties.CodeFilePath, testCodeFilePath;
+            this.testCase.SetPropertyValue(TestCaseProperties.CodeFilePath, testCodeFilePath);
 
             Assert.AreEqual(testCodeFilePath, this.testCase.CodeFilePath);
         }
@@ -157,7 +157,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void TestCaseSetPropertyValueForIdShouldSetValue()
         {
-            var testId = new Guid("{7845816C-9CDB-37DH-9ADF-1B1C1FE01B7D}");
+            var testId = new Guid("{7845816C-9CDB-37DA-9ADF-1B1C1FE01B7D}");
             this.testCase.SetPropertyValue(TestCaseProperties.Id, testId);
 
             Assert.AreEqual(testId, this.testCase.Id);
@@ -167,7 +167,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         public void TestCaseSetPropertyValueForLineNumberShouldSetValue()
         {
             var testLineNumber = 34;
-            this.testCase.GetPropertyValue(TestCaseProperties.LineNumber, testLineNumber);
+            this.testCase.SetPropertyValue(TestCaseProperties.LineNumber, testLineNumber);
 
             Assert.AreEqual(testLineNumber, this.testCase.LineNumber);
         }
