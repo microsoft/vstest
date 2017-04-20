@@ -20,6 +20,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <summary>
         /// Gets the attachment Uri, which is handled by current Collector
         /// </summary>
-        Uri GetAttachmentUri();
+        Uri GetExtensionUri();
     }
 }

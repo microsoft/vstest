@@ -26,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string MergeMethodName = "MergeCoverageFiles";
         private const string CoverageInfoTypeName = "CoverageInfo";
 
-        public Uri GetAttachmentUri()
+        public Uri GetExtensionUri()
         {
             return CodeCoverageDataCollectorUri;
         }

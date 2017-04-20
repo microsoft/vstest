@@ -52,12 +52,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             
             if (parallelRunComplete)
             {
-                var finalAttachmentSet = new Collection<AttachmentSet>();
-
                 // todo: use TestPluginCache to iterate over all IDataCollectorAttachments
                 {
                     var coverageHandler = new CodeCoverageDataAttachmentsHandler();
-                    Uri attachementUri = coverageHandler.GetAttachmentUri();
+                    Uri attachementUri = coverageHandler.GetExtensionUri();
                     if (attachementUri != null)
                     {
                         var coverageAttachments = runDataAggregator.RunContextAttachments
@@ -71,22 +69,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                         ICollection<AttachmentSet> attachments = coverageHandler.HandleDataCollectionAttachmentSets(new Collection<AttachmentSet>(coverageAttachments));
                         foreach (var attachment in attachments)
                         {
-                            finalAttachmentSet.Add(attachment);
+                            runDataAggregator.RunContextAttachments.Add(attachment);
                         }
                     }
-                }
-
-                // add remaning attachments like trx.
-                foreach (var attachment in runDataAggregator.RunContextAttachments)
-                {
-                    finalAttachmentSet.Add(attachment);
                 }
 
                 var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),
-                    new Collection<AttachmentSet>(finalAttachmentSet),
+                    runDataAggregator.RunContextAttachments,
                     runDataAggregator.ElapsedTime);
 
                 HandleParallelTestRunComplete(completedArgs);
