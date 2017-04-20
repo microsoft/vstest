@@ -50,12 +50,12 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.ComInterfaces.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll" />
-	  <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Common.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Resource.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" />
-      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.Common.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.ExecutionCommon.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.Resource.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
@@ -108,6 +108,7 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CoreUtilities.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.CrossPlatEngine.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.TestPlatform.Utilities.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.Common.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.exe" />
