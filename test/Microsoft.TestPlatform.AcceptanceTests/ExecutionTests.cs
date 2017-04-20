@@ -3,6 +3,8 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using System;
+    using System.IO;
     using System.Threading;
 
     using global::TestPlatform.TestUtilities;
@@ -94,16 +96,63 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NET46TargetFramework]
         [NETCORETargetFramework]
-        public void ShouldGetErrorMessageOnTesthostExitWithError(string runnerFramework, string targetFramework, string targetRuntime)
+        public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            if (this.testEnvironment.BuildConfiguration.Equals("release", StringComparison.OrdinalIgnoreCase)
+                && targetFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("On StackOverflowException testhost not exited in release configuration.");
+                return;
+            }
+
+            var diagLogFilePath = Path.Combine(Path.GetTempPath(), $"std_error_log_{Guid.NewGuid()}.txt");
+            File.Delete(diagLogFilePath);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " /tests:ExitWithStdErrorMessageTest");
+            arguments = string.Concat(arguments, " /tests:ExitWithStackoverFlow");
+            arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
+
             this.InvokeVsTest(arguments);
-            this.StdErrorContains("The active test run was aborted.");
+            var errorMessage = string.Empty;
+
+            if (targetFramework.StartsWith("netcoreapp2."))
+            {
+                errorMessage = "Process is terminating due to StackOverflowException.";
+            }
+            else
+            {
+                errorMessage = "Process is terminated due to StackOverflowException.";
+            }
+
+            FileAssert.Contains(diagLogFilePath, errorMessage);
+            this.StdErrorContains(errorMessage);
+            File.Delete(diagLogFilePath);
+        }
+
+        [CustomDataTestMethod]
+        [NET46TargetFramework]
+        [NETCORETargetFramework]
+        public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var diagLogFilePath = Path.Combine(Path.GetTempPath(), $"std_error_log_{Guid.NewGuid()}.txt");
+            File.Delete(diagLogFilePath);
+
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " /tests:ExitwithUnhandleException");
+            arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
+
+            this.InvokeVsTest(arguments);
+            var errorFirstLine = "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";
+            FileAssert.Contains(diagLogFilePath, errorFirstLine);
+            File.Delete(diagLogFilePath);
         }
     }
 }
