@@ -247,20 +247,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             switch (property.Id)
             {
-                case "TestCase.Id":
-                    return this.Id;
+                case "TestCase.CodeFilePath":
+                    return this.CodeFilePath;
+                case "TestCase.DisplayName":
+                    return this.DisplayName;
                 case "TestCase.ExecutorUri":
                     return this.ExecutorUri;
                 case "TestCase.FullyQualifiedName":
                     return this.FullyQualifiedName;
-                case "TestCase.DisplayName":
-                    return this.DisplayName;
-                case "TestCase.Source":
-                    return this.Source;
-                case "TestCase.CodeFilePath":
-                    return this.CodeFilePath;
+                case "TestCase.Id":
+                    return this.Id;
                 case "TestCase.LineNumber":
                     return this.LineNumber;
+                case "TestCase.Source":
+                    return this.Source;
             }
 
             // It is a custom test case property. Should be retrieved from the TestObject store.
@@ -276,20 +276,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             switch (property.Id)
             {
-                case "TestCase.Id":
-                    this.Id = value is Guid ? (Guid)value : Guid.Parse((string)value); return;
+                case "TestCase.CodeFilePath":
+                    this.CodeFilePath = (string)value; return;
+                case "TestCase.DisplayName":
+                    this.DisplayName = (string)value; return;
                 case "TestCase.ExecutorUri":
                     this.ExecutorUri = value as Uri ?? new Uri((string)value); return;
                 case "TestCase.FullyQualifiedName":
                     this.FullyQualifiedName = (string)value; return;
-                case "TestCase.DisplayName":
-                    this.DisplayName = (string)value; return;
-                case "TestCase.Source":
-                    this.Source = (string)value; return;
-                case "TestCase.CodeFilePath":
-                    this.CodeFilePath = (string)value; return;
+                case "TestCase.Id":
+                    this.Id = value is Guid ? (Guid)value : Guid.Parse((string)value); return;
                 case "TestCase.LineNumber":
                     this.LineNumber = (int)value; return;
+                case "TestCase.Source":
+                    this.Source = (string)value; return;
             }
 
             // It is a custom test case property. Should be set in the TestObject store.
@@ -343,11 +343,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         internal static TestProperty[] Properties { get; } =
         {
-            Id,
             CodeFilePath,
+            DisplayName,
             ExecutorUri,
             FullyQualifiedName,
-            DisplayName,
+            Id,
             LineNumber,
             Source
         };

@@ -195,22 +195,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             switch (property.Id)
             {
-                case "TestResult.DisplayName":
-                    return this.DisplayName;
                 case "TestResult.ComputerName":
                     return this.ComputerName;
-                case "TestResult.Outcome":
-                    return this.Outcome;
+                case "TestResult.DisplayName":
+                    return this.DisplayName;
                 case "TestResult.Duration":
                     return this.Duration;
-                case "TestResult.CodeFilePath":
-                    return this.StartTime;
                 case "TestResult.EndTime":
                     return this.EndTime;
                 case "TestResult.ErrorMessage":
                     return this.ErrorMessage;
                 case "TestResult.ErrorStackTrace":
                     return this.ErrorStackTrace;
+                case "TestResult.Outcome":
+                    return this.Outcome;
+                case "TestResult.StartTime":
+                    return this.StartTime;
             }
 
             return base.ProtectedGetPropertyValue(property, defaultValue);
@@ -225,22 +225,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             switch (property.Id)
             {
-                case "TestResult.DisplayName":
-                    this.DisplayName = (string)value; return;
                 case "TestResult.ComputerName":
                     this.ComputerName = (string)value; return;
-                case "TestResult.Outcome":
-                    this.Outcome = (TestOutcome)value; return;
+                case "TestResult.DisplayName":
+                    this.DisplayName = (string)value; return;
                 case "TestResult.Duration":
                     this.Duration = (TimeSpan)value; return;
-                case "TestResult.StartTime":
-                    this.StartTime = (DateTimeOffset)value; return;
                 case "TestResult.EndTime":
                     this.EndTime = (DateTimeOffset)value; return;
                 case "TestResult.ErrorMessage":
                     this.ErrorMessage = (string)value; return;
                 case "TestResult.ErrorStackTrace":
                     this.ErrorStackTrace = (string)value; return;
+                case "TestResult.Outcome":
+                    this.Outcome = (TestOutcome)value; return;
+                case "TestResult.StartTime":
+                    this.StartTime = (DateTimeOffset)value; return;
             }
             base.ProtectedSetPropertyValue(property, value);
         }
@@ -365,15 +365,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #endif
         internal static TestProperty[] Properties { get; } =
         {
-            DisplayName,
             ComputerName,
-            Outcome,
-            Duration,
             DisplayName,
-            StartTime,
+            Duration,
             EndTime,
             ErrorMessage,
-            ErrorStackTrace
+            ErrorStackTrace,
+            Outcome,
+            StartTime
         };
 
         private static bool ValidateOutcome(object value)
