@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private Guid defaultId = Guid.Empty;
         private Guid id;
         private string displayName;
+        private string fullyQualifiedName;
+        private string source;
 
         #region Constructor
 
@@ -41,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestCase"/> class. 
+        /// Initializes a new instance of the <see cref="TestCase"/> class.
         /// </summary>
         /// <param name="fullyQualifiedName">
         /// Fully qualified name of the test case.
@@ -90,10 +92,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (this.id == Guid.Empty)
                 {
-                    this.id = this.GetTestId();
+                    if (this.defaultId == Guid.Empty)
+                    {
+                        this.defaultId = this.GetTestId();
+                    }
+                    return this.defaultId;
                 }
 
-                return id;
+                return this.id;
             }
 
             set
@@ -108,7 +114,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string FullyQualifiedName
         {
-            get; set;
+            get
+            {
+                return this.fullyQualifiedName;
+            }
+            set
+            {
+                this.fullyQualifiedName = value;
+
+                // defaultId should be reset as it is based on FullyQualifiedName and Source.
+                this.defaultId = Guid.Empty;
+            }
         }
 
         /// <summary>
@@ -142,7 +158,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [DataMember]
         public string Source
         {
-            get; set;
+            get
+            {
+                return this.source;
+            }
+            set
+            {
+                this.source = value;
+
+                // defaultId should be reset as it is based on FullyQualifiedName and Source.
+                this.defaultId = Guid.Empty;
+            }
         }
 
         /// <summary>
@@ -192,9 +218,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             // To generate id hash "ExecutorUri + source + Name";
 
-            // If source is a file name then just use the filename for the identifier since the 
+            // If source is a file name then just use the filename for the identifier since the
             // file might have moved between discovery and execution (in appx mode for example)
-            // This is not elegant because the Source contents should be a black box to the framework. For example in the database adapter case this is not a file path.
+            // This is not elegant because the Source contents should be a black box to the framework.
+            // For example in the database adapter case this is not a file path.
             string source = this.Source;
 
             if (File.Exists(source))
@@ -220,20 +247,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             switch (property.Id)
             {
-                case "TestCase.Id":
-                    return this.Id;
+                case "TestCase.CodeFilePath":
+                    return this.CodeFilePath;
+                case "TestCase.DisplayName":
+                    return this.DisplayName;
                 case "TestCase.ExecutorUri":
                     return this.ExecutorUri;
                 case "TestCase.FullyQualifiedName":
                     return this.FullyQualifiedName;
-                case "TestCase.DisplayName":
-                    return this.DisplayName;
-                case "TestCase.Source":
-                    return this.Source;
-                case "TestCase.CodeFilePath":
-                    return this.CodeFilePath;
+                case "TestCase.Id":
+                    return this.Id;
                 case "TestCase.LineNumber":
                     return this.LineNumber;
+                case "TestCase.Source":
+                    return this.Source;
             }
 
             // It is a custom test case property. Should be retrieved from the TestObject store.
@@ -249,20 +276,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
             switch (property.Id)
             {
-                case "TestCase.Id":
-                    this.Id = value is Guid ? (Guid)value : Guid.Parse((string)value); return;
+                case "TestCase.CodeFilePath":
+                    this.CodeFilePath = (string)value; return;
+                case "TestCase.DisplayName":
+                    this.DisplayName = (string)value; return;
                 case "TestCase.ExecutorUri":
                     this.ExecutorUri = value as Uri ?? new Uri((string)value); return;
                 case "TestCase.FullyQualifiedName":
                     this.FullyQualifiedName = (string)value; return;
-                case "TestCase.DisplayName":
-                    this.DisplayName = (string)value; return;
-                case "TestCase.Source":
-                    this.Source = (string)value; return;
-                case "TestCase.CodeFilePath":
-                    this.CodeFilePath = (string)value; return;
+                case "TestCase.Id":
+                    this.Id = value is Guid ? (Guid)value : Guid.Parse((string)value); return;
                 case "TestCase.LineNumber":
                     this.LineNumber = (int)value; return;
+                case "TestCase.Source":
+                    this.Source = (string)value; return;
             }
 
             // It is a custom test case property. Should be set in the TestObject store.
@@ -316,11 +343,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         internal static TestProperty[] Properties { get; } =
         {
-            Id,
             CodeFilePath,
+            DisplayName,
             ExecutorUri,
             FullyQualifiedName,
-            DisplayName,
+            Id,
             LineNumber,
             Source
         };

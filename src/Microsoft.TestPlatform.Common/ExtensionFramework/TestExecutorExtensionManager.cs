@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    
+
     /// <summary>
     /// Manages the the Test Executor extensions.
     /// </summary>
@@ -67,12 +67,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                         IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions;
 
                         TestPluginManager.Instance
-                            .GetTestExtensions<ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+                            .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+                                TestPlatformConstants.TestAdapterRegexPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
-                        
+
                         testExecutorExtensionManager = new TestExecutorExtensionManager(
-                                                            unfilteredTestExtensions, testExtensions, TestSessionMessageLogger.Instance);
+                            unfilteredTestExtensions, testExtensions, TestSessionMessageLogger.Instance);
                     }
                 }
             }
@@ -95,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<ITestExecutor, ITestExecutorCapabilities>> testExtensions;
 
             TestPluginManager.Instance
-                .GetTestExtensions<ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
+                .GetTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
                     extensionAssembly,
                     out unfilteredTestExtensions,
                     out testExtensions);

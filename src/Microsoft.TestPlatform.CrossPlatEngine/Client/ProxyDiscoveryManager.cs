@@ -6,17 +6,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using System.Text.RegularExpressions;
-    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the client.
@@ -122,14 +122,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             var sourceList = sources.ToList();
             var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.DefaultExtensionPaths).ToList();
-            if (TestPluginCache.Instance.PathToAdditionalExtensions != null)
+            if (TestPluginCache.Instance.PathToExtensions != null)
             {
                 var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
-                extensions.AddRange(TestPluginCache.Instance.PathToAdditionalExtensions.Where(ext => regex.IsMatch(ext)));
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => regex.IsMatch(ext)));
             }
 
             // Only send this if needed.
-            if (extensions.Count > 0)
+            if (extensions.Count() > 0)
             {
                 this.SetupChannel(sourceList);
 

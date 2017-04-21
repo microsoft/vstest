@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -32,9 +33,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private readonly IFileHelper fileHelper;
 
         /// <summary>
-        /// Specify the path to additional extensions
+        /// Specify the path to extensions
         /// </summary>
-        private IEnumerable<string> pathToAdditionalExtensions;
+        private List<string> pathToExtensions;
 
         /// <summary>
         /// Specifies whether we should load only well known extensions or not. Default is "load all".
@@ -47,9 +48,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private AssemblyResolver assemblyResolver;
 
         /// <summary>
-        /// Lock for additional extensions update
+        /// Lock for extensions update
         /// </summary>
-        private object lockForAdditionalExtensionsUpdate;
+        private object lockForExtensionsUpdate;
 
         private static TestPluginCache instance;
 
@@ -62,13 +63,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPluginCache"/> class. 
         /// </summary>
+        /// <param name="fileHelper">
+        /// The file Helper.
+        /// </param>
         protected TestPluginCache(IFileHelper fileHelper)
         {
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
-            this.pathToAdditionalExtensions = null;
+            this.pathToExtensions = null;
             this.loadOnlyWellKnownExtensions = false;
-            this.lockForAdditionalExtensionsUpdate = new object();
+            this.lockForExtensionsUpdate = new object();
             this.fileHelper = fileHelper;
+            this.TestExtensions = null;
         }
 
         #endregion
@@ -88,30 +93,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
         }
 
-
         /// <summary>
-        /// Gets whether default extensions discovery is done.
-        /// </summary>
-        public bool AreDefaultExtensionsDiscovered
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// The test extensions discovered by the cache until now.
+        /// Gets the test extensions discovered by the cache until now.
         /// </summary>
         /// <remarks>Returns null if discovery of extensions is not done.</remarks>
         internal TestExtensions TestExtensions { get; private set; }
 
         /// <summary>
-        /// Path to additional extensions
+        /// Path to extensions
         /// </summary>
-        public IEnumerable<string> PathToAdditionalExtensions
+        public IEnumerable<string> PathToExtensions
         {
             get
             {
-                return this.pathToAdditionalExtensions;
+                return this.pathToExtensions;
             }
         }
 
@@ -131,73 +126,31 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         #region Public Methods
 
         /// <summary>
-        /// Gets the test extensions defined in the provided extension assembly.
+        /// Performs discovery of specific type of test extensions.
         /// </summary>
-        /// <param name="extensionAssembly">The extension assembly.</param>
-        /// <returns>The test extension collection defined in this assembly.</returns>
-        public TestExtensions GetTestExtensions(string extensionAssembly)
-        {
-            // Check if extensions from this assembly have already been discovered.
-            var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly(extensionAssembly);
-
-            if (extensions != null)
-            {
-                return extensions;
-            }
-
-            this.SetupAssemblyResolver(extensionAssembly);
-
-            try
-            {
-                EqtTrace.Verbose("TestPluginCache: Discovering the extensions using extension path.");
-
-                extensions = this.GetTestExtensions(new List<string> { extensionAssembly });
-
-                // Add extensions discovered to the cache.
-                if (this.TestExtensions == null)
-                {
-                    this.TestExtensions = extensions;
-                }
-                else
-                {
-                    this.TestExtensions.AddExtensions(extensions);
-                }
-
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(
-                        "TestPluginCache: Discovered extensions from '{0}'.",
-                        extensionAssembly);
-                }
-
-                this.LogExtensions();
-            }
-#if NET46
-            catch (ThreadAbortException)
-            {
-                // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
-                // being aborted as it is a legitimate exception to receive.
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("TestPluginCache.DiscoverTestExtensions: Data extension discovery is being aborted due to a thread abort.");
-                }
-            }
-#endif
-            catch (Exception e)
-            {
-                EqtTrace.Error("TestPluginCache: Discovery of extension from {0} failed! {1}", extensionAssembly, e);
-                throw;
-            }
-
-            return extensions;
-        }
-
-        /// <summary>
-        /// Performs discovery of data extensions.
-        /// </summary>
+        /// <typeparam name="TPluginInfo">
+        /// Type of Plugin info.
+        /// </typeparam>
+        /// <typeparam name="TExtension">
+        /// Type of extension.
+        /// </typeparam>
+        /// <param name="regexPattern">
+        /// The regex Pattern.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Dictionary"/>. of test plugin info.
+        /// </returns>
         [System.Security.SecurityCritical]
-        public void DiscoverAllTestExtensions()
+        public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string regexPattern)
+            where TPluginInfo : TestPluginInformation
         {
+            // Return the cached value if cache is valid.
+            if (this.TestExtensions != null && this.TestExtensions.AreTestExtensionsCached<TPluginInfo>())
+            {
+                return this.TestExtensions.GetTestExtensionCache<TPluginInfo>();
+            }
+
+            Dictionary<string, TPluginInfo> pluginInfos = null;
             this.SetupAssemblyResolver(null);
 
             // Some times TestPlatform.core.dll assembly fails to load in the current appdomain (from devenv.exe).
@@ -216,29 +169,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 // Combine all the possible extensions - both default and additional
                 var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
-                if (this.pathToAdditionalExtensions != null)
+                if (this.pathToExtensions != null)
                 {
-                    allExtensionPaths.AddRange(this.pathToAdditionalExtensions);
+                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, regexPattern);
+                    allExtensionPaths.AddRange(filteredExtensions);
                 }
 
                 // Discover the test extensions from candidate assemblies.
-                var extensions = this.GetTestExtensions(allExtensionPaths);
+                pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
 
                 if (this.TestExtensions == null)
                 {
-                    this.TestExtensions = extensions;
-                }
-                else
-                {
-                    this.TestExtensions.AddExtensions(extensions);
+                    this.TestExtensions = new TestExtensions();
                 }
 
-                this.AreDefaultExtensionsDiscovered = true;
+                this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
+
+                // Set the cache bool to true.
+                this.TestExtensions.SetTestExtensionsCacheStatus<TPluginInfo>();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    var extensionString = this.pathToAdditionalExtensions != null
-                                              ? string.Join(",", this.pathToAdditionalExtensions.ToArray())
+                    var extensionString = this.pathToExtensions != null
+                                              ? string.Join(",", this.pathToExtensions.ToArray())
                                               : null;
                     EqtTrace.Verbose(
                         "TestPluginCache: Discovered the extensions using extension path '{0}'.",
@@ -277,14 +230,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     this.resolvedAssemblies?.Clear();
                 }
             }
+
+            return pluginInfos;
         }
 
         /// <summary>
         /// Use the parameter path to extensions
         /// </summary>
-        public void UpdateAdditionalExtensions(IEnumerable<string> additionalExtensionsPath, bool shouldLoadOnlyWellKnownExtensions)
+        public void UpdateExtensions(IEnumerable<string> additionalExtensionsPath, bool shouldLoadOnlyWellKnownExtensions)
         {
-            lock (this.lockForAdditionalExtensionsUpdate)
+            lock (this.lockForExtensionsUpdate)
             {
                 EqtTrace.Verbose(
                     "TestPluginCache: Updating loadOnlyWellKnownExtensions from {0} to {1}.",
@@ -293,19 +248,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.loadOnlyWellKnownExtensions = shouldLoadOnlyWellKnownExtensions;
 
-                IList<string> extensions = additionalExtensionsPath?.ToList();
+                List<string> extensions = additionalExtensionsPath?.ToList();
                 if (extensions == null || extensions.Count == 0)
                 {
                     return;
                 }
 
                 string extensionString;
-                if (this.pathToAdditionalExtensions != null
-                    && extensions.Count == this.pathToAdditionalExtensions.Count()
-                    && extensions.All(e => this.pathToAdditionalExtensions.Contains(e)))
+                if (this.pathToExtensions != null
+                    && extensions.Count == this.pathToExtensions.Count()
+                    && extensions.All(e => this.pathToExtensions.Contains(e)))
                 {
-                    extensionString = this.pathToAdditionalExtensions != null
-                                          ? string.Join(",", this.pathToAdditionalExtensions.ToArray())
+                    extensionString = this.pathToExtensions != null
+                                          ? string.Join(",", this.pathToExtensions.ToArray())
                                           : null;
                     EqtTrace.Verbose(
                         "TestPluginCache: Ignoring the new extensions update as there is no change. Current extensions are '{0}'.",
@@ -319,31 +274,32 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 // directory. The path to nuget directory is automatically setup for CLR to resolve.
                 // Test platform tries to load every extension by assembly name. If it is not resolved, we don't
                 // an error.
-                var newExtensionPaths = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
-                if (this.pathToAdditionalExtensions != null)
+                if (this.pathToExtensions != null)
                 {
-                    newExtensionPaths.AddRange(this.pathToAdditionalExtensions);
+                    extensions.AddRange(this.pathToExtensions);
                 }
+
+                extensions = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
 
                 // Use the new paths and set the extensions discovered to false so that the next time 
                 // any one tries to get the additional extensions, we rediscover. 
-                this.pathToAdditionalExtensions = newExtensionPaths;
+                this.pathToExtensions = extensions;
 
-                this.AreDefaultExtensionsDiscovered = false;
+                this.TestExtensions?.InvalidateCache();
 
                 if (EqtTrace.IsVerboseEnabled)
                 {
                     var directories =
-                        this.pathToAdditionalExtensions.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
+                        this.pathToExtensions.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
 
                     var directoryString = directories != null ? string.Join(",", directories.ToArray()) : null;
                     EqtTrace.Verbose(
                         "TestPluginCache: Using directories for assembly resolution '{0}'.",
                         directoryString);
 
-                    extensionString = this.pathToAdditionalExtensions != null
-                                          ? string.Join(",", this.pathToAdditionalExtensions.ToArray())
+                    extensionString = this.pathToExtensions != null
+                                          ? string.Join(",", this.pathToExtensions.ToArray())
                                           : null;
                     EqtTrace.Verbose("TestPluginCache: Updated the available extensions to '{0}'.", extensionString);
                 }
@@ -393,16 +349,58 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         }
 
         /// <summary>
-        /// Gets the test extensions defined in the extension assembly list.
+        /// Get the files which match the regex pattern
         /// </summary>
-        /// <param name="extensionPaths">Extension assembly paths.</param>
-        /// <returns>List of extensions.</returns>
-        /// <remarks>Added to mock out dependency from the actual test plugin discovery as such.</remarks>
-        internal virtual TestExtensions GetTestExtensions(IEnumerable<string> extensionPaths)
+        /// <param name="extensions">
+        /// The extensions.
+        /// </param>
+        /// <param name="searchPattern">
+        /// Regex search pattern of extension.
+        /// </param>
+        /// <returns>
+        /// The list of files which match the regex pattern
+        /// </returns>
+        internal virtual List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
         {
-            var discoverer = new TestPluginDiscoverer();
+            var regex = new Regex(searchPattern, RegexOptions.IgnoreCase);
+            return extensions.Where(ext => regex.IsMatch(ext)).ToList();
+        }
 
-            return discoverer.GetTestExtensionsInformation(extensionPaths, this.loadOnlyWellKnownExtensions);
+        /// <summary>
+        /// The get test extensions.
+        /// </summary>
+        /// <param name="extensionAssembly">
+        /// The extension assembly.
+        /// </param>
+        /// <typeparam name="TPluginInfo">
+        /// Type of Test plugin info.
+        /// </typeparam>
+        /// <typeparam name="TExtension">
+        /// Type of extension.
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="Dictionary"/>.
+        /// </returns>
+        internal virtual Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(string extensionAssembly) where TPluginInfo : TestPluginInformation
+        {
+            // Check if extensions from this assembly have already been discovered.
+            var extensions = this.TestExtensions?.GetExtensionsDiscoveredFromAssembly<TPluginInfo>(this.TestExtensions.GetTestExtensionCache<TPluginInfo>(), extensionAssembly);
+
+            if (extensions != null)
+            {
+                return extensions;
+            }
+
+            var pluginInfos = this.GetTestExtensions<TPluginInfo, TExtension>(new List<string>() { extensionAssembly });
+
+            // Add extensions discovered to the cache.
+            if (this.TestExtensions == null)
+            {
+                this.TestExtensions = new TestExtensions();
+            }
+
+            this.TestExtensions.AddExtension<TPluginInfo>(pluginInfos);
+            return pluginInfos;
         }
 
         /// <summary>
@@ -435,7 +433,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         {
             var resolutionPaths = new List<string>();
 
-            var extensionDirectories = this.pathToAdditionalExtensions?.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
+            var extensionDirectories = this.pathToExtensions?.Select(e => Path.GetDirectoryName(Path.GetFullPath(e))).Distinct();
             if (extensionDirectories != null && extensionDirectories.Any())
             {
                 resolutionPaths.AddRange(extensionDirectories);
@@ -455,6 +453,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
 
             return resolutionPaths;
+        }
+
+        /// <summary>
+        /// Gets the test extensions defined in the extension assembly list.
+        /// </summary>
+        /// <typeparam name="TPluginInfo">
+        /// Type of PluginInfo.
+        /// </typeparam>
+        /// <typeparam name="TExtension">
+        /// Type of Extension.
+        /// </typeparam>
+        /// <param name="extensionPaths">
+        /// Extension assembly paths.
+        /// </param>
+        /// <returns>
+        /// List of extensions.
+        /// </returns>
+        /// <remarks>
+        /// Added to mock out dependency from the actual test plugin discovery as such.
+        /// </remarks>
+        private Dictionary<string, TPluginInfo> GetTestExtensions<TPluginInfo, TExtension>(IEnumerable<string> extensionPaths) where TPluginInfo : TestPluginInformation
+        {
+            foreach (var extensionPath in extensionPaths)
+            {
+                this.SetupAssemblyResolver(extensionPath);
+            }
+
+            var discoverer = new TestPluginDiscoverer();
+
+            return discoverer.GetTestExtensionsInformation<TPluginInfo, TExtension>(extensionPaths, this.loadOnlyWellKnownExtensions);
         }
 
         private void SetupAssemblyResolver(string extensionAssembly)

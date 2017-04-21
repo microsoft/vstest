@@ -12,7 +12,7 @@
   <!-- Static analysis dependencies -->
   <ItemGroup Condition="$(EnableCodeAnalysis) == 'true'">
     <PackageReference Include="StyleCop.Analyzers">
-      <Version>1.1.0-beta001</Version>
+      <Version>1.0.1</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>

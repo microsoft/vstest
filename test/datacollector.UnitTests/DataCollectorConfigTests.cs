@@ -32,42 +32,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         }
 
         [TestMethod]
-        public void ConstructorShouldThrowExceptionIfUriIsNotSpecifiedInDataCollector()
+        public void ConstructorShouldNotThrowExceptionIfUriIsNotSpecifiedInDataCollector()
         {
-            Assert.That.Throws<ArgumentException>(() =>
-                    {
-                        new DataCollectorConfig(typeof(CustomDataCollectorWithoutUri));
-                    })
-                    .WithMessage(string.Format(
-                            CultureInfo.CurrentCulture,
-                            Resources.Resources.DataCollector_TypeIsNull,
-                            typeof(CustomDataCollectorWithoutUri).FullName));
+            var dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollectorWithoutUri));
+            Assert.AreEqual("CustomDataCollector", dataCollectorConfig.FriendlyName);
+            Assert.IsNull(dataCollectorConfig.TypeUri);
         }
 
         [TestMethod]
-        public void ConstructorShouldThrowExceptionIfFriendlyNameIsEmpty()
+        public void ConstructorShouldNotThrowExceptionIfFriendlyNameIsEmpty()
         {
-            Assert.That.Throws<ArgumentException>(() =>
-                    {
-                        new DataCollectorConfig(typeof(CustomDataCollectorWithEmptyFriendlyName));
-                    })
-                    .WithMessage(string.Format(
-                            CultureInfo.CurrentCulture,
-                            Resources.Resources.FriendlyNameIsNullOrEmpty,
-                            typeof(CustomDataCollectorWithEmptyFriendlyName).FullName));
+            var dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollectorWithEmptyFriendlyName));
+            Assert.AreEqual("", dataCollectorConfig.FriendlyName);
+            Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri.ToString());
         }
 
         [TestMethod]
-        public void ConstructorShouldThrowExceptionIfFriendlyNameIsNotSpecified()
+        public void ConstructorShouldNotThrowExceptionIfFriendlyNameIsNotSpecified()
         {
-            Assert.That.Throws<ArgumentException>(() =>
-                    {
-                        new DataCollectorConfig(typeof(CustomDataCollectorWithoutFriendlyName));
-                    }).
-                    WithMessage(string.Format(
-                            CultureInfo.CurrentCulture,
-                            Resources.Resources.FriendlyNameIsNullOrEmpty,
-                            typeof(CustomDataCollectorWithoutFriendlyName).FullName));
+            var dataCollectorConfig = new DataCollectorConfig(typeof(CustomDataCollectorWithoutFriendlyName));
+            Assert.AreEqual("", dataCollectorConfig.FriendlyName);
+            Assert.AreEqual("my://custom/datacollector", dataCollectorConfig.TypeUri.ToString());
         }
     }
 }

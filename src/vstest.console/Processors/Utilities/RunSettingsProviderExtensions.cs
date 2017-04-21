@@ -58,6 +58,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
         }
 
+        public static void UpdateRunSettingsNodeInnerXml(this IRunSettingsProvider runSettingsProvider, string key, string xml)
+        {
+            ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
+            ValidateArg.NotNullOrWhiteSpace(key, nameof(key));
+            ValidateArg.NotNull(xml, nameof(xml));
+
+            var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
+            RunSettingsProviderExtensions.UpdateRunSettingsXmlDocumentInnerXml(xmlDocument, key, xml);
+            runSettingsProvider.UpdateRunSettings(xmlDocument.OuterXml);
+        }
+
         public static string QueryRunSettingsNode(this IRunSettingsProvider runSettingsProvider, string key)
         {
             ValidateArg.NotNull(runSettingsProvider, nameof(runSettingsProvider));
@@ -66,6 +77,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             var xmlDocument = runSettingsProvider.GetRunSettingXmlDocument();
             var node = GetXmlNode(xmlDocument, key);
             return node?.InnerText;
+        }
+
+        internal static XmlNode GetXmlNode(XmlDocument xmlDocument, string key)
+        {
+            var xPath = key.Replace('.', '/');
+            var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
+            return node;
+        }
+
+        internal static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string data)
+        {
+            var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
+            node.InnerText = data;
         }
 
         /// <summary>
@@ -107,14 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
 
             return node;
-        }
-
-        private static XmlNode GetXmlNode(XmlDocument xmlDocument, string key)
-        {
-            var xPath = key.Replace('.', '/');
-            var node = xmlDocument.SelectSingleNode(string.Format("//RunSettings/{0}", xPath));
-            return node;
-        }
+        }        
 
         private static XmlDocument GetRunSettingXmlDocument(this IRunSettingsProvider runSettingsProvider)
         {
@@ -133,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
 #else
                 using (
                     var reader = XmlReader.Create(new StringReader(settingsXml),
-                        new XmlReaderSettings() {CloseInput = true, DtdProcessing = DtdProcessing.Prohibit}))
+                        new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
 #endif
                     doc.Load(reader);
@@ -149,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
                         XmlReader.Create(
                             new StringReader(
                                 XmlRunSettingsUtilities.CreateDefaultRunSettings().CreateNavigator().OuterXml),
-                            new XmlReaderSettings() {CloseInput = true, DtdProcessing = DtdProcessing.Prohibit}))
+                            new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
                     doc.Load(reader);
                 }
@@ -157,11 +174,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
             return doc;
         }
-
-        private static void UpdateRunSettingsXmlDocument(XmlDocument xmlDocument, string key, string data)
+         
+        private static void UpdateRunSettingsXmlDocumentInnerXml(XmlDocument xmlDocument, string key, string data)
         {
             var node = GetXmlNode(xmlDocument, key) ?? RunSettingsProviderExtensions.CreateNode(xmlDocument, key);
-            node.InnerText = data;
+            node.InnerXml = data;
         }
     }
 }

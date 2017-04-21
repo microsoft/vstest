@@ -9,10 +9,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-
+    
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
     /// </summary>
@@ -45,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// <summary>
         /// LockObject to update execution status in parallel
         /// </summary>
-        private object executionStatusLockObject = new object();
+        private readonly object executionStatusLockObject = new object();
 
         #endregion
 
@@ -145,7 +146,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
                 proxyExecutionManager = CreateNewConcurrentManager();
 
-                var parallelEventsHandler = new ParallelRunEventsHandler(
+                var parallelEventsHandler = proxyExecutionManager is ProxyExecutionManagerWithDataCollection ? 
+                    new ParallelDataCollectionEventsHandler(proxyExecutionManager,
+                                                this.currentRunEventsHandler,
+                                                this,
+                                                this.currentRunDataAggregator) : 
+                    new ParallelRunEventsHandler(
                                                proxyExecutionManager,
                                                this.currentRunEventsHandler,
                                                this,
@@ -239,15 +245,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             this.currentRunDataAggregator = new ParallelRunDataAggregator();
             this.concurrentManagerHandlerMap = new Dictionary<IProxyExecutionManager, ITestRunEventsHandler>();
 
-            for (int i = 0; i < this.concurrentManagerInstances.Length; i++)
+            foreach (var concurrentManager in this.concurrentManagerInstances)
             {
-                var concurrentManager = this.concurrentManagerInstances[i];
-
-                var parallelEventsHandler = new ParallelRunEventsHandler(
-                                                concurrentManager,
-                                                runEventsHandler,
+                var parallelEventsHandler = concurrentManager is ProxyExecutionManagerWithDataCollection ? 
+                    new ParallelDataCollectionEventsHandler(concurrentManager,
+                                                this.currentRunEventsHandler,
                                                 this,
-                                                this.currentRunDataAggregator);
+                                                this.currentRunDataAggregator) : 
+                    new ParallelRunEventsHandler(
+                                               concurrentManager,
+                                               this.currentRunEventsHandler,
+                                               this,
+                                               this.currentRunDataAggregator);
+
                 this.concurrentManagerHandlerMap.Add(concurrentManager, parallelEventsHandler);
 
                 Task.Run(() => this.StartTestRunOnConcurrentManager(concurrentManager));
