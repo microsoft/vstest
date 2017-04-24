@@ -299,6 +299,7 @@ function Create-VsixPackage
     $vsixSourceDir = Join-Path $env:TP_ROOT_DIR "src\package\VSIXProject"
     $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
+    $testhostPackageDir = Join-Path $packageDir "TestHost"
 
     # Copy legacy dependencies
     $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-692152\contentFiles\any\any"
@@ -306,7 +307,7 @@ function Create-VsixPackage
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
-    Copy-Item -Recurse $comComponentsDirectory\* $packageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostPackageDir -Force
 
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force
