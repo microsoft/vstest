@@ -128,6 +128,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         EnableCodeCoverageArgumentProcessorHelpPriority,
 
         /// <summary>
+        /// CollectArgumentProcessor Help
+        /// </summary>
+        CollectArgumentProcessorHelpPriority,
+
+        /// <summary>
         /// InIsolationArgumentProcessor Help
         /// </summary>
         InIsolationArgumentProcessorHelpPriority,

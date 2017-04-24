@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyModel;
+    using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -85,7 +86,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.processHelper = processHelper;
             this.fileHelper = fileHelper;
             this.dotnetHostHelper = dotnetHostHelper;
-            this.hostExitedEventRaised = false;
         }
 
         /// <inheritdoc />
@@ -111,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <summary>
         /// Gets or sets the error length for runtime error stream.
         /// </summary>
-        protected int ErrorLength { get; set; } = 1000;
+        protected int ErrorLength { get; set; } = 4096;
 
         /// <summary>
         /// Gets or sets the Timeout for runtime to initialize.
@@ -123,10 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
         {
-            var exitCode = 0;
-            this.processHelper.TryGetExitCode(process, out exitCode);
-
-            this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
+            TestHostManagerCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
         };
 
         /// <summary>
@@ -134,43 +131,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
-            var exitCode = 0;
-            if (!string.IsNullOrEmpty(data))
-            {
-                // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                if (data.Length > this.testHostProcessStdError.MaxCapacity)
-                {
-                    this.testHostProcessStdError.Clear();
-                    data = data.Substring(data.Length - this.testHostProcessStdError.MaxCapacity);
-                }
-
-                // remove only what is required, from beginning of error stream
-                else
-                {
-                    int required = data.Length + this.testHostProcessStdError.Length - this.testHostProcessStdError.MaxCapacity;
-                    if (required > 0)
-                    {
-                        this.testHostProcessStdError.Remove(0, required);
-                    }
-                }
-
-                this.testHostProcessStdError.Append(data);
-            }
-
-            if (this.processHelper.TryGetExitCode(process, out exitCode))
-            {
-                EqtTrace.Error("Test host exited with error: {0}", this.testHostProcessStdError);
-                this.OnHostExited(new HostProviderEventArgs(this.testHostProcessStdError.ToString(), exitCode, (process as Process).Id));
-            }
+            TestHostManagerCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data);
         };
 
         /// <inheritdoc/>
         public void Initialize(IMessageLogger logger, string runsettingsXml)
         {
             this.messageLogger = logger;
-            this.processHelper = new ProcessHelper();
-            this.fileHelper = new FileHelper();
-            this.dotnetHostHelper = new DotnetHostHelper();
             this.hostExitedEventRaised = false;
         }
 
@@ -277,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> defaultExtensions)
+        public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
         {
             var sourceDirectory = Path.GetDirectoryName(sources.Single());
 

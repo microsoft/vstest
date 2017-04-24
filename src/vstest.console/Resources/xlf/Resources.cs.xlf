@@ -468,19 +468,17 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="Examples">
-        <source>  To run tests in the same process:
+        <source>  To run tests:
     &gt;vstest.console.exe tests.dll 
-  To run tests in a separate process:
-    &gt;vstest.console.exe /inIsolation tests.dll
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="translated">  Spuštění testů ve stejném procesu:
+        <target state="new">  Spuštění testů ve stejném procesu:
     &gt;vstest.console.exe tests.dll 
   Spuštění testů v samostatném procesu:
     &gt;vstest.console.exe /inIsolation tests.dll
   Spuštění testů s dalšími nastaveními, třeba s kolekcemi dat:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Chcete-li spustit testy ve stejném procesu:
     &gt; vstest.console.exe tests.dll Chcete-li spustit testy v samostatném procesu:
@@ -1532,6 +1530,18 @@
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
         <target state="new">Logging Vstest Diagnostics in file: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="CollectArgumentHelp">
+        <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
+      Enables data diagnostic adapter in the test run. Default 
+      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</source>
+        <target state="new">CollectArgumentHelp</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DataCollectorFriendlyNameInvalid">
+        <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
+        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
         <note></note>
       </trans-unit>
     </body>
