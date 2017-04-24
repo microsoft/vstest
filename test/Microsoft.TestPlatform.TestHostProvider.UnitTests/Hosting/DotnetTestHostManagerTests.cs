@@ -38,6 +38,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private readonly Mock<IFileHelper> mockFileHelper;
 
+        private readonly Mock<IMessageLogger> mockMessageLogger;
+
         private readonly TestRunnerConnectionInfo defaultConnectionInfo;
 
         private readonly string[] testSource = { "test.dll" };
@@ -48,7 +50,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestableDotnetTestHostManager dotnetHostManager;
 
         private string errorMessage;
-        private int errorLength = 20;
+        private int maxStdErrStringLength = 22;
 
         private int exitCode;
 
@@ -57,7 +59,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockTestHostLauncher = new Mock<ITestHostLauncher>();
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockFileHelper = new Mock<IFileHelper>();
-            Mock<IMessageLogger> mockLogger = new Mock<IMessageLogger>();
+            this.mockMessageLogger = new Mock<IMessageLogger>();
             this.defaultConnectionInfo = default(TestRunnerConnectionInfo);
             string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
             this.defaultTestHostPath = @"\tmp\testhost.dll";
@@ -65,7 +67,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
                                          new DotnetHostHelper(this.mockFileHelper.Object),
-                                         this.errorLength);
+                                         this.maxStdErrStringLength);
+            this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
             this.dotnetHostManager.HostExited += this.DotnetHostManagerHostExited;
 
@@ -296,7 +299,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestPlatformExtensionsShouldReturnEmptySetIfSourceDirectoryDoesNotExist()
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(false);
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, new List<string>());
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
 
             Assert.AreEqual(0, extensions.Count());
         }
@@ -306,7 +309,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.TestAdapter.dll" });
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, new List<string>());
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
 
             CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
         }
@@ -317,7 +320,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Parent directory is empty since the input source is file "test.dll"
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
             this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.dll" });
-            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, new List<string>());
+            var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, Enumerable.Empty<string>());
 
             Assert.AreEqual(0, extensions.Count());
         }
@@ -500,7 +503,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
-            Assert.AreEqual(this.errorMessage, errorData);
+            Assert.AreEqual(errorData, this.errorMessage);
+            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine));
         }
 
         [TestMethod]
@@ -511,8 +515,10 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
-            Assert.AreEqual(this.errorMessage.Length, this.errorLength);
-            Assert.AreEqual(this.errorMessage, errorData.Substring(5));
+            // Ignore new line chars
+            Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
+            Assert.AreEqual(errorData.Substring(5), this.errorMessage);
+            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine));
         }
 
         [TestMethod]
@@ -523,7 +529,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
-            Assert.AreEqual(null, this.errorMessage);
+            Assert.IsNull(this.errorMessage);
+            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine), Times.Never);
         }
 
         [TestMethod]
@@ -557,7 +564,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
         private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
         {
-            this.errorMessage = e.Data;
+            this.errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
             this.exitCode = e.ErrroCode;
         }
 
@@ -565,7 +572,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             if (e.ErrroCode != 0)
             {
-                this.errorMessage = e.Data;
+                this.errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
             }
         }
 
@@ -586,6 +593,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                         var process = Process.GetCurrentProcess();
 
                         errorCallback(process, errorMessage);
+                        exitCallback(process);
                     }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);

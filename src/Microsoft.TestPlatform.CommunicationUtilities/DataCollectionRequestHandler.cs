@@ -4,19 +4,24 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
     using System;
-    using System.Collections.ObjectModel;
+    using System.Collections.Generic;
+    using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// Handles test session events received from vstest console process.
@@ -24,13 +29,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDisposable
     {
         private const int DATACOLLECTIONCONNTIMEOUT = 15 * 1000;
+
         private static readonly object SyncObject = new object();
 
         private readonly ICommunicationManager communicationManager;
 
         private IMessageSink messageSink;
+
         private IDataCollectionManager dataCollectionManager;
+
         private IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler;
+
         private Task testCaseEventMonitorTask;
 
         /// <summary>
@@ -45,7 +54,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// The message sink.
         /// </param>
         protected DataCollectionRequestHandler(IMessageSink messageSink)
-            : this(new SocketCommunicationManager(), messageSink, DataCollectionManager.Create(messageSink), new DataCollectionTestCaseEventHandler())
+            : this(
+                new SocketCommunicationManager(),
+                messageSink,
+                DataCollectionManager.Create(messageSink),
+                new DataCollectionTestCaseEventHandler())
         {
             this.messageSink = messageSink;
         }
@@ -65,7 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <param name="dataCollectionTestCaseEventHandler">
         /// The data collection test case event handler.
         /// </param>
-        protected DataCollectionRequestHandler(ICommunicationManager communicationManager, IMessageSink messageSink, IDataCollectionManager dataCollectionManager, IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler)
+        protected DataCollectionRequestHandler(
+            ICommunicationManager communicationManager,
+            IMessageSink messageSink,
+            IDataCollectionManager dataCollectionManager,
+            IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler)
         {
             this.communicationManager = communicationManager;
             this.messageSink = messageSink;
@@ -91,7 +108,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <returns>
         /// The instance of <see cref="DataCollectionRequestHandler"/>.
         /// </returns>
-        public static DataCollectionRequestHandler Create(ICommunicationManager communicationManager, IMessageSink messageSink)
+        public static DataCollectionRequestHandler Create(
+            ICommunicationManager communicationManager,
+            IMessageSink messageSink)
         {
             if (Instance == null)
             {
@@ -102,7 +121,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                 {
                     if (Instance == null)
                     {
-                        Instance = new DataCollectionRequestHandler(communicationManager, messageSink, DataCollectionManager.Create(messageSink), new DataCollectionTestCaseEventHandler());
+                        Instance = new DataCollectionRequestHandler(
+                            communicationManager,
+                            messageSink,
+                            DataCollectionManager.Create(messageSink),
+                            new DataCollectionTestCaseEventHandler());
                     }
                 }
             }
@@ -142,6 +165,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                         // Initialize datacollectors and get enviornment variables.
                         var settingXml = message.Payload.ToObject<string>();
+                        this.AddExtensionAssemblies(settingXml);
+
                         var envVariables = this.dataCollectionManager.InitializeDataCollectors(settingXml);
                         var areTestCaseLevelEventsRequired = this.dataCollectionManager.SessionStarted();
 
@@ -156,7 +181,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                                     {
                                         try
                                         {
-                                            if (this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(DATACOLLECTIONCONNTIMEOUT))
+                                            if (
+                                                this.dataCollectionTestCaseEventHandler.WaitForRequestHandlerConnection(
+                                                    DATACOLLECTIONCONNTIMEOUT))
                                             {
                                                 this.dataCollectionTestCaseEventHandler.ProcessRequests();
                                             }
@@ -185,7 +212,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                                 this.cancellationTokenSource.Token);
                         }
 
-                        this.communicationManager.SendMessage(MessageType.BeforeTestRunStartResult, new BeforeTestRunStartResult(envVariables, testCaseEventsPort));
+                        this.communicationManager.SendMessage(
+                            MessageType.BeforeTestRunStartResult,
+                            new BeforeTestRunStartResult(envVariables, testCaseEventsPort));
                         if (EqtTrace.IsInfoEnabled)
                         {
                             EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : DataCollection started.");
@@ -223,7 +252,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         this.communicationManager.SendMessage(MessageType.AfterTestRunEndResult, attachmentsets);
                         if (EqtTrace.IsInfoEnabled)
                         {
-                            EqtTrace.Info("DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");
+                            EqtTrace.Info(
+                                "DataCollectionRequestHandler.ProcessRequests : Session End message received from server. Closing the connection.");
                         }
 
                         isSessionEnded = true;
@@ -274,6 +304,55 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         {
             this.Dispose();
             EqtTrace.Info("Closing the connection !");
+        }
+
+        /// <summary>
+        /// Update the test adapter paths provided through run settings to be used by the test plugin cache.
+        /// </summary>
+        /// <param name="runSettings">
+        /// The run Settings.
+        /// </param>
+        private void AddExtensionAssemblies(string runSettings)
+        {
+            try
+            {
+                IEnumerable<string> customTestAdaptersPaths = RunSettingsUtilities.GetTestAdaptersPaths(runSettings);
+                if (customTestAdaptersPaths != null)
+                {
+                    var fileHelper = new FileHelper();
+
+                    List<string> extensionAssemblies = new List<string>();
+                    foreach (var customTestAdaptersPath in customTestAdaptersPaths)
+                    {
+                        var adapterPath =
+                            Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
+                        if (!fileHelper.DirectoryExists(adapterPath))
+                        {
+                            EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                            continue;
+                        }
+
+                        extensionAssemblies.AddRange(
+                            fileHelper.EnumerateFiles(
+                                adapterPath,
+                                TestPlatformConstants.DataCollectorRegexPattern,
+                                SearchOption.AllDirectories));
+                    }
+
+                    if (extensionAssemblies.Count > 0)
+                    {
+                        TestPluginCache.Instance.UpdateExtensions(extensionAssemblies, true);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                // If any exception is throuwn while updating additional assemblies, log the exception in eqt trace.
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("DataCollectionRequestHandler.AddExtensionAssemblies: Exception occured: {0}", e);
+                }
+            }
         }
     }
 }

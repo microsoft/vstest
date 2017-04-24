@@ -6,6 +6,7 @@ namespace SampleUnitTestProject3
     using System;
     using System.IO;
     using System.Reflection;
+    using System.Threading;
 
     [TestClass]
     public class UnitTest1
@@ -17,10 +18,18 @@ namespace SampleUnitTestProject3
         }
 
         [TestMethod]
-        public void ExitWithStdErrorMessageTest()
+        public void ExitwithUnhandleException()
         {
-            Console.Error.WriteLine("Std Error Message");
-            Environment.Exit(1);
+            Action fail = () => throw new InvalidOperationException();
+            var thread = new Thread(new ThreadStart(fail));
+            thread.Start();
+            thread.Join();
+        }
+
+        [TestMethod]
+        public void ExitWithStackoverFlow()
+        {
+            ExitWithStackoverFlow();
         }
     }
 }

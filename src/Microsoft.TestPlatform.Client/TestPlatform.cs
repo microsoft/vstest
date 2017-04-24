@@ -112,7 +112,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 throw new ArgumentNullException(nameof(testRunCriteria));
             }
 
-            // Update cache with Extension Folder's files
             this.AddExtensionAssemblies(testRunCriteria.TestRunSettings);
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
@@ -201,8 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// </param>
         private void AddExtensionAssembliesFromSource(TestRunCriteria testRunCriteria)
         {
-            // Find source directories
-            var sources = testRunCriteria.Sources;
+            IEnumerable<string> sources = testRunCriteria.Sources;
             if (testRunCriteria.HasSpecificTests)
             {
                 // If the test execution is with a test filter, group them by sources
@@ -211,6 +209,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
 
             // Currently we support discovering loggers only from Source directory
             var loggersToUpdate = new List<string>();
+
             foreach (var source in sources)
             {
                 var sourceDirectory = Path.GetDirectoryName(source);

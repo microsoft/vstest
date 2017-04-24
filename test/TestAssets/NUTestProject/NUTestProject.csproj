@@ -4,16 +4,23 @@
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
     <AssemblyName>NUTestProject</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
     <PackageReference Include="NUnit">
       <Version>$(NUnitFrameworkVersion)</Version>
     </PackageReference>
     <PackageReference Include="NUnitTestAdapter">
       <Version>$(NUnitAdapterVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Allow build in unix machines -->
+  <ItemGroup Condition="'$(TargetFramework)' != 'net46'">
+    <PackageReference Include="NUnit">
+      <Version>$(NUnit3FrameworkVersion)</Version>
     </PackageReference>
   </ItemGroup>
 </Project>
