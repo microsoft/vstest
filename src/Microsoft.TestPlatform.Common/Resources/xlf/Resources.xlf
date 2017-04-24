@@ -92,7 +92,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
-        <source>Data collector '{0}'  threw an exception during type loading, construction, or initialization: {1}.</source>
+        <source>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</source>
         <target state="new">The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</target>
         <note></note>
       </trans-unit>

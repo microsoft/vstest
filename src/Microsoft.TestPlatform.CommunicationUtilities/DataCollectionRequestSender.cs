@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         private void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler requestHandler)
         {
             string logMessage;
-            if (dataCollectionMessageEventArgs.Uri == null)
+            if (string.IsNullOrWhiteSpace(dataCollectionMessageEventArgs.FriendlyName))
             {
                 // Message from data collection framework.
                 logMessage = string.Format(CultureInfo.CurrentCulture, CommonResources.DataCollectionMessageFormat, dataCollectionMessageEventArgs.Message);

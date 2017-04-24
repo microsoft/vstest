@@ -124,7 +124,7 @@
     <value>Data collector '{0}' failed to provide intialization information. Error: {1}</value>
   </data>
   <data name="DataCollectorInitializationError" xml:space="preserve">
-    <value>Data collector '{0}'  threw an exception during type loading, construction, or initialization: {1}.</value>
+    <value>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</value>
   </data>
   <data name="DataCollectorMessageFormat" xml:space="preserve">
     <value>Data collector '{0}' message: {1}.</value>
