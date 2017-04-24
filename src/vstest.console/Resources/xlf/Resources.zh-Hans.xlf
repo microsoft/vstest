@@ -275,9 +275,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="HelpUsageText">
-        <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]]</source>
-        <target state="translated">用法: vstest.console.exe [参数] [选项] [[--] &lt;args&gt;...]]</target>
-        <note />
+        <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
+        <target state="new">用法: vstest.console.exe [参数] [选项] [[--] &lt;args&gt;...]]</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">用法︰ vstest.console.exe [参数] [选项]</target>
         </alt-trans>
@@ -1486,11 +1486,13 @@
         <note />
       </trans-unit>
       <trans-unit id="CLIRunSettingsArgumentHelp">
-        <source>Args:
-      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</source>
-        <target state="translated">参数:
+        <source>RunSettings arguments:
+      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
+      Use a space to separate multiple [name]=[value].
+      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
+        <target state="new">参数:
       指应传递到适配器的任何多余参数。可以用形式为 &lt;n&gt;=&lt;v&gt; 的名称-值对指定参数，其中 &lt;n&gt; 是参数名称，&lt;v&gt; 是参数值。请使用空格来分隔多个参数。</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
