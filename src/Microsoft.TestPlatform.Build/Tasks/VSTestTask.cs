@@ -98,6 +98,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string[] VSTestCollect
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -212,6 +218,14 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 foreach (var arg in this.VSTestCLIRunSettings)
                 {
                     allArgs.Add(this.AddDoubleQuotes(arg));
+                }
+            }
+
+            if(this.VSTestCollect != null && this.VSTestCollect.Length > 0)
+            {
+                foreach(var arg in this.VSTestCollect)
+                {
+                    allArgs.Add("--collect:" + arg);
                 }
             }
 
