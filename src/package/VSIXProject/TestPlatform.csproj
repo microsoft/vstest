@@ -92,13 +92,6 @@
       <VSIXSubPath>zh-Hant</VSIXSubPath>
     </VsixSourceItem>
 
-    <VsixSourceItem Include="$(VsixInputFileLocation)\ComComponents\x64\*.*">
-      <VSIXSubPath>ComComponents\x64</VSIXSubPath>
-    </VsixSourceItem>
-    <VsixSourceItem Include="$(VsixInputFileLocation)\ComComponents\x86\*.*">
-      <VSIXSubPath>ComComponents\x86</VSIXSubPath>
-    </VsixSourceItem>
-
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\*.*" Exclude="$(VsixInputFileLocation)\Extensions\*.pdb">
       <VSIXSubPath>Extensions</VSIXSubPath>
     </VsixSourceItem>
@@ -106,6 +99,18 @@
       <VSIXSubPath>Extensions\CppUnitFramework</VSIXSubPath>
     </VsixSourceItem>
 
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\ComComponents\x64\*.*">
+      <VSIXSubPath>TestHost\ComComponents\x64</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\ComComponents\x86\*.*">
+      <VSIXSubPath>TestHost\ComComponents\x86</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\TestPlatform.ObjectModel.manifest">
+      <VSIXSubPath>TestHost</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\TestPlatform.ObjectModel.x86.manifest">
+      <VSIXSubPath>TestHost</VSIXSubPath>
+    </VsixSourceItem>
     <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\*.*" Exclude="$(VsixInputFileLocation)\TestHost\*.pdb" >
       <VSIXSubPath>TestHost</VSIXSubPath>
     </VsixSourceItem>
