@@ -53,7 +53,7 @@ while [ $# -gt 0 ]; do
             PROJECT_NAME_PATTERNS=$2
             ;;
         -verbose)
-            VERBOSE=$2
+            VERBOSE=true
             ;;
         *)
             break
@@ -141,7 +141,7 @@ function install_cli()
     local remote_path="https://raw.githubusercontent.com/dotnet/cli/master/scripts/obtain/dotnet-install.sh"
 
     log "Installing dotnet cli..."
-    start=$SECONDS
+    local start=$SECONDS
 
     # Install the latest version of dotnet-cli
     curl --retry 10 -sSL --create-dirs -o $install_script $remote_path || failed=true
@@ -171,7 +171,7 @@ function restore_package()
     local dotnet=$(_get_dotnet_path)
 
     log "restore_package: Start restoring packages to $TP_PACKAGES_DIR."
-    start=$SECONDS
+    local start=$SECONDS
 
     log ".. .. Restore: Source: $TPB_Solution"
     $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror || failed=true
@@ -196,7 +196,7 @@ function invoke_build()
     local dotnet=$(_get_dotnet_path)
 
     log "invoke_build: Start build."
-    start=$SECONDS
+    local start=$SECONDS
     log ".. .. Build: Source: $TPB_Solution"
     
     if $TPB_HasMono; then
@@ -254,7 +254,7 @@ function publish_package()
     local dotnet=$(_get_dotnet_path)
 
     log "publish_package: Started."
-    start=$SECONDS
+    local start=$SECONDS
     
     coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
     
@@ -318,7 +318,7 @@ function publishplatformatbstractions()
 {
     log "Publish-PlatfromAbstractions-Internal: Started."
     
-    start=$SECONDS
+    local start=$SECONDS
     coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
     
     platformAbstraction="$TP_ROOT_DIR/src/Microsoft.TestPlatform.PlatformAbstractions/bin/$TPB_Configuration"
@@ -334,7 +334,7 @@ function create_package()
     local failed=false
     local dotnet=$(_get_dotnet_path)
 
-    start=$SECONDS
+    local start=$SECONDS
     log "Create-NugetPackages: Started."
     stagingDir="$TP_OUT_DIR/$TPB_Configuration"
     packageOutputDir="$TP_OUT_DIR/$TPB_Configuration/packages"
