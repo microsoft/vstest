@@ -105,12 +105,6 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\ComComponents\x86\*.*">
       <VSIXSubPath>TestHost\ComComponents\x86</VSIXSubPath>
     </VsixSourceItem>
-    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\TestPlatform.ObjectModel.manifest">
-      <VSIXSubPath>TestHost</VSIXSubPath>
-    </VsixSourceItem>
-    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\TestPlatform.ObjectModel.x86.manifest">
-      <VSIXSubPath>TestHost</VSIXSubPath>
-    </VsixSourceItem>
     <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\*.*" Exclude="$(VsixInputFileLocation)\TestHost\*.pdb" >
       <VSIXSubPath>TestHost</VSIXSubPath>
     </VsixSourceItem>
