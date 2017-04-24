@@ -21,18 +21,18 @@
     </header>
     <body>
       <trans-unit id="DataCollectionMessageFormat">
-        <source>Diagnostic data adapter message: {0}</source>
-        <target state="translated">診斷資料配接器訊息: {0}</target>
-        <note />
+        <source>Data collection : {0}</source>
+        <target state="new">診斷資料配接器訊息: {0}</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">诊断数据适配器消息︰ {0}</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="5" adjWordcount="4.25" curWordcount="4.25"</note>
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
-        <source>Diagnostic data adapter ('{0}') message: {1}.</source>
-        <target state="translated">診斷資料配接器 ('{0}') 訊息: {1}。</target>
-        <note />
+        <source>Data collector '{0}' message: {1}.</source>
+        <target state="new">診斷資料配接器 ('{0}') 訊息: {1}。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">诊断数据适配器 ("{0}) 消息︰ {1}。</target>
         </alt-trans>
@@ -209,73 +209,33 @@
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
-      <trans-unit id="AttributeRetrievalError">
-        <source>An error occurred while retrieving the attributes for the diagnostic data adapter of type '{0}'.</source>
-        <target state="new">An error occurred while retrieving the attributes for the diagnostic data adapter of type '{0}'.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="DataCollectorAssemblyNotFound">
-        <source>Could not find diagnostic data adapter '{0}'.  Make sure diagnostic data adapter is installed and try again.</source>
-        <target state="new">Could not find diagnostic data adapter '{0}'.  Make sure diagnostic data adapter is installed and try again.</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
-        <source>Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</source>
+        <source>Data collector '{0}' failed to provide intialization information. Error: {1}</source>
         <target state="new">Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
-        <source>The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</source>
+        <source>Data collector '{0}'  threw an exception during type loading, construction, or initialization: {1}.</source>
         <target state="new">The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
-        <source>Could not find diagnostic data adapter of FriendlyName '{0}'</source>
+        <source>Could not find data collector '{0}'</source>
         <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorRequestedDuplicateEnvironmentVariable">
-        <source>The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</source>
+        <source>The data collector '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another data collector '{3}' has already requested same environment variable with different value '{4}'.</source>
         <target state="new">The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="DataCollectorRequiredAttributeMissing">
-        <source>The required diagnostic data adapter attribute '{0}' is missing for the diagnostic data adapter of type '{1}'.</source>
-        <target state="new">The required diagnostic data adapter attribute '{0}' is missing for the diagnostic data adapter of type '{1}'.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="DataCollectorTypeNotFound">
-        <source>Failed to get type for diagnostic data adapter '{0}'. Error: {1}.</source>
-        <target state="new">Failed to get type for diagnostic data adapter '{0}'. Error: {1}.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="DataCollectorTypeUriFormatInvalid">
-        <source>Invalid URI format. The URI '{0}' provided for the diagnostic data adapter of type '{1}' is not a valid URI.</source>
-        <target state="new">Invalid URI format. The URI '{0}' provided for the diagnostic data adapter of type '{1}' is not a valid URI.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="DataCollectorUnsupportedMessageType">
-        <source>Sending message of Message Type '{0}' is not supported.</source>
-        <target state="new">Sending message of Message Type '{0}' is not supported.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="DataCollector_TypeIsNull">
-        <source>Diagnostic data adapter type URI cannot be null or empty. The type URI for the diagnostic data adapter of type '{0}' is null or empty.</source>
-        <target state="new">Diagnostic data adapter type URI cannot be null or empty. The type URI for the diagnostic data adapter of type '{0}' is null or empty.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="FriendlyNameIsNullOrEmpty">
-        <source>Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type '{0}' is null or empty.</source>
-        <target state="new">Diagnostic data adapter friendly names cannot be null or empty. The friendly name for the diagnostic data adapter of type '{0}' is null or empty.</target>
-        <note></note>
-      </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
-        <source>There are multiple configurations that have diagnostic data adapter FriendlyName '{0}'. Duplicate configurations will be ignored in the test run.</source>
+        <source>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</source>
         <target state="new">There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</target>
         <note></note>
       </trans-unit>
       <trans-unit id="ReportDataCollectorException">
-        <source>Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</source>
+        <source>Data collector caught an exception of type '{0}': '{1}'. More details: {2}.</source>
         <target state="new">Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</target>
         <note></note>
       </trans-unit>

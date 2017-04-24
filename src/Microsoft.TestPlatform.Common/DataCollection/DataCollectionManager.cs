@@ -562,15 +562,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 {
                     unloadedAnyCollector = true;
 
-                    var dataCollectorType = dataCollectorInfo.DataCollector.GetType();
+                    var friendlyName = dataCollectorInfo.DataCollectorConfig.FriendlyName;
                     failedCollectors.Add(dataCollectorInfo);
                     dataCollectorInfo.Logger.LogError(
                         this.dataCollectionEnvironmentContext.SessionDataCollectionContext,
-                        string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorErrorOnGetVariable, dataCollectorType, ex.ToString()));
+                        string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorErrorOnGetVariable, friendlyName, ex));
 
                     if (EqtTrace.IsErrorEnabled)
                     {
-                        EqtTrace.Error("DataCollectionManager.GetEnvironmentVariables: Failed to get variable for Collector '{0}': {1}", dataCollectorType, ex);
+                        EqtTrace.Error("DataCollectionManager.GetEnvironmentVariables: Failed to get variable for Collector '{0}': {1}", friendlyName, ex);
                     }
                 }
             }

@@ -223,8 +223,7 @@
   </data>
   <data name="EnableCodeCoverageArgumentProcessorHelp" xml:space="preserve">
     <value>/EnableCodeCoverage
-      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
-      settings are used if not specified using settings file.</value>
+      Enables data collector 'CodeCoverage' for the test run.</value>
   </data>
   <data name="EnableDiagUsage" xml:space="preserve">
     <value>--Diag|/Diag:&lt;Path to log file&gt;
@@ -646,8 +645,7 @@
   </data>
   <data name="CollectArgumentHelp" xml:space="preserve">
     <value>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      Enables data diagnostic adapter in the test run. Default 
-      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</value>
+      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</value>
   </data>
   <data name="DataCollectorFriendlyNameInvalid" xml:space="preserve">
     <value>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</value>
