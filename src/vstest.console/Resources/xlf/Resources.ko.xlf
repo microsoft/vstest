@@ -944,12 +944,11 @@
       </trans-unit>
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
-      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
-      settings are used if not specified using settings file.</source>
-        <target state="translated">/EnableCodeCoverage
+      Enables data collector 'CodeCoverage' for the test run.</source>
+        <target state="new">/EnableCodeCoverage
       테스트 실행에서 데이터 진단 어댑터 'CodeCoverage'를 사용하도록 설정합니다. 설정 파일을 
       사용하여 지정하지 않는 경우 기본 설정이 사용됩니다.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       테스트 실행에서 데이터 진단 어댑터 'CodeCoverage' 수 있습니다. 기본 설정을 사용 하는 설정 파일을 사용 하 여 지정 하지 않으면.</target>
@@ -1536,8 +1535,7 @@
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      Enables data diagnostic adapter in the test run. Default 
-      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</source>
+      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
         <target state="new">CollectArgumentHelp</target>
         <note></note>
       </trans-unit>

@@ -944,12 +944,11 @@
       </trans-unit>
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
-      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
-      settings are used if not specified using settings file.</source>
-        <target state="translated">/EnableCodeCoverage
+      Enables data collector 'CodeCoverage' for the test run.</source>
+        <target state="new">/EnableCodeCoverage
       Active l'adaptateur de données de diagnostic 'CodeCoverage' dans la série de tests. Les paramètres par défaut 
       sont utilisés s'ils ne sont pas spécifiés à l'aide du fichier de paramètres.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Permet l’adaptateur de diagnostic de données « CodeCoverage » dans la série de tests. Paramètres par défaut sont utilisées si elle n’est pas spécifié à l’aide du fichier de paramètres.</target>
@@ -1536,8 +1535,7 @@
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      Enables data diagnostic adapter in the test run. Default 
-      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</source>
+      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
         <target state="new">CollectArgumentHelp</target>
         <note></note>
       </trans-unit>

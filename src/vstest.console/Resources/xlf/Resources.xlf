@@ -399,8 +399,7 @@
       </trans-unit>
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
-      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
-      settings are used if not specified using settings file.</source>
+      Enables data collector 'CodeCoverage' for the test run.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="InvalidEnableCodeCoverageCommand">
@@ -686,8 +685,7 @@ More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-ar
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      Enables data diagnostic adapter in the test run. Default 
-      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</source>
+      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
         <target state="new">CollectArgumentHelp</target>
         <note></note>
       </trans-unit>
