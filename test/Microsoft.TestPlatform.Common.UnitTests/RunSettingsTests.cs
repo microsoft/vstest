@@ -204,7 +204,7 @@ namespace TestPlatform.Common.UnitTests
 
             Assert.IsNotNull(receivedWarningMessage);
             Assert.AreEqual(
-                "Duplicated run settings section named 'RunConfiguration' found.  Ignoring the duplicate settings.",
+                "Duplicate run settings section named 'RunConfiguration' found.  Ignoring the duplicate settings.",
                 receivedWarningMessage);
         }
 
