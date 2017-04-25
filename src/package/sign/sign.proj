@@ -56,6 +56,14 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.Resource.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
+
+      <!-- DataCollector related dlls -->
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.IntelliTrace.Core.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Coverage.Analysis.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Coverage.Interop.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Diagnostics.Utilities.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.VisualStudio.Enterprise.AspNetHelper.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TraceCollector.dll" />
     </ItemGroup>
 
     <!-- Sign test platform v2 assemblies for .NET 4.6-->
