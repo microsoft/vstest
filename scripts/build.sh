@@ -89,8 +89,7 @@ TPB_Solution="TestPlatform.sln"
 TPB_TargetFrameworkCore="netcoreapp2.0"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
-TPB_Version=$VERSION
-TPB_VersionSuffix=$VERSION_SUFFIX
+TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo "$VERSION-$VERSION_SUFFIX")
 TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
@@ -156,7 +155,7 @@ function install_cli()
 
     # Get netcoreapp1.1 shared components
     log "install_cli: Get the shared netcoreapp1.0 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.4" --shared-runtime
+    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5-servicing-004880-00" --shared-runtime
     log "install_cli: Get the shared netcoreapp1.1 runtime..."
     $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.1" --shared-runtime
 
@@ -365,8 +364,8 @@ function create_package()
 
 
     for i in ${projectFiles[@]}; do
-        log "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version-$TPB_VersionSuffix" \
-        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version-$TPB_VersionSuffix
+        log "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
+        && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
     done
 
     log "Create-NugetPackages: Elapsed $(( SECONDS - start ))s."
