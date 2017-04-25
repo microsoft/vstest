@@ -139,6 +139,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="reader">
         /// The reader.
         /// </param>
+        /// <param name="framework"></param>
+        /// <param name="architecture"></param>
         /// <returns>
         /// The <see cref="InProcDataCollectorSettings"/>.
         /// </returns>
@@ -147,11 +149,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </exception>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        internal static DataCollectorSettings FromXml(XmlReader reader)
+        internal static DataCollectorSettings FromXml(XmlReader reader, Framework framework, Architecture architecture)
         {
             DataCollectorSettings settings = new DataCollectorSettings();
             settings.IsEnabled = true;
             bool empty = reader.IsEmptyElement;
+            string dataCollectorType = reader.Name;
+
             if (reader.HasAttributes)
             {
                 while (reader.MoveToNextAttribute())
@@ -210,6 +214,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlDocument doc = new XmlDocument();
                             XmlElement element = doc.CreateElement("Configuration");
                             element.InnerXml = reader.ReadInnerXml();
+
+                            // do not additional settings to InProcDataCollector, it might break LUT
+                            if (!dataCollectorType.Equals(Constants.InProcDataCollectorSettingName,
+                                StringComparison.OrdinalIgnoreCase))
+                            {
+                                // Add Framework config, since it could be required by DataCollector, to determine whether they support this Framework or not
+                                if (framework != null)
+                                {
+                                    AppendChildNodeOrInnerText(doc, element, "Framework", "", framework.Name);
+                                }
+
+                                // Add Architecture configuration, since native binaries are Architecture specific, & datacollectors might need this information
+                                // to load appropriate native dll.
+                                AppendChildNodeOrInnerText(doc, element, "Architecture", "", architecture.ToString());
+                            }
+
                             settings.Configuration = element;
                             break;
 
@@ -225,6 +245,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 reader.ReadEndElement();
             }
             return settings;
+        }
+
+        private static void AppendChildNodeOrInnerText(XmlDocument doc, XmlElement owner, string elementName, string nameSpaceUri, string innerText)
+        {
+            var node = owner.SelectSingleNode(elementName) ?? doc.CreateNode("element", elementName, nameSpaceUri);
+            node.InnerText = innerText;
+            owner.AppendChild(node);
         }
 
         private static void AppendAttribute(XmlDocument doc, XmlElement owner, string attributeName, string attributeValue)

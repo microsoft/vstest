@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
 namespace vstest.console.UnitTests.Processors
 {
     using System;
@@ -15,8 +18,10 @@ namespace vstest.console.UnitTests.Processors
     {
         private TestableRunSettingsProvider settingsProvider;
         private CollectArgumentExecutor executor;
+        private Architecture architecture;
+        private Framework frameWork;
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
-
+        
         public CollectArgumentProcessorTests()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
@@ -46,7 +51,7 @@ namespace vstest.console.UnitTests.Processors
             var capabilities = new CollectArgumentProcessorCapabilities();
 
             Assert.AreEqual("/Collect", capabilities.CommandName);
-            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\n      Enables data diagnostic adapter in the test run. Default \n      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName);
+            Assert.AreEqual("--Collect|/Collect:<DataCollector FriendlyName>\n      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect", capabilities.HelpContentResourceName);
 
             Assert.AreEqual(HelpContentPriority.CollectArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(false, capabilities.IsAction);
@@ -89,8 +94,14 @@ namespace vstest.console.UnitTests.Processors
 
             this.executor.Initialize("MyDataCollector");
 
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -103,7 +114,13 @@ namespace vstest.console.UnitTests.Processors
 
             this.executor.Initialize("MyDataCollector");
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -117,7 +134,13 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("MyDataCollector");
             this.executor.Initialize("MyDataCollector2");
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n      <DataCollector friendlyName=\"MyDataCollector2\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -130,7 +153,20 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("MyDataCollector");
             this.executor.Initialize("MyDataCollector1");
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        private void SetPlatformAndArchitecture()
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.settingsProvider.ActiveRunSettings.SettingsXml);
+            this.frameWork = runConfiguration.TargetFrameworkVersion;
+            this.architecture = runConfiguration.TargetPlatform;
         }
 
         #endregion

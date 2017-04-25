@@ -106,29 +106,31 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="reader">
         /// The reader.
         /// </param>
+        /// <param name="framework"></param>
+        /// <param name="architecture"></param>
         /// <returns>
         /// The <see cref="DataCollectionRunSettings"/>.
         /// </returns>
         /// <exception cref="SettingsException">
         /// Settings exception
         /// </exception>
-        public static DataCollectionRunSettings FromXml(XmlReader reader)
+        public static DataCollectionRunSettings FromXml(XmlReader reader, Framework framework, Architecture architecture)
         {
             return CreateDataCollectionRunSettings(
                 reader,
                 Constants.DataCollectionRunSettingsName,
                 Constants.DataCollectorsSettingName,
-                Constants.DataCollectorSettingName);
+                Constants.DataCollectorSettingName, framework, architecture);
         }
 
         public static DataCollectionRunSettings FromXml(XmlReader reader, string dataCollectionName, string dataCollectorsName, string dataCollectorName)
         {
-            return CreateDataCollectionRunSettings(reader, dataCollectionName, dataCollectorsName, dataCollectorName);
+            return CreateDataCollectionRunSettings(reader, dataCollectionName, dataCollectorsName, dataCollectorName, null, Architecture.Default);
         }
 
         public static DataCollectionRunSettings CreateDataCollectionRunSettings(
             XmlReader reader, string dataCollectionName,            
-            string dataCollectorsName, string dataCollectorName)
+            string dataCollectorsName, string dataCollectorName, Framework framework, Architecture architecture)
         {
             ValidateArg.NotNull<XmlReader>(reader, "reader");
             ValidateArg.NotNull<string>(dataCollectorsName, "dataCollectorsName");
@@ -155,7 +157,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 {
                     if (reader.Name.Equals(dataCollectorsName))
                     {
-                        var items = ReadListElementFromXml(reader, dataCollectorName);
+                        var items = ReadListElementFromXml(reader, dataCollectorName, framework, architecture);
                             foreach (var item in items)
                             {
                                 settings.DataCollectorSettingsList.Add(item);
@@ -184,12 +186,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="reader">
         /// The reader.
         /// </param>
+        /// <param name="dataCollectorsName"></param>
+        /// <param name="framework"></param>
+        /// <param name="architecture"></param>
         /// <returns>
         /// The <see cref="List"/>.
         /// </returns>
         /// <exception cref="SettingsException">
         /// </exception>
-        internal static List<DataCollectorSettings> ReadListElementFromXml(XmlReader reader, string dataCollectorsName)
+        internal static List<DataCollectorSettings> ReadListElementFromXml(XmlReader reader, string dataCollectorsName, Framework framework, Architecture architecture)
         {
             List<DataCollectorSettings> settings = new List<DataCollectorSettings>();
             bool empty = reader.IsEmptyElement;
@@ -211,7 +216,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 {
                     if (reader.Name.Equals(dataCollectorsName))
                     {
-                        settings.Add(DataCollectorSettings.FromXml(reader));
+                        settings.Add(DataCollectorSettings.FromXml(reader, framework, architecture));
                     }
                     else
                     {

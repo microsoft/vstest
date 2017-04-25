@@ -113,10 +113,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("filename.txt");
             this.StdOutputContains("TestCaseStarted");
             this.StdOutputContains("TestCaseEnded");
-            this.StdOutputContains("SessionEnded");
-            this.StdOutputContains("SessionStarted");
-            this.StdOutputContains("my warning");
-            this.StdErrorContains("Diagnostic data adapter caught an exception of type 'System.Exception': 'my exception'. More details: .");
+            this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionStarted");
+            this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
+            this.StdOutputContains("Data collector 'SampleDataCollector' message: my warning");
+            this.StdErrorContains("Data collector 'SampleDataCollector' message: Data collector caught an exception of type 'System.Exception': 'my exception'. More details:");
 
             // Verify attachments
             var isTestRunLevelAttachmentFound = false;
