@@ -226,6 +226,9 @@ function Publish-Package
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
 
+    # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
+    
     $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse

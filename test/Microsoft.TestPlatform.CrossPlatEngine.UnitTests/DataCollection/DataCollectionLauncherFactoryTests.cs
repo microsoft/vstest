@@ -14,6 +14,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     {
         private Mock<IProcessHelper> mockProcessHelper;
 
+        private string dummyRunSettings =
+            "<RunSettings><DataCollectionRunSettings>< DataCollectors >< DataCollector friendName=\"dummy\"></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
+
         public DataCollectionLauncherFactoryTests()
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
@@ -23,7 +26,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void GetDataCollectorLauncherShouldReturnDefaultDataCollectionLauncherWithFullCLRRunner()
         {
             mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("vstest.console.exe");
-            var dataCollectorLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(mockProcessHelper.Object);
+            var dataCollectorLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(mockProcessHelper.Object, this.dummyRunSettings);
             Assert.IsInstanceOfType(dataCollectorLauncher, typeof(DefaultDataCollectionLauncher));
         }
 
@@ -31,7 +34,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void GetDataCollectorLauncherShouldReturnDotnetDataCollectionLauncherWithDotnetCore()
         {
             mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("dotnet");
-            var dataCollectorLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(mockProcessHelper.Object);
+            var dataCollectorLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(mockProcessHelper.Object, this.dummyRunSettings);
             Assert.IsInstanceOfType(dataCollectorLauncher, typeof(DotnetDataCollectionLauncher));
         }
 
@@ -39,7 +42,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         public void GetDataCollectorLauncherShouldBeInsensitiveToCaseOfCurrentProcess()
         {
             mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DOTNET");
-            var dataCollectorLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(mockProcessHelper.Object);
+            var dataCollectorLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(mockProcessHelper.Object, this.dummyRunSettings);
             Assert.IsInstanceOfType(dataCollectorLauncher, typeof(DotnetDataCollectionLauncher));
         }
     }
