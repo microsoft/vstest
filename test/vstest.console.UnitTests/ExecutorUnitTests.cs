@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using CoreUtilities.Tracing.Interfaces;
 
@@ -39,6 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
         {
             var mockOutput = new MockOutput();
             var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute("/badArgument");
+            var assemblyVersion = typeof(Executor).GetTypeInfo().Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
 
             Assert.AreEqual(1, exitCode, "Exit code must be One for bad arguments");
 
@@ -51,6 +53,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                 mockOutput.Messages.First()
                     .Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
                 "First Printed message must be Microsoft Copyright");
+
+            Assert.IsTrue(mockOutput.Messages.First().Message.EndsWith(assemblyVersion));
         }
 
 
