@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.DataCollection
         private Mock<IProcessHelper> mockProcessHelper;
 
         private string dummyRunSettings =
-            "<RunSettings><DataCollectionRunSettings>< DataCollectors >< DataCollector friendName=\"dummy\"></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
+            "<RunSettings><DataCollectionRunSettings><DataCollectors><DataCollector friendlyName=\"dummy\"></DataCollector></DataCollectors></DataCollectionRunSettings></RunSettings>";
 
         public DataCollectionLauncherFactoryTests()
         {
