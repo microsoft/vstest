@@ -15,6 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+
     /// <summary>
     /// Utility class that facilitates the IPC communication. Acts as server.
     /// </summary>
@@ -102,8 +104,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {
-                    var msg = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                    runEventsHandler.HandleLogMessage(msg.Level, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorUriForLogMessage, msg.FriendlyName, msg.Message));
+                    var dataCollectionMessageEventArgs = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    this.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
                 }
                 else if (message.MessageType == MessageType.BeforeTestRunStartResult)
                 {
@@ -131,8 +133,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 
                 if (message.MessageType == MessageType.DataCollectionMessage)
                 {
-                    var msg = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
-                    runEventsHandler.HandleLogMessage(msg.Level, string.Format(CultureInfo.CurrentCulture, Resources.Resources.DataCollectorUriForLogMessage, msg.FriendlyName, msg.Message));
+                    var dataCollectionMessageEventArgs = this.dataSerializer.DeserializePayload<DataCollectionMessageEventArgs>(message);
+                    this.LogDataCollectorMessage(dataCollectionMessageEventArgs, runEventsHandler);
                 }
                 else if (message.MessageType == MessageType.AfterTestRunEndResult)
                 {
@@ -142,6 +144,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
             }
 
             return attachmentSets;
+        }
+
+        private void LogDataCollectorMessage(DataCollectionMessageEventArgs dataCollectionMessageEventArgs, ITestMessageEventHandler requestHandler)
+        {
+            string logMessage;
+            if (string.IsNullOrWhiteSpace(dataCollectionMessageEventArgs.FriendlyName))
+            {
+                // Message from data collection framework.
+                logMessage = string.Format(CultureInfo.CurrentCulture, CommonResources.DataCollectionMessageFormat, dataCollectionMessageEventArgs.Message);
+            }
+            else
+            {
+                // Message from individual data collector.
+                logMessage = string.Format(CultureInfo.CurrentCulture, CommonResources.DataCollectorMessageFormat, dataCollectionMessageEventArgs.FriendlyName, dataCollectionMessageEventArgs.Message);
+            }
+
+            requestHandler.HandleLogMessage(dataCollectionMessageEventArgs.Level, logMessage);
         }
     }
 }

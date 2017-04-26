@@ -276,9 +276,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="1" adjWordcount="0.85" curWordcount="0.85"</note>
       </trans-unit>
       <trans-unit id="HelpUsageText">
-        <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;args&gt;...]]</source>
-        <target state="translated">Sintassi: vstest.console.exe [Argomenti] [Opzioni] [[--] &lt;args&gt;...]]</target>
-        <note />
+        <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
+        <target state="new">Sintassi: vstest.console.exe [Argomenti] [Opzioni] [[--] &lt;args&gt;...]]</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sintassi: vstest.console.exe [argomenti] [opzioni]</target>
         </alt-trans>
@@ -944,12 +944,11 @@
       </trans-unit>
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
-      Enables data diagnostic adapter 'CodeCoverage' in the test run. Default 
-      settings are used if not specified using settings file.</source>
-        <target state="translated">/EnableCodeCoverage
+      Enables data collector 'CodeCoverage' for the test run.</source>
+        <target state="new">/EnableCodeCoverage
       Abilita l'adattatore dati di diagnostica 'CodeCoverage' nell'esecuzione dei test. Vengono 
       usate le impostazioni predefinite se non è specificato diversamente in un file di impostazioni.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Consente l'adattatore dati di diagnostica "CodeCoverage" nell'esecuzione del test. Impostazioni predefinite vengono utilizzate se non viene specificato utilizzando i file di impostazioni.</target>
@@ -1487,11 +1486,13 @@
         <note />
       </trans-unit>
       <trans-unit id="CLIRunSettingsArgumentHelp">
-        <source>Args:
-      Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</source>
-        <target state="translated">Args:
+        <source>RunSettings arguments:
+      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
+      Use a space to separate multiple [name]=[value].
+      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
+        <target state="new">Args:
       Eventuali argomenti aggiuntivi che devono essere passati all'adattatore. Gli argomenti possono essere specificati come coppia nome-valore in formato &lt;n&gt;=&lt;v&gt;, in cui &lt;n&gt; corrisponde al nome dell'argomento e &lt;v&gt; al valore dell'argomento. Usare uno spazio per separare più argomenti.</target>
-        <note />
+        <note></note>
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
@@ -1534,8 +1535,7 @@
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
-      Enables data diagnostic adapter in the test run. Default 
-      settings are used if not specified using settings file. More info here : https://aka.ms/vstest-collect</source>
+      Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
         <target state="new">CollectArgumentHelp</target>
         <note></note>
       </trans-unit>

@@ -98,17 +98,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to communicate with test execution process..
-        /// </summary>
-        internal static string DataCollectorUriForLogMessage
-        {
-            get
-            {
-                return ResourceManager.GetString("DataCollectorUriForLogMessage", resourceCulture);
-            }
-        }
-
-        /// <summary>
         ///   Looks up a localized string similar to Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}.
         /// </summary>
         internal static string UnexpectedMessage
