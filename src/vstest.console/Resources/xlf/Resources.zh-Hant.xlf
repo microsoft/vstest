@@ -1486,8 +1486,9 @@
       </trans-unit>
       <trans-unit id="CLIRunSettingsArgumentHelp">
         <source>RunSettings arguments:
-      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. Use a space to separate multiple [name]=[value].
-More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
+      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
+      Use a space to separate multiple [name]=[value].
+      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
         <target state="new">Args:
       任何應額外傳遞給配接器的引數。引數可以名稱/值對 &lt;n&gt;=&lt;v&gt; 的形式指定，其中 &lt;n&gt; 是引數名稱，&lt;v&gt; 是引數值。如有多個引數，請使用空格加以分隔。</target>
         <note></note>

@@ -29,6 +29,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
 
+        /// <inheritdoc/>
+        public bool IsInitialized { get; private set; } = false;
+
+
         #region Constructors
 
         /// <summary>
@@ -69,6 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is shared. SetupChannel it early.");
                 this.InitializeExtensions(Enumerable.Empty<string>());
             }
+            this.IsInitialized = true;
         }
 
         /// <summary>

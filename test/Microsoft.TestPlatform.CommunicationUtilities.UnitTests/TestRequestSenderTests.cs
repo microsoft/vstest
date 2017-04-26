@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private ITestRequestSender testRequestSender;
         private Mock<ICommunicationManager> mockCommunicationManager;
         private Mock<IDataSerializer> mockDataSerializer;
-        private ProtocolConfig protocolConfig = new ProtocolConfig { Version = 1 };
+        private ProtocolConfig protocolConfig = new ProtocolConfig { Version = 2 };
 
         [TestInitialize]
         public void TestInit()
@@ -34,6 +34,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
             this.testRequestSender = new TestRequestSender(this.mockCommunicationManager.Object, this.mockDataSerializer.Object, this.protocolConfig);
+            this.CheckAndSetProtocolVersion();
         }
 
         [TestMethod]
@@ -75,31 +76,39 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void VersionCheckWithTestHostShouldCheckVersionIfVersionCheckPassesReturnTrue()
         {
+            var mockCommunicationManager = new Mock<ICommunicationManager>();
             var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolConfig.Version };
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            var testRequestSender = new TestRequestSender(mockCommunicationManager.Object, this.mockDataSerializer.Object, this.protocolConfig);
 
-            this.testRequestSender.CheckVersionWithTestHost();
+            testRequestSender.CheckVersionWithTestHost();
 
-            this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.protocolConfig.Version), Times.Once);
+            mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.VersionCheck, this.protocolConfig.Version), Times.Once);
         }
 
         [TestMethod]
         public void VersionCheckWithTestHostShouldBeAbleToReceiveProtocolErrorAndThrowException()
         {
-            var message = new Message() { MessageType = MessageType.ProtocolError, Payload = this.protocolConfig.Version };
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            var mockCommunicationManager = new Mock<ICommunicationManager>();
+            var message = new Message() { MessageType = MessageType.ProtocolError, Payload = null };
+            mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            var testRequestSender = new TestRequestSender(mockCommunicationManager.Object, this.mockDataSerializer.Object, this.protocolConfig);
 
-            var ex = Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
+            var ex = Assert.ThrowsException<TestPlatformException>(() => testRequestSender.CheckVersionWithTestHost());
+
             Assert.AreEqual("Protocol version check failed. Make sure test runner and host are compatible.", ex.Message);
         }
 
         [TestMethod]
         public void VersionCheckWithTestHostForInvalidMessageShouldThrowException()
         {
+            var mockCommunicationManager = new Mock<ICommunicationManager>();
             var message = new Message() { MessageType = MessageType.TestCasesFound, Payload = null };
-            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            var testRequestSender = new TestRequestSender(mockCommunicationManager.Object, this.mockDataSerializer.Object, this.protocolConfig);
 
-            var ex = Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
+            var ex = Assert.ThrowsException<TestPlatformException>(() => testRequestSender.CheckVersionWithTestHost());
+
             Assert.AreEqual("Unexpected message received. Expected MessageType : ProtocolVersion Actual MessageType: TestDiscovery.TestFound", ex.Message);
         }
 
@@ -107,6 +116,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void InitializeDiscoveryShouldSendCommunicationMessageWithCorrectParameters()
         {
             var paths = new List<string>() { "Hello", "World" };
+            this.CheckAndSetProtocolVersion();
             this.testRequestSender.InitializeDiscovery(paths, false);
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.DiscoveryInitialize, paths, this.protocolConfig.Version), Times.Once);
@@ -494,6 +504,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.SendTestRunCancel();
 
             this.mockCommunicationManager.Verify(mc => mc.SendMessage(MessageType.CancelTestRun), Times.Once);
+        }
+
+        private void CheckAndSetProtocolVersion()
+        {
+            var message = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolConfig.Version };
+            this.mockCommunicationManager.Setup(mc => mc.ReceiveMessage()).Returns(message);
+            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.IsAny<Message>())).Returns(this.protocolConfig.Version);
+            this.testRequestSender.CheckVersionWithTestHost();
         }
 
         private void SetupReceiveRawMessageAsyncAndDeserializeMessageAndInitialize(string rawMessage, Message message)
