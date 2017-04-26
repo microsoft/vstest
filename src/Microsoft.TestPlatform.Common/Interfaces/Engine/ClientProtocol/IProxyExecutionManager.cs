@@ -11,6 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
     public interface IProxyExecutionManager
     {
         /// <summary>
+        /// Gets whether current Execution Manager is initialized or not
+        /// </summary>
+        bool IsInitialized { get; }
+
+        /// <summary>
         /// Initializes test execution. Create the test host, setup channel and initialize extensions.
         /// </summary>
         void Initialize();
@@ -38,10 +43,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Terminates the test host.
         /// </summary>
         void Close();
-
-        /// <summary>
-        /// Returns whether current Execution Manager is initialized or not
-        /// </summary>
-        bool IsInitialized { get; }
     }
 }

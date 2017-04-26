@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public void Close()
         {
             this.DoActionOnAllManagers(proxyManager => proxyManager.Close(), doActionsInParallel: true);
-        }        
+        }
 
         #endregion
 
@@ -321,6 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     proxyExecutionManager.Initialize();
                 }
+
                 proxyExecutionManager.StartTestRun(testRunCriteria, this.concurrentManagerHandlerMap[proxyExecutionManager]);
             }
 
