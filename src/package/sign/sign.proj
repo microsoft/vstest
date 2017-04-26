@@ -122,6 +122,7 @@
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.exe" />
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\testhost.x86.exe" />
+      <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)TestHost\datacollector.exe" />
 
       <!-- NetCoreExtensions -->
       <CoreAssembliesToSign Include="$(ArtifactsCoreDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />

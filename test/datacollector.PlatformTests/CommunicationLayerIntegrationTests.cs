@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
             this.dataCollectorSettings = string.Format("<DataCollector friendlyName=\"CustomDataCollector\" uri=\"my://custom/datacollector\" assemblyQualifiedName=\"{0}\" codebase=\"{1}\" />", typeof(CustomDataCollector).AssemblyQualifiedName, typeof(CustomDataCollector).GetTypeInfo().Assembly.Location);
             this.runSettings = string.Format(this.defaultRunSettings, this.dataCollectorSettings);
             this.processHelper = new ProcessHelper();
-            this.dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper);
+            this.dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper, this.runSettings);
         }
 
         [TestMethod]
@@ -74,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
         {
             var socketCommManager = new SocketCommunicationManager();
             var dataCollectionRequestSender = new DataCollectionRequestSender(socketCommManager, JsonDataSerializer.Instance);
-            var dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper);
+            var dataCollectionLauncher = DataCollectionLauncherFactory.GetDataCollectorLauncher(this.processHelper, this.runSettings);
 
             using (var proxyDataCollectionManager = new ProxyDataCollectionManager(this.runSettings, dataCollectionRequestSender, this.processHelper, dataCollectionLauncher))
             {
