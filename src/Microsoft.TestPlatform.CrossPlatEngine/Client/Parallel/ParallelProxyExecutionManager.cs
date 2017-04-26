@@ -38,11 +38,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private ITestRunEventsHandler currentRunEventsHandler;
 
         private ParallelRunDataAggregator currentRunDataAggregator;
+        
+        /// <inheritdoc/>
+        public bool IsInitialized { get; private set; } = false;
 
         #endregion
 
         #region Concurrency Keeper Objects
-        
+
         /// <summary>
         /// LockObject to update execution status in parallel
         /// </summary>
@@ -65,6 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public void Initialize()
         {
             this.DoActionOnAllManagers((proxyManager) => proxyManager.Initialize(), doActionsInParallel: true);
+            this.IsInitialized = true;
         }
 
         public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
@@ -114,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public void Close()
         {
             this.DoActionOnAllManagers(proxyManager => proxyManager.Close(), doActionsInParallel: true);
-        }
+        }        
 
         #endregion
 
@@ -313,6 +317,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (testRunCriteria != null)
             {
+                if (!proxyExecutionManager.IsInitialized)
+                {
+                    proxyExecutionManager.Initialize();
+                }
                 proxyExecutionManager.StartTestRun(testRunCriteria, this.concurrentManagerHandlerMap[proxyExecutionManager]);
             }
 

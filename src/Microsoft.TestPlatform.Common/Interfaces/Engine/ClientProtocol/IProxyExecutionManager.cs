@@ -38,5 +38,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine
         /// Terminates the test host.
         /// </summary>
         void Close();
+
+        /// <summary>
+        /// Returns whether current Execution Manager is initialized or not
+        /// </summary>
+        bool IsInitialized { get; }
     }
 }
