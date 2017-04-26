@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         internal static IDataCollectionLauncher GetDataCollectorLauncher(IProcessHelper processHelper, string settingsXml)
         {
             // Always launch datacollector.exe if code coverage is configured.
-            if (string.IsNullOrWhiteSpace(settingsXml))
+            if (!string.IsNullOrWhiteSpace(settingsXml))
             {
                 var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settingsXml);
                 foreach (var dataCollectorSettings in dataCollectionRunSettings.DataCollectorSettingsList)
