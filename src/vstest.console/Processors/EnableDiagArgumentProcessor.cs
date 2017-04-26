@@ -163,11 +163,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             return ArgumentProcessorResult.Success;
         }
 
-        private bool IsFileReadOnly(string path)
-        {
-            return (this.fileHelper.GetFileAttributes(path) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
-        }
-
         #endregion
     }
 }
