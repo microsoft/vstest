@@ -37,7 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                 null,
                 new Mock<IDataCollectionAttachmentManager>().Object,
                 new TestPlatformDataCollectionEvents(),
-                mockMessageSink.Object);
+                mockMessageSink.Object,
+                string.Empty);
         }
 
         [TestMethod]
