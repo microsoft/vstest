@@ -200,5 +200,23 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=minimal")));
         }
+
+        [TestMethod]
+        public void CreateArgumentShouldAddOneCollectArgumentForEachCollect()
+        {
+            var vstestTask = new VSTestTask { VSTestCollect = new string[2] };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            vstestTask.VSTestCollect[0] = "name1";
+            vstestTask.VSTestCollect[1] = "name2";
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name1")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name2")));
+        }
     }
 }

@@ -27,10 +27,10 @@
     <PackageReference Include="Microsoft.Internal.Dia" Version="14.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\src\package\package\TestPlatform.ObjectModel.manifest">
+    <Content Include="..\..\src\testhost.x86\TestPlatform.ObjectModel.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\src\package\package\TestPlatform.ObjectModel.x86.manifest">
+    <Content Include="..\..\src\testhost.x86\TestPlatform.ObjectModel.x86.manifest">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
