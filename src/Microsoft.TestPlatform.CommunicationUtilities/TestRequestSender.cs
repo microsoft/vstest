@@ -27,8 +27,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private IDataSerializer dataSerializer;
 
-        // TODO:sasin Change the version to 2
-        private int highestNegotiatedVersion = 1;
+        // Set default to 1, if protocol version check does not happen
+        // that implies host is using version 1
+        private int protocolVersion = 1;
+
+        private int highestSupportedVersion = 2;
 
         /// <summary>
         /// Use to cancel blocking tasks associated with testhost process
@@ -54,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="protocolConfig">Protocol related information</param>
         internal TestRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer, ProtocolConfig protocolConfig)
         {
-            this.highestNegotiatedVersion = protocolConfig.Version;
+            this.highestSupportedVersion = protocolConfig.Version;
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
         }
@@ -91,16 +94,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void CheckVersionWithTestHost()
         {
-            this.communicationManager.SendMessage(MessageType.VersionCheck, payload: this.highestNegotiatedVersion);
+            this.communicationManager.SendMessage(MessageType.VersionCheck, payload: this.highestSupportedVersion);
 
             var message = this.communicationManager.ReceiveMessage();
 
             if (message.MessageType == MessageType.VersionCheck)
             {
-                var protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
-                this.highestNegotiatedVersion = protocolVersion;
+                this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
 
-                EqtTrace.Info("TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.highestNegotiatedVersion);
+                EqtTrace.Info("TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.protocolVersion);
             }
             else if (message.MessageType == MessageType.ProtocolError)
             {
@@ -116,13 +118,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions, version: this.highestNegotiatedVersion);
+            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions, version: this.protocolVersion);
         }
 
         /// <inheritdoc/>
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions, version: this.highestNegotiatedVersion);
+            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions, version: this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -130,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria, version: this.highestNegotiatedVersion);
+                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria, version: this.protocolVersion);
 
                 var isDiscoveryComplete = false;
 
@@ -242,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(messageType, payload, version: this.highestNegotiatedVersion);
+                this.communicationManager.SendMessage(messageType, payload, version: this.protocolVersion);
 
                 // This needs to happen asynchronously.
                 Task.Run(() => this.ListenAndReportTestResults(eventHandler));
@@ -302,7 +304,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         this.communicationManager.SendMessage(
                             MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
                             processId,
-                            version: this.highestNegotiatedVersion);
+                            version: this.protocolVersion);
                     }
                 }
                 catch (IOException exception)
