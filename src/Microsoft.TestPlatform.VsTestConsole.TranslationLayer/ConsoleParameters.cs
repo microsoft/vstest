@@ -17,12 +17,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         internal static readonly ConsoleParameters Default = new ConsoleParameters();
 
         private string logFilePath = null;
-        private IFileHelper fileHelper = new FileHelper();
+        private IFileHelper fileHelper;
 
         /// <summary>
         /// Create instance of <see cref="ConsoleParameters"/>
         /// </summary>
-        public ConsoleParameters() { }
+        public ConsoleParameters() : this(new FileHelper())
+        { }
 
         /// <summary>
         /// Create instance of <see cref="ConsoleParameters"/>
@@ -52,14 +53,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 }
 
                 // Ensure path is double quoted. if path has white space then it can create problem.
-                if (!value.StartsWith("\""))
-                {
-                    this.logFilePath = "\"" + value + "\"";
-                }
-                else
-                {
-                    this.logFilePath = value;
-                }
+                this.logFilePath = "\"" + value + "\"";
             }
         }
 

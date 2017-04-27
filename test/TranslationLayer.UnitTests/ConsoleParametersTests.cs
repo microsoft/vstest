@@ -26,9 +26,5 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             Assert.IsTrue(result.StartsWith("\""));
         }
-
     }
-
-
-
 }
