@@ -18,8 +18,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class SocketServer : ICommunicationServer
     {
-        private const int STREAMREADTIMEOUT = 1000 * 1000;
-
         private readonly CancellationTokenSource cancellation;
 
         private readonly Func<Stream, ICommunicationChannel> channelFactory;
@@ -31,8 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private TcpClient tcpClient;
 
         private bool stopped;
-
-        ////private CancellationTokenSource cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SocketServer"/> class.
@@ -98,57 +94,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.ClientConnected.Invoke(this, new ConnectedEventArgs(this.channel));
 
                 // Start the message loop
-                Task.Run(() => this.MessageLoopAsync(this.tcpClient)).ConfigureAwait(false);
+                Task.Run(() => this.tcpClient.MessageLoopAsync(this.channel, error => this.Stop(error), this.cancellation.Token)).ConfigureAwait(false);
             }
-        }
-
-        private Task MessageLoopAsync(TcpClient client)
-        {
-            Exception error = null;
-
-            // Set read timeout to avoid blocking receive raw message
-            while (this.channel != null && !this.cancellation.Token.IsCancellationRequested)
-            {
-                try
-                {
-                    if (client.Client.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
-                    {
-                        this.channel.NotifyDataAvailable();
-                    }
-                }
-                catch (IOException ioException)
-                {
-                    var socketException = ioException.InnerException as SocketException;
-                    if (socketException != null
-                            && socketException.SocketErrorCode == SocketError.TimedOut)
-                    {
-                        EqtTrace.Info(
-                                "SocketServer: Message loop: failed to receive message due to read timeout {0}",
-                                ioException);
-                    }
-                    else
-                    {
-                        EqtTrace.Error(
-                                "SocketServer: Message loop: failed to receive message due to socket error {0}",
-                                ioException);
-                        error = ioException;
-                        break;
-                    }
-                }
-                catch (Exception exception)
-                {
-                    EqtTrace.Error(
-                            "SocketServer: Message loop: failed to receive message {0}",
-                            exception);
-                    error = exception;
-                    break;
-                }
-            }
-
-            // Try clean up and raise client disconnected events
-            this.Stop(error);
-
-            return Task.FromResult(0);
         }
 
         private void Stop(Exception error)

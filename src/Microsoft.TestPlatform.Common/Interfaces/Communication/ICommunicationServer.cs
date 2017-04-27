@@ -5,8 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     using System;
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-
     /// <summary>
     /// Server interface for inter-process communications in test platform. A server can serve only a single
     /// client.
@@ -34,7 +32,4 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// </summary>
         void Stop();
     }
-
-    // Writes header as 7bitEncodedInteger (see https://msdn.microsoft.com/en-us/library/dd946975(v=office.12).aspx)
-    // Followed by data as bytes
 }

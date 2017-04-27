@@ -1,0 +1,77 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
+{
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.Net.Sockets;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    [TestClass]
+    public abstract class SocketTestsBase
+    {
+        protected const string DUMMYDATA = "Dummy Data";
+
+        protected abstract TcpClient Client { get; }
+
+        [TestMethod]
+        public void SocketEndpointStartShouldRaiseServerConnectedEventOnServerConnection()
+        {
+            this.SetupChannel(out ConnectedEventArgs connectedEventArgs);
+
+            Assert.IsNotNull(connectedEventArgs);
+        }
+
+        [TestMethod]
+        public async Task SocketEndpointShouldInitializeChannelOnServerConnection()
+        {
+            var channel = this.SetupChannel(out ConnectedEventArgs connectedEventArgs);
+
+            await channel.Send(DUMMYDATA);
+
+            Assert.AreEqual(DUMMYDATA, ReadData(this.Client));
+        }
+
+        [TestMethod]
+        public void SocketEndpointShouldNotifyChannelOnDataAvailable()
+        {
+            var message = string.Empty;
+            ManualResetEvent waitForMessage = new ManualResetEvent(false);
+            this.SetupChannel(out ConnectedEventArgs clientConnected).MessageReceived += (s, e) =>
+            {
+                message = e.Data;
+                waitForMessage.Set();
+            };
+
+            WriteData(this.Client);
+
+            waitForMessage.WaitOne();
+            Assert.AreEqual(DUMMYDATA, message);
+        }
+
+        protected static string ReadData(TcpClient client)
+        {
+            using (BinaryReader reader = new BinaryReader(client.GetStream()))
+            {
+                return reader.ReadString();
+            }
+        }
+
+        protected static void WriteData(TcpClient client)
+        {
+            using (BinaryWriter writer = new BinaryWriter(client.GetStream()))
+            {
+                writer.Write(DUMMYDATA);
+            }
+        }
+
+        protected abstract ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEventArgs);
+    }
+}

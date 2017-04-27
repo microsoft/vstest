@@ -15,10 +15,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class SocketServerTests : IDisposable
+    public class SocketServerTests : SocketTestsBase, IDisposable
     {
-        private const string DUMMYDATA = "Dummy Data";
-
         private readonly TcpClient tcpClient;
 
         private readonly ICommunicationServer socketServer;
@@ -29,6 +27,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
             this.tcpClient = new TcpClient();
         }
+
+        protected override TcpClient Client => this.tcpClient;
 
         public void Dispose()
         {
@@ -63,41 +63,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         ////}
 
         [TestMethod]
-        public void SocketServerStartShouldRaiseClientConnectedEventOnClientConnection()
-        {
-            var channel = this.SetupChannel(out ConnectedEventArgs clientConnected);
-
-            Assert.IsNotNull(clientConnected);
-        }
-
-        [TestMethod]
-        public async Task SocketServerShouldInitializeChannelOnClientConnected()
-        {
-            var channel = this.SetupChannel(out ConnectedEventArgs clientConnected);
-
-            await channel.Send(DUMMYDATA);
-
-            Assert.AreEqual(DUMMYDATA, this.ReadData(this.tcpClient));
-        }
-
-        [TestMethod]
-        public void SocketServerShouldNotifyChannelOnDataAvailable()
-        {
-            var message = string.Empty;
-            ManualResetEvent waitForMessage = new ManualResetEvent(false);
-            this.SetupChannel(out ConnectedEventArgs clientConnected).MessageReceived += (s, e) =>
-            {
-                message = e.Data;
-                waitForMessage.Set();
-            };
-
-            this.WriteData(this.tcpClient);
-
-            waitForMessage.WaitOne();
-            Assert.AreEqual(DUMMYDATA, message);
-        }
-
-        [TestMethod]
         public void SocketServerStopShouldStopListening()
         {
             var connectionInfo = this.socketServer.Start();
@@ -125,7 +90,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             this.socketServer.Stop();
 
             waitEvent.WaitOne();
-            Assert.ThrowsException<IOException>(() => this.WriteData(this.tcpClient));
+            Assert.ThrowsException<IOException>(() => WriteData(this.tcpClient));
         }
 
         [TestMethod]
@@ -179,7 +144,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             Assert.IsTrue(clientDisconnected.Error is IOException);
         }
 
-        private ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEvent)
+        protected override ICommunicationChannel SetupChannel(out ConnectedEventArgs connectedEvent)
         {
             ICommunicationChannel channel = null;
             ConnectedEventArgs clientConnectedEvent = null;
@@ -202,22 +167,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         private async Task ConnectToServer(int port)
         {
             await this.tcpClient.ConnectAsync(IPAddress.Loopback, port);
-        }
-
-        private string ReadData(TcpClient client)
-        {
-            using (BinaryReader reader = new BinaryReader(client.GetStream()))
-            {
-                return reader.ReadString();
-            }
-        }
-
-        private void WriteData(TcpClient client)
-        {
-            using (BinaryWriter writer = new BinaryWriter(client.GetStream()))
-            {
-                writer.Write(DUMMYDATA);
-            }
         }
     }
 }

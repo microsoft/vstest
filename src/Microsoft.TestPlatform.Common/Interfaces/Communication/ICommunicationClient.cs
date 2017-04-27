@@ -21,10 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         event EventHandler<DisconnectedEventArgs> ServerDisconnected;
 
         /// <summary>
-        /// Connect to the server specified in <see cref="connectonInfo"/>.
+        /// Connect to the server specified in <see cref="connectionInfo"/>.
         /// </summary>
-        /// <param name="connectonInfo">Parameters to connect to server.</param>
-        void Start(string connectonInfo);
+        /// <param name="connectionInfo">Parameters to connect to server.</param>
+        void Start(string connectionInfo);
 
         /// <summary>
         /// Close the communication channel and stop the client.
