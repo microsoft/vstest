@@ -21,7 +21,7 @@
     </header>
     <body>
       <trans-unit id="DataCollectionMessageFormat">
-        <source>Data collection : {0}.</source>
+        <source>Data collection : {0}</source>
         <target state="new">診斷資料配接器訊息: {0}</target>
         <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -210,7 +210,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
-        <source>Data collector '{0}' failed to provide initialization information. Error: {1}.</source>
+        <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
         <target state="new">Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</target>
         <note></note>
       </trans-unit>
@@ -220,7 +220,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
-        <source>Could not find data collector '{0}'.</source>
+        <source>Could not find data collector '{0}'</source>
         <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
         <note></note>
       </trans-unit>

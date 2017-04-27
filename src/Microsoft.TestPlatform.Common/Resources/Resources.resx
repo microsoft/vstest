@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DataCollectionMessageFormat" xml:space="preserve">
-    <value>Data collection : {0}.</value>
+    <value>Data collection : {0}</value>
   </data>
   <data name="DataCollectorErrorOnGetVariable" xml:space="preserve">
-    <value>Data collector '{0}' failed to provide initialization information. Error: {1}.</value>
+    <value>Data collector '{0}' failed to provide initialization information. Error: {1}</value>
   </data>
   <data name="DataCollectorInitializationError" xml:space="preserve">
     <value>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</value>
@@ -130,7 +130,7 @@
     <value>Data collector '{0}' message: {1}.</value>
   </data>
   <data name="DataCollectorNotFound" xml:space="preserve">
-    <value>Could not find data collector '{0}'.</value>
+    <value>Could not find data collector '{0}'</value>
   </data>
   <data name="DataCollectorRequestedDuplicateEnvironmentVariable" xml:space="preserve">
     <value>The data collector '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another data collector '{3}' has already requested same environment variable with different value '{4}'.</value>
