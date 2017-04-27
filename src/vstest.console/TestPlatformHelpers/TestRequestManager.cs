@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            runsettings = UpdateExtensionsFolderInRunSettings(runsettings);
+            runsettings = UpdateExtensionsFolderInRunSettings(runsettings, discoveryPayload.Sources.ToList());
 
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
@@ -211,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            runsettings = UpdateExtensionsFolderInRunSettings(runsettings);
+            runsettings = UpdateExtensionsFolderInRunSettings(runsettings, testRunRequestPayload.Sources.ToList());
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
@@ -355,7 +355,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// Update Extensions path folder in testadapterspaths in runsettings.
         /// </summary>
         /// <param name="settingsXml"></param>
-        private static string UpdateExtensionsFolderInRunSettings(string settingsXml)
+        private static string UpdateExtensionsFolderInRunSettings(string settingsXml, List<string> sources)
         {
             if (string.IsNullOrWhiteSpace(settingsXml))
             {
@@ -363,6 +363,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             }
 
             var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
+            var sourcesPath = sources.Select(source => Path.GetDirectoryName(source)).ToList();
+            sourcesPath.Add(extensionsFolder);
+
+            sourcesPath = sourcesPath.Distinct().ToList();
+
+            var extensionsFolders = string.Join(";", sourcesPath.ToArray());
 
             using (var stream = new StringReader(settingsXml))
             using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
@@ -374,10 +380,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                 if (tapNode != null && !string.IsNullOrWhiteSpace(tapNode.InnerText))
                 {
-                    extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
+                    extensionsFolders = string.Concat(tapNode.InnerText, ';', extensionsFolders);
                 }
 
-                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
+                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolders);
 
                 return document.OuterXml;
             }
