@@ -61,7 +61,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             string dataCollectorProcessPath = null, processWorkingDirectory = null;
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
 
-            dataCollectorProcessPath = Path.Combine(currentWorkingDirectory, DataCollectorProcessName);
+            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+
+            // If current process is dotnet/dotnet.exe and you are here, datacollector.exe is present in TestHost folder.
+            if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                dataCollectorProcessPath = Path.Combine(currentWorkingDirectory, "TestHost", DataCollectorProcessName);
+            }
+            else
+            {
+                dataCollectorProcessPath = Path.Combine(currentWorkingDirectory, DataCollectorProcessName);
+            }
+
             processWorkingDirectory = Directory.GetCurrentDirectory();
 
             var argumentsString = string.Join(" ", commandLineArguments);

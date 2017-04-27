@@ -226,6 +226,13 @@ function Publish-Package
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
 
+    # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
+    Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
+    # Overwrite datacollector.config file for netcore
+    $dataCollectorNetCoreConfigSource = Join-Path $env:TP_ROOT_DIR ".\src\datacollector\app_netcore.config"
+    $dataCollectorNetCoreConfigDest = Join-Path $fullDestDir "datacollector.exe.config"
+    Copy-Item $dataCollectorNetCoreConfigSource  $dataCollectorNetCoreConfigDest  -Force 
+
     $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
     Copy-Item $testhostFullPackageDir\* $fullDestDir -Force -recurse
@@ -302,7 +309,7 @@ function Create-VsixPackage
     $testhostPackageDir = Join-Path $packageDir "TestHost"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-699596\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-706259\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
