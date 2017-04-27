@@ -58,7 +58,22 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 
             this.socketClient.Start(dummyConnectionInfo);
 
-            Assert.ThrowsException<SocketException>(() => this.socketClient.Start(dummyConnectionInfo));
+            var exceptionThrown = false;
+            try
+            {
+                this.socketClient.Start(dummyConnectionInfo);
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // Thrown on unix
+                exceptionThrown = true;
+            }
+            catch (SocketException)
+            {
+                exceptionThrown = true;
+            }
+
+            Assert.IsTrue(exceptionThrown);
         }
 
         [TestMethod]
