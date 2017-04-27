@@ -19,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
-    /// <summary>
     /// Manages data collection.
     /// </summary>
     internal class DataCollectionManager : IDataCollectionManager
@@ -187,7 +186,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             foreach (var dataCollectorSettings in enabledDataCollectorsSettings)
             {
-                this.LoadAndInitialize(dataCollectorSettings);
+                this.LoadAndInitialize(dataCollectorSettings, settingsXml);
             }
 
             // Once all data collectors have been initialized, query for environment variables
@@ -379,7 +378,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="dataCollectorSettings">
         /// The data collector settings.
         /// </param>
-        private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
+        /// <param name="settingsXml"></param>
+        private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings, string settingsXml)
         {
             DataCollectorInformation dataCollectorInfo;
             DataCollectorConfig dataCollectorConfig;
@@ -419,7 +419,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                                     this.dataCollectionEnvironmentContext,
                                                     this.attachmentManager,
                                                     this.events,
-                                                    this.messageSink);
+                                                    this.messageSink,
+                                                    settingsXml);
             }
             catch (Exception ex)
             {

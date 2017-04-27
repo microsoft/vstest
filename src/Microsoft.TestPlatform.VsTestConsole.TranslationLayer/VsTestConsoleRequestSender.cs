@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool handShakeSuccessful = false;
 
-        private int protocolVersion = 1;
+        private int protocolVersion = 2;
 
         /// <summary>
         /// Use to cancel blocking tasks associated with vstest.console process
