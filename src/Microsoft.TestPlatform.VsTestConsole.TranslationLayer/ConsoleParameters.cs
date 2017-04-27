@@ -34,7 +34,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     throw new ArgumentException("LogFilePath must point to a valid directory for logging!");
                 }
 
-                this.logFilePath = value;
+                // Ensure path is double quoted. if path has white space then it can create problem.
+                if (!value.StartsWith("\""))
+                {
+                    this.logFilePath = "\"" + value + "\"";
+                }
+                else
+                {
+                    this.logFilePath = value;
+                }
             }
         }
 
