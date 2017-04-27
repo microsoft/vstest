@@ -3,14 +3,10 @@
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
 {
-    using System;
     using System.IO;
-    using System.Net;
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,6 +14,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
     public abstract class SocketTestsBase
     {
         protected const string DUMMYDATA = "Dummy Data";
+        protected const int TIMEOUT = 10 * 1000;
 
         protected abstract TcpClient Client { get; }
 
@@ -32,7 +29,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         [TestMethod]
         public async Task SocketEndpointShouldInitializeChannelOnServerConnection()
         {
-            var channel = this.SetupChannel(out ConnectedEventArgs connectedEventArgs);
+            var channel = this.SetupChannel(out ConnectedEventArgs _);
 
             await channel.Send(DUMMYDATA);
 
@@ -44,7 +41,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         {
             var message = string.Empty;
             ManualResetEvent waitForMessage = new ManualResetEvent(false);
-            this.SetupChannel(out ConnectedEventArgs clientConnected).MessageReceived += (s, e) =>
+            this.SetupChannel(out ConnectedEventArgs _).MessageReceived += (s, e) =>
             {
                 message = e.Data;
                 waitForMessage.Set();

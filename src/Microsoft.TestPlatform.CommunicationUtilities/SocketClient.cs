@@ -9,9 +9,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Communication client implementation over sockets.
@@ -22,9 +21,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly TcpClient tcpClient;
         private readonly Func<Stream, ICommunicationChannel> channelFactory;
         private ICommunicationChannel channel;
+        private bool stopped;
 
         public SocketClient()
-            : this((stream) => new LengthPrefixCommunicationChannel(stream))
+            : this(stream => new LengthPrefixCommunicationChannel(stream))
         {
         }
 
@@ -32,6 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             // Used to cancel the message loop
             this.cancellation = new CancellationTokenSource();
+            this.stopped = false;
 
             this.tcpClient = new TcpClient();
             this.channelFactory = channelFactory;
@@ -46,15 +47,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void Start(string connectionInfo)
         {
-            this.tcpClient.ConnectAsync(IPAddress.Loopback, int.Parse(connectionInfo)).ContinueWith(t => this.OnServerConnected(t));
+            this.tcpClient.ConnectAsync(IPAddress.Loopback, int.Parse(connectionInfo))
+                .ContinueWith(this.OnServerConnected);
         }
 
         /// <inheritdoc />
         public void Stop()
         {
-            if (this.ServerDisconnected != null)
+            if (!this.stopped)
             {
-                this.ServerDisconnected.Invoke(this, new DisconnectedEventArgs());
+                EqtTrace.Info("SocketClient: Stop: Cancellation requested. Stopping message loop.");
+                this.cancellation.Cancel();
             }
         }
 
@@ -71,31 +74,29 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.ServerConnected.Invoke(this, new ConnectedEventArgs(this.channel));
 
                 // Start the message loop
-                Task.Run(() => this.tcpClient.MessageLoopAsync(this.channel, error => this.Stop(error), this.cancellation.Token)).ConfigureAwait(false);
+                Task.Run(() => this.tcpClient.MessageLoopAsync(
+                        this.channel,
+                        this.Stop,
+                        this.cancellation.Token))
+                    .ConfigureAwait(false);
             }
         }
 
         private void Stop(Exception error)
         {
-            ////if (!this.stopped)
-            ////{
-                ////// Do not allow stop to be called multiple times.
-                ////this.stopped = true;
+            if (!this.stopped)
+            {
+                // Do not allow stop to be called multiple times.
+                this.stopped = true;
 
-                ////// Stop accepting any other connections
-                ////this.tcpListener.Stop();
+                // Close the client and dispose the underlying stream
+                this.tcpClient?.Dispose();
+                this.channel.Dispose();
 
-                ////// Close the client and dispose the underlying stream
-                ////this.tcpClient?.Dispose();
-                ////this.channel.Dispose();
+                this.cancellation.Dispose();
 
-                ////this.cancellation.Dispose();
-
-                ////if (this.ClientDisconnected != null)
-                ////{
-                    ////this.ClientDisconnected.Invoke(this, new DisconnectedEventArgs { Error = error });
-                ////}
-            ////}
+                this.ServerDisconnected?.Invoke(this, new DisconnectedEventArgs());
+            }
         }
     }
 }
