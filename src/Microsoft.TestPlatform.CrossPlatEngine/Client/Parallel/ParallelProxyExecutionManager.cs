@@ -143,17 +143,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var allRunsCompleted = false;
 
-            if(!this.SharedHosts)
+            if (!this.SharedHosts || (proxyExecutionManager is ProxyExecutionManagerWithDataCollection))
             {
                 this.concurrentManagerHandlerMap.Remove(proxyExecutionManager);
                 proxyExecutionManager.Close();
 
                 proxyExecutionManager = CreateNewConcurrentManager();
 
-                var parallelEventsHandler = proxyExecutionManager is ProxyExecutionManagerWithDataCollection ? 
-                    new ParallelDataCollectionEventsHandler(proxyExecutionManager,
-                                                this.currentRunEventsHandler,
-                                                this,
+                var parallelEventsHandler = proxyExecutionManager is ProxyExecutionManagerWithDataCollection
+                                                ? new ParallelDataCollectionEventsHandler(
+                                                    proxyExecutionManager,
+                                                    this.currentRunEventsHandler,
+                                                    this,
                                                 this.currentRunDataAggregator) : 
                     new ParallelRunEventsHandler(
                                                proxyExecutionManager,
