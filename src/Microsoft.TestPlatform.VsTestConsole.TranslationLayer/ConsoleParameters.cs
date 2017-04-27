@@ -4,6 +4,8 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System;
     using System.IO;
 
@@ -15,6 +17,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         internal static readonly ConsoleParameters Default = new ConsoleParameters();
 
         private string logFilePath = null;
+        private IFileHelper fileHelper = new FileHelper();
+
+        /// <summary>
+        /// Create instance of <see cref="ConsoleParameters"/>
+        /// </summary>
+        public ConsoleParameters() { }
+
+        /// <summary>
+        /// Create instance of <see cref="ConsoleParameters"/>
+        /// </summary>
+        /// <param name="fileHelper"> Object of type <see cref="IFileHelper"/></param>
+        public ConsoleParameters(IFileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
+        }
 
         /// <summary>
         /// Full path for the log file
@@ -29,7 +46,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             set
             {
                 ValidateArg.NotNullOrEmpty(value, "LogFilePath");
-                if(!Directory.Exists(Path.GetDirectoryName(value)))
+                if (!fileHelper.DirectoryExists(Path.GetDirectoryName(value)))
                 {
                     throw new ArgumentException("LogFilePath must point to a valid directory for logging!");
                 }
