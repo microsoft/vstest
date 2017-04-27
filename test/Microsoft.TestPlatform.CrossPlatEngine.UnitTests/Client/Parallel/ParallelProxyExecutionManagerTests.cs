@@ -10,10 +10,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -27,14 +31,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private List<Mock<IProxyExecutionManager>> createdMockManagers;
         private Func<IProxyExecutionManager> proxyManagerFunc;
         private Mock<ITestRunEventsHandler> mockHandler;
+        private Mock<ITestRuntimeProvider> mockTestHostManager;
+
+        private Mock<ITestRequestSender> mockRequestSender;
+
+        private Mock<IProxyDataCollectionManager> mockDataCollectionManager;
         private List<string> sources;
         private TestRunCriteria testRunCriteria;
+
+        private bool proxyManagerFuncCalled;
 
         public ParallelProxyExecutionManagerTests()
         {
             this.createdMockManagers = new List<Mock<IProxyExecutionManager>>();
             this.proxyManagerFunc = () =>
-            {
+                {
+                    this.proxyManagerFuncCalled = true;
                 var manager = new Mock<IProxyExecutionManager>();
                 createdMockManagers.Add(manager);
                 return manager.Object;
@@ -141,6 +153,35 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
             Assert.AreEqual(sources.Count, processedSources.Count, "All Sources must be processed.");
             AssertMissingAndDuplicateSources(processedSources);
+        }
+
+        [TestMethod]
+        public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfDataCollectionEnabled()
+        {
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
+            this.mockRequestSender = new Mock<ITestRequestSender>();
+            this.mockDataCollectionManager = new Mock<IProxyDataCollectionManager>();
+
+            var proxyDataCollectionManager = new ProxyExecutionManagerWithDataCollection(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataCollectionManager.Object);
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 2);
+
+            var tests = CreateTestCases();
+            var testRunCriteria = new TestRunCriteria(tests, 100);
+            var processedTestCases = new List<TestCase>();
+            SetupMockManagersForTestCase(processedTestCases, testRunCriteria);
+
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
+
+            SetupHandleTestRunComplete(completeEvent);
+
+            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object);
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
+            this.proxyManagerFuncCalled = false;
+
+            this.proxyParallelExecutionManager.HandlePartialRunComplete(proxyDataCollectionManager, completeArgs, null, null, null);
+
+            Assert.IsTrue(this.proxyManagerFuncCalled);
         }
 
         [TestMethod]

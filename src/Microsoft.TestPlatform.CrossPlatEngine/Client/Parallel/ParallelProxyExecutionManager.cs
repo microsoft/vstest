@@ -143,6 +143,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var allRunsCompleted = false;
 
+            // In case of DataCollection we only start dc.exe on initialize, & close once the TestRun is complete,
+            // So instead of resuing ProxyExecutionManager, we will close it here, & create new PEMWDC
             if (!this.SharedHosts || (proxyExecutionManager is ProxyExecutionManagerWithDataCollection))
             {
                 this.concurrentManagerHandlerMap.Remove(proxyExecutionManager);
