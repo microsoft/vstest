@@ -327,7 +327,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open))
                 {
                     var context = new DependencyContextJsonReader().Read(stream);
-                    var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                    var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                     if (testhostPackage != null)
                     {
@@ -335,7 +335,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         {
                             foreach (var path in runtimeAssemblyGroup.AssetPaths)
                             {
-                                if (path.EndsWith("testhost.dll", StringComparison.CurrentCultureIgnoreCase))
+                                if (path.EndsWith("testhost.dll", StringComparison.OrdinalIgnoreCase))
                                 {
                                     testHostPath = path;
                                     break;
