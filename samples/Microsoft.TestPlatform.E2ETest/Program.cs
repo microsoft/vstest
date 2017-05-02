@@ -32,6 +32,7 @@ namespace Microsoft.TestPlatform.E2ETest
             var testAssembly = Path.Combine(executingLocation, "UnitTestProject.dll");
 
             var arguments = string.Concat(testAssembly.AddDoubleQuote(), " /testadapterpath:", testadapterPath.AddDoubleQuote());
+
             var process = new Process
                               {
                                   StartInfo =

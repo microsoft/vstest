@@ -117,5 +117,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         /// The test host appdomain stop event id.
         /// </summary>
         public const int TestHostAppDomainCreationStopEventId = 0x31;
+
+        /// <summary>
+        /// Events fired on initialization of translation layer.
+        /// </summary>
+        public const int TranslationLayerInitializeStartEventId = 0x32;
+
+        /// <summary>
+        /// Events fired on initialization complete of translation layer.
+        /// </summary>
+        public const int TranslationLayerInitializeStopEventId = 0x33;
+
+        /// <summary>
+        /// Events fired on discovery start of translation layer.
+        /// </summary>
+        public const int TranslationLayerDiscoveryStartEventId = 0x34;
+
+        /// <summary>
+        /// Events fired on discovery complete in translation layer.
+        /// </summary>
+        public const int TranslationLayerDiscoveryStopEventId = 0x35;
+
+        /// <summary>
+        /// Event fired on execution start in translation layer.
+        /// </summary>
+        public const int TranslationLayerExecutionStartEventId = 0x36;
+
+        /// <summary>
+        /// Event fired on execution complete in translation layer.
+        /// </summary>
+        public const int TranslationLayerExecutionStopEventId = 0x37;
     }
 }

@@ -138,5 +138,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces
         /// The data collection stop.
         /// </summary>
         void DataCollectionStop();
+
+        /// <summary>
+        /// Mark the start of translation layer initialization.
+        /// </summary>
+        void TranslationLayerInitializeStart();
+
+        /// <summary>
+        /// Mark the completion of translation layer initialization.
+        /// </summary>
+        void TranslationLayerInitializeStop();
+
+        /// <summary>
+        /// Mark the start of translation layer discovery request.
+        /// </summary>
+        void TranslationLayerDiscoveryStart();
+
+        /// <summary>
+        /// Mark the completion of translation layer discovery request.
+        /// </summary>
+        void TranslationLayerDiscoveryStop();
+
+        /// <summary>
+        /// Mark the start of translation layer execution request.
+        /// </summary>
+        /// <param name="customTestHost">Set to 1 if custom test host is used, 0 otherwise</param>
+        /// <param name="sourcesCount"></param>
+        /// <param name="testCasesCount">Number of test cases if request has a filter</param>
+        /// <param name="runSettings"></param>
+        void TranslationLayerExecutionStart(long customTestHost, long sourcesCount, long testCasesCount, string runSettings);
+
+        /// <summary>
+        /// Mark the completion of translation layer execution request.
+        /// </summary>
+        void TranslationLayerExecutionStop();
     }
 }

@@ -158,8 +158,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     discoveryRequest.DiscoverAsync();
                     discoveryRequest.WaitForCompletion();
 
-                    this.testPlatformEventSource.DiscoveryRequestStop();
-
                     success = true;
                 }
                 catch (Exception ex)
@@ -185,7 +183,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 }
             }
 
-            EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, sucessful: {0}.", success);
+            EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests completed, successful: {0}.", success);
+            this.testPlatformEventSource.DiscoveryRequestStop();
             return success;
         }
 
@@ -237,6 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             var success = this.RunTests(runCriteria, testRunEventsRegistrar, protocolConfig);
             EqtTrace.Info("TestRequestManager.RunTests: run tests completed, sucessful: {0}.", success);
+            this.testPlatformEventSource.ExecutionRequestStop();
             return success;
         }
 
@@ -319,8 +319,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                         // Wait for the run completion event
                         testRunRequest.WaitForCompletion();
-
-                        this.testPlatformEventSource.ExecutionRequestStop();
                     }
                     catch (Exception ex)
                     {
