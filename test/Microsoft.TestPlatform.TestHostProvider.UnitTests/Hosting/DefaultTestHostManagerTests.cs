@@ -9,6 +9,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -119,7 +120,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + "\"" + source + "\"", info.Arguments);
+            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + source.AddDoubleQuote(), info.Arguments);
         }
 
         [TestMethod]

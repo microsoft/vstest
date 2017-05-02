@@ -12,6 +12,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Text.RegularExpressions;
     using System.Xml;
 
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -56,27 +57,27 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns>Command line arguments string.</returns>
         public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.6")
         {
-            var arguments = EncloseInQuotes(testAssembly);
+            var arguments = testAssembly.AddDoubleQuote();
 
             if (!string.IsNullOrWhiteSpace(testAdapterPath))
             {
                 // Append adapter path
-                arguments = string.Concat(arguments, " /testadapterpath:", EncloseInQuotes(testAdapterPath));
+                arguments = string.Concat(arguments, " /testadapterpath:", testAdapterPath.AddDoubleQuote());
             }
 
             if (!string.IsNullOrWhiteSpace(runSettings))
             {
                 // Append run settings
-                arguments = string.Concat(arguments, " /settings:", EncloseInQuotes(runSettings));
+                arguments = string.Concat(arguments, " /settings:", runSettings.AddDoubleQuote());
             }
 
             if (!string.IsNullOrWhiteSpace(framework))
             {
                 // Append framework setting
-                arguments = string.Concat(arguments, " /Framework:", EncloseInQuotes(framework));
+                arguments = string.Concat(arguments, " /Framework:", framework.AddDoubleQuote());
             }
 
-            arguments = string.Concat(arguments, " /logger:", EncloseInQuotes("console;verbosity=normal"));
+            arguments = string.Concat(arguments, " /logger:", "console;verbosity=normal".AddDoubleQuote());
 
             return arguments;
         }
@@ -339,7 +340,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             if (this.IsNetCoreRunner())
             {
                 var vstestConsoleDll = Path.Combine(this.testEnvironment.PublishDirectory, "vstest.console.dll");
-                vstestConsoleDll = EncloseInQuotes(vstestConsoleDll);
+                vstestConsoleDll = vstestConsoleDll.AddDoubleQuote();
                 args = string.Concat(
                     vstestConsoleDll,
                     " ",
@@ -393,16 +394,6 @@ namespace Microsoft.TestPlatform.TestUtilities
             this.standardTestOutput = Regex.Replace(this.standardTestOutput, @"\s+", " ");
         }
 
-        private static string EncloseString(string innerString, string outerString)
-        {
-            return string.Format("{1}{0}{1}", innerString, outerString);
-        }
-
-        private static string EncloseInQuotes(string innerString)
-        {
-            return EncloseString(innerString, "\"");
-        }
-
         /// <summary>
         /// Create runsettings file from runConfigurationDictionary at destinationRunsettingsPath
         /// </summary>
@@ -440,7 +431,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             var assertFullPaths = new string[assetNames.Length];
             for (var i = 0; i < assetNames.Length; i++)
             {
-                assertFullPaths[i] = IntegrationTestBase.EncloseString(this.GetAssetFullPath(assetNames[i]), "\"");
+                assertFullPaths[i] = this.GetAssetFullPath(assetNames[i]).AddDoubleQuote();
             }
 
             return string.Join(" ", assertFullPaths);

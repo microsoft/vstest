@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -234,9 +235,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private string GetTimestampedLogFile(string logFile)
         {
-            return "\"" + Path.ChangeExtension(logFile,
+            return Path.ChangeExtension(logFile,
                 string.Format("datacollector.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
-                    Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile))) + "\"";
+                    Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile))).AddDoubleQuote();
         }
     }
 }
