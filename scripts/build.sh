@@ -95,8 +95,7 @@ TPB_VersionSuffix=$VERSION_SUFFIX
 TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
-TPB_HasMono=false
-#TPB_HasMono=$(command -v mono > /dev/null && echo true || echo false)
+TPB_HasMono=$(command -v mono > /dev/null && echo true || echo false)
 
 #
 # Logging
