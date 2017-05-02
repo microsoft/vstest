@@ -504,7 +504,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
             Assert.AreEqual(errorData, this.errorMessage);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine));
         }
 
         [TestMethod]
@@ -518,7 +517,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Ignore new line chars
             Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
             Assert.AreEqual(errorData.Substring(5), this.errorMessage);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine));
         }
 
         [TestMethod]
@@ -530,7 +528,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo);
 
             Assert.IsNull(this.errorMessage);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine), Times.Never);
         }
 
         [TestMethod]
