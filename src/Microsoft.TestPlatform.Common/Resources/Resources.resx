@@ -121,7 +121,7 @@
     <value>Data collection : {0}</value>
   </data>
   <data name="DataCollectorErrorOnGetVariable" xml:space="preserve">
-    <value>Data collector '{0}' failed to provide intialization information. Error: {1}</value>
+    <value>Data collector '{0}' failed to provide initialization information. Error: {1}</value>
   </data>
   <data name="DataCollectorInitializationError" xml:space="preserve">
     <value>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</value>
@@ -142,7 +142,7 @@
     <value>Duplicate settings provider named '{0}'.  Ignoring the duplicate provider.</value>
   </data>
   <data name="DuplicateSettingsProvided" xml:space="preserve">
-    <value>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</value>
+    <value>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</value>
   </data>
   <data name="EmptyParenthesis" xml:space="preserve">
     <value>Error: Empty parenthesis ( )</value>
