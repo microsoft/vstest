@@ -71,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="e">hostprovider event args</param>
         public void OnDataCollectorLaunched(HostProviderEventArgs e)
         {
-            this.DataCollectorLaunched.SafeInvoke(this, e, "DataCollectorLauncher.OnHostLaunched");
+            this.DataCollectorLaunched.SafeInvoke(this, e, "DataCollectorLauncher.OnDataCollectorLaunched");
         }
 
         /// <summary>
