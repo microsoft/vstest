@@ -19,7 +19,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
-        <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
+        <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
         <note></note>
       </trans-unit>
       <trans-unit id="EmptyParenthesis">
@@ -87,7 +87,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
-        <source>Data collector '{0}' failed to provide intialization information. Error: {1}</source>
+        <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
         <target state="new">Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</target>
         <note></note>
       </trans-unit>

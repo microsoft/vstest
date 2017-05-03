@@ -396,10 +396,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             if (message == null)
             {
-                var reason = string.IsNullOrWhiteSpace(this.clientExitErrorMessage)
-                    ? CommonResources.UnableToCommunicateToTestHost
-                    : this.clientExitErrorMessage;
-                EqtTrace.Error("Unable to receive message from testhost: {0}", reason);
+                EqtTrace.Warning("TestRequestSender: Communication channel with test host is broken.");
+                var reason = CommonResources.UnableToCommunicateToTestHost;
+                if (!string.IsNullOrWhiteSpace(this.clientExitErrorMessage))
+                {
+                    reason = this.clientExitErrorMessage;
+                }
+                else
+                {
+                    // Test host process has not exited yet. We will wait for exit to allow us gather
+                    // standard error
+                    var processWaitEvent = new ManualResetEventSlim();
+                    try
+                    {
+                        EqtTrace.Info("TestRequestSender: Waiting for test host to exit.");
+                        processWaitEvent.Wait(TimeSpan.FromSeconds(10), this.clientExitCancellationSource.Token);
+
+                        // Use a default error message
+                        EqtTrace.Info("TestRequestSender: Timed out waiting for test host to exit.");
+                        reason = CommonResources.UnableToCommunicateToTestHost;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        EqtTrace.Info("TestRequestSender: Got error message from test host.");
+                        reason = this.clientExitErrorMessage;
+                    }
+                }
+
+                EqtTrace.Error("TestRequestSender: Unable to receive message from testhost: {0}", reason);
                 throw new IOException(reason);
             }
 
