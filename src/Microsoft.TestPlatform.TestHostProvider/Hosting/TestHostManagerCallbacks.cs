@@ -59,8 +59,7 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
 
             if (exitCode != 0)
             {
-                EqtTrace.Error("Test host exited with error: {0}", testHostProcessStdErrorStr);
-                messageLogger.SendMessage(TestMessageLevel.Error, testHostProcessStdErrorStr);
+                EqtTrace.Error("Test host exited with error: '{0}'", testHostProcessStdErrorStr);
             }
 
             onHostExited(new HostProviderEventArgs(testHostProcessStdErrorStr, exitCode, (process as Process).Id));

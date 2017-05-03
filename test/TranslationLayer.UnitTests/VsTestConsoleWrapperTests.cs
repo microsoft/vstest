@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using System.Collections.Generic;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -23,13 +24,13 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
         private Mock<ITranslationLayerRequestSender> mockRequestSender;
 
-        private List<string> testSources = new List<string> { "Hello", "World" };
+        private readonly List<string> testSources = new List<string> { "Hello", "World" };
 
-        private List<TestCase> testCases = new List<TestCase>
-                                              {
-                                                  new TestCase("a.b.c", new Uri("d://uri"), "a.dll"),
-                                                  new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
-                                              };
+        private readonly List<TestCase> testCases = new List<TestCase>
+                                                      {
+                                                          new TestCase("a.b.c", new Uri("d://uri"), "a.dll"),
+                                                          new TestCase("d.e.f", new Uri("g://uri"), "d.dll")
+                                                      };
 
         private ConsoleParameters consoleParameters;
 
@@ -40,7 +41,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
             this.mockRequestSender = new Mock<ITranslationLayerRequestSender>();
             this.mockProcessManager = new Mock<IProcessManager>();
-            this.consoleWrapper = new VsTestConsoleWrapper(this.mockRequestSender.Object, this.mockProcessManager.Object, this.consoleParameters);
+            this.consoleWrapper = new VsTestConsoleWrapper(
+                this.mockRequestSender.Object,
+                this.mockProcessManager.Object,
+                this.consoleParameters,
+                new Mock<ITestPlatformEventSource>().Object);
 
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
             this.mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
