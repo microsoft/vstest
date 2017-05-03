@@ -1,17 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.TestHostProvider.Hosting
+namespace Microsoft.VisualStudio.TestPlatform.Common
 {
     using System;
     using System.Diagnostics;
     using System.Text;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-    internal class TestHostManagerCallbacks
+    internal class ProcessCallbacks
     {
         public static void ErrorReceivedCallback(StringBuilder testHostProcessStdError, string data)
         {
@@ -30,10 +31,9 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
                     testHostProcessStdError.Clear();
                     data = data.Substring(data.Length - testHostProcessStdError.MaxCapacity);
                 }
-
-                // remove only what is required, from beginning of error stream
                 else
                 {
+                    // remove only what is required, from beginning of error stream
                     int required = data.Length + testHostProcessStdError.Length - testHostProcessStdError.MaxCapacity;
                     if (required > 0)
                     {

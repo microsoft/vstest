@@ -3,14 +3,30 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
     /// <summary>
     /// The DataCollectionLauncher interface.
     /// </summary>
     internal interface IDataCollectionLauncher
     {
+        #region events
+        /// <summary>
+        /// Raised when data collector is launched successfully
+        /// </summary>
+        event EventHandler<HostProviderEventArgs> DataCollectorLaunched;
+
+        /// <summary>
+        /// Raised when data collector is reports Error
+        /// </summary>
+        event EventHandler<HostProviderEventArgs> DataCollectorExited;
+
+        #endregion
+
         /// <summary>
         /// Gets the data collector process info.
         /// </summary>

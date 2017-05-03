@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.IO;
     using System.Threading;
 
@@ -14,10 +15,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
+    using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
@@ -34,35 +38,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private IProcessHelper processHelper;
         private string settingsXml;
         private int connectionTimeout;
-
+        private IMessageLogger messageLogger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
+        /// <param name="messageLogger">
+        /// The message Logger.
+        /// </param>
         /// <param name="settingsXml">
         /// Runsettings that contains the datacollector related configuration.
         /// </param>
-        public ProxyDataCollectionManager(string settingsXml)
-            : this(settingsXml, new ProcessHelper())
+        public ProxyDataCollectionManager(IMessageLogger messageLogger, string settingsXml)
+            : this(messageLogger, settingsXml, new ProcessHelper())
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
+        /// <param name="messageLogger">
+        /// The message Logger.
+        /// </param>
         /// <param name="settingsXml">
         /// The settings xml.
         /// </param>
         /// <param name="processHelper">
         /// The process helper.
         /// </param>
-        internal ProxyDataCollectionManager(string settingsXml, IProcessHelper processHelper) : this(settingsXml, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
+        internal ProxyDataCollectionManager(IMessageLogger messageLogger, string settingsXml, IProcessHelper processHelper) : this(messageLogger, settingsXml, new DataCollectionRequestSender(), processHelper, DataCollectionLauncherFactory.GetDataCollectorLauncher(processHelper, settingsXml))
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
+        /// <param name="messageLogger">
+        /// The message Logger.
+        /// </param>
         /// <param name="settingsXml">
         /// Runsettings that contains the datacollector related configuration.
         /// </param>
@@ -75,8 +88,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="dataCollectionLauncher">
         /// Launches datacollector process.
         /// </param>
-        internal ProxyDataCollectionManager(string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper, IDataCollectionLauncher dataCollectionLauncher)
+        internal ProxyDataCollectionManager(IMessageLogger messageLogger, string settingsXml, IDataCollectionRequestSender dataCollectionRequestSender, IProcessHelper processHelper, IDataCollectionLauncher dataCollectionLauncher)
         {
+            this.messageLogger = messageLogger;
             this.settingsXml = settingsXml;
             this.dataCollectionRequestSender = dataCollectionRequestSender;
             this.dataCollectionLauncher = dataCollectionLauncher;
@@ -151,6 +165,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         public void Dispose()
         {
+            this.dataCollectionLauncher.DataCollectorLaunched -= this.OnDataCollectorLaunched;
+            this.dataCollectionLauncher.DataCollectorExited -= this.OnDataCollectorExited;
             this.dataCollectionRequestSender.Close();
         }
 
@@ -158,6 +174,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         public void Initialize()
         {
             var port = this.dataCollectionRequestSender.InitializeCommunication();
+
+            this.dataCollectionLauncher.DataCollectorLaunched += this.OnDataCollectorLaunched;
+            this.dataCollectionLauncher.DataCollectorExited += this.OnDataCollectorExited;
 
             // Warn the user that execution will wait for debugger attach.
             var processId = this.dataCollectionLauncher.LaunchDataCollector(null, this.GetCommandLineArguments(port));
@@ -237,6 +256,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             return "\"" + Path.ChangeExtension(logFile,
                 string.Format("datacollector.{0}_{1}{2}", DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     Thread.CurrentThread.ManagedThreadId, Path.GetExtension(logFile))) + "\"";
+        }
+
+        private void OnDataCollectorLaunched(object sender, HostProviderEventArgs e)
+        {
+            EqtTrace.Verbose(e.Data);
+        }
+
+        private void OnDataCollectorExited(object sender, HostProviderEventArgs e)
+        {
+            if (e.ErrroCode != 0 && !string.IsNullOrWhiteSpace(e.Data))
+            {
+                this.messageLogger.SendMessage(TestMessageLevel.Error, string.Format(CultureInfo.CurrentUICulture, CommonResources.DataCollectionMessageFormat, e.Data));
+
+                // todo : Cancel test run here. 
+            }
         }
     }
 }

@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyModel;
-    using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -123,7 +122,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
         {
-            TestHostManagerCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
+            ProcessCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
         };
 
         /// <summary>
@@ -131,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
-            TestHostManagerCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data);
+            ProcessCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data);
         };
 
         /// <inheritdoc/>
