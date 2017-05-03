@@ -29,7 +29,7 @@ namespace Microsoft.TestPlatform.E2ETest
             var runnerLocation = Path.Combine(executingLocation, "vstest.console.exe");
             var testadapterPath = Path.Combine(executingLocation, "Adapter");
             var testAssembly = Path.Combine(executingLocation, "UnitTestProject.dll");
-            
+
             var arguments = string.Concat("\"", testAssembly, "\"", " /testadapterpath:\"", testadapterPath, "\"");
             var process = new Process
                               {

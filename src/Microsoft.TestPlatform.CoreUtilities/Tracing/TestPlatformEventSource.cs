@@ -176,5 +176,52 @@ namespace Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing
         {
             this.WriteEvent(TestPlatformInstrumentationEvents.DataCollectionStopEventId);
         }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerInitializeStartEventId)]
+        public void TranslationLayerInitializeStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerInitializeStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerInitializeStopEventId)]
+        public void TranslationLayerInitializeStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerInitializeStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerDiscoveryStartEventId)]
+        public void TranslationLayerDiscoveryStart()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerDiscoveryStartEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerDiscoveryStopEventId)]
+        public void TranslationLayerDiscoveryStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerDiscoveryStopEventId);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerExecutionStartEventId)]
+        public void TranslationLayerExecutionStart(long customTestHost, long sourcesCount, long testCasesCount, string runSettings)
+        {
+            this.WriteEvent(
+                TestPlatformInstrumentationEvents.TranslationLayerExecutionStartEventId,
+                customTestHost,
+                sourcesCount,
+                testCasesCount,
+                runSettings);
+        }
+
+        /// <inheritdoc/>
+        [Event(TestPlatformInstrumentationEvents.TranslationLayerExecutionStopEventId)]
+        public void TranslationLayerExecutionStop()
+        {
+            this.WriteEvent(TestPlatformInstrumentationEvents.TranslationLayerExecutionStopEventId);
+        }
     }
 }
