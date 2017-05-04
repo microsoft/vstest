@@ -14,6 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     internal static class TcpClientExtensions
     {
+        // Timeout for polling stream in micro seconds.
         private const int STREAMREADTIMEOUT = 1000 * 1000;
 
         internal static Task MessageLoopAsync(

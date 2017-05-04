@@ -18,6 +18,10 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     [TestClass]
     public class TestRequestSenderTests2
     {
+        private const int DUMMYPROTOCOLVERSION = 42;
+        private const int DEFAULTPROTOCOLVERSION = 1;
+        private const int DUMMYNEGOTIATEDPROTOCOLVERSION = 41;
+
         private readonly ITestRequestSender testRequestSender;
         private readonly Mock<ICommunicationServer> mockServer;
         private readonly Mock<IDataSerializer> mockDataSerializer;
@@ -34,7 +38,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockChannel = new Mock<ICommunicationChannel>();
             this.mockServer = new Mock<ICommunicationServer>();
             this.mockDataSerializer = new Mock<IDataSerializer>();
-            this.testRequestSender = new TestableTestRequestSender(this.mockServer.Object, this.mockDataSerializer.Object);
+            this.testRequestSender = new TestableTestRequestSender(this.mockServer.Object, this.mockDataSerializer.Object, new ProtocolConfig { Version = DUMMYPROTOCOLVERSION });
 
             this.connectedEventArgs = new ConnectedEventArgs(this.mockChannel.Object);
             this.mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
@@ -173,6 +177,43 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockDataSerializer.Verify(ds => ds.SerializeMessage(MessageType.SessionEnd), Times.Once);
         }
 
+        #region Version Check Tests
+
+        [TestMethod]
+        public void CheckVersionWithTestHostShouldSendHighestSupportedVersion()
+        {
+            this.SetupDeserializeMessage(MessageType.VersionCheck, 99);
+            this.SetupRaiseMessageReceivedOnCheckVersion();
+            this.SetupFakeCommunicationChannel();
+
+            this.testRequestSender.CheckVersionWithTestHost();
+
+            this.mockDataSerializer.Verify(ds => ds.SerializePayload(MessageType.VersionCheck, DUMMYPROTOCOLVERSION), Times.Once);
+            this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void CheckVersionWithTestHostShouldThrowIfTestHostVersionDoesNotMatch()
+        {
+            this.SetupDeserializeMessage(MessageType.ProtocolError, string.Empty);
+            this.SetupRaiseMessageReceivedOnCheckVersion();
+            this.SetupFakeCommunicationChannel();
+
+            Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
+        }
+
+        [TestMethod]
+        public void CheckVersionWithTestHostShouldThrowIfUnexpectedResponseIsReceived()
+        {
+            this.SetupDeserializeMessage(MessageType.TestCasesFound, string.Empty);
+            this.SetupRaiseMessageReceivedOnCheckVersion();
+            this.SetupFakeCommunicationChannel();
+
+            Assert.ThrowsException<TestPlatformException>(() => this.testRequestSender.CheckVersionWithTestHost());
+        }
+
+        #endregion
+
         #region Discovery Protocol Tests
         [TestMethod]
         public void InitializeDiscoveryShouldSendCommunicationMessageWithCorrectParameters()
@@ -193,7 +234,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
 
             this.mockDataSerializer.Verify(
-                s => s.SerializePayload(MessageType.StartDiscovery, It.IsAny<DiscoveryCriteria>()),
+                s => s.SerializePayload(MessageType.StartDiscovery, It.IsAny<DiscoveryCriteria>(), DEFAULTPROTOCOLVERSION),
                 Times.Once);
             this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
         }
@@ -207,7 +248,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.testRequestSender.DiscoverTests(new DiscoveryCriteria(), this.mockDiscoveryEventsHandler.Object);
 
             this.RaiseMessageReceivedEvent();
-            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleRawMessage("DummyData"));
+            this.mockDiscoveryEventsHandler.Verify(eh => eh.HandleRawMessage("DummyData"), Times.Once);
         }
 
         [TestMethod]
@@ -341,7 +382,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.StartTestRun(this.testRunCriteriaWithSources, this.mockExecutionEventsHandler.Object);
 
-            this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.StartTestExecutionWithSources, this.testRunCriteriaWithSources), Times.Once);
+            this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.StartTestExecutionWithSources, this.testRunCriteriaWithSources, DEFAULTPROTOCOLVERSION), Times.Once);
             this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
         }
 
@@ -353,19 +394,20 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.testRequestSender.StartTestRun(runCriteria, this.mockExecutionEventsHandler.Object);
 
-            this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.StartTestExecutionWithTests, runCriteria), Times.Once);
+            this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.StartTestExecutionWithTests, runCriteria, DEFAULTPROTOCOLVERSION), Times.Once);
             this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
         }
 
         [TestMethod]
         public void StartTestRunShouldNotifyRawMessageOnMessageReceived()
         {
+            this.SetupDeserializeMessage(MessageType.TestMessage, new TestMessagePayload());
             this.SetupFakeCommunicationChannel();
 
             this.testRequestSender.StartTestRun(this.testRunCriteriaWithSources, this.mockExecutionEventsHandler.Object);
 
-            this.mockDataSerializer.Verify(d => d.SerializePayload(MessageType.StartTestExecutionWithSources, this.testRunCriteriaWithSources), Times.Once);
-            this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
+            this.RaiseMessageReceivedEvent();
+            this.mockExecutionEventsHandler.Verify(eh => eh.HandleRawMessage("DummyData"), Times.Once);
         }
 
         [TestMethod]
@@ -583,10 +625,15 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
                 .Callback(() => throw new Exception("Dummy Message"));
         }
 
+        private void SetupRaiseMessageReceivedOnCheckVersion()
+        {
+            this.mockChannel.Setup(mc => mc.Send(It.IsAny<string>())).Callback(this.RaiseMessageReceivedEvent);
+        }
+
         private class TestableTestRequestSender : TestRequestSender2
         {
-            public TestableTestRequestSender(ICommunicationServer server, IDataSerializer serializer)
-                : base(server, serializer)
+            public TestableTestRequestSender(ICommunicationServer server, IDataSerializer serializer, ProtocolConfig protocolConfig)
+                : base(server, serializer, protocolConfig)
             {
             }
         }

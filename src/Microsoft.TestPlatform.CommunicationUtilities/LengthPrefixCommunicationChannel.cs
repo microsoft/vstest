@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// A communication channel using a length prefix packet frame for communication.
@@ -41,6 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             catch (Exception ex)
             {
+                EqtTrace.Verbose("LengthPrefixCommunicationChannel: Error sending data: {0}.", ex);
                 throw new CommunicationException("Unable to send data over channel.", ex);
             }
 

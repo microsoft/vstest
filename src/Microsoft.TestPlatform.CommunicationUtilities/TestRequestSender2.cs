@@ -37,13 +37,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private int operationCompleted;
 
         private ITestMessageEventHandler messageEventHandler;
-        private int highestNegotiatedVersion;
+
+        // Set default to 1, if protocol version check does not happen
+        // that implies host is using version 1
+        private int protocolVersion = 1;
+
+        private int highestSupportedVersion = 2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRequestSender2"/> class.
         /// </summary>
-        public TestRequestSender2()
-            : this(new SocketServer(), JsonDataSerializer.Instance)
+        /// <param name="protocolConfig">Protocol configuration.</param>
+        public TestRequestSender2(ProtocolConfig protocolConfig)
+            : this(new SocketServer(), JsonDataSerializer.Instance, protocolConfig)
         {
         }
 
@@ -52,15 +58,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         /// <param name="server">Communication server implementation.</param>
         /// <param name="serializer">Serializer implementation.</param>
-        protected TestRequestSender2(ICommunicationServer server, IDataSerializer serializer)
+        /// <param name="protocolConfig">Protocol configuration.</param>
+        protected TestRequestSender2(ICommunicationServer server, IDataSerializer serializer, ProtocolConfig protocolConfig)
         {
             this.communicationServer = server;
             this.dataSerializer = serializer;
             this.connected = new ManualResetEvent(false);
             this.operationCompleted = 0;
 
-            // TODO Change this to v2
-            this.highestNegotiatedVersion = 1;
+            this.highestSupportedVersion = protocolConfig.Version;
         }
 
         /// <inheritdoc />
@@ -97,10 +103,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
-                    var protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
-                    this.highestNegotiatedVersion = protocolVersion;
+                    this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
 
-                    EqtTrace.Info(@"TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.highestNegotiatedVersion);
+                    EqtTrace.Info(@"TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.protocolVersion);
                 }
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
@@ -124,7 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             try
             {
                 // Send the protocol negotiation request
-                var data = this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.highestNegotiatedVersion);
+                var data = this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.highestSupportedVersion);
                 this.channel.Send(data);
 
                 // Wait for negotiation response
@@ -209,7 +214,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.channel.MessageReceived += this.onMessageReceived;
             var message = this.dataSerializer.SerializePayload(
                 MessageType.StartDiscovery,
-                discoveryCriteria);
+                discoveryCriteria,
+                this.protocolVersion);
             this.channel.Send(message);
         }
 
@@ -239,7 +245,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             var message = this.dataSerializer.SerializePayload(
                 MessageType.StartTestExecutionWithSources,
-                runCriteria);
+                runCriteria,
+                this.protocolVersion);
             this.channel.Send(message);
         }
 
@@ -256,7 +263,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             var message = this.dataSerializer.SerializePayload(
                 MessageType.StartTestExecutionWithTests,
-                runCriteria);
+                runCriteria,
+                this.protocolVersion);
             this.channel.Send(message);
         }
 

@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// Frames and sends the provided data over communication channel.
         /// </summary>
-        /// <param name="data">Data to sent over the channel.</param>
+        /// <param name="data">Data to send over the channel.</param>
         /// <returns>A <see cref="Task"/> implying async nature of the function.</returns>
         Task Send(string data);
 

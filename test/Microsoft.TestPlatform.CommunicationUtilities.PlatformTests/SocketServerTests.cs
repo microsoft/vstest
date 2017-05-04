@@ -46,22 +46,6 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             Assert.IsTrue(this.tcpClient.Connected);
         }
 
-        ////[TestMethod]
-        ////public async Task SocketServerStartShouldNotServiceMoreThanOneClients()
-        ////{
-            ////var connectionInfo = this.socketServer.Start();
-
-            ////await this.ConnectToServer(int.Parse(connectionInfo));
-            ////var client2 = new TcpClient();
-            ////await client2.ConnectAsync(IPAddress.Loopback, int.Parse(connectionInfo));
-            ////Assert.ThrowsException<SocketException>(() =>
-                    ////{
-                        ////var clientStream = client2.GetStream();
-                        ////clientStream.WriteByte(0x1);
-                        ////clientStream.Flush();
-                    ////});
-        ////}
-
         [TestMethod]
         public void SocketServerStopShouldStopListening()
         {
