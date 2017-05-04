@@ -12,7 +12,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyModel;
-    using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -43,6 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     {
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
         private const string DotnetTestHostFriendltName = "DotnetTestHost";
+        private const string ProcessNameForLogging = "Test host";
 
         private IDotnetHostHelper dotnetHostHelper;
 
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
         {
-            TestHostManagerCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
+            ProcessCallbacks.ExitCallBack(this.processHelper, process, this.testHostProcessStdError, this.OnHostExited, ProcessNameForLogging);
         };
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
-            TestHostManagerCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data);
+            ProcessCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data, ProcessNameForLogging);
         };
 
         /// <inheritdoc/>

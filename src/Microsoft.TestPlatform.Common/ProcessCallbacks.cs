@@ -1,68 +1,67 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.TestHostProvider.Hosting
+namespace Microsoft.VisualStudio.TestPlatform.Common
 {
     using System;
     using System.Diagnostics;
     using System.Text;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-    internal class TestHostManagerCallbacks
+    internal class ProcessCallbacks
     {
-        public static void ErrorReceivedCallback(StringBuilder testHostProcessStdError, string data)
+        public static void ErrorReceivedCallback(StringBuilder processStdError, string data, string processName)
         {
             if (!string.IsNullOrEmpty(data))
             {
                 // Log all standard error message because on too much data we ignore starting part.
-                // This is helpful in abnormal failure of testhost.
-                EqtTrace.Warning("Test host standard error line: {0}", data);
+                // This is helpful in abnormal failure of process.
+                EqtTrace.Warning("{0} standard error line: {1}", processName, data);
 
                 // Add newline for readbility.
                 data += Environment.NewLine;
 
                 // if incoming data stream is huge empty entire testError stream, & limit data stream to MaxCapacity
-                if (data.Length > testHostProcessStdError.MaxCapacity)
+                if (data.Length > processStdError.MaxCapacity)
                 {
-                    testHostProcessStdError.Clear();
-                    data = data.Substring(data.Length - testHostProcessStdError.MaxCapacity);
+                    processStdError.Clear();
+                    data = data.Substring(data.Length - processStdError.MaxCapacity);
                 }
-
-                // remove only what is required, from beginning of error stream
                 else
                 {
-                    int required = data.Length + testHostProcessStdError.Length - testHostProcessStdError.MaxCapacity;
+                    // remove only what is required, from beginning of error stream
+                    int required = data.Length + processStdError.Length - processStdError.MaxCapacity;
                     if (required > 0)
                     {
-                        testHostProcessStdError.Remove(0, required);
+                        processStdError.Remove(0, required);
                     }
                 }
 
-                testHostProcessStdError.Append(data);
+                processStdError.Append(data);
             }
         }
 
         public static void ExitCallBack(
             IProcessHelper processHelper,
-            IMessageLogger messageLogger,
             object process,
-            StringBuilder testHostProcessStdError,
-            Action<HostProviderEventArgs> onHostExited)
+            StringBuilder processStdError,
+            Action<HostProviderEventArgs> onProcessExited, string processName)
         {
             var exitCode = 0;
-            var testHostProcessStdErrorStr = testHostProcessStdError.ToString();
+            var processStdErrorStr = processStdError.ToString();
 
             processHelper.TryGetExitCode(process, out exitCode);
 
             if (exitCode != 0)
             {
-                EqtTrace.Error("Test host exited with error: '{0}'", testHostProcessStdErrorStr);
+                EqtTrace.Error("{0} exited with error: '{1}'", processName, processStdErrorStr);
             }
 
-            onHostExited(new HostProviderEventArgs(testHostProcessStdErrorStr, exitCode, (process as Process).Id));
+            onProcessExited(new HostProviderEventArgs(processStdErrorStr, exitCode, (process as Process).Id));
         }
     }
 }

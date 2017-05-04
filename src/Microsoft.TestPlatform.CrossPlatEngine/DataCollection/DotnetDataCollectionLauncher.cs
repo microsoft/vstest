@@ -7,8 +7,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using System.Text;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -18,16 +19,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
-    /// The datacollection launcher.
     /// This works for Desktop local scenarios
     /// </summary>
-    internal class DotnetDataCollectionLauncher : IDataCollectionLauncher
+    internal class DotnetDataCollectionLauncher : DataCollectionLauncher
     {
         private const string DataCollectorProcessName = "datacollector.dll";
         private const string DotnetProcessName = "dotnet.exe";
         private const string DotnetProcessNameXPlat = "dotnet";
-
-        private IProcessHelper processHelper;
 
         private IFileHelper fileHelper;
 
@@ -47,7 +45,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="processHelper">
         /// The process helper. 
         /// </param>
-        internal DotnetDataCollectionLauncher(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetHostHelper)
+        /// <param name="fileHelper">
+        /// The file Helper.
+        /// </param>
+        /// <param name="dotnetHostHelper">
+        /// The dotnet Host Helper.
+        /// </param>
+        internal DotnetDataCollectionLauncher(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetHostHelper) : base(processHelper, TestSessionMessageLogger.Instance)
         {
             this.processHelper = processHelper;
             this.DataCollectorProcess = null;
@@ -58,9 +62,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Gets the data collector process.
         /// </summary>
-        public Process DataCollectorProcess
+        public override Process DataCollectorProcess
         {
-            get; private set;
+            get; protected set;
         }
 
         /// <summary>
@@ -69,9 +73,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="environmentVariables">Environment variables for the process.</param>
         /// <param name="commandLineArguments">The command line arguments to pass to the process.</param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-        public virtual int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+        public override int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
             string dataCollectorFileName = null;
+            this.dcExitedEventRaised = false;
+            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+
             var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
             var currentProcessFileName = this.processHelper.GetCurrentProcessFileName();
 
@@ -128,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var cliArgs = string.Join(" ", commandLineArguments);
             var argumentsString = string.Format("{0} {1} {2} ", args, dataCollectorAssemblyPath, cliArgs);
 
-            this.DataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory, environmentVariables, null, null) as Process;
+            this.DataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory, environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
             return this.DataCollectorProcess != null ? this.DataCollectorProcess.Id : 0;
         }
     }

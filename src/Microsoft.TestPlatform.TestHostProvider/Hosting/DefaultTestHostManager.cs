@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.TestPlatform.TestHostProvider.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -35,6 +35,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
         private const string DefaultTestHostFriendltName = "DefaultTestHost";
+
+        private const string ProcessNameForLogging = "Test host";
 
         private Architecture architecture;
 
@@ -93,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
         {
-            TestHostManagerCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
+            ProcessCallbacks.ExitCallBack(this.processHelper, process, this.testHostProcessStdError, this.OnHostExited, ProcessNameForLogging);
         };
 
         /// <summary>
@@ -101,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
-            TestHostManagerCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data);
+            ProcessCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data, ProcessNameForLogging);
         };
 
         /// <inheritdoc/>
