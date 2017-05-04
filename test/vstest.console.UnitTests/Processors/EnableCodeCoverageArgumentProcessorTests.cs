@@ -6,12 +6,17 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
 
     [TestClass]
     public class EnableCodeCoverageArgumentProcessorTests
     {
         private TestableRunSettingsProvider settingsProvider;
         private EnableCodeCoverageArgumentExecutor executor;
+        private Architecture architecture;
+        private Framework frameWork;
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
 
         public EnableCodeCoverageArgumentProcessorTests()
@@ -67,8 +72,14 @@ namespace vstest.console.UnitTests.Processors
 
             this.executor.Initialize("Code Coverage");
 
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -81,7 +92,13 @@ namespace vstest.console.UnitTests.Processors
 
             this.executor.Initialize("Code Coverage");
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -92,9 +109,15 @@ namespace vstest.console.UnitTests.Processors
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
 
-            this.executor.Initialize("Code Coverage");            
+            this.executor.Initialize("Code Coverage");
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
         [TestMethod]
@@ -107,7 +130,20 @@ namespace vstest.console.UnitTests.Processors
 
             this.executor.Initialize("Code Coverage");
 
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+            SetPlatformAndArchitecture();
+
+            var expectedSettings = string.Format(
+                "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\">\r\n        <Configuration>\r\n          <Framework>{0}</Framework>\r\n          <Architecture>{1}</Architecture>\r\n        </Configuration>\r\n      </DataCollector>\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>",
+                frameWork.Name, architecture.ToString());
+
+            Assert.AreEqual(expectedSettings, this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        private void SetPlatformAndArchitecture()
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(this.settingsProvider.ActiveRunSettings.SettingsXml);
+            this.frameWork = runConfiguration.TargetFrameworkVersion;
+            this.architecture = runConfiguration.TargetPlatform;
         }
 
         #endregion

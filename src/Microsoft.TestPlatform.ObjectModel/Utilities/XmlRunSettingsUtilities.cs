@@ -259,8 +259,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                     return null;
                 }
 
+                var runConfiguration = GetRunConfigurationNode(runSettingsXml);
+                var frameWork = runConfiguration.TargetFrameworkVersion;
+                var architecture = runConfiguration.TargetPlatform;
+
                 // Reached here => DC element present. 
-                return DataCollectionRunSettings.FromXml(reader);
+                return DataCollectionRunSettings.FromXml(reader, frameWork, architecture);
             }
         }
 

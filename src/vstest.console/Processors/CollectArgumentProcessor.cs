@@ -7,6 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Collections.Generic;
 
     using System.Globalization;
+    using System.IO;
+    using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -93,6 +95,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private IRunSettingsProvider runSettingsManager;
         internal static List<string> EnabledDataCollectors = new List<string>();
+
+        private const string DefaultConfigurationSettings = @"<Configuration />";
         internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager)
         {
             this.runSettingsManager = runSettingsManager;
@@ -155,13 +159,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 dataCollectorSettings = new DataCollectorSettings();
                 dataCollectorSettings.FriendlyName = argument;
-                dataCollectorSettings.IsEnabled = true;
                 dataCollectionRunSettings.DataCollectorSettingsList.Add(dataCollectorSettings);
             }
-            else
+
+            // todo: remove adding default configuration element once we pass full runsettings to datacollectors
+            if (dataCollectorSettings.Configuration == null)
             {
-                dataCollectorSettings.IsEnabled = true;
+                var doc = new XmlDocument();
+                using (
+                    var xmlReader = XmlReader.Create(
+                        new StringReader(DefaultConfigurationSettings),
+                        new XmlReaderSettings() { CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
+                {
+                    doc.Load(xmlReader);
+                }
+
+                dataCollectorSettings.Configuration = doc.DocumentElement;
+                var settings = RunSettingsManager.Instance.ActiveRunSettings?.SettingsXml;
+
+                var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settings);
+                var frameWork = runConfiguration.TargetFrameworkVersion;
+                var architecture = runConfiguration.TargetPlatform;
+
+                // Add Framework config, since it could be required by DataCollector, to determine whether they support this Framework or not
+                if (frameWork != null)
+                {
+                    AppendChildNodeOrInnerText(doc, dataCollectorSettings.Configuration, "Framework", "", frameWork.Name);
+                }
+                // Add Architecture configuration, since native binaries are Architecture specific, & datacollectors might need this information
+                // to load appropriate native dll.
+                AppendChildNodeOrInnerText(doc, dataCollectorSettings.Configuration, "Architecture", "", architecture.ToString());
             }
+
+            dataCollectorSettings.IsEnabled = true;
         }
 
         private static void DisableUnConfiguredDataCollectors(DataCollectionRunSettings dataCollectionRunSettings)
@@ -194,6 +224,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             return false;
+        }
+
+        private static void AppendChildNodeOrInnerText(XmlDocument doc, XmlElement owner, string elementName, string nameSpaceUri, string innerText)
+        {
+            var node = owner.SelectSingleNode(elementName) ?? doc.CreateNode("element", elementName, nameSpaceUri);
+            node.InnerText = innerText;
+            owner.AppendChild(node);
         }
     }
 }
