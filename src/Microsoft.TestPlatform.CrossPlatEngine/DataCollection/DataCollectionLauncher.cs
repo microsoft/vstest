@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         protected StringBuilder testHostProcessStdError;
 
+        private const string ProcessNameForLogging = "Data collector";
+
         /// <summary>
         /// Gets or sets the error length for datacollector error stream.
         /// </summary>
@@ -38,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         protected int TimeOut { get; set; } = 10000;
 
-        public virtual Process DataCollectorProcess { get;  protected set; }
+        public virtual Process DataCollectorProcess { get; protected set; }
 
         public event EventHandler<HostProviderEventArgs> DataCollectorLaunched;
         public event EventHandler<HostProviderEventArgs> DataCollectorExited;
@@ -92,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         protected Action<object> ExitCallBack => (process) =>
         {
-            ProcessCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnDataCollectorExited);
+            ProcessCallbacks.ExitCallBack(this.processHelper, process, this.testHostProcessStdError, this.OnDataCollectorExited, ProcessNameForLogging);
         };
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         protected Action<object, string> ErrorReceivedCallback => (process, data) =>
         {
-            ProcessCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data);
+            ProcessCallbacks.ErrorReceivedCallback(this.testHostProcessStdError, data, ProcessNameForLogging);
         };
     }
 }
