@@ -229,20 +229,23 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
+        <target state="translated">--logger|/logger:&lt;Identifikátor URI protokolovače / PopisnýNázev&gt;
       Určuje protokolovač pro výsledky testu. Pokud třeba chcete protokolovat výsledky 
-      do souboru výsledků testování nástroje Visual Studio (TRX), použijte /logger:trx [;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
+      do souboru výsledků testování sady Visual Studio (TRX), použijte /logger:trx [;LogFileName=&lt;Jako výchozí se nastaví jedinečný název souboru.&gt;]
       Vytvoří soubor v adresáři TestResults s daným názvem LogFileName.
+
+      Změna úrovně podrobností pro protokolovač konzoly. Povolené hodnoty podrobností: quiet, minimal a normal.
+      Příklad: /logger:console;verbosity=&lt;Výchozí hodnotou je minimal.&gt;
 
       Pokud chcete výsledky testu publikovat na Team Foundation Server, použijte TfsPublisher podle ukázky níže.
       Příklad: /logger:TfsPublisher;
                 Collection=&lt;adresa URL kolekce týmového projektu&gt;;
-                BuildName=&lt;název buildu&gt;;
+                BuildName=&lt;název sestavení&gt;;
                 TeamProject=&lt;název týmového projektu&gt;
-                [;Platform=&lt;výchozí hodnota je Any CPU&gt;]
-                [;Flavor=&lt;výchozí hodnotou je Debug&gt;]
+                [;Platform=&lt;Výchozí hodnotou je Any CPU.&gt;]
+                [;Flavor=&lt;Výchozí hodnotou je Debug.&gt;]
                 [;RunTitle=&lt;nadpis&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--protokoly | / logger: &lt; Uri/FriendlyName protokolovacího nástroje &gt;
       Zadejte protokolovací nástroj pro výsledky testů.  Výsledky do Visual Studio testovací výsledky souboru (TRX) použijte k přihlášení /logger:trx.
@@ -277,8 +280,8 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="new">Použití: vstest.console.exe [argumenty] [možnosti] [[--] &lt;args&gt;...]]</target>
-        <note></note>
+        <target state="translated">Použití: vstest.console.exe [argumenty] [možnosti] [[--] &lt;argumenty RunSettings&gt;...]]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Použití: vstest.console.exe [argumenty] [možnosti]</target>
         </alt-trans>
@@ -472,13 +475,11 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="new">  Spuštění testů ve stejném procesu:
+        <target state="translated">  Spuštění testů:
     &gt;vstest.console.exe tests.dll 
-  Spuštění testů v samostatném procesu:
-    &gt;vstest.console.exe /inIsolation tests.dll
-  Spuštění testů s dalšími nastaveními, třeba s kolekcemi dat:
+  Spuštění testů s dalšími nastaveními, například s kolekcemi dat:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Chcete-li spustit testy ve stejném procesu:
     &gt; vstest.console.exe tests.dll Chcete-li spustit testy v samostatném procesu:
@@ -945,10 +946,9 @@
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</source>
-        <target state="new">/EnableCodeCoverage
-      Povolí v testovacím běhu adaptér diagnostických dat CodeCoverage. Pokud
-      se tento argument v souboru nastavení nezadá, použije se výchozí nastavení.</target>
-        <note></note>
+        <target state="translated">/EnableCodeCoverage
+      Povolí kolekci dat CodeCoverage pro testovací běh.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Umožňuje data diagnostiky adaptéru "CodeCoverage" do testovacího běhu. Výchozí nastavení se používají, pokud není zadán, pomocí souboru nastavení.</target>
@@ -1195,7 +1195,7 @@
       <trans-unit id="BuildBasePathArgumentHelp">
         <source>--BuildBasePath|/BuildBasePath:&lt;BuildBasePath&gt;
       The directory containing the temporary outputs.</source>
-        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;CestaKZákladuSestavení&gt;
+        <target state="translated">--BuildBasePath|/BuildBasePath:&lt;ZákladníCestaKSestavení&gt;
       Adresář, který obsahuje dočasné výstupy</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -1490,9 +1490,11 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="new">Args:
-      Veškeré dodatečné argumenty k předání do adaptéru. Argumenty je možné zadat jako dvojice název-hodnota ve formě &lt;n&gt;=&lt;v&gt;, kde &lt;n&gt; je název argumentu a &lt;v&gt; je jeho hodnota. Více argumentů oddělte mezerou.</target>
-        <note></note>
+        <target state="translated">Argumenty RunSettings:
+      Argumenty k předání konfigurací runsettings prostřednictvím příkazového řádku. Argumenty je možné zadat jako dvojici název-hodnota ve formě [název]=[hodnota] po -- . Po -- následuje mezera. 
+      K oddělení více dvojic [název]=[hodnota] použijte mezeru.
+      Další informace o podpoře argumentů RunSettings: https://aka.ms/vstest-runsettings-arguments</target>
+        <note />
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
@@ -1503,46 +1505,47 @@
         <source>--ResultsDirectory|/ResultsDirectory
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
-        <target state="new">--ResultsDirectory|/ResultsDirectory
-      Test results directory will be created in specified path if not exists.
-      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
-        <note></note>
+        <target state="translated">--ResultsDirectory|/ResultsDirectory
+      Na zadané cestě se vytvoří adresář pro výsledky testů (pokud neexistuje).
+      Příklad  /ResultsDirectory:&lt;cestaKAdresářiVýsledků&gt;</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
         <source>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</source>
-        <target state="new">The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
-        <note></note>
+        <target state="translated">Parametr /ResultsDirectory vyžaduje hodnotu určující, kam se výsledky testů uloží. Příklad:  /ResultsDirectory:c:\MůjAdresářVýsledkůTestů</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidResultsDirectoryPathCommand">
         <source>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</source>
-        <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
-        <note></note>
+        <target state="translated">Cesta {0} zadaná v ResultsDirectory není platná. Chyba: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
-        <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
-        <note></note>
+        <target state="translated">Příznak /InIsolation je zastaralý. Testy se vždy spouští v samostatném procesu.</target>
+        <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run  {0}</source>
-        <target state="new">Not Run  {0}</target>
-        <note></note>
+        <target state="translated">Nespuštěno: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
-        <target state="new">Logging Vstest Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Protokolování diagnostiky Vstest v souboru: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="new">CollectArgumentHelp</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:&lt;popisný název kolekce dat&gt;
+      Povolí kolekci dat pro testovací běh. Další informace: https://aka.ms/vstest-collect</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
-        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
-        <note></note>
+        <target state="translated">Popisný název kolekce dat {0} není platný. Kolekce dat se bude ignorovat.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

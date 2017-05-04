@@ -154,23 +154,23 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
-        <target state="new">Testhost process exited with error: {0}</target>
-        <note></note>
+        <target state="translated">Le processus testhost s'est arrêté avec l'erreur : {0}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
-        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
-        <note></note>
+        <target state="translated">Le débogage de collecteur de données est activé. Attachez le débogueur au processus datacollector pour continuer.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
-        <note></note>
+        <target state="translated">Aucun test n'est disponible dans {0}. Vérifiez que le découvreur et les exécuteurs de tests sont inscrits, et que les paramètres de version de la plateforme et du framework sont corrects, puis réessayez.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TesthostDiagLogOutputFile">
         <source>Logging TestHost Diagnostics in file: {0}</source>
-        <target state="new">Logging TestHost Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Journalisation des diagnostics TestHost dans le fichier : {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>

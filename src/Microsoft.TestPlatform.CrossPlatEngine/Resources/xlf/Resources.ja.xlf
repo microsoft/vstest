@@ -140,7 +140,7 @@
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
         <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="translated">フィルターに一致するテストがありません。フィルターに無効なプロパティが&amp;1; つ以上含まれています ({0})。有効なプロパティを含むフィルター式を指定 ({1}) してもう一度お試しください。</target>
+        <target state="translated">フィルターに一致するテストがありません。フィルターに無効なプロパティが 1 つ以上含まれています ({0})。有効なプロパティを含むフィルター式を指定 ({1}) してもう一度お試しください。</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">1 つまたは複数のプロパティは無効です ({0}) が含まれているために、テストによって、フィルターは一致しませんでした。有効なプロパティ ({1}) を含むフィルター式を指定してからやり直してください。</target>
@@ -154,23 +154,23 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
-        <target state="new">Testhost process exited with error: {0}</target>
-        <note></note>
+        <target state="translated">Testhost プロセスが次のエラーにより終了しました: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
-        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
-        <note></note>
+        <target state="translated">DataCollector のデバッグが有効です。続行するにはデバッガーを datacollector プロセスにアタッチしてください。</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
-        <note></note>
+        <target state="translated">{0} で使用できるテストはありません。テスト探索プログラムと実行プログラムが登録されており、プラットフォームとフレームワークのバージョン設定が適切であることを確認して、もう一度お試しください。</target>
+        <note />
       </trans-unit>
       <trans-unit id="TesthostDiagLogOutputFile">
         <source>Logging TestHost Diagnostics in file: {0}</source>
-        <target state="new">Logging TestHost Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">次のファイルで TestHost 診断をログ記録しています: {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>

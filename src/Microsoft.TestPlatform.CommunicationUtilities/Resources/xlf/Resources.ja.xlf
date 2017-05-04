@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">アクティブなテストの実行が中止されました。 {0}</target>
-        <note></note>
+        <target state="translated">アクティブなテストの実行が中止されました。理由: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの実行は中止されました。</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">アクティブなテスト探索が中止されました。 {0}</target>
-        <note></note>
+        <target state="translated">アクティブなテスト探索が中止されました。理由: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">アクティブなテストの探索は中止されました。</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
-        <target state="new">テスト実行プロセスと通信できません。</target>
-        <note></note>
+        <target state="translated">テスト ホスト プロセスと通信できません。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">テストの実行プロセスと通信できません。</target>
         </alt-trans>
@@ -58,13 +58,13 @@
       </trans-unit>
       <trans-unit id="UnexpectedMessage">
         <source>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</source>
-        <target state="new">Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</target>
-        <note></note>
+        <target state="translated">予期しないメッセージを受信しました。予想されたメッセージの種類: {0} 実際のメッセージの種類: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VersionCheckFailed">
         <source>Protocol version check failed. Make sure test runner and host are compatible.</source>
-        <target state="new">Protocol version check failed. Make sure test runner and host are compatible.</target>
-        <note></note>
+        <target state="translated">プロトコルのバージョンを確認できませんでした。テスト ランナーとホストに互換性があることをご確認ください。</target>
+        <note />
       </trans-unit>
     </body>
   </file>
