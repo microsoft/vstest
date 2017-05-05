@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -53,7 +54,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 }
 
                 // Ensure path is double quoted. if path has white space then it can create problem.
-                this.logFilePath = "\"" + value + "\"";
+                this.logFilePath = value.AddDoubleQuote();
             }
         }
 

@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.E2ETest
 {
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using System.Diagnostics;
     using System.IO;
     
@@ -30,7 +31,8 @@ namespace Microsoft.TestPlatform.E2ETest
             var testadapterPath = Path.Combine(executingLocation, "Adapter");
             var testAssembly = Path.Combine(executingLocation, "UnitTestProject.dll");
 
-            var arguments = string.Concat("\"", testAssembly, "\"", " /testadapterpath:\"", testadapterPath, "\"");
+            var arguments = string.Concat(testAssembly.AddDoubleQuote(), " /testadapterpath:", testadapterPath.AddDoubleQuote());
+
             var process = new Process
                               {
                                   StartInfo =
