@@ -69,7 +69,7 @@ DOTNET_CLI_VERSION="latest"
 # Build configuration
 #
 TPB_Solution="TestPlatform.sln"
-TPB_TargetFrameworkCore="netcoreapp1.0"
+TPB_TargetFrameworkCore="netcoreapp2.0"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
 TPB_Verbose=$VERBOSE
@@ -111,8 +111,9 @@ function usage()
 function invoke_test()
 {
     local dotnet=$(_get_dotnet_path)
+    local vstest=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore/vstest.console.dll
 
-    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet vstest --parallel
+    find ./test -path $PROJECT_NAME_PATTERNS | xargs $dotnet $vstest --parallel
 }
 
 #
