@@ -25,7 +25,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private readonly IDataSerializer dataSerializer;
 
-        private readonly ManualResetEvent connected;
+        private readonly ManualResetEventSlim connected;
+
+        private readonly ManualResetEventSlim clientExited;
 
         private ICommunicationChannel channel;
 
@@ -37,6 +39,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private int operationCompleted;
 
         private ITestMessageEventHandler messageEventHandler;
+
+        private string clientExitErrorMessage;
 
         // Set default to 1, if protocol version check does not happen
         // that implies host is using version 1
@@ -63,7 +67,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.communicationServer = server;
             this.dataSerializer = serializer;
-            this.connected = new ManualResetEvent(false);
+            this.connected = new ManualResetEventSlim(false);
+            this.clientExited = new ManualResetEventSlim(false);
             this.operationCompleted = 0;
 
             this.highestSupportedVersion = protocolConfig.Version;
@@ -90,12 +95,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public bool WaitForRequestHandlerConnection(int connectionTimeout)
         {
-            return this.connected.WaitOne(connectionTimeout);
+            return this.connected.Wait(connectionTimeout);
         }
 
         /// <inheritdoc />
         public void CheckVersionWithTestHost()
         {
+            // Negotiation follows these steps:
+            // Runner sends highest supported version to Test host
+            // Test host sends the version it can support (must be less than highest) to runner
+            // Error case: test host can send a protocol error if it cannot find a supported version
             var protocolNegotiated = new ManualResetEvent(false);
             this.onMessageReceived = (sender, args) =>
             {
@@ -128,7 +137,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             try
             {
-                // Send the protocol negotiation request
+                // Send the protocol negotiation request. Note that we always serialize this data
+                // without any versioning in the message itself.
                 var data = this.dataSerializer.SerializePayload(MessageType.VersionCheck, this.highestSupportedVersion);
                 this.channel.Send(data);
 
@@ -152,7 +162,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var message = this.dataSerializer.SerializePayload(
                 MessageType.DiscoveryInitialize,
-                pathToAdditionalExtensions);
+                pathToAdditionalExtensions,
+                this.protocolVersion);
             this.channel.Send(message);
         }
 
@@ -228,7 +239,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var message = this.dataSerializer.SerializePayload(
                 MessageType.ExecutionInitialize,
-                pathToAdditionalExtensions);
+                pathToAdditionalExtensions,
+                this.protocolVersion);
             this.channel.Send(message);
         }
 
@@ -294,17 +306,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void OnClientProcessExit(string stdError)
         {
-            // This method is called on test host exit. If test host has any errors, stdError is not
-            // empty. In case of test host crash, there is a race condition between
-            // ClientDisconnected and process exit. We're sending a message to event handlers if
-            // stdErr is not empty. Ideally, "whether a message is an error" should be provided to
-            // this API.
-            EqtTrace.Info("TestRequestSender.OnClientProcessExit: Test host process exited.");
-            if (!string.IsNullOrWhiteSpace(stdError))
-            {
-                EqtTrace.Error("TestRequestSender.OnClientProcessExit: Test host stderr: " + stdError);
-                this.LogErrorMessage(stdError);
-            }
+            // This method is called on test host exit. If test host has any errors, stdError
+            // provides the crash call stack.
+            EqtTrace.Info("TestRequestSender.OnClientProcessExit: Test host process exited. Standard error: " + stdError);
+            this.clientExitErrorMessage = stdError;
+            this.clientExited.Set();
+
+            // Note that we're not explicitly disconnecting the communication channel; wait for the
+            // channel to determine the disconnection on its own.
         }
 
         /// <inheritdoc />
@@ -363,7 +372,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         var data =
                             this.dataSerializer.SerializePayload(
                                 MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
-                                processId);
+                                processId,
+                                this.protocolVersion);
 
                         this.channel.Send(data);
                         break;
@@ -383,10 +393,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             this.SetOperationComplete();
-            EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
 
-            var reason = string.Format(CommonResources.AbortedTestRun, exception?.Message);
-            this.LogErrorMessage(reason);
+            this.LogErrorMessage(string.Format("Test host standard error: {0}.", this.GetTestHostErrorOutput()));
+            EqtTrace.Error("TestRequestSender: Aborting test run because {0}", exception);
+            this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, exception?.Message));
 
             // notify test run abort to vstest console wrapper.
             var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
@@ -396,8 +406,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             // notify of a test run complete and bail out.
             testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
-
-            this.CleanupCommunicationIfProcessExit();
         }
 
         private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception)
@@ -408,10 +416,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
 
             this.SetOperationComplete();
-            EqtTrace.Error("Server: TestExecution: Aborting test discovery because {0}", exception);
 
-            var reason = string.Format(CommonResources.AbortedTestDiscovery, exception?.Message);
-            this.LogErrorMessage(reason);
+            this.LogErrorMessage(string.Format("Test host standard error: {0}.", this.GetTestHostErrorOutput()));
+            EqtTrace.Error("TestRequestSender: Aborting test discovery because {0}", exception);
+            this.LogErrorMessage(string.Format(CommonResources.AbortedTestDiscovery, exception?.Message));
 
             // Notify discovery abort to IDE test output
             var payload = new DiscoveryCompletePayload()
@@ -425,8 +433,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             // Complete discovery
             eventHandler.HandleDiscoveryComplete(-1, null, true);
-
-            this.CleanupCommunicationIfProcessExit();
         }
 
         private void LogErrorMessage(string message)
@@ -457,8 +463,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             Interlocked.CompareExchange(ref this.operationCompleted, 1, 0);
         }
 
-        private void CleanupCommunicationIfProcessExit()
+        private string GetTestHostErrorOutput()
         {
+            // Wait for test host to exit for a moment
+            if (this.clientExited.Wait(10 * 1000))
+            {
+                EqtTrace.Info("TestRequestSender: Received test host error message.");
+                return this.clientExitErrorMessage;
+            }
+
+            EqtTrace.Info("TestRequestSender: Timed out waiting for test host error message.");
+            return string.Empty;
         }
     }
 }
