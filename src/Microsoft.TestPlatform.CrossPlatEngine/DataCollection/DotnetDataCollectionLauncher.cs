@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -91,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
-                var argsToAdd = " --runtimeconfig \"" + runtimeConfigPath + "\"";
+                var argsToAdd = " --runtimeconfig " + runtimeConfigPath.AddDoubleQuote();
                 args += argsToAdd;
                 if (EqtTrace.IsVerboseEnabled)
                 {
@@ -110,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var depsFilePath = Path.Combine(currentWorkingDirectory, string.Concat(dataCollectorFileName, ".deps.json"));
             if (this.fileHelper.Exists(depsFilePath))
             {
-                var argsToAdd = " --depsfile \"" + depsFilePath + "\"";
+                var argsToAdd = " --depsfile " + depsFilePath.AddDoubleQuote();
                 args += argsToAdd;
                 if (EqtTrace.IsVerboseEnabled)
                 {

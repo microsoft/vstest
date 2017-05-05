@@ -11,6 +11,8 @@ namespace Microsoft.TestPlatform.Build.Tasks
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
 
+    using Microsoft.TestPlatform.Build.Extensions;
+
     using Trace;
 
     public class VSTestTask : Task, ICancelableTask
@@ -131,17 +133,17 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // TODO log arguments in task
             if (!string.IsNullOrEmpty(this.VSTestSetting))
             {
-                allArgs.Add("--settings:" + this.AddDoubleQuotes(this.VSTestSetting));
+                allArgs.Add("--settings:" + this.VSTestSetting.AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestAdapterPath))
             {
-                allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(this.VSTestTestAdapterPath));
+                allArgs.Add("--testAdapterPath:" + this.VSTestTestAdapterPath.AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
-                allArgs.Add("--framework:" + this.AddDoubleQuotes(this.VSTestFramework));
+                allArgs.Add("--framework:" + this.VSTestFramework.AddDoubleQuote());
             }
 
             // vstest.console only support x86 and x64 for argument platform
@@ -152,7 +154,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
             {
-                allArgs.Add("--testCaseFilter:" + this.AddDoubleQuotes(this.VSTestTestCaseFilter));
+                allArgs.Add("--testCaseFilter:" + this.VSTestTestCaseFilter.AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestLogger))
@@ -162,7 +164,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
             {
-                allArgs.Add("--resultsDirectory:" + this.AddDoubleQuotes(this.VSTestResultsDirectory));
+                allArgs.Add("--resultsDirectory:" + this.VSTestResultsDirectory.AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestListTests))
@@ -172,7 +174,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestDiag))
             {
-                allArgs.Add("--Diag:" + this.AddDoubleQuotes(this.VSTestDiag));
+                allArgs.Add("--Diag:" + this.VSTestDiag.AddDoubleQuote());
             }
 
             if (string.IsNullOrEmpty(this.TestFileFullPath))
@@ -181,7 +183,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
             else
             {
-                allArgs.Add(this.AddDoubleQuotes(this.TestFileFullPath));
+                allArgs.Add(this.TestFileFullPath.AddDoubleQuote());
             }
 
             // For Full CLR, add source directory as test adapter path.
@@ -189,7 +191,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 if (this.VSTestFramework.StartsWith(".NETFramework", StringComparison.OrdinalIgnoreCase))
                 {
-                    allArgs.Add("--testAdapterPath:" + this.AddDoubleQuotes(Path.GetDirectoryName(this.TestFileFullPath)));
+                    allArgs.Add("--testAdapterPath:" + Path.GetDirectoryName(this.TestFileFullPath).AddDoubleQuote());
                 }
             }
 
@@ -217,7 +219,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--");
                 foreach (var arg in this.VSTestCLIRunSettings)
                 {
-                    allArgs.Add(this.AddDoubleQuotes(arg));
+                    allArgs.Add(arg.AddDoubleQuote());
                 }
             }
 
@@ -230,11 +232,6 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
 
             return allArgs;
-        }
-
-        private string AddDoubleQuotes(string x)
-        {
-            return "\"" + x + "\"";
         }
     }
 }
