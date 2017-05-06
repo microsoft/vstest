@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -192,13 +193,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             if (string.IsNullOrWhiteSpace(logFile))
                 return null;
 
-            return "\"" + Path.ChangeExtension(
+            return Path.ChangeExtension(
                 logFile,
                 string.Format(
                     "host.{0}_{1}{2}",
                     DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
                     Thread.CurrentThread.ManagedThreadId,
-                    Path.GetExtension(logFile))) + "\"";
+                    Path.GetExtension(logFile))).AddDoubleQuote();
         }
 
         private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)

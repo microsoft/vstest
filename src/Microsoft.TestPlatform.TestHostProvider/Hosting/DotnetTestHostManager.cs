@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -188,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var runtimeConfigPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.json"));
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
-                string argsToAdd = " --runtimeconfig \"" + runtimeConfigPath + "\"";
+                string argsToAdd = " --runtimeconfig " + runtimeConfigPath.AddDoubleQuote();
                 args += argsToAdd;
                 EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
             }
@@ -201,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var depsFilePath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".deps.json"));
             if (this.fileHelper.Exists(depsFilePath))
             {
-                string argsToAdd = " --depsfile \"" + depsFilePath + "\"";
+                string argsToAdd = " --depsfile " + depsFilePath.AddDoubleQuote();
                 args += argsToAdd;
                 EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
             }
@@ -216,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (this.fileHelper.Exists(testHostPath))
             {
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
-                args += " \"" + testHostPath + "\" " + connectionInfo.ToCommandLineOptions();
+                args += " " + testHostPath.AddDoubleQuote() + " " + connectionInfo.ToCommandLineOptions();
             }
             else
             {
