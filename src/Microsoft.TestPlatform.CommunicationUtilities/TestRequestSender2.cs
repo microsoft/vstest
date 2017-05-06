@@ -21,6 +21,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class TestRequestSender2 : ITestRequestSender
     {
+        // Time to wait for test host exit (in seconds)
+        private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
+
         private readonly ICommunicationServer communicationServer;
 
         private readonly IDataSerializer dataSerializer;
@@ -28,6 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly ManualResetEventSlim connected;
 
         private readonly ManualResetEventSlim clientExited;
+
+        private readonly int clientExitedWaitTime;
 
         private ICommunicationChannel channel;
 
@@ -53,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         /// <param name="protocolConfig">Protocol configuration.</param>
         public TestRequestSender2(ProtocolConfig protocolConfig)
-            : this(new SocketServer(), JsonDataSerializer.Instance, protocolConfig)
+            : this(new SocketServer(), JsonDataSerializer.Instance, protocolConfig, CLIENTPROCESSEXITWAIT)
         {
         }
 
@@ -63,12 +68,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="server">Communication server implementation.</param>
         /// <param name="serializer">Serializer implementation.</param>
         /// <param name="protocolConfig">Protocol configuration.</param>
-        protected TestRequestSender2(ICommunicationServer server, IDataSerializer serializer, ProtocolConfig protocolConfig)
+        /// <param name="clientExitedWaitTime">Time to wait for client process exit.</param>
+        protected TestRequestSender2(
+                ICommunicationServer server,
+                IDataSerializer serializer,
+                ProtocolConfig protocolConfig,
+                int clientExitedWaitTime)
         {
             this.communicationServer = server;
             this.dataSerializer = serializer;
             this.connected = new ManualResetEventSlim(false);
             this.clientExited = new ManualResetEventSlim(false);
+            this.clientExitedWaitTime = clientExitedWaitTime;
             this.operationCompleted = 0;
 
             this.highestSupportedVersion = protocolConfig.Version;
@@ -173,7 +184,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.messageEventHandler = discoveryEventsHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
                 {
-                    this.OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error);
+                    this.OnDiscoveryAbort(discoveryEventsHandler, disconnectedEventArgs.Error, true);
                 };
             this.onMessageReceived = (sender, args) =>
                 {
@@ -218,7 +229,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     }
                     catch (Exception ex)
                     {
-                        this.OnDiscoveryAbort(discoveryEventsHandler, ex);
+                        this.OnDiscoveryAbort(discoveryEventsHandler, ex, false);
                     }
                 };
 
@@ -250,7 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.messageEventHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
                 {
-                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error);
+                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
                 };
             this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
@@ -268,7 +279,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.messageEventHandler = eventHandler;
             this.onDisconnected = (disconnectedEventArgs) =>
                 {
-                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error);
+                    this.OnTestRunAbort(eventHandler, disconnectedEventArgs.Error, true);
                 };
             this.onMessageReceived = (sender, args) => this.OnExecutionMessageReceived(sender, args, eventHandler);
             this.channel.MessageReceived += this.onMessageReceived;
@@ -381,22 +392,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             }
             catch (Exception exception)
             {
-                this.OnTestRunAbort(testRunEventsHandler, exception);
+                this.OnTestRunAbort(testRunEventsHandler, exception, false);
             }
         }
 
-        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception)
+        private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception, bool getClientError)
         {
             if (this.IsOperationComplete())
             {
+                EqtTrace.Verbose("TestRequestSender: OnTestRunAbort: Operation is already complete. Skip error message.");
                 return;
             }
 
+            EqtTrace.Verbose("TestRequestSender: OnTestRunAbort: Set operation complete.");
             this.SetOperationComplete();
 
-            this.LogErrorMessage(string.Format("Test host standard error: {0}.", this.GetTestHostErrorOutput()));
-            EqtTrace.Error("TestRequestSender: Aborting test run because {0}", exception);
-            this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, exception?.Message));
+            var reason = this.GetAbortErrorMessage(exception, getClientError);
+            EqtTrace.Error("TestRequestSender: Aborting test run because {0}", reason);
+            this.LogErrorMessage(string.Format(CommonResources.AbortedTestRun, reason));
 
             // notify test run abort to vstest console wrapper.
             var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
@@ -408,18 +421,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
         }
 
-        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception)
+        private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception, bool getClientError)
         {
             if (this.IsOperationComplete())
             {
+                EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Operation is already complete. Skip error message.");
                 return;
             }
 
+            EqtTrace.Verbose("TestRequestSender: OnDiscoveryAbort: Set operation complete.");
             this.SetOperationComplete();
 
-            this.LogErrorMessage(string.Format("Test host standard error: {0}.", this.GetTestHostErrorOutput()));
-            EqtTrace.Error("TestRequestSender: Aborting test discovery because {0}", exception);
-            this.LogErrorMessage(string.Format(CommonResources.AbortedTestDiscovery, exception?.Message));
+            var reason = this.GetAbortErrorMessage(exception, getClientError);
+            EqtTrace.Error("TestRequestSender: Aborting test discovery because {0}", reason);
+            this.LogErrorMessage(string.Format(CommonResources.AbortedTestDiscovery, reason));
 
             // Notify discovery abort to IDE test output
             var payload = new DiscoveryCompletePayload()
@@ -433,6 +448,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             // Complete discovery
             eventHandler.HandleDiscoveryComplete(-1, null, true);
+        }
+
+        private string GetAbortErrorMessage(Exception exception, bool getClientError)
+        {
+            EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Exception: " + exception);
+
+            // It is also possible for an operation to abort even if client has not
+            // disconnected, e.g. if there's an error parsing the response from test host. We
+            // want the exception to be available in those scenarios.
+            var reason = exception?.Message;
+            if (getClientError)
+            {
+                EqtTrace.Verbose("TestRequestSender: GetAbortErrorMessage: Client has disconnected. Wait for standard error.");
+
+                // Set a default message and wait for test host to exit for a moment
+                reason = CommonResources.UnableToCommunicateToTestHost;
+                if (this.clientExited.Wait(this.clientExitedWaitTime))
+                {
+                    EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Received test host error message.");
+                    reason = this.clientExitErrorMessage;
+                }
+
+                EqtTrace.Info("TestRequestSender: GetAbortErrorMessage: Timed out waiting for test host error message.");
+            }
+
+            return reason;
         }
 
         private void LogErrorMessage(string message)
@@ -461,19 +502,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             // Complete the currently ongoing operation (Discovery/Execution)
             Interlocked.CompareExchange(ref this.operationCompleted, 1, 0);
-        }
-
-        private string GetTestHostErrorOutput()
-        {
-            // Wait for test host to exit for a moment
-            if (this.clientExited.Wait(10 * 1000))
-            {
-                EqtTrace.Info("TestRequestSender: Received test host error message.");
-                return this.clientExitErrorMessage;
-            }
-
-            EqtTrace.Info("TestRequestSender: Timed out waiting for test host error message.");
-            return string.Empty;
         }
     }
 }
