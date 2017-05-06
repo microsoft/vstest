@@ -3,10 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
+    using System;
+
     /// <summary>
     /// Provides properties for the connected communication channel.
     /// </summary>
-    public class ConnectedEventArgs
+    public class ConnectedEventArgs : EventArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectedEventArgs"/> class.

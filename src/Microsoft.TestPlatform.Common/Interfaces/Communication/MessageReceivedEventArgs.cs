@@ -3,10 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
+    using System;
+
     /// <summary>
     /// Provides a framed data and related properties.
     /// </summary>
-    public class MessageReceivedEventArgs
+    public class MessageReceivedEventArgs : EventArgs
     {
         /// <summary>
         /// Gets or sets the data contained in message frame.

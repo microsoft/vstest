@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// A communication channel using a length prefix packet frame for communication.
@@ -59,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             if (this.MessageReceived != null)
             {
-                this.MessageReceived.Invoke(this, new MessageReceivedEventArgs { Data = data });
+                this.MessageReceived.SafeInvoke(this, new MessageReceivedEventArgs { Data = data }, "LengthPrefixCommunicationChannel: MessageReceived");
             }
 
             return Task.FromResult(0);

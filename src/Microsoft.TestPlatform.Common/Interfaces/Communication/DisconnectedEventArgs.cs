@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
     /// <summary>
     /// Provides information on disconnection of a communication channel.
     /// </summary>
-    public class DisconnectedEventArgs
+    public class DisconnectedEventArgs : EventArgs
     {
         /// <summary>
         /// Gets or sets if there's an error on disconnection.

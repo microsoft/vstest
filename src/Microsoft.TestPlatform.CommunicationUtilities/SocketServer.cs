@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
     /// Communication server implementation over sockets.
@@ -91,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (this.ClientConnected != null)
             {
                 this.channel = this.channelFactory(client.GetStream());
-                this.ClientConnected.Invoke(this, new ConnectedEventArgs(this.channel));
+                this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 
                 // Start the message loop
                 Task.Run(() => this.tcpClient.MessageLoopAsync(this.channel, error => this.Stop(error), this.cancellation.Token)).ConfigureAwait(false);
@@ -114,10 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 this.cancellation.Dispose();
 
-                if (this.ClientDisconnected != null)
-                {
-                    this.ClientDisconnected.Invoke(this, new DisconnectedEventArgs { Error = error });
-                }
+                this.ClientDisconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
             }
         }
     }

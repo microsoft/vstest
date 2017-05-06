@@ -129,9 +129,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
-                    // TODO : Payload for ProtocolError needs to finalized.
-                    throw new TestPlatformException(
-                        string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
                 }
                 else
                 {
@@ -156,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // Wait for negotiation response
                 if (!protocolNegotiated.WaitOne(60 * 1000))
                 {
-                    throw new TestPlatformException("Failed to negotiate protocol. Timed out.");
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, "CommonResources.VersionCheckTimedout"));
                 }
             }
             finally
