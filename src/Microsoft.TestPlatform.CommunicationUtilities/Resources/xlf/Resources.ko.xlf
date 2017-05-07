@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">활성 테스트 실행이 중단되었습니다. {0}</target>
-        <note></note>
+        <target state="translated">활성 테스트 실행이 중단되었습니다. 이유: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">활성 테스트 실행이 중단 되었습니다.</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">활성 테스트 검색이 중단되었습니다. {0}</target>
-        <note></note>
+        <target state="translated">활성 테스트 검색이 중단되었습니다. 이유: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">현재 테스트 검색 중단 되었습니다.</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
-        <target state="new">테스트 실행 프로세스와 통신할 수 없습니다.</target>
-        <note></note>
+        <target state="translated">테스트 호스트 프로세스와 통신할 수 없습니다.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">테스트 실행 프로세스와 통신할 수 없습니다.</target>
         </alt-trans>
@@ -58,13 +58,13 @@
       </trans-unit>
       <trans-unit id="UnexpectedMessage">
         <source>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</source>
-        <target state="new">Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</target>
-        <note></note>
+        <target state="translated">예기치 않은 메시지를 수신했습니다. 필요한 MessageType: {0} 실제 MessageType: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VersionCheckFailed">
         <source>Protocol version check failed. Make sure test runner and host are compatible.</source>
-        <target state="new">Protocol version check failed. Make sure test runner and host are compatible.</target>
-        <note></note>
+        <target state="translated">프로토콜 버전을 확인하지 못했습니다. Test Runner와 호스트가 호환되는지 확인하세요.</target>
+        <note />
       </trans-unit>
     </body>
   </file>
