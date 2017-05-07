@@ -154,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // Wait for negotiation response
                 if (!protocolNegotiated.WaitOne(60 * 1000))
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, "CommonResources.VersionCheckTimedout"));
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout));
                 }
             }
             finally

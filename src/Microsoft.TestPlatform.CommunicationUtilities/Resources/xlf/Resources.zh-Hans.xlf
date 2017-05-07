@@ -66,6 +66,11 @@
         <target state="translated">协议版本检查失败。请确保测试运行程序和主机兼容。</target>
         <note />
       </trans-unit>
+      <trans-unit id="VersionCheckTimedout">
+        <source>Failed to negotiate protocol. Wait for response timed out.</source>
+        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

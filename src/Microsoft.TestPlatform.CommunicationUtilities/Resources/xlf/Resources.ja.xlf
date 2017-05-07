@@ -66,6 +66,11 @@
         <target state="translated">プロトコルのバージョンを確認できませんでした。テスト ランナーとホストに互換性があることをご確認ください。</target>
         <note />
       </trans-unit>
+      <trans-unit id="VersionCheckTimedout">
+        <source>Failed to negotiate protocol. Wait for response timed out.</source>
+        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

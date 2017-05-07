@@ -118,5 +118,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
                 return ResourceManager.GetString("VersionCheckFailed", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to negotiate protocol. Wait for response timed out.
+        /// </summary>
+        internal static string VersionCheckTimedout
+        {
+            get
+            {
+                return ResourceManager.GetString("VersionCheckTimedout", resourceCulture);
+            }
+        }
     }
 }

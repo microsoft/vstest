@@ -66,6 +66,11 @@
         <target state="translated">Protokol sürümü denetlenemedi. Test çalıştırıcısı ve ana bilgisayarının uyumlu olduğundan emin olun.</target>
         <note />
       </trans-unit>
+      <trans-unit id="VersionCheckTimedout">
+        <source>Failed to negotiate protocol. Wait for response timed out.</source>
+        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

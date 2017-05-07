@@ -66,6 +66,11 @@
         <target state="translated">Échec de la vérification de la version du protocole. Vérifiez que Test Runner et l'hôte sont compatibles.</target>
         <note />
       </trans-unit>
+      <trans-unit id="VersionCheckTimedout">
+        <source>Failed to negotiate protocol. Wait for response timed out.</source>
+        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
