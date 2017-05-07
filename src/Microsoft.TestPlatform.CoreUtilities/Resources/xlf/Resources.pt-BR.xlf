@@ -157,8 +157,8 @@
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
         <source>Could not find {0}. Make sure that the dotnet is installed on the machine.</source>
-        <target state="new">Could not find {0}. Make sure that the dotnet is installed on the machine.</target>
-        <note></note>
+        <target state="translated">Não foi possível localizar {0}. Certifique-se de que o dotnet esteja instalado no computador.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">Der aktive Testlauf wurde abgebrochen. {0}</target>
-        <note></note>
+        <target state="translated">Der aktive Testlauf wurde abgebrochen. Grund: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aktive Testlauf wurde abgebrochen.</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">Die aktive Testermittlung wurde abgebrochen. {0}</target>
-        <note></note>
+        <target state="translated">Die aktive Testermittlung wurde abgebrochen. Grund: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Der aktive Test wurde abgebrochen.</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
-        <target state="new">Die Kommunikation mit dem Testausführungsvorgang ist nicht möglich.</target>
-        <note></note>
+        <target state="translated">Die Kommunikation mit dem Testhostprozess ist nicht möglich.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Kommunikation mit Test Ausführung nicht möglich.</target>
         </alt-trans>
@@ -58,13 +58,13 @@
       </trans-unit>
       <trans-unit id="UnexpectedMessage">
         <source>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</source>
-        <target state="new">Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</target>
-        <note></note>
+        <target state="translated">Unerwartete Meldung empfangen. Erwarteter MessageType: {0}. Tatsächlicher MessageType: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VersionCheckFailed">
         <source>Protocol version check failed. Make sure test runner and host are compatible.</source>
-        <target state="new">Protocol version check failed. Make sure test runner and host are compatible.</target>
-        <note></note>
+        <target state="translated">Fehler beim Überprüfen der Protokollversion. Der Test Runner und der Host müssen kompatibel sein.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

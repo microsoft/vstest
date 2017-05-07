@@ -4,8 +4,8 @@
     <body>
       <trans-unit id="NoTestHostFileExist">
         <source>No test is available in {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk" and framework version settings are appropriate and try again.</source>
-        <target state="new">Could not find testhost.dll for source '{0}'. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdkt". And also check the framework passed when running test.</target>
-        <note></note>
+        <target state="translated">No hay pruebas disponibles en {0}. Asegúrese de que el proyecto tiene una referencia NuGet del paquete "Microsoft.NET.Test.Sdk" y de que la configuración de la versión del marco es correcta e inténtelo de nuevo.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

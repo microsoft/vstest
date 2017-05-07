@@ -154,23 +154,23 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
-        <target state="new">Testhost process exited with error: {0}</target>
-        <note></note>
+        <target state="translated">Процесс testhost завершен с ошибкой {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
-        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
-        <note></note>
+        <target state="translated">Включена отладка datacollector. Для продолжения подключите отладчик к процессу datacollector.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
-        <note></note>
+        <target state="translated">В {0} нет доступных тестов. Убедитесь, что средства обнаружения и выполнения зарегистрированы, а параметры версий платформ верны, и повторите попытку.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TesthostDiagLogOutputFile">
         <source>Logging TestHost Diagnostics in file: {0}</source>
-        <target state="new">Logging TestHost Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Ведение журналов диагностики TestHost в файле: {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>
