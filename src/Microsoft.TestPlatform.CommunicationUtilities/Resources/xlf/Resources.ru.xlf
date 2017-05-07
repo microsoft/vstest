@@ -66,6 +66,11 @@
         <target state="translated">Проверка версии протокола не пройдена. Убедитесь, что средство запуска теста и узел совместимы.</target>
         <note />
       </trans-unit>
+      <trans-unit id="VersionCheckTimedout">
+        <source>Failed to negotiate protocol. Wait for response timed out.</source>
+        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
