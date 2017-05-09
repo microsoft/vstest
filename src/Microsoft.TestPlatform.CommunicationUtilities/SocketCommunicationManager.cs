@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Stream to use read timeout
         /// </summary>
-        private NetworkStream stream;
+        private Stream stream;
 
         private Socket socket;
 
@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 var client = await this.tcpListener.AcceptTcpClientAsync();
                 this.socket = client.Client;
-                this.stream = client.GetStream();
+                this.stream = new BufferedStream(client.GetStream(), 64 * 1024);
                 this.binaryReader = new BinaryReader(this.stream);
                 this.binaryWriter = new BinaryWriter(this.stream);
 
@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.tcpClient = new TcpClient();
             this.socket = this.tcpClient.Client;
             await this.tcpClient.ConnectAsync(IPAddress.Loopback, portNumber);
-            this.stream = this.tcpClient.GetStream();
+            this.stream = new BufferedStream(this.tcpClient.GetStream(), 64 * 1024);
             this.binaryReader = new BinaryReader(this.stream);
             this.binaryWriter = new BinaryWriter(this.stream);
             this.clientConnectionAcceptedEvent.Set();

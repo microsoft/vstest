@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 throw connectAsyncTask.Exception;
             }
 
-            this.channel = this.channelFactory(this.tcpClient.GetStream());
+            this.channel = this.channelFactory(new BufferedStream(this.tcpClient.GetStream(), 64 * 1024));
             if (this.ServerConnected != null)
             {
                 this.ServerConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");

@@ -92,6 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             if (this.ClientConnected != null)
             {
                 this.channel = this.channelFactory(client.GetStream());
+                this.channel = this.channelFactory(new BufferedStream(client.GetStream(), 64 * 1024));
                 this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 
                 // Start the message loop
