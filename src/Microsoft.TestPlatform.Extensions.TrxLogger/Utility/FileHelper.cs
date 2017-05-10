@@ -31,8 +31,19 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
         // Have to init InvalidFileNameChars dynamically.
         static FileHelper()
         {
-            // Create a hash table of invalid chars.
-            char[] invalidCharsArray = Path.GetInvalidFileNameChars();
+            // Create a hash table of invalid chars. On Windows, this should match the contents of System.IO.Path.GetInvalidFileNameChars.
+            // See https://github.com/dotnet/coreclr/blob/8e99cd8031b2f568ea69116e7cf96d55e32cb7f5/src/mscorlib/shared/System/IO/Path.Windows.cs#L12-L19
+            // These are manually listed here to avoid characters that may be valid on Linux but would make a filename invalid when copying the file to Windows.
+            // Path.GetInvalidFileNameChars on Linux only contains { \0, / }
+            var invalidCharsArray = new char[]
+            {
+                '\"', '<', '>', '|', '\0',
+                (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9, (char)10,
+                (char)11, (char)12, (char)13, (char)14, (char)15, (char)16, (char)17, (char)18, (char)19, (char)20,
+                (char)21, (char)22, (char)23, (char)24, (char)25, (char)26, (char)27, (char)28, (char)29, (char)30,
+                (char)31, ':', '*', '?', '\\', '/'
+            };
+
             InvalidFileNameChars = new Dictionary<char, object>(invalidCharsArray.Length);
             foreach (char c in invalidCharsArray)
             {
@@ -60,7 +71,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             EqtAssert.StringNotNullOrEmpty(fileName, "fileName");
 
             // Replace bad chars by this.
-            char replacementChar = '_'; 
+            char replacementChar = '_';
             StringBuilder result = new StringBuilder(fileName.Length);
             result.Length = fileName.Length;
 
@@ -79,7 +90,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             }
 
             // We trim spaces in the end because CreateFile/Dir trim those.
-            string replaced = result.ToString().TrimEnd(); 
+            string replaced = result.ToString().TrimEnd();
             if (replaced.Length == 0)
             {
                 Debug.Fail(string.Format(CultureInfo.InvariantCulture, "After replacing invalid chars in file '{0}' there's nothing left...", fileName));
@@ -226,9 +237,9 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             }
 
             // CreateFile:
-            // The following reserved device names cannot be used as the name of a file: 
-            // CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9, 
-            // LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9. 
+            // The following reserved device names cannot be used as the name of a file:
+            // CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8, COM9,
+            // LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
             // Also avoid these names followed by an extension, for example, NUL.tx7.
             // Windows NT: CLOCK$ is also a reserved device name.
             return ReservedFileNamesRegex.Match(fileName).Success;

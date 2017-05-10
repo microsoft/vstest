@@ -47,7 +47,6 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
 
         public static void ExitCallBack(
             IProcessHelper processHelper,
-            IMessageLogger messageLogger,
             object process,
             StringBuilder testHostProcessStdError,
             Action<HostProviderEventArgs> onHostExited)
