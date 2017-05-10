@@ -29,6 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private TcpClient tcpClient;
 
+        private Stream stream;
+
         private bool stopped;
 
         /// <summary>
@@ -91,8 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             if (this.ClientConnected != null)
             {
-                this.channel = this.channelFactory(client.GetStream());
-                this.channel = this.channelFactory(new BufferedStream(client.GetStream(), 64 * 1024));
+                this.stream = new BufferedStream(client.GetStream(), 64 * 1024);
+                this.channel = this.channelFactory(this.stream);
                 this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 
                 // Start the message loop
@@ -111,8 +113,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.tcpListener.Stop();
 
                 // Close the client and dispose the underlying stream
+                this.stream?.Dispose();
                 this.tcpClient?.Dispose();
-                this.channel.Dispose();
+                this.channel?.Dispose();
 
                 this.cancellation.Dispose();
 

@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly TcpClient tcpClient;
         private readonly Func<Stream, ICommunicationChannel> channelFactory;
         private ICommunicationChannel channel;
+        private Stream stream;
         private bool stopped;
 
         public SocketClient()
@@ -69,7 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 throw connectAsyncTask.Exception;
             }
 
-            this.channel = this.channelFactory(new BufferedStream(this.tcpClient.GetStream(), 64 * 1024));
+            this.stream = new BufferedStream(this.tcpClient.GetStream(), 64 * 1024);
+            this.channel = this.channelFactory(this.stream);
             if (this.ServerConnected != null)
             {
                 this.ServerConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");
@@ -91,8 +93,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.stopped = true;
 
                 // Close the client and dispose the underlying stream
+                this.stream?.Dispose();
                 this.tcpClient?.Dispose();
-                this.channel.Dispose();
+                this.channel?.Dispose();
 
                 this.cancellation.Dispose();
 
