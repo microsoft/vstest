@@ -59,12 +59,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <summary>
         /// The wait for parent process exit async.
         /// </summary>
-        /// <param name="parentProcessId">
+        /// <param name="processId">
         /// The parent process id.
         /// </param>
         /// <param name="callbackAction">
         /// Callback on process exit.
         /// </param>
-        void SetExitCallback(int parentProcessId, Action callbackAction);
+        void SetExitCallback(int processId, Action callbackAction);
     }
 }
