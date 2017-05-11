@@ -19,8 +19,26 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             var sut = JsonDataSerializer.Instance;
 
-            // this line should not throw exception
+            // This line should not throw exception
             sut.SerializePayload("dummy", classWithSelfReferencingLoop);
+        }
+
+        [TestMethod]
+        public void DeserializeShouldDeserializeAnObjectWhichHadSelfReferencingLoopBeforeSerialization()
+        {
+            var classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(null);
+            classWithSelfReferencingLoop = new ClassWithSelfReferencingLoop(classWithSelfReferencingLoop);
+            classWithSelfReferencingLoop.InfiniteRefernce.InfiniteRefernce = classWithSelfReferencingLoop;
+
+            var sut = JsonDataSerializer.Instance;
+
+            var json = sut.SerializePayload("dummy", classWithSelfReferencingLoop);
+
+            // This line should deserialize properly
+            var result = sut.Deserialize<ClassWithSelfReferencingLoop>(json, 1);
+
+            Assert.AreEqual(typeof(ClassWithSelfReferencingLoop), result.GetType());
+            Assert.IsNull(result.InfiniteRefernce);
         }
 
         public class ClassWithSelfReferencingLoop
