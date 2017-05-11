@@ -544,7 +544,7 @@ function Update-VsixVersion($vsixProjectDir)
         $vsixVersion = "$vsixVersion.$($vsixVersionSuffix[1])$($vsixVersionSuffix[2])"
     }
 
-    $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("`$version`$", "$vsixVersion") } 
+    $manifestContentWithVersion = Get-Content "$vsixProjectDir\source.extension.vsixmanifest" -raw | % {$_.ToString().Replace("42.42.42", "$vsixVersion") } 
     Set-Content -path "$vsixProjectDir\source.extension.vsixmanifest" -value $manifestContentWithVersion
 
     Write-Log "Update-VsixVersion: Completed."
