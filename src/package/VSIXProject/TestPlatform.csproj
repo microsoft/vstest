@@ -6,7 +6,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Dependencies.props" />
-  <Import Project="$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('($TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" />
+  <Import Project="$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -160,7 +160,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
@@ -171,10 +173,10 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props'))" />
-    <Error Condition="!Exists('$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets'))" />
+    <Error Condition="!Exists('$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" Text="$([System.String]::Format('$(ErrorText)', '$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props'))" />
+    <Error Condition="!Exists('$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets'))" />
   </Target>
-  <Import Project="$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets" Condition="Exists('$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets')" />
+  <Import Project="$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets" Condition="Exists('$(TestPlatformRoot)packages\Microsoft.VSSDK.BuildTools.$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
