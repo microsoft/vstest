@@ -333,58 +333,74 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception)
         {
-            EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
+            try
+            {
+                EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
 
-            var reason = string.Format(CommonResources.AbortedTestRun, exception?.Message);
+                var reason = string.Format(CommonResources.AbortedTestRun, exception?.Message);
 
-            // log console message to vstest console
-            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, reason);
+                // log console message to vstest console
+                testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, reason);
 
-            // log console message to vstest console wrapper
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-            testRunEventsHandler.HandleRawMessage(rawMessage);
+                // log console message to vstest console wrapper
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
+                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+                testRunEventsHandler.HandleRawMessage(rawMessage);
 
-            // notify test run abort to vstest console wrapper.
-            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
-            var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
-            rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
-            testRunEventsHandler.HandleRawMessage(rawMessage);
+                // notify test run abort to vstest console wrapper.
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+                var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
+                rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
+                testRunEventsHandler.HandleRawMessage(rawMessage);
 
-            // notify of a test run complete and bail out.
-            testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+                // notify of a test run complete and bail out.
+                testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
-            this.CleanupCommunicationIfProcessExit();
+                this.CleanupCommunicationIfProcessExit();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex);
+                throw ex;
+            }
         }
 
         private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception)
         {
-            EqtTrace.Error("Server: TestExecution: Aborting test discovery because {0}", exception);
-
-            var reason = string.Format(CommonResources.AbortedTestDiscovery, exception?.Message);
-
-            // Log to vstest console
-            eventHandler.HandleLogMessage(TestMessageLevel.Error, reason);
-
-            // Log to vs ide test output
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-            eventHandler.HandleRawMessage(rawMessage);
-
-            // Notify discovery abort to IDE test output
-            var payload = new DiscoveryCompletePayload()
+            try
             {
-                IsAborted = true,
-                LastDiscoveredTests = null,
-                TotalTests = -1
-            };
-            rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
-            eventHandler.HandleRawMessage(rawMessage);
+                EqtTrace.Error("Server: TestExecution: Aborting test discovery because {0}", exception);
 
-            // Complete discovery
-            eventHandler.HandleDiscoveryComplete(-1, null, true);
+                var reason = string.Format(CommonResources.AbortedTestDiscovery, exception?.Message);
 
-            this.CleanupCommunicationIfProcessExit();
+                // Log to vstest console
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, reason);
+
+                // Log to vs ide test output
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
+                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+                eventHandler.HandleRawMessage(rawMessage);
+
+                // Notify discovery abort to IDE test output
+                var payload = new DiscoveryCompletePayload()
+                {
+                    IsAborted = true,
+                    LastDiscoveredTests = null,
+                    TotalTests = -1
+                };
+                rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
+                eventHandler.HandleRawMessage(rawMessage);
+
+                // Complete discovery
+                eventHandler.HandleDiscoveryComplete(-1, null, true);
+
+                this.CleanupCommunicationIfProcessExit();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex);
+                throw ex;
+            }
         }
 
         private string TryReceiveRawMessage()

@@ -32,7 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateParseHandling = DateParseHandling.DateTimeOffset,
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                TypeNameHandling = TypeNameHandling.None
+                TypeNameHandling = TypeNameHandling.None,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
 
             payloadSerializer = JsonSerializer.Create(jsonSettings);
