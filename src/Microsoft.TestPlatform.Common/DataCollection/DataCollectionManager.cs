@@ -518,23 +518,18 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
-            {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("DataCollectionManger:SendEvent: Raising event {0} to collector {1}", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName);
-                }
 
-                try
+            //do not send events multiple times
+
+            try
+            {
+                this.events.RaiseEvent(args);
+            }
+            catch (Exception ex)
+            {
+                if (EqtTrace.IsErrorEnabled)
                 {
-                    this.events.RaiseEvent(args);
-                }
-                catch (Exception ex)
-                {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector {1} : {2}.", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName, ex);
-                    }
+                    EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector : {1}.", args.GetType(), ex);
                 }
             }
         }
@@ -555,6 +550,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var dataCollectorEnvironmentVariable = new Dictionary<string, DataCollectionEnvironmentVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
             {
+                dataCollectorInfo.SetTestExecutionEnvironmentVariables();
                 try
                 {
                     this.AddCollectorEnvironmentVariables(dataCollectorInfo, dataCollectorEnvironmentVariable);

@@ -115,7 +115,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             UpdateConfigurationElement();
 
             this.DataCollector.Initialize(this.ConfigurationElement, this.Events, this.DataCollectionSink, this.Logger, this.EnvironmentContext);
-            this.SetTestExecutionEnvironmentVariables();
         }
 
         private void UpdateConfigurationElement()
@@ -176,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// The get test execution environment variables sync.
         /// </summary>
-        private void SetTestExecutionEnvironmentVariables()
+        public void SetTestExecutionEnvironmentVariables()
         {
             var testExecutionEnvironmentSpecifier = this.DataCollector as ITestExecutionEnvironmentSpecifier;
             if (testExecutionEnvironmentSpecifier != null)

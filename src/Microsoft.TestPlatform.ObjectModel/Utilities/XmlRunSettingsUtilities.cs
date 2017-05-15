@@ -12,26 +12,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System.Xml;
     using System.Xml.XPath;
 
+    using ObjectModelResources = Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources.Resources;
+
     /// <summary>
     /// Utilities for the run settings XML.
     /// </summary>
-    public class XmlRunSettingsUtilities
+    public static class XmlRunSettingsUtilities
     {
-        /// <summary>
-        /// Friendly name of the data collector
-        /// </summary>
-        private const string FriendlyName = "UnitTestIsolation";
-
-        /// <summary>
-        /// Gets the URI of the data collector
-        /// </summary>
-        private const string DataCollectorUri = "datacollector://microsoft/unittestisolation/1.0";
-
-        /// <summary>
-        /// Gets the assembly qualified name of the data collector type
-        /// </summary>
-        private const string DataCollectorAssemblyQualifiedName = "Microsoft.VisualStudio.TraceCollector.UnitTestIsolationDataCollector, Microsoft.VisualStudio.TraceCollector, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
-
         /// <summary>
         /// Gets the os architecture of the machine where this application is running
         /// </summary>
@@ -81,12 +68,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             if (runSettingDocument == null)
             {
-                throw new ArgumentNullException("runSettingDocument");
+                throw new ArgumentNullException(nameof(runSettingDocument));
             }
 
             if (dataCollectorUri == null)
             {
-                throw new ArgumentNullException("dataCollectorUri");
+                throw new ArgumentNullException(nameof(dataCollectorUri));
             }
 
             var navigator = runSettingDocument.CreateNavigator();
@@ -105,6 +92,33 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         }
 
         /// <summary>
+        /// Inserts a data collector settings in the file
+        /// </summary>
+        /// <param name="runSettingDocument">runSettingDocument</param>
+        /// <param name="settings">settings</param>
+        public static void InsertDataCollectorsNode(IXPathNavigable runSettingDocument, DataCollectorSettings settings)
+        {
+            if (runSettingDocument == null)
+            {
+                throw new ArgumentNullException(nameof(runSettingDocument));
+            }
+
+            if (settings == null)
+            {
+                throw new ArgumentNullException(nameof(settings));
+            }
+
+            var navigator = runSettingDocument.CreateNavigator();
+            MoveToDataCollectorsNode(ref navigator);
+
+            var settingsXml = settings.ToXml();
+            var dataCollectorNode = settingsXml.CreateNavigator();
+            dataCollectorNode.MoveToRoot();
+
+            navigator.AppendChild(dataCollectorNode);
+        }
+
+        /// <summary>
         /// Returns RunConfiguration from settingsXml. 
         /// </summary>
         /// <param name="settingsXml">The run settings.</param>
@@ -117,6 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 // Return default one.
                 nodeValue = new RunConfiguration();
             }
+
             return nodeValue;
         }
 
@@ -134,27 +149,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 // Return default.
                 nodeValue = new Dictionary<string, object>();
             }
+
             return nodeValue;
-        }
-
-        /// <summary>
-        /// Returns a value that indicates if the Fakes data collector is already configured  in the settings.
-        /// </summary>
-        /// <param name="runSettings">The run settings.</param>
-        /// <returns>True if the fakes data collector is enabled.</returns>
-        public static bool ContainsFakesDataCollector(IXPathNavigable runSettings)
-        {
-            if (runSettings == null)
-            {
-                throw new ArgumentNullException("runSettings");
-            }
-
-            return ContainsDataCollector(runSettings, DataCollectorUri);
         }
 
         /// <summary>
         /// Create a default run settings
         /// </summary>
+        /// <returns>
+        /// The <see cref="IXPathNavigable"/>.
+        /// </returns>
         [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
             Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public static IXPathNavigable CreateDefaultRunSettings()
@@ -167,9 +171,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             //     </DataCollectors>
             //   </DataCollectionRunSettings>
             // </RunSettings>
-
             var doc = new XmlDocument();
-            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, "", "");
+            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
 
             doc.AppendChild(xmlDeclaration);
             var runSettingsNode = doc.CreateElement(Constants.RunSettingsName);
@@ -314,6 +317,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
 
             return default(T);
+        }
+
+        /// <summary>
+        /// Moves the given runsettings file navigator to the DataCollectors node in the runsettings xml.
+        /// Throws XmlException if it was unable to find the DataCollectors node.
+        /// </summary>
+        /// <param name="runSettingsNavigator">XPathNavigator for a runsettings xml document.</param>
+        private static void MoveToDataCollectorsNode(ref XPathNavigator runSettingsNavigator)
+        {
+            runSettingsNavigator.MoveToRoot();
+            if (!runSettingsNavigator.MoveToChild("RunSettings", string.Empty))
+            {
+                throw new XmlException(string.Format(CultureInfo.CurrentCulture, ObjectModelResources.CouldNotFindXmlNode, "RunSettings"));
+            }
+
+            if (!runSettingsNavigator.MoveToChild("DataCollectionRunSettings", string.Empty))
+            {
+                runSettingsNavigator.AppendChildElement(string.Empty, "DataCollectionRunSettings", string.Empty, string.Empty);
+                runSettingsNavigator.MoveToChild("DataCollectionRunSettings", string.Empty);
+            }
+
+            if (!runSettingsNavigator.MoveToChild("DataCollectors", string.Empty))
+            {
+                runSettingsNavigator.AppendChildElement(string.Empty, "DataCollectors", string.Empty, string.Empty);
+                runSettingsNavigator.MoveToChild("DataCollectors", string.Empty);
+            }
         }
 
         /// <summary>
