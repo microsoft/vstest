@@ -354,6 +354,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
                     Output.Information(output);
+                    DisplayFullInformation(e.Result);
                 }
                 this.testsPassed++;
             }

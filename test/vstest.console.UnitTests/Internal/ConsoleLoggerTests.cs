@@ -315,6 +315,32 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void TestResultHandlerShouldShowStdOutMsgOfPassedTestIfVerbosityIsNormal()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.AdditionalInfoCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Passed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
         public void TestResultHandlerShouldWriteToConsoleButSkipPassedTestsForMinimalVerbosity()
         {
             var parameters = new Dictionary<string, string>();
