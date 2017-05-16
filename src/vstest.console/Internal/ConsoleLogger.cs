@@ -263,6 +263,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
 
+            var DbgTrcMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.DebugTraceCategory);
+            if (DbgTrcMessagesCollection.Count > 0)
+            {
+                addAdditionalNewLine = false;
+                var dbgTrcMessages = GetFormattedOutput(DbgTrcMessagesCollection);
+
+                if (!string.IsNullOrEmpty(dbgTrcMessages))
+                {
+                    Output.Information(CommandLineResources.DbgTrcMessagesBanner);
+                    Output.Information(dbgTrcMessages);
+                }
+            }
+
             var addnlInfoMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.AdditionalInfoCategory);
             if (addnlInfoMessagesCollection.Count > 0)
             {
@@ -275,6 +288,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     Output.Information(addnlInfoMessages);
                 }
             }
+
             if (addAdditionalNewLine)
             {
                 Output.WriteLine(String.Empty, OutputLevel.Information);
@@ -354,6 +368,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
                     Output.Information(output);
+                    DisplayFullInformation(e.Result);
                 }
                 this.testsPassed++;
             }
