@@ -30,7 +30,7 @@
         <!-- TestPlatform.Common dependencies -->
         <dependency id="System.Runtime.Loader" version="[4.3.0, )" />
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
-        <dependency id="Newtonsoft.Json" version="8.0.3"/>
+        <dependency id="Newtonsoft.Json" version="9.0.1"/>
       </group>
     </dependencies>
     <frameworkAssemblies>
