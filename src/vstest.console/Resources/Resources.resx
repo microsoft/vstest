@@ -652,4 +652,7 @@
   <data name="DataCollectorFriendlyNameInvalid" xml:space="preserve">
     <value>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</value>
   </data>
+  <data name="DbgTrcMessagesBanner" xml:space="preserve">
+    <value>Debug Traces Messages:</value>
+  </data>
 </root>
