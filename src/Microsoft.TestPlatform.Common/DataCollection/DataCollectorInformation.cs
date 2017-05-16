@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             // Add Framework config, since it could be required by DataCollector, to determine whether they support this Framework or not
             if (frameWork != null)
             {
-                AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "Framework", "", frameWork.Name);
+                AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "Framework", string.Empty, frameWork.Name);
             }
         }
 

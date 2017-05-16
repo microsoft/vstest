@@ -60,7 +60,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </summary>
         private DataCollectorExtensionManager dataCollectorExtensionManager;
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
         /// </summary>
@@ -378,7 +377,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="dataCollectorSettings">
         /// The data collector settings.
         /// </param>
-        /// <param name="settingsXml"></param>
+        /// <param name="settingsXml"> runsettings Xml</param>
         private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings, string settingsXml)
         {
             DataCollectorInformation dataCollectorInfo;
@@ -518,20 +517,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-
-            //do not send events multiple times
-
-            try
-            {
-                this.events.RaiseEvent(args);
-            }
-            catch (Exception ex)
-            {
-                if (EqtTrace.IsErrorEnabled)
-                {
-                    EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector : {1}.", args.GetType(), ex);
-                }
-            }
+            // do not send events multiple times
+            this.events.RaiseEvent(args);
         }
 
         /// <summary>

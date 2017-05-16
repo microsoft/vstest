@@ -51,6 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class DisableAutoFakesArgumentProcessorCapabilities : BaseArgumentProcessorCapabilities
     {
         public override bool AllowMultiple => false;
+
         public override string CommandName => DisableAutoFakesArgumentProcessor.CommandName;
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;

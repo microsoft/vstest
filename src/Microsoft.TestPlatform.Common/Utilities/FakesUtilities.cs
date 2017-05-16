@@ -7,9 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+#if NET46
     using System.Reflection;
-#if !NET46
-    using System.Runtime.Loader;
 #endif
     using System.Xml;
 
@@ -25,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private const string ConfiguratorMethodName = "GetDataCollectorSettingsOrDefault";
 
-        private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes";
+        private const string FakesConfiguratorAssembly = "Microsoft.VisualStudio.TestPlatform.Fakes, Version=15.0.0.0, Culture=neutral";
 
         /// <summary>
         /// Dynamically compute the Fakes data collector settings, given a set of test assemblies
@@ -141,17 +140,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
         private static bool TryGetFakesDataCollectorConfigurator(out Func<IEnumerable<string>, string> configurator)
         {
+#if NET46
             try
             {
-                var assemblyPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), FakesConfiguratorAssembly + ".dll");
+                Assembly assembly = Assembly.Load(FakesConfiguratorAssembly);
 
-                Assembly assembly = null;
-#if NET46
-                assembly = Assembly.LoadFrom(assemblyPath);
-#else
-                // I think we should not do this, since FakeConfigurator is built for net46?
-                assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
                 var type = assembly?.GetType(ConfiguratorAssemblyQualifiedName, false);
                 if (type != null)
                 {
@@ -170,6 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     EqtTrace.Info("Failed to create Fakes Configurator. Reason:{0} ", ex);
                 }
             }
+#endif
             configurator = null;
             return false;
         }
