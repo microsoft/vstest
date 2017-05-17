@@ -1454,6 +1454,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Debug Traces Messages:.
+        /// </summary>
+        public static string DbgTrcMessagesBanner
+        {
+            get
+            {
+                return ResourceManager.GetString("DbgTrcMessagesBanner", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Additionally, you can try specifying &apos;/UseVsixExtensions&apos; command if the test discoverer &amp; executor is installed on the machine as vsix extensions and your installation supports vsix extensions. Example: vstest.console.exe myTests.dll /UseVsixExtensions:true.
         /// </summary>
         public static string SuggestUseVsixExtensionsIfNoTestsIsFound
