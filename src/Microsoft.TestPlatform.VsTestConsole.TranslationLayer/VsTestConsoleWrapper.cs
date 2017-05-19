@@ -80,7 +80,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.vstestConsoleProcessManager = processManager;
             this.consoleParameters = consoleParameters;
             this.testPlatformEventSource = testPlatformEventSource;
-
             this.pathToAdditionalExtensions = new List<string>();
 
             this.vstestConsoleProcessManager.ProcessExited += (sender, args) => this.requestSender.OnProcessExited();
