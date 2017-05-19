@@ -695,6 +695,11 @@
         <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

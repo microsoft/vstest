@@ -1547,6 +1547,11 @@
         <target state="translated">資料收集器的易記名稱 '{0}' 無效。該資料收集器將予忽略。</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

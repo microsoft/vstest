@@ -81,6 +81,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.consoleParameters = consoleParameters;
             this.testPlatformEventSource = testPlatformEventSource;
 
+            this.pathToAdditionalExtensions = new List<string>();
+
             this.vstestConsoleProcessManager.ProcessExited += (sender, args) => this.requestSender.OnProcessExited();
             this.sessionStarted = false;
         }

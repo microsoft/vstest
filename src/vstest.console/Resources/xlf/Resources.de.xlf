@@ -1547,6 +1547,11 @@
         <target state="translated">Der benutzerfreundliche Name des Datensammlers "{0}" ist ungültig. Der Datensammler wird ignoriert.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
