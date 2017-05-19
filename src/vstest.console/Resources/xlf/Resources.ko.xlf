@@ -1547,6 +1547,11 @@
         <target state="translated">데이터 수집기 이름 ‘{0}’이(가) 잘못되었습니다. 데이터 수집기가 무시됩니다.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
