@@ -1547,6 +1547,11 @@
         <target state="translated">Przyjazna nazwa modułu zbierającego dane „0}” jest nieprawidłowa. Moduł zbierający dane będzie ignorowany.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

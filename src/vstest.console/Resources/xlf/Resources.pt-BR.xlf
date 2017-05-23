@@ -1546,6 +1546,11 @@
         <target state="translated">O nome amigável '{0}' do Coletor de Dados não é válido. O Coletor de Dados será ignorado.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

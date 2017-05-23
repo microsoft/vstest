@@ -10,8 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+    using Microsoft.VisualStudio.TestPlatform.CommandLineUtilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -195,6 +195,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             // for command line keep alive is always false.
             // for Windows Store apps it should be false, as Windows Store apps executor should terminate after finishing the test execution.
             var keepAlive = false;
+
+            GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runSettings);
 
             var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive };
             var result = this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);

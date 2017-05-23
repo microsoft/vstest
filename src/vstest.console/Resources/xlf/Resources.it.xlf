@@ -1547,6 +1547,11 @@
         <target state="translated">Il nome descrittivo '{0}' dell'agente di raccolta dati non è valido. L'agente di raccolta dati verrà ignorato.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

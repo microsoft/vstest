@@ -47,6 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
 
             this.dataCollectorInfo.InitializeDataCollector();
+            this.dataCollectorInfo.SetTestExecutionEnvironmentVariables();
 
             CollectionAssert.AreEqual(this.envVarList, this.dataCollectorInfo.TestExecutionEnvironmentVariables.ToList());
         }

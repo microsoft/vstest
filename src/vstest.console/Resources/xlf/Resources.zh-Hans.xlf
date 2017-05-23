@@ -1546,6 +1546,11 @@
         <target state="translated">数据收集器友好名称“{0}”无效。将忽略数据收集器。</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
