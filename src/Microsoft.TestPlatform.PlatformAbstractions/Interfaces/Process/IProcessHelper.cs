@@ -57,10 +57,10 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         bool TryGetExitCode(object process, out int exitCode);
 
         /// <summary>
-        /// The wait for parent process exit async.
+        /// Sets the process exit callback.
         /// </summary>
         /// <param name="processId">
-        /// The parent process id.
+        /// The process id.
         /// </param>
         /// <param name="callbackAction">
         /// Callback on process exit.

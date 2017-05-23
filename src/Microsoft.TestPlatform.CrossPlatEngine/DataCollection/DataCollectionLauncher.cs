@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     /// <summary>
     /// Abstract DataCollection Launcher provides functionality to handle process launch and exit events.
     /// </summary>
-    public abstract class DataCollectionLauncher : IDataCollectionLauncher
+    internal abstract class DataCollectionLauncher : IDataCollectionLauncher
     {
         protected IProcessHelper processHelper;
 
@@ -61,7 +61,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             if (exitCode != 0)
             {
                 EqtTrace.Error("Data collector exited with error: '{0}'", processStdErrorStr);
-                this.messageLogger.SendMessage(TestMessageLevel.Error, processStdErrorStr);
+
+                if (!string.IsNullOrWhiteSpace(processStdErrorStr))
+                {
+                    this.messageLogger.SendMessage(TestMessageLevel.Error, processStdErrorStr);
+                }
             }
         };
 
