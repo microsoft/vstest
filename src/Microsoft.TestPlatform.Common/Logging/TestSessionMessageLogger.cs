@@ -80,6 +80,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
                 this.TestRunMessage.SafeInvoke(this, args, "TestRunMessageLoggerProxy.SendMessage");
             }
         }
-
     }
 }
