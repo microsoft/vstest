@@ -115,9 +115,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
-        public void SetExitCallback(int parentProcessId, Action callbackAction)
+        public void SetExitCallback(int processId, Action callbackAction)
         {
-            var process = Process.GetProcessById(parentProcessId);
+            var process = Process.GetProcessById(processId);
 
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) =>
