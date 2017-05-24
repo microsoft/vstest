@@ -8,10 +8,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.CoverageLogger
     using System.Globalization;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Threading;
     using System.Xml;
-    using Microsoft.TestPlatform.COM;
     using Microsoft.VisualStudio.Setup.Interop;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -34,10 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.CoverageLogger
         private const string FriendlyName = "CoverageLogger";
 
         private const string CodeCoverageExeRelativePath = @"Team Tools\Dynamic Code Coverage Tools\CodeCoverage.exe";
-
-        private const string SetupInteropx86 = @"x86\Microsoft.VisualStudio.Setup.Configuration.Native.dll";
-
-        private const string SetupInteropx64 = @"x64\Microsoft.VisualStudio.Setup.Configuration.Native.dll";
 
         private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
 
@@ -226,13 +220,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.CoverageLogger
 
         private string GetVSInstallPath()
         {
-            var dllLocation = Path.GetDirectoryName(typeof(CoverageLogger).GetTypeInfo().Assembly.Location);
-            dllLocation = Path.Combine(dllLocation, IntPtr.Size == 4 ? SetupInteropx86 : SetupInteropx64);
-
-            var setupInstance = ComOperations.CreateInstanceFrom(
-                                    dllLocation,
-                                    typeof(SetupConfiguration).GetTypeInfo().GUID,
-                                    typeof(ISetupConfiguration).GetTypeInfo().GUID) as ISetupConfiguration;
+            var setupInstance = new SetupConfiguration() as ISetupConfiguration;
 
             IEnumSetupInstances vsInstances = setupInstance?.EnumInstances();
 
