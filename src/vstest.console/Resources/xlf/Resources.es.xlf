@@ -1555,6 +1555,11 @@
         <target state="translated">El nombre descriptivo del recopilador de datos "{0}" no es válido. El recopilador de datos se ignorará.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
