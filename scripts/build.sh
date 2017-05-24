@@ -174,14 +174,14 @@ function restore_package()
     local start=$SECONDS
 
     log ".. .. Restore: Source: $TPB_Solution"
-    $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror || failed=true
+    $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     if [ "$failed" = true ]; then
         error "Failed to restore packages."
         return 1
     fi
 
     log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
-    $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal || failed=true
+    $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     if [ "$failed" = true ]; then
         error "Failed to restore packages."
         return 2
