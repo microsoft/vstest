@@ -118,6 +118,91 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.CoverageLogger
             }
         }
 
+        internal string GetCodeCoverageInstallPath(ISetupConfiguration setupConfiguration)
+        {
+            IEnumSetupInstances vsInstances = setupConfiguration?.EnumInstances();
+
+            if (vsInstances != null)
+            {
+                vsInstances.Next(1, out ISetupInstance currentInstance, out int fetched);
+                while (currentInstance != null && fetched == 1)
+                {
+                    string installRoot = Path.GetFullPath(currentInstance.GetInstallationPath());
+                    if (!string.IsNullOrEmpty(installRoot))
+                    {
+                        string codeCoverageExePath = Path.Combine(installRoot, CodeCoverageExeRelativePath);
+
+                        if (File.Exists(codeCoverageExePath))
+                        {
+                            return codeCoverageExePath;
+                        }
+                    }
+
+                    vsInstances.Next(1, out currentInstance, out fetched);
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private void AnalyzeCoverageFile(string arguments)
+        {
+            try
+            {
+                var setupInstance = new SetupConfiguration() as ISetupConfiguration;
+                this.coverageXmlGenerateEvent.Reset();
+                if (setupInstance != null)
+                {
+                    string codeCoverageExe = this.GetCodeCoverageInstallPath(setupInstance);
+
+                    this.vanguardProcess = new Process
+                                               {
+                                                   StartInfo =
+                                                       {
+                                                           UseShellExecute = false,
+                                                           CreateNoWindow = true,
+                                                           FileName = codeCoverageExe,
+                                                           Arguments = arguments,
+                                                           RedirectStandardError = true
+                                                       },
+                                                   EnableRaisingEvents = true
+                                               };
+
+                    this.vanguardProcess.Exited += this.CodeCoverageExited;
+                    this.vanguardProcess.Start();
+
+                    this.vanguardProcess.WaitForExit();
+                }
+            }
+            catch (DllNotFoundException ex)
+            {
+                ConsoleOutput.Instance.Information(ex.Message);
+            }
+            catch (NullReferenceException ex)
+            {
+                ConsoleOutput.Instance.Information(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                ConsoleOutput.Instance.Information(ex.Message);
+            }
+        }
+
+        private void CodeCoverageExited(object sender, EventArgs e)
+        {
+            if (this.vanguardProcess != null)
+            {
+                if (this.vanguardProcess.HasExited && this.vanguardProcess.ExitCode != 0)
+                {
+                    EqtTrace.Error(this.vanguardProcess.StandardError.ReadToEnd());
+                }
+
+                this.vanguardProcess.Exited -= this.CodeCoverageExited;
+            }
+
+            this.coverageXmlGenerateEvent.Set();
+        }
+
         private void ProcessCoverageXml(string coverageXml)
         {
             using (XmlReader reader = XmlReader.Create(coverageXml, ReaderSettings))
@@ -156,90 +241,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.CoverageLogger
                                                        moudle.Attributes["block_coverage"].Value);
                 }
             }
-        }
-
-        private void AnalyzeCoverageFile(string arguments)
-        {
-            try
-            {
-                string vsInstallPath = this.GetVSInstallPath();
-                this.coverageXmlGenerateEvent.Reset();
-                string codeCoverageExe = Path.Combine(vsInstallPath, CodeCoverageExeRelativePath);
-
-                if (!File.Exists(codeCoverageExe))
-                {
-                    throw new FileNotFoundException(codeCoverageExe);
-                }
-
-                this.vanguardProcess = new Process
-                                           {
-                                               StartInfo =
-                                                   {
-                                                       UseShellExecute = false,
-                                                       CreateNoWindow = true,
-                                                       FileName = codeCoverageExe,
-                                                       Arguments = arguments,
-                                                       RedirectStandardError = true
-                                                   },
-                                               EnableRaisingEvents = true
-                                           };
-
-                this.vanguardProcess.Exited += this.CodeCoverageExited;
-                this.vanguardProcess.Start();
-
-                this.vanguardProcess.WaitForExit();
-            }
-            catch (DllNotFoundException ex)
-            {
-                ConsoleOutput.Instance.Information(ex.Message);
-            }
-            catch (NullReferenceException ex)
-            {
-                ConsoleOutput.Instance.Information(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                ConsoleOutput.Instance.Information(ex.Message);
-            }
-        }
-
-        private void CodeCoverageExited(object sender, EventArgs e)
-        {
-            if (this.vanguardProcess != null)
-            {
-                if (this.vanguardProcess.HasExited && this.vanguardProcess.ExitCode != 0)
-                {
-                    EqtTrace.Error(this.vanguardProcess.StandardError.ReadToEnd());
-                }
-
-                this.vanguardProcess.Exited -= this.CodeCoverageExited;
-            }
-
-            this.coverageXmlGenerateEvent.Set();
-        }
-
-        private string GetVSInstallPath()
-        {
-            var setupInstance = new SetupConfiguration() as ISetupConfiguration;
-
-            IEnumSetupInstances vsInstances = setupInstance?.EnumInstances();
-
-            if (vsInstances != null)
-            {
-                vsInstances.Next(1, out ISetupInstance currentInstance, out int fetched);
-                while (currentInstance != null && fetched == 1)
-                {
-                    string installRoot = Path.GetFullPath(currentInstance.GetInstallationPath());
-                    if (!string.IsNullOrEmpty(installRoot))
-                    {
-                        return installRoot;
-                    }
-
-                    vsInstances.Next(1, out currentInstance, out fetched);
-                }
-            }
-
-            return string.Empty;
         }
 
         #endregion
