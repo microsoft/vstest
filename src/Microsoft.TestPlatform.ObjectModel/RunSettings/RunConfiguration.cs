@@ -350,6 +350,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         public string BinariesRoot { get; private set; }
 
+        /// <summary>
+        /// Collect source information
+        /// </summary>
+        public bool CollectSourceInformation { get; private set; }
+
         #endregion
 
         /// <inheritdoc/>
@@ -439,6 +444,20 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "ResultsDirectory":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.ResultsDirectory = reader.ReadElementContentAsString();
+                            break;
+
+                        case "CollectSourceInformation":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            string collectSourceInformationStr = reader.ReadElementContentAsString();
+
+                            bool bCollectSourceInformation = true;
+                            if (!bool.TryParse(collectSourceInformationStr, out bCollectSourceInformation))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, bCollectSourceInformation, elementName));
+                            }
+
+                            runConfiguration.CollectSourceInformation = bCollectSourceInformation;
                             break;
 
                         case "MaxCpuCount":
