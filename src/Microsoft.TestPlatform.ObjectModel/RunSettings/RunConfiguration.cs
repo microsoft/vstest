@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Paths at which rocksteady should look for test adapters
         /// </summary>
         private string testAdaptersPaths;
-
+        
         /// <summary>
         /// Indication to adapters to disable app domain.
         /// </summary>
