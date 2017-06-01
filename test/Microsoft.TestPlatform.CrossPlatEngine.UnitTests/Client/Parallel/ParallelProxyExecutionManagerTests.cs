@@ -268,7 +268,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Task.Run(() => { this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object); });
 
             Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
-            Assert.AreEqual(1, processedSources.Count, "Abort should stop all sources execution.");
+            Assert.AreEqual(2, processedSources.Count, "Abort should stop all sources execution.");
         }
 
         [TestMethod]
