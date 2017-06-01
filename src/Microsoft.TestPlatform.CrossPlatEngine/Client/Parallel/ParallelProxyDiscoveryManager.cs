@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     /// <summary>
     /// ParallelProxyDiscoveryManager that manages parallel discovery
     /// </summary>
-    internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager>, IParallelProxyDiscoveryManager
+    internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler>, IParallelProxyDiscoveryManager
     {
         #region DiscoverySpecificData
 
@@ -25,8 +25,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private IEnumerator<string> sourceEnumerator;
         
         private Task lastParallelDiscoveryCleanUpTask = null;
-
-        private IDictionary<IProxyDiscoveryManager, ITestDiscoveryEventsHandler> concurrentManagerHandlerMap;
 
         private ITestDiscoveryEventsHandler currentDiscoveryEventsHandler;
 
@@ -89,10 +87,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         {
             var allDiscoverersCompleted = false;
 
-            if (!this.SharedHosts)
+            // In Case of Abort, clean old one and create a new ProxyDiscoveryManager in place of old one.
+            if (!this.SharedHosts || isAborted)
             {
-                this.concurrentManagerHandlerMap.Remove(proxyDiscoveryManager);
-                proxyDiscoveryManager.Close();
+                this.RemoveManager(proxyDiscoveryManager);
 
                 proxyDiscoveryManager = this.CreateNewConcurrentManager();
 
@@ -101,19 +99,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                                                this.currentDiscoveryEventsHandler,
                                                this,
                                                this.currentDiscoveryDataAggregator);
-                this.concurrentManagerHandlerMap.Add(proxyDiscoveryManager, parallelEventsHandler);
+                this.AddManager(proxyDiscoveryManager, parallelEventsHandler);
             }
 
-            // In Case of Cancel or Abort, no need to trigger discovery for rest of the data
             // If there are no more sources/testcases, a parallel executor is truly done with discovery
-            if (isAborted || !this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager))
+            if (!this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager))
             {
                 lock (this.discoveryStatusLockObject)
                 {
                     // Each concurrent Executor calls this method 
                     // So, we need to keep track of total discoverycomplete calls
                     this.discoveryCompletedClients++;
-                    allDiscoverersCompleted = this.discoveryCompletedClients == this.concurrentManagerInstances.Length;
+                    allDiscoverersCompleted = this.discoveryCompletedClients == this.GetConcurrentManagersCount();
                 }
 
                 // verify that all executors are done with the discovery and there are no more sources/testcases to execute
@@ -191,18 +188,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // One data aggregator per parallel discovery
             this.currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
-            this.concurrentManagerHandlerMap = new Dictionary<IProxyDiscoveryManager, ITestDiscoveryEventsHandler>();
 
-            for (int i = 0; i < this.concurrentManagerInstances.Length; i++)
+            foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
-                var concurrentManager = this.concurrentManagerInstances[i];
-
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                                                 concurrentManager,
                                                 discoveryEventsHandler,
                                                 this,
                                                 this.currentDiscoveryDataAggregator);
-                this.concurrentManagerHandlerMap.Add(concurrentManager, parallelEventsHandler);
+
+                this.UpdateHandlerForManager(concurrentManager, parallelEventsHandler);
 
                 Task.Run(() => this.DiscoverTestsOnConcurrentManager(concurrentManager));
             }
@@ -227,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             if (discoveryCriteria != null)
             {
-                proxyDiscoveryManager.DiscoverTests(discoveryCriteria, this.concurrentManagerHandlerMap[proxyDiscoveryManager]);
+                proxyDiscoveryManager.DiscoverTests(discoveryCriteria, this.GetHandlerForGivenManager(proxyDiscoveryManager));
                 return true;
             }
 
