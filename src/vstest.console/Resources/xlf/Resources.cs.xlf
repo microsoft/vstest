@@ -1547,6 +1547,11 @@
         <target state="translated">Popisný název kolekce dat {0} není platný. Kolekce dat se bude ignorovat.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Specifies whether the Fakes automatic configuration should be disabled.
         /// </summary>
-        public bool DisableAutoFakes { get; set; }
+        public bool DisableAutoFakes { get; set; } = false;
 
         /// <summary>
         /// Specifies whether vsixExtensions is enabled or not. 

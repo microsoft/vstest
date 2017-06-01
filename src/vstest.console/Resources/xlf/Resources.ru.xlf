@@ -1548,6 +1548,11 @@
         <target state="translated">Понятное имя сборщика данных "{0}" недопустимо. Сборщик данных будет пропущен.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -149,9 +149,9 @@ function Restore-Package
     $dotnetExe = Get-DotNetPath
 
     Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
-    & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror
+    & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
-    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror
+    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -309,7 +309,7 @@ function Create-VsixPackage
     $testhostPackageDir = Join-Path $packageDir "TestHost"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-706562\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.1.0-preview-745112\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over

@@ -6,8 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 #if !NET46
     using System.Runtime.Loader;
@@ -19,12 +19,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     {
         private const string CoverageUri = "datacollector://microsoft/CodeCoverage/2.0";
         private const string CoverageFileExtension = ".coverage";
-        private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
         private const string CoverageFriendlyName = "Code Coverage";
 
         private const string CodeCoverageAnalysisAssemblyName = "Microsoft.VisualStudio.Coverage.Analysis";
         private const string MergeMethodName = "MergeCoverageFiles";
         private const string CoverageInfoTypeName = "CoverageInfo";
+
+        private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
 
         public Uri GetExtensionUri()
         {
@@ -44,6 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), CoverageFriendlyName));
                     return new Collection<AttachmentSet> { attachmentSet };
                 }
+
                 // In case merging fails(esp in dotnet core we cannot merge), so return filtered list of Code Coverage Attachments
                 return dataCollectionAttachments;
             }
@@ -84,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                     File.Delete(fileName);
                 }
+
                 return outputfileName;
             }
             catch (Exception ex)

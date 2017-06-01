@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -28,6 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager
     {
         private readonly ITestRuntimeProvider testHostManager;
+        private IDataSerializer dataSerializer;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -40,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
-        public ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestSender, testHostManager, Constants.ClientConnectionTimeout)
+        public ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
         {
         }
 
@@ -51,10 +53,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="requestSender">Request Sender instance</param>
         /// <param name="testHostManager">Test host manager instance</param>
         /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
-        internal ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, int clientConnectionTimeout)
+        internal ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
+            this.dataSerializer = dataSerializer;
         }
 
         #endregion
@@ -137,8 +140,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
-                var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
+
+                // Log to vs ide test output
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.Message };
+                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+                eventHandler.HandleRawMessage(rawMessage);
+
+                // Log to vstest.console
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+
+                var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
 

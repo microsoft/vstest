@@ -27,6 +27,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private Mock<ITestRequestSender> mockRequestSender;
 
+        private Mock<IDataSerializer> mockDataSerializer;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -38,9 +40,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
+            this.mockDataSerializer = new Mock<IDataSerializer>();
             this.testDiscoveryManager = new ProxyDiscoveryManager(
                                             this.mockRequestSender.Object,
                                             this.mockTestHostManager.Object,
+                                            this.mockDataSerializer.Object,
                                             this.testableClientConnectionTimeout);
             this.discoveryCriteria = new DiscoveryCriteria(new[] { "test.dll" }, 1, string.Empty);
 
@@ -148,6 +152,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Verify
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(0, It.IsAny<IEnumerable<TestCase>>(), false));
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.IsAny<string>()));
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()));
         }
 

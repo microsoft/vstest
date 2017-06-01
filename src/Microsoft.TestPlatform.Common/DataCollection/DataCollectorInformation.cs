@@ -115,7 +115,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             UpdateConfigurationElement();
 
             this.DataCollector.Initialize(this.ConfigurationElement, this.Events, this.DataCollectionSink, this.Logger, this.EnvironmentContext);
-            this.SetTestExecutionEnvironmentVariables();
         }
 
         private void UpdateConfigurationElement()
@@ -139,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             // Add Framework config, since it could be required by DataCollector, to determine whether they support this Framework or not
             if (frameWork != null)
             {
-                AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "Framework", "", frameWork.Name);
+                AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "Framework", string.Empty, frameWork.Name);
             }
         }
 
@@ -176,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// The get test execution environment variables sync.
         /// </summary>
-        private void SetTestExecutionEnvironmentVariables()
+        public void SetTestExecutionEnvironmentVariables()
         {
             var testExecutionEnvironmentSpecifier = this.DataCollector as ITestExecutionEnvironmentSpecifier;
             if (testExecutionEnvironmentSpecifier != null)
