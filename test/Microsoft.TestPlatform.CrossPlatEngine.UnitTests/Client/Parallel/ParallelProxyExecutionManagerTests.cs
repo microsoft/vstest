@@ -185,6 +185,34 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void HandlePartialRunCompleteShouldCreateNewProxyExecutionManagerIfIsAbortedIsTrue()
+        {
+            var completeArgs = new TestRunCompleteEventArgs(null, true, true, null, null, TimeSpan.Zero);
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
+            this.mockRequestSender = new Mock<ITestRequestSender>();
+
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 2);
+
+            var tests = CreateTestCases();
+            var testRunCriteria = new TestRunCriteria(tests, 100);
+            var processedTestCases = new List<TestCase>();
+            SetupMockManagersForTestCase(processedTestCases, testRunCriteria);
+
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
+
+            SetupHandleTestRunComplete(completeEvent);
+
+            this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object);
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
+
+            this.proxyManagerFuncCalled = false;
+            var proxyExecutionManagerManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object);
+            this.proxyParallelExecutionManager.HandlePartialRunComplete(proxyExecutionManagerManager, completeArgs, null, null, null);
+
+            Assert.IsTrue(this.proxyManagerFuncCalled);
+        }
+
+        [TestMethod]
         public void StartTestRunWithTestsShouldNotSendCompleteUntilAllTestsAreProcessed()
         {
             this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(this.proxyManagerFunc, 3);
@@ -208,16 +236,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             AssertMissingAndDuplicateTestCases(tests, processedTestCases);
         }
 
-        [DataRow(true, false)]
-        [DataRow(false, true)]
         [TestMethod]
-        public void ExecutionTestsShouldNotProcessAllSourcesOnExecutionCancelsOrAbortsForAnySource(bool isCanceled, bool isAborted)
+        public void ExecutionTestsShouldNotProcessAllSourcesOnExecutionCancelsForAnySource()
         {
             var executionManagerMock = new Mock<IProxyExecutionManager>();
             this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(() => executionManagerMock.Object, 1);
             this.createdMockManagers.Add(executionManagerMock);
             var processedSources = new List<string>();
-            this.SetupMockManagers(processedSources, isCanceled: isCanceled, isAborted: isAborted);
+            this.SetupMockManagers(processedSources, isCanceled: true, isAborted: false);
             AutoResetEvent completeEvent = new AutoResetEvent(false);
             SetupHandleTestRunComplete(completeEvent);
 
@@ -225,6 +251,24 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
             Assert.AreEqual(1, processedSources.Count, "Abort should stop all sources execution.");
+        }
+
+
+        [TestMethod]
+        public void ExecutionTestsShouldProcessAllSourcesOnExecutionAbortsForAnySource()
+        {
+            var executionManagerMock = new Mock<IProxyExecutionManager>();
+            this.proxyParallelExecutionManager = new ParallelProxyExecutionManager(() => executionManagerMock.Object, 1);
+            this.createdMockManagers.Add(executionManagerMock);
+            var processedSources = new List<string>();
+            this.SetupMockManagers(processedSources, isCanceled: false, isAborted: true);
+            AutoResetEvent completeEvent = new AutoResetEvent(false);
+            SetupHandleTestRunComplete(completeEvent);
+
+            Task.Run(() => { this.proxyParallelExecutionManager.StartTestRun(testRunCriteria, this.mockHandler.Object); });
+
+            Assert.IsTrue(completeEvent.WaitOne(taskTimeout), "Test run not completed.");
+            Assert.AreEqual(2, processedSources.Count, "Abort should stop all sources execution.");
         }
 
         [TestMethod]

@@ -3,19 +3,19 @@
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
-    using System;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Moq;
 
     [TestClass]
     public class ParallelProxyDiscoveryManagerTests
@@ -27,12 +27,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private Mock<ITestDiscoveryEventsHandler> mockHandler;
         private List<string> sources = new List<string>() { "1.dll", "2.dll" };
         private DiscoveryCriteria testDiscoveryCriteria;
+        private bool proxyManagerFuncCalled;
 
         public ParallelProxyDiscoveryManagerTests()
         {
             this.createdMockManagers = new List<Mock<IProxyDiscoveryManager>>();
             this.proxyManagerFunc = () =>
             {
+                this.proxyManagerFuncCalled = true;
                 var manager = new Mock<IProxyDiscoveryManager>();
                 this.createdMockManagers.Add(manager);
                 return manager.Object;
@@ -93,7 +95,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         ///  Abort in any source should stop discovery for other sources.
         /// </summary>
         [TestMethod]
-        public void DiscoveryTestsShouldNotProcessAllSourcesOnDiscoveryAbortsForAnySource()
+        public void DiscoveryTestsShouldProcessAllSourcesOnDiscoveryAbortsForAnySource()
         {
             var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
             proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(() => discoveryManagerMock.Object, 1, false);
@@ -101,7 +103,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var processedSources = new List<string>();
             SetupDiscoveryTests(processedSources, true);
             AutoResetEvent completeEvent = new AutoResetEvent(false);
-            SetupHandleDiscoveyComplete(completeEvent, true, totalTests:10);
+            SetupHandleDiscoveyComplete(completeEvent, true);
 
             Task.Run(() =>
             {
@@ -109,7 +111,19 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             });
 
             Assert.IsTrue(completeEvent.WaitOne(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
-            Assert.AreEqual(1, processedSources.Count, "All Sources must not be processed.");
+            Assert.AreEqual(2, processedSources.Count, "All Sources must not be processed.");
+        }
+
+        [TestMethod]
+        public void HandlePartialDiscoveryCompleteShouldCreateANewProxyDiscoveryManagerIfIsAbortedIsTrue()
+        {
+            proxyParallelDiscoveryManager = new ParallelProxyDiscoveryManager(this.proxyManagerFunc, 1, false);
+
+            this.proxyManagerFuncCalled = false;
+            var proxyDiscovermanager = new ProxyDiscoveryManager(new Mock<ITestRequestSender>().Object, new Mock<ITestRuntimeProvider>().Object);
+            this.proxyParallelDiscoveryManager.HandlePartialDiscoveryComplete(proxyDiscovermanager, 20, new List<TestCase>(), isAborted: true);
+
+            Assert.IsTrue(this.proxyManagerFuncCalled);
         }
 
         private void SetupHandleDiscoveyComplete(AutoResetEvent eventHandle, bool isAbort, int totalTests=20)
