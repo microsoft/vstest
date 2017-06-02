@@ -158,7 +158,7 @@ function install_cli()
     log "install_cli: Get the shared netcoreapp1.0 runtime..."
     $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
     log "install_cli: Get the shared netcoreapp1.1 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.1" --shared-runtime
+    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
 
     log "install_cli: Complete. Elapsed $(( SECONDS - start ))s."
     return 0
