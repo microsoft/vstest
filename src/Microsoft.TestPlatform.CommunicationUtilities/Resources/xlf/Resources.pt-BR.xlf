@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new">A Execução de Teste ativa foi anulada. {0}</target>
-        <note></note>
+        <target state="translated">A execução de teste ativa foi anulada. Motivo: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Execução de teste ativa foi anulada.</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new">A Descoberta de Teste ativa foi anulada. {0}</target>
-        <note></note>
+        <target state="translated">A descoberta de teste ativa foi anulada. Motivo: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">A detecção ativa de teste foi anulada.</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
-        <target state="new">Não é possível se comunicar com o processo de execução de teste.</target>
-        <note></note>
+        <target state="translated">Não é possível se comunicar com o processo de host de teste.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Não é possível se comunicar com o processo de execução de teste.</target>
         </alt-trans>
@@ -58,12 +58,17 @@
       </trans-unit>
       <trans-unit id="UnexpectedMessage">
         <source>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</source>
-        <target state="new">Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</target>
-        <note></note>
+        <target state="translated">Mensagem inesperada recebida. MessageType esperada: {0} MessageType real: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VersionCheckFailed">
         <source>Protocol version check failed. Make sure test runner and host are compatible.</source>
-        <target state="new">Protocol version check failed. Make sure test runner and host are compatible.</target>
+        <target state="translated">Falha na verificação da versão do protocolo. Verifique se o executor de testes e o host são compatíveis.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VersionCheckTimedout">
+        <source>Failed to negotiate protocol. Wait for response timed out.</source>
+        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
         <note></note>
       </trans-unit>
     </body>

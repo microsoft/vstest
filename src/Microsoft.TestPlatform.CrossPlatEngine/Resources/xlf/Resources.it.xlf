@@ -154,23 +154,23 @@
       </trans-unit>
       <trans-unit id="TestHostExitedWithError">
         <source>Testhost process exited with error: {0}</source>
-        <target state="new">Testhost process exited with error: {0}</target>
-        <note></note>
+        <target state="translated">Il processo host dei test è terminato con l'errore {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorDebuggerWarning">
         <source>DataCollector debugging is enabled. Please attach debugger to datacollector process to continue.</source>
-        <target state="new">DataCollector debugging is enabled. Please attach debugger to testhost process to continue.</target>
-        <note></note>
+        <target state="translated">Il debug dell'agente di raccolta dati è abilitato. Per continuare, collegare il debugger al processo dell'agente di raccolta dati.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources">
         <source>No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</source>
-        <target state="new">No test is available in {0}. Make sure that test discoverer &amp; executors are registered and platform &amp; framework version settings are appropriate and try again.</target>
-        <note></note>
+        <target state="translated">Non ci sono test disponibili in {0}. Assicurarsi che l'agente di individuazione test e l'executor di test siano registrati e che le impostazioni delle versioni di piattaforma e framework siano appropriate, quindi riprovare.</target>
+        <note />
       </trans-unit>
       <trans-unit id="TesthostDiagLogOutputFile">
         <source>Logging TestHost Diagnostics in file: {0}</source>
-        <target state="new">Logging TestHost Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Registrazione della diagnostica di TestHost nel file: {0}</target>
+        <note />
       </trans-unit>
     </body>
   </file>

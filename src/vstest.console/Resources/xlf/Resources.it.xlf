@@ -229,10 +229,13 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
+        <target state="translated">--logger|/logger:&lt;URI/Nome descrittivo logger&gt;
       Specifica un logger per i risultati dei test. Ad esempio, per registrare risultati in un 
       file di risultati dei test di Visual Studio (TRX), usare /logger:trx. [;LogFileName=&lt;il valore predefinito è un nome file univoco&gt;]
       Crea nella directory TestResults il file con il valore specificato per LogFileName.
+
+      Consente di cambiare il livello di dettaglio per il logger di console. I valori consentiti per verbosity sono: quiet, minimal e normal.
+      Esempio: /logger:console;verbosity=&lt;valore predefinito "minimal"&gt;
 
       Per pubblicare i risultati dei test in Team Foundation Server, usare TfsPublisher come mostrato di seguito.
       Esempio: /logger:TfsPublisher;
@@ -242,7 +245,7 @@
                 [;Platform=&lt;valore predefinito "Any CPU"&gt;]
                 [;Flavor=&lt;valore predefinito "Debug"&gt;]
                 [;RunTitle=&lt;titolo&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-logger | / logger: &lt; Logger Uri/FriendlyName &gt;
       Specificare un logger per risultati di test.  Ad esempio, per registrare i risultati in un Visual Studio Test risultati File (TRX) utilizzano /logger:trx.
@@ -277,8 +280,8 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="new">Sintassi: vstest.console.exe [Argomenti] [Opzioni] [[--] &lt;args&gt;...]]</target>
-        <note></note>
+        <target state="translated">Sintassi: vstest.console.exe [Argomenti] [Opzioni] [[--] &lt;argomenti di RunSettings&gt;...]]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Sintassi: vstest.console.exe [argomenti] [opzioni]</target>
         </alt-trans>
@@ -472,13 +475,11 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="new">  Per eseguire test nello stesso processo:
+        <target state="translated">  Per eseguire test:
     &gt;vstest.console.exe tests.dll 
-  Per eseguire test in un processo separato:
-    &gt;vstest.console.exe /inIsolation tests.dll
-  Per eseguire test con ulteriori impostazioni, quali agenti di raccolta dati:
+  Per eseguire test con impostazioni aggiuntive, quali agenti di raccolta dati:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Per eseguire i test nello stesso processo:
     &gt; Tests vstest.console.exe per eseguire test in un processo separato:
@@ -945,10 +946,9 @@
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</source>
-        <target state="new">/EnableCodeCoverage
-      Abilita l'adattatore dati di diagnostica 'CodeCoverage' nell'esecuzione dei test. Vengono 
-      usate le impostazioni predefinite se non è specificato diversamente in un file di impostazioni.</target>
-        <note></note>
+        <target state="translated">/EnableCodeCoverage
+      Abilita l'agente di raccolta dati 'CodeCoverage' per l'esecuzione dei test.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Consente l'adattatore dati di diagnostica "CodeCoverage" nell'esecuzione del test. Impostazioni predefinite vengono utilizzate se non viene specificato utilizzando i file di impostazioni.</target>
@@ -1007,7 +1007,7 @@
       Example  /TestAdapterPath:&lt;pathToCustomAdapters&gt;</source>
         <target state="translated">--TestAdapterPath|/TestAdapterPath
       Determina se il processo vstest.console.exe usa adattatori di test personalizzati
-      da un percorso eventualmente specificato nell'esecuzione del test. 
+      da un percorso eventualmente specificato nell'esecuzione dei test. 
       Esempio: /TestAdapterPath:&lt;percorsoAdattatoriPersonalizzati&gt;</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
@@ -1490,9 +1490,11 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="new">Args:
-      Eventuali argomenti aggiuntivi che devono essere passati all'adattatore. Gli argomenti possono essere specificati come coppia nome-valore in formato &lt;n&gt;=&lt;v&gt;, in cui &lt;n&gt; corrisponde al nome dell'argomento e &lt;v&gt; al valore dell'argomento. Usare uno spazio per separare più argomenti.</target>
-        <note></note>
+        <target state="translated">Argomenti di RunSettings:
+      Argomenti per passare le configurazioni di runsettings tramite la riga di comando. È possibile specificare gli argomenti come coppia nome-valore in formato [nome]=[valore] dopo "-- ". Notare lo spazio dopo --. 
+      Usare uno spazio per separare più coppie [nome]=[valore].
+      Per altre informazioni sul supporto degli argomenti di RunSettings, vedere: https://aka.ms/vstest-runsettings-arguments</target>
+        <note />
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
@@ -1503,45 +1505,51 @@
         <source>--ResultsDirectory|/ResultsDirectory
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
-        <target state="new">--ResultsDirectory|/ResultsDirectory
-      Test results directory will be created in specified path if not exists.
-      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
-        <note></note>
+        <target state="translated">--ResultsDirectory|/ResultsDirectory
+      Se non esiste già, la directory dei risultati dei test verrà creata nel percorso specificato.
+      Esempio: /ResultsDirectory:&lt;percorsoDirectoryRisultati&gt;</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
         <source>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</source>
-        <target state="new">The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
-        <note></note>
+        <target state="translated">Con il parametro /ResultsDirectory è richiesto un valore, corrispondente alla directory in cui verranno salvati i risultati dei test. Esempio: /ResultsDirectory:c:\MyTestResultsDirectory</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidResultsDirectoryPathCommand">
         <source>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</source>
-        <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
-        <note></note>
+        <target state="translated">Il percorso '{0}' specificato in 'ResultsDirectory' non è valido. Errore: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
-        <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
-        <note></note>
+        <target state="translated">Il flag /InIsolation è deprecato. I test verranno sempre eseguiti in un processo separato</target>
+        <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run  {0}</source>
-        <target state="new">Not Run  {0}</target>
-        <note></note>
+        <target state="translated">Non eseguiti: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
-        <target state="new">Logging Vstest Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Registrazione della diagnostica di Vstest nel file: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="new">CollectArgumentHelp</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:&lt;Nome descrittivo agente di raccolta dati&gt;
+      Abilita l'agente di raccolta dati per l'esecuzione dei test. Per altre informazioni, vedere: https://aka.ms/vstest-collect</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
-        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
+        <target state="translated">Il nome descrittivo '{0}' dell'agente di raccolta dati non è valido. L'agente di raccolta dati verrà ignorato.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
         <note></note>
       </trans-unit>
     </body>

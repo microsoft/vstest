@@ -51,6 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private static void FixNodeFilePath(XmlNode node, string root)
         {
             string fileName = node.InnerXml;
+            fileName = Environment.ExpandEnvironmentVariables(fileName);
 
             if (!string.IsNullOrEmpty(fileName)
                     && !Path.IsPathRooted(fileName))
@@ -58,9 +59,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 // We have a relative file path...
                 fileName = Path.Combine(root, fileName);
                 fileName = Path.GetFullPath(fileName);
-
-                node.InnerXml = fileName;
             }
+
+            node.InnerXml = fileName;
         }
     }
 }

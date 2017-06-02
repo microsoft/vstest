@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.Protocol
 {
     using System.IO;
-    
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Newtonsoft.Json.Serialization;
@@ -25,12 +25,13 @@ namespace Microsoft.TestPlatform.Protocol
         {
             serializer = JsonSerializer.Create(
                             new JsonSerializerSettings
-                                {
-                                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                                    DateParseHandling = DateParseHandling.DateTimeOffset,
-                                    DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                                    TypeNameHandling = TypeNameHandling.None
-                                });
+                            {
+                                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                                DateParseHandling = DateParseHandling.DateTimeOffset,
+                                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+                                TypeNameHandling = TypeNameHandling.None,
+                                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                            });
 #if DEBUG
             // MemoryTraceWriter can help diagnose serialization issues. Enable it for
             // debug builds only.
@@ -68,7 +69,7 @@ namespace Microsoft.TestPlatform.Protocol
         public T DeserializePayload<T>(Message message)
         {
             T retValue = default(T);
-            
+
             // TODO: Currently we use json serializer auto only for non-testmessage types
             // CHECK: Can't we just use auto for everything
             if (Microsoft.TestPlatform.Protocol.MessageType.TestMessage.Equals(message.MessageType))
@@ -117,7 +118,7 @@ namespace Microsoft.TestPlatform.Protocol
         public string SerializePayload(string messageType, object payload)
         {
             JToken serializedPayload = null;
-            
+
             // TODO: Currently we use json serializer auto only for non-testmessage types
             // CHECK: Can't we just use auto for everything
             if (MessageType.TestMessage.Equals(messageType))

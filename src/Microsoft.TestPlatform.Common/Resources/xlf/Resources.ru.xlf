@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Data collection : {0}</source>
-        <target state="new">Сообщение адаптера диагностических данных: {0}</target>
-        <note></note>
+        <target state="translated">Сбор данных: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Сообщение адаптера диагностических данных: {0}</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Data collector '{0}' message: {1}.</source>
-        <target state="new">Сообщение адаптера диагностических данных ("{0}"): {1}.</target>
-        <note></note>
+        <target state="translated">Сообщение сборщика данных "{0}": {1}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Адаптер («{0}») сообщение диагностических данных: {1}.</target>
         </alt-trans>
@@ -57,9 +57,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
-        <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="translated">Обнаружен повторяющийся раздел параметров запуска с именем "{0}". Повторяющиеся параметры пропускаются.</target>
-        <note />
+        <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
+        <target state="new">Обнаружен повторяющийся раздел параметров запуска с именем "{0}". Повторяющиеся параметры пропускаются.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Дублирование с именем «{0}» обнаружен раздел параметров запуска.  Игнорировать повторяющиеся параметры.</target>
         </alt-trans>
@@ -210,44 +210,44 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
-        <source>Data collector '{0}' failed to provide intialization information. Error: {1}</source>
-        <target state="new">Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</target>
+        <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
+        <target state="new">Сборщику данных "{0}" не удалось предоставить сведения об инициализации. Ошибка: {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
         <source>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</source>
-        <target state="new">The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</target>
-        <note></note>
+        <target state="translated">В сборщике данных "{0}" возникло исключение во время загрузки типа, создания или инициализации: {1}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
         <source>Could not find data collector '{0}'</source>
-        <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
-        <note></note>
+        <target state="translated">Не удалось найти сборщик данных "{0}"</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorRequestedDuplicateEnvironmentVariable">
         <source>The data collector '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another data collector '{3}' has already requested same environment variable with different value '{4}'.</source>
-        <target state="new">The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</target>
-        <note></note>
+        <target state="translated">Сборщик данных "{0}" запросил, чтобы в окружении выполнения тестов была установлена переменная окружения "{1}" со значением "{2}", но другой сборщик данных "{3}" уже запросил эту переменную окружения со значением "{4}".</target>
+        <note />
       </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
         <source>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</source>
-        <target state="new">There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</target>
-        <note></note>
+        <target state="translated">Существует несколько конфигураций со значением "{0}" для FriendlyName сборщика данных. Повторяющиеся конфигурации будут пропущены в тестовом запуске.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ReportDataCollectorException">
         <source>Data collector caught an exception of type '{0}': '{1}'. More details: {2}.</source>
-        <target state="new">Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</target>
-        <note></note>
+        <target state="translated">В сборщике данных возникло исключение типа "{0}": "{1}". Дополнительные сведения: {2}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="WrongDataCollectionContextType">
         <source>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</source>
-        <target state="new">Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</target>
-        <note></note>
+        <target state="translated">Нельзя использовать типы, производные от контекста сбора данных, для отправки данных и сообщений.  Используемый для отправки данных и сообщений DataCollectionContext должен происходить от одного из событий, возникших для сборщика данных.</target>
+        <note />
       </trans-unit>
       <trans-unit id="LoggerUriInvalid">
         <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
-        <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
-        <note></note>
+        <target state="translated">URI средства ведения журнала тестирования "{0}" недопустимо. Это средство ведения журнала тестирования будет игнорироваться.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

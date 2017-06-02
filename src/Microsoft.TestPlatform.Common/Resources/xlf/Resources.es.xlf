@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Data collection : {0}</source>
-        <target state="new">Mensaje del adaptador de datos de diagnóstico: {0}</target>
-        <note></note>
+        <target state="translated">Recopilación de datos: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Mensaje del adaptador de datos de diagnóstico: {0}</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Data collector '{0}' message: {1}.</source>
-        <target state="new">Mensaje del adaptador de datos de diagnóstico ({0}): {1}.</target>
-        <note></note>
+        <target state="translated">Mensaje del recopilador de datos "{0}": {1}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Mensaje de adaptador ('{0}') de datos de diagnóstico: {1}.</target>
         </alt-trans>
@@ -57,9 +57,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
-        <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="translated">Sección de parámetros de ejecución duplicada con el nombre '{0}'. Se omitirán los parámetros duplicados.</target>
-        <note />
+        <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
+        <target state="new">Sección de parámetros de ejecución duplicada con el nombre '{0}'. Se omitirán los parámetros duplicados.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Duplicar la sección de configuración de ejecución denominada '{0}'.  Se omitirá la configuración de duplicados.</target>
         </alt-trans>
@@ -210,44 +210,44 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
-        <source>Data collector '{0}' failed to provide intialization information. Error: {1}</source>
-        <target state="new">Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</target>
+        <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
+        <target state="new">El recopilador de datos "{0}" no pudo proporcionar información de inicialización. Error: {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
         <source>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</source>
-        <target state="new">The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</target>
-        <note></note>
+        <target state="translated">El recopilador de datos "{0}" produjo una excepción durante la carga, creación o inicialización del tipo: {1}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
         <source>Could not find data collector '{0}'</source>
-        <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
-        <note></note>
+        <target state="translated">No se pudo encontrar el recopilador de datos "{0}"</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorRequestedDuplicateEnvironmentVariable">
         <source>The data collector '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another data collector '{3}' has already requested same environment variable with different value '{4}'.</source>
-        <target state="new">The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</target>
-        <note></note>
+        <target state="translated">El recopilador de datos "{0}" solicitó que la variable de entorno "{1}" con el valor "{2}" se estableciera en el entorno de ejecución de pruebas, pero otro recopilador de datos "{3}" ya ha solicitado la misma variable de entorno con otro valor "{4}".</target>
+        <note />
       </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
         <source>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</source>
-        <target state="new">There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</target>
-        <note></note>
+        <target state="translated">Hay varias configuraciones que tienen el nombre descriptivo del recopilador de datos "{0}". Se omitirán las configuraciones duplicadas en la serie de pruebas.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ReportDataCollectorException">
         <source>Data collector caught an exception of type '{0}': '{1}'. More details: {2}.</source>
-        <target state="new">Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</target>
-        <note></note>
+        <target state="translated">El recopilador de datos detectó una excepción de tipo "{0}": "{1}". Más detalles: {2}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="WrongDataCollectionContextType">
         <source>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</source>
-        <target state="new">Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</target>
-        <note></note>
+        <target state="translated">Los tipos derivados del contexto de recolección de datos no se pueden usar para enviar datos y mensajes. El elemento DataCollectionContext usado para enviar datos y mensajes debe proceder de alguno de los eventos generados para el recolector de datos.</target>
+        <note />
       </trans-unit>
       <trans-unit id="LoggerUriInvalid">
         <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
-        <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
-        <note></note>
+        <target state="translated">El URI de registrador de pruebas '{0}' no es válido. Se omitirá el registrador de pruebas.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

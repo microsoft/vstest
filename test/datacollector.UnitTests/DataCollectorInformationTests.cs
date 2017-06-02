@@ -37,7 +37,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
                 null,
                 new Mock<IDataCollectionAttachmentManager>().Object,
                 new TestPlatformDataCollectionEvents(),
-                mockMessageSink.Object);
+                mockMessageSink.Object,
+                string.Empty);
         }
 
         [TestMethod]
@@ -46,6 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.envVarList.Add(new KeyValuePair<string, string>("key", "value"));
 
             this.dataCollectorInfo.InitializeDataCollector();
+            this.dataCollectorInfo.SetTestExecutionEnvironmentVariables();
 
             CollectionAssert.AreEqual(this.envVarList, this.dataCollectorInfo.TestExecutionEnvironmentVariables.ToList());
         }

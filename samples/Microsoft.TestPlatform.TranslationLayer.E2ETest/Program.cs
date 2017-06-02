@@ -19,15 +19,45 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
 
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            // Spawn of vstest.console with a run tests from the current execting folder.
-            var executingLocation = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-            var runnerLocation = Path.Combine(executingLocation, "vstest.console.exe");
-            var testadapterPath = Path.Combine(executingLocation, "Adapter\\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll");
-            var testAssembly = Path.Combine(executingLocation, "UnitTestProject.dll");
+            if(args == null || args.Length < 1)
+            {
+                Console.WriteLine(@"Please provide appropriate arguments. Arguments can be passed as following:");
+                Console.WriteLine(@"Microsoft.TestPlatform.TranslationLayer.E2ETest.exe --runner:'[vstest.console path]' --testassembly:'[assemblyPath]' --testadapterpath:'[path]'");
+                Console.WriteLine(@"Example: Microsoft.TestPlatform.TranslationLayer.E2ETest.exe --runner:'c:\tmp\vstest.console.dll' --testassembly:'c:\a\a.tests.dll' --testadapterpath:'c:\a\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll'");
 
-            IVsTestConsoleWrapper consoleWrapper = new VsTestConsoleWrapper(runnerLocation);
+                return 1;
+            }
+
+            string runnerLocation = string.Empty;
+            string testadapterPath = string.Empty;
+            string testAssembly = string.Empty;
+
+            var separator = new char[] { ':' };
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("-p:") || arg.StartsWith("--testadapterpath:"))
+                {
+                    testadapterPath = arg.Split(separator, 2)[1];
+                }
+                else if (arg.StartsWith("-a:") || arg.StartsWith("--testassembly:"))
+                {
+                    testAssembly = arg.Split(separator, 2)[1];
+                }
+                else if (arg.StartsWith("-r:") || arg.StartsWith("--runner:"))
+                {
+                    runnerLocation = arg.Split(separator, 2)[1];
+                }
+            }
+
+            Console.WriteLine("Parameters:");
+            Console.WriteLine("Runner Path: " + runnerLocation);
+            Console.WriteLine("Test Assembly Path: " + testAssembly);
+            Console.WriteLine("Test Adapter Path: " + testadapterPath);
+            Console.WriteLine("-------------------------------------------------------");
+
+            IVsTestConsoleWrapper consoleWrapper = new VsTestConsoleWrapper(runnerLocation, new ConsoleParameters { LogFilePath = @"log.txt" });
 
             consoleWrapper.StartSession();
             consoleWrapper.InitializeExtensions(new List<string>() { testadapterPath });
@@ -57,6 +87,8 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
             Console.WriteLine("Run All (custom launcher) Test Result: " + testresults?.FirstOrDefault()?.TestCase?.DisplayName + " :" + testresults?.FirstOrDefault()?.Outcome);
 
             Console.WriteLine("-------------------------------------------------------");
+
+            return 0;
         }
 
         static IEnumerable<TestCase> DiscoverTests(IEnumerable<string> sources, IVsTestConsoleWrapper consoleWrapper)

@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active test run was aborted. Reason: {0}</source>
-        <target state="new" state-qualifier="mt-suggestion">Etkin Test Çalıştırması iptal edildi. {0}</target>
-        <note></note>
+        <target state="translated">Etkin test çalıştırması iptal edildi. Nedeni: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Etkin Test çalışmasını iptal edildi.</target>
         </alt-trans>
@@ -40,8 +40,8 @@
       </trans-unit>
       <trans-unit id="AbortedTestDiscovery">
         <source>The active test discovery was aborted. Reason: {0}</source>
-        <target state="new" state-qualifier="mt-suggestion">Etkin Test Bulma iptal edildi. {0}</target>
-        <note></note>
+        <target state="translated">Etkin test bulma iptal edildi. Nedeni: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Etkin Test keşfi iptal edildi.</target>
         </alt-trans>
@@ -49,8 +49,8 @@
       </trans-unit>
       <trans-unit id="UnableToCommunicateToTestHost">
         <source>Unable to communicate with test host process.</source>
-        <target state="new" state-qualifier="mt-suggestion">Test yürütmesi işlemi ile iletişim kurulamıyor.</target>
-        <note></note>
+        <target state="translated">Test ana bilgisayarı işlemi ile iletişim kurulamıyor.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Test yürütme işlemi ile iletişim kurulamıyor.</target>
         </alt-trans>
@@ -58,12 +58,17 @@
       </trans-unit>
       <trans-unit id="UnexpectedMessage">
         <source>Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</source>
-        <target state="new">Unexpected message received. Expected MessageType : {0} Actual MessageType: {1}</target>
-        <note></note>
+        <target state="translated">Beklenmeyen ileti alındı. Beklenen MessageType: {0} Gerçek MessageType: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VersionCheckFailed">
         <source>Protocol version check failed. Make sure test runner and host are compatible.</source>
-        <target state="new">Protocol version check failed. Make sure test runner and host are compatible.</target>
+        <target state="translated">Protokol sürümü denetlenemedi. Test çalıştırıcısı ve ana bilgisayarının uyumlu olduğundan emin olun.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="VersionCheckTimedout">
+        <source>Failed to negotiate protocol. Wait for response timed out.</source>
+        <target state="new">Failed to negotiate protocol. Wait for response timed out.</target>
         <note></note>
       </trans-unit>
     </body>

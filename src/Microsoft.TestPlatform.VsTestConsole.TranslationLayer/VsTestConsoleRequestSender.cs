@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 {
     using System;
@@ -13,6 +14,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -25,15 +28,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// </summary>
     internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
-        private ICommunicationManager communicationManager;
+        private readonly ICommunicationManager communicationManager;
 
-        private IDataSerializer dataSerializer;
+        private readonly IDataSerializer dataSerializer;
+        private readonly ITestPlatformEventSource testPlatformEventSource;
 
-        private ManualResetEvent handShakeComplete = new ManualResetEvent(false);
+        private readonly ManualResetEvent handShakeComplete = new ManualResetEvent(false);
 
         private bool handShakeSuccessful = false;
 
-        private int protocolVersion = 1;
+        private int protocolVersion = 2;
 
         /// <summary>
         /// Use to cancel blocking tasks associated with vstest.console process
@@ -42,14 +46,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         #region Constructor
 
-        public VsTestConsoleRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
+        public VsTestConsoleRequestSender() : this(new SocketCommunicationManager(), JsonDataSerializer.Instance, TestPlatformEventSource.Instance)
         {
         }
 
-        internal VsTestConsoleRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
+        internal VsTestConsoleRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer, ITestPlatformEventSource testPlatformEventSource)
         {
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
+            this.testPlatformEventSource = testPlatformEventSource;
         }
 
         #endregion
@@ -116,7 +121,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         /// <param name="eventHandler"></param>
         public void DiscoverTests(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler eventHandler)
         {
-                this.SendMessageAndListenAndReportTestCases(sources, runSettings, eventHandler);
+            this.SendMessageAndListenAndReportTestCases(sources, runSettings, eventHandler);
         }
 
         /// <summary>
@@ -288,8 +293,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                             this.protocolVersion);
                 var isDiscoveryComplete = false;
 
-                // Cycle through the messages that the vstest.console sends. 
-                // Currently each of the operations are not separate tasks since they should not each take much time. 
+                // Cycle through the messages that the vstest.console sends.
+                // Currently each of the operations are not separate tasks since they should not each take much time.
                 // This is just a notification.
                 while (!isDiscoveryComplete)
                 {
@@ -322,11 +327,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception exception)
             {
                 EqtTrace.Error("Aborting Test Discovery Operation: {0}", exception);
+
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, TranslationLayerResources.AbortedTestsDiscovery);
                 eventHandler.HandleDiscoveryComplete(-1, null, true);
 
                 CleanupCommunicationIfProcessExit();
             }
+
+            this.testPlatformEventSource.TranslationLayerDiscoveryStop();
         }
 
         private void SendMessageAndListenAndReportTestResults(string messageType, object payload, ITestRunEventsHandler eventHandler, ITestHostLauncher customHostLauncher)
@@ -379,6 +387,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
                 this.CleanupCommunicationIfProcessExit();
             }
+
+            this.testPlatformEventSource.TranslationLayerExecutionStop();
         }
 
         private void CleanupCommunicationIfProcessExit()

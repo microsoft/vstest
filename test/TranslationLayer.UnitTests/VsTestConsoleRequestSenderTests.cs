@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 {
     using System;
@@ -14,7 +15,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -23,7 +24,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
 
     using Moq;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
     using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
@@ -31,19 +31,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
     [TestClass]
     public class VsTestConsoleRequestSenderTests
     {
-        private ITranslationLayerRequestSender requestSender;
+        private readonly ITranslationLayerRequestSender requestSender;
 
-        private Mock<ICommunicationManager> mockCommunicationManager;
+        private readonly Mock<ICommunicationManager> mockCommunicationManager;
 
-        private int WaitTimeout = 2000;
+        private readonly int WaitTimeout = 2000;
 
-        private int protocolVersion = 1;
+        private int protocolVersion = 2;
         private IDataSerializer serializer = JsonDataSerializer.Instance;
 
         public VsTestConsoleRequestSenderTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.requestSender = new VsTestConsoleRequestSender(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+            this.requestSender = new VsTestConsoleRequestSender(
+                this.mockCommunicationManager.Object,
+                JsonDataSerializer.Instance,
+                new Mock<ITestPlatformEventSource>().Object);
         }
 
         #region Communication Tests

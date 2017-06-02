@@ -229,10 +229,14 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;URI или понятное имя средства ведения журналов&gt;
+        <target state="translated">--logger|/logger:&lt;URI или понятное имя средства ведения журналов&gt;
       Укажите средство ведения журналов для результатов тестирования. Например, для записи результатов
-      в файл результатов теста Visual Studio (TRX) используйте/logger:trx [;LogFileName=&lt;умолчание: уникальное имя файла&gt;].
+      в файл результатов теста Visual Studio (TRX) используйте /logger:trx [;LogFileName=&lt;по умолчанию: уникальное имя файла&gt;].
       Создает файл в каталоге TestResults с указанным LogFileName.
+
+      Измените уровень детализации для консольного средства ведения журналов. Разрешенные значения для детализации: quiet (отсутствует), minimal (минимальный) и normal (обычный).
+
+      Пример: /logger:console;verbosity=&lt;по умолчанию: "minimal" (минимальный)&gt;
 
       Для публикации результатов тестов на Team Foundation Server используйте TfsPublisher, как показано ниже.
       Пример: /logger:TfsPublisher;
@@ -242,7 +246,7 @@
                 [;Platform=&lt;по умолчанию используется значение Any CPU (Любой ЦП)&gt;];
                 [;Flavor=&lt;по умолчанию имеет значение Debug (Отладка)&gt;];
                 [;RunTitle=&lt;заголовок&gt;].</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--средства ведения журнала | / logger: &lt; Uri средство ведения журнала и FriendlyName &gt;
       Укажите средство ведения журнала для результатов тестов.  Например для регистрации результатов в Visual Studio теста результаты файла (TRX) используется /logger:trx.
@@ -277,8 +281,8 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="new">Использование: vstest.console.exe [аргументы] [параметры] [[--] &lt;аргументы&gt;...]]</target>
-        <note></note>
+        <target state="translated">Использование: vstest.console.exe [аргументы] [параметры] [[--] &lt;аргументы RunSettings&gt;...]]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Использование: vstest.console.exe [параметры] [аргументы]</target>
         </alt-trans>
@@ -472,13 +476,11 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="new">  Для запуска тестов в том же процессе:
+        <target state="translated">  Для запуска тестов:
     &gt;vstest.console.exe tests.dll 
-  Для запуска тестов в отдельном процессе:
-    &gt;vstest.console.exe /inIsolation tests.dll
   Для запуска тестов с дополнительными параметрами, например со сборщиками данных:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Для выполнения тестов в том же процессе:
     &gt; tests.dll vstest.console.exe для выполнения тестов в отдельном процессе:
@@ -764,7 +766,7 @@
       </trans-unit>
       <trans-unit id="PlatformTypeRequired">
         <source>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</source>
-        <target state="translated">Для аргумента /Platform требуется указать тип целевой платформы для тестового запуска. Пример: /Platform:x&amp;86;</target>
+        <target state="translated">Для аргумента /Platform требуется указать тип целевой платформы для тестового запуска. Пример: /Platform:x 86</target>
         <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Аргумент/Platform требует тип целевой платформы для выполнения теста должны быть предоставлены.   Пример: /Platform:x 86</target>
@@ -945,10 +947,9 @@
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</source>
-        <target state="new">/EnableCodeCoverage
-       Включение адаптера диагностических данных CodeCoverage в тестовом запуске. Если параметры
-       не заданы с помощью файла параметров, используются значения по умолчанию.</target>
-        <note></note>
+        <target state="translated">/EnableCodeCoverage
+      Включает сборщик данных "CodeCoverage" для тестового запуска.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Позволяет адаптера диагностических данных «CodeCoverage» в тестовом запуске. Параметры по умолчанию используются, если не указана с помощью файла параметров.</target>
@@ -1490,9 +1491,11 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="new">Args:
-      Все дополнительные аргументы должны передаваться в адаптер. Их можно указать в виде пар "название-значение" (как &lt;н&gt;=&lt;з&gt;), где &lt;н&gt; — название аргумента, а &lt;з&gt; — значение. Для разделения нескольких аргументов используется пробел.</target>
-        <note></note>
+        <target state="translated">Аргументы RunSettings:
+      Аргументы для передачи конфигураций runsettings через командную строку. Аргументы могут быть указаны как пара "имя-значение" в формате [имя]=[значение] после "-- ". Обратите внимание на пробел после --. 
+      Используйте пробел для разделения нескольких пар [имя]=[значение].
+      Дополнительные сведения о поддержке аргументов RunSettings: https://aka.ms/vstest-runsettings-arguments</target>
+        <note />
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
@@ -1503,45 +1506,51 @@
         <source>--ResultsDirectory|/ResultsDirectory
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
-        <target state="new">--ResultsDirectory|/ResultsDirectory
-      Test results directory will be created in specified path if not exists.
-      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
-        <note></note>
+        <target state="translated">--ResultsDirectory|/ResultsDirectory
+      По указанному пути будет создан каталог с результатами тестирования, если он не существует.
+      Пример: /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
         <source>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</source>
-        <target state="new">The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
-        <note></note>
+        <target state="translated">Для параметра /ResultsDirectory требуется значение, в котором сохраняются результаты тестирования. Пример:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidResultsDirectoryPathCommand">
         <source>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</source>
-        <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
-        <note></note>
+        <target state="translated">Путь "{0}", указанный в "ResultsDirectory", недопустим. Ошибка: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
-        <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
-        <note></note>
+        <target state="translated">Флаг /InIsolation использовать не рекомендуется. Тесты всегда запускаются в отдельном процессе</target>
+        <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run  {0}</source>
-        <target state="new">Not Run  {0}</target>
-        <note></note>
+        <target state="translated">Не запущен {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
-        <target state="new">Logging Vstest Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Ведение журналов диагностики Vstest в файле: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="new">CollectArgumentHelp</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
+      Включает сборщик тестов для тестового запуска. Дополнительные сведения: https://aka.ms/vstest-collect</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
-        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
+        <target state="translated">Понятное имя сборщика данных "{0}" недопустимо. Сборщик данных будет пропущен.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
         <note></note>
       </trans-unit>
     </body>

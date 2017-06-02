@@ -19,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     /// <summary>
-    /// <summary>
     /// Manages data collection.
     /// </summary>
     internal class DataCollectionManager : IDataCollectionManager
@@ -60,7 +59,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Extension manager for data collectors.
         /// </summary>
         private DataCollectorExtensionManager dataCollectorExtensionManager;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataCollectionManager"/> class.
@@ -187,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
 
             foreach (var dataCollectorSettings in enabledDataCollectorsSettings)
             {
-                this.LoadAndInitialize(dataCollectorSettings);
+                this.LoadAndInitialize(dataCollectorSettings, settingsXml);
             }
 
             // Once all data collectors have been initialized, query for environment variables
@@ -379,7 +377,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="dataCollectorSettings">
         /// The data collector settings.
         /// </param>
-        private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings)
+        /// <param name="settingsXml"> runsettings Xml</param>
+        private void LoadAndInitialize(DataCollectorSettings dataCollectorSettings, string settingsXml)
         {
             DataCollectorInformation dataCollectorInfo;
             DataCollectorConfig dataCollectorConfig;
@@ -419,7 +418,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                                     this.dataCollectionEnvironmentContext,
                                                     this.attachmentManager,
                                                     this.events,
-                                                    this.messageSink);
+                                                    this.messageSink,
+                                                    settingsXml);
             }
             catch (Exception ex)
             {
@@ -517,25 +517,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                 return;
             }
 
-            foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
-            {
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose("DataCollectionManger:SendEvent: Raising event {0} to collector {1}", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName);
-                }
-
-                try
-                {
-                    this.events.RaiseEvent(args);
-                }
-                catch (Exception ex)
-                {
-                    if (EqtTrace.IsErrorEnabled)
-                    {
-                        EqtTrace.Error("DataCollectionManger:SendEvent: Error while RaiseEvent {0} to datacollector {1} : {2}.", args.GetType(), dataCollectorInfo.DataCollectorConfig.FriendlyName, ex);
-                    }
-                }
-            }
+            // do not send events multiple times
+            this.events.RaiseEvent(args);
         }
 
         /// <summary>
@@ -554,6 +537,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             var dataCollectorEnvironmentVariable = new Dictionary<string, DataCollectionEnvironmentVariable>(StringComparer.OrdinalIgnoreCase);
             foreach (var dataCollectorInfo in this.RunDataCollectors.Values)
             {
+                dataCollectorInfo.SetTestExecutionEnvironmentVariables();
                 try
                 {
                     this.AddCollectorEnvironmentVariables(dataCollectorInfo, dataCollectorEnvironmentVariable);

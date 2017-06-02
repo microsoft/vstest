@@ -229,19 +229,23 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
-      Especifica un registrador para los resultados de las pruebas. Por ejemplo, para registrar los resultados en un archivo de resultados de pruebas (TRX) de Visual Studio, use /logger:trx [;LogFileName=&lt;Adopta como predeterminado un nombre de archivo único&gt;]
+        <target state="translated">--logger|/logger:&lt;Logger Uri/FriendlyName&gt;
+      Especifica un registrador para los resultados de las pruebas. Por ejemplo, para registrar los resultados en un 
+      archivo de resultados de pruebas (TRX) de Visual Studio, use /logger:trx [;LogFileName=&lt;Adopta como predeterminado un nombre de archivo único&gt;]
       Crea el archivo en el directorio TestResults con el valor de LogFileName dado.
 
-      Para publicar los resultados de las pruebas en Team Foundation Server, use TfsPublisher como se muestra a continuación
+      Cambie el nivel de detalle para el registrador de la consola. Los valores de detalle permitidos son: silencioso, mínimo y normal.
+      Ejemplo: /logger:console;verbosity=&lt;Adopta como predeterminado "mínimo"&gt;
+
+     Para publicar los resultados de las pruebas en Team Foundation Server, use TfsPublisher como se muestra a continuación
       Ejemplo: /logger:TfsPublisher;
                 Colección=&lt;dirección URL de colección de proyecto de equipo&gt;;
                 BuildName=&lt;nombre de compilación&gt;;
                 TeamProject=&lt;nombre de proyecto de equipo&gt;
                 [;Platform=&lt;Adopta como predeterminado "Cualquier CPU"&gt;]
                 [;Flavor=&lt;Adopta como predeterminado "Depurar"&gt;]
-                [;RunTitle=&lt;title&gt;]</target>
-        <note></note>
+                [;RunTitle=&lt;título&gt;]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--registrador | / registrador: &lt; Logger Uri/FriendlyName &gt;
       Especifique un registrador para los resultados de la prueba.  Por ejemplo, para registrar los resultados en un archivo de resultados de prueba (TRANS) de Visual Studio use /logger:trx.
@@ -276,8 +280,8 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="new">Uso: vstest.console.exe [argumentos] [opciones] [[--] &lt;args&gt;...]]</target>
-        <note></note>
+        <target state="translated">Uso: vstest.console.exe [argumentos] [opciones] [[--] &lt;Argumentos de RunSettings&gt;...]]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Uso: vstest.console.exe [opciones] [argumentos]</target>
         </alt-trans>
@@ -473,14 +477,11 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="new">  Para ejecutar pruebas en el mismo proceso:
+        <target state="translated">  Para ejecutar pruebas:
     &gt;vstest.console.exe tests.dll 
-  Para ejecutar pruebas en un proceso aparte:
-    &gt;vstest.console.exe /inIsolation tests.dll
-  Para ejecutar las pruebas con configuración adicional, como
-    recopiladores de datos:
+  Para ejecutar las pruebas con configuración adicional, como recopiladores de datos:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Para ejecutar pruebas en el mismo proceso:
     &gt; vstest.console.exe tests.dll para ejecutar pruebas en un proceso independiente:
@@ -951,11 +952,9 @@
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</source>
-        <target state="new">/EnableCodeCoverage
-      Habilita el adaptador de datos de diagnóstico 'CodeCoverage' en
-       la serie de pruebas. Si no se especifica en el archivo de
-       configuración, se usa la configuración predeterminada.</target>
-        <note></note>
+        <target state="translated">/EnableCodeCoverage
+      Habilita el recopilador de datos "CodeCoverage" para la serie de pruebas.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Habilita el adaptador de datos diagnóstico 'CodeCoverage' en la ejecución de pruebas. Valores predeterminados se utilizan si no especifican utilizando el archivo de configuración.</target>
@@ -1499,9 +1498,11 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="new">Args:
-      Cualquier argumento adicional que se deba pasar al adaptador. Los argumentos se pueden especificar como pares de nombre-valor con el formato &lt;n&gt;=&lt;v&gt;, donde &lt;n&gt; es el nombre del argumento y &lt;v&gt; es el valor del argumento. Use un espacio para separar varios argumentos.</target>
-        <note></note>
+        <target state="translated">Argumentos de RunSettings:
+      Argumentos para pasar configuraciones de runsettings a través de la línea de comandos. Los argumentos se pueden especificar como un par nombre-valor en la forma [nombre]=[valor] después de "-- ". Observe que hay un espacio después de --. 
+      Use un espacio para separar varios pares de [nombre]=[valor].
+      Más información sobre la compatibilidad de argumentos de RunSettings: https://aka.ms/vstest-runsettings-arguments</target>
+        <note />
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
@@ -1512,45 +1513,51 @@
         <source>--ResultsDirectory|/ResultsDirectory
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
-        <target state="new">--ResultsDirectory|/ResultsDirectory
-      Test results directory will be created in specified path if not exists.
-      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
-        <note></note>
+        <target state="translated">--ResultsDirectory|/ResultsDirectory
+      El directorio de resultados de la prueba se creará en la ruta especificada si no existe.
+      Example  /ResultsDirectory:&lt;rutaADirectorioDeResultados&gt;</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
         <source>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</source>
-        <target state="new">The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
-        <note></note>
+        <target state="translated">El parámetro /ResultsDirectory requiere un valor, donde deben guardarse los resultados de la prueba. Ejemplo: /ResultsDirectory:c:\MyTestResultsDirectory</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidResultsDirectoryPathCommand">
         <source>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</source>
-        <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
-        <note></note>
+        <target state="translated">La ruta de acceso "{0}" especificada en "ResultsDirectory" no es válida. Error: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
-        <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
-        <note></note>
+        <target state="translated">La marca /InIsolation está en desuso. Las pruebas se ejecutan siempre en un proceso independiente</target>
+        <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run  {0}</source>
-        <target state="new">Not Run  {0}</target>
-        <note></note>
+        <target state="translated">No ejecutar {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
-        <target state="new">Logging Vstest Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Registrando diagnósticos de Vstest en el archivo: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="new">CollectArgumentHelp</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:&lt;NombreDescriptivo RecopiladorDeDatos&gt;
+      Habilita el recopilador de datos para la serie de pruebas. Más información aquí: https://aka.ms/vstest-collect</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
-        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
+        <target state="translated">El nombre descriptivo del recopilador de datos "{0}" no es válido. El recopilador de datos se ignorará.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
         <note></note>
       </trans-unit>
     </body>

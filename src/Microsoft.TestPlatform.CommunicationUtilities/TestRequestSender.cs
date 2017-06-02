@@ -27,8 +27,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private IDataSerializer dataSerializer;
 
-        // TODO:sasin Change the version to 2
-        private int highestNegotiatedVersion = 1;
+        // Set default to 1, if protocol version check does not happen
+        // that implies host is using version 1
+        private int protocolVersion = 1;
+
+        private int highestSupportedVersion = 2;
 
         /// <summary>
         /// Use to cancel blocking tasks associated with testhost process
@@ -54,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="protocolConfig">Protocol related information</param>
         internal TestRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer, ProtocolConfig protocolConfig)
         {
-            this.highestNegotiatedVersion = protocolConfig.Version;
+            this.highestSupportedVersion = protocolConfig.Version;
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
         }
@@ -91,16 +94,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void CheckVersionWithTestHost()
         {
-            this.communicationManager.SendMessage(MessageType.VersionCheck, payload: this.highestNegotiatedVersion);
+            this.communicationManager.SendMessage(MessageType.VersionCheck, payload: this.highestSupportedVersion);
 
             var message = this.communicationManager.ReceiveMessage();
 
             if (message.MessageType == MessageType.VersionCheck)
             {
-                var protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
-                this.highestNegotiatedVersion = protocolVersion;
+                this.protocolVersion = this.dataSerializer.DeserializePayload<int>(message);
 
-                EqtTrace.Info("TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.highestNegotiatedVersion);
+                EqtTrace.Info("TestRequestSender: VersionCheck Succeeded, NegotiatedVersion = {0}", this.protocolVersion);
             }
             else if (message.MessageType == MessageType.ProtocolError)
             {
@@ -116,13 +118,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void InitializeDiscovery(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions, version: this.highestNegotiatedVersion);
+            this.communicationManager.SendMessage(MessageType.DiscoveryInitialize, pathToAdditionalExtensions, version: this.protocolVersion);
         }
 
         /// <inheritdoc/>
         public void InitializeExecution(IEnumerable<string> pathToAdditionalExtensions, bool loadOnlyWellKnownExtensions)
         {
-            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions, version: this.highestNegotiatedVersion);
+            this.communicationManager.SendMessage(MessageType.ExecutionInitialize, pathToAdditionalExtensions, version: this.protocolVersion);
         }
 
         /// <inheritdoc/>
@@ -130,7 +132,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria, version: this.highestNegotiatedVersion);
+                this.communicationManager.SendMessage(MessageType.StartDiscovery, discoveryCriteria, version: this.protocolVersion);
 
                 var isDiscoveryComplete = false;
 
@@ -242,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             try
             {
-                this.communicationManager.SendMessage(messageType, payload, version: this.highestNegotiatedVersion);
+                this.communicationManager.SendMessage(messageType, payload, version: this.protocolVersion);
 
                 // This needs to happen asynchronously.
                 Task.Run(() => this.ListenAndReportTestResults(eventHandler));
@@ -302,7 +304,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         this.communicationManager.SendMessage(
                             MessageType.LaunchAdapterProcessWithDebuggerAttachedCallback,
                             processId,
-                            version: this.highestNegotiatedVersion);
+                            version: this.protocolVersion);
                     }
                 }
                 catch (IOException exception)
@@ -331,58 +333,74 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private void OnTestRunAbort(ITestRunEventsHandler testRunEventsHandler, Exception exception)
         {
-            EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
+            try
+            {
+                EqtTrace.Error("Server: TestExecution: Aborting test run because {0}", exception);
 
-            var reason = string.Format(CommonResources.AbortedTestRun, exception?.Message);
+                var reason = string.Format(CommonResources.AbortedTestRun, exception?.Message);
 
-            // log console message to vstest console
-            testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, reason);
+                // log console message to vstest console
+                testRunEventsHandler.HandleLogMessage(TestMessageLevel.Error, reason);
 
-            // log console message to vstest console wrapper
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-            testRunEventsHandler.HandleRawMessage(rawMessage);
+                // log console message to vstest console wrapper
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
+                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+                testRunEventsHandler.HandleRawMessage(rawMessage);
 
-            // notify test run abort to vstest console wrapper.
-            var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
-            var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
-            rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
-            testRunEventsHandler.HandleRawMessage(rawMessage);
+                // notify test run abort to vstest console wrapper.
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, null, TimeSpan.Zero);
+                var payload = new TestRunCompletePayload { TestRunCompleteArgs = completeArgs };
+                rawMessage = this.dataSerializer.SerializePayload(MessageType.ExecutionComplete, payload);
+                testRunEventsHandler.HandleRawMessage(rawMessage);
 
-            // notify of a test run complete and bail out.
-            testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
+                // notify of a test run complete and bail out.
+                testRunEventsHandler.HandleTestRunComplete(completeArgs, null, null, null);
 
-            this.CleanupCommunicationIfProcessExit();
+                this.CleanupCommunicationIfProcessExit();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex);
+                throw ex;
+            }
         }
 
         private void OnDiscoveryAbort(ITestDiscoveryEventsHandler eventHandler, Exception exception)
         {
-            EqtTrace.Error("Server: TestExecution: Aborting test discovery because {0}", exception);
-
-            var reason = string.Format(CommonResources.AbortedTestDiscovery, exception?.Message);
-
-            // Log to vstest console
-            eventHandler.HandleLogMessage(TestMessageLevel.Error, reason);
-
-            // Log to vs ide test output
-            var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
-            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-            eventHandler.HandleRawMessage(rawMessage);
-
-            // Notify discovery abort to IDE test output
-            var payload = new DiscoveryCompletePayload()
+            try
             {
-                IsAborted = true,
-                LastDiscoveredTests = null,
-                TotalTests = -1
-            };
-            rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
-            eventHandler.HandleRawMessage(rawMessage);
+                EqtTrace.Error("Server: TestExecution: Aborting test discovery because {0}", exception);
 
-            // Complete discovery
-            eventHandler.HandleDiscoveryComplete(-1, null, true);
+                var reason = string.Format(CommonResources.AbortedTestDiscovery, exception?.Message);
 
-            this.CleanupCommunicationIfProcessExit();
+                // Log to vstest console
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, reason);
+
+                // Log to vs ide test output
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = reason };
+                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+                eventHandler.HandleRawMessage(rawMessage);
+
+                // Notify discovery abort to IDE test output
+                var payload = new DiscoveryCompletePayload()
+                {
+                    IsAborted = true,
+                    LastDiscoveredTests = null,
+                    TotalTests = -1
+                };
+                rawMessage = this.dataSerializer.SerializePayload(MessageType.DiscoveryComplete, payload);
+                eventHandler.HandleRawMessage(rawMessage);
+
+                // Complete discovery
+                eventHandler.HandleDiscoveryComplete(-1, null, true);
+
+                this.CleanupCommunicationIfProcessExit();
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error(ex);
+                throw ex;
+            }
         }
 
         private string TryReceiveRawMessage()
@@ -394,10 +412,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             if (message == null)
             {
-                var reason = string.IsNullOrWhiteSpace(this.clientExitErrorMessage)
-                    ? CommonResources.UnableToCommunicateToTestHost
-                    : this.clientExitErrorMessage;
-                EqtTrace.Error("Unable to receive message from testhost: {0}", reason);
+                EqtTrace.Warning("TestRequestSender: Communication channel with test host is broken.");
+                var reason = CommonResources.UnableToCommunicateToTestHost;
+                if (!string.IsNullOrWhiteSpace(this.clientExitErrorMessage))
+                {
+                    reason = this.clientExitErrorMessage;
+                }
+                else
+                {
+                    // Test host process has not exited yet. We will wait for exit to allow us gather
+                    // standard error
+                    var processWaitEvent = new ManualResetEventSlim();
+                    try
+                    {
+                        EqtTrace.Info("TestRequestSender: Waiting for test host to exit.");
+                        processWaitEvent.Wait(TimeSpan.FromSeconds(10), this.clientExitCancellationSource.Token);
+
+                        // Use a default error message
+                        EqtTrace.Info("TestRequestSender: Timed out waiting for test host to exit.");
+                        reason = CommonResources.UnableToCommunicateToTestHost;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        EqtTrace.Info("TestRequestSender: Got error message from test host.");
+                        reason = this.clientExitErrorMessage;
+                    }
+                }
+
+                EqtTrace.Error("TestRequestSender: Unable to receive message from testhost: {0}", reason);
                 throw new IOException(reason);
             }
 

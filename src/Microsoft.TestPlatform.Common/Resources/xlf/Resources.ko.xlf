@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Data collection : {0}</source>
-        <target state="new">진단 데이터 어댑터 메시지: {0}</target>
-        <note></note>
+        <target state="translated">데이터 수집: {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">진단 데이터 어댑터의 메시지: {0}</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Data collector '{0}' message: {1}.</source>
-        <target state="new">진단 데이터 어댑터('{0}') 메시지: {1}.</target>
-        <note></note>
+        <target state="translated">데이터 수집기 ‘{0}’ 메시지: {1}.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">진단 데이터 어댑터 (' {0} ') 메시지: {1}입니다.</target>
         </alt-trans>
@@ -57,9 +57,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
-        <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="translated">중복되는 실행 설정 섹션 '{0}'이(가) 있습니다. 중복 설정을 무시합니다.</target>
-        <note />
+        <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
+        <target state="new">중복되는 실행 설정 섹션 '{0}'이(가) 있습니다. 중복 설정을 무시합니다.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">이름이 ' {0} '이 (가) 발견 실행된 설정 섹션을 중복.  복제 설정을 무시합니다.</target>
         </alt-trans>
@@ -210,44 +210,44 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
-        <source>Data collector '{0}' failed to provide intialization information. Error: {1}</source>
-        <target state="new">Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</target>
+        <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
+        <target state="new">데이터 수집기 ‘{0}’에서 초기화 정보를 제공하지 못했습니다. 오류: {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
         <source>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</source>
-        <target state="new">The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</target>
-        <note></note>
+        <target state="translated">형식 로드, 생성 또는 초기화 중에 데이터 수집기 ‘{0}’에서 예외를 throw했습니다. {1}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
         <source>Could not find data collector '{0}'</source>
-        <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
-        <note></note>
+        <target state="translated">데이터 수집기 ‘{0}’을(를) 찾을 수 없습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorRequestedDuplicateEnvironmentVariable">
         <source>The data collector '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another data collector '{3}' has already requested same environment variable with different value '{4}'.</source>
-        <target state="new">The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</target>
-        <note></note>
+        <target state="translated">데이터 수집기 ‘{0}’에서 값이 ‘{2}’인 환경 변수 ‘{1}’을(를) 테스트 실행 환경에서 설정하도록 요청했는데, 다른 데이터 수집기 ‘{3}’이(가) 다른 값(‘{4}’)을 포함하는 동일 환경 변수를 이미 요청했습니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
         <source>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</source>
-        <target state="new">There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</target>
-        <note></note>
+        <target state="translated">데이터 수집기 FriendlyName이 ‘{0}’인 여러 개의 구성이 있습니다. 중복 구성은 테스트 실행에서 무시됩니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="ReportDataCollectorException">
         <source>Data collector caught an exception of type '{0}': '{1}'. More details: {2}.</source>
-        <target state="new">Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</target>
-        <note></note>
+        <target state="translated">데이터 수집기에서 ‘{0}’: ‘{1}’ 형식의 예외를 catch했습니다. 자세한 정보: {2}.</target>
+        <note />
       </trans-unit>
       <trans-unit id="WrongDataCollectionContextType">
         <source>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</source>
-        <target state="new">Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</target>
-        <note></note>
+        <target state="translated">데이터 컬렉션 컨텍스트에서 파생된 형식을 사용하여 데이터 및 메시지를 보낼 수 없습니다.  데이터 및 메시지를 보내는 데 사용되는 DataCollectionContext는 데이터에 대해 발생한 이벤트 중 하나에서 가져와야 합니다.</target>
+        <note />
       </trans-unit>
       <trans-unit id="LoggerUriInvalid">
         <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
-        <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
-        <note></note>
+        <target state="translated">테스트 로거 URI '{0}'이(가) 잘못되었습니다. 테스트 로거를 무시합니다.</target>
+        <note />
       </trans-unit>
     </body>
   </file>

@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -93,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
         {
-            TestHostManagerCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
+            TestHostManagerCallbacks.ExitCallBack(this.processHelper, process, this.testHostProcessStdError, this.OnHostExited);
         };
 
         /// <summary>
@@ -134,7 +135,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 // Not sharing the host which means we need to pass the test assembly path as argument
                 // so that the test host can create an appdomain on startup (Main method) and set appbase
-                argumentsString += " " + "--testsourcepath " + "\"" + sources.FirstOrDefault() + "\"";
+                argumentsString += " " + "--testsourcepath " + sources.FirstOrDefault().AddDoubleQuote();
             }
 
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);

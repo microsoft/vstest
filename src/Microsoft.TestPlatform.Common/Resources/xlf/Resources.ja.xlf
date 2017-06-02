@@ -22,8 +22,8 @@
     <body>
       <trans-unit id="DataCollectionMessageFormat">
         <source>Data collection : {0}</source>
-        <target state="new">診断データ アダプターのメッセージ: {0}</target>
-        <note></note>
+        <target state="translated">データ コレクション : {0}</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">診断データ アダプターのメッセージ: {0}</target>
         </alt-trans>
@@ -31,8 +31,8 @@
       </trans-unit>
       <trans-unit id="DataCollectorMessageFormat">
         <source>Data collector '{0}' message: {1}.</source>
-        <target state="new">診断データ アダプター ('{0}') のメッセージ: {1}。</target>
-        <note></note>
+        <target state="translated">データ コレクター '{0}' メッセージ: {1}。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">診断データ アダプター (' {0} ') のメッセージ: {1}。</target>
         </alt-trans>
@@ -57,9 +57,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="9" adjWordcount="7.65" curWordcount="7.65"</note>
       </trans-unit>
       <trans-unit id="DuplicateSettingsProvided">
-        <source>Duplicated run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
-        <target state="translated">'{0}' という名前の重複した実行設定セクションが見つかりました。重複する設定を無視しています。</target>
-        <note />
+        <source>Duplicate run settings section named '{0}' found.  Ignoring the duplicate settings.</source>
+        <target state="new">'{0}' という名前の重複した実行設定セクションが見つかりました。重複する設定を無視しています。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">実行設定セクションの名前 '{0}' が見つかりましたが重複しています。 重複する設定は無視されます。</target>
         </alt-trans>
@@ -210,44 +210,44 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="24" adjWordcount="20.4" curWordcount="20.4"</note>
       </trans-unit>
       <trans-unit id="DataCollectorErrorOnGetVariable">
-        <source>Data collector '{0}' failed to provide intialization information. Error: {1}</source>
-        <target state="new">Diagnostic data adapter '{0}' failed to provide intialization information. Error: {1}</target>
+        <source>Data collector '{0}' failed to provide initialization information. Error: {1}</source>
+        <target state="new">データ コレクター '{0}' で初期化情報を表示できませんでした。エラー: {1}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="DataCollectorInitializationError">
         <source>Data collector '{0}' threw an exception during type loading, construction, or initialization: {1}.</source>
-        <target state="new">The diagnostic data adapter '{0}'  threw an exception during type loading, construction, or initialization: {1}.</target>
-        <note></note>
+        <target state="translated">データ コレクター '{0}' が型の読み込み、作成、または初期化中に例外をスローしました: {1}。</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorNotFound">
         <source>Could not find data collector '{0}'</source>
-        <target state="new">Could not find diagnostic data adapter of type '{0}' and Uri '{1}'</target>
-        <note></note>
+        <target state="translated">データ コレクター '{0}' が見つかりませんでした</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorRequestedDuplicateEnvironmentVariable">
         <source>The data collector '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another data collector '{3}' has already requested same environment variable with different value '{4}'.</source>
-        <target state="new">The diagnostic data adapter '{0}' requested environment variable '{1}' with value '{2}' to be set in test execution environment, but another diagnostic data adapter '{3}' has already requested same environment variable with different value '{4}'.</target>
-        <note></note>
+        <target state="translated">データ コレクター '{0}' が値 '{2}' の環境変数 '{1}' をテスト実行時環境で設定するように要求しましたが、別のデータ コレクター '{3}' が既に別の値 '{4}' を持つ同じ環境変数を要求しています。</target>
+        <note />
       </trans-unit>
       <trans-unit id="IgnoredDuplicateConfiguration">
         <source>There are multiple configurations that have data collector FriendlyName as '{0}'. Duplicate configurations will be ignored in the test run.</source>
-        <target state="new">There are multiple configurations that have diagnostic data adapter  type '{0}' or Uri '{1}'. Duplicate configurations will be ignored in the test run.</target>
-        <note></note>
+        <target state="translated">データ コレクターの FriendlyName が '{0}' の構成が複数あります。テストの実行では、重複した構成は無視されます。</target>
+        <note />
       </trans-unit>
       <trans-unit id="ReportDataCollectorException">
         <source>Data collector caught an exception of type '{0}': '{1}'. More details: {2}.</source>
-        <target state="new">Diagnostic data adapter caught an exception of type '{0}': '{1}'. More details: {2}.</target>
-        <note></note>
+        <target state="translated">データ コレクターが型 '{0}' の例外をキャッチしました: '{1}'。詳細: {2}。</target>
+        <note />
       </trans-unit>
       <trans-unit id="WrongDataCollectionContextType">
         <source>Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</source>
-        <target state="new">Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector.</target>
-        <note></note>
+        <target state="translated">データ コレクション コンテキストから派生する型をデータおよびメッセージの送信に使用することはできません。データおよびメッセージの送信に使用される DataCollectionContext は、データ コレクターに対して発生したイベントの 1 つからのものである必要があります。</target>
+        <note />
       </trans-unit>
       <trans-unit id="LoggerUriInvalid">
         <source>The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</source>
-        <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
-        <note></note>
+        <target state="translated">テスト ロガーの URI '{0}' は無効です。テスト ロガーは無視されます。</target>
+        <note />
       </trans-unit>
     </body>
   </file>

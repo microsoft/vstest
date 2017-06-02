@@ -643,8 +643,9 @@
       </trans-unit>
       <trans-unit id="CLIRunSettingsArgumentHelp">
         <source>RunSettings arguments:
-      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. Use a space to separate multiple [name]=[value].
-More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
+      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
+      Use a space to separate multiple [name]=[value].
+      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
         <target state="new">Args:
       Any extra arguments that should be passed to adapter. Arguments may be specified as name-value pair of the form &lt;n&gt;=&lt;v&gt;, where &lt;n&gt; is the argument name, and &lt;v&gt; is the argument value. Use a space to separate multiple arguments.</target>
         <note></note>
@@ -692,6 +693,11 @@ More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-ar
       <trans-unit id="DataCollectorFriendlyNameInvalid">
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
         <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
         <note></note>
       </trans-unit>
     </body>

@@ -85,7 +85,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(0, createdSampleClasses.Count, "All concurrent objects must be called.");
         }
 
-        private class MockParallelOperationManager : ParallelOperationManager<SampleConcurrentClass>
+        private class MockParallelOperationManager : ParallelOperationManager<SampleConcurrentClass, SampleHandlerClass>
         {
             public MockParallelOperationManager(Func<SampleConcurrentClass> createNewClient, int parallelLevel, bool sharedHosts) : 
                 base(createNewClient, parallelLevel, sharedHosts)
@@ -106,6 +106,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private class SampleConcurrentClass
         {
             public bool IsDisposeCalled = false;
+        }
+
+        private class SampleHandlerClass
+        {
+
         }
     }
 }

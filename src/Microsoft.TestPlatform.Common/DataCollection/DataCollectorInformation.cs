@@ -6,11 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using System;
     using System.Collections.Generic;
     using System.Xml;
-
+    using System.IO;
+    
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector;
 
     /// <summary>
     /// Encapsulates datacollector object and other objects required to facilitate datacollection.
@@ -41,7 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <param name="messageSink">
         /// The message Sink.
         /// </param>
-        internal DataCollectorInformation(DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink)
+        /// <param name="settingsXml"></param>
+        internal DataCollectorInformation(DataCollector dataCollector, XmlElement configurationElement, DataCollectorConfig dataCollectorConfig, DataCollectionEnvironmentContext environmentContext, IDataCollectionAttachmentManager attachmentManager, TestPlatformDataCollectionEvents events, IMessageSink messageSink, string settingsXml)
         {
             this.DataCollector = dataCollector;
             this.ConfigurationElement = configurationElement;
@@ -50,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
             this.EnvironmentContext = environmentContext;
             this.DataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, dataCollectorConfig);
             this.Logger = new TestPlatformDataCollectionLogger(messageSink, dataCollectorConfig);
+            this.SettingsXml = settingsXml;
         }
 
         /// <summary>
@@ -88,6 +91,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         public TestPlatformDataCollectionLogger Logger { get; private set; }
 
         /// <summary>
+        /// Gets the data collection logger
+        /// </summary>
+        private string SettingsXml { get; set; }
+
+        private const string DefaultConfigurationSettings = @"<Configuration />";
+
+        /// <summary>
         /// Gets or sets environment variables supplied by the data collector.
         /// These are available after the collector has been initialized.
         /// </summary>
@@ -102,8 +112,41 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// </summary>
         internal void InitializeDataCollector()
         {
+            UpdateConfigurationElement();
+
             this.DataCollector.Initialize(this.ConfigurationElement, this.Events, this.DataCollectionSink, this.Logger, this.EnvironmentContext);
-            this.SetTestExecutionEnvironmentVariables();
+        }
+
+        private void UpdateConfigurationElement()
+        {
+            var frameWork = XmlRunSettingsUtilities.GetRunConfigurationNode(this.SettingsXml).TargetFrameworkVersion;
+
+            if (this.ConfigurationElement == null)
+            {
+                var doc = new XmlDocument();
+                using (
+                    var xmlReader = XmlReader.Create(
+                        new StringReader(DefaultConfigurationSettings),
+                        new XmlReaderSettings{ CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
+                {
+                    doc.Load(xmlReader);
+                }
+
+                this.ConfigurationElement = doc.DocumentElement;
+            }
+
+            // Add Framework config, since it could be required by DataCollector, to determine whether they support this Framework or not
+            if (frameWork != null)
+            {
+                AppendChildNodeOrInnerText(this.ConfigurationElement.OwnerDocument, this.ConfigurationElement, "Framework", string.Empty, frameWork.Name);
+            }
+        }
+
+        private static void AppendChildNodeOrInnerText(XmlDocument doc, XmlElement owner, string elementName, string nameSpaceUri, string innerText)
+        {
+            var node = owner.SelectSingleNode(elementName) ?? doc.CreateNode("element", elementName, nameSpaceUri);
+            node.InnerText = innerText;
+            owner.AppendChild(node);
         }
 
         /// <summary>
@@ -132,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// <summary>
         /// The get test execution environment variables sync.
         /// </summary>
-        private void SetTestExecutionEnvironmentVariables()
+        public void SetTestExecutionEnvironmentVariables()
         {
             var testExecutionEnvironmentSpecifier = this.DataCollector as ITestExecutionEnvironmentSpecifier;
             if (testExecutionEnvironmentSpecifier != null)

@@ -337,11 +337,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             var assembly = typeof(Executor).GetTypeInfo().Assembly;
             string assemblyVersion = string.Empty;
 
-#if NETCOREAPP1_0
-            assemblyVersion = assembly.GetName().Version.ToString();
-#else
-            assemblyVersion = FileVersionInfo.GetVersionInfo(assembly.Location).ProductVersion;
-#endif
+            assemblyVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);
 

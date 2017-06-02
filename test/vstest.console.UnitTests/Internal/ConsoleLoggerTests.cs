@@ -146,6 +146,156 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void TestResultHandlerShouldShowStdOutMessagesBannerIfStdOutIsNotEmpty()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Failed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldNotShowStdOutMessagesBannerIfStdOutIsEmpty()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, null);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Failed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Never());
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldShowStdErrMessagesBannerIfStdErrIsNotEmpty()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardErrorCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Failed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldNotShowStdErrMessagesBannerIfStdErrIsEmpty()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardErrorCategory, null);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Failed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdErrMessagesBanner, OutputLevel.Information), Times.Never());
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldShowAdditionalInfoBannerIfAdditionalInfoIsNotEmpty()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.AdditionalInfoCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Failed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldNotShowAdditionalInfoBannerIfAdditionalInfoIsEmpty()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.AdditionalInfoCategory, null);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Failed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.AddnlInfoMessagesBanner, OutputLevel.Information), Times.Never());
+        }
+
+        [TestMethod]
         public void TestResultHandlerShouldWriteToConsoleShouldShowPassedTestsForNormalVebosity()
         {
             var parameters = new Dictionary<string, string>();
@@ -163,6 +313,59 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator, "TestName"), OutputLevel.Warning), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator, "TestName"), OutputLevel.Information), Times.Exactly(2));
         }
+
+        [TestMethod]
+        public void TestResultHandlerShouldShowStdOutMsgOfPassedTestIfVerbosityIsNormal()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.StandardOutCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Passed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestResultHandlerShouldShowDbgTrcMsg()
+        {
+            var parameters = new Dictionary<string, string>();
+            parameters.Add("verbosity", "normal");
+            this.consoleLogger.Initialize(this.events.Object, parameters);
+
+            var testcase = new TestCase("TestName", new Uri("some://uri"), "TestSource");
+
+            string message = "Dummy message";
+            TestResultMessage testResultMessage = new TestResultMessage(TestResultMessage.DebugTraceCategory, message);
+
+            var testresult = new ObjectModel.TestResult(testcase);
+            testresult.Outcome = TestOutcome.Passed;
+            testresult.Messages.Add(testResultMessage);
+
+            var eventArgs = new TestRunChangedEventArgs(null, new List<ObjectModel.TestResult> { testresult }, null);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+            this.FlushLoggerMessages();
+
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.DbgTrcMessagesBanner, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(" " + message, OutputLevel.Information), Times.Once());
+        }
+
 
         [TestMethod]
         public void TestResultHandlerShouldWriteToConsoleButSkipPassedTestsForMinimalVerbosity()

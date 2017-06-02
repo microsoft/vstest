@@ -9,6 +9,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
@@ -119,7 +120,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + "\"" + source + "\"", info.Arguments);
+            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + source.AddDoubleQuote(), info.Arguments);
         }
 
         [TestMethod]
@@ -180,7 +181,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
             Assert.AreEqual(errorData, this.errorMessage);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine));
         }
 
         [TestMethod]
@@ -194,7 +194,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             // Ignore new line chars
             Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
             Assert.AreEqual(errorData.Substring(5), this.errorMessage);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine));
         }
 
         [TestMethod]
@@ -206,7 +205,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
             Assert.AreEqual(null, this.errorMessage);
-            this.mockMessageLogger.Verify(ml => ml.SendMessage(TestMessageLevel.Error, this.errorMessage + Environment.NewLine), Times.Never);
         }
 
         [TestMethod]

@@ -229,12 +229,15 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
+        <target state="translated">--logger|/logger:&lt;Günlükçü URI’si/KolayAdı&gt;
       Test sonuçları için bir günlükçü belirtin. Örneğin, sonuçları bir 
       Visual Studio Test Sonuçları Dosyası’na (TRX) kaydetmek için şunu kullanın: /logger:trx [;LogFileName=&lt;Varsayılan değer benzersiz dosya adıdır&gt;]
       Dosyayı belirtilen LogFileName ile TestResults dizininde oluşturur.
 
-      Test sonuçlarını Team Foundation Server’da yayımlamak için TfsPublisher’ı aşağıda gösterildiği gibi kullanın
+      Konsol günlükçüsü için ayrıntı düzeyini değiştirin. İzin verilen verbosity değerleri: quiet, minimal ve normal.
+      Örnek: /logger:console;verbosity=&lt;Varsayılan değer "minimal"&gt;
+
+      Test sonuçlarını Team Foundation Server’da yayımlamak için, TfsPublisher’ı aşağıda gösterildiği gibi kullanın
       Örnek: /logger:TfsPublisher;
                 Collection=&lt;takım projesi koleksiyonu URL’si&gt;;
                 BuildName=&lt;derleme adı&gt;;
@@ -242,7 +245,7 @@
                 [;Platform=&lt;Varsayılan değer "Any CPU"&gt;]
                 [;Flavor=&lt;Varsayılan değer "Debug"&gt;]
                 [;RunTitle=&lt;başlık&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Günlükçü | / Günlükçü: &lt; Günlükçü URI/FriendlyName &gt;
       Test sonuçları için Günlükçü belirtin.  Örneğin, oturum açmak için /logger:trx sonuçları içine bir Visual Studio Test sonuçları dosyası (TRX) kullanın.
@@ -277,8 +280,8 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="new">Kullanım: vstest.console.exe [Bağımsız Değişkenler] [Seçenekler] [[--] &lt;bağımsız değişkenler&gt;...]]</target>
-        <note></note>
+        <target state="translated">Kullanım: vstest.console.exe [Bağımsız Değişkenler] [Seçenekler] [[--] &lt;RunSettings bağımsız değişkenleri&gt;...]]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Kullanım: vstest.console.exe [bağımsız değişkenler] [Seçenekler]</target>
         </alt-trans>
@@ -472,13 +475,11 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="new">  Testleri aynı işlemde çalıştırmak için:
+        <target state="translated">  Testleri çalıştırmak için:
     &gt;vstest.console.exe tests.dll 
-  Testleri ayrı bir işlemde çalıştırmak için:
-    &gt;vstest.console.exe /inIsolation tests.dll
   Testleri veri toplayıcılar gibi ek ayarlarla çalıştırmak için:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Aynı işlem içinde testleri çalıştırmak için:
     &gt; vstest.console.exe tests.dll testleri ayrı bir işlemde çalıştırmak için:
@@ -945,10 +946,9 @@
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</source>
-        <target state="new">/EnableCodeCoverage
-      Test çalıştırmasında 'CodeCoverage' adlı veri tanılama bağdaştırıcısını etkinleştirir. Ayarlar 
-      dosyası kullanılarak belirtilmezse varsayılan ayarlar kullanılır.</target>
-        <note></note>
+        <target state="translated">/EnableCodeCoverage
+      Test çalıştırması için 'CodeCoverage' veri toplayıcısını etkinleştirir.</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       Veri Tanılama Bağdaştırıcısı 'CodeCoverage' içinde test çalışmasını sağlar. Varsayılan ayarları kullanılır belirtilmediğinde ayarları dosyası kullanarak.</target>
@@ -1490,9 +1490,11 @@
       Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
       Use a space to separate multiple [name]=[value].
       More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="new">Args:
-      Bağdaştırıcıya geçirilmesi gereken ek bağımsız değişkenler. Bağımsız değişkenler, &lt;n&gt; bağımsız değişken adı ve &lt;v&gt; bağımsız değişken değeri olmak üzere, &lt;n&gt;=&lt;v&gt; biçiminde bir ad-değer çifti olarak belirtilebilir. Birden fazla bağımsız değişkeni ayırmak için boşluk kullanın.</target>
-        <note></note>
+        <target state="translated">RunSettings bağımsız değişkenleri:
+      Komut satırı aracılığıyla runsettings yapılandırmalarını geçirmek için kullanılan bağımsız değişkenler. Bağımsız değişkenler "-- " karakterlerinden sonra [ad]=[değer] biçiminde ad-değer çifti olarak belirtilebilir. -- karakterlerinden sonra boşluk olduğuna dikkat edin. 
+      Birden fazla [ad]=[değer] çiftini ayırmak için bir boşluk kullanın.
+      RunSettings bağımsız değişkenleri desteği hakkında daha fazla bilgi: https://aka.ms/vstest-runsettings-arguments</target>
+        <note />
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
@@ -1503,45 +1505,51 @@
         <source>--ResultsDirectory|/ResultsDirectory
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
-        <target state="new">--ResultsDirectory|/ResultsDirectory
-      Test results directory will be created in specified path if not exists.
-      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
-        <note></note>
+        <target state="translated">--ResultsDirectory|/ResultsDirectory
+      Test sonuçları dizini belirtilen yolda yoksa oluşturulur.
+      Örnek  /ResultsDirectory:&lt;SonuçDiziniYolu&gt;</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
         <source>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</source>
-        <target state="new">The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
-        <note></note>
+        <target state="translated">/ResultsDirectory parametresi test sonuçlarının kaydedileceği bir değer gerektirir. Örnek:  /ResultsDirectory:c:\TestSonuçlarıDizinim</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidResultsDirectoryPathCommand">
         <source>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</source>
-        <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
-        <note></note>
+        <target state="translated">'ResultsDirectory' içinde belirtilen '{0}' yolu geçersiz. Hata: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
-        <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
-        <note></note>
+        <target state="translated">/InIsolation bayrağı kullanım dışı bırakıldı. Testler her zaman ayrı bir işlem içinde çalıştırılır</target>
+        <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run  {0}</source>
-        <target state="new">Not Run  {0}</target>
-        <note></note>
+        <target state="translated">{0} Çalıştırılmadı</target>
+        <note />
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
-        <target state="new">Logging Vstest Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">Vstest Tanılamaları şu dosyadaki günlüğe kaydediliyor: {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="new">CollectArgumentHelp</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:&lt;VeriToplayıcı KolayAdı&gt;
+      Test çalıştırması için veri toplayıcıyı etkinleştirir. Daha fazla bilgi için bkz. https://aka.ms/vstest-collect</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
-        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
+        <target state="translated">Veri Toplayıcı kolay adı '{0}' geçerli değil. Veri Toplayıcı yoksayılacak.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
         <note></note>
       </trans-unit>
     </body>

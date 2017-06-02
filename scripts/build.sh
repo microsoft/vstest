@@ -87,9 +87,10 @@ DOTNET_CLI_VERSION="latest"
 #
 TPB_Solution="TestPlatform.sln"
 TPB_TargetFrameworkCore="netcoreapp2.0"
+TPB_TargetFrameworkCore10="netcoreapp1.0"
 TPB_Configuration=$CONFIGURATION
 TPB_TargetRuntime=$TARGET_RUNTIME
-TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo "$VERSION-$VERSION_SUFFIX")
+TPB_Version=$(test -z $VERSION_SUFFIX && echo $VERSION || echo $VERSION-$VERSION_SUFFIX)
 TPB_CIBuild=$CI_BUILD
 TPB_LocalizedBuild=$DISABLE_LOCALIZED_BUILD
 TPB_Verbose=$VERBOSE
@@ -173,14 +174,14 @@ function restore_package()
     local start=$SECONDS
 
     log ".. .. Restore: Source: $TPB_Solution"
-    $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror || failed=true
+    $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     if [ "$failed" = true ]; then
         error "Failed to restore packages."
         return 1
     fi
 
     log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
-    $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal || failed=true
+    $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     if [ "$failed" = true ]; then
         error "Failed to restore packages."
         return 2
@@ -260,8 +261,7 @@ function publish_package()
     PROJECTPACKAGEOUTPUTMAP=( \
         $TP_PACKAGE_PROJ_DIR/package.csproj:$coreCLRPackageDir \
         $TP_ROOT_DIR/src/vstest.console/vstest.console.csproj:$coreCLRPackageDir \
-        $TP_ROOT_DIR/src/datacollector/datacollector.csproj:$coreCLRPackageDir \
-        $TP_ROOT_DIR/src/testhost/testhost.csproj:$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore
+        $TP_ROOT_DIR/src/datacollector/datacollector.csproj:$coreCLRPackageDir
     )
 
     for item in "${PROJECTPACKAGEOUTPUTMAP[@]}" ;
@@ -271,6 +271,12 @@ function publish_package()
         log "Package: Publish $projectToPackage"
         $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
     done
+
+    # Publish TestHost for netcoreapp1.0 target
+    log "Package: Publish testhost.csproj"
+    local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
+    local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore10
+    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
 
     # Copy TestHost for desktop targets if we've built net46
     # packages with mono
@@ -318,10 +324,10 @@ function publishplatformatbstractions()
     log "Publish-PlatfromAbstractions-Internal: Started."
     
     local start=$SECONDS
-    coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
+    local coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore10
     
-    platformAbstraction="$TP_ROOT_DIR/src/Microsoft.TestPlatform.PlatformAbstractions/bin/$TPB_Configuration"
-    platformAbstractionNetCore=$platformAbstraction/$TPB_TargetFrameworkCore
+    local platformAbstraction="$TP_ROOT_DIR/src/Microsoft.TestPlatform.PlatformAbstractions/bin/$TPB_Configuration"
+    local platformAbstractionNetCore=$platformAbstraction/$TPB_TargetFrameworkCore10
     
     cp -r $platformAbstractionNetCore $coreCLRPackageDir
     

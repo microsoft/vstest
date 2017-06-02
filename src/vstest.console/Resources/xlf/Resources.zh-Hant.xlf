@@ -229,19 +229,23 @@
                 [;Platform=&lt;Defaults to "Any CPU"&gt;]
                 [;Flavor=&lt;Defaults to "Debug"&gt;]
                 [;RunTitle=&lt;title&gt;]</source>
-        <target state="new">--logger|/logger:&lt;記錄器 Uri/易記名稱&gt;
-      指定測試結果的記錄器。例如，若要將結果記錄到
-      Visual Studio 測試結果檔案 (TRX) 中，請使用 /logger:trx [;LogFileName=&lt;預設值為唯一的檔案名稱&gt;]
+        <target state="translated">--logger|/logger:&lt;記錄器 URI/FriendlyName&gt;
+      指定測試結果的記錄器。例如，若要將結果記錄到 
+      Visual Studio 測試結果檔案 (TRX)，請使用 /logger:trx [;LogFileName=&lt;預設為唯一的檔案名稱&gt;]
       使用指定的 LogFileName 在 TestResults 目錄中建立檔案。
 
-      若要將測試結果發行到 Team Foundation Server，請使用 TfsPublisher，如下所示      範例: /logger:TfsPublisher;
+      變更主控台記錄器的詳細資訊層級。允許的詳細資訊值: quiet、minimal 與 normal。
+      範例: /logger:console;verbosity=&lt;預設為 "minimal"&gt;
+
+      若要將測試結果發行到 Team Foundation Server，請使用 TfsPublisher，如下所示
+      範例: /logger:TfsPublisher;
                 Collection=&lt;Team 專案集合 URL&gt;;
-                BuildName=&lt;組建名稱&gt;;
+                BuildName=&lt;專案集合&gt;;
                 TeamProject=&lt;Team 專案名稱&gt;
                 [;Platform=&lt;預設值為 [任何 CPU]&gt;]
                 [;Flavor=&lt;預設值為 [偵錯]&gt;]
                 [;RunTitle=&lt;標題&gt;]</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-记录器 | / 记录器︰ &lt; 记录器 Uri/友好 &gt;
       指定记录器的测试结果。 例如，要记录结果到 Visual Studio 测试结果文件 (TRX) 使用 /logger:trx。
@@ -276,8 +280,8 @@
       </trans-unit>
       <trans-unit id="HelpUsageText">
         <source>Usage: vstest.console.exe [Arguments] [Options] [[--] &lt;RunSettings arguments&gt;...]]</source>
-        <target state="new">用法: vstest.console.exe [引數] [選項] [[--] &lt;args&gt;...]]</target>
-        <note></note>
+        <target state="translated">用法: vstest.console.exe [引數] [選項] [[--] &lt;RunSettings 引數&gt;...]]</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">用法︰ vstest.console.exe [参数] [选项]</target>
         </alt-trans>
@@ -471,13 +475,11 @@
     &gt;vstest.console.exe tests.dll 
   To run tests with additional settings such as  data collectors:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</source>
-        <target state="new">  在相同的處理序中執行測試:
+        <target state="translated">  若要執行測試:
     &gt;vstest.console.exe tests.dll 
-  在個別的處理序中執行測試:
-    &gt;vstest.console.exe /inIsolation tests.dll
-  使用像資料收集器之類的其他設定執行測試:
+  若要使用資料收集器一類的其他設定執行測試:
     &gt;vstest.console.exe  tests.dll /Settings:Local.RunSettings</target>
-        <note></note>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">同一进程中运行测试︰
     &gt; vstest.console.exe tests.dll 若要在单独的进程中运行测试︰
@@ -944,10 +946,9 @@
       <trans-unit id="EnableCodeCoverageArgumentProcessorHelp">
         <source>/EnableCodeCoverage
       Enables data collector 'CodeCoverage' for the test run.</source>
-        <target state="new">/EnableCodeCoverage
-      在測試回合中啟用資料診斷配接器 'CodeCoverage'。如果 
-      未使用設定檔來指定，則使用預設設定。</target>
-        <note></note>
+        <target state="translated">/EnableCodeCoverage
+      為測試回合啟用資料收集器 'CodeCoverage'。</target>
+        <note />
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ EnableCodeCoverage
       启用诊断数据适配器 CodeCoverage 中的测试运行。如果不使用设置文件指定，则默认设置使用。</target>
@@ -1486,11 +1487,14 @@
       </trans-unit>
       <trans-unit id="CLIRunSettingsArgumentHelp">
         <source>RunSettings arguments:
-      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. Use a space to separate multiple [name]=[value].
-More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
-        <target state="new">Args:
-      任何應額外傳遞給配接器的引數。引數可以名稱/值對 &lt;n&gt;=&lt;v&gt; 的形式指定，其中 &lt;n&gt; 是引數名稱，&lt;v&gt; 是引數值。如有多個引數，請使用空格加以分隔。</target>
-        <note></note>
+      Arguments to pass runsettings configurations through commandline. Arguments may be specified as name-value pair of the form [name]=[value] after "-- ". Note the space after --. 
+      Use a space to separate multiple [name]=[value].
+      More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-arguments</source>
+        <target state="translated">RunSettings 引數:
+      透過命令列傳遞 runsettings 組態的引數。引數可以接在 "-- " 之後，以 [名稱]=[值] 的格式指定名稱/值配對。請注意 -- 之後的空格。
+      使用空格以隔開多個 [名稱]=[值]。
+      RunSettings 引數支援的詳細資訊: https://aka.ms/vstest-runsettings-arguments</target>
+        <note />
       </trans-unit>
       <trans-unit id="MalformedRunSettingsKey">
         <source>One or more runsettings provided contain invalid token</source>
@@ -1501,45 +1505,51 @@ More info on RunSettings arguments support: https://aka.ms/vstest-runsettings-ar
         <source>--ResultsDirectory|/ResultsDirectory
       Test results directory will be created in specified path if not exists.
       Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</source>
-        <target state="new">--ResultsDirectory|/ResultsDirectory
-      Test results directory will be created in specified path if not exists.
-      Example  /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
-        <note></note>
+        <target state="translated">--ResultsDirectory|/ResultsDirectory
+      若沒有測試結果目錄，將會在指定的路徑中加以建立。
+      範例: /ResultsDirectory:&lt;pathToResultsDirectory&gt;</target>
+        <note />
       </trans-unit>
       <trans-unit id="ResultsDirectoryValueRequired">
         <source>The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</source>
-        <target state="new">The /ResultsDirectory parameter requires a value, where the test results should be saved. Example:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
-        <note></note>
+        <target state="translated">/ResultsDirectory 參數需要值，亦即測試結果的儲存位置。範例:  /ResultsDirectory:c:\MyTestResultsDirectory</target>
+        <note />
       </trans-unit>
       <trans-unit id="InvalidResultsDirectoryPathCommand">
         <source>The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</source>
-        <target state="new">The path '{0}' specified in the 'ResultsDirectory' is invalid. Error: {1}</target>
-        <note></note>
+        <target state="translated">'ResultsDirectory' 中指定的路徑 '{0}' 無效。錯誤: {1}</target>
+        <note />
       </trans-unit>
       <trans-unit id="InIsolationDeprecated">
         <source>The /InIsolation flag is deprecated. The tests are always run in a separate process</source>
-        <target state="new">The /InIsolation flag is deprecated. The tests are always run in a separate process</target>
-        <note></note>
+        <target state="translated">/InIsolation 旗標已標示即將淘汰。測試一律會在個別的處理序中執行</target>
+        <note />
       </trans-unit>
       <trans-unit id="NotRunTestIndicator">
         <source>Not Run  {0}</source>
-        <target state="new">Not Run  {0}</target>
-        <note></note>
+        <target state="translated">未執行 {0}</target>
+        <note />
       </trans-unit>
       <trans-unit id="VstestDiagLogOutputPath">
         <source>Logging Vstest Diagnostics in file: {0}</source>
-        <target state="new">Logging Vstest Diagnostics in file: {0}</target>
-        <note></note>
+        <target state="translated">在檔案 {0} 中記錄 Vstest 診斷</target>
+        <note />
       </trans-unit>
       <trans-unit id="CollectArgumentHelp">
         <source>--Collect|/Collect:&lt;DataCollector FriendlyName&gt;
       Enables data collector for the test run. More info here : https://aka.ms/vstest-collect</source>
-        <target state="new">CollectArgumentHelp</target>
-        <note></note>
+        <target state="translated">--Collect|/Collect:&lt;資料收集器的易記名稱&gt;
+      為測試回合啟用資料收集器。如需詳細資訊，請參閱: https://aka.ms/vstest-collect</target>
+        <note />
       </trans-unit>
       <trans-unit id="DataCollectorFriendlyNameInvalid">
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
-        <target state="new">The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</target>
+        <target state="translated">資料收集器的易記名稱 '{0}' 無效。該資料收集器將予忽略。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
         <note></note>
       </trans-unit>
     </body>

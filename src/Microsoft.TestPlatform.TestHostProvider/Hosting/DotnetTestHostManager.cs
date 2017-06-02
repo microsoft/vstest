@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -43,6 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     {
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
         private const string DotnetTestHostFriendltName = "DotnetTestHost";
+        private const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
 
         private IDotnetHostHelper dotnetHostHelper;
 
@@ -123,7 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
         {
-            TestHostManagerCallbacks.ExitCallBack(this.processHelper, this.messageLogger, process, this.testHostProcessStdError, this.OnHostExited);
+            TestHostManagerCallbacks.ExitCallBack(this.processHelper, process, this.testHostProcessStdError, this.OnHostExited);
         };
 
         /// <summary>
@@ -188,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var runtimeConfigPath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".runtimeconfig.json"));
             if (this.fileHelper.Exists(runtimeConfigPath))
             {
-                string argsToAdd = " --runtimeconfig \"" + runtimeConfigPath + "\"";
+                string argsToAdd = " --runtimeconfig " + runtimeConfigPath.AddDoubleQuote();
                 args += argsToAdd;
                 EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
             }
@@ -201,7 +203,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var depsFilePath = Path.Combine(sourceDirectory, string.Concat(sourceFile, ".deps.json"));
             if (this.fileHelper.Exists(depsFilePath))
             {
-                string argsToAdd = " --depsfile \"" + depsFilePath + "\"";
+                string argsToAdd = " --depsfile " + depsFilePath.AddDoubleQuote();
                 args += argsToAdd;
                 EqtTrace.Verbose("DotnetTestHostmanager: Adding {0} in args", argsToAdd);
             }
@@ -216,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (this.fileHelper.Exists(testHostPath))
             {
                 EqtTrace.Verbose("DotnetTestHostmanager: Full path of testhost.dll is {0}", testHostPath);
-                args += " \"" + testHostPath + "\" " + connectionInfo.ToCommandLineOptions();
+                args += " " + testHostPath.AddDoubleQuote() + " " + connectionInfo.ToCommandLineOptions();
             }
             else
             {
@@ -250,7 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
-                return this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.TopDirectoryOnly);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, TestAdapterRegexPattern, SearchOption.TopDirectoryOnly);
             }
 
             return Enumerable.Empty<string>();
@@ -327,7 +329,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 using (var stream = this.fileHelper.GetStream(depsFilePath, FileMode.Open))
                 {
                     var context = new DependencyContextJsonReader().Read(stream);
-                    var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+                    var testhostPackage = context.RuntimeLibraries.Where(lib => lib.Name.Equals(testHostPackageName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
 
                     if (testhostPackage != null)
                     {
@@ -335,7 +337,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                         {
                             foreach (var path in runtimeAssemblyGroup.AssetPaths)
                             {
-                                if (path.EndsWith("testhost.dll", StringComparison.CurrentCultureIgnoreCase))
+                                if (path.EndsWith("testhost.dll", StringComparison.OrdinalIgnoreCase))
                                 {
                                     testHostPath = path;
                                     break;

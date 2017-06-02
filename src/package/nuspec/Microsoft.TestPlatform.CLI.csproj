@@ -4,5 +4,9 @@
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <NuspecFile>TestPlatform.CLI.nuspec</NuspecFile>
     <NuspecProperties>version=$(Version)</NuspecProperties>
+
+    <!-- Don't include the output.dll and output.runtimeconfig.json files in nuget package -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 </Project>

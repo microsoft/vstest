@@ -328,7 +328,7 @@
       </trans-unit>
       <trans-unit id="NotificationTimeoutIsZero">
         <source>Notification timeout must be greater than zero.</source>
-        <target state="translated">通知タイムアウトは&amp;0; より大きくする必要があります。</target>
+        <target state="translated">通知タイムアウトは 0 より大きくする必要があります。</target>
         <note>Timeout used during test discovery and execution must be greater than zero.</note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">通知のタイムアウトは 0 以上である必要があります。</target>
