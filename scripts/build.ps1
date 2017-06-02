@@ -137,7 +137,7 @@ function Install-DotNetCli
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.0.5' -Channel 'preview'
     
     # Get netcoreapp1.1 shared components.
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.1' -Channel 'release/1.1.0'
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
