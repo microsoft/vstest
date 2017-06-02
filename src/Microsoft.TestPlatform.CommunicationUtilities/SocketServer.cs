@@ -90,10 +90,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private void OnClientConnected(TcpClient client)
         {
             this.tcpClient = client;
+            this.tcpClient.Client.NoDelay = true;
 
             if (this.ClientConnected != null)
             {
-                this.stream = new BufferedStream(client.GetStream(), 64 * 1024);
+                this.stream = new BufferedStream(client.GetStream(), 8 * 1024);
                 this.channel = this.channelFactory(this.stream);
                 this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 

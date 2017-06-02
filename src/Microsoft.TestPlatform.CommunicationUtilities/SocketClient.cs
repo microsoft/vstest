@@ -36,7 +36,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             this.cancellation = new CancellationTokenSource();
             this.stopped = false;
 
-            this.tcpClient = new TcpClient();
+            this.tcpClient = new TcpClient { NoDelay = true };
             this.channelFactory = channelFactory;
         }
 
@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 throw connectAsyncTask.Exception;
             }
 
-            this.stream = new BufferedStream(this.tcpClient.GetStream(), 64 * 1024);
+            this.stream = new BufferedStream(this.tcpClient.GetStream(), 8 * 1024);
             this.channel = this.channelFactory(this.stream);
             if (this.ServerConnected != null)
             {
