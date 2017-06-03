@@ -17,6 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// Manages file transfer from data collector to test runner service.
@@ -44,6 +45,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Use to cancel attachment transfers if test run is cancelled.
         /// </summary>
         private CancellationTokenSource cancellationTokenSource;
+        
+        /// <summary>
+        /// File helper instance.
+        /// </summary>
+        private IFileHelper fileHelper;
 
         #endregion
 
@@ -53,7 +59,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
         /// Initializes a new instance of the <see cref="DataCollectionAttachmentManager"/> class.
         /// </summary>
         public DataCollectionAttachmentManager()
+            : this(new Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper())
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataCollectionAttachmentManager"/> class.
+        /// </summary>
+        /// <param name="fileHelper">File helper instance.</param>
+        protected DataCollectionAttachmentManager(IFileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
             this.cancellationTokenSource = new CancellationTokenSource();
             this.attachmentTasks = new Dictionary<DataCollectionContext, List<Task>>();
             this.AttachmentSets = new Dictionary<DataCollectionContext, Dictionary<Uri, AttachmentSet>>();
@@ -250,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                 EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Moving file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                             }
 
-                            File.Move(fileTransferInfo.FileName, localFilePath);
+                            this.fileHelper.MoveFile(fileTransferInfo.FileName, localFilePath);
 
                             if (EqtTrace.IsInfoEnabled)
                             {
@@ -264,7 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                                 EqtTrace.Info("DataCollectionAttachmentManager.AddNewFileTransfer : Copying file {0} to {1}", fileTransferInfo.FileName, localFilePath);
                             }
 
-                            File.Copy(fileTransferInfo.FileName, localFilePath);
+                            this.fileHelper.CopyFile(fileTransferInfo.FileName, localFilePath);
 
                             if (EqtTrace.IsInfoEnabled)
                             {
@@ -292,7 +308,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                     {
                         if (t.Exception == null)
                         {
-                            this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(new Uri(localFilePath), fileTransferInfo.Description));
+                            // Uri doesn't recognize file paths in unix. See https://github.com/dotnet/corefx/issues/1745
+                            var attachmentUri = new UriBuilder() { Scheme = "file", Host="", Path = localFilePath }.Uri;
+                            this.AttachmentSets[fileTransferInfo.Context][uri].Attachments.Add(new UriDataAttachment(attachmentUri, fileTransferInfo.Description));
                         }
 
                         if (sendFileCompletedCallback != null)
