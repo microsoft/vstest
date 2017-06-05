@@ -93,9 +93,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.stopped = true;
 
                 // Close the client and dispose the underlying stream
+                // Depending on implementation order of dispose may be important.
+                // 1. Channel dispose -> disposes reader/writer which call a Flush on the Stream. Stream shouldn't
+                // be disposed at this time.
+                // 2. Stream's dispose may Flush the underlying base stream (if it's a BufferedStream). We should try
+                // dispose it next.
+                // 3. TcpClient's dispose will clean up the network stream and close any sockets. NetworkStream's dispose
+                // is a no-op if called a second time.
+                this.channel?.Dispose();
                 this.stream?.Dispose();
                 this.tcpClient?.Dispose();
-                this.channel?.Dispose();
 
                 this.cancellation.Dispose();
 
