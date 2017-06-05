@@ -18,6 +18,8 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [TestMethod]
         public void SocketThroughput2()
         {
+            // Measure the throughput with socket communication v2 (SocketServer, SocketClient)
+            // implementation.
             var server = new SocketServer();
             var client = new SocketClient();
             ICommunicationChannel serverChannel = null;
@@ -71,6 +73,8 @@ namespace Microsoft.TestPlatform.PerformanceTests
         [TestMethod]
         public void SocketThroughput1()
         {
+            // Measure the throughput with socket communication v1 (SocketCommunicationManager)
+            // implementation.
             var server = new SocketCommunicationManager();
             var client = new SocketCommunicationManager();
             var watch = new Stopwatch();
