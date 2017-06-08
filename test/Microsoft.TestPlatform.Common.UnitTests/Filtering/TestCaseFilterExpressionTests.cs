@@ -4,7 +4,6 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using CrossPlatEngineAdapter = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -16,7 +15,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         public void ValidForPropertiesShouldNotSetvalidForMatchVariableTofalseIfFilterIsInvalid()
         {
             var filterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
-            var testCaseFilterExpression = new CrossPlatEngineAdapter.TestCaseFilterExpression(filterExpressionWrapper);
+            var testCaseFilterExpression = new TestCaseFilterExpression(filterExpressionWrapper);
 
             testCaseFilterExpression.ValidForProperties(new List<string>() { "TestCategory" }, (s) => { return null; });
 
