@@ -84,7 +84,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                     var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
                     var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
                     var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
-                    throw new TestPlatformFormatException(errorMessage, this.FilterExpressionWrapper.FilterString);
+                    EqtTrace.Info(errorMessage);
                 }
             }
 

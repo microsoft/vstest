@@ -44,13 +44,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Adapter
         }
 
         [TestMethod]
-        public void GetTestCaseFilterShouldThrowOnInvalidProperties()
+        public void GetTestCaseFilterShouldNotThrowOnInvalidProperties()
         {
             this.runContext.FilterExpressionWrapper = new FilterExpressionWrapper("highlyunlikelyproperty=unused");
 
-            Assert.That.Throws<TestPlatformFormatException>(() => 
-                        this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; }))
-                    .WithMessage("No tests matched the filter because it contains one or more properties that are not valid (highlyunlikelyproperty). Specify filter expression containing valid properties (TestCategory) and try again.");
+            var filter = this.runContext.GetTestCaseFilter(new List<string> { "TestCategory" }, (s) => { return null; });
+
+            Assert.IsNotNull(filter);
         }
 
         [TestMethod]

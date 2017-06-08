@@ -54,10 +54,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
             if (null != this.filterWrapper && this.validForMatch)
             {
                 invalidProperties = this.filterWrapper.ValidForProperties(supportedProperties, propertyProvider);
-                if (null != invalidProperties)
-                {
-                    this.validForMatch = false;
-                }
             }
             return invalidProperties;
         }
