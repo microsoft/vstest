@@ -18,7 +18,7 @@
     </ProjectReference>
 
     <PackageReference Include="Newtonsoft.Json">
-      <Version>9.0.1</Version>
+      <Version>$(JsonNetVersion)</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
