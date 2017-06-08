@@ -83,10 +83,15 @@
           <Version>$(MSTestAdapterVersion)</Version>
         </PackageReference>
         <PackageReference Include="Moq">
-          <Version>4.6.38-*</Version>
+          <Version>$(MoqVersion)</Version>
         </PackageReference>
         <PackageReference Include="MSTest.Assert.Extensions">
           <Version>$(MSTestAssertExtensionVersion)</Version>
+        </PackageReference>
+
+        <!-- Workaround for https://github.com/castleproject/Core/issues/239 -->
+        <PackageReference Include="System.ComponentModel.TypeConverter">
+          <Version>4.3.0</Version>
         </PackageReference>
       </ItemGroup>
     </When>
