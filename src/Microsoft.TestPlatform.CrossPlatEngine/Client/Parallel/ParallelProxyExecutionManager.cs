@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     /// <summary>
     /// ParallelProxyExecutionManager that manages parallel execution
     /// </summary>
-    internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyExecutionManager>, IParallelProxyExecutionManager
+    internal class ParallelProxyExecutionManager : ParallelOperationManager<IProxyExecutionManager, ITestRunEventsHandler>, IParallelProxyExecutionManager
     {
         #region TestRunSpecificData
 
@@ -32,8 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         private bool hasSpecificTestsRun = false;
 
         private Task lastParallelRunCleanUpTask = null;
-
-        private IDictionary<IProxyExecutionManager, ITestRunEventsHandler> concurrentManagerHandlerMap;
 
         private ITestRunEventsHandler currentRunEventsHandler;
 
@@ -145,10 +143,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // In case of DataCollection we only start dc.exe on initialize, & close once the TestRun is complete,
             // So instead of resuing ProxyExecutionManager, we will close it here, & create new PEMWDC
-            if (!this.SharedHosts || (proxyExecutionManager is ProxyExecutionManagerWithDataCollection))
+            // In Case of Abort, clean old one and create new proxyExecutionManager in place of old one.
+            if (!this.SharedHosts || testRunCompleteArgs.IsAborted || (proxyExecutionManager is ProxyExecutionManagerWithDataCollection))
             {
-                this.concurrentManagerHandlerMap.Remove(proxyExecutionManager);
-                proxyExecutionManager.Close();
+                this.RemoveManager(proxyExecutionManager);
 
                 proxyExecutionManager = CreateNewConcurrentManager();
 
@@ -163,19 +161,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                                                this.currentRunEventsHandler,
                                                this,
                                                this.currentRunDataAggregator);
-                this.concurrentManagerHandlerMap.Add(proxyExecutionManager, parallelEventsHandler);
+
+                this.AddManager(proxyExecutionManager, parallelEventsHandler);
             }
 
-            // In Case of Cancel or Abort, no need to trigger run for rest of the data
             // If there are no more sources/testcases, a parallel executor is truly done with execution
-            if (testRunCompleteArgs.IsAborted || testRunCompleteArgs.IsCanceled || !this.StartTestRunOnConcurrentManager(proxyExecutionManager))
+            if (testRunCompleteArgs.IsCanceled || !this.StartTestRunOnConcurrentManager(proxyExecutionManager))
             {
                 lock (this.executionStatusLockObject)
                 {
                     // Each concurrent Executor calls this method 
                     // So, we need to keep track of total runcomplete calls
                     this.runCompletedClients++;
-                    allRunsCompleted = this.runCompletedClients == this.concurrentManagerInstances.Length;
+                    allRunsCompleted = this.runCompletedClients == this.GetConcurrentManagersCount();
                 }
 
                 // verify that all executors are done with the execution and there are no more sources/testcases to execute
@@ -250,9 +248,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // One data aggregator per parallel run
             this.currentRunDataAggregator = new ParallelRunDataAggregator();
-            this.concurrentManagerHandlerMap = new Dictionary<IProxyExecutionManager, ITestRunEventsHandler>();
 
-            foreach (var concurrentManager in this.concurrentManagerInstances)
+            foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
                 var parallelEventsHandler = concurrentManager is ProxyExecutionManagerWithDataCollection ? 
                     new ParallelDataCollectionEventsHandler(concurrentManager,
@@ -265,7 +262,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                                                this,
                                                this.currentRunDataAggregator);
 
-                this.concurrentManagerHandlerMap.Add(concurrentManager, parallelEventsHandler);
+                this.UpdateHandlerForManager(concurrentManager, parallelEventsHandler);
 
                 Task.Run(() => this.StartTestRunOnConcurrentManager(concurrentManager));
             }
@@ -325,7 +322,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                     proxyExecutionManager.Initialize();
                 }
 
-                proxyExecutionManager.StartTestRun(testRunCriteria, this.concurrentManagerHandlerMap[proxyExecutionManager]);
+                proxyExecutionManager.StartTestRun(testRunCriteria, this.GetHandlerForGivenManager(proxyExecutionManager));
             }
 
             return testRunCriteria != null;

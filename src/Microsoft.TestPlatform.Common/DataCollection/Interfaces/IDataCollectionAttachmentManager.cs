@@ -49,13 +49,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces
         /// <param name="sendFileCompletedCallback">
         /// The send File Completed Callback.
         /// </param>
-        /// <param name="typeUri">
-        /// The type Uri.
+        /// <param name="dataCollectorUri">
+        /// Uri of the data collector.
         /// </param>
         /// <param name="friendlyName">
         /// The friendly Name.
         /// </param>
-        void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri typeUri, string friendlyName);
+        void AddAttachment(FileTransferInformation fileTransferInfo, AsyncCompletedEventHandler sendFileCompletedCallback, Uri dataCollectorUri, string friendlyName);
 
         /// <summary>
         /// Stops processing further transfer requests as test run is cancelled.

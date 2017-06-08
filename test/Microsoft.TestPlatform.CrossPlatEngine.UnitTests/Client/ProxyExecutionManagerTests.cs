@@ -4,7 +4,6 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -16,11 +15,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
-
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     [TestClass]
     public class ProxyExecutionManagerTests
@@ -33,6 +31,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
         private readonly Mock<TestRunCriteria> mockTestRunCriteria;
 
+        private readonly Mock<IDataSerializer> mockDataSerializer;
+
         /// <summary>
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
@@ -43,7 +43,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockTestRunCriteria = new Mock<TestRunCriteria>(new List<string> { "source.dll" }, 10);
-            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.clientConnectionTimeout);
+            this.mockDataSerializer = new Mock<IDataSerializer>();
+            this.testExecutionManager = new ProxyExecutionManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.mockDataSerializer.Object, this.clientConnectionTimeout);
 
             // Default to shared test host
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
@@ -170,6 +171,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
             mockTestRunEventsHandler.Verify(s => s.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null));
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldCatchExceptionAndCallHandleRawMessageAndHandleLogMessage()
+        {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+            mockTestRunEventsHandler.Verify(s => s.HandleRawMessage(It.IsAny<string>()));
+            mockTestRunEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()));
         }
 
         [TestMethod]

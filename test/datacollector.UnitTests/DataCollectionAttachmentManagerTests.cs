@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -18,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     [TestClass]
     public class DataCollectionAttachmentManagerTests
     {
+        private const int Timeout = 10 * 60 * 1000;
         private DataCollectionAttachmentManager attachmentManager;
         private Mock<IMessageSink> messageSink;
         private SessionId sessionId;
@@ -109,7 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
-            waitHandle.WaitOne();
+            waitHandle.WaitOne(Timeout);
 
             Assert.IsTrue(File.Exists(Path.Combine(System.AppContext.BaseDirectory, filename)));
             Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
@@ -136,7 +138,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             this.attachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
             // Wait for file operations to complete
-            waitHandle.WaitOne();
+            waitHandle.WaitOne(Timeout);
 
             Assert.AreEqual(1, this.attachmentManager.AttachmentSets[datacollectioncontext][uri].Attachments.Count);
             Assert.IsTrue(File.Exists(Path.Combine(AppContext.BaseDirectory, this.sessionId.Id.ToString(), filename)));
@@ -192,24 +194,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void GetAttachmentsShouldNotReturnAttachmentsAfterCancelled()
         {
-            var filename = "filename1.txt";
-            File.WriteAllText(Path.Combine(AppContext.BaseDirectory, filename), string.Empty);
-
-            this.attachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
-
+            var fileHelper = new Mock<IFileHelper>();
+            var testableAttachmentManager = new TestableDataCollectionAttachmentManager(fileHelper.Object);
+            var attachmentPath = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+            File.WriteAllText(attachmentPath, string.Empty);
             var datacollectioncontext = new DataCollectionContext(this.sessionId);
             var friendlyName = "TestDataCollector";
             var uri = new Uri("datacollector://Company/Product/Version");
+            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, attachmentPath, true);
+            var waitHandle = new AutoResetEvent(false);
+            var handler = new AsyncCompletedEventHandler((a, e) => { Assert.Fail("Handler shouldn't be called since operation is canceled."); });
 
-            var dataCollectorDataMessage = new FileTransferInformation(datacollectioncontext, Path.Combine(AppContext.BaseDirectory, filename), true);
+            // We cancel the operation in the actual operation. This ensures the follow up task to is never called, attachments
+            // are not added.
+            Action cancelAddAttachment = () => testableAttachmentManager.Cancel();
+            fileHelper.Setup(fh => fh.MoveFile(It.IsAny<string>(), It.IsAny<string>())).Callback(cancelAddAttachment);
+            testableAttachmentManager.Initialize(this.sessionId, AppContext.BaseDirectory, this.messageSink.Object);
+            testableAttachmentManager.AddAttachment(dataCollectorDataMessage, handler, uri, friendlyName);
 
-            this.attachmentManager.AddAttachment(dataCollectorDataMessage, null, uri, friendlyName);
-
-            this.attachmentManager.Cancel();
-
-            var result = this.attachmentManager.GetAttachments(datacollectioncontext);
-
+            // Wait for the attachment transfer tasks to complete
+            var result = testableAttachmentManager.GetAttachments(datacollectioncontext);
             Assert.AreEqual(0, result[0].Attachments.Count);
+        }
+
+        private class TestableDataCollectionAttachmentManager : DataCollectionAttachmentManager
+        {
+            public TestableDataCollectionAttachmentManager(IFileHelper fileHelper)
+                : base(fileHelper)
+            {
+            }
         }
     }
 }

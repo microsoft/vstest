@@ -1547,6 +1547,11 @@
         <target state="translated">データ コレクターのフレンドリ名 '{0}' が無効です。データ コレクターは無視されます。</target>
         <note />
       </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

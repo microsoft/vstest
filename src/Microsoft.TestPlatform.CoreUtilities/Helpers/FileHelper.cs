@@ -58,5 +58,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             return new FileInfo(path).Attributes;
         }
+
+        /// <inheritdoc/>
+        public void CopyFile(string sourcePath, string destinationPath)
+        {
+            File.Copy(sourcePath, destinationPath);
+        }
+
+        /// <inheritdoc/>
+        public void MoveFile(string sourcePath, string destinationPath)
+        {
+            File.Move(sourcePath, destinationPath);
+        }
     }
 }

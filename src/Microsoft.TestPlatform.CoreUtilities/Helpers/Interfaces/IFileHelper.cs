@@ -62,5 +62,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="path">Full path of the file.</param>
         /// <returns>Attributes of the file.</returns>
         FileAttributes GetFileAttributes(string path);
+
+        /// <summary>
+        /// Copy a file in the file system.
+        /// </summary>
+        /// <param name="sourcePath">Full path of the file.</param>
+        /// <param name="destinationPath">Target path for the file.</param>
+        void CopyFile(string sourcePath, string destinationPath);
+
+        /// <summary>
+        /// Moves a file in the file system.
+        /// </summary>
+        /// <param name="sourcePath">Full path of the file.</param>
+        /// <param name="destinationPath">Target path for the file.</param>
+        void MoveFile(string sourcePath, string destinationPath);
     }
 }

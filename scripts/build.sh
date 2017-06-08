@@ -156,9 +156,9 @@ function install_cli()
 
     # Get netcoreapp1.1 shared components
     log "install_cli: Get the shared netcoreapp1.0 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.4" --shared-runtime
+    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "preview" --version "1.0.5" --shared-runtime
     log "install_cli: Get the shared netcoreapp1.1 runtime..."
-    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.1" --shared-runtime
+    $install_script --install-dir "$TP_TOOLS_DIR/dotnet" --no-path --channel "release/1.1.0" --version "1.1.2" --shared-runtime
 
     log "install_cli: Complete. Elapsed $(( SECONDS - start ))s."
     return 0
@@ -174,14 +174,14 @@ function restore_package()
     local start=$SECONDS
 
     log ".. .. Restore: Source: $TPB_Solution"
-    $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror || failed=true
+    $dotnet restore $TPB_Solution --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     if [ "$failed" = true ]; then
         error "Failed to restore packages."
         return 1
     fi
 
     log ".. .. Restore: Source: $TP_ROOT_DIR/src/package/external/external.csproj"
-    $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal || failed=true
+    $dotnet restore $TP_ROOT_DIR/src/package/external/external.csproj --packages $TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version || failed=true
     if [ "$failed" = true ]; then
         error "Failed to restore packages."
         return 2
