@@ -16,6 +16,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private MockParallelOperationManager proxyParallelManager;
 
+        [TestInitialize]
+        public void InitializeTests()
+        {
+            Func<SampleConcurrentClass> sampleCreator =
+                () =>
+                {
+                    return new SampleConcurrentClass();
+                };
+
+            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
+        }
+
         [TestMethod]
         public void AbstractProxyParallelManagerShouldCreateCorrectNumberOfConcurrentObjects()
         {
@@ -88,14 +100,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void AddManagerShouldAddAManagerWithHandlerInConcurrentManagerList()
         {
-            Func<SampleConcurrentClass> sampleCreator =
-                () =>
-                {
-                    return new SampleConcurrentClass();
-                };
-
-            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
-
             // At the begining it should be equal to parallel level
             Assert.AreEqual(2, this.proxyParallelManager.GetConcurrentManagersCount());
 
@@ -108,14 +112,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void RemoveManagerShouldRemoveAManagerFromConcurrentManagerList()
         {
-            Func<SampleConcurrentClass> sampleCreator =
-                () =>
-                {
-                    return new SampleConcurrentClass();
-                };
-
-            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
-
             var manager = new SampleConcurrentClass(true);
             this.proxyParallelManager.AddManager(manager, new SampleHandlerClass());
 
@@ -130,14 +126,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void UpdateHandlerForManagerShouldAddNewHandlerIfNotexist()
         {
-            Func<SampleConcurrentClass> sampleCreator =
-                () =>
-                {
-                    return new SampleConcurrentClass();
-                };
-
-            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
-
             var manager = new SampleConcurrentClass(true);
             this.proxyParallelManager.UpdateHandlerForManager(manager, new SampleHandlerClass());
 
@@ -148,13 +136,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void UpdateHandlerForManagerShouldUpdateHandlerForGivenManager()
         {
-            Func<SampleConcurrentClass> sampleCreator =
-                () =>
-                {
-                    return new SampleConcurrentClass();
-                };
-
-            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
             var manager = new SampleConcurrentClass(true);
             this.proxyParallelManager.AddManager(manager, new SampleHandlerClass());
 

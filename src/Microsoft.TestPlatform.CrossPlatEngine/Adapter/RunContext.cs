@@ -84,6 +84,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter
                     var invalidPropertiesString = string.Join(CrossPlatEngineResources.StringSeperator, invalidProperties);
                     var validPropertiesSttring = supportedProperties == null ? string.Empty : string.Join(CrossPlatEngineResources.StringSeperator, supportedProperties.ToArray());
                     var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.UnsupportedPropertiesInTestCaseFilter, invalidPropertiesString, validPropertiesSttring);
+
+                    // For unsupported property don’t throw exception, just log the message. Later it is going to handle properly with TestCaseFilterExpression.MatchTestCase().
                     EqtTrace.Info(errorMessage);
                 }
             }
