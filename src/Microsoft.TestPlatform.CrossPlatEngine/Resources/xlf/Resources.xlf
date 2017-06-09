@@ -55,7 +55,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
-        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
+        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
         <note></note>
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">

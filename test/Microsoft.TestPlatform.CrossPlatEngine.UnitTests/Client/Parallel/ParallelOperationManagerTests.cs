@@ -16,6 +16,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     {
         private MockParallelOperationManager proxyParallelManager;
 
+        [TestInitialize]
+        public void InitializeTests()
+        {
+            Func<SampleConcurrentClass> sampleCreator =
+                () =>
+                {
+                    return new SampleConcurrentClass();
+                };
+
+            this.proxyParallelManager = new MockParallelOperationManager(sampleCreator, 2, true);
+        }
+
         [TestMethod]
         public void AbstractProxyParallelManagerShouldCreateCorrectNumberOfConcurrentObjects()
         {
@@ -85,6 +97,61 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Assert.AreEqual(0, createdSampleClasses.Count, "All concurrent objects must be called.");
         }
 
+        [TestMethod]
+        public void AddManagerShouldAddAManagerWithHandlerInConcurrentManagerList()
+        {
+            // At the begining it should be equal to parallel level
+            Assert.AreEqual(2, this.proxyParallelManager.GetConcurrentManagersCount());
+
+            this.proxyParallelManager.AddManager(new SampleConcurrentClass(true), new SampleHandlerClass());
+
+            Assert.AreEqual(3, this.proxyParallelManager.GetConcurrentManagersCount());
+            Assert.AreEqual(1, this.proxyParallelManager.GetConcurrentManagerInstances().Where(m => m.CheckValue == true).Count());
+        }
+
+        [TestMethod]
+        public void RemoveManagerShouldRemoveAManagerFromConcurrentManagerList()
+        {
+            var manager = new SampleConcurrentClass(true);
+            this.proxyParallelManager.AddManager(manager, new SampleHandlerClass());
+
+            Assert.AreEqual(3, this.proxyParallelManager.GetConcurrentManagersCount());
+
+            this.proxyParallelManager.RemoveManager(manager);
+
+            Assert.AreEqual(2, this.proxyParallelManager.GetConcurrentManagersCount());
+            Assert.AreEqual(0, this.proxyParallelManager.GetConcurrentManagerInstances().Where(m => m.CheckValue == true).Count());
+        }
+
+        [TestMethod]
+        public void UpdateHandlerForManagerShouldAddNewHandlerIfNotexist()
+        {
+            var manager = new SampleConcurrentClass(true);
+            this.proxyParallelManager.UpdateHandlerForManager(manager, new SampleHandlerClass());
+
+            Assert.AreEqual(3, this.proxyParallelManager.GetConcurrentManagersCount());
+            Assert.AreEqual(1, this.proxyParallelManager.GetConcurrentManagerInstances().Where(m => m.CheckValue == true).Count());
+        }
+
+        [TestMethod]
+        public void UpdateHandlerForManagerShouldUpdateHandlerForGivenManager()
+        {
+            var manager = new SampleConcurrentClass(true);
+            this.proxyParallelManager.AddManager(manager, new SampleHandlerClass());
+
+            // For current handler the value of variable CheckValue should be false;
+            Assert.IsFalse(this.proxyParallelManager.GetHandlerForGivenManager(manager).CheckValue);
+
+            var newHandler = new SampleHandlerClass(true);
+
+            // Update manager with new handler
+            this.proxyParallelManager.UpdateHandlerForManager(manager, newHandler);
+
+            // It should not add new manager but update the current one
+            Assert.AreEqual(3, this.proxyParallelManager.GetConcurrentManagersCount());
+            Assert.IsTrue(this.proxyParallelManager.GetHandlerForGivenManager(manager).CheckValue);
+        }
+
         private class MockParallelOperationManager : ParallelOperationManager<SampleConcurrentClass, SampleHandlerClass>
         {
             public MockParallelOperationManager(Func<SampleConcurrentClass> createNewClient, int parallelLevel, bool sharedHosts) : 
@@ -106,10 +173,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private class SampleConcurrentClass
         {
             public bool IsDisposeCalled = false;
+            public bool CheckValue;
+            public SampleConcurrentClass(bool value=false)
+            {
+                this.CheckValue = value;
+            }
         }
 
         private class SampleHandlerClass
         {
+            public bool CheckValue;
+            public SampleHandlerClass(bool value=false)
+            {
+                this.CheckValue = value;
+            }
 
         }
     }
