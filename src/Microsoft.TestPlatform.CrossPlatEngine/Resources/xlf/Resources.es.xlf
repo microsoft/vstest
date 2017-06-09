@@ -139,9 +139,9 @@
         <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
-        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="translated">Ninguna prueba coincide con el filtro porque contiene una o varias propiedades no válidas ({0}). Especifique una expresión de filtro que contenga propiedades válidas ({1}) y vuelva a intentarlo.</target>
-        <note />
+        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
+        <target state="new">Ninguna prueba coincide con el filtro porque contiene una o varias propiedades no válidas ({0}). Especifique una expresión de filtro que contenga propiedades válidas ({1}) y vuelva a intentarlo.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">No hay pruebas que coincide con el filtro porque contiene una o más propiedades que no son válidos ({0}). Especifique la expresión de filtro que contiene propiedades válidas ({1}) y vuelva a intentarlo.</target>
         </alt-trans>

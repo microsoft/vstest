@@ -7,8 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using ObjectModel.Adapter;
-    
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+
     /// <summary>
     /// Implements ITestCaseFilterExpression, providing test case filtering functionality.
     /// </summary>
@@ -34,24 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
         }
 
         /// <summary>
-        /// Validate if underlying filter expression is valid for given set of supported properties.
-        /// </summary>
-        public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
-        {
-            string[] invalidProperties = null;
-            if (null != this.filterWrapper && this.validForMatch)
-            {
-                invalidProperties = this.filterWrapper.ValidForProperties(supportedProperties, propertyProvider);
-                if (null != invalidProperties)
-                {
-                    this.validForMatch = false;
-                }
-            }
-
-            return invalidProperties;
-        }
-        
-        /// <summary>
         /// User specified filter criteria.
         /// </summary>
         public string TestCaseFilterValue
@@ -61,7 +43,20 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 return this.filterWrapper.FilterString;
             }
         }
-        
+
+        /// <summary>
+        /// Validate if underlying filter expression is valid for given set of supported properties.
+        /// </summary>
+        public string[] ValidForProperties(IEnumerable<String> supportedProperties, Func<string, TestProperty> propertyProvider)
+        {
+            string[] invalidProperties = null;
+            if (null != this.filterWrapper && this.validForMatch)
+            {
+                invalidProperties = this.filterWrapper.ValidForProperties(supportedProperties, propertyProvider);
+            }
+            return invalidProperties;
+        }
+
         /// <summary>
         /// Match test case with filter criteria.
         /// </summary>
@@ -79,7 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering
                 // can be null when parsing error occurs. Invalid filter results in no match.
                 return false;
             }
-
             return this.filterWrapper.Evaluate(propertyValueProvider);
         }
 
