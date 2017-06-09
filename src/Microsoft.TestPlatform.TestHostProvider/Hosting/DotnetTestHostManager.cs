@@ -361,7 +361,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                     foreach (var x in additionalProbingPaths)
                     {
                         EqtTrace.Verbose("DotnetTestHostmanager: Looking for path {0} in folder {1}", testHostPath, x.ToString());
-                        string testHostFullPath = Path.Combine(x.ToString(), testHostPath);
+                        string testHostFullPath;
+                        try
+                        {
+                            testHostFullPath = Path.Combine(x.ToString(), testHostPath);
+                        }
+                        catch (ArgumentException)
+                        {
+                            // https://github.com/Microsoft/vstest/issues/847
+                            // skip any invalid paths and continue checking the others
+                            continue;
+                        }
+
                         if (this.fileHelper.Exists(testHostFullPath))
                         {
                             return testHostFullPath;
