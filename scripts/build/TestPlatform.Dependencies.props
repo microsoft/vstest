@@ -18,5 +18,7 @@
     <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
 
     <ChutzpahAdapterVersion>4.2.4</ChutzpahAdapterVersion>
+
+    <MoqVersion>4.7.25</MoqVersion>
   </PropertyGroup>
 </Project>
