@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
     using System.Collections.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -302,6 +303,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
                 finally
                 {
+                    TestPluginCache.Instance.ClearExtentions();
+
                     if (isCanceled)
                     {
                         this.State = TestRunState.Canceled;

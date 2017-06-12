@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using System.Linq;
     using System.Threading;
 
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -225,6 +226,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
                 finally
                 {
+                    TestPluginCache.Instance.ClearExtentions();
                     ManualResetEvent discoveryComplete = this.discoveryCompleted;
 
                     // Notify the waiting handle that discovery is complete
