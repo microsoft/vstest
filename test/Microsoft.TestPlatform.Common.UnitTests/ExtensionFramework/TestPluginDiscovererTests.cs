@@ -110,6 +110,22 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
         }
 
+        [TestMethod]
+        public void GetTestExtensionsInformationShouldNotAbortOnFaultyExtensions()
+        {
+            var pathToExtensions = new List<string>
+            {
+                typeof(TestPluginDiscovererTests).GetTypeInfo().Assembly.Location,
+                typeof(TestPluginDiscoverer).GetTypeInfo().Assembly.Location,
+            };
+
+            // The below should not throw an exception.
+            this.testPluginDiscoverer = new DummyTestPluginDiscoverer();
+            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<TestSettingsProviderPluginInformation, ISettingsProvider>(pathToExtensions, loadOnlyWellKnownExtensions: true);
+
+            Assert.IsTrue(testExtensions.Keys.Select(k => k.Contains("ValidSettingsProvider")).Count() >= 3);
+        }
+
         #region implementations
 
         #region Discoverers
@@ -262,6 +278,21 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         }
 
         #endregion
+
+        private class DummyTestPluginDiscoverer : TestPluginDiscoverer
+        {
+            internal override void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos)
+            {
+                if (assembly.Location.Contains("Microsoft.VisualStudio.TestPlatform.Common.dll"))
+                {
+                    throw new Exception("Fail to load types");
+                }
+                else
+                {
+                    base.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
+                }
+            }
+        }
 
         #endregion
     }
