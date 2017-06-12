@@ -119,7 +119,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
                 typeof(TestPluginDiscoverer).GetTypeInfo().Assembly.Location,
             };
 
-            // The below should not throw an exception.
             this.testPluginDiscoverer = new DummyTestPluginDiscoverer();
             var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<TestSettingsProviderPluginInformation, ISettingsProvider>(pathToExtensions, loadOnlyWellKnownExtensions: true);
 
