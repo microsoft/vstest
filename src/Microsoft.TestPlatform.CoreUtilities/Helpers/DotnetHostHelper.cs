@@ -10,17 +10,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     public class DotnetHostHelper : IDotnetHostHelper
     {
         private readonly IFileHelper fileHelper;
+        private readonly IEnvironment environment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
         /// </summary>
-        public DotnetHostHelper() : this(new FileHelper())
+        public DotnetHostHelper() : this(new FileHelper(), new PlatformEnvironment())
         {
         }
 
@@ -28,29 +30,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
         /// </summary>
         /// <param name="fileHelper">File Helper</param>
-        public DotnetHostHelper(IFileHelper fileHelper)
+        public DotnetHostHelper(IFileHelper fileHelper, IEnvironment environment)
         {
             this.fileHelper = fileHelper;
+            this.environment = environment;
         }
 
         /// <inheritdoc />
         public string GetDotnetHostFullPath()
         {
-            char separator = ';';
             var dotnetExeName = "dotnet.exe";
 
-#if !NET46
-            // Use semicolon(;) as path separator for windows
-            // colon(:) for Linux and OSX
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
             {
-                separator = ':';
                 dotnetExeName = "dotnet";
             }
-#endif
 
             var pathString = Environment.GetEnvironmentVariable("PATH");
-            foreach (string path in pathString.Split(separator))
+            foreach (string path in pathString.Split(Path.PathSeparator))
             {
                 string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
                 if (this.fileHelper.Exists(exeFullPath))
