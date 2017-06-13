@@ -301,7 +301,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                 }
                 finally
                 {
-                    TestPluginCache.Instance.ClearExtentions();
+                    // Clear the cache once request is complete, so that new request will not use extension from last request.
+                    TestPluginCache.Instance.ClearExtentsions();
 
                     if (isCanceled)
                     {

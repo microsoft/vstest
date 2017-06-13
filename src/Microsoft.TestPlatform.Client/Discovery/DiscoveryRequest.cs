@@ -226,7 +226,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
                 finally
                 {
-                    TestPluginCache.Instance.ClearExtentions();
+                    // Clear the cache once request is complete, so that new request will not use extension from last request.
+                    TestPluginCache.Instance.ClearExtentsions();
+
                     ManualResetEvent discoveryComplete = this.discoveryCompleted;
 
                     // Notify the waiting handle that discovery is complete
