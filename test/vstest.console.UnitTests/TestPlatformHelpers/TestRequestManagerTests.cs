@@ -151,7 +151,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
 
-            this.mockTestPlatform.Verify(tp => tp.ClearExtentsions(), Times.Once);
+            this.mockTestPlatform.Verify(tp => tp.ClearExtensions(), Times.Once);
         }
 
         [TestMethod]
@@ -320,7 +320,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 (TestRunCriteria runCriteria, ProtocolConfig config) => { }).Returns(mockDiscoveryRequest.Object);
 
             var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
-            this.mockTestPlatform.Verify(tp => tp.ClearExtentsions(), Times.Once);
+            this.mockTestPlatform.Verify(tp => tp.ClearExtensions(), Times.Once);
         }
 
         [TestMethod]
