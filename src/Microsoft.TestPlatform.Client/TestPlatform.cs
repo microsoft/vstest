@@ -159,6 +159,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         }
 
         /// <summary>
+        /// Clear test plugin cache
+        /// </summary>
+        public void ClearExtentsions()
+        {
+            TestPluginCache.Instance.ClearExtentsions();
+        }
+
+        /// <summary>
         /// Update the test adapter paths provided through run settings to be used by the test service
         /// </summary>
         /// <param name="runSettings">

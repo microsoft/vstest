@@ -224,11 +224,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 AssemblyLoadContext.Default.Resolving -= this.CurrentDomainAssemblyResolve;
 #endif
 
-                // Dispose the assembly resolver once the work is done, otherwise resolution path of this assembly resolver
-                // will get use during test run for netcoreapp because test will run in this appdomain only as there is no
-                // separate appdomain for netcorepp tests.
-                this.assemblyResolver?.Dispose();
-
                 // clear the assemblies
                 lock (this.resolvedAssemblies)
                 {
