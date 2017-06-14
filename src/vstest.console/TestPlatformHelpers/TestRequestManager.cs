@@ -182,7 +182,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     discoveryEventsRegistrar?.UnregisterDiscoveryEvents(discoveryRequest);
 
                     // Clear the extensions once request is complete, so that new request will not use extension from last request.
-                    this.testPlatform.ClearExtentsions();
+                    this.testPlatform.ClearExtensions();
                 }
             }
 
@@ -345,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                         testRunEventsRegistrar?.UnregisterTestRunEvents(testRunRequest);
 
                         // Clear the extensions once request is complete, so that new request will not use extension from last request.
-                        this.testPlatform.ClearExtentsions();
+                        this.testPlatform.ClearExtensions();
                     }
                 }
 

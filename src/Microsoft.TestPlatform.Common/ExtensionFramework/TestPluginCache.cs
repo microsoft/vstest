@@ -309,7 +309,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Clear test plugin cache
         /// </summary>
-        public void ClearExtentsions()
+        public void ClearExtensions()
         {
             this.pathToExtensions = null;
             this.TestExtensions?.InvalidateCache();

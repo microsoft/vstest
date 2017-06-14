@@ -161,9 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Clear test plugin cache
         /// </summary>
-        public void ClearExtentsions()
+        public void ClearExtensions()
         {
-            TestPluginCache.Instance.ClearExtentsions();
+            TestPluginCache.Instance.ClearExtensions();
         }
 
         /// <summary>

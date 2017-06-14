@@ -149,7 +149,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var additionalExtensions = new List<string> { "foo.dll" };
             TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
 
-            TestPluginCache.Instance.ClearExtentsions();
+            TestPluginCache.Instance.ClearExtensions();
 
             Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
         }
@@ -164,7 +164,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
 
             // Clear cache
-            TestPluginCache.Instance.ClearExtentsions();
+            TestPluginCache.Instance.ClearExtensions();
 
             Assert.IsFalse(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
         }
