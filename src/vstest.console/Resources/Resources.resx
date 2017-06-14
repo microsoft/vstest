@@ -655,4 +655,11 @@
   <data name="DbgTrcMessagesBanner" xml:space="preserve">
     <value>Debug Traces Messages:</value>
   </data>
+  <data name="OpenResponseFileError" xml:space="preserve">
+    <value>Error opening response file '{0}'</value>
+  </data>
+  <data name="ResponseFileArgumentHelp" xml:space="preserve">
+    <value>@&lt;file&gt;
+      Read response file for more options.</value>
+  </data>
 </root>
