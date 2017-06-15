@@ -127,10 +127,46 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.AreEqual(1, updatedExtensions.Count());
         }
 
-        [Ignore]
         [TestMethod]
         public void UpdateAdditionalExtensionsShouldResetExtensionsDiscoveredFlag()
         {
+            SetupMockAdditionalPathExtensions();
+
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
+
+            Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
+
+            // update extensions
+            var additionalExtensions = new List<string> { "foo.dll" };
+            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
+
+            Assert.IsFalse(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
+        }
+
+        [TestMethod]
+        public void ClearExtensionsShouldClearExtensionPath()
+        {
+            var additionalExtensions = new List<string> { "foo.dll" };
+            TestPluginCache.Instance.UpdateExtensions(additionalExtensions, true);
+
+            TestPluginCache.Instance.ClearExtensions();
+
+            Assert.IsNull(TestPluginCache.Instance.PathToExtensions);
+        }
+
+        [TestMethod]
+        public void ClearExtensionsShouldClearTestExtensionsCache()
+        {
+            SetupMockAdditionalPathExtensions();
+
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
+
+            Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
+
+            // Clear cache
+            TestPluginCache.Instance.ClearExtensions();
+
+            Assert.IsFalse(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
         }
 
         #endregion
