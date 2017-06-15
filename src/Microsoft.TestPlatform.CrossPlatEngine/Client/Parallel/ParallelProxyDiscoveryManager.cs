@@ -148,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             // Second, let's attempt to trigger discovery for the next source.
             this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager);
 
-            return allDiscoverersCompleted;
+            return false;
         }
 
         #endregion
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 catch (Exception ex)
                 {
                     // ignore any exceptions
-                    EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to dispose discoveyr manager. Exception: " + ex);
+                    EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to dispose discovery manager. Exception: " + ex);
                 }
             }
         }
@@ -261,7 +261,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                             EqtTrace.Warning("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
                         }
 
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(0, Enumerable.Empty<TestCase>(), true);
+                        // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
+                        // Differences:
+                        // Total tests must be zero here since parallel discovery events handler adds the count
+                        // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
+                        // Set `isAborted` as true since we want this instance of discovery manager to be replaced
+                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(0, null, true);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);
             }

@@ -149,6 +149,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Log to vstest.console
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
 
+                // Send a run complete to caller.
+                // Same logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
