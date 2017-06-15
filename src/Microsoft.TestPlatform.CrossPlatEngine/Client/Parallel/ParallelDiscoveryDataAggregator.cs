@@ -45,7 +45,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             lock (dataUpdateSyncObject)
             {
                 this.IsAborted = this.IsAborted || isAborted;
-                this.TotalTests = this.TotalTests + totalTests;
+
+                if (!this.IsAborted)
+                {
+                    // Do not aggregate tests count if test discovery is aborted. It is mandated by
+                    // platform that tests count is negative for discovery abort event.
+                    // See `DiscoveryCompleteEventArgs`.
+                    this.TotalTests = this.TotalTests + totalTests;
+                }
             }
         }
 

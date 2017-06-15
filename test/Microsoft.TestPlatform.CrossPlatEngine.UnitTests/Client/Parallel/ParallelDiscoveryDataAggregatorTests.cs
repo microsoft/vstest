@@ -22,6 +22,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client.Parallel
 
             aggregator.Aggregate(totalTests: 5, isAborted: false);
             Assert.IsTrue(aggregator.IsAborted, "Aborted must be true");
+
+            Assert.AreEqual(10, aggregator.TotalTests, "Aggregator shouldn't count tests for aborted event");
         }
 
         [TestMethod]
