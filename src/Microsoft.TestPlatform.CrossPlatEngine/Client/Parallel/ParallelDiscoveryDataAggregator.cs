@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 this.IsAborted = this.IsAborted || isAborted;
 
-                if (!this.IsAborted)
+                if (!isAborted)
                 {
                     // Do not aggregate tests count if test discovery is aborted. It is mandated by
                     // platform that tests count is negative for discovery abort event.
