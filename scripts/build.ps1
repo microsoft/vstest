@@ -61,7 +61,8 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1
 # Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
 $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
-$env:DOTNET_CLI_VERSION = "latest"
+$env:DOTNET_CLI_VERSION = "2.1.0-preview1-006329"
+$env:DOTNET_RUNTIME_VERSION = "2.0.0-preview2-25331-01"
 $env:LOCATE_VS_API_VERSION = "0.2.4-beta"
 $env:MSBUILD_VERSION = "15.0"
 
@@ -138,6 +139,9 @@ function Install-DotNetCli
     
     # Get netcoreapp1.1 shared components.
     & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
+
+    # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
+    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }

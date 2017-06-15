@@ -18,5 +18,8 @@
     <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
 
     <ChutzpahAdapterVersion>4.2.4</ChutzpahAdapterVersion>
+
+    <JsonNetVersion>9.0.1</JsonNetVersion>
+    <MoqVersion>4.7.25</MoqVersion>
   </PropertyGroup>
 </Project>

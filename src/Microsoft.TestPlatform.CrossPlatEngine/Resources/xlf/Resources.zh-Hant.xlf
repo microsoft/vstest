@@ -139,9 +139,9 @@
         <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
-        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="translated">沒有符合篩選的測試，因為篩選包含一或多個無效的屬性 ({0})。請指定包含有效屬性 ({1}) 的篩選運算式，並再試一次。</target>
-        <note />
+        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
+        <target state="new">沒有符合篩選的測試，因為篩選包含一或多個無效的屬性 ({0})。請指定包含有效屬性 ({1}) 的篩選運算式，並再試一次。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">没有测试匹配筛选器，因为它包含一个或多个属性无效 ({0})。指定筛选器表达式，其中包含有效的属性 ({1})，然后重试。</target>
         </alt-trans>
