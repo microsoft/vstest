@@ -36,7 +36,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         private string settingsXml;
         private int connectionTimeout;
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyDataCollectionManager"/> class.
         /// </summary>
