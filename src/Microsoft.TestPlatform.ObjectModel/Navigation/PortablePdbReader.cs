@@ -3,10 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
-#if !NET46
     using System;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
     using System.Reflection.Metadata;
     using System.Reflection.Metadata.Ecma335;
@@ -85,6 +83,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return this.GetDiaNavigationData(handle);
         }
 
+        /// <summary>
+        /// Checks gives stream is from portable pdb or not
+        /// </summary>
+        /// <param name="stream">
+        /// Stream.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        internal static bool IsPortable(Stream stream)
+        {
+            // First four bytes should be 'BSJB'
+            var result = (stream.ReadByte() == 'B') && (stream.ReadByte() == 'S') && (stream.ReadByte() == 'J')
+                         && (stream.ReadByte() == 'B');
+            stream.Position = 0;
+            return result;
+        }
+
         internal static MethodDebugInformationHandle GetMethodDebugInformationHandle(MethodInfo methodInfo)
         {
             var methodToken = (int)MethodInfoMethodTokenProperty.GetValue(methodInfo);
@@ -111,24 +127,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 minLineNumber = Math.Min(minLineNumber, sequencePoint.StartLine);
                 maxLineNumber = Math.Max(maxLineNumber, sequencePoint.StartLine);
             }
-        }
-
-        /// <summary>
-        /// Checks gives stream is from portable pdb or not
-        /// </summary>
-        /// <param name="stream">
-        /// Stream.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        private static bool IsPortable(Stream stream)
-        {
-            // First four bytes should be 'BSJB'
-            var result = (stream.ReadByte() == 'B') && (stream.ReadByte() == 'S') && (stream.ReadByte() == 'J')
-                         && (stream.ReadByte() == 'B');
-            stream.Position = 0;
-            return result;
         }
 
         private DiaNavigationData GetDiaNavigationData(MethodDebugInformationHandle handle)
@@ -168,5 +166,4 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return fileName;
         }
     }
-#endif
 }

@@ -6,6 +6,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Diagnostics.CodeAnalysis;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation;
+    using System.IO;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// The class that enables us to get debug information from both managed and native binaries.
@@ -45,12 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// search path.
         /// </param>
         public DiaSession(string binaryPath, string searchPath)
-            :
-#if NET46
-            this(binaryPath, searchPath, new FullSymbolReader())
-#else
-            this(binaryPath, searchPath, new PortableSymbolReader())
-#endif
+            : this(binaryPath, searchPath, GetSymbolReader(binaryPath))
         {
         }
 
@@ -93,6 +90,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             ValidateArg.NotNullOrEmpty(methodName, "methodName");
             methodName = methodName.TrimEnd(TestNameStripChars);
             return this.symbolReader.GetNavigationData(declaringTypeName, methodName);
+        }
+
+        private static ISymbolReader GetSymbolReader(string binaryPath)
+        {
+#if NET46
+            var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
+            using (var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read))
+            {
+                if (PortablePdbReader.IsPortable(stream))
+                {
+                    return new PortableSymbolReader();
+                }
+
+                return new FullSymbolReader();
+            }
+#else
+            // We don't support full PDB files with .net core
+            return new PortableSymbolReader();
+#endif
         }
     }
 }
