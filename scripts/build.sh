@@ -87,6 +87,7 @@ DOTNET_RUNTIME_VERSION="2.0.0-preview2-25331-01"
 # Build configuration
 #
 TPB_Solution="TestPlatform.sln"
+TPB_TargetFramework="net46"
 TPB_TargetFrameworkCore="netcoreapp2.0"
 TPB_TargetFrameworkCore10="netcoreapp1.0"
 TPB_Configuration=$CONFIGURATION
@@ -203,8 +204,6 @@ function invoke_build()
     log ".. .. Build: Source: $TPB_Solution"
     
     if $TPB_HasMono; then
-        # Workaround for https://github.com/dotnet/sdk/issues/335
-        export FrameworkPathOverride=/usr/lib/mono/4.5/
         if [ -z "$PROJECT_NAME_PATTERNS" ]
         then
             $dotnet build $TPB_Solution --configuration $TPB_Configuration -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild || failed=true
@@ -259,56 +258,70 @@ function publish_package()
     log "publish_package: Started."
     local start=$SECONDS
     
-    coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
-    
-    PROJECTPACKAGEOUTPUTMAP=( \
-        $TP_PACKAGE_PROJ_DIR/package.csproj:$coreCLRPackageDir \
-        $TP_ROOT_DIR/src/vstest.console/vstest.console.csproj:$coreCLRPackageDir \
-        $TP_ROOT_DIR/src/datacollector/datacollector.csproj:$coreCLRPackageDir
+    local packageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFramework/$TPB_TargetRuntime
+    local coreCLRPackageDir=$TP_OUT_DIR/$TPB_Configuration/$TPB_TargetFrameworkCore
+    local frameworkPackageDirMap=( \
+        $TPB_TargetFrameworkCore:$coreCLRPackageDir \
+        $TPB_TargetFramework:$packageDir
     )
-
-    for item in "${PROJECTPACKAGEOUTPUTMAP[@]}" ;
+    
+    for fxpkg in "${frameworkPackageDirMap[@]}" ;
     do
-        projectToPackage="${item%%:*}"
-        packageOutputPath="${item##*:}"
-        log "Package: Publish $projectToPackage"
-        $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+        local framework="${fxpkg%%:*}"
+        local packageDir="${fxpkg##*:}"
+        local projects=( \
+            $TP_PACKAGE_PROJ_DIR/package.csproj \
+            $TP_ROOT_DIR/src/vstest.console/vstest.console.csproj \
+            $TP_ROOT_DIR/src/datacollector/datacollector.csproj
+        )
+
+        if [ "$framework" == "net46" ] && ! $TPB_HasMono; then
+            # Skip publish if mono is not available
+            continue
+        fi
+
+        log "Package: Publish projects for $framework"
+        for project in "${projects[@]}" ;
+        do
+            log ".. Package: Publish $project"
+            $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+        done
+
+        # Copy TestHost for desktop targets if we've built net46
+        # packages with mono
+        if $TPB_HasMono; then
+            local testhost=$packageDir/TestHost
+            mkdir -p $testhost
+            cp -r src/testhost/bin/$TPB_Configuration/net46/win7-x64/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/net46/win7-x64/* $testhost
+        fi
+        
+        # Copy over the logger assemblies to the Extensions folder.
+        local extensionsDir="$packageDir/Extensions"
+        # Create an extensions directory.
+        mkdir -p $extensionsDir
+
+        # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
+        # Ideally we should just be publishing the loggers to the Extensions folder.
+        loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
+        for i in ${loggers[@]}; do
+            mv $packageDir/${i} $extensionsDir
+        done
+
+        # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+        runtimeproviders=("Microsoft.TestPlatform.TestHostRuntimeProvider.dll" "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
+        for i in ${runtimeproviders[@]}; do
+            mv $packageDir/${i} $extensionsDir
+        done
+        newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
+        cp $newtonsoft $packageDir
     done
 
     # Publish TestHost for netcoreapp1.0 target
-    log "Package: Publish testhost.csproj"
+    log ".. Package: Publish testhost.csproj"
     local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
     local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore10
     $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
-
-    # Copy TestHost for desktop targets if we've built net46
-    # packages with mono
-    if $TPB_HasMono; then
-        local testhost=$coreCLRPackageDir/TestHost
-        mkdir -p $testhost
-        cp -r src/testhost/bin/$TPB_Configuration/net46/win7-x64/* $testhost
-        cp -r src/testhost.x86/bin/$TPB_Configuration/net46/win7-x64/* $testhost
-    fi
-    
-    # Copy over the logger assemblies to the Extensions folder.
-    coreCLRExtensionsDir="$coreCLRPackageDir/Extensions"
-    # Create an extensions directory.
-    mkdir -p $coreCLRExtensionsDir
-
-    # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
-    # Ideally we should just be publishing the loggers to the Extensions folder.
-    loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
-    for i in ${loggers[@]}; do
-        mv $coreCLRPackageDir/${i} $coreCLRExtensionsDir
-    done
-
-    # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
-    runtimeproviders=("Microsoft.TestPlatform.TestHostRuntimeProvider.dll" "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
-    for i in ${runtimeproviders[@]}; do
-        mv $coreCLRPackageDir/${i} $coreCLRExtensionsDir
-    done
-    newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
-    cp $newtonsoft $coreCLRPackageDir
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
@@ -397,9 +410,15 @@ log "Test platform environment variables: "
 log "Test platform build variables: "
 (set | grep ^TPB_)
 
+if $TPB_HasMono; then
+    # Workaround for https://github.com/dotnet/sdk/issues/335
+    export FrameworkPathOverride=/usr/lib/mono/4.5/
+fi
+
 if [ -z "$PROJECT_NAME_PATTERNS" ]
 then
-    install_cli && restore_package && invoke_build && publish_package && create_package
+    #install_cli && restore_package && invoke_build && publish_package && create_package
+    publish_package
 else
     invoke_build
 fi
