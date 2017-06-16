@@ -1,19 +1,32 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
-using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using System;
-
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
+    using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
+    using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Moq;
+    using System;
+    using System.Diagnostics;
+
     [TestClass]
     public class PortArgumentProcessorTests
     {
+        private Mock<IProcessHelper> mockProcessHelper;
+        private Mock<IDesignModeClient> testDesignModeClient;
+        private Mock<ITestRequestManager> testRequestManager;
+
+        public PortArgumentProcessorTests()
+        {
+            this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.testDesignModeClient = new Mock<IDesignModeClient>();
+            this.testRequestManager = new Mock<ITestRequestManager>();
+        }
+
         [TestMethod]
         public void GetMetadataShouldReturnPortArgumentProcessorCapabilities()
         {
@@ -51,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorInitializeWithNullOrEmptyPortShouldThrowCommandLineException()
         {
-            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance);
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object);
             try
             {
                 executor.Initialize(null);
@@ -66,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorInitializeWithInvalidPortShouldThrowCommandLineException()
         {
-            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance);
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object);
             try
             {
                 executor.Initialize("Foo");
@@ -81,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorInitializeWithValidPortShouldAddPortToCommandLineOptionsAndInitializeDesignModeManager()
         {
-            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance);
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object);
             int port = 2345;
             CommandLineOptions.Instance.ParentProcessId = 0;
 
@@ -94,7 +107,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorInitializeShouldSetDesignMode()
         {
-            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance);
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object);
             int port = 2345;
             CommandLineOptions.Instance.ParentProcessId = 0;
 
@@ -104,20 +117,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
+        public void ExecutorInitializeShouldSetProcessExitCallback()
+        {
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object, this.mockProcessHelper.Object);
+            int port = 2345;
+            int processId = Process.GetCurrentProcess().Id;
+            CommandLineOptions.Instance.ParentProcessId = processId;
+
+            executor.Initialize(port.ToString());
+
+            this.mockProcessHelper.Verify(ph => ph.SetExitCallback(processId, It.IsAny<Action>()), Times.Once);
+        }
+
+        [TestMethod]
         public void ExecutorExecuteForValidConnectionReturnsArgumentProcessorResultSuccess()
         {
-            var testDesignModeClient = new Mock<IDesignModeClient>();
-            var testRequestManager = new Mock<ITestRequestManager>();
-
-            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, testRequestManager.Object,
-                (parentProcessId) => testDesignModeClient.Object);
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object,
+                (parentProcessId, ph) => this.testDesignModeClient.Object, this.mockProcessHelper.Object);
 
             int port = 2345;
             executor.Initialize(port.ToString());
             var result = executor.Execute();
 
-            testDesignModeClient.Verify(td =>
-                td.ConnectToClientAndProcessRequests(port, testRequestManager.Object), Times.Once);
+            this.testDesignModeClient.Verify(td =>
+                td.ConnectToClientAndProcessRequests(port, this.testRequestManager.Object), Times.Once);
 
             Assert.AreEqual(ArgumentProcessorResult.Success, result);
         }
@@ -125,11 +148,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         [TestMethod]
         public void ExecutorExecuteForFailedConnectionShouldThrowCommandLineException()
         {
-            var testRequestManager = new Mock<ITestRequestManager>();
-            var testDesignModeClient = new Mock<IDesignModeClient>();
-
-            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, testRequestManager.Object,
-                (parentProcessId) => testDesignModeClient.Object);
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, this.testRequestManager.Object,
+                (parentProcessId, ph) => testDesignModeClient.Object, this.mockProcessHelper.Object);
 
             testDesignModeClient.Setup(td => td.ConnectToClientAndProcessRequests(It.IsAny<int>(),
                 It.IsAny<ITestRequestManager>())).Callback(() => { throw new TimeoutException(); });
@@ -138,27 +158,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             executor.Initialize(port.ToString());
             Assert.ThrowsException<CommandLineException>(() => executor.Execute());
 
-            testDesignModeClient.Verify(td => td.ConnectToClientAndProcessRequests(port, testRequestManager.Object), Times.Once);
+            testDesignModeClient.Verify(td => td.ConnectToClientAndProcessRequests(port, this.testRequestManager.Object), Times.Once);
         }
 
 
         [TestMethod]
         public void ExecutorExecuteSetsParentProcessIdOnDesignModeInitializer()
         {
-            var testDesignModeClient = new Mock<IDesignModeClient>();
-            var testRequestManager = new Mock<ITestRequestManager>();
-
             var parentProcessId = 2346;
             var parentProcessIdArgumentExecutor = new ParentProcessIdArgumentExecutor(CommandLineOptions.Instance);
             parentProcessIdArgumentExecutor.Initialize(parentProcessId.ToString());
 
             int actualParentProcessId = -1;
-            var executor = new PortArgumentExecutor(CommandLineOptions.Instance, testRequestManager.Object,
-                (ppid) =>
+            var executor = new PortArgumentExecutor(CommandLineOptions.Instance,
+                this.testRequestManager.Object,
+                (ppid, ph) =>
                 {
                     actualParentProcessId = ppid;
                     return testDesignModeClient.Object;
-                });
+                },
+                this.mockProcessHelper.Object
+                );
 
             int port = 2345;
             executor.Initialize(port.ToString());

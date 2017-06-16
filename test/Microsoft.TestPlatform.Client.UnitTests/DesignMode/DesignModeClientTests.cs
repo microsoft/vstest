@@ -321,5 +321,51 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                     new Message() { MessageType = MessageType.CustomTestHostLaunchCallback, Payload = JToken.FromObject(payload) });
             }
         }
+
+        [TestMethod]
+        public void DesignModeClientConnectShouldSendTestMessageAndDiscoverCompleteOnExceptionInDiscovery()
+        {
+            var complateEvent = new AutoResetEvent(false);
+            var payload = new DiscoveryRequestPayload();
+            var startDiscovery = new Message { MessageType = MessageType.StartDiscovery, Payload = JToken.FromObject(payload)};
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(startDiscovery);
+            this.mockCommunicationManager
+                .Setup(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()))
+                .Callback(() => complateEvent.Set());
+            this.mockTestRequestManager.Setup(rm => rm.DiscoverTests(It.IsAny<DiscoveryRequestPayload>(),
+                It.IsAny<ITestDiscoveryEventsRegistrar>(), It.IsAny<ProtocolConfig>())).Throws(new Exception());
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+
+            var timeout = 15 * 1000;
+            Assert.IsTrue(complateEvent.WaitOne(timeout), "Discovery not completed.");
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()), Times.Once());
+        }
+
+        [TestMethod]
+        public void DesignModeClientConnectShouldSendTestMessageAndExecutionCompleteOnExceptionInTestRun()
+        {
+            var complateEvent = new AutoResetEvent(false);
+            var payload = new TestRunRequestPayload();
+            var testRunAll = new Message { MessageType = MessageType.TestRunAllSourcesWithDefaultHost, Payload = JToken.FromObject(payload) };
+            this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
+            this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(testRunAll);
+            this.mockCommunicationManager
+                .Setup(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()))
+                .Callback(() => complateEvent.Set());
+            this.mockTestRequestManager.Setup(rm => rm.RunTests(It.IsAny<TestRunRequestPayload>(),
+                null,
+                It.IsAny<DesignModeTestEventsRegistrar>(),
+                It.IsAny<ProtocolConfig>())).Throws(new Exception());
+
+            this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
+
+            var timeout = 15 * 1000;
+            Assert.IsTrue(complateEvent.WaitOne(timeout), "Execution not completed.");
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.TestMessage, It.IsAny<TestMessagePayload>()), Times.Once());
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()), Times.Once());
+        }
     }
 }
