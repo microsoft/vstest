@@ -266,7 +266,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                         // Total tests must be zero here since parallel discovery events handler adds the count
                         // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
                         // Set `isAborted` as true since we want this instance of discovery manager to be replaced
-                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(0, null, true);
+                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(-1, null, true);
                     },
                     TaskContinuationOptions.OnlyOnFaulted);
             }
