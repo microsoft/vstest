@@ -251,6 +251,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
         }
 
+        [Ignore("Enable after having ability to mock Environment.Exit()")]
         [TestMethod]
         public void DesignModeClientShouldStopCommunicationOnParentProcessExit()
         {
