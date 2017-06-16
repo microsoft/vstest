@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         {
             get
             {
-                var arch = PlatformEnvironment.Architecture;
+                var arch = new PlatformEnvironment().Architecture;
 
                 switch (arch)
                 {
