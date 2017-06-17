@@ -56,11 +56,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void CancelDiscovery();
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="CancelDiscovery"/>.
-        /// </summary>
-        Task CancelDiscoveryAsync();
-
-        /// <summary>
         /// Starts a test run given a list of sources.
         /// </summary>
         /// <param name="sources">Sources to Run tests on</param>
@@ -120,20 +115,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void CancelTestRun();
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="CancelTestRun"/>.
-        /// </summary>
-        Task CancelTestRunAsync();
-
-        /// <summary>
         /// Abort the last test run.
         /// </summary>
         void AbortTestRun();
 
-        /// <summary>
-        /// Asynchronous equivalent of <see cref="AbortTestRun"/>.
-        /// </summary>
-        Task AbortTestRunAsync();
-        
         /// <summary>
         /// Ends the test session and stops processing requests.
         /// </summary>

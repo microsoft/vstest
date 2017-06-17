@@ -23,11 +23,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         int InitializeCommunication();
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="InitializeCommunication"/>.
-        /// </summary>
-        Task<int> InitializeCommunicationAsync();
-
-        /// <summary>
         /// Waits for Request Handler to be connected 
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
@@ -35,9 +30,9 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         bool WaitForRequestHandlerConnection(int connectionTimeout);
 
         /// <summary>
-        /// Asynchronous equivalent of <see cref="WaitForRequestHandlerConnection(int)"/>.
+        /// Asynchronous equivalent of <see cref="InitializeCommunication"/> and <see cref="WaitForRequestHandlerConnection(int)"/>.
         /// </summary>
-        Task<bool> WaitForRequestHandlerConnectionAsync(int connectionTimeout);
+        Task<int> InitializeCommunicationAsync(int clientConnectionTimeout);
 
         /// <summary>
         /// Close the Sender 
