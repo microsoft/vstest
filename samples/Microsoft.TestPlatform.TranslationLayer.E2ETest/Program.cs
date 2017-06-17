@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
     {
         public static int Main(string[] args)
         {
-            if(args == null || args.Length < 1)
+            if (args == null || args.Length < 1)
             {
                 Console.WriteLine(@"Please provide appropriate arguments. Arguments can be passed as following:");
                 Console.WriteLine(@"Microsoft.TestPlatform.TranslationLayer.E2ETest.exe --runner:'[vstest.console path]' --testassembly:'[assemblyPath]' --testadapterpath:'[path]'");
@@ -51,13 +51,16 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
                 }
             }
 
+            Console.WriteLine(Directory.GetCurrentDirectory());
+
             Console.WriteLine("Parameters:");
             Console.WriteLine("Runner Path: " + runnerLocation);
             Console.WriteLine("Test Assembly Path: " + testAssembly);
             Console.WriteLine("Test Adapter Path: " + testadapterPath);
             Console.WriteLine("-------------------------------------------------------");
 
-            IVsTestConsoleWrapper consoleWrapper = new VsTestConsoleWrapper(runnerLocation, new ConsoleParameters { LogFilePath = @"log.txt" });
+            var logFilePath = Path.Combine(Directory.GetCurrentDirectory(), @"log.txt");
+            IVsTestConsoleWrapper consoleWrapper = new VsTestConsoleWrapper(runnerLocation, new ConsoleParameters { LogFilePath = logFilePath });
 
             consoleWrapper.StartSession();
             consoleWrapper.InitializeExtensions(new List<string>() { testadapterPath });
