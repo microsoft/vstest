@@ -134,7 +134,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
                 this.testExecutionManager.Initialize();
 
-
                 this.mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
             }
             finally
