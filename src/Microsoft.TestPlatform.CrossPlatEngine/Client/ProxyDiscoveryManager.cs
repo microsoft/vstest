@@ -131,7 +131,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            List<string> extensions = new List<string>();
+            var extensions = new List<string>();
 
             if (TestPluginCache.Instance.PathToExtensions != null)
             {
@@ -139,17 +139,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => regex.IsMatch(ext)));
             }
 
-            // Concatenate adapters with default extensions
             extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
             var sourceList = sources.ToList();
-            var extensionsToInitialize = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
+            var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
             // Only send this if needed.
-            if (extensionsToInitialize.Count() > 0)
+            if (platformExtensions.Any())
             {
                 this.SetupChannel(sourceList);
 
-                this.RequestSender.InitializeDiscovery(extensionsToInitialize, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+                this.RequestSender.InitializeDiscovery(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
         }
     }

@@ -119,6 +119,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void InitializeShouldPassAdapterToTestHostManagerFromTestPluginCacheExtensions()
+        {
+            // We are updating extension with testadapter only to make it easy to test.
+            // In product code it filter out testadapter from extension
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll"}, false);
+            try
+            {
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+                var expectedResult = new List<string>();
+                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
+                expectedResult.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+
+                this.testExecutionManager.Initialize();
+
+
+                this.mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
+        }
+
+        [TestMethod]
         public void StartTestRunShouldNotIntializeIfDoneSoAlready()
         {
             this.testExecutionManager.Initialize();
