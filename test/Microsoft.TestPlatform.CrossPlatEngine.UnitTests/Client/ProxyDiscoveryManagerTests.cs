@@ -113,6 +113,29 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void InitializeShouldPassAdapterToTestHostManagerFromTestPluginCacheExtensions()
+        {
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
+            try
+            {
+                this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+                var expectedResult = new List<string>();
+                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
+                expectedResult.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+
+                this.testDiscoveryManager.Initialize();
+
+
+                this.mockTestHostManager.Verify(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), expectedResult), Times.Once);
+            }
+            finally
+            {
+                TestPluginCache.Instance = null;
+            }
+        }
+
+        [TestMethod]
         public void DiscoverTestsShouldNotIntializeIfDoneSoAlready()
         {
             this.testDiscoveryManager.Initialize();
