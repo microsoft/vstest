@@ -138,23 +138,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldClearCacheAfterDiscovery()
-        {
-            var payload = new DiscoveryRequestPayload()
-            {
-                Sources = new List<string>() { "a" },
-            };
-
-            var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
-                (DiscoveryCriteria discoveryCriteria, ProtocolConfig config) => { }).Returns(mockDiscoveryRequest.Object);
-
-            var success = this.testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
-
-            this.mockTestPlatform.Verify(tp => tp.ClearExtensions(), Times.Once);
-        }
-
-        [TestMethod]
         public void DiscoverTestsShouldCallTestPlatformAndSucceed()
         {
             var payload = new DiscoveryRequestPayload()
@@ -215,10 +198,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
                (TestRunCriteria runCriteria, ProtocolConfig config) =>
                {
-                   Thread.Sleep(1);
-                   createRunRequestTime = sw.ElapsedMilliseconds;
-                   observedCriteria = runCriteria;
-               }).Returns(mockRunRequest.Object);
+                    Thread.Sleep(1);
+                    createRunRequestTime = sw.ElapsedMilliseconds;
+                    observedCriteria = runCriteria;
+                }).Returns(mockRunRequest.Object);
 
             mockRunRequest.Setup(mr => mr.CancelAsync()).Callback(() =>
             {
@@ -305,22 +288,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
             Assert.AreEqual(15, actualTestRunCriteria.FrequencyOfRunStatsChangeEvent);
-        }
-
-        [TestMethod]
-        public void RunTestsShouldCallClearExtensionsAfterRun()
-        {
-            var payload = new TestRunRequestPayload()
-            {
-                Sources = new List<string>() { "a" },
-            };
-
-            var mockDiscoveryRequest = new Mock<ITestRunRequest>();
-            this.mockTestPlatform.Setup(mt => mt.CreateTestRunRequest(It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Callback(
-                (TestRunCriteria runCriteria, ProtocolConfig config) => { }).Returns(mockDiscoveryRequest.Object);
-
-            var success = this.testRequestManager.RunTests(payload, new Mock<ITestHostLauncher>().Object, new Mock<ITestRunEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
-            this.mockTestPlatform.Verify(tp => tp.ClearExtensions(), Times.Once);
         }
 
         [TestMethod]
@@ -630,7 +597,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var payload = new TestRunRequestPayload
             {
                 RunSettings = runsettings,
-                Sources = new List<string> { "c:\\testproject.dll" }
+                Sources = new List<string> {"c:\\testproject.dll"}
             };
             this.commandLineOptions.IsDesignMode = designModeValue;
 
@@ -645,7 +612,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var discoveryPayload = new DiscoveryRequestPayload
             {
                 RunSettings = runsettings,
-                Sources = new[] { "c:\\testproject.dll" }
+                Sources = new[] {"c:\\testproject.dll"}
             };
             return discoveryPayload;
         }
