@@ -10,11 +10,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -27,6 +30,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestProcessStartInfo startInfo;
         private readonly Mock<IMessageLogger> mockMessageLogger;
         private readonly Mock<IProcessHelper> mockProcessHelper;
+        private readonly Mock<IDotnetHostHelper> mockDotnetHostHelper;
+        private readonly Mock<IEnvironment> mockEnvironment;
 
         private DefaultTestHostManager testHostManager;
         private TestableTestHostManager testableTestHostManager;
@@ -38,10 +43,12 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+            this.mockDotnetHostHelper = new Mock<IDotnetHostHelper>();
+            this.mockEnvironment = new Mock<IEnvironment>();
 
             this.mockMessageLogger = new Mock<IMessageLogger>();
 
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object, this.mockEnvironment.Object, this.mockDotnetHostHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
@@ -49,7 +56,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
@@ -110,17 +116,50 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeTestSourcePathInArgumentsIfNonShared()
         {
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{true}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
-
             var source = "C:\temp\a.dll";
+
             var info = this.testHostManager.GetTestHostProcessStartInfo(
                 new List<string>() { source },
                 null,
                 connectionInfo);
 
             Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + source.AddDoubleQuote(), info.Arguments);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseMonoAsHostOnNonWindowsIfNotStartedWithMono()
+        {
+            this.mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/dotnet");
+            this.mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
+            var source = "C:\temp\a.dll";
+
+            var info = this.testHostManager.GetTestHostProcessStartInfo(
+                new List<string>() { source },
+                null,
+                default(TestRunnerConnectionInfo));
+
+            Assert.AreEqual("/usr/bin/mono", info.FileName);
+            StringAssert.Contains(info.Arguments, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldNotUseMonoAsHostOnNonWindowsIfStartedWithMono()
+        {
+            this.mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/mono");
+            this.mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
+            var source = "C:\temp\a.dll";
+
+            var info = this.testHostManager.GetTestHostProcessStartInfo(
+                new List<string>() { source },
+                null,
+                default(TestRunnerConnectionInfo));
+
+            StringAssert.Contains(info.FileName, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
+            Assert.IsFalse(info.Arguments.Contains("TestHost" + Path.DirectorySeparatorChar + "testhost.exe"));
         }
 
         [TestMethod]
@@ -136,7 +175,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                         It.IsAny<Action<object, string>>(),
                         It.IsAny<Action<object>>())).Returns(Process.GetCurrentProcess());
 
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
@@ -325,7 +363,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 bool shared,
                 int errorLength,
                 IMessageLogger logger)
-                : base(processHelper)
+                : base(processHelper, new PlatformEnvironment(), new DotnetHostHelper())
             {
                 this.TimeOut = 30000;
                 this.ErrorLength = errorLength;

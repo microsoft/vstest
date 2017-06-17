@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using System;
     using System.Runtime.InteropServices;
 
