@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -22,11 +23,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         int InitializeCommunication();
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="InitializeCommunication"/>.
+        /// </summary>
+        Task<int> InitializeCommunicationAsync();
+
+        /// <summary>
         /// Waits for Request Handler to be connected 
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <returns>True, if Handler is connected</returns>
         bool WaitForRequestHandlerConnection(int connectionTimeout);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="WaitForRequestHandlerConnection(int)"/>.
+        /// </summary>
+        Task<bool> WaitForRequestHandlerConnectionAsync(int connectionTimeout);
 
         /// <summary>
         /// Close the Sender 
@@ -48,6 +59,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void DiscoverTests(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler discoveryEventsHandler);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="DiscoverTests(IEnumerable{string}, string, ITestDiscoveryEventsHandler)"/>.
+        /// </summary>
+        Task DiscoverTestsAsync(IEnumerable<string> sources, string runSettings, ITestDiscoveryEventsHandler discoveryEventsHandler);
+
+        /// <summary>
         /// Starts the TestRun with given sources and criteria
         /// </summary>
         /// <param name="sources">Sources for test run</param>
@@ -56,12 +72,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void StartTestRun(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="StartTestRun(IEnumerable{string}, string, ITestRunEventsHandler)"/>.
+        /// </summary>
+        Task StartTestRunAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler);
+
+        /// <summary>
         /// Starts the TestRun with given test cases and criteria
         /// </summary>
         /// <param name="testCases">TestCases to run</param>
         /// <param name="runSettings">RunSettings for test run</param>
         /// <param name="runEventsHandler">EventHandler for test run events</param>
         void StartTestRun(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="StartTestRun(IEnumerable{TestCase}, string, ITestRunEventsHandler)"/>.
+        /// </summary>
+        Task StartTestRunAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler);
 
         /// <summary>
         /// Starts the TestRun with given sources and criteria with custom test host
@@ -73,6 +99,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void StartTestRunWithCustomHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="StartTestRunWithCustomHost(IEnumerable{string}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
+        /// </summary>
+        Task StartTestRunWithCustomHostAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
         /// Starts the TestRun with given test cases and criteria with custom test host
         /// </summary>
         /// <param name="testCases">TestCases to run</param>
@@ -80,6 +111,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// <param name="runEventsHandler">EventHandler for test run events</param>
         /// <param name="customTestHostLauncher">Custom TestHost launcher</param>
         void StartTestRunWithCustomHost(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="StartTestRunWithCustomHost(IEnumerable{TestCase}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
+        /// </summary>
+        Task StartTestRunWithCustomHostAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler runEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
         /// Ends the Session

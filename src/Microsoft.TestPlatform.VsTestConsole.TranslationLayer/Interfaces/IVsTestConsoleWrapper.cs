@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -20,10 +21,21 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void StartSession();
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="StartSession"/>.
+        /// </summary>
+        /// <returns></returns>
+        Task StartSessionAsync();
+
+        /// <summary>
         /// Initialize the TestPlatform with Paths to extensions like adapters, loggers and any other extensions
         /// </summary>
         /// <param name="pathToAdditionalExtensions">Folder Paths to where extension DLLs are present</param>
         void InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="InitializeExtensions(IEnumerable{string})"/>.
+        /// </summary>
+        Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions);
 
         /// <summary>
         /// Start Discover Tests for the given sources and discovery settings.
@@ -34,9 +46,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void DiscoverTests(IEnumerable<string> sources, string discoverySettings, ITestDiscoveryEventsHandler discoveryEventsHandler);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="DiscoverTests(IEnumerable{string}, string, ITestDiscoveryEventsHandler)"/>.
+        /// </summary>
+        Task DiscoverTestsAsync(IEnumerable<string> sources, string discoverySettings, ITestDiscoveryEventsHandler discoveryEventsHandler);
+
+        /// <summary>
         /// Cancels the last discovery request.
         /// </summary>
         void CancelDiscovery();
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="CancelDiscovery"/>.
+        /// </summary>
+        Task CancelDiscoveryAsync();
 
         /// <summary>
         /// Starts a test run given a list of sources.
@@ -47,12 +69,22 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void RunTests(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="RunTests(IEnumerable{string}, string, ITestRunEventsHandler)"/>.
+        /// </summary>
+        Task RunTestsAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler);
+
+        /// <summary>
         /// Starts a test run given a list of test cases
         /// </summary>
         /// <param name="testCases">TestCases to run</param>
         /// <param name="runSettings">RunSettings XML to run the tests</param>
         /// <param name="testRunEventsHandler">EventHandler to receive test run events</param>
         void RunTests(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler);
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="RunTests(IEnumerable{TestCase}, string, ITestRunEventsHandler)"/>.
+        /// </summary>
+        Task RunTestsAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler);
 
         /// <summary>
         /// Starts a test run given a list of sources by giving caller an option to start their own test host.
@@ -64,6 +96,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void RunTestsWithCustomTestHost(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="RunTestsWithCustomTestHost(IEnumerable{string}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
+        /// </summary>
+        Task RunTestsWithCustomTestHostAsync(IEnumerable<string> sources, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
         /// Starts a test run given a list of test cases by giving caller an option to start their own test host
         /// </summary>
         /// <param name="testCases">TestCases to run.</param>
@@ -73,14 +110,29 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         void RunTestsWithCustomTestHost(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="RunTestsWithCustomTestHost(IEnumerable{TestCase}, string, ITestRunEventsHandler, ITestHostLauncher)"/>.
+        /// </summary>
+        Task RunTestsWithCustomTestHostAsync(IEnumerable<TestCase> testCases, string runSettings, ITestRunEventsHandler testRunEventsHandler, ITestHostLauncher customTestHostLauncher);
+
+        /// <summary>
         /// Cancel the last test run.
         /// </summary>
         void CancelTestRun();
 
         /// <summary>
+        /// Asynchronous equivalent of <see cref="CancelTestRun"/>.
+        /// </summary>
+        Task CancelTestRunAsync();
+
+        /// <summary>
         /// Abort the last test run.
         /// </summary>
         void AbortTestRun();
+
+        /// <summary>
+        /// Asynchronous equivalent of <see cref="AbortTestRun"/>.
+        /// </summary>
+        Task AbortTestRunAsync();
         
         /// <summary>
         /// Ends the test session and stops processing requests.
