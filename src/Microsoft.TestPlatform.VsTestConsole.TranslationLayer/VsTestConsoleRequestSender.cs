@@ -86,7 +86,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("VsTestConsoleRequestSender: Error initializing communication with VstestConsole: {0}", ex);
+                EqtTrace.Error("VsTestConsoleRequestSender.InitializeCommunication: Error initializing communication with VstestConsole: {0}", ex);
                 this.handShakeComplete.Set();
             }
 
@@ -116,22 +116,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             try
             {
                 port = this.communicationManager.HostServer();
-                var acceptClientTask = this.communicationManager.AcceptClientAsync();
+                var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
+                await Task.Run(this.communicationManager.AcceptClientAsync, timeoutSource.Token);
 
-                if(await Task.WhenAny(acceptClientTask, Task.Delay(clientConnectionTimeout)) != acceptClientTask)
-                    return -1;
-
-                await acceptClientTask; // catch exceptions
                 this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync();
                 this.handShakeComplete.Set();
             }
             catch (Exception ex)
             {
-                EqtTrace.Error("VsTestConsoleRequestSender: Error initializing communication with VstestConsole: {0}", ex);
+                EqtTrace.Error("VsTestConsoleRequestSender.InitializeCommunicationAsync: Error initializing communication with VstestConsole: {0}", ex);
                 this.handShakeComplete.Set();
             }
 
-            return port;
+            return this.handShakeSuccessful ? port : -1;
         }
 
         /// <summary>
@@ -372,16 +369,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
                     // TODO : Payload for ProtocolError needs to finalized.
-                    EqtTrace.Error("VsTestConsoleRequestSender: Version Check failed. ProtolError was revceived from the runner");
+                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsole: Version Check failed. ProtolError was revceived from the runner");
                 }
                 else
                 {
-                    EqtTrace.Error("VsTestConsoleRequestSender: VersionCheck Message Expected but different message received: Received MessageType: {0}", message.MessageType);
+                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsole: VersionCheck Message Expected but different message received: Received MessageType: {0}", message.MessageType);
                 }
             }
             else
             {
-                EqtTrace.Error("VsTestConsoleRequestSender: SessionConnected Message Expected but different message received: Received MessageType: {0}", message.MessageType);
+                EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsole: SessionConnected Message Expected but different message received: Received MessageType: {0}", message.MessageType);
             }
 
             return success;
@@ -390,11 +387,11 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         private async Task<bool> HandShakeWithVsTestConsoleAsync()
         {
             var success = false;
-            var message = await this.communicationManager.ReceiveMessageAsync();
+            var message = await this.communicationManager.ReceiveMessageAsync(this.processExitCancellationTokenSource.Token);
             if (message.MessageType == MessageType.SessionConnected)
             {
                 this.communicationManager.SendMessage(MessageType.VersionCheck, this.protocolVersion);
-                message = await this.communicationManager.ReceiveMessageAsync();
+                message = await this.communicationManager.ReceiveMessageAsync(this.processExitCancellationTokenSource.Token);
 
                 if (message.MessageType == MessageType.VersionCheck)
                 {
@@ -404,16 +401,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
                     // TODO : Payload for ProtocolError needs to finalized.
-                    EqtTrace.Error("VsTestConsoleRequestSender: Version Check failed. ProtolError was revceived from the runner");
+                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: Version Check failed. ProtolError was revceived from the runner");
                 }
                 else
                 {
-                    EqtTrace.Error("VsTestConsoleRequestSender: VersionCheck Message Expected but different message received: Received MessageType: {0}", message.MessageType);
+                    EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: VersionCheck Message Expected but different message received: Received MessageType: {0}", message.MessageType);
                 }
             }
             else
             {
-                EqtTrace.Error("VsTestConsoleRequestSender: SessionConnected Message Expected but different message received: Received MessageType: {0}", message.MessageType);
+                EqtTrace.Error("VsTestConsoleRequestSender.HandShakeWithVsTestConsoleAsync: SessionConnected Message Expected but different message received: Received MessageType: {0}", message.MessageType);
             }
 
             return success;

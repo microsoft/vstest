@@ -122,7 +122,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.testPlatformEventSource.TranslationLayerInitializeStart();
 
             // Start communication
-            var port = await this.requestSender.InitializeCommunicationAsync();
+            var port = await this.requestSender.InitializeCommunicationAsync(ConnectionTimeout);
 
             if (port > 0)
             {
@@ -137,7 +137,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 // Close the sender as it failed to host server
                 this.requestSender.Close();
-                throw new TransationLayerException("Error hosting communication channel");
+                throw new TransationLayerException("Error hosting communication channel and connecting to console");
             }
         }
 
@@ -309,33 +309,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             }
         }
 
-        private async Task EnsureInitializedAsync()
-        {
-            if (!this.vstestConsoleProcessManager.IsProcessInitialized())
-            {
-                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process is not started.");
-                await this.StartSessionAsync();
-                this.sessionStarted = await this.WaitForConnectionAsync();
-
-                if (this.sessionStarted)
-                {
-                    EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Send a request to initialize extensions.");
-                    this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
-                }
-            }
-
-            if (!this.sessionStarted && this.requestSender != null)
-            {
-                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitialized: Process Started.");
-                this.sessionStarted = await this.WaitForConnectionAsync();
-            }
-
-            if (!this.sessionStarted)
-            {
-                throw new TransationLayerException("Error connecting to Vstest Command Line");
-            }
-        }
-
         private bool WaitForConnection()
         {
             EqtTrace.Info("VsTestConsoleWrapper.WaitForConnection: Waiting for connection to command line runner.");
@@ -345,13 +318,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             return connected;
         }
 
-        private async Task<bool> WaitForConnectionAsync()
+        private async Task EnsureInitializedAsync()
         {
-            EqtTrace.Info("VsTestConsoleWrapper.WaitForConnection: Waiting for connection to command line runner.");
-            var connected = await this.requestSender.WaitForRequestHandlerConnectionAsync(ConnectionTimeout);
-            this.testPlatformEventSource.TranslationLayerInitializeStop();
+            if (!this.vstestConsoleProcessManager.IsProcessInitialized())
+            {
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Process is not started.");
+                await this.StartSessionAsync();
+                this.sessionStarted = true;
 
-            return connected;
+                EqtTrace.Info("VsTestConsoleWrapper.EnsureInitializedAsync: Send a request to initialize extensions.");
+                this.requestSender.InitializeExtensions(this.pathToAdditionalExtensions);
+            }
         }
+
     }
 }
