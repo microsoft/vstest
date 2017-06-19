@@ -51,8 +51,6 @@ namespace Microsoft.TestPlatform.TranslationLayer.E2ETest
                 }
             }
 
-            Console.WriteLine(Directory.GetCurrentDirectory());
-
             Console.WriteLine("Parameters:");
             Console.WriteLine("Runner Path: " + runnerLocation);
             Console.WriteLine("Test Assembly Path: " + testAssembly);
