@@ -17,6 +17,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using MSTest.TestFramework.AssertExtensions;
+
     [TestClass]
     public class TestPluginDiscovererTests
     {
@@ -116,13 +118,11 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             var pathToExtensions = new List<string>
             {
                 typeof(TestPluginDiscovererTests).GetTypeInfo().Assembly.Location,
-                typeof(TestPluginDiscoverer).GetTypeInfo().Assembly.Location,
             };
 
-            this.testPluginDiscoverer = new DummyTestPluginDiscoverer();
-            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<TestSettingsProviderPluginInformation, ISettingsProvider>(pathToExtensions, loadOnlyWellKnownExtensions: true);
+            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true);
 
-            Assert.IsTrue(testExtensions.Keys.Select(k => k.Contains("ValidSettingsProvider")).Count() >= 3);
+            Assert.That.DoesNotThrow(() =>this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true));
         }
 
         #region implementations
@@ -278,21 +278,17 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         #endregion
 
-        private class DummyTestPluginDiscoverer : TestPluginDiscoverer
+        internal class FaultyTestExecutorPluginInformation : TestExtensionPluginInformation
         {
-            internal override void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos)
+            /// <summary>
+            /// Default constructor
+            /// </summary>
+            /// <param name="type"> The Type. </param>
+            public FaultyTestExecutorPluginInformation(Type type): base(type)
             {
-                if (assembly.Location.Contains("Microsoft.VisualStudio.TestPlatform.Common.dll"))
-                {
-                    throw new Exception("Fail to load types");
-                }
-                else
-                {
-                    base.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
-                }
+                throw new Exception();
             }
         }
-
         #endregion
     }
 }
