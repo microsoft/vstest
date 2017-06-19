@@ -117,7 +117,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             {
                 port = this.communicationManager.HostServer();
                 var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
-                await Task.Run(this.communicationManager.AcceptClientAsync, timeoutSource.Token);
+                await Task.Run(() => this.communicationManager.AcceptClientAsync(), timeoutSource.Token);
 
                 this.handShakeSuccessful = await this.HandShakeWithVsTestConsoleAsync();
                 this.handShakeComplete.Set();
