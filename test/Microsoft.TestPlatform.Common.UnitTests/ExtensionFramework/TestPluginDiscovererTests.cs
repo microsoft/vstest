@@ -17,6 +17,8 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    using MSTest.TestFramework.AssertExtensions;
+
     [TestClass]
     public class TestPluginDiscovererTests
     {
@@ -108,6 +110,19 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             Assert.IsTrue(testExtensions.Keys.Select(k => k.Contains("ValidSettingsProvider")).Count() >= 3);
             Assert.IsTrue(testExtensions.ContainsKey(pluginInformation.IdentifierData));
             Assert.IsTrue(testExtensions.ContainsKey(pluginInformation2.IdentifierData));
+        }
+
+        [TestMethod]
+        public void GetTestExtensionsInformationShouldNotAbortOnFaultyExtensions()
+        {
+            var pathToExtensions = new List<string>
+            {
+                typeof(TestPluginDiscovererTests).GetTypeInfo().Assembly.Location,
+            };
+
+            var testExtensions = this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true);
+
+            Assert.That.DoesNotThrow(() =>this.testPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions, loadOnlyWellKnownExtensions: true));
         }
 
         #region implementations
@@ -263,6 +278,17 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         #endregion
 
+        internal class FaultyTestExecutorPluginInformation : TestExtensionPluginInformation
+        {
+            /// <summary>
+            /// Default constructor
+            /// </summary>
+            /// <param name="type"> The Type. </param>
+            public FaultyTestExecutorPluginInformation(Type type): base(type)
+            {
+                throw new Exception();
+            }
+        }
         #endregion
     }
 }
