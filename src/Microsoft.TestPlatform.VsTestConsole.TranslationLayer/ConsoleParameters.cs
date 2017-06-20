@@ -48,7 +48,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             set
             {
                 ValidateArg.NotNullOrEmpty(value, "LogFilePath");
-                if (!fileHelper.DirectoryExists(Path.GetDirectoryName(value)))
+                var directoryPath = Path.GetDirectoryName(value);
+                if (!string.IsNullOrEmpty(directoryPath) && !fileHelper.DirectoryExists(Path.GetDirectoryName(value)))
                 {
                     throw new ArgumentException("LogFilePath must point to a valid directory for logging!");
                 }
