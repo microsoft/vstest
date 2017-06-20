@@ -8,8 +8,10 @@
   <PropertyGroup Condition="$(NetCoreAppTargetFrameWork) == 'true' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' and $(Configuration) == 'Debug'">
     <DebugType>full</DebugType>
   </PropertyGroup>
-
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46' and $(Configuration) == 'Release'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
 </Project>
