@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             "MICROSOFT.VISUALSTUDIO.TESTPLATFORM.OBJECTMODEL.DLL",
             "VSTEST_EXECUTIONENGINE_PLATFORMBRIDGE.DLL",
             "VSTEST_EXECUTIONENGINE_PLATFORMBRIDGE.WINMD",
-            "VSTEST.EXECUTIONENGINE.WINDOWSPHONE.DLL", 
+            "VSTEST.EXECUTIONENGINE.WINDOWSPHONE.DLL",
             "MICROSOFT.CSHARP.DLL",
             "MICROSOFT.VISUALBASIC.DLL",
             "CLRCOMPRESSION.DLL",
@@ -51,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// The path to the extensions.
         /// </param>
         /// <param name="loadOnlyWellKnownExtensions">
-        /// Should load only well known extensions or all. 
+        /// Should load only well known extensions or all.
         /// </param>
         /// <returns>
         /// The <see cref="Dictionary"/>` of assembly qualified name and testplugin information.
@@ -73,8 +73,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             fileSearchTask.Wait();
 
             var binaries = fileSearchTask.Result.Where(storageFile =>
-                                
-                                (storageFile.Name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) 
+
+                                (storageFile.Name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)
                                 || storageFile.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                                 && !storageFile.Name.StartsWith(SYSTEM_ASSEMBLY_PREFIX, StringComparison.OrdinalIgnoreCase)
                                 && !platformAssemblies.Contains(storageFile.Name.ToUpperInvariant())
@@ -142,13 +142,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // Scan each of the files for data extensions.
             foreach (var file in files)
             {
-                Assembly assembly = null;
                 try
                 {
+                    Assembly assembly = null;
                     var assemblyName = Path.GetFileNameWithoutExtension(file);
                     assembly = Assembly.Load(new AssemblyName(assemblyName));
+                    if (assembly != null)
+                    {
+                        this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
+                    }
 
-                    // Check whether this assembly is known or not. 
+                    // Check whether this assembly is known or not.
                     //if (loadOnlyWellKnownExtensions && assembly != null)
                     //{
                     //    var extensionAssemblyName = new AssemblyName(assembly.FullName);
@@ -161,13 +165,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
                 catch (Exception e)
                 {
-                    EqtTrace.Warning("TestPluginDiscoverer: Failed to load file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e.ToString());
+                    EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
                     continue;
-                }
-
-                if (assembly != null)
-                {
-                    this.GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos);
                 }
             }
         }
