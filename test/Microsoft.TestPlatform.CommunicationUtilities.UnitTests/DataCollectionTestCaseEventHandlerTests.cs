@@ -24,12 +24,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private Mock<ICommunicationManager> mockCommunicationManager;
         private Mock<IDataCollectionManager> mockDataCollectionManager;
         private DataCollectionTestCaseEventHandler requestHandler;
+        private Mock<IDataSerializer> dataSerializer;
 
         public DataCollectionTestCaseEventHandlerTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
             this.mockDataCollectionManager = new Mock<IDataCollectionManager>();
-            this.requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, new Mock<IDataCollectionManager>().Object);
+            this.dataSerializer = new Mock<IDataSerializer>();
+            this.requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, new Mock<IDataCollectionManager>().Object, this.dataSerializer.Object);
         }
 
         [TestMethod]
@@ -96,7 +98,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void CloseShouldNotThrowExceptionIfCommunicationManagerIsNull()
         {
-            var requestHandler = new DataCollectionTestCaseEventHandler(null, new Mock<IDataCollectionManager>().Object);
+            var requestHandler = new DataCollectionTestCaseEventHandler(null, new Mock<IDataCollectionManager>().Object, this.dataSerializer.Object);
 
             requestHandler.Close();
 
@@ -112,7 +114,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = "false" });
 
-            var requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, this.mockDataCollectionManager.Object);
+            var requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, this.mockDataCollectionManager.Object, this.dataSerializer.Object);
 
             requestHandler.ProcessRequests();
 
@@ -129,7 +131,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = MessageType.SessionEnd, Payload = "false" });
 
-            var requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, this.mockDataCollectionManager.Object);
+            var requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, this.mockDataCollectionManager.Object, this.dataSerializer.Object);
 
             requestHandler.ProcessRequests();
 
@@ -144,5 +146,24 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             Assert.ThrowsException<Exception>(() => { this.requestHandler.ProcessRequests(); });
         }
+
+        // [TestMethod]
+        // public void ProcessRequestsShouldDeserializeMessage()
+        // {
+        //    System.Diagnostics.Debugger.Launch();
+        //    var message = new Message();
+        //    message.MessageType = MessageType.DataCollectionTestStart;
+        //    var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+
+        // message.Payload = JToken.FromObject(new TestCaseStartEventArgs(testCase));
+
+        // this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = message.MessageType, Payload = message.Payload });
+
+        // this.dataSerializer.Setup(x => x.DeserializePayload<TestCaseStartEventArgs>(It.IsAny<Message>())).Returns(new TestCaseStartEventArgs(testCase));
+        //    var requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, this.mockDataCollectionManager.Object, this.dataSerializer.Object);
+
+        // requestHandler.ProcessRequests();
+        //    this.dataSerializer.Verify(x => x.DeserializePayload<TestCaseStartEventArgs>(It.IsAny<Message>()), Times.Once);
+        // }
     }
 }

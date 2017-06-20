@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.StartDiscovery:
                             {
-                                var discoveryPayload = message.Payload.ToObject<DiscoveryRequestPayload>();
+                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
                                 testRequestManager.DiscoverTests(discoveryPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                                 break;
                             }
