@@ -46,6 +46,7 @@ namespace OutOfProcDataCollector
             var filename = Path.Combine(AppContext.BaseDirectory, "testcasefilename" + i++ + ".txt");
             File.WriteAllText(filename, string.Empty);
             this.dataCollectionSink.SendFileAsync(e.Context, filename, true);
+
         }
 
         private void SessionStarted_Handler(object sender, SessionStartEventArgs args)

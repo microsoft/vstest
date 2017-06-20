@@ -146,5 +146,24 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 
             Assert.ThrowsException<Exception>(() => { this.requestHandler.ProcessRequests(); });
         }
+
+        // [TestMethod]
+        // public void ProcessRequestsShouldDeserializeMessage()
+        // {
+        //    System.Diagnostics.Debugger.Launch();
+        //    var message = new Message();
+        //    message.MessageType = MessageType.DataCollectionTestStart;
+        //    var testCase = new TestCase("hello", new Uri("world://how"), "1.dll");
+
+        // message.Payload = JToken.FromObject(new TestCaseStartEventArgs(testCase));
+
+        // this.mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(message).Returns(new Message() { MessageType = message.MessageType, Payload = message.Payload });
+
+        // this.dataSerializer.Setup(x => x.DeserializePayload<TestCaseStartEventArgs>(It.IsAny<Message>())).Returns(new TestCaseStartEventArgs(testCase));
+        //    var requestHandler = new DataCollectionTestCaseEventHandler(this.mockCommunicationManager.Object, this.mockDataCollectionManager.Object, this.dataSerializer.Object);
+
+        // requestHandler.ProcessRequests();
+        //    this.dataSerializer.Verify(x => x.DeserializePayload<TestCaseStartEventArgs>(It.IsAny<Message>()), Times.Once);
+        // }
     }
 }
