@@ -154,7 +154,7 @@
     <value>Unhandled exception occurred while processing a job from the '{0}' queue: {1}</value>
   </data>
   <data name="NoDotnetExeFound" xml:space="preserve">
-    <value>Could not find {0}. Make sure that the dotnet is installed on the machine.</value>
+    <value>Could not find '{0}' host. Make sure that '{0}' is installed on the machine and is available in PATH environment variable.</value>
   </data>
   <data name="QueueAlreadyDisposed" xml:space="preserve">
     <value>The {0} queue has already been disposed.</value>
