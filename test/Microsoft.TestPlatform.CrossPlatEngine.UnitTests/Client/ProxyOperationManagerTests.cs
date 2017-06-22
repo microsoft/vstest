@@ -38,11 +38,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender = new Mock<ITestRequestSender>();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
-        }
 
-        [TestInitialize]
-        public void Init()
-        {
             this.mockTestHostManager.Setup(m =>
                             m.GetTestHostProcessStartInfo(It.IsAny<IEnumerable<string>>(),
                             It.IsAny<IDictionary<string, string>>(),
@@ -182,23 +178,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        [Ignore]
-        //Not valid test anymore, since host providers now monitor test host themselves
-        public void SetupChannelShouldAddExitCallbackToTestHostStartInfo()
-        {
-            TestProcessStartInfo startInfo = null;
-            this.mockTestHostManager.Setup(m => m.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()))
-                .Callback<TestProcessStartInfo>(
-                    (s) => { startInfo = s; });
-
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
-
-            //Assert.IsNotNull(startInfo.ErrorReceivedCallback);
-        }
-
-        [TestMethod]
         public void CloseShouldEndSession()
         {
+            this.SetupWaitForTestHostExit();
+
             this.testOperationManager.Close();
 
             this.mockRequestSender.Verify(rs => rs.EndSession(), Times.Once);
@@ -207,6 +190,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void CloseShouldResetChannelInitialization()
         {
+            this.SetupWaitForTestHostExit();
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
@@ -214,6 +198,34 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
             this.mockTestHostManager.Verify(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
+        }
+
+        [TestMethod]
+        public void CloseShouldTerminateTesthostProcessIfWaitTimesout()
+        {
+            // Ensure testhost start returns a dummy process id
+            this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
+            this.mockTestHostManager.Setup(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>())).Returns(() => Task.FromResult<int>(123));
+            this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
+
+            this.testOperationManager.Close();
+
+            this.mockTestHostManager.Verify(th => th.TerminateAsync(123, CancellationToken.None), Times.Once);
+        }
+
+        [TestMethod]
+        public void CloseShouldNotThrowIfEndSessionFails()
+        {
+            this.mockRequestSender.Setup(rs => rs.EndSession()).Throws<Exception>();
+
+            this.testOperationManager.Close();
+        }
+
+        private void SetupWaitForTestHostExit()
+        {
+            // Raise host exited when end session is called
+            this.mockRequestSender.Setup(rs => rs.EndSession())
+                .Callback(() => this.mockTestHostManager.Raise(t => t.HostExited += null, new HostProviderEventArgs(string.Empty)));
         }
 
         private class TestableProxyOperationManager : ProxyOperationManager

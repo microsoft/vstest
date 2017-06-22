@@ -211,6 +211,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     return;
                 }
 
+                // Close the discovery session and terminate any test host processes. This operation should never
+                // throw.
+                this.DiscoveryManager?.Close();
+
                 try
                 {
                     // Raise onDiscoveredTests event if there are some tests in the last chunk. 
@@ -225,12 +229,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 }
                 finally
                 {
-                    ManualResetEvent discoveryComplete = this.discoveryCompleted;
-
                     // Notify the waiting handle that discovery is complete
-                    if (discoveryComplete != null)
+                    if (this.discoveryCompleted != null)
                     {
-                        discoveryComplete.Set();
+                        this.discoveryCompleted.Set();
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose("DiscoveryRequest.DiscoveryComplete: Notified the discovery complete event.");
@@ -245,9 +247,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     }
 
                     this.discoveryInProgress = false;
-
-                    // Close the discovery session
-                    this.DiscoveryManager?.Close();
                 }
             }
 
