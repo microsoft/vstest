@@ -306,20 +306,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
         }
 
-        /// <summary>
-        /// Clear test plugin cache
-        /// </summary>
-        public void ClearExtensions()
-        {
-            this.pathToExtensions = null;
-            this.TestExtensions?.InvalidateCache();
-
-            if (EqtTrace.IsVerboseEnabled)
-            {
-                EqtTrace.Verbose("TestPluginCache: Clearing test plugin cache");
-            }
-        }
-
         #endregion
 
         #region Utility methods
