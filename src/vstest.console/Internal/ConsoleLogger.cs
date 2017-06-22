@@ -17,6 +17,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System.IO;
+    using System.Xml;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
     /// Logger for sending output to the console.
@@ -66,6 +69,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private int testsPassed = 0;
         private int testsFailed = 0;
         private int testsSkipped = 0;
+        private static string testCaseName = string.Empty;
+        private bool isAborted = false;
 
         #endregion
 
@@ -98,6 +103,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             get;
             private set;
+        }
+        public string GetTestCaseName()
+        {
+            return testCaseName;
         }
 
         /// <summary>
@@ -317,7 +326,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     break;
                 case TestMessageLevel.Error:
                     this.testOutcome = TestOutcome.Failed;
-                    Output.Error(e.Message);
+                    if(e.Message.Equals(CommandLineResources.TestRunAbort))
+                    {
+                        isAborted = true;
+                    }
+                    else
+                    {
+                        Output.Error(e.Message);
+                    }
                     break;
                 default:
                     Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
@@ -391,17 +407,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             Output.WriteLine(string.Empty, OutputLevel.Information);
 
-            // Printing Run-level Attachments
+            //Printing Faulty Test Case Name If Test Host Crashed 
+            if (isAborted)
+            {
+                string testCaseName = GetLastTestCase(e);
+                var reason = CommandLineResources.TestRunAbort + Environment.NewLine + "The faulty test case is : " + testCaseName;
+                Output.Error(reason);
+            }
+
             var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
+            
+            // Printing Run-level Attachments
             if (runLevelAttachementCount > 0)
             {
-                Output.Information(CommandLineResources.AttachmentsBanner);
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    foreach (var uriDataAttachment in attachmentSet.Attachments)
+                    if (!attachmentSet.DisplayName.Equals(vstest.console.ConsoleConstants.BlameName))
                     {
-                        var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
-                        Output.Information(attachmentOutput);
+                        Output.Information(CommandLineResources.AttachmentsBanner);
+                        break;
+                    }
+                }
+            }
+            if (runLevelAttachementCount > 0)
+            {
+                foreach (var attachmentSet in e.AttachmentSets)
+                {
+                    if (!attachmentSet.DisplayName.Equals(vstest.console.ConsoleConstants.BlameName))
+                    {
+                        foreach (var uriDataAttachment in attachmentSet.Attachments)
+                        {
+                            var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
+                            Output.Information(attachmentOutput);
+                        }
                     }
                 }
                 Output.WriteLine(String.Empty, OutputLevel.Information);
@@ -431,6 +469,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
         }
+
+        private string GetLastTestCase(TestRunCompleteEventArgs e)
+        {
+            string testname = null;
+            foreach (var attachmentSet in e.AttachmentSets)
+            {
+                if (attachmentSet.DisplayName.Equals(vstest.console.ConsoleConstants.BlameName))
+                {
+                    testname = FileRead(attachmentSet.Attachments[0].Uri.LocalPath);
+                }
+            }
+            return testname;
+        }
+
+        private string FileRead(string filepath)
+        {
+            string testname = string.Empty;
+            var doc = new XmlDocument();
+            using (var stream = new FileHelper().GetStream(filepath, FileMode.Open))
+            {
+                doc.Load(stream);
+            }
+            var root = doc.LastChild;
+            testname = root.LastChild.Attributes[vstest.console.ConsoleConstants.BlameAttributeTestName].Value;
+            return testname;
+        }
+
         #endregion
 
     }

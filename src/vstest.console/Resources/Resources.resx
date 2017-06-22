@@ -655,4 +655,7 @@
   <data name="DbgTrcMessagesBanner" xml:space="preserve">
     <value>Debug Traces Messages:</value>
   </data>
+  <data name="TestRunAbort" xml:space="preserve">
+    <value>The active test run was aborted. Reason: </value>
+  </data>
 </root>

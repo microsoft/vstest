@@ -1809,5 +1809,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("DataCollectorFriendlyNameInvalid", resourceCulture);
             }
         }
+
+        public static string TestRunAbort
+        {
+            get
+            {
+                return ResourceManager.GetString("TestRunAbort", resourceCulture);
+            }
+        }
     }
 }
