@@ -125,5 +125,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     callbackAction.Invoke();
                 };
         }
+
+        /// <inheritdoc/>
+        public void TerminateProcess(int processId)
+        {
+            var process = Process.GetProcessById(processId);
+            process.Kill();
+        }
     }
 }

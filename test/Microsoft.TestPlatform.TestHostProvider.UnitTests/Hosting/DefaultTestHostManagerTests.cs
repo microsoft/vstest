@@ -8,6 +8,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -17,7 +18,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
 
 #pragma warning disable SA1600
@@ -229,8 +229,25 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
 
             Assert.AreEqual(this.errorMessage, string.Empty);
-
             Assert.AreEqual(this.exitCode, exitCode);
+        }
+
+        [TestMethod]
+        public async Task TerminateAsyncShouldKillTestHostProcess()
+        {
+            await this.testHostManager.TerminateAsync(123, CancellationToken.None);
+
+            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(123), Times.Once);
+        }
+
+        [TestMethod]
+        public void TerminateAsyncShouldNotThrowIfTestHostIsNotStarted()
+        {
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<int>())).Throws<Exception>();
+
+            this.testHostManager.TerminateAsync(123, CancellationToken.None).Wait();
+
+            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(123), Times.Once);
         }
 
         private void TestableTestHostManagerHostExited(object sender, HostProviderEventArgs e)
