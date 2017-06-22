@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading.Tasks;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -40,6 +42,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private Architecture architecture;
 
         private IProcessHelper processHelper;
+        private IEnvironment environment;
+        private IDotnetHostHelper dotnetHostHelper;
 
         private ITestHostLauncher customTestHostLauncher;
         private Process testHostProcess;
@@ -52,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
         public DefaultTestHostManager()
-            : this(new ProcessHelper())
+            : this(new ProcessHelper(), new PlatformEnvironment(), new DotnetHostHelper())
         {
         }
 
@@ -60,9 +64,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
         /// <param name="processHelper">Process helper instance.</param>
-        internal DefaultTestHostManager(IProcessHelper processHelper)
+        /// <param name="environment">Instance of platform environment.</param>
+        /// <param name="dotnetHostHelper">Instance of dotnet host helper.</param>
+        internal DefaultTestHostManager(IProcessHelper processHelper, IEnvironment environment, IDotnetHostHelper dotnetHostHelper)
         {
             this.processHelper = processHelper;
+            this.environment = environment;
+            this.dotnetHostHelper = dotnetHostHelper;
         }
 
         /// <inheritdoc/>
@@ -141,6 +149,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
             EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
+            var launcherPath = testhostProcessPath;
+            if (!this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
+                !this.processHelper.GetCurrentProcessFileName().EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+            {
+                launcherPath = this.dotnetHostHelper.GetMonoPath();
+                argumentsString = testhostProcessPath + " " + argumentsString;
+            }
+
             // For IDEs and other scenario, current directory should be the
             // working directory (not the vstest.console.exe location).
             // For VS - this becomes the solution directory for example
@@ -149,7 +165,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             return new TestProcessStartInfo
             {
-                FileName = testhostProcessPath,
+                FileName = launcherPath,
                 Arguments = argumentsString,
                 EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
                 WorkingDirectory = processWorkingDirectory
