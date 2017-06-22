@@ -70,11 +70,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             File.Move(sourcePath, destinationPath);
         }
-
-        /// <inheritdoc/>
-        public void AppendAllText(string sourcePath, string contents)
-        {
-            File.AppendAllText(sourcePath, contents);
-        }
     }
 }
