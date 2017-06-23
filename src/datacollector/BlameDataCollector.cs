@@ -12,25 +12,26 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using FileHelper = Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper;
     using System.Text;
+    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
 
     [DataCollectorFriendlyName("Blame")]
     [DataCollectorTypeUri("my://sample/datacollector")]
-    class BlameDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
+    public class BlameDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
         private DataCollectionLogger logger;
         private DataCollectionEvents events;
         private IFileHelper fileHelper;
-        private XmlDocument doc;
-        private XmlElement blameTestRoot;
-        private string filepath;
+        private List<TestCase> TestSequence;
+        private BlameDataReaderWriter dataWriter;
+        private IBlameFormatHelper blameFormatHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
         public BlameDataCollector()
-            : this(new FileHelper())
+            : this(new FileHelper(), new BlameXmlHelper())
         {
         }
 
@@ -38,9 +39,10 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
         /// <param name="fileHelper">File helper instance.</param>
-        internal BlameDataCollector(IFileHelper fileHelper)
+        internal BlameDataCollector(IFileHelper fileHelper, IBlameFormatHelper blameFormatHelper)
         {
             this.fileHelper = fileHelper;
+            this.blameFormatHelper = blameFormatHelper;
         }
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
             this.logger = logger;
-            InitializeXml();
+            TestSequence = new List<TestCase>();
         }
 
         /// <summary>
@@ -90,7 +92,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
         {
             EqtTrace.Info(Constants.TestCaseStart);
-            WriteToXml(e.TestElement.FullyQualifiedName, e.TestElement.Source);
+            TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
+            TestSequence.Add(testcase);
         }
 
         /// <summary>
@@ -106,45 +109,11 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// </summary>
         private void SessionEnded_Handler(object sender, SessionEndEventArgs args)
         {
+            var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
             EqtTrace.Info(Constants.TestSessionEnd);
-            SaveXmlDocument();
-            this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, this.filepath, true);
-        }
-
-        /// <summary>
-        /// To Initialize xml writing for writing test cases to file
-        /// </summary>
-        private void InitializeXml()
-        {
-            this.filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
-            doc = new XmlDocument();
-            var xmlDeclaration = doc.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
-            blameTestRoot = doc.CreateElement(Constants.BlameRootNode);
-            doc.AppendChild(xmlDeclaration);
-        }
-
-        /// <summary>
-        /// Writing each test node to xml file
-        /// </summary>
-        private void WriteToXml(string fullyQualifiedName, string source)
-        {
-            var testElement = doc.CreateElement(Constants.BlameTestNode);
-            testElement.SetAttribute(Constants.TestNameAttribute, fullyQualifiedName);
-            testElement.SetAttribute(Constants.TestSourceAttribute, source);
-            blameTestRoot.AppendChild(testElement);  
-        }
-
-        /// <summary>
-        /// Saving Xml Document to file for attachment to be sent
-        /// </summary>
-        private void SaveXmlDocument()
-        {
-            doc.AppendChild(blameTestRoot);
-
-            using (var stream = new FileHelper().GetStream(this.filepath, FileMode.Create))
-            {
-                doc.Save(stream);
-            }
+            this.dataWriter = new BlameDataReaderWriter(TestSequence, filepath, blameFormatHelper);
+            dataWriter.WriteTestsToFile();
+            this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
         }
 
         /// <summary>
@@ -161,13 +130,13 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <summary>
         /// Only used for testing purposes
         /// </summary>
-        public XmlDocument ValidateXmlWriter(string fullyQualifiedName, string source)
-        {
-            InitializeXml();
-            WriteToXml(fullyQualifiedName,source);
-            doc.AppendChild(blameTestRoot);
-            return doc;
-        }
+        //public XmlDocument ValidateXmlWriter(string fullyQualifiedName, string source)
+        //{
+        //    //InitializeXml();
+        //    //WriteToXml(fullyQualifiedName,source);
+        //    //doc.AppendChild(blameTestRoot);
+        //    //return doc;
+        //}
 
     }
 
@@ -220,5 +189,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// Test Source Attribute.
         /// </summary>
         public const string TestSourceAttribute = "Source";
+
     }
 }

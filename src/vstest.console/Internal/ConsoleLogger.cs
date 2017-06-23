@@ -69,7 +69,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private int testsPassed = 0;
         private int testsFailed = 0;
         private int testsSkipped = 0;
-        private static string testCaseName = string.Empty;
         private bool isAborted = false;
 
         #endregion
@@ -103,10 +102,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             get;
             private set;
-        }
-        public string GetTestCaseName()
-        {
-            return testCaseName;
         }
 
         /// <summary>
@@ -494,6 +489,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var root = doc.LastChild;
             testname = root.LastChild.Attributes[vstest.console.ConsoleConstants.BlameAttributeTestName].Value;
             return testname;
+            //var dataReader = new BlameDataReaderWriter(filepath, new BlameXmlHelper());
+            //var testCase = dataReader.GetLastTestCase();
+            //return testCase.FullyQualifiedName;
         }
 
         #endregion

@@ -26,8 +26,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private Mock<IMessageSink> mockMessageSink;
         private Mock<IDataCollectionManager> mockDataCollectionManager;
         private Mock<IDataCollectionTestCaseEventHandler> mockDataCollectionTestCaseEventHandler;
-        private TestableDataCollectionRequestHandler requestHandler;
         private Mock<IDataSerializer> mockDataSerializer;
+        private TestableDataCollectionRequestHandler requestHandler;
 
         public DataCollectionRequestHandlerTests()
         {

@@ -24,6 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using vstest.console.Internal;
 
     /// <summary>
     /// Defines the TestRequestManger which can fire off discovery and test run requests
@@ -80,6 +81,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 var consoleLogger = new ConsoleLogger();
                 this.testLoggerManager.AddLogger(consoleLogger, ConsoleLogger.ExtensionUri, null);
+                var blameLogger = new BlameLogger();
+                this.testLoggerManager.AddLogger(blameLogger, BlameLogger.ExtensionUri, null);
             }
         }
 
