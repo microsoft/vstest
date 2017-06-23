@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private bool initialized;
         private string testHostProcessStdError;
-        private int testHostId;
+        private int testHostProcessId;
 
         #region Constructors
 
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
             this.initialized = false;
-            this.testHostId = -1;
+            this.testHostProcessId = -1;
         }
 
         #endregion
@@ -102,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     hostLaunchedTask.Wait(hostLaunchCts.Token);
-                    this.testHostId = hostLaunchedTask.Result;
+                    this.testHostProcessId = hostLaunchedTask.Result;
                 }
                 catch (OperationCanceledException ex)
                 {
@@ -166,7 +166,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
             catch (Exception ex)
             {
-                // Sending an end session is not necessarily a failure. Discovery and execution should be already
+                // Error in sending an end session is not necessarily a failure. Discovery and execution should be already
                 // complete at this time.
                 EqtTrace.Warning("ProxyOperationManager: Failed to end session: " + ex);
             }
@@ -174,10 +174,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.initialized = false;
 
-                if (!this.testHostExited.Wait(1000) && this.testHostId != -1)
+                // We don't need to terminate if the test host has already terminated. The upper bound
+                // for wait should be 1s.
+                if (!this.testHostExited.Wait(1000) && this.testHostProcessId != -1)
                 {
                     EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
-                    this.testHostManager.TerminateAsync(this.testHostId, CancellationToken.None).Wait();
+                    this.testHostManager.TerminateAsync(this.testHostProcessId, CancellationToken.None).Wait();
                 }
 
                 this.testHostManager.HostExited -= this.TestHostManagerHostExited;
@@ -226,6 +228,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostProcessStdError = e.Data;
 
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
+
+            this.testHostExited.Set();
         }
     }
 }
