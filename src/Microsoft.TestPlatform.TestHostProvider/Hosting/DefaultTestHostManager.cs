@@ -194,28 +194,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return true;
         }
 
-        /// <summary>
-        /// Raises HostLaunched event
-        /// </summary>
-        /// <param name="e">hostprovider event args</param>
-        public void OnHostLaunched(HostProviderEventArgs e)
-        {
-            this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
-        }
-
-        /// <summary>
-        /// Raises HostExited event
-        /// </summary>
-        /// <param name="e">hostprovider event args</param>
-        public void OnHostExited(HostProviderEventArgs e)
-        {
-            if (!this.hostExitedEventRaised)
-            {
-                this.hostExitedEventRaised = true;
-                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
-            }
-        }
-
         /// <inheritdoc/>
         public void Initialize(IMessageLogger logger, string runsettingsXml)
         {
@@ -227,6 +205,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             this.Shared = !runConfiguration.DisableAppDomain;
             this.hostExitedEventRaised = false;
+        }
+
+        /// <inheritdoc/>
+        public Task TerminateAsync(int processId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                this.processHelper.TerminateProcess(processId);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning("DefaultTestHostManager: Unable to terminate test host process: " + ex);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Raises HostLaunched event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
+        private void OnHostLaunched(HostProviderEventArgs e)
+        {
+            this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
+        }
+
+        /// <summary>
+        /// Raises HostExited event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
+        private void OnHostExited(HostProviderEventArgs e)
+        {
+            if (!this.hostExitedEventRaised)
+            {
+                this.hostExitedEventRaised = true;
+                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
+            }
         }
 
         private CancellationTokenSource GetCancellationTokenSource()

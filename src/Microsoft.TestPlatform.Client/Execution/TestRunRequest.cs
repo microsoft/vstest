@@ -276,6 +276,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     return;
                 }
 
+                // Disposing off the resources held by the execution manager so that the test host process can shut down.
+                this.ExecutionManager?.Close();
+
                 try
                 {
                     this.runRequestTimeTracker.Stop();
@@ -317,9 +320,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Notify the waiting handle that run is complete
                     this.runCompletionEvent.Set();
-
-                    // Disposing off the resources held by the execution manager so that the test host process can shut down.
-                    this.ExecutionManager?.Close();
                 }
 
                 EqtTrace.Info("TestRunRequest:TestRunComplete: Completed.");

@@ -13,8 +13,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using System.Linq;
 
     /// <summary>
     /// The design mode client.
@@ -105,6 +106,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             // Dispose off the communications to end the session
             // this should end the "ProcessRequests" loop with an exception
             this.Dispose();
+
+            EqtTrace.Info("DesignModeClient: Parent process exited, Exiting myself..");
+            Environment.Exit(1);
         }
 
         /// <summary>
@@ -143,8 +147,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                         case MessageType.StartDiscovery:
                             {
-                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message);
-                                testRequestManager.DiscoverTests(discoveryPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+
+                                var discoveryPayload = this.dataSerializer.DeserializePayload<DiscoveryRequestPayload>(message); 
+                                this.StartDiscovery(discoveryPayload, testRequestManager);
                                 break;
                             }
 
@@ -277,19 +282,56 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                 }
                 catch(Exception ex)
                 {
+                    EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
                     // If there is an exception during test run request creation or some time during the process
                     // In such cases, TestPlatform will never send a TestRunComplete event and IDE need to be sent a run complete message
-                    // We need recoverability in translationlayer-designmode scenarios 
+                    // We need recoverability in translationlayer-designmode scenarios
+
+                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                    this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
                     var runCompletePayload = new TestRunCompletePayload()
                     {
                         TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
                         LastRunTests = null
                     };
-
                     // Send run complete to translation layer
                     this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
                 }
             });
+        }
+
+        private void StartDiscovery(DiscoveryRequestPayload discoveryRequestPayload, ITestRequestManager testRequestManager)
+        {
+            Task.Run(
+                delegate
+                {
+                    try
+                    {
+                        testRequestManager.ResetOptions();
+                        testRequestManager.DiscoverTests(discoveryRequestPayload, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
+                    }
+                    catch (Exception ex)
+                    {
+                        EqtTrace.Error("DesignModeClient: Exception in StartDiscovery: " + ex);
+
+                        // If there is an exception during test discovery request creation or some time during the process
+                        // In such cases, TestPlatform will never send a DiscoveryComplete event and IDE need to be sent a discovery complete message
+                        // We need recoverability in translationlayer-designmode scenarios
+
+                        var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
+                        this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
+
+                        var payload = new DiscoveryCompletePayload()
+                        {
+                            IsAborted = true,
+                            LastDiscoveredTests = null,
+                            TotalTests = -1
+                        };
+
+                        // Send run complete to translation layer
+                        this.communicationManager.SendMessage(MessageType.DiscoveryComplete, payload);
+                    }
+                });
         }
 
         #region IDisposable Support
