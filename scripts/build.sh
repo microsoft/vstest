@@ -412,7 +412,7 @@ log "Test platform build variables: "
 
 if $TPB_HasMono; then
     # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=/usr/lib/mono/4.5/
+    export FrameworkPathOverride=$(dirname $(which mono))/../lib/mono/4.5/
 fi
 
 if [ -z "$PROJECT_NAME_PATTERNS" ]
