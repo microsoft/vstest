@@ -25,8 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         Mock<IProxyExecutionManager> executionManager;
         TestRunCriteria testRunCriteria;
 
-        [TestInitialize]
-        public void TestInit()
+        public TestRunRequestTests()
         {
             testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1);
             executionManager = new Mock<IProxyExecutionManager>();
@@ -142,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
         }
 
         [TestMethod]
-        public void HandleTestRunStatsChangeShouldInokeListenersWithTestRunChangedEventArgs()
+        public void HandleTestRunStatsChangeShouldInvokeListenersWithTestRunChangedEventArgs()
         {
             var mockStats = new Mock<ITestRunStatistics>();
 
@@ -197,6 +196,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
 
             Assert.AreEqual(rawMessage, messageReceived, "RunRequest should just pass the message as is.");
             testRunRequest.OnRawMessageReceived -= handler;
+        }
+
+        [TestMethod]
+        public void HandleTestRunCompleteShouldCloseExecutionManager()
+        {
+            var events = new List<string>();
+            this.executionManager.Setup(em => em.Close()).Callback(() => events.Add("close"));
+            this.testRunRequest.OnRunCompletion += (s, e) => events.Add("complete");
+            this.testRunRequest.ExecuteAsync();
+
+            this.testRunRequest.HandleTestRunComplete(new TestRunCompleteEventArgs(new TestRunStatistics(1, null), false, false, null, null, TimeSpan.FromSeconds(0)), null, null, null);
+
+            Assert.AreEqual(2, events.Count);
+            Assert.AreEqual("close", events[0]);
+            Assert.AreEqual("complete", events[1]);
         }
 
         [TestMethod]
