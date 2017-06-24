@@ -32,7 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 return;
             }
-            
+
             Debug.Assert(childDomain != null, "domain");
             if (childDomain != null)
             {
