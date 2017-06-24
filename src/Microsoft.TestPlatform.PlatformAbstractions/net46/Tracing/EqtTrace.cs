@@ -28,6 +28,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <param name="childDomain">Child <c>AppDomain</c>.</param>
         public void SetupRemoteEqtTraceListeners(AppDomain childDomain)
         {
+            if(!isInitialized)
+            {
+                return;
+            }
+            
             Debug.Assert(childDomain != null, "domain");
             if (childDomain != null)
             {

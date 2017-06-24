@@ -164,13 +164,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 case PlatformTraceLevel.Off:
                     return false;
                 case PlatformTraceLevel.Error:
-                    return Source.Switch.ShouldTrace(TraceEventType.Error);
                 case PlatformTraceLevel.Warning:
-                    return Source.Switch.ShouldTrace(TraceEventType.Warning);
                 case PlatformTraceLevel.Info:
-                    return Source.Switch.ShouldTrace(TraceEventType.Information);
                 case PlatformTraceLevel.Verbose:
-                    return Source.Switch.ShouldTrace(TraceEventType.Verbose);
+                    return isInitialized;
                 default:
                     Debug.Fail("Should never get here!");
                     return false;
@@ -387,7 +384,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private static void UnInitializeVerboseTrace()
         {
             isInitialized = false;
-
+            
             LogFile = null;
             TraceLevel = TraceLevel.Off;
             Source.Switch.Level = SourceLevels.Off;
