@@ -384,7 +384,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private static void UnInitializeVerboseTrace()
         {
             isInitialized = false;
-            
+
             LogFile = null;
             TraceLevel = TraceLevel.Off;
             Source.Switch.Level = SourceLevels.Off;
