@@ -22,16 +22,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         private DataCollectionEnvironmentContext context;
         private DataCollectionLogger logger;
         private DataCollectionEvents events;
-        private IFileHelper fileHelper;
         private List<TestCase> TestSequence;
         private BlameDataReaderWriter dataWriter;
-        private IBlameFormatHelper blameFormatHelper;
+        private IBlameFileManager blameFileManager;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
         public BlameDataCollector()
-            : this(new FileHelper(), new BlameXmlHelper())
+            : this(new BlameXmlManager())
         {
         }
 
@@ -39,10 +38,9 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
         /// <param name="fileHelper">File helper instance.</param>
-        internal BlameDataCollector(IFileHelper fileHelper, IBlameFormatHelper blameFormatHelper)
+        internal BlameDataCollector(IBlameFileManager blameFileManager)
         {
-            this.fileHelper = fileHelper;
-            this.blameFormatHelper = blameFormatHelper;
+            this.blameFileManager = blameFileManager;
         }
 
         /// <summary>
@@ -111,8 +109,8 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
             EqtTrace.Info(Constants.TestSessionEnd);
-            this.dataWriter = new BlameDataReaderWriter(TestSequence, filepath, blameFormatHelper);
-            dataWriter.WriteTestsToFile();
+            this.dataWriter = new BlameDataReaderWriter(TestSequence, filepath, this.blameFileManager);
+            this.dataWriter.WriteTestsToFile();
             this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
         }
 
@@ -126,18 +124,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             this.events.TestCaseStart -= this.Events_TestCaseStart;
             this.events.TestCaseEnd -= this.Events_TestCaseEnd;
         }
-
-        /// <summary>
-        /// Only used for testing purposes
-        /// </summary>
-        //public XmlDocument ValidateXmlWriter(string fullyQualifiedName, string source)
-        //{
-        //    //InitializeXml();
-        //    //WriteToXml(fullyQualifiedName,source);
-        //    //doc.AppendChild(blameTestRoot);
-        //    //return doc;
-        //}
-
     }
 
     /// <summary>

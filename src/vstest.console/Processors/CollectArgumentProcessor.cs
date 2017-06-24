@@ -15,6 +15,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using vstest.console.Internal;
+    using System.Diagnostics.Contracts;
+    using vstest.console;
+
 
     /// <summary>
     /// The argument processor for enabling data collectors.
@@ -59,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => new CollectArgumentExecutor(RunSettingsManager.Instance));
+                    this.executor = new Lazy<IArgumentExecutor>(() => new CollectArgumentExecutor(RunSettingsManager.Instance, TestLoggerManager.Instance));
                 }
 
                 return this.executor;
@@ -93,9 +98,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     {
         private IRunSettingsProvider runSettingsManager;
         internal static List<string> EnabledDataCollectors = new List<string>();
-        internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager)
+        private readonly TestLoggerManager loggerManager;
+        internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager, TestLoggerManager loggerManager)
         {
             this.runSettingsManager = runSettingsManager;
+            Contract.Requires(loggerManager != null);
+            this.loggerManager = loggerManager;
         }
 
         /// <inheritdoc />
@@ -115,6 +123,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             EnabledDataCollectors.Add(argument.ToLower());
+          
+            if (argument.ToLower().Equals(ConsoleConstants.BlameDataCollectorName.ToLower()))
+            {
+                string loggerIdentifier = null;
+                Dictionary<string, string> parameters = null;
+                var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
+                if (parseSucceeded)
+                {
+                    this.loggerManager.AddLogger(new BlameLogger(), BlameLogger.ExtensionUri, parameters);
+                }
+            }
 
             var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
             if (settings == null)

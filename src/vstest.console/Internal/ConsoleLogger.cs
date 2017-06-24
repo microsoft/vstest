@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-
+    using Constants = vstest.console.ConsoleConstants;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using System.IO;
     using System.Xml;
@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private int testsPassed = 0;
         private int testsFailed = 0;
         private int testsSkipped = 0;
-        private bool isAborted = false;
+        //private bool isAborted = false;
 
         #endregion
 
@@ -321,11 +321,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     break;
                 case TestMessageLevel.Error:
                     this.testOutcome = TestOutcome.Failed;
-                    if(e.Message.Equals(CommandLineResources.TestRunAbort))
-                    {
-                        isAborted = true;
-                    }
-                    else
+                    var isTestRunAborted = e.Message.Equals(CommandLineResources.TestRunAbort) || e.Message.Contains(CommandLineResources.TestRunAbortStackOverFlow);
+                    if (!isTestRunAborted)
                     {
                         Output.Error(e.Message);
                     }
@@ -401,15 +398,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             Output.WriteLine(string.Empty, OutputLevel.Information);
-
-            //Printing Faulty Test Case Name If Test Host Crashed 
-            if (isAborted)
-            {
-                string testCaseName = GetLastTestCase(e);
-                var reason = CommandLineResources.TestRunAbort + Environment.NewLine + "The faulty test case is : " + testCaseName;
-                Output.Error(reason);
-            }
-
             var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
             
             // Printing Run-level Attachments
@@ -417,7 +405,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    if (!attachmentSet.DisplayName.Equals(vstest.console.ConsoleConstants.BlameName))
+                    if (!attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
                     {
                         Output.Information(CommandLineResources.AttachmentsBanner);
                         break;
@@ -428,7 +416,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    if (!attachmentSet.DisplayName.Equals(vstest.console.ConsoleConstants.BlameName))
+                    if (!attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
                     {
                         foreach (var uriDataAttachment in attachmentSet.Attachments)
                         {
@@ -464,37 +452,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 }
             }
         }
-
-        private string GetLastTestCase(TestRunCompleteEventArgs e)
-        {
-            string testname = null;
-            foreach (var attachmentSet in e.AttachmentSets)
-            {
-                if (attachmentSet.DisplayName.Equals(vstest.console.ConsoleConstants.BlameName))
-                {
-                    testname = FileRead(attachmentSet.Attachments[0].Uri.LocalPath);
-                }
-            }
-            return testname;
-        }
-
-        private string FileRead(string filepath)
-        {
-            string testname = string.Empty;
-            var doc = new XmlDocument();
-            using (var stream = new FileHelper().GetStream(filepath, FileMode.Open))
-            {
-                doc.Load(stream);
-            }
-            var root = doc.LastChild;
-            testname = root.LastChild.Attributes[vstest.console.ConsoleConstants.BlameAttributeTestName].Value;
-            return testname;
-            //var dataReader = new BlameDataReaderWriter(filepath, new BlameXmlHelper());
-            //var testCase = dataReader.GetLastTestCase();
-            //return testCase.FullyQualifiedName;
-        }
-
         #endregion
-
     }
 }

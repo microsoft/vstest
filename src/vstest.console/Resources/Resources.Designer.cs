@@ -1817,5 +1817,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("TestRunAbort", resourceCulture);
             }
         }
+
+        public static string TestRunAbortStackOverFlow
+        {
+            get
+            {
+                return ResourceManager.GetString("TestRunAbortStackOverFlow", resourceCulture);
+            }
+        }
     }
 }

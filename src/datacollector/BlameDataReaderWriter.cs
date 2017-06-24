@@ -10,39 +10,55 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     public class BlameDataReaderWriter
     {
         private string filePath;
-        private IBlameFormatHelper blameFormatHelper;
+        private IBlameFileManager blameFileManager;
         private List<TestCase> TestSequence;
 
+        #region Constructor
         public BlameDataReaderWriter()
         { }
 
-        public BlameDataReaderWriter(string filePath, IBlameFormatHelper blameFormatHelper)
+        public BlameDataReaderWriter(string filePath, IBlameFileManager blameFileManager)
         {
+            ValidateArg.NotNullOrWhiteSpace(filePath, "File Path");
+            ValidateArg.NotNull<IBlameFileManager>(blameFileManager, "Blame File manager");
+
             this.filePath = filePath;
-            this.blameFormatHelper = blameFormatHelper;
+            this.blameFileManager = blameFileManager;
         }
 
-        public BlameDataReaderWriter(List<TestCase> TestSequence, string filePath, IBlameFormatHelper blameFormatHelper)
+        public BlameDataReaderWriter(List<TestCase> TestSequence, string filePath, IBlameFileManager blameFileManager)
         {
+            ValidateArg.NotNullOrWhiteSpace(filePath, "File Path");
+            ValidateArg.NotNull<IBlameFileManager>(blameFileManager, "Blame File manager");
+
             this.TestSequence = TestSequence;
             this.filePath = filePath;
-            this.blameFormatHelper = blameFormatHelper;
+            this.blameFileManager = blameFileManager;
         }
 
+        #endregion
+
+        /// <summary>
+        /// Writes all tests in the test sequence to the file
+        /// </summary>
         public void WriteTestsToFile()
         {
-            blameFormatHelper.InitializeHelper();
+            blameFileManager.InitializeHelper();
 
             foreach (var test in TestSequence)
             {
-                blameFormatHelper.AddTestToFormat(test);
+                blameFileManager.AddTestToFormat(test);
             }
-            blameFormatHelper.SaveToFile(this.filePath);
+            blameFileManager.SaveToFile(this.filePath);
         }
 
+        /// <summary>
+        /// Gets faulty test case from the file
+        /// </summary>
+        /// <returns>Faulty test case</returns>
         public TestCase GetLastTestCase()
         {
-            return blameFormatHelper.ReadFaultyTestCase(this.filePath);
+            return blameFileManager.ReadFaultyTestCase(this.filePath);
         }
     }
 }

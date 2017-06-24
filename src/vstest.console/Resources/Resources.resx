@@ -658,4 +658,7 @@
   <data name="TestRunAbort" xml:space="preserve">
     <value>The active test run was aborted. Reason: </value>
   </data>
+  <data name="TestRunAbortStackOverFlow" xml:space="preserve">
+    <value>The active test run was aborted. Reason: Process is terminated due to StackOverflowException.</value>
+  </data>
 </root>

@@ -9,18 +9,23 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
+    using vstest.console.UnitTests.TestDoubles;
 
     [TestClass]
     public class CollectArgumentProcessorTests
     {
         private TestableRunSettingsProvider settingsProvider;
         private CollectArgumentExecutor executor;
+        private DummyTestLoggerManager testloggerManager;
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
 
         public CollectArgumentProcessorTests()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.executor = new CollectArgumentExecutor(this.settingsProvider);
+            this.testloggerManager = new DummyTestLoggerManager();
+            this.executor = new CollectArgumentExecutor(this.settingsProvider, testloggerManager);
             CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 
@@ -82,7 +87,7 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldCreateEntryForDataCollectorInRunSettingsIfNotAlreadyPresent()
         {
-            var runsettingsString = string.Format(DefaultRunSettings,"");
+            var runsettingsString = string.Format(DefaultRunSettings, "");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
@@ -131,6 +136,13 @@ namespace vstest.console.UnitTests.Processors
             this.executor.Initialize("MyDataCollector1");
 
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void ExecutorInitializeWithBlameArgumentsShouldAddBlameloggerToTestLoggerManager()
+        {
+            executor.Initialize("blame");
+            Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/BlameLogger"));
         }
 
         #endregion

@@ -81,8 +81,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 var consoleLogger = new ConsoleLogger();
                 this.testLoggerManager.AddLogger(consoleLogger, ConsoleLogger.ExtensionUri, null);
-                var blameLogger = new BlameLogger();
-                this.testLoggerManager.AddLogger(blameLogger, BlameLogger.ExtensionUri, null);
             }
         }
 
