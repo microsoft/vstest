@@ -109,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     case MessageType.DiscoveryInitialize:
                         {
                             EqtTrace.Info("Discovery Session Initialize.");
-                            var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
+                            var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions), 0);
@@ -121,7 +121,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Discovery started.");
 
                             var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
-                            var discoveryCriteria = message.Payload.ToObject<DiscoveryCriteria>();
+                            var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
                             jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetDiscoveryManager()
@@ -133,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     case MessageType.ExecutionInitialize:
                         {
                             EqtTrace.Info("Discovery Session Initialize.");
-                            var pathToAdditionalExtensions = message.Payload.ToObject<IEnumerable<string>>();
+                            var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions), 0);
@@ -145,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Execution started.");
                             var testRunEventsHandler = new TestRunEventsHandler(this);
 
-                            var testRunCriteriaWithSources = message.Payload.ToObject<TestRunCriteriaWithSources>();
+                            var testRunCriteriaWithSources = this.dataSerializer.DeserializePayload<TestRunCriteriaWithSources>(message);
                             jobQueue.QueueJob(
                                 () =>
                                 testHostManagerFactory.GetExecutionManager()
