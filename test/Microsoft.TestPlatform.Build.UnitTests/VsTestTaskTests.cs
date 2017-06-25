@@ -211,12 +211,12 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             vstestTask.VSTestFramework = "abc";
 
             vstestTask.VSTestCollect[0] = "name1";
-            vstestTask.VSTestCollect[1] = "name2";
+            vstestTask.VSTestCollect[1] = "name 2";
 
             var allArguments = vstestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name1")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name2")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name1\"")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name 2\"")));
         }
     }
 }

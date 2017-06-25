@@ -227,7 +227,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 foreach(var arg in this.VSTestCollect)
                 {
-                    allArgs.Add("--collect:" + arg);
+                    allArgs.Add("--collect:" + arg.AddDoubleQuote());
                 }
             }
 
