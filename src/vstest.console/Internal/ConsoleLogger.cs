@@ -321,7 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     break;
                 case TestMessageLevel.Error:
                     this.testOutcome = TestOutcome.Failed;
-                    var isTestRunAborted = e.Message.Equals(CommandLineResources.TestRunAbort) || e.Message.Contains(CommandLineResources.TestRunAbortStackOverFlow);
+                    var isTestRunAborted = e.Message.Equals(CommandLineResources.TestRunAbort);
                     if (!isTestRunAborted)
                     {
                         Output.Error(e.Message);

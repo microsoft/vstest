@@ -110,7 +110,7 @@ namespace vstest.console.Internal
                 string reason = String.Empty;
                 if(isStackoverFlow)
                 {
-                    reason = CommandLineResources.TestRunAbortStackOverFlow + Environment.NewLine + "Faulty Test is : " + testCaseName;
+                    reason = "StackoverflowException"+ Environment.NewLine + "Faulty Test is : " + testCaseName;
                 }
                 else
                 {
