@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
-        /// <param name="fileHelper">File helper instance.</param>
+        /// <param name="blameFileManager">BlameFileManager instance.</param>
         internal BlameDataCollector(IBlameFileManager blameFileManager)
         {
             this.blameFileManager = blameFileManager;
