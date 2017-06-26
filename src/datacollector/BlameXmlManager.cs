@@ -1,4 +1,7 @@
-﻿using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using System;
@@ -8,6 +11,7 @@ using System.Text;
 using System.Xml;
 using FileHelper = Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper;
 using Constants = Microsoft.VisualStudio.TestPlatform.DataCollector.Constants;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
@@ -15,8 +19,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     {
         private XmlDocument doc;
         private XmlElement blameTestRoot;
+        private IFileHelper fileHelper;
         public BlameXmlManager()
-        {}
+            : this(new FileHelper())
+        {
+        }
+        protected BlameXmlManager(IFileHelper fileHelper)
+        {
+            this.fileHelper = fileHelper;
+        }
 
         /// <summary>
         /// Initializes resources for writing to file
@@ -48,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         {
             doc.AppendChild(blameTestRoot);
 
-            using (var stream = new FileHelper().GetStream(filePath, FileMode.Create))
+            using (var stream = this.fileHelper.GetStream(filePath, FileMode.Create))
             {
                 doc.Save(stream);
             }
@@ -64,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
             TestCase testCase = new TestCase();
             string testname = string.Empty;
             var doc = new XmlDocument();
-            using (var stream = new FileHelper().GetStream(filePath, FileMode.Open))
+            using (var stream = this.fileHelper.GetStream(filePath, FileMode.Open))
             {
                 doc.Load(stream);
             }

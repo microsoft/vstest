@@ -62,12 +62,12 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.UnitTests
             this.blameDataCollector.Initialize(this.configurationElement,
                     this.mockDataColectionEvents.Object, this.mockDataCollectionSink.Object,
                     this.mockLogger.Object, context);
-            //var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
+            var filepath = Path.Combine(AppContext.BaseDirectory, "TestSequence.xml");
             //Raising Session End Event
             this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<DataCollectionContext>(), It.IsAny<String>(), It.IsAny<bool>()));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionContext));
 
-            this.mockBlameFileManager.Verify(x => x.SaveToFile(It.IsAny<string>()), Times.Once);
+            this.mockBlameFileManager.Verify(x => x.SaveToFile(filepath), Times.Once);
         }
 
     }
