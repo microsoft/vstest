@@ -272,14 +272,14 @@ function publish_package()
         projectToPackage="${item%%:*}"
         packageOutputPath="${item##*:}"
         log "Package: Publish $projectToPackage"
-        $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+        $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal --p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild p:LocalizedBuild=$TPB_LocalizedBuild
     done
 
     # Publish TestHost for netcoreapp1.0 target
     log "Package: Publish testhost.csproj"
     local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
     local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore10
-    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
     # Copy TestHost for desktop targets if we've built net46
     # packages with mono

@@ -344,7 +344,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 IMessageLogger logger)
                 : base(processHelper)
             {
-                this.TimeOut = 30000;
                 this.ErrorLength = errorLength;
                 this.Initialize(logger, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{architecture}</TargetPlatform> <TargetFrameworkVersion>{framework}</TargetFrameworkVersion> <DisableAppDomain>{!shared}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             }

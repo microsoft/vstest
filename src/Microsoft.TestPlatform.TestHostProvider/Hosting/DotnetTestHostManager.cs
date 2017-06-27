@@ -56,8 +56,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private Process testHostProcess;
 
-        private CancellationTokenSource hostLaunchCts;
-
         private StringBuilder testHostProcessStdError;
 
         private IMessageLogger messageLogger;
@@ -116,11 +114,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         protected int ErrorLength { get; set; } = 4096;
 
         /// <summary>
-        /// Gets or sets the Timeout for runtime to initialize.
-        /// </summary>
-        protected int TimeOut { get; set; } = 10000;
-
-        /// <summary>
         /// Gets callback on process exit
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
@@ -152,7 +145,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
-            return await Task.Run(() => this.LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
+            return await Task.Run(() => this.LaunchHost(testHostStartInfo), CancellationToken.None);
         }
 
         /// <inheritdoc/>
@@ -404,12 +397,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             EqtTrace.Verbose("DotnetTestHostManager: Assume published test project, with test host path = {0}.", testHostPath);
 
             return testHostPath;
-        }
-
-        private CancellationTokenSource GetCancellationTokenSource()
-        {
-            this.hostLaunchCts = new CancellationTokenSource(this.TimeOut);
-            return this.hostLaunchCts;
         }
     }
 }
