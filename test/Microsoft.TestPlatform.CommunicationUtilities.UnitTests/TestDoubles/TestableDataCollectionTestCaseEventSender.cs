@@ -8,8 +8,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles
 
     internal class TestableDataCollectionTestCaseEventSender : DataCollectionTestCaseEventSender
     {
-        public TestableDataCollectionTestCaseEventSender(ICommunicationManager communicationManager)
-            : base(communicationManager)
+        public TestableDataCollectionTestCaseEventSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
+            : base(communicationManager, dataSerializer)
         {
         }
     }

@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public DataCollectionTestCaseEventSenderTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.dataCollectionTestCaseEventSender = new TestableDataCollectionTestCaseEventSender(this.mockCommunicationManager.Object);
+            this.dataCollectionTestCaseEventSender = new TestableDataCollectionTestCaseEventSender(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
         }
 
         [TestMethod]
