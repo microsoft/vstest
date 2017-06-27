@@ -101,7 +101,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 try
                 {
                     this.testHostProcessId = hostLaunchedTask.Result;
-                    ////hostLaunchedTask.Wait();
                 }
                 catch (OperationCanceledException ex)
                 {
