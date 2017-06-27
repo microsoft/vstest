@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestLogger))
             {
-                allArgs.Add("--logger:" + this.VSTestLogger);
+                allArgs.Add("--logger:" + this.VSTestLogger.AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
