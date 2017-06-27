@@ -57,8 +57,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = vstestTask.CreateArgument().ToArray();
 
-            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
+            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"Console;Verbosity=normal\"")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"Console;Verbosity=quiet\"")));
         }
 
         [TestMethod]
@@ -144,8 +144,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
         }
-        [TestMethod]
 
+        [TestMethod]
         public void CreateArgumentShouldSetConsoleLoggerVerbosityToQuietIfConsoleLoggerIsNotGivenInArgsAndVerbosityIsq()
         {
             var vstestTask = new VSTestTask { VSTestVerbosity = "q" };
@@ -202,6 +202,22 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
+        public void CreateArgumentShouldPreserveWhiteSpaceInLogger()
+        {
+            var vstestTask = new VSTestTask();
+            
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+            vstestTask.VSTestLogger = "trx;LogFileName=foo bar.trx";
+
+
+            var allArguments = vstestTask.CreateArgument().ToArray();
+
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"trx;LogFileName=foo bar.trx\"")));
+        }
+
+        [TestMethod]
         public void CreateArgumentShouldAddOneCollectArgumentForEachCollect()
         {
             var vstestTask = new VSTestTask { VSTestCollect = new string[2] };
@@ -211,12 +227,12 @@ namespace Microsoft.TestPlatform.Build.UnitTests
             vstestTask.VSTestFramework = "abc";
 
             vstestTask.VSTestCollect[0] = "name1";
-            vstestTask.VSTestCollect[1] = "name2";
+            vstestTask.VSTestCollect[1] = "name 2";
 
             var allArguments = vstestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name1")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name2")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name1\"")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name 2\"")));
         }
     }
 }
