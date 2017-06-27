@@ -9,8 +9,8 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles
 
     internal class TestableDataCollectionRequestHandler : DataCollectionRequestHandler
     {
-        public TestableDataCollectionRequestHandler(ICommunicationManager communicationManager, IMessageSink messageSink, IDataCollectionManager dataCollectionManager, IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler)
-            : base(communicationManager, messageSink, dataCollectionManager, dataCollectionTestCaseEventHandler)
+        public TestableDataCollectionRequestHandler(ICommunicationManager communicationManager, IMessageSink messageSink, IDataCollectionManager dataCollectionManager, IDataCollectionTestCaseEventHandler dataCollectionTestCaseEventHandler, IDataSerializer dataSerializer)
+            : base(communicationManager, messageSink, dataCollectionManager, dataCollectionTestCaseEventHandler, dataSerializer)
         {
         }
     }

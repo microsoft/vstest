@@ -274,11 +274,26 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return false;
         }
 
+        /// <inheritdoc/>
+        public Task TerminateAsync(int processId, CancellationToken cancellationToken)
+        {
+            try
+            {
+                this.processHelper.TerminateProcess(processId);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning("DotnetTestHostManager: Unable to terminate test host process: " + ex);
+            }
+
+            return Task.FromResult(true);
+        }
+
         /// <summary>
         /// Raises HostLaunched event
         /// </summary>
         /// <param name="e">hostprovider event args</param>
-        public void OnHostLaunched(HostProviderEventArgs e)
+        private void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
         }
@@ -287,7 +302,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Raises HostExited event
         /// </summary>
         /// <param name="e">hostprovider event args</param>
-        public void OnHostExited(HostProviderEventArgs e)
+        private void OnHostExited(HostProviderEventArgs e)
         {
             if (!this.hostExitedEventRaised)
             {

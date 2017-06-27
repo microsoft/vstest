@@ -11,6 +11,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
     using Microsoft.VisualStudio.TestPlatform.CommandLine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     using TestPlatformHelpers;
 
@@ -59,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             {
                 if (this.executor == null)
                 {
-                    this.executor = new Lazy<IArgumentExecutor>(() => 
+                    this.executor = new Lazy<IArgumentExecutor>(() =>
                     new PortArgumentExecutor(CommandLineOptions.Instance, TestRequestManager.Instance));
                 }
 
@@ -108,12 +111,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Initializes Design mode when called
         /// </summary>
-        private Func<int, IDesignModeClient> designModeInitializer;
+        private Func<int, IProcessHelper, IDesignModeClient> designModeInitializer;
 
         /// <summary>
         /// IDesignModeClient
         /// </summary>
         private IDesignModeClient designModeClient;
+
+        /// <summary>
+        /// Process helper for process management actions.
+        /// </summary>
+        private IProcessHelper processHelper;
 
         #endregion
 
@@ -127,19 +135,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// </param>
         /// <param name="testRequestManager"> Test request manager</param>
         public PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager)
-            : this(options, testRequestManager, InitializeDesignMode)
+            : this(options, testRequestManager, InitializeDesignMode, new ProcessHelper())
         {
         }
 
         /// <summary>
         /// For Unit testing only
         /// </summary>
-        internal PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager, Func<int, IDesignModeClient> designModeInitializer)
+        internal PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager, IProcessHelper processHelper)
+            : this(options, testRequestManager, InitializeDesignMode, processHelper)
+        {
+        }
+
+        /// <summary>
+        /// For Unit testing only
+        /// </summary>
+        internal PortArgumentExecutor(CommandLineOptions options, ITestRequestManager testRequestManager, Func<int, IProcessHelper, IDesignModeClient> designModeInitializer, IProcessHelper processHelper)
         {
             Contract.Requires(options != null);
             this.commandLineOptions = options;
             this.testRequestManager = testRequestManager;
             this.designModeInitializer = designModeInitializer;
+            this.processHelper = processHelper;
         }
 
         #endregion
@@ -159,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             this.commandLineOptions.Port = portNumber;
             this.commandLineOptions.IsDesignMode = true;
-            this.designModeClient = this.designModeInitializer?.Invoke(this.commandLineOptions.ParentProcessId);
+            this.designModeClient = this.designModeInitializer?.Invoke(this.commandLineOptions.ParentProcessId, this.processHelper);
         }
 
         /// <summary>
@@ -182,16 +199,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         #endregion
 
-        private static IDesignModeClient InitializeDesignMode(int parentProcessId)
+        private static IDesignModeClient InitializeDesignMode(int parentProcessId, IProcessHelper processHelper)
         {
             if (parentProcessId > 0)
             {
-                var process = Process.GetProcessById(parentProcessId);
-                if (process != null && !process.HasExited)
+                processHelper.SetExitCallback(parentProcessId, () =>
                 {
-                    process.EnableRaisingEvents = true;
-                    process.Exited += (sender, e) => DesignModeClient.Instance?.HandleParentProcessExit();
-                }
+                    EqtTrace.Info($"PortArgumentProcessor: parent process:{parentProcessId} exited.");
+                    DesignModeClient.Instance?.HandleParentProcessExit();
+                });
             }
 
             DesignModeClient.Initialize();

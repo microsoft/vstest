@@ -27,15 +27,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private Mock<IDataCollectionManager> mockDataCollectionManager;
         private Mock<IDataCollectionTestCaseEventHandler> mockDataCollectionTestCaseEventHandler;
         private TestableDataCollectionRequestHandler requestHandler;
+        private Mock<IDataSerializer> mockDataSerializer;
 
         public DataCollectionRequestHandlerTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
             this.mockMessageSink = new Mock<IMessageSink>();
             this.mockDataCollectionManager = new Mock<IDataCollectionManager>();
+            this.mockDataSerializer = new Mock<IDataSerializer>();
             this.mockDataCollectionTestCaseEventHandler = new Mock<IDataCollectionTestCaseEventHandler>();
             this.mockDataCollectionTestCaseEventHandler.Setup(x => x.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
-            this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object);
+            this.requestHandler = new TestableDataCollectionRequestHandler(this.mockCommunicationManager.Object, this.mockMessageSink.Object, this.mockDataCollectionManager.Object, this.mockDataCollectionTestCaseEventHandler.Object, this.mockDataSerializer.Object);
         }
 
         [TestMethod]
