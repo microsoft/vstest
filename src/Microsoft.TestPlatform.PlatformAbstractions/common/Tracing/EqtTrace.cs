@@ -159,15 +159,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
+            if(!isInitialized)
+            {
+                return false;
+            }
+
             switch (traceLevel)
             {
                 case PlatformTraceLevel.Off:
                     return false;
                 case PlatformTraceLevel.Error:
+                    return Source.Switch.ShouldTrace(TraceEventType.Error);
                 case PlatformTraceLevel.Warning:
+                    return Source.Switch.ShouldTrace(TraceEventType.Warning);
                 case PlatformTraceLevel.Info:
+                    return Source.Switch.ShouldTrace(TraceEventType.Information);
                 case PlatformTraceLevel.Verbose:
-                    return isInitialized;
+                    return Source.Switch.ShouldTrace(TraceEventType.Verbose);
                 default:
                     Debug.Fail("Should never get here!");
                     return false;
