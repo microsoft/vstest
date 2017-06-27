@@ -84,11 +84,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         protected int ErrorLength { get; set; } = 4096;
 
         /// <summary>
-        /// Gets or sets the Timeout for runtime to initialize.
-        /// </summary>
-        protected int TimeOut { get; set; } = 10000;
-
-        /// <summary>
         /// Gets callback on process exit
         /// </summary>
         private Action<object> ExitCallBack => (process) =>

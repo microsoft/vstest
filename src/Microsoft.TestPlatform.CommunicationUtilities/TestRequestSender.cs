@@ -141,9 +141,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 while (!isDiscoveryComplete)
                 {
                     var rawMessage = this.TryReceiveRawMessage();
-                    if (EqtTrace.IsInfoEnabled)
+                    if (EqtTrace.IsVerboseEnabled)
                     {
-                        EqtTrace.Info("Received message: {0}", rawMessage);
+                        EqtTrace.Verbose("Received message: {0}", rawMessage);
                     }
 
                     // Send raw message first to unblock handlers waiting to send message to IDEs
