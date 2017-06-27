@@ -106,20 +106,20 @@ namespace vstest.console.Internal
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             //Gets the faulty test case if test aborted without reason
-            if (isAborted)
+            if (e.IsAborted)
             {
                 Output.WriteLine(string.Empty, OutputLevel.Information);
                 string testCaseName = GetFaultyTestCase(e);
                 string reason = String.Empty;
-                if(isStackoverFlow)
+                if (isStackoverFlow)
                 {
-                    reason = "StackoverflowException"+ Environment.NewLine + "Faulty Test is : " + testCaseName;
+                    reason = "StackoverflowException" + Environment.NewLine + "Faulty Test is : " + testCaseName;
                 }
                 else
                 {
                     reason = CommandLineResources.TestRunAbort + Environment.NewLine + "Faulty Test is : " + testCaseName;
                 }
-                Output.Error(reason);
+                Output.Error(reason);  
             }
         }
 
