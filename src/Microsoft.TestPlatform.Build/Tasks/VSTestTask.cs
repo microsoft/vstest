@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestLogger))
             {
-                allArgs.Add("--logger:" + this.VSTestLogger);
+                allArgs.Add("--logger:" + this.VSTestLogger.AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
@@ -227,7 +227,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 foreach(var arg in this.VSTestCollect)
                 {
-                    allArgs.Add("--collect:" + arg);
+                    allArgs.Add("--collect:" + arg.AddDoubleQuote());
                 }
             }
 
