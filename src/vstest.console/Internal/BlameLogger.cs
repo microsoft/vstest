@@ -106,7 +106,7 @@ namespace vstest.console.Internal
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             //Gets the faulty test case if test aborted without reason
-            if (e.IsAborted)
+            if (isAborted)
             {
                 Output.WriteLine(string.Empty, OutputLevel.Information);
                 string testCaseName = GetFaultyTestCase(e);
