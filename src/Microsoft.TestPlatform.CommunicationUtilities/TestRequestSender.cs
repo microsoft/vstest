@@ -141,7 +141,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 while (!isDiscoveryComplete)
                 {
                     var rawMessage = this.TryReceiveRawMessage();
-                    EqtTrace.Info("received message: {0}", rawMessage);
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("Received message: {0}", rawMessage);
+                    }
 
                     // Send raw message first to unblock handlers waiting to send message to IDEs
                     discoveryEventsHandler.HandleRawMessage(rawMessage);
