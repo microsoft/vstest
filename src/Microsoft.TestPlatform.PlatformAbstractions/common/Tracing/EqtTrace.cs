@@ -159,11 +159,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
-            if(!isInitialized)
-            {
-                return false;
-            }
-
             switch (traceLevel)
             {
                 case PlatformTraceLevel.Off:
