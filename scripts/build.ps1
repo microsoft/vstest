@@ -251,6 +251,7 @@ function Publish-Package
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
     Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
+
     
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
@@ -264,6 +265,23 @@ function Publish-Package
     # Ideally we should just be publishing the loggers to the Extensions folder.
     $loggers = @("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
     foreach($file in $loggers) {
+        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
+        
+        Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
+        Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
+    }
+
+    # Publish DATACOLLECTOR
+    $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.BlameDataCollector\bin\$TPB_Configuration"
+    $blameDataCollectorNet46 = Join-Path $blameDataCollector $TPB_TargetFramework
+    $blameDataCollectorNetCore = Join-Path $blameDataCollector $TPB_TargetFrameworkCore
+    Copy-Item $blameDataCollectorNet46\* $fullCLRPackageDir -Force
+    Copy-Item $blameDataCollectorNetCore\* $coreCLR20PackageDir -Force
+
+    # Note Note: Move the Blame data collector to extensions folder
+    $datacollector = @("Blamedatacollector.dll","Blamedatacollector.pdb")
+    foreach($file in $datacollector) {
         Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
         Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
         

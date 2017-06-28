@@ -1,18 +1,12 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using Microsoft.VisualStudio.TestPlatform.DataCollector;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-using Constants = vstest.console.ConsoleConstants;
 
-namespace vstest.console.Internal
+namespace Microsoft.TestPlatform.BlameDataCollector
 {
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
@@ -94,10 +88,10 @@ namespace vstest.console.Internal
 
             if (e.Level == TestMessageLevel.Error)
             {
-                this.isAborted = e.Message.Equals(CommandLineResources.TestRunAbort) || e.Message.Contains(CommandLineResources.TestRunAbortStackOverFlow);
-                this.isStackoverFlow = e.Message.Contains(CommandLineResources.TestRunAbortStackOverFlow);
+                this.isAborted = e.Message.Equals(Constants.TestRunAbort) || e.Message.Contains(Constants.TestRunAbortStackOverFlow);
+                this.isStackoverFlow = e.Message.Contains(Constants.TestRunAbortStackOverFlow);
             }
-            
+
         }
 
         /// <summary>
@@ -117,9 +111,9 @@ namespace vstest.console.Internal
                 }
                 else
                 {
-                    reason = CommandLineResources.TestRunAbort + Environment.NewLine + "Faulty Test is : " + testCaseName;
+                    reason = Constants.TestRunAbort + Environment.NewLine + "Faulty Test is : " + testCaseName;
                 }
-                Output.Error(reason);  
+                Output.Error(reason);
             }
         }
 

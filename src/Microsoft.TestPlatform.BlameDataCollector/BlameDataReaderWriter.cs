@@ -1,13 +1,9 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
-
-using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector
+namespace Microsoft.TestPlatform.BlameDataCollector
 {
     public class BlameDataReaderWriter
     {
@@ -64,4 +60,3 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         }
     }
 }
-

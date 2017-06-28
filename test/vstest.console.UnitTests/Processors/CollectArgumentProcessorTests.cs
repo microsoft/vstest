@@ -18,14 +18,12 @@ namespace vstest.console.UnitTests.Processors
     {
         private TestableRunSettingsProvider settingsProvider;
         private CollectArgumentExecutor executor;
-        private DummyTestLoggerManager testloggerManager;
         private const string DefaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";
 
         public CollectArgumentProcessorTests()
         {
             this.settingsProvider = new TestableRunSettingsProvider();
-            this.testloggerManager = new DummyTestLoggerManager();
-            this.executor = new CollectArgumentExecutor(this.settingsProvider, testloggerManager);
+            this.executor = new CollectArgumentExecutor(this.settingsProvider);
             CollectArgumentExecutor.EnabledDataCollectors.Clear();
         }
 
@@ -138,12 +136,12 @@ namespace vstest.console.UnitTests.Processors
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"MyDataCollector\" enabled=\"True\" />\r\n      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
         }
 
-        [TestMethod]
-        public void ExecutorInitializeWithBlameArgumentsShouldAddBlameloggerToTestLoggerManager()
-        {
-            executor.Initialize("blame");
-            Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/BlameLogger"));
-        }
+        //[TestMethod]
+        //public void ExecutorInitializeWithBlameArgumentsShouldAddBlameloggerToTestLoggerManager()
+        //{
+        //    executor.Initialize("blame");
+        //    Assert.IsTrue(testloggerManager.GetInitializedLoggers.Contains("logger://Microsoft/TestPlatform/BlameLogger"));
+        //}
 
         #endregion
     }

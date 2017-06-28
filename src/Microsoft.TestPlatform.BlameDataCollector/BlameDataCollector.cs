@@ -1,7 +1,8 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector
+namespace Microsoft.TestPlatform.BlameDataCollector
 {
     using System;
     using System.Collections.Generic;
@@ -9,10 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using FileHelper = Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.FileHelper;
-    using System.Text;
-    using Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces;
 
     [DataCollectorFriendlyName("Blame")]
     [DataCollectorTypeUri("my://sample/datacollector")]
@@ -169,12 +166,15 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
         /// <summary>
         /// Test Name Attribute.
         /// </summary>
-        public const string TestNameAttribute= "Name";
+        public const string TestNameAttribute = "Name";
 
         /// <summary>
         /// Test Source Attribute.
         /// </summary>
         public const string TestSourceAttribute = "Source";
+        public const string TestRunAbort = "The active test run was aborted. Reason: ";
+        public const string TestRunAbortStackOverFlow = "The active test run was aborted. Reason: Process is terminated due to StackOverflowException.";
+        public const string BlameDataCollectorName = "Blame";
 
     }
 }

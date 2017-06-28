@@ -2,9 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Xml;
 
-namespace Microsoft.VisualStudio.TestPlatform.DataCollector.Interfaces
+namespace Microsoft.TestPlatform.BlameDataCollector
 {
     public interface IBlameFileManager
     {
