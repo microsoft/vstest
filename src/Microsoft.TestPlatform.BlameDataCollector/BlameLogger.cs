@@ -63,12 +63,12 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// Initializes the Logger.
         /// </summary>
         /// <param name="events">Events that can be registered for.</param>
-        /// <param name="testRunDirectory">Test Run Directory</param>
+        /// <param name="testRunDictionary">Test Run Directory</param>
         public void Initialize(TestLoggerEvents events, string testRunDictionary)
         {
             if (events == null)
             {
-                throw new ArgumentNullException("events");
+                throw new ArgumentNullException(nameof(events));
             }
 
             if (BlameLogger.Output == null)
@@ -104,21 +104,20 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             ValidateArg.NotNull<TestRunCompleteEventArgs>(e, "e");
 
             // Gets the faulty test case if test aborted without reason
-            if (isAborted)
+            if (!isAborted) return;
+
+            Output.WriteLine(string.Empty, OutputLevel.Information);
+            var testCaseName = GetFaultyTestCase(e);
+            string reason;
+            if (isStackoverFlow)
             {
-                Output.WriteLine(string.Empty, OutputLevel.Information);
-                string testCaseName = GetFaultyTestCase(e);
-                string reason = String.Empty;
-                if (isStackoverFlow)
-                {
-                    reason = "StackoverflowException" + Environment.NewLine + "Faulty Test is : " + testCaseName;
-                }
-                else
-                {
-                    reason = Constants.TestRunAbort + Environment.NewLine + "Faulty Test is : " + testCaseName;
-                }
-                Output.Error(reason);
+                reason = "StackoverflowException" + Environment.NewLine + "Faulty Test is : " + testCaseName;
             }
+            else
+            {
+                reason = Constants.TestRunAbort + Environment.NewLine + "Faulty Test is : " + testCaseName;
+            }
+            Output.Error(reason);
         }
 
         #endregion
@@ -127,7 +126,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Fetches faulty test case in case of test host crash 
         /// </summary>
-        private string GetFaultyTestCase(TestRunCompleteEventArgs e)
+        private static string GetFaultyTestCase(TestRunCompleteEventArgs e)
         {
             string testname = null;
             foreach (var attachmentSet in e.AttachmentSets)
@@ -143,7 +142,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Reads file for last test case
         /// </summary>
-        private string GetTestFromFile(string filepath)
+        private static string GetTestFromFile(string filepath)
         {
             var dataReader = new BlameDataReaderWriter(filepath, new XmlFileManager());
             var testCase = dataReader.GetLastTestCase();

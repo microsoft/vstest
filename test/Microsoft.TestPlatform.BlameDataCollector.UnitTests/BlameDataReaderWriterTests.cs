@@ -58,10 +58,12 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         public void WriteTestsToFileShouldAddTestsInFormat()
         {
             // Initialize blameDataWriter
-            TestCase testcase = new TestCase();
-            testcase.Id = Guid.NewGuid();
-            testcase.FullyQualifiedName = "TestProject.UnitTest.TestMethod";
-            testcase.Source = "abc.dll";
+            TestCase testcase = new TestCase
+            {
+                Id = Guid.NewGuid(),
+                FullyQualifiedName = "TestProject.UnitTest.TestMethod",
+                Source = "abc.dll"
+            };
             TestSequence.Add(testcase);
             this.blameDataReaderWriter = new BlameDataReaderWriter(this.TestSequence, this.filePath, this.mockBlamefileManager.Object);
 

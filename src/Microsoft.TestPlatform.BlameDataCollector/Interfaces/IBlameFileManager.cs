@@ -16,14 +16,14 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Adds tests to document
         /// </summary>
-        /// <param name="TestSequence">List of tests in sequence</param>
-        /// <param name="filepath">The path of saved file</param>
-        void AddTestsToFormat(List<TestCase> TestSequence, string filePath);
+        /// <param name="testSequence">List of tests in sequence</param>
+        /// <param name="filePath">The path of saved file</param>
+        void AddTestsToFormat(List<TestCase> testSequence, string filePath);
 
         /// <summary>
         /// Reads Faulty test case from file
         /// </summary>
-        /// <param name="filepath">The path of saved file</param>
+        /// <param name="filePath">The path of saved file</param>
         /// <returns>Faulty test case</returns>
         TestCase ReadLastTestCase(string filePath);
     }
