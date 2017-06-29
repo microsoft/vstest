@@ -284,7 +284,7 @@ function publish_package()
         for project in "${projects[@]}" ;
         do
             log ".. Package: Publish $project"
-            $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal --p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
+            $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
         done
 
         # Copy TestHost for desktop targets if we've built net46
