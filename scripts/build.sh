@@ -315,7 +315,6 @@ function publish_package()
         done
         newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
         cp $newtonsoft $packageDir
->>>>>>> bf43157... Add platform abstraction for OS name and architecture. (#851)
     done
 
     # Publish TestHost for netcoreapp1.0 target
