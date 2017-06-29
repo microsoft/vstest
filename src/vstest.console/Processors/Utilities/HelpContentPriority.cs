@@ -98,6 +98,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         EnableDiagArgumentProcessorHelpPriority,
 
         /// <summary>
+        /// EnableBlameArgumentProcessor Help
+        /// </summary>
+        EnableBlameArgumentProcessorHelpPriority,
+
+        /// <summary>
         /// EnableLoggerArgumentProcessor Help
         /// </summary>
         EnableLoggerArgumentProcessorHelpPriority,

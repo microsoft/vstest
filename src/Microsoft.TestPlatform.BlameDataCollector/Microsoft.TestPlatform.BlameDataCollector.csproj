@@ -8,7 +8,7 @@
     <RootNamespace>Microsoft.TestPlatform.BlameDataCollector</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyName>BlameDataCollector</AssemblyName>
+    <AssemblyName>Microsoft.TestPlatform.BlameDataCollector</AssemblyName>
     <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net46</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PackageTargetFallback Condition=" '$(TargetFramework)' != 'net46' ">$(PackageTargetFallback);dnxcore50;netstandardapp1.0;portable-net45+win8;portable-net45+wp80+win8+wpa81+dnxcore50</PackageTargetFallback>

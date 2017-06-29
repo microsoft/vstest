@@ -476,6 +476,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to --Blame|/Blame 
+        ///      Enable Blame mode for diagnosis of faulty test case
+        /// </summary>
+        public static string EnableBlameUsage
+        {
+            get
+            {
+                return ResourceManager.GetString("EnableBlameUsage", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
         ///      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]

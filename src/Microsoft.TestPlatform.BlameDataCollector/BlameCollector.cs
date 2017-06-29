@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.BlameDataCollector
 {
@@ -12,8 +11,8 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     [DataCollectorFriendlyName("Blame")]
-    [DataCollectorTypeUri("my://sample/datacollector")]
-    public class BlameDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier
+    [DataCollectorTypeUri("my://blame/datacollector")]
+    public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
@@ -26,8 +25,8 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
-        public BlameDataCollector()
-            : this(new BlameXmlManager())
+        public BlameCollector()
+            : this(new XmlFileManager())
         {
         }
 
@@ -35,7 +34,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
         /// <param name="blameFileManager">BlameFileManager instance.</param>
-        internal BlameDataCollector(IBlameFileManager blameFileManager)
+        public BlameCollector(IBlameFileManager blameFileManager)
         {
             this.blameFileManager = blameFileManager;
         }
@@ -63,22 +62,14 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         {
             ValidateArg.NotNull(logger, nameof(logger));
             this.events = events;
-            this.events.SessionStart += this.SessionStarted_Handler;
-            this.events.SessionEnd += this.SessionEnded_Handler;
-            this.events.TestCaseStart += this.Events_TestCaseStart;
-            this.events.TestCaseEnd += this.Events_TestCaseEnd;
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
             this.logger = logger;
             TestSequence = new List<TestCase>();
-        }
 
-        /// <summary>
-        /// Called when Test Case End event is invoked 
-        /// </summary>
-        private void Events_TestCaseEnd(object sender, TestCaseEndEventArgs e)
-        {
-            EqtTrace.Info(Constants.TestCaseEnd);
+            // Subscribing to events
+            this.events.SessionEnd += this.SessionEnded_Handler;
+            this.events.TestCaseStart += this.Events_TestCaseStart;
         }
 
         /// <summary>
@@ -89,14 +80,6 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             EqtTrace.Info(Constants.TestCaseStart);
             TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
             TestSequence.Add(testcase);
-        }
-
-        /// <summary>
-        /// Called when Session Start Event is invoked 
-        /// </summary>
-        private void SessionStarted_Handler(object sender, SessionStartEventArgs args)
-        {
-            EqtTrace.Info(Constants.TestSessionStart);
         }
 
         /// <summary>
@@ -114,67 +97,10 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Destructor to unregister methods and cleanup
         /// </summary>
-        ~BlameDataCollector()
+        ~BlameCollector()
         {
-            this.events.SessionStart -= this.SessionStarted_Handler;
             this.events.SessionEnd -= this.SessionEnded_Handler;
             this.events.TestCaseStart -= this.Events_TestCaseStart;
-            this.events.TestCaseEnd -= this.Events_TestCaseEnd;
         }
-    }
-
-    /// <summary>
-    /// Class for constants used across the class.
-    /// </summary>
-    internal static class Constants
-    {
-        /// <summary>
-        /// The test session start constant.
-        /// </summary>
-        public const string TestSessionStart = "TestSessionStart";
-
-        /// <summary>
-        /// The test session end constant.
-        /// </summary>
-        public const string TestSessionEnd = "TestSessionEnd";
-
-        /// <summary>
-        /// The test case start constant.
-        /// </summary>
-        public const string TestCaseStart = "TestCaseStart";
-
-        /// <summary>
-        /// The test case end method name.
-        /// </summary>
-        public const string TestCaseEnd = "TestCaseEnd";
-
-        /// <summary>
-        /// Root node name for Xml file.
-        /// </summary>
-        public const string BlameRootNode = "TestSequence";
-
-        /// <summary>
-        /// Node name for each Xml node.
-        /// </summary>
-        public const string BlameTestNode = "Test";
-
-        /// <summary>
-        /// Attachment File name.
-        /// </summary>
-        public const string AttachmentFileName = "TestSequence.xml";
-
-        /// <summary>
-        /// Test Name Attribute.
-        /// </summary>
-        public const string TestNameAttribute = "Name";
-
-        /// <summary>
-        /// Test Source Attribute.
-        /// </summary>
-        public const string TestSourceAttribute = "Source";
-        public const string TestRunAbort = "The active test run was aborted. Reason: ";
-        public const string TestRunAbortStackOverFlow = "The active test run was aborted. Reason: Process is terminated due to StackOverflowException.";
-        public const string BlameDataCollectorName = "Blame";
-
     }
 }

@@ -1,16 +1,17 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.BlameDataCollector
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using System;
+
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
-    class BlameLogger : ITestLogger
+    public class BlameLogger : ITestLogger
     {
         #region Constants
 
@@ -44,7 +45,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// Constructor added for testing purpose
         /// </summary>
         /// <param name="output"></param>
-        internal BlameLogger(IOutput output)
+        public BlameLogger(IOutput output)
         {
             BlameLogger.Output = output;
         }
@@ -99,7 +100,10 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
-            //Gets the faulty test case if test aborted without reason
+            ValidateArg.NotNull<object>(sender, "sender");
+            ValidateArg.NotNull<TestRunCompleteEventArgs>(e, "e");
+
+            // Gets the faulty test case if test aborted without reason
             if (isAborted)
             {
                 Output.WriteLine(string.Empty, OutputLevel.Information);
@@ -137,11 +141,11 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         }
 
         /// <summary>
-        /// Reads file for faulty test case
+        /// Reads file for last test case
         /// </summary>
         private string GetTestFromFile(string filepath)
         {
-            var dataReader = new BlameDataReaderWriter(filepath, new BlameXmlManager());
+            var dataReader = new BlameDataReaderWriter(filepath, new XmlFileManager());
             var testCase = dataReader.GetLastTestCase();
             return testCase.FullyQualifiedName;
         }

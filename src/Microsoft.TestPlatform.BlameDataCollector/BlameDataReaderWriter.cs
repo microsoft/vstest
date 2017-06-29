@@ -1,10 +1,11 @@
-﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.BlameDataCollector
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using System.Collections.Generic;
+
     public class BlameDataReaderWriter
     {
         private string filePath;
@@ -41,22 +42,21 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         public void WriteTestsToFile()
         {
+            // Initialize Helper
             blameFileManager.InitializeHelper();
 
-            foreach (var test in TestSequence)
-            {
-                blameFileManager.AddTestToFormat(test);
-            }
-            blameFileManager.SaveToFile(this.filePath);
+            // Adds all tests to file
+            blameFileManager.AddTestsToFormat(this.TestSequence, this.filePath);
+
         }
 
         /// <summary>
-        /// Gets faulty test case from the file
+        /// Gets last test case from the file
         /// </summary>
-        /// <returns>Faulty test case</returns>
+        /// <returns>Last test case</returns>
         public TestCase GetLastTestCase()
         {
-            return blameFileManager.ReadFaultyTestCase(this.filePath);
+            return blameFileManager.ReadLastTestCase(this.filePath);
         }
     }
 }

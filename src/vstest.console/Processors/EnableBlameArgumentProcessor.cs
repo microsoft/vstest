@@ -4,20 +4,13 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using System.IO;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using Microsoft.VisualStudio.TestPlatform.Common;
-    using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -85,11 +78,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Diag;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Blame;
 
-        public override string HelpContentResourceName => CommandLineResources.EnableDiagUsage;
+        public override string HelpContentResourceName => CommandLineResources.EnableBlameUsage;
 
-        public override HelpContentPriority HelpPriority => HelpContentPriority.EnableDiagArgumentProcessorHelpPriority;
+        public override HelpContentPriority HelpPriority => HelpContentPriority.EnableBlameArgumentProcessorHelpPriority;
     }
 
     /// <summary>
@@ -104,6 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         internal static List<string> EnabledDataCollectors = new List<string>();
         private readonly TestLoggerManager loggerManager;
         private static string BlameFriendlyName = "Blame";
+
         internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, TestLoggerManager loggerManager)
         {
             this.runSettingsManager = runSettingsManager;
@@ -120,12 +114,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            
+            // Adding Blame Logger to Logger list
             string loggerIdentifier = null;
             Dictionary<string, string> parameters = null;
             var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
             this.loggerManager.UpdateLoggerList(BlameFriendlyName.ToLower(), BlameFriendlyName.ToLower(), parameters);
 
+            // Adding Blame Data Collector to Enabled Data Collectors List
             CollectArgumentExecutor.EnabledDataCollectors.Add(BlameFriendlyName.ToLower());
 
             var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
@@ -152,7 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <returns>The <see cref="ArgumentProcessorResult"/>.</returns>
         public ArgumentProcessorResult Execute()
         {
-            // Nothing to do since we updated the parameter during initialize parameter
+            // Nothing to do since we updated the logger and data collector list in initialize
             return ArgumentProcessorResult.Success;
         }
 
