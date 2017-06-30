@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     public class InferRunSettingsHelper
     {
         private const string DesignModeNodeName = "DesignMode";
+        private const string CollectSourceInformationNodeName = "CollectSourceInformation";
         private const string RunSettingsNodeName = "RunSettings";
         private const string RunConfigurationNodeName = "RunConfiguration";
         private const string ResultsDirectoryNodeName = "ResultsDirectory";
@@ -26,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetFrameworkNodeName = "TargetFrameworkVersion";
 
         private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
+        private const string CollectSourceInformationNodePath = @"/RunSettings/RunConfiguration/CollectSourceInformation";
         private const string RunConfigurationNodePath = @"/RunSettings/RunConfiguration";
         private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
@@ -87,18 +89,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="designModeValue">Value to set</param>
         public static void UpdateDesignMode(XPathNavigator runSettingsNavigator, bool designModeValue)
         {
+            AddNodeIfNotPresent<bool>(runSettingsNavigator, DesignModeNodePath, DesignModeNodeName, designModeValue);            
+        }
+
+        /// <summary>
+        /// Updates the <c>RunConfiguration.CollectSourceInformation</c> value for a run settings. Doesn't do anything if the value is already set.
+        /// </summary>
+        /// <param name="runSettingsNavigator">Navigator for runsettings xml</param>
+        /// <param name="collectSourceInformationValue">Value to set</param>
+        public static void UpdateCollectSourceInformation(XPathNavigator runSettingsNavigator, bool collectSourceInformationValue)
+        {
+            AddNodeIfNotPresent<bool>(runSettingsNavigator, CollectSourceInformationNodePath, CollectSourceInformationNodeName, collectSourceInformationValue);
+        }
+
+        /// <summary>
+        /// Adds node under RunConfiguration setting. Noop if node is already present.
+        /// </summary>
+        private static void AddNodeIfNotPresent<T>(XPathNavigator runSettingsNavigator, string nodePath, string nodeName, T nodeValue)
+        {
             // Navigator should be at Root of runsettings xml, attempt to move to /RunSettings/RunConfiguration
             if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
-!runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+                !runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
             {
-                EqtTrace.Error("InferRunSettingsHelper.UpdateDesignMode: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                EqtTrace.Error("InferRunSettingsHelper.UpdateNodeIfNotPresent: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
                 return;
             }
 
-            var hasDesignMode = runSettingsNavigator.SelectSingleNode(DesignModeNodePath) != null;
-            if (!hasDesignMode)
+            var hasNode = runSettingsNavigator.SelectSingleNode(nodePath) != null;
+            if (!hasNode)
             {
-                XmlUtilities.AppendOrModifyChild(runSettingsNavigator, DesignModeNodePath, DesignModeNodeName, designModeValue.ToString());
+                XmlUtilities.AppendOrModifyChild(runSettingsNavigator, nodePath, nodeName, nodeValue.ToString());
                 runSettingsNavigator.MoveToRoot();
             }
         }

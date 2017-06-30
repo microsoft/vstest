@@ -63,6 +63,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private bool designMode;
 
+        /// <summary>
+        /// False indicates that the test adapter should not collect source information for discovered tests
+        /// </summary>
+        private bool shouldCollectSourceInformation;
+
         #endregion
 
         #region Constructor
@@ -85,6 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.disableAppDomain = false;
             this.disableParallelization = false;
             this.designMode = false;
+            this.shouldCollectSourceInformation = this.designMode;
         }
 
         #endregion
@@ -163,6 +169,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.designMode = value;
                 this.DesignModeSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether test adapter needs to collect source information for discovered tests
+        /// </summary>
+        public bool ShouldCollectSourceInformation
+        {
+            get
+            {
+                return (this.CollectSourceInformationSet) ? this.shouldCollectSourceInformation : this.designMode;
+            }
+
+            set
+            {
+                this.shouldCollectSourceInformation = value;
+                this.CollectSourceInformationSet = true;
             }
         }
 
@@ -353,7 +376,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Collect source information
         /// </summary>
-        public bool CollectSourceInformation { get; private set; }
+        public bool CollectSourceInformationSet { get; private set; } = false;
 
         #endregion
 
@@ -362,6 +385,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public override XmlElement ToXml()
         {
+            System.Diagnostics.Debugger.Launch();
+
             XmlDocument doc = new XmlDocument();
 
             XmlElement root = doc.CreateElement(Constants.RunConfigurationSettingsName);
@@ -385,6 +410,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement designMode = doc.CreateElement("DesignMode");
             designMode.InnerXml = this.DesignMode.ToString();
             root.AppendChild(designMode);
+
+            XmlElement collectSourceInformation = doc.CreateElement("CollectSourceInformation");
+            collectSourceInformation.InnerXml = this.ShouldCollectSourceInformation.ToString();
+            root.AppendChild(collectSourceInformation);
 
             XmlElement disableAppDomain = doc.CreateElement("DisableAppDomain");
             disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
@@ -457,7 +486,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, bCollectSourceInformation, elementName));
                             }
 
-                            runConfiguration.CollectSourceInformation = bCollectSourceInformation;
+                            runConfiguration.ShouldCollectSourceInformation = bCollectSourceInformation;
                             break;
 
                         case "MaxCpuCount":
