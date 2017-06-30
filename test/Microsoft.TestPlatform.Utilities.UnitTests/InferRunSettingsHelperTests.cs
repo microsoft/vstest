@@ -266,8 +266,6 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/CollectSourceInformation"));
         }   
 
-            
-
         #region private methods
 
         private XPathNavigator GetNavigator(string settingsXml)
