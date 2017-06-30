@@ -96,12 +96,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 var testHostStartInfo = this.UpdateTestProcessStartInfo(this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo));
 
                 // Launch the test host.
-                CancellationTokenSource hostLaunchCts = new CancellationTokenSource();
-                Task<int> hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo);
+                var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo);
 
                 try
                 {
-                    hostLaunchedTask.Wait(hostLaunchCts.Token);
                     this.testHostProcessId = hostLaunchedTask.Result;
                 }
                 catch (OperationCanceledException ex)
@@ -175,8 +173,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.initialized = false;
 
                 // We don't need to terminate if the test host has already terminated. The upper bound
-                // for wait should be 1s.
-                if (!this.testHostExited.Wait(1000) && this.testHostProcessId != -1)
+                // for wait should be 100ms.
+                if (this.testHostProcessId != -1 && !this.testHostExited.Wait(100))
                 {
                     EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
                     this.testHostManager.TerminateAsync(this.testHostProcessId, CancellationToken.None).Wait();

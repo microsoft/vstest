@@ -47,7 +47,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private ITestHostLauncher customTestHostLauncher;
         private Process testHostProcess;
-        private CancellationTokenSource hostLaunchCts;
         private StringBuilder testHostProcessStdError;
         private IMessageLogger messageLogger;
         private bool hostExitedEventRaised;
@@ -93,11 +92,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         protected int ErrorLength { get; set; } = 4096;
 
         /// <summary>
-        /// Gets or sets the Timeout for runtime to initialize.
-        /// </summary>
-        protected int TimeOut { get; set; } = 10000;
-
-        /// <summary>
         /// Gets callback on process exit
         /// </summary>
         private Action<object> ExitCallBack => (process) =>
@@ -122,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
-            return await Task.Run(() => this.LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
+            return await Task.Run(() => this.LaunchHost(testHostStartInfo), CancellationToken.None);
         }
 
         /// <inheritdoc/>
@@ -242,12 +236,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 this.hostExitedEventRaised = true;
                 this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
             }
-        }
-
-        private CancellationTokenSource GetCancellationTokenSource()
-        {
-            this.hostLaunchCts = new CancellationTokenSource(this.TimeOut);
-            return this.hostLaunchCts;
         }
 
         private int LaunchHost(TestProcessStartInfo testHostStartInfo)
