@@ -5,7 +5,6 @@ namespace Microsoft.TestPlatform.BlameDataCollector
 {
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System;
 
@@ -24,16 +23,6 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// Alternate user friendly string to uniquely identify the Blame logger.
         /// </summary>
         public const string FriendlyName = "Blame";
-
-        /// <summary>
-        /// Parameter for test run abort
-        /// </summary>
-        private bool isAborted = false;
-
-        /// <summary>
-        /// Parameter for Stack overflow 
-        /// </summary>
-        private bool isStackoverFlow = false;
 
         #endregion
 
@@ -75,24 +64,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             {
                 BlameLogger.Output = ConsoleOutput.Instance;
             }
-            events.TestRunMessage += this.TestMessageHandler;
             events.TestRunComplete += this.TestRunCompleteHandler;
-        }
-
-        /// <summary>
-        /// Called when a test message is received.
-        /// </summary>
-        private void TestMessageHandler(object sender, TestRunMessageEventArgs e)
-        {
-            ValidateArg.NotNull<object>(sender, "sender");
-            ValidateArg.NotNull<TestRunMessageEventArgs>(e, "e");
-
-            if (e.Level == TestMessageLevel.Error)
-            {
-                this.isAborted = e.Message.Equals(Constants.TestRunAbort) || e.Message.Contains(Constants.TestRunAbortStackOverFlow);
-                this.isStackoverFlow = e.Message.Contains(Constants.TestRunAbortStackOverFlow);
-            }
-
         }
 
         /// <summary>
@@ -103,20 +75,13 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunCompleteEventArgs>(e, "e");
 
-            // Gets the faulty test case if test aborted without reason
-            if (!isAborted) return;
-
             Output.WriteLine(string.Empty, OutputLevel.Information);
+            if (!e.IsAborted) return;
+
+            // Gets the faulty test case if test aborted without reason
             var testCaseName = GetFaultyTestCase(e);
             string reason;
-            if (isStackoverFlow)
-            {
-                reason = "StackoverflowException" + Environment.NewLine + "Faulty Test is : " + testCaseName;
-            }
-            else
-            {
-                reason = Constants.TestRunAbort + Environment.NewLine + "Faulty Test is : " + testCaseName;
-            }
+            reason = "The active test run was aborted because the host process existed unexpectedly while executing test " + testCaseName;
             Output.Error(reason);
         }
 

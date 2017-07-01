@@ -36,16 +36,6 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         }
 
         [TestMethod]
-        public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
-        {
-            // Raise an event on mock object
-            Assert.ThrowsException<ArgumentNullException>(() =>
-            {
-                this.testRunRequest.Raise(m => m.TestRunMessage += null, default(TestRunMessageEventArgs));
-            });
-        }
-
-        [TestMethod]
         public void TestResulCompleteHandlerShouldThowExceptionIfEventArgsIsNull()
         {
             // Raise an event on mock object

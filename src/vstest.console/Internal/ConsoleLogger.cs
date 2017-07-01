@@ -69,7 +69,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private int testsPassed = 0;
         private int testsFailed = 0;
         private int testsSkipped = 0;
-        //private bool isAborted = false;
 
         #endregion
 
@@ -321,11 +320,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     break;
                 case TestMessageLevel.Error:
                     this.testOutcome = TestOutcome.Failed;
-                    var isTestRunAborted = e.Message.Equals(CommandLineResources.TestRunAbort);
-                    if (!isTestRunAborted)
-                    {
-                        Output.Error(e.Message);
-                    }
+                    Output.Error(e.Message);
                     break;
                 default:
                     Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
