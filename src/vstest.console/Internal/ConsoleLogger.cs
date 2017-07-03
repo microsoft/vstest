@@ -17,10 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Constants = vstest.console.ConsoleConstants;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-    using System.IO;
-    using System.Xml;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-
+    
     /// <summary>
     /// Logger for sending output to the console.
     /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
