@@ -251,7 +251,6 @@ function Publish-Package
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
     Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
-
     
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
