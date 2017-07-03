@@ -19,6 +19,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -59,13 +60,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockMessageLogger = new Mock<IMessageLogger>();
+            var mockEnvironment = new Mock<IEnvironment>();
             this.defaultConnectionInfo = default(TestRunnerConnectionInfo);
             string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
             this.defaultTestHostPath = @"\tmp\testhost.dll";
             this.dotnetHostManager = new TestableDotnetTestHostManager(
                                          this.mockProcessHelper.Object,
                                          this.mockFileHelper.Object,
-                                         new DotnetHostHelper(this.mockFileHelper.Object),
+                                         new DotnetHostHelper(this.mockFileHelper.Object, mockEnvironment.Object),
                                          this.maxStdErrStringLength);
             this.dotnetHostManager.Initialize(this.mockMessageLogger.Object, string.Empty);
 
