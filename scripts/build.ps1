@@ -232,10 +232,6 @@ function Publish-Package
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
-    # Overwrite datacollector.config file for netcore
-    $dataCollectorNetCoreConfigSource = Join-Path $env:TP_ROOT_DIR ".\src\datacollector\app_netcore.config"
-    $dataCollectorNetCoreConfigDest = Join-Path $fullDestDir "datacollector.exe.config"
-    Copy-Item $dataCollectorNetCoreConfigSource  $dataCollectorNetCoreConfigDest  -Force 
 
     $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
@@ -298,8 +294,8 @@ function Publish-Package
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 }
 
 function Create-VsixPackage
