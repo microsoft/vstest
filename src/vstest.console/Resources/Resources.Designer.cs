@@ -1821,21 +1821,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
                 return ResourceManager.GetString("DataCollectorFriendlyNameInvalid", resourceCulture);
             }
         }
-
-        public static string TestRunAbort
-        {
-            get
-            {
-                return ResourceManager.GetString("TestRunAbort", resourceCulture);
-            }
-        }
-
-        public static string TestRunAbortStackOverFlow
-        {
-            get
-            {
-                return ResourceManager.GetString("TestRunAbortStackOverFlow", resourceCulture);
-            }
-        }
     }
 }
