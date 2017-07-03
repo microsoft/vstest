@@ -9,11 +9,6 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     internal static class Constants
     {
         /// <summary>
-        /// The test session start constant.
-        /// </summary>
-        public const string TestSessionStart = "TestSessionStart";
-
-        /// <summary>
         /// The test session end constant.
         /// </summary>
         public const string TestSessionEnd = "TestSessionEnd";
@@ -22,11 +17,6 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// The test case start constant.
         /// </summary>
         public const string TestCaseStart = "TestCaseStart";
-
-        /// <summary>
-        /// The test case end method name.
-        /// </summary>
-        public const string TestCaseEnd = "TestCaseEnd";
 
         /// <summary>
         /// Root node name for Xml file.
@@ -52,17 +42,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// Test Source Attribute.
         /// </summary>
         public const string TestSourceAttribute = "Source";
-
-        /// <summary>
-        /// Abort Message
-        /// </summary>
-        public const string TestRunAbort = "The active test run was aborted. Reason: ";
-
-        /// <summary>
-        /// Stakoverflow Message
-        /// </summary>
-        public const string TestRunAbortStackOverFlow = "The active test run was aborted. Reason: Process is terminated due to StackOverflowException.";
-
+        
         /// <summary>
         /// Friendly name of the data collector
         /// </summary>
