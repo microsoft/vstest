@@ -9,9 +9,6 @@ namespace vstest.console.UnitTests.Processors
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
-    using vstest.console.UnitTests.TestDoubles;
 
     [TestClass]
     public class CollectArgumentProcessorTests
@@ -85,7 +82,7 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldCreateEntryForDataCollectorInRunSettingsIfNotAlreadyPresent()
         {
-            var runsettingsString = string.Format(DefaultRunSettings, "");
+            var runsettingsString = string.Format(DefaultRunSettings,"");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
             this.settingsProvider.SetActiveRunSettings(runsettings);
