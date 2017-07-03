@@ -11,14 +11,14 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     [DataCollectorFriendlyName("Blame")]
-    [DataCollectorTypeUri("my://blame/datacollector")]
+    [DataCollectorTypeUri("datacollector://microsoft/blame/1.0")]
     public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
         private DataCollectionLogger logger;
         private DataCollectionEvents events;
-        private List<TestCase> TestSequence;
+        private List<object> TestSequence;
         private BlameDataReaderWriter dataWriter;
         private IBlameFileManager blameFileManager;
 
@@ -45,7 +45,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <returns>Environment variables that should be set in the test execution environment</returns>
         public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
         {
-            return new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("key", "value") };
+            return new List<KeyValuePair<string, string>> { };
         }
 
         /// <summary>
@@ -65,7 +65,8 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
             this.logger = logger;
-            TestSequence = new List<TestCase>();
+            this.dataWriter = new BlameDataReaderWriter(this.blameFileManager);
+            TestSequence = new List<object>();
 
             // Subscribing to events
             this.events.SessionEnd += this.SessionEnded_Handler;
@@ -77,9 +78,16 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
         {
-            EqtTrace.Info(Constants.TestCaseStart);
-            TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
-            TestSequence.Add(testcase);
+            try
+            {
+                EqtTrace.Info("Blame Collector : Events_TestCaseStart");
+                TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
+                TestSequence.Add(testcase);
+            }
+            catch(Exception exception)
+            {
+                EqtTrace.Error("BlameCollector Events_TestCaseStart : Exception {0}", exception);
+            }
         }
 
         /// <summary>
@@ -87,11 +95,17 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void SessionEnded_Handler(object sender, SessionEndEventArgs args)
         {
-            var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
-            EqtTrace.Info(Constants.TestSessionEnd);
-            this.dataWriter = new BlameDataReaderWriter(TestSequence, filepath, this.blameFileManager);
-            this.dataWriter.WriteTestsToFile();
-            this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
+            try
+            {
+                EqtTrace.Info("Blame Collector : Events_SessionEnded_Handler");
+                var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
+                this.dataWriter.WriteTestsToFile(TestSequence, filepath);
+                this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
+            }
+            catch (Exception exception)
+            {
+                EqtTrace.Error("BlameCollector SessionEnded_Handler : Exception {0}", exception);
+            }
         }
 
         /// <summary>

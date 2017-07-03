@@ -8,30 +8,13 @@ namespace Microsoft.TestPlatform.BlameDataCollector
 
     public class BlameDataReaderWriter
     {
-        private string filePath;
         private IBlameFileManager blameFileManager;
-        private List<TestCase> TestSequence;
 
-        #region Constructor
-        public BlameDataReaderWriter()
-        { }
+        #region Constructor 
 
-        public BlameDataReaderWriter(string filePath, IBlameFileManager blameFileManager)
+        public BlameDataReaderWriter(IBlameFileManager blameFileManager)
         {
-            ValidateArg.NotNullOrWhiteSpace(filePath, "File Path");
-            ValidateArg.NotNull<IBlameFileManager>(blameFileManager, "Blame File manager");
-
-            this.filePath = filePath;
-            this.blameFileManager = blameFileManager;
-        }
-
-        public BlameDataReaderWriter(List<TestCase> TestSequence, string filePath, IBlameFileManager blameFileManager)
-        {
-            ValidateArg.NotNullOrWhiteSpace(filePath, "File Path");
-            ValidateArg.NotNull<IBlameFileManager>(blameFileManager, "Blame File manager");
-
-            this.TestSequence = TestSequence;
-            this.filePath = filePath;
+            ValidateArg.NotNull<IBlameFileManager>(blameFileManager, nameof(blameFileManager));
             this.blameFileManager = blameFileManager;
         }
 
@@ -40,23 +23,25 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Writes all tests in the test sequence to the file
         /// </summary>
-        public void WriteTestsToFile()
+        public void WriteTestsToFile(List<object> TestSequence, string filePath)
         {
+            ValidateArg.NotNull<List<object>>(TestSequence, nameof(TestSequence));
+            ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
+
             // Initialize Helper
             blameFileManager.InitializeHelper();
-
             // Adds all tests to file
-            blameFileManager.AddTestsToFormat(this.TestSequence, this.filePath);
-
+            blameFileManager.AddTestsToFormat(TestSequence, filePath);
         }
 
         /// <summary>
-        /// Gets last test case from the file
+        /// Reads all tests in the file
         /// </summary>
-        /// <returns>Last test case</returns>
-        public TestCase GetLastTestCase()
+        public List<object> ReadAllTests(string filePath)
         {
-            return blameFileManager.ReadLastTestCase(this.filePath);
+            ValidateArg.NotNull<string>(filePath, nameof(filePath));
+
+            return blameFileManager.GetAllTests(filePath);
         }
     }
 }

@@ -276,18 +276,8 @@ function Publish-Package
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.BlameDataCollector\bin\$TPB_Configuration"
     $blameDataCollectorNet46 = Join-Path $blameDataCollector $TPB_TargetFramework
     $blameDataCollectorNetCore = Join-Path $blameDataCollector $TPB_TargetFrameworkCore
-    Copy-Item $blameDataCollectorNet46\* $fullCLRPackageDir -Force
-    Copy-Item $blameDataCollectorNetCore\* $coreCLR20PackageDir -Force
-
-    # Note Note: Move the Blame data collector to extensions folder
-    $datacollector = @("Microsoft.TestPlatform.BlameDataCollector.dll","Microsoft.TestPlatform.BlameDataCollector.pdb")
-    foreach($file in $datacollector) {
-        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
-        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
-        
-        Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
-        Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
-    }
+    Copy-Item $blameDataCollectorNet46\* $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetCore\* $coreCLRExtensionsDir -Force
 	
 	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")

@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System;
+    using System.Collections.Generic;
 
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
@@ -109,9 +110,10 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private static string GetTestFromFile(string filepath)
         {
-            var dataReader = new BlameDataReaderWriter(filepath, new XmlFileManager());
-            var testCase = dataReader.GetLastTestCase();
-            return testCase.FullyQualifiedName;
+            var dataReader = new BlameDataReaderWriter(new XmlFileManager());
+            List<object> testCaseList = dataReader.ReadAllTests(filepath);
+            var testcase = (TestCase)testCaseList[testCaseList.Count - 1];
+            return testcase.FullyQualifiedName; 
         }
         #endregion
     }

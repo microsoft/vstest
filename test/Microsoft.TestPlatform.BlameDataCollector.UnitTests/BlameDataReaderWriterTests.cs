@@ -16,7 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
     {
         private string filePath;
         private Mock<IBlameFileManager> mockBlamefileManager;
-        private List<TestCase> TestSequence;
+        private List<object> TestSequence;
         private BlameDataReaderWriter blameDataReaderWriter;
 
         public BlameDataReaderWriterTests()
@@ -24,24 +24,51 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
 
             this.filePath = Path.Combine(AppContext.BaseDirectory, "TestSequence.xml");
             this.mockBlamefileManager = new Mock<IBlameFileManager>();
-            this.TestSequence = new List<TestCase>();
+            this.TestSequence = new List<object>();
         }
 
         [TestMethod]
-        public void InitializeBlameDataReaderWriterShouldThrowExceptionIfFilePathIsNull()
+        public void WriteTestsToFileShouldThrowExceptionIfFilePathIsNull()
         {
+            this.blameDataReaderWriter = new BlameDataReaderWriter(mockBlamefileManager.Object);
+            TestCase testcase = new TestCase
+            {
+                Id = Guid.NewGuid(),
+                FullyQualifiedName = "TestProject.UnitTest.TestMethod",
+                Source = "abc.dll"
+            };
+            TestSequence.Add(testcase);
+
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                new BlameDataReaderWriter(null, mockBlamefileManager.Object);
+                this.blameDataReaderWriter.WriteTestsToFile(this.TestSequence, null);
             });
         }
 
         [TestMethod]
-        public void InitializeBlameDataReaderWriterShouldThrowExceptionIfFilePathIsEmpty()
+        public void WriteTestsToFileShouldThrowExceptionIfFilePathIsEmpty()
         {
+            this.blameDataReaderWriter = new BlameDataReaderWriter(mockBlamefileManager.Object);
+            TestCase testcase = new TestCase
+            {
+                Id = Guid.NewGuid(),
+                FullyQualifiedName = "TestProject.UnitTest.TestMethod",
+                Source = "abc.dll"
+            };
+            TestSequence.Add(testcase);
+
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                new BlameDataReaderWriter(String.Empty, mockBlamefileManager.Object);
+                this.blameDataReaderWriter.WriteTestsToFile(this.TestSequence, String.Empty);
+            });
+        }
+        [TestMethod]
+        public void WriteTestsToFileShouldThrowExceptionIfTestSequenceIsNull()
+        {
+            this.blameDataReaderWriter = new BlameDataReaderWriter(mockBlamefileManager.Object);
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                this.blameDataReaderWriter.WriteTestsToFile(null, this.filePath);
             });
         }
 
@@ -50,7 +77,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         {
             Assert.ThrowsException<ArgumentNullException>(() =>
             {
-                new BlameDataReaderWriter("filename", null);
+                new BlameDataReaderWriter(null);
             });
         }
 
@@ -65,10 +92,10 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
                 Source = "abc.dll"
             };
             TestSequence.Add(testcase);
-            this.blameDataReaderWriter = new BlameDataReaderWriter(this.TestSequence, this.filePath, this.mockBlamefileManager.Object);
+            this.blameDataReaderWriter = new BlameDataReaderWriter(this.mockBlamefileManager.Object);
 
             // Call WriteTestsToFile method
-            this.blameDataReaderWriter.WriteTestsToFile();
+            this.blameDataReaderWriter.WriteTestsToFile(this.TestSequence, this.filePath);
 
             // Verify if tests are added
             this.mockBlamefileManager.Verify(x => x.AddTestsToFormat(this.TestSequence,this.filePath), Times.Once);

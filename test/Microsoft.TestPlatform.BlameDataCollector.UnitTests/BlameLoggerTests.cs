@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
     using System;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Moq;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 

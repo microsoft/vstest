@@ -38,13 +38,14 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Adds tests to document and saves document to file
         /// </summary>
-        public void AddTestsToFormat(List<TestCase> TestSequence, string filePath)
+        public void AddTestsToFormat(List<object> TestSequence, string filePath)
         {
             foreach (var testCase in TestSequence)
             {
+                TestCase test = (TestCase)testCase;
                 var testElement = doc.CreateElement(Constants.BlameTestNode);
-                testElement.SetAttribute(Constants.TestNameAttribute, testCase.FullyQualifiedName);
-                testElement.SetAttribute(Constants.TestSourceAttribute, testCase.Source);
+                testElement.SetAttribute(Constants.TestNameAttribute, test.FullyQualifiedName);
+                testElement.SetAttribute(Constants.TestSourceAttribute, test.Source);
                 blameTestRoot.AppendChild(testElement);
             }
             doc.AppendChild(blameTestRoot);
@@ -55,23 +56,27 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         }
 
         /// <summary>
-        /// Reads Faulty test case from file
+        /// Reads All test case from file
         /// </summary>
         /// <param name="filepath">The path of saved file</param>
-        /// <returns>Faulty test case</returns>
-        public TestCase ReadLastTestCase(string filePath)
+        /// <returns>Test Case List</returns>
+        public List<object> GetAllTests(string filePath) 
         {
-            TestCase testCase = new TestCase();
-            string testname = string.Empty;
+            List<object> testCaseList = new List<object>();
             var doc = new XmlDocument();
             using (var stream = this.fileHelper.GetStream(filePath, FileMode.Open))
             {
                 doc.Load(stream);
             }
             var root = doc.LastChild;
-            testCase.FullyQualifiedName = root.LastChild.Attributes[Constants.TestNameAttribute].Value;
-            testCase.Source = root.LastChild.Attributes[Constants.TestSourceAttribute].Value;
-            return testCase;
+            foreach (XmlNode node in root)
+            {
+                TestCase testCase = new TestCase();
+                testCase.FullyQualifiedName = node.Attributes[Constants.TestNameAttribute].Value;
+                testCase.Source = node.Attributes[Constants.TestSourceAttribute].Value;
+                testCaseList.Add(testCase);
+            }
+            return testCaseList;
         }
     }
 }

@@ -24,7 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         private Mock<DataCollectionSink> mockDataCollectionSink;
         private Mock<IBlameFileManager> mockBlameFileManager;
         private XmlElement configurationElement;
-        private TestCase testcase;
 
         public BlameCollectorTests()
         {
@@ -36,9 +35,10 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
             this.mockBlameFileManager = new Mock<IBlameFileManager>();
             this.blameDataCollector = new BlameCollector(this.mockBlameFileManager.Object);
 
-            this.testcase = new TestCase();
-            this.testcase.Id = Guid.NewGuid();
-            this.dataCollectionContext = new DataCollectionContext(this.testcase);
+
+            TestCase testcase = new TestCase();
+            testcase.Id = Guid.NewGuid();
+            this.dataCollectionContext = new DataCollectionContext(testcase);
             this.configurationElement = null;
             this.context = new DataCollectionEnvironmentContext(this.dataCollectionContext);
         }
@@ -68,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionContext));
 
             // Verify Add Tests to Format
-            this.mockBlameFileManager.Verify(x => x.AddTestsToFormat(It.IsAny<List<TestCase>>(),filepath), Times.Once);
+            this.mockBlameFileManager.Verify(x => x.AddTestsToFormat(It.IsAny<List<object>>(),filepath), Times.Once);
         }
     }
 }

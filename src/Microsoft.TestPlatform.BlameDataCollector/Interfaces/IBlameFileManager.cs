@@ -3,7 +3,6 @@
 
 namespace Microsoft.TestPlatform.BlameDataCollector
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Collections.Generic;
 
     public interface IBlameFileManager
@@ -18,13 +17,13 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         /// <param name="testSequence">List of tests in sequence</param>
         /// <param name="filePath">The path of saved file</param>
-        void AddTestsToFormat(List<TestCase> testSequence, string filePath);
+        void AddTestsToFormat(List<object> testSequence, string filePath);
 
         /// <summary>
-        /// Reads Faulty test case from file
+        /// Reads all tests from file
         /// </summary>
         /// <param name="filePath">The path of saved file</param>
-        /// <returns>Faulty test case</returns>
-        TestCase ReadLastTestCase(string filePath);
+        /// <returns>All tests</returns>
+        List<object> GetAllTests(string filePath);
     }
 }
