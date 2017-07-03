@@ -655,12 +655,6 @@
   <data name="DbgTrcMessagesBanner" xml:space="preserve">
     <value>Debug Traces Messages:</value>
   </data>
-  <data name="TestRunAbort" xml:space="preserve">
-    <value>The active test run was aborted. Reason: </value>
-  </data>
-  <data name="TestRunAbortStackOverFlow" xml:space="preserve">
-    <value>The active test run was aborted. Reason: Process is terminated due to StackOverflowException.</value>
-  </data>
   <data name="EnableBlameUsage" xml:space="preserve">
     <value>--Blame|/Blame
       Enable Blame mode to get name of the faulty test case in event of a test host crash.</value>
