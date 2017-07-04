@@ -88,19 +88,6 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Once);
-          
-            // Verify output
-            FlushLoggerMessages();
-            var reason = "The active test run was aborted because the host process exited unexpectedly while executing test ";
-            this.mockOutput.Verify( o => o.WriteLine(reason + "ABC.UnitTestMethod2" , OutputLevel.Error), Times.Once);
-        }
-
-        private void FlushLoggerMessages()
-        {
-            // Raise a test run complete message to flush out any pending messages in queue
-            this.testRunRequest.Raise(
-                m => m.OnRunCompletion += null,
-                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: false, error: null, attachmentSets: null, elapsedTime: new TimeSpan(1, 0, 0, 0)));
         }
 
         internal class DummyTestLoggerManager : TestLoggerManager
