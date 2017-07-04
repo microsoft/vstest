@@ -99,6 +99,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         #endregion
 
         #region Faulty test case fetch
+        
         /// <summary>
         /// Fetches faulty test case
         /// </summary>
@@ -132,6 +133,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             }
             return String.Empty;
         }
+        
         #endregion
     }
 }
