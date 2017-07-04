@@ -90,18 +90,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     /// </summary>
     internal class EnableBlameArgumentExecutor : IArgumentExecutor
     {
+        /// <summary>
+        /// Blame logger and data collector friendly name
+        /// </summary>
+        private static string BlameFriendlyName = "Blame";
+
+        /// <summary>
+        /// Test logger manager instance
+        /// </summary>
+        private readonly TestLoggerManager loggerManager;
+
+        /// <summary>
+        /// Run settings manager
+        /// </summary>
+        private IRunSettingsProvider runSettingsManager;
 
         #region Constructor
 
-        private IRunSettingsProvider runSettingsManager;
-        internal static List<string> EnabledDataCollectors = new List<string>();
-        private readonly TestLoggerManager loggerManager;
-        private static string BlameFriendlyName = "Blame";
-
         internal EnableBlameArgumentExecutor(IRunSettingsProvider runSettingsManager, TestLoggerManager loggerManager)
         {
-            this.runSettingsManager = runSettingsManager;
             Contract.Requires(loggerManager != null);
+
+            this.runSettingsManager = runSettingsManager;
             this.loggerManager = loggerManager;
         }
         #endregion
@@ -114,13 +124,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
-            // Adding Blame Logger to Logger list
-            string loggerIdentifier = null;
-            Dictionary<string, string> parameters = null;
-            var parseSucceeded = LoggerUtilities.TryParseLoggerArgument(argument, out loggerIdentifier, out parameters);
-            this.loggerManager.UpdateLoggerList(BlameFriendlyName.ToLower(), BlameFriendlyName.ToLower(), parameters);
+            // Add Blame Logger
+            this.loggerManager.UpdateLoggerList(BlameFriendlyName.ToLower(), BlameFriendlyName.ToLower(), null);
 
-            // Adding Blame Data Collector to Enabled Data Collectors List
+            // Add Blame Data Collector
             CollectArgumentExecutor.EnabledDataCollectors.Add(BlameFriendlyName.ToLower());
 
             var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
@@ -136,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 dataCollectionRunSettings = new DataCollectionRunSettings();
             }
 
-            CollectArgumentExecutor.EnableDataCollectorUsingFriendlyName(BlameFriendlyName.ToLower(), dataCollectionRunSettings);
+            CollectArgumentExecutor.EnableDataCollectorUsingFriendlyName(BlameFriendlyName, dataCollectionRunSettings);
 
             this.runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
         }

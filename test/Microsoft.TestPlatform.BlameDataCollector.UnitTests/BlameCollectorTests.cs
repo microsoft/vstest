@@ -22,20 +22,19 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         private Mock<DataCollectionLogger> mockLogger;
         private Mock<DataCollectionEvents> mockDataColectionEvents;
         private Mock<DataCollectionSink> mockDataCollectionSink;
-        private Mock<IBlameFileManager> mockBlameFileManager;
+        private Mock<IBlameReaderWriter> mockBlameFileManager;
         private XmlElement configurationElement;
 
         public BlameCollectorTests()
         {
-
-            // Initaializing mocks
+            // Initializing mocks
             this.mockLogger = new Mock<DataCollectionLogger>();
             this.mockDataColectionEvents = new Mock<DataCollectionEvents>();
             this.mockDataCollectionSink = new Mock<DataCollectionSink>();
-            this.mockBlameFileManager = new Mock<IBlameFileManager>();
+            this.mockBlameFileManager = new Mock<IBlameReaderWriter>();
             this.blameDataCollector = new BlameCollector(this.mockBlameFileManager.Object);
 
-
+            // Initializing members
             TestCase testcase = new TestCase();
             testcase.Id = Guid.NewGuid();
             this.dataCollectionContext = new DataCollectionContext(testcase);
@@ -55,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         }
 
         [TestMethod]
-        public void TriggerSessionEndedHandlerShouldSaveToFile()
+        public void TriggerSessionEndedHandlerShouldWriteToFile()
         {
             // Initializing Blame Data Collector
             this.blameDataCollector.Initialize(this.configurationElement,
@@ -63,12 +62,12 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
                     this.mockLogger.Object, this.context);
             var filepath = Path.Combine(AppContext.BaseDirectory, "TestSequence.xml");
 
-            // Raising Session End Event
+            // Setup and Raise Session End Event
             this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<DataCollectionContext>(), It.IsAny<String>(), It.IsAny<bool>()));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionContext));
 
-            // Verify Add Tests to Format
-            this.mockBlameFileManager.Verify(x => x.AddTestsToFormat(It.IsAny<List<object>>(),filepath), Times.Once);
+            // Verify WriteTestSequence Call
+            this.mockBlameFileManager.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), filepath), Times.Once);
         }
     }
 }

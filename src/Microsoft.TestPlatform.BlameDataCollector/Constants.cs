@@ -47,6 +47,5 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// Friendly name of the data collector
         /// </summary>
         public const string BlameDataCollectorName = "Blame";
-
     }
 }

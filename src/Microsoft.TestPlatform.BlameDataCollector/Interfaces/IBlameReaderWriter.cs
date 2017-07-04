@@ -3,27 +3,23 @@
 
 namespace Microsoft.TestPlatform.BlameDataCollector
 {
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Collections.Generic;
 
-    public interface IBlameFileManager
+    public interface IBlameReaderWriter
     {
         /// <summary>
-        /// Initializes resources for writing to file
-        /// </summary>
-        void InitializeHelper();
-
-        /// <summary>
-        /// Adds tests to document
+        /// Writes tests to document
         /// </summary>
         /// <param name="testSequence">List of tests in sequence</param>
-        /// <param name="filePath">The path of saved file</param>
-        void AddTestsToFormat(List<object> testSequence, string filePath);
+        /// <param name="filePath">The path of file</param>
+        void WriteTestSequence(List<TestCase> testSequence, string filePath);
 
         /// <summary>
         /// Reads all tests from file
         /// </summary>
         /// <param name="filePath">The path of saved file</param>
         /// <returns>All tests</returns>
-        List<object> GetAllTests(string filePath);
+        List<TestCase> ReadTestSequence(string filePath);
     }
 }

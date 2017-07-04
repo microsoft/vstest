@@ -3,16 +3,20 @@
 
 namespace Microsoft.TestPlatform.BlameDataCollector
 {
+    using Microsoft.TestPlatform.BlameDataCollector.Properties;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
     public class BlameLogger : ITestLogger
     {
+        private readonly IBlameReaderWriter blameReaderWriter;
+
         #region Constants
 
         /// <summary>
@@ -25,22 +29,30 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         public const string FriendlyName = "Blame";
 
-        #endregion
+        #endregion      
 
         #region Constructor
+
+        /// <summary>
+        /// Constructor : Default BlameReaderWriter used is XmlReaderWriter
+        /// </summary>
         public BlameLogger()
+            : this(ConsoleOutput.Instance, new XmlReaderWriter())
         {
         }
+
         /// <summary>
         /// Constructor added for testing purpose
         /// </summary>
         /// <param name="output"></param>
-        public BlameLogger(IOutput output)
+        /// <param name="blameReaderWriter">BlameReaderWriter Instance</param>
+        public BlameLogger(IOutput output, IBlameReaderWriter blameReaderWriter)
         {
-            BlameLogger.Output = output;
+            this.Output = output;
+            this.blameReaderWriter = blameReaderWriter;
         }
 
-        protected static IOutput Output
+        protected IOutput Output
         {
             get;
             private set;
@@ -48,7 +60,8 @@ namespace Microsoft.TestPlatform.BlameDataCollector
 
         #endregion
 
-        #region ITestLoggerWithParameters
+        #region ITestLogger
+
         /// <summary>
         /// Initializes the Logger.
         /// </summary>
@@ -59,11 +72,6 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             if (events == null)
             {
                 throw new ArgumentNullException(nameof(events));
-            }
-
-            if (BlameLogger.Output == null)
-            {
-                BlameLogger.Output = ConsoleOutput.Instance;
             }
             events.TestRunComplete += this.TestRunCompleteHandler;
         }
@@ -76,13 +84,15 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunCompleteEventArgs>(e, "e");
 
-            Output.WriteLine(string.Empty, OutputLevel.Information);
             if (!e.IsAborted) return;
 
-            // Gets the faulty test case if test aborted without reason
+            // Gets the faulty test case if test aborted 
             var testCaseName = GetFaultyTestCase(e);
-            string reason;
-            reason = "The active test run was aborted because the host process existed unexpectedly while executing test " + testCaseName;
+            string reason = string.Format(
+                       CultureInfo.CurrentCulture,
+                       Resources.TestRunAbortReason,
+                       testCaseName);
+
             Output.Error(reason);
         }
 
@@ -90,16 +100,16 @@ namespace Microsoft.TestPlatform.BlameDataCollector
 
         #region Faulty test case fetch
         /// <summary>
-        /// Fetches faulty test case in case of test host crash 
+        /// Fetches faulty test case
         /// </summary>
-        private static string GetFaultyTestCase(TestRunCompleteEventArgs e)
+        private string GetFaultyTestCase(TestRunCompleteEventArgs e)
         {
             string testname = null;
             foreach (var attachmentSet in e.AttachmentSets)
             {
                 if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
                 {
-                    testname = GetTestFromFile(attachmentSet.Attachments[0].Uri.LocalPath);
+                    testname = GetLastTestFromFile(attachmentSet.Attachments[0].Uri.LocalPath);
                 }
             }
             return testname;
@@ -108,12 +118,19 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Reads file for last test case
         /// </summary>
-        private static string GetTestFromFile(string filepath)
+        public string GetLastTestFromFile(string filepath)
         {
-            var dataReader = new BlameDataReaderWriter(new XmlFileManager());
-            List<object> testCaseList = dataReader.ReadAllTests(filepath);
-            var testcase = (TestCase)testCaseList[testCaseList.Count - 1];
-            return testcase.FullyQualifiedName; 
+            try
+            {
+                List<TestCase> testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
+                var testcase = testCaseList[testCaseList.Count - 1];
+                return testcase.FullyQualifiedName;
+            }
+            catch (NullReferenceException e)
+            {
+               EqtTrace.Error("Blame Logger: GetLastTestFromFile : " + e);
+            }
+            return String.Empty;
         }
         #endregion
     }

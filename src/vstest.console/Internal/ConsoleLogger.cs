@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using Constants = vstest.console.ConsoleConstants;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     
     /// <summary>
@@ -29,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     {
         #region Constants
         private const string TestMessageFormattingPrefix = " ";
+
+        private const string BlameDataCollectorName = "Blame";
 
         /// <summary>
         /// Uri used to uniquely identify the console logger.
@@ -397,7 +398,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    if (!attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
+                    if (!attachmentSet.DisplayName.Equals(BlameDataCollectorName))
                     {
                         Output.Information(CommandLineResources.AttachmentsBanner);
                         break;
@@ -408,7 +409,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    if (!attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
+                    if (!attachmentSet.DisplayName.Equals(BlameDataCollectorName))
                     {
                         foreach (var uriDataAttachment in attachmentSet.Attachments)
                         {

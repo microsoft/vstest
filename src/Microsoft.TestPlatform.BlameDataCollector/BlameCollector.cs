@@ -16,27 +16,26 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     {
         private DataCollectionSink dataCollectionSink;
         private DataCollectionEnvironmentContext context;
-        private DataCollectionLogger logger;
         private DataCollectionEvents events;
-        private List<object> TestSequence;
-        private BlameDataReaderWriter dataWriter;
-        private IBlameFileManager blameFileManager;
+        private List<TestCase> testSequence;
+        private IBlameReaderWriter blameReaderWriter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
+        /// Using XmlReaderWriter by default
         /// </summary>
         public BlameCollector()
-            : this(new XmlFileManager())
+            : this(new XmlReaderWriter())
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
         /// </summary>
-        /// <param name="blameFileManager">BlameFileManager instance.</param>
-        public BlameCollector(IBlameFileManager blameFileManager)
+        /// <param name="blameReaderWriter">BlameReaderWriter instance.</param>
+        public BlameCollector(IBlameReaderWriter blameReaderWriter)
         {
-            this.blameFileManager = blameFileManager;
+            this.blameReaderWriter = blameReaderWriter;
         }
 
         /// <summary>
@@ -61,12 +60,11 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             DataCollectionLogger logger, DataCollectionEnvironmentContext environmentContext)
         {
             ValidateArg.NotNull(logger, nameof(logger));
+
             this.events = events;
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
-            this.logger = logger;
-            this.dataWriter = new BlameDataReaderWriter(this.blameFileManager);
-            TestSequence = new List<object>();
+            testSequence = new List<TestCase>();
 
             // Subscribing to events
             this.events.SessionEnd += this.SessionEnded_Handler;
@@ -78,16 +76,9 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
         {
-            try
-            {
-                EqtTrace.Info("Blame Collector : Events_TestCaseStart");
-                TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
-                TestSequence.Add(testcase);
-            }
-            catch(Exception exception)
-            {
-                EqtTrace.Error("BlameCollector Events_TestCaseStart : Exception {0}", exception);
-            }
+            EqtTrace.Info("Blame Collector : " + Constants.TestCaseStart);
+            TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
+            this.testSequence.Add(testcase);
         }
 
         /// <summary>
@@ -95,23 +86,17 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void SessionEnded_Handler(object sender, SessionEndEventArgs args)
         {
-            try
-            {
-                EqtTrace.Info("Blame Collector : Events_SessionEnded_Handler");
-                var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
-                this.dataWriter.WriteTestsToFile(TestSequence, filepath);
-                this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
-            }
-            catch (Exception exception)
-            {
-                EqtTrace.Error("BlameCollector SessionEnded_Handler : Exception {0}", exception);
-            }
+            EqtTrace.Info("Blame Collector :" + Constants.TestSessionEnd);
+            var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
+            this.blameReaderWriter.WriteTestSequence(this.testSequence, filepath);
+            this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
+            DeregisterEvents();
         }
 
         /// <summary>
-        /// Destructor to unregister methods and cleanup
+        /// Method to deregister handlers and cleanup
         /// </summary>
-        ~BlameCollector()
+        private void DeregisterEvents()
         {
             this.events.SessionEnd -= this.SessionEnded_Handler;
             this.events.TestCaseStart -= this.Events_TestCaseStart;
