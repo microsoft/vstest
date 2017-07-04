@@ -18,9 +18,11 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         private readonly IFileHelper fileHelper;
 
         #region  Constructor
+        
         public XmlReaderWriter()
             : this(new FileHelper())
         { }
+        
         public XmlReaderWriter(IFileHelper fileHelper)
         {
             this.fileHelper = fileHelper;
