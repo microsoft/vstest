@@ -128,8 +128,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
         /// <returns>True, if successful</returns>
         public bool DiscoverTests(DiscoveryRequestPayload discoveryPayload, ITestDiscoveryEventsRegistrar discoveryEventsRegistrar, ProtocolConfig protocolConfig)
         {
-            System.Diagnostics.Debugger.Launch();
-
             EqtTrace.Info("TestRequestManager.DiscoverTests: Discovery tests started.");
 
             bool success = false;

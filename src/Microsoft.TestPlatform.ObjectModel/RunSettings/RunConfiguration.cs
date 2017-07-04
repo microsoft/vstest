@@ -385,8 +385,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             Justification = "XmlDocument.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
         public override XmlElement ToXml()
         {
-            System.Diagnostics.Debugger.Launch();
-
             XmlDocument doc = new XmlDocument();
 
             XmlElement root = doc.CreateElement(Constants.RunConfigurationSettingsName);
