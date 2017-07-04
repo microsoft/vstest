@@ -3,17 +3,19 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Threading;
+
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Diagnostics;
-    using System.Threading;
+
     using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+    using System.Collections.ObjectModel;
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
@@ -274,6 +276,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
                     return;
                 }
 
+                // Disposing off the resources held by the execution manager so that the test host process can shut down.
+                this.ExecutionManager?.Close();
+
                 try
                 {
                     this.runRequestTimeTracker.Stop();
@@ -315,9 +320,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     // Notify the waiting handle that run is complete
                     this.runCompletionEvent.Set();
-
-                    // Disposing off the resources held by the execution manager so that the test host process can shut down.
-                    this.ExecutionManager?.Close();
                 }
 
                 EqtTrace.Info("TestRunRequest:TestRunComplete: Completed.");

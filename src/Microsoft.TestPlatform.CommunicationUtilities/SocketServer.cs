@@ -29,8 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private TcpClient tcpClient;
 
-        private Stream stream;
-
         private bool stopped;
 
         /// <summary>
@@ -90,12 +88,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private void OnClientConnected(TcpClient client)
         {
             this.tcpClient = client;
-            this.tcpClient.Client.NoDelay = true;
 
             if (this.ClientConnected != null)
             {
-                this.stream = new BufferedStream(client.GetStream(), 8 * 1024);
-                this.channel = this.channelFactory(this.stream);
+                this.channel = this.channelFactory(client.GetStream());
                 this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 
                 // Start the message loop
@@ -113,17 +109,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // Stop accepting any other connections
                 this.tcpListener.Stop();
 
-                // Close the client and dispose the underlying stream.
-                // Depending on implementation order of dispose may be important.
-                // 1. Channel dispose -> disposes reader/writer which call a Flush on the Stream. Stream shouldn't
-                // be disposed at this time.
-                // 2. Stream's dispose may Flush the underlying base stream (if it's a BufferedStream). We should try
-                // dispose it next.
-                // 3. TcpClient's dispose will clean up the network stream and close any sockets. NetworkStream's dispose
-                // is a no-op if called a second time.
-                this.channel?.Dispose();
-                this.stream?.Dispose();
+                // Close the client and dispose the underlying stream
                 this.tcpClient?.Dispose();
+                this.channel.Dispose();
 
                 this.cancellation.Dispose();
 

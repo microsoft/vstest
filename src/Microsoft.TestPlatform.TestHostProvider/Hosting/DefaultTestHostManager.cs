@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Threading.Tasks;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
@@ -40,10 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private Architecture architecture;
 
         private IProcessHelper processHelper;
+        private IEnvironment environment;
+        private IDotnetHostHelper dotnetHostHelper;
 
         private ITestHostLauncher customTestHostLauncher;
         private Process testHostProcess;
-        private CancellationTokenSource hostLaunchCts;
         private StringBuilder testHostProcessStdError;
         private IMessageLogger messageLogger;
         private bool hostExitedEventRaised;
@@ -52,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
         public DefaultTestHostManager()
-            : this(new ProcessHelper())
+            : this(new ProcessHelper(), new PlatformEnvironment(), new DotnetHostHelper())
         {
         }
 
@@ -60,9 +63,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
         /// <param name="processHelper">Process helper instance.</param>
-        internal DefaultTestHostManager(IProcessHelper processHelper)
+        /// <param name="environment">Instance of platform environment.</param>
+        /// <param name="dotnetHostHelper">Instance of dotnet host helper.</param>
+        internal DefaultTestHostManager(IProcessHelper processHelper, IEnvironment environment, IDotnetHostHelper dotnetHostHelper)
         {
             this.processHelper = processHelper;
+            this.environment = environment;
+            this.dotnetHostHelper = dotnetHostHelper;
         }
 
         /// <inheritdoc/>
@@ -83,11 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Gets or sets the error length for runtime error stream.
         /// </summary>
         protected int ErrorLength { get; set; } = 4096;
-
-        /// <summary>
-        /// Gets or sets the Timeout for runtime to initialize.
-        /// </summary>
-        protected int TimeOut { get; set; } = 10000;
 
         /// <summary>
         /// Gets callback on process exit
@@ -114,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
         {
-            return await Task.Run(() => this.LaunchHost(testHostStartInfo), this.GetCancellationTokenSource().Token);
+            return await Task.Run(() => this.LaunchHost(testHostStartInfo), CancellationToken.None);
         }
 
         /// <inheritdoc/>
@@ -141,6 +143,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
             EqtTrace.Verbose("DefaultTestHostmanager: Full path of {0} is {1}", testHostProcessName, testhostProcessPath);
 
+            var launcherPath = testhostProcessPath;
+            if (!this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows) &&
+                !this.processHelper.GetCurrentProcessFileName().EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
+            {
+                launcherPath = this.dotnetHostHelper.GetMonoPath();
+                argumentsString = testhostProcessPath + " " + argumentsString;
+            }
+
             // For IDEs and other scenario, current directory should be the
             // working directory (not the vstest.console.exe location).
             // For VS - this becomes the solution directory for example
@@ -149,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             return new TestProcessStartInfo
             {
-                FileName = testhostProcessPath,
+                FileName = launcherPath,
                 Arguments = argumentsString,
                 EnvironmentVariables = environmentVariables ?? new Dictionary<string, string>(),
                 WorkingDirectory = processWorkingDirectory
@@ -178,28 +188,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             return true;
         }
 
-        /// <summary>
-        /// Raises HostLaunched event
-        /// </summary>
-        /// <param name="e">hostprovider event args</param>
-        public void OnHostLaunched(HostProviderEventArgs e)
-        {
-            this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
-        }
-
-        /// <summary>
-        /// Raises HostExited event
-        /// </summary>
-        /// <param name="e">hostprovider event args</param>
-        public void OnHostExited(HostProviderEventArgs e)
-        {
-            if (!this.hostExitedEventRaised)
-            {
-                this.hostExitedEventRaised = true;
-                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
-            }
-        }
-
         /// <inheritdoc/>
         public void Initialize(IMessageLogger logger, string runsettingsXml)
         {
@@ -213,10 +201,41 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.hostExitedEventRaised = false;
         }
 
-        private CancellationTokenSource GetCancellationTokenSource()
+        /// <inheritdoc/>
+        public Task TerminateAsync(int processId, CancellationToken cancellationToken)
         {
-            this.hostLaunchCts = new CancellationTokenSource(this.TimeOut);
-            return this.hostLaunchCts;
+            try
+            {
+                this.processHelper.TerminateProcess(processId);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning("DefaultTestHostManager: Unable to terminate test host process: " + ex);
+            }
+
+            return Task.FromResult(true);
+        }
+
+        /// <summary>
+        /// Raises HostLaunched event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
+        private void OnHostLaunched(HostProviderEventArgs e)
+        {
+            this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
+        }
+
+        /// <summary>
+        /// Raises HostExited event
+        /// </summary>
+        /// <param name="e">hostprovider event args</param>
+        private void OnHostExited(HostProviderEventArgs e)
+        {
+            if (!this.hostExitedEventRaised)
+            {
+                this.hostExitedEventRaised = true;
+                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
+            }
         }
 
         private int LaunchHost(TestProcessStartInfo testHostStartInfo)
