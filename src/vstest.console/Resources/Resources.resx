@@ -655,4 +655,8 @@
   <data name="DbgTrcMessagesBanner" xml:space="preserve">
     <value>Debug Traces Messages:</value>
   </data>
+  <data name="EnableBlameUsage" xml:space="preserve">
+    <value>--Blame|/Blame
+      Enable Blame mode to get name of the faulty test case in event of a test host crash.</value>
+  </data>
 </root>
