@@ -32,9 +32,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector.Properties {
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-
-        public static string TestRunAbortReason { get; internal set; }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -60,6 +58,15 @@ namespace Microsoft.TestPlatform.BlameDataCollector.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The active test run was aborted because the host process exited unexpectedly while executing test .
+        /// </summary>
+        internal static string TestRunAbortReason {
+            get {
+                return ResourceManager.GetString("TestRunAbortReason", resourceCulture);
             }
         }
     }

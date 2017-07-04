@@ -88,11 +88,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
 
             // Gets the faulty test case if test aborted 
             var testCaseName = GetFaultyTestCase(e);
-            string reason = string.Format(
-                       CultureInfo.CurrentCulture,
-                       Resources.TestRunAbortReason,
-                       testCaseName);
-
+            string reason = Resources.TestRunAbortReason + testCaseName;
             Output.Error(reason);
         }
 

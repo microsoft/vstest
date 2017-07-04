@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="TestRunAbortReason" xml:space="preserve">
-    <value>The active test run was aborted because the host process existed unexpectedly while executing test '{0}'</value>
+    <value>The active test run was aborted because the host process exited unexpectedly while executing test </value>
   </data>
 </root>
