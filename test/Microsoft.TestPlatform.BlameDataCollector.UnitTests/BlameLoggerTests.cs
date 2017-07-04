@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
             testCaseList.Add(new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath"));
 
             // Setup and Raise event
-            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
+            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
             this.testRunRequest.Raise(
                m => m.OnRunCompletion += null,
                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
