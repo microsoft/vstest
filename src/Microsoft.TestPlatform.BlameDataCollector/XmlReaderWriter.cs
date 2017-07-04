@@ -10,6 +10,9 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     using System.IO;
     using System.Xml;
 
+    /// <summary>
+    /// XmlReaderWriter class for reading and writing test sequences to file
+    /// </summary>
     public class XmlReaderWriter : IBlameReaderWriter
     {
         private readonly IFileHelper fileHelper;

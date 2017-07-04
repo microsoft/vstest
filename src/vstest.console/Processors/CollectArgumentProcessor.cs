@@ -114,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             EnabledDataCollectors.Add(argument.ToLower());
-         
+
             var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
             if (settings == null)
             {

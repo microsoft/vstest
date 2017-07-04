@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         private Mock<DataCollectionLogger> mockLogger;
         private Mock<DataCollectionEvents> mockDataColectionEvents;
         private Mock<DataCollectionSink> mockDataCollectionSink;
-        private Mock<IBlameReaderWriter> mockBlameFileManager;
+        private Mock<IBlameReaderWriter> mockBlameReaderWriter;
         private XmlElement configurationElement;
 
         public BlameCollectorTests()
@@ -31,8 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
             this.mockLogger = new Mock<DataCollectionLogger>();
             this.mockDataColectionEvents = new Mock<DataCollectionEvents>();
             this.mockDataCollectionSink = new Mock<DataCollectionSink>();
-            this.mockBlameFileManager = new Mock<IBlameReaderWriter>();
-            this.blameDataCollector = new BlameCollector(this.mockBlameFileManager.Object);
+            this.mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
+            this.blameDataCollector = new BlameCollector(this.mockBlameReaderWriter.Object);
 
             // Initializing members
             TestCase testcase = new TestCase();
@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionContext));
 
             // Verify WriteTestSequence Call
-            this.mockBlameFileManager.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), filepath), Times.Once);
+            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), filepath), Times.Once);
         }
     }
 }

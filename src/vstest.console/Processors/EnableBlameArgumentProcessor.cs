@@ -59,7 +59,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                 return this.executor;
             }
-
             set
             {
                 this.executor = value;
