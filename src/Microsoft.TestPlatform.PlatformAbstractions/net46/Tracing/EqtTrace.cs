@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public void SetupRemoteEqtTraceListeners(AppDomain childDomain)
         {
             Debug.Assert(childDomain != null, "domain");
-            if (childDomain != null)
+            if (childDomain != null && !Enum.Equals(TraceLevel, TraceLevel.Off))
             {
                 RemoteEqtTrace remoteEqtTrace = (RemoteEqtTrace)childDomain.CreateInstanceFromAndUnwrap(
                     typeof(RemoteEqtTrace).Assembly.Location,
@@ -37,20 +37,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 remoteEqtTrace.TraceLevel = TraceLevel;
 
-                if (!Enum.Equals(TraceLevel, TraceLevel.Off))
+                TraceListener tptListner = null;
+                foreach (TraceListener listener in Trace.Listeners)
                 {
-                    TraceListener tptListner = null;
-                    foreach (TraceListener listener in Trace.Listeners)
+                    if (string.Equals(listener.Name, ListenerName, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (string.Equals(listener.Name, ListenerName, StringComparison.OrdinalIgnoreCase))
-                        {
-                            Debug.Assert(tptListner == null, "Multiple TptListeners found.");
-                            tptListner = listener;
-                        }
+                        Debug.Assert(tptListner == null, "Multiple TptListeners found.");
+                        tptListner = listener;
                     }
-
-                    remoteEqtTrace.SetupRemoteListeners(tptListner);
                 }
+
+                remoteEqtTrace.SetupRemoteListeners(tptListner);
             }
         }
 

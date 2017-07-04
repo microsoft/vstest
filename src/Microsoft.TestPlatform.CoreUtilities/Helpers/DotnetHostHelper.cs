@@ -10,17 +10,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Resources;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     public class DotnetHostHelper : IDotnetHostHelper
     {
+        public const string MONOEXENAME = "mono";
+
         private readonly IFileHelper fileHelper;
+        private readonly IEnvironment environment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
         /// </summary>
-        public DotnetHostHelper() : this(new FileHelper())
+        public DotnetHostHelper() : this(new FileHelper(), new PlatformEnvironment())
         {
         }
 
@@ -28,41 +33,59 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers
         /// Initializes a new instance of the <see cref="DotnetHostHelper"/> class.
         /// </summary>
         /// <param name="fileHelper">File Helper</param>
-        public DotnetHostHelper(IFileHelper fileHelper)
+        public DotnetHostHelper(IFileHelper fileHelper, IEnvironment environment)
         {
             this.fileHelper = fileHelper;
+            this.environment = environment;
         }
 
         /// <inheritdoc />
-        public string GetDotnetHostFullPath()
+        public string GetDotnetPath()
         {
-            char separator = ';';
-            var dotnetExeName = "dotnet.exe";
-
-#if !NET46
-            // Use semicolon(;) as path separator for windows
-            // colon(:) for Linux and OSX
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (!TryGetExecutablePath("dotnet", out string dotnetPath))
             {
-                separator = ':';
-                dotnetExeName = "dotnet";
+                string errorMessage = string.Format(Resources.NoDotnetExeFound, "dotnet");
+
+                EqtTrace.Error(errorMessage);
+                throw new FileNotFoundException(errorMessage);
             }
-#endif
 
-            var pathString = Environment.GetEnvironmentVariable("PATH");
-            foreach (string path in pathString.Split(separator))
+            return dotnetPath;
+        }
+
+        public string GetMonoPath()
+        {
+            if (!TryGetExecutablePath(MONOEXENAME, out string monoPath))
             {
-                string exeFullPath = Path.Combine(path.Trim(), dotnetExeName);
+                string errorMessage = string.Format(Resources.NoDotnetExeFound, MONOEXENAME);
+
+                EqtTrace.Error(errorMessage);
+                throw new FileNotFoundException(errorMessage);
+            }
+
+            return monoPath;
+        }
+
+        private bool TryGetExecutablePath(string executableBaseName, out string executablePath)
+        {
+            if (this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            {
+                executableBaseName = executableBaseName + ".exe";
+            }
+
+            executablePath = string.Empty;
+            var pathString = Environment.GetEnvironmentVariable("PATH");
+            foreach (string path in pathString.Split(Path.PathSeparator))
+            {
+                string exeFullPath = Path.Combine(path.Trim(), executableBaseName);
                 if (this.fileHelper.Exists(exeFullPath))
                 {
-                    return exeFullPath;
+                    executablePath = exeFullPath;
+                    return true;
                 }
             }
 
-            string errorMessage = string.Format(Resources.NoDotnetExeFound, dotnetExeName);
-
-            EqtTrace.Error(errorMessage);
-            throw new FileNotFoundException(errorMessage);
+            return false;
         }
     }
 }
