@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using System.Threading;
 
     /// <summary>
     /// Interface for TestRuntimeProvider which manages test host processes for test engine.
@@ -84,6 +85,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// <param name="sources">List of test sources.</param>
         /// <returns>List of paths to extension assemblies.</returns>
         IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions);
+
+        /// <summary>
+        /// Terminate the test host process.
+        /// </summary>
+        /// <param name="processId">Process identifier for the test host.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        Task TerminateAsync(int processId, CancellationToken cancellationToken);
     }
 
     /// <summary>
