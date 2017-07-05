@@ -138,6 +138,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestTestAdapterPath))
             {
+                if (this.VSTestTestAdapterPath.EndsWith(@"\"))
+                {
+                    this.VSTestTestAdapterPath = this.VSTestTestAdapterPath.Substring(0, this.VSTestTestAdapterPath.Length - 1);
+                }
+
                 allArgs.Add("--testAdapterPath:" + this.VSTestTestAdapterPath.AddDoubleQuote());
             }
 
@@ -164,6 +169,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
             {
+                if(this.VSTestResultsDirectory.EndsWith(@"\"))
+                {
+                    this.VSTestResultsDirectory = this.VSTestResultsDirectory.Substring(0, this.VSTestResultsDirectory.Length - 1);
+                }
+
                 allArgs.Add("--resultsDirectory:" + this.VSTestResultsDirectory.AddDoubleQuote());
             }
 

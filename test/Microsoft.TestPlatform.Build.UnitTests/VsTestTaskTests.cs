@@ -46,6 +46,38 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
+        public void CreateArgumentShouldRemoveTrailingSlashFromResultsDirectory()
+        {
+            const string resultsDirectoryValue = @"C:\tmp\ResultsDirectory\";
+            var vstestTask = new VSTestTask { VSTestResultsDirectory = resultsDirectoryValue };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var result = vstestTask.CreateArgument().ToArray();
+
+            var expectedTestresultDirectory = @"C:\tmp\ResultsDirectory";
+            Assert.AreEqual($"--resultsDirectory:\"{expectedTestresultDirectory}\"", result[1]);
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldRemoveTrailingSlashFromTestAdapterPath()
+        {
+            const string testAdapterPath = @"C:\tmp\TestAdapterPath\";
+            var vstestTask = new VSTestTask { VSTestTestAdapterPath = testAdapterPath };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var result = vstestTask.CreateArgument().ToArray();
+
+            var expectedTestAdapterPath = @"C:\tmp\TestAdapterPath";
+            Assert.AreEqual($"--testAdapterPath:\"{expectedTestAdapterPath}\"", result[0]);
+        }
+
+        [TestMethod]
         public void CreateArgumentShouldNotSetConsoleLoggerVerbosityIfConsoleLoggerIsGivenInArgs()
         {
             var vstestTask = new VSTestTask { VSTestVerbosity = "diag" };
