@@ -96,6 +96,16 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private static int traceFileSize = 0;
         private static int defaultTraceFileSize = 10240; // 10Mb.
 
+        private static IPlatformEqtTrace instance;
+
+        public static IPlatformEqtTrace Instance
+        {
+            get
+            {
+                return instance ?? (instance = new PlatformEqtTrace());
+            }
+        }
+
         public static string LogFile
         {
             get;
@@ -125,6 +135,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+        public static string ErrorOnInitialization
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Setup trace listeners. It should be called when setting trace listener for child domain.
         /// </summary>
@@ -136,7 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 // Add new listeners.
                 if (listener != null)
                 {
-                    Source.Listeners.Add((TraceListener)listener);
+                    Source.Listeners.Add(listener);
                 }
 
                 isInitialized = true;
@@ -183,15 +199,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return LogFile;
         }
 
-        public static string ErrorOnInitialization
-        {
-            get;
-            set;
-        }
-
         /// <summary>
         /// Ensure the trace is initialized
         /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         private static bool EnsureTraceIsInitialized()
         {
             if (isInitialized)
