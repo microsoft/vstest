@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.disableAppDomain = false;
             this.disableParallelization = false;
             this.designMode = false;
-            this.shouldCollectSourceInformation = this.designMode;
+            this.shouldCollectSourceInformation = false;
         }
 
         #endregion

@@ -305,7 +305,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             return settingsUpdated;
         }
-        
+
         private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)
         {
             // Make sure to run the run request inside a lock as the below section is not thread-safe
