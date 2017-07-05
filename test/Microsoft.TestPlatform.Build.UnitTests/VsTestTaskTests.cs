@@ -31,22 +31,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
-        public void CreateArgumentShouldPassResultsDirectoryCorrectly()
-        {
-            const string resultsDirectoryValue = @"C:\tmp\ResultsDirectory";
-            var vstestTask = new VSTestTask {  VSTestResultsDirectory = resultsDirectoryValue };
-
-            // Add values for required properties.
-            vstestTask.TestFileFullPath = "abc";
-            vstestTask.VSTestFramework = "abc";
-
-            var result = vstestTask.CreateArgument().ToArray();
-
-            Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue}\"", result[1]);
-        }
-
-        [TestMethod]
-        public void CreateArgumentShouldRemoveTrailingSlashFromResultsDirectory()
+        public void CreateArgumentShouldAddSpaceAtTheEndOfResultsDirectory()
         {
             const string resultsDirectoryValue = @"C:\tmp\ResultsDirectory\";
             var vstestTask = new VSTestTask { VSTestResultsDirectory = resultsDirectoryValue };
@@ -57,12 +42,11 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var result = vstestTask.CreateArgument().ToArray();
 
-            var expectedTestresultDirectory = @"C:\tmp\ResultsDirectory";
-            Assert.AreEqual($"--resultsDirectory:\"{expectedTestresultDirectory}\"", result[1]);
+            Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue} \"", result[1]);
         }
 
         [TestMethod]
-        public void CreateArgumentShouldRemoveTrailingSlashFromTestAdapterPath()
+        public void CreateArgumentShouldAddSpaceAtTheEndOfTestAdapterPath()
         {
             const string testAdapterPath = @"C:\tmp\TestAdapterPath\";
             var vstestTask = new VSTestTask { VSTestTestAdapterPath = testAdapterPath };
@@ -73,8 +57,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var result = vstestTask.CreateArgument().ToArray();
 
-            var expectedTestAdapterPath = @"C:\tmp\TestAdapterPath";
-            Assert.AreEqual($"--testAdapterPath:\"{expectedTestAdapterPath}\"", result[0]);
+            Assert.AreEqual($"--testAdapterPath:\"{testAdapterPath} \"", result[0]);
         }
 
         [TestMethod]
