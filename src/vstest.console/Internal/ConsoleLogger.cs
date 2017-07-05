@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
-
+    
     /// <summary>
     /// Logger for sending output to the console.
     /// All the console logger messages prints to Standard Output with respective color, except OutputLevel.Error messages
@@ -29,6 +29,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
     {
         #region Constants
         private const string TestMessageFormattingPrefix = " ";
+
+        private const string BlameDataCollectorName = "Blame";
 
         /// <summary>
         /// Uri used to uniquely identify the console logger.
@@ -390,18 +392,31 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             Output.WriteLine(string.Empty, OutputLevel.Information);
-
-            // Printing Run-level Attachments
             var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
+            
+            // Printing Run-level Attachments
             if (runLevelAttachementCount > 0)
             {
-                Output.Information(CommandLineResources.AttachmentsBanner);
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
-                    foreach (var uriDataAttachment in attachmentSet.Attachments)
+                    if (!attachmentSet.DisplayName.Equals(BlameDataCollectorName))
                     {
-                        var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
-                        Output.Information(attachmentOutput);
+                        Output.Information(CommandLineResources.AttachmentsBanner);
+                        break;
+                    }
+                }
+            }
+            if (runLevelAttachementCount > 0)
+            {
+                foreach (var attachmentSet in e.AttachmentSets)
+                {
+                    if (!attachmentSet.DisplayName.Equals(BlameDataCollectorName))
+                    {
+                        foreach (var uriDataAttachment in attachmentSet.Attachments)
+                        {
+                            var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
+                            Output.Information(attachmentOutput);
+                        }
                     }
                 }
                 Output.WriteLine(String.Empty, OutputLevel.Information);
@@ -432,6 +447,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
         }
         #endregion
-
     }
 }

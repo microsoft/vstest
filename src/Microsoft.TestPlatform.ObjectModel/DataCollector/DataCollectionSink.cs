@@ -39,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
         /// <param name="context">The context in which the file is being sent.  Cannot be null.</param>
         /// <param name="path">the path to the file on the local file system</param>
         /// <param name="deleteFile">True to automatically have the file removed after sending it.</param>
-        public void SendFileAsync(DataCollectionContext context, string path, bool deleteFile)
+        public virtual void SendFileAsync(DataCollectionContext context, string path, bool deleteFile)
         {
             this.SendFileAsync(context, path, string.Empty, deleteFile);
         }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26326.0
+VisualStudioVersion = 15.0.26605.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED0C35EB-7F31-4841-A24F-8EB708FFA959}"
 EndProject
@@ -150,6 +150,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.TestHostProvider.UnitTests", "test\Microsoft.TestPlatform.TestHostProvider.UnitTests\Microsoft.TestPlatform.TestHostProvider.UnitTests.csproj", "{FBF74C8F-695C-4967-84AC-358EEFB1376D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.TestHostProvider", "src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj", "{11ECCB8B-6958-42A7-BD58-88C09CB149B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.BlameDataCollector", "src\Microsoft.TestPlatform.BlameDataCollector\Microsoft.TestPlatform.BlameDataCollector.csproj", "{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.BlameDataCollector.UnitTests", "test\Microsoft.TestPlatform.BlameDataCollector.UnitTests\Microsoft.TestPlatform.BlameDataCollector.UnitTests.csproj", "{67AEC962-14ED-4432-86BF-14F3381D2B2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -785,6 +789,30 @@ Global
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2}.Release|x64.Build.0 = Release|Any CPU
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2}.Release|x86.ActiveCfg = Release|Any CPU
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2}.Release|x86.Build.0 = Release|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Debug|x64.Build.0 = Debug|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Debug|x86.Build.0 = Debug|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Release|x64.ActiveCfg = Release|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Release|x64.Build.0 = Release|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Release|x86.ActiveCfg = Release|Any CPU
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A}.Release|x86.Build.0 = Release|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Debug|x64.Build.0 = Debug|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Debug|x86.Build.0 = Debug|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Release|x64.ActiveCfg = Release|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Release|x64.Build.0 = Release|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Release|x86.ActiveCfg = Release|Any CPU
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -851,5 +879,7 @@ Global
 		{7B48115A-B766-4B55-93A8-C08A42C37710} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{FBF74C8F-695C-4967-84AC-358EEFB1376D} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
+		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
+		{67AEC962-14ED-4432-86BF-14F3381D2B2F} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 	EndGlobalSection
 EndGlobal
