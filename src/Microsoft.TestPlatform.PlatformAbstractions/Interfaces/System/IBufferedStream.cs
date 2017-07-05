@@ -8,7 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     /// <summary>
     /// Helper class to return plaform specific stream.
     /// </summary>
-    public interface IStream
+    public interface IBufferedStream
     {
         /// <summary>
         /// Returns plarform specific Buffered Stream

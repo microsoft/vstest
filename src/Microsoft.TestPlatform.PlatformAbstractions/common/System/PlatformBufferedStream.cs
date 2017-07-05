@@ -3,34 +3,22 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System;
     using System.IO;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc/>
-    public class PlatformStream : IStream
+    public class PlatformBufferedStream : IBufferedStream
     {
-        /// <summary>
-        /// Gets the PlatformStream instance.
-        /// </summary>
-        public static PlatformStream Instance
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         /// <inheritdoc/>
         public Stream PlaformBufferedStream(Stream stream)
         {
-            throw new NotImplementedException();
+            return new BufferedStream(stream);
         }
 
         /// <inheritdoc/>
         public Stream PlaformBufferedStreamWithBufferSize(Stream stream, int bufferSize)
         {
-            throw new NotImplementedException();
+            return new BufferedStream(stream, bufferSize);
         }
     }
 }

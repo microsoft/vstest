@@ -7,31 +7,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc/>
-    public class PlatformStream : IStream
+    public class PlatformBufferedStream : IBufferedStream
     {
-        private static PlatformStream instance;
-
-        /// <summary>
-        /// Gets the PlatformStream instance.
-        /// </summary>
-        public static PlatformStream Instance
-        {
-            get
-            {
-                return instance ?? (instance = new PlatformStream());
-            }
-        }
-
         /// <inheritdoc/>
         public Stream PlaformBufferedStream(Stream stream)
         {
-            return new BufferedStream(stream);
+            return stream;
         }
 
         /// <inheritdoc/>
         public Stream PlaformBufferedStreamWithBufferSize(Stream stream, int bufferSize)
         {
-            return new BufferedStream(stream, bufferSize);
+            return stream;
         }
     }
 }
