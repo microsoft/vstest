@@ -824,9 +824,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
-        <target state="translated">Neplatná verze rozhraní .NET Framework: {0}. Zadejte prosím úplný název pro TargetFramework. Dalšími podporovanými verzemi jsou Framework35, Framework40 a Framework45.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
+        <target state="new">Neplatná verze rozhraní .NET Framework: {0}. Zadejte prosím úplný název pro TargetFramework. Dalšími podporovanými verzemi jsou Framework35, Framework40 a Framework45.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Neplatné rozhraní .net Framework verze: {0}. uveďte, prosím, fullname TargetFramework. Ostatní podporované rozhraní .net Framework verze jsou Framework35, Framework40 a Framework45.</target>
         </alt-trans>
