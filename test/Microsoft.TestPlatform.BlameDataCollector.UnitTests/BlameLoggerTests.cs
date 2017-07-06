@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         }
 
         [TestMethod]
-        public void TestResulCompleteHandlerShouldThowExceptionIfEventArgsIsNull()
+        public void TestResultCompleteHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
             // Raise an event on mock object
             Assert.ThrowsException<NullReferenceException>(() =>
@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         }
 
         [TestMethod]
-        public void TestRunCompleteHandlerShouldGetFaultyTestCaseIfTestRunAborted()
+        public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAborted()
         {
             // Initialize
             var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
@@ -87,6 +87,22 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldNotReadFileIfTestRunNotAborted()
+        { 
+            // Initialize Blame Logger
+            this.blameLogger.Initialize(this.events.Object, null);
+
+            // Setup and Raise event
+            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
+            this.testRunRequest.Raise(
+                m => m.OnRunCompletion += null,
+                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: false, error: null, attachmentSets: null, elapsedTime: new TimeSpan(1, 0, 0, 0)));
+
+            // Verify Call
+            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
         }
 
         internal class DummyTestLoggerManager : TestLoggerManager

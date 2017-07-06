@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -77,11 +76,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Blame;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Diag;
 
         public override string HelpContentResourceName => CommandLineResources.EnableBlameUsage;
 
-        public override HelpContentPriority HelpPriority => HelpContentPriority.EnableBlameArgumentProcessorHelpPriority;
+        public override HelpContentPriority HelpPriority => HelpContentPriority.EnableDiagArgumentProcessorHelpPriority;
     }
 
     /// <summary>

@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         /// <param name="testSequence">List of tests in sequence</param>
         /// <param name="filePath">The path of file</param>
-        void WriteTestSequence(List<TestCase> testSequence, string filePath);
+        string WriteTestSequence(List<TestCase> testSequence, string filePath);
 
         /// <summary>
         /// Reads all tests from file

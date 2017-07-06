@@ -24,11 +24,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         Diag = 1,
 
         /// <summary>
-        /// Priority of the Blame processor.
-        /// </summary>
-        Blame = 1,
-
-        /// <summary>
         /// Priority of processors related to design mode. This needs to be higher priority
         /// since some of the functionalities (like logger) depend on this.
         /// </summary>

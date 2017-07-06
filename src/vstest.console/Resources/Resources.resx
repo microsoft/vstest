@@ -657,6 +657,6 @@
   </data>
   <data name="EnableBlameUsage" xml:space="preserve">
     <value>--Blame|/Blame
-      Enable Blame mode to get name of the faulty test case in event of a test host crash.</value>
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</value>
   </data>
 </root>

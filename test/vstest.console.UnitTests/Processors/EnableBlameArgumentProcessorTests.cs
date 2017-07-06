@@ -1,12 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
+
 namespace vstest.console.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using vstest.console.UnitTests.TestDoubles;
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     [TestClass]
     public class EnableBlameArgumentProcessorTests
@@ -45,7 +48,9 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.AreEqual("/Blame", capabilities.CommandName);
             Assert.AreEqual(false, capabilities.IsAction);
-            Assert.AreEqual(ArgumentProcessorPriority.Blame, capabilities.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.Diag, capabilities.Priority);
+            Assert.AreEqual(HelpContentPriority.EnableDiagArgumentProcessorHelpPriority, capabilities.HelpPriority);
+            Assert.AreEqual(CommandLineResources.EnableBlameUsage, capabilities.HelpContentResourceName);
 
             Assert.AreEqual(false, capabilities.AllowMultiple);
             Assert.AreEqual(false, capabilities.AlwaysExecute);
@@ -64,6 +69,14 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.IsNotNull(this.settingsProvider.ActiveRunSettings);
             Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors>\r\n      <DataCollector friendlyName=\"Blame\" enabled=\"True\" />\r\n    </DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>", this.settingsProvider.ActiveRunSettings.SettingsXml);
+        }
+
+        [TestMethod]
+        public void ExecutorInitializeShouldAddBlameLoggerInLoggerList()
+        { 
+            executor.Initialize(String.Empty);
+
+            Assert.IsTrue(testloggerManager.LoggerExist("blame"));
         }
     }
 }

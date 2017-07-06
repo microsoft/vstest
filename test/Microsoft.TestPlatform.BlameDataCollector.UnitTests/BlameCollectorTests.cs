@@ -54,20 +54,76 @@ namespace Microsoft.VisualStudio.TestPlatform.BlameDataCollector.UnitTests
         }
 
         [TestMethod]
-        public void TriggerSessionEndedHandlerShouldWriteToFile()
+        public void TriggerTestCaseStartedHandlerShouldIncreaseTestStartCount()
+        {
+            TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
+
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(this.configurationElement,
+                this.mockDataColectionEvents.Object, this.mockDataCollectionSink.Object,
+                this.mockLogger.Object, this.context);
+
+            // Setup and Raise Session End Event
+            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
+
+            // Assert
+            Assert.AreEqual(1, this.blameDataCollector.TestStartCount);
+        }
+
+        [TestMethod]
+        public void TriggerTestCaseEndedHandlerShouldIncreaseTestEndCount()
+        {
+            TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
+
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(this.configurationElement,
+                this.mockDataColectionEvents.Object, this.mockDataCollectionSink.Object,
+                this.mockLogger.Object, this.context);
+
+            // Setup and Raise Session End Event
+            this.mockDataColectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
+
+            // Assert
+            Assert.AreEqual(1, this.blameDataCollector.TestEndCount);
+        }
+
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldWriteToFileIfTestStartCountIsGreater()
         {
             // Initializing Blame Data Collector
             this.blameDataCollector.Initialize(this.configurationElement,
                     this.mockDataColectionEvents.Object, this.mockDataCollectionSink.Object,
                     this.mockLogger.Object, this.context);
-            var filepath = Path.Combine(AppContext.BaseDirectory, "TestSequence.xml");
+            var filepath = Path.Combine(AppContext.BaseDirectory, "Sequence");
+            TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
 
-            // Setup and Raise Session End Event
+            // Setup and Raise TestCaseStart and Session End Event
             this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<DataCollectionContext>(), It.IsAny<String>(), It.IsAny<bool>()));
+            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionContext));
 
             // Verify WriteTestSequence Call
             this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), filepath), Times.Once);
+        }
+
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldNotWriteToTestStartCountIsSameAsTestEndCountFile()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(this.configurationElement,
+                this.mockDataColectionEvents.Object, this.mockDataCollectionSink.Object,
+                this.mockLogger.Object, this.context);
+            var filepath = Path.Combine(AppContext.BaseDirectory, "TestSequence.xml");
+            TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
+
+            // Setup and Raise TestCaseStart and Session End Event
+            this.mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<DataCollectionContext>(), It.IsAny<String>(), It.IsAny<bool>()));
+            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
+            this.mockDataColectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(dataCollectionContext));
+
+            // Verify WriteTestSequence Call
+            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), filepath), Times.Never);
         }
     }
 }

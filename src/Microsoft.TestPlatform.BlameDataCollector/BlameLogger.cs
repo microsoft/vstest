@@ -8,7 +8,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
+    using Microsoft.TestPlatform.BlameDataCollector.Resources;
 
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
@@ -89,7 +89,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
 
             // Gets the faulty test case if test aborted 
             var testCaseName = GetFaultyTestCase(e);
-            string reason = Constants.TestRunAbortReason + testCaseName;
+            string reason = Resources.Resources.AbortedTestRun + testCaseName;
             Output.Error(reason);
         }
 
@@ -102,32 +102,19 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private string GetFaultyTestCase(TestRunCompleteEventArgs e)
         {
-            string testname = null;
             foreach (var attachmentSet in e.AttachmentSets)
             {
                 if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
                 {
-                    testname = GetLastTestFromFile(attachmentSet.Attachments[0].Uri.LocalPath);
-                    break;
+                    var filepath = attachmentSet.Attachments[0].Uri.LocalPath;
+                    List<TestCase> testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
+                    if (testCaseList.Count > 0)
+                    {
+                        var testcase = testCaseList[testCaseList.Count - 1];
+                        return testcase.FullyQualifiedName;
+                    }
+                    return String.Empty;
                 }
-            }
-            return testname;
-        }
-
-        /// <summary>
-        /// Reads file for last test case
-        /// </summary>
-        public string GetLastTestFromFile(string filepath)
-        {
-            try
-            {
-                List<TestCase> testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
-                var testcase = testCaseList[testCaseList.Count - 1];
-                return testcase.FullyQualifiedName;
-            }
-            catch (NullReferenceException e)
-            {
-               EqtTrace.Error("Blame Logger: GetLastTestFromFile : " + e);
             }
             return String.Empty;
         }

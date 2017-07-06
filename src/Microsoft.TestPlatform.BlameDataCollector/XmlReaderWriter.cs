@@ -33,11 +33,14 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Adds tests to document and saves document to file
         /// </summary>
-        public void WriteTestSequence(List<TestCase> testSequence, string filePath)
+        public string WriteTestSequence(List<TestCase> testSequence, string filePath)
         {
             ValidateArg.NotNull(testSequence, nameof(testSequence));
             ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
 
+            filePath = filePath + ".xml";
+
+            // Writing test sequence
             var xmlDocument = new XmlDocument();
             var xmlDeclaration = xmlDocument.CreateNode(XmlNodeType.XmlDeclaration, string.Empty, string.Empty);
             var blameTestRoot = xmlDocument.CreateElement(Constants.BlameRootNode);
@@ -48,24 +51,25 @@ namespace Microsoft.TestPlatform.BlameDataCollector
                 var testElement = xmlDocument.CreateElement(Constants.BlameTestNode);
                 testElement.SetAttribute(Constants.TestNameAttribute, testCase.FullyQualifiedName);
                 testElement.SetAttribute(Constants.TestSourceAttribute, testCase.Source);
+
                 blameTestRoot.AppendChild(testElement);
             }
             xmlDocument.AppendChild(blameTestRoot);
-
             using (var stream = this.fileHelper.GetStream(filePath, FileMode.Create))
             {
                 xmlDocument.Save(stream);
             }
+            return filePath;
         }
 
         /// <summary>
         /// Reads All test case from file
         /// </summary>
-        /// <param name="filePath">The path of saved file</param>
+        /// <param name="filePath">The path of test sequence file</param>
         /// <returns>Test Case List</returns>
         public List<TestCase> ReadTestSequence(string filePath) 
         {
-            ValidateArg.NotNullOrEmpty(filePath, nameof(filePath));
+            ValidateArg.NotNull(filePath, nameof(filePath));
 
             if (!fileHelper.Exists(filePath))
             {
@@ -73,19 +77,26 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             }
 
             List<TestCase> testCaseList = new List<TestCase>();
-            var xmlDocument = new XmlDocument();
-            using (var stream = this.fileHelper.GetStream(filePath, FileMode.Open))
+            try
             {
-                xmlDocument.Load(stream);
+                // Reading test sequence 
+                var xmlDocument = new XmlDocument();
+                using (var stream = this.fileHelper.GetStream(filePath, FileMode.Open))
+                {
+                    xmlDocument.Load(stream);
+                }
+                var root = xmlDocument.LastChild;
+                foreach (XmlNode node in root)
+                {
+                    TestCase testCase = new TestCase();
+                    testCase.FullyQualifiedName = node.Attributes[Constants.TestNameAttribute].Value;
+                    testCase.Source = node.Attributes[Constants.TestSourceAttribute].Value;
+                    testCaseList.Add(testCase);
+                }
             }
-            var root = xmlDocument.LastChild;
-
-            foreach (XmlNode node in root)
+            catch (XmlException xmlException)
             {
-                TestCase testCase = new TestCase();
-                testCase.FullyQualifiedName = node.Attributes[Constants.TestNameAttribute].Value;
-                testCase.Source = node.Attributes[Constants.TestSourceAttribute].Value;
-                testCaseList.Add(testCase);
+                EqtTrace.Warning("XmlReaderWriter : Exception ", xmlException);
             }
             return testCaseList;
         }

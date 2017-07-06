@@ -79,7 +79,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
         {
-            EqtTrace.Info("Blame Collector : " + Constants.TestCaseStart);
+            EqtTrace.Info("Blame Collector : Test Case Start");
             TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
             this.testSequence.Add(testcase);
             this.testStartCount++;
@@ -90,7 +90,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void Events_TestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
-            EqtTrace.Info("Blame Collector : " + Constants.TestCaseEnd);
+            EqtTrace.Info("Blame Collector : Test Case End");
             this.testEndCount++;
         }
 
@@ -99,11 +99,14 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void SessionEnded_Handler(object sender, SessionEndEventArgs args)
         {
-            EqtTrace.Info("Blame Collector :" + Constants.TestSessionEnd);
-            if (this.testStartCount != this.testEndCount)
+            EqtTrace.Info("Blame Collector : Session End");
+            
+            // If the last test crashes, it will not invoke a test case end and therefore 
+            // In case of crash testStartCount will be greater than testEndCount and we need to send write the sequence
+            if (this.testStartCount > this.testEndCount)
             {
                 var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
-                this.blameReaderWriter.WriteTestSequence(this.testSequence, filepath);
+                filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, filepath);
                 this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
             }
             DeregisterEvents();
@@ -117,6 +120,28 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             this.events.SessionEnd -= this.SessionEnded_Handler;
             this.events.TestCaseStart -= this.Events_TestCaseStart;
             this.events.TestCaseEnd -= this.Events_TestCaseEnd;
+        }
+
+        /// <summary>
+        /// Getter method
+        /// </summary>
+        internal int TestStartCount
+        {
+            get
+            {
+                return this.testStartCount;
+            }
+        }
+
+        /// <summary>
+        /// Getter method
+        /// </summary>
+        internal int TestEndCount
+        {
+            get
+            {
+                return this.testEndCount;
+            }
         }
     }
 }

@@ -9,21 +9,6 @@ namespace Microsoft.TestPlatform.BlameDataCollector
     internal static class Constants
     {
         /// <summary>
-        /// The test session end constant.
-        /// </summary>
-        public const string TestSessionEnd = "TestSessionEnd";
-
-        /// <summary>
-        /// The test case start constant.
-        /// </summary>
-        public const string TestCaseStart = "TestCaseStart";
-
-        /// <summary>
-        /// The test case end constant.
-        /// </summary>
-        public const string TestCaseEnd = "TestCaseEnd";
-
-        /// <summary>
         /// Root node name for Xml file.
         /// </summary>
         public const string BlameRootNode = "TestSequence";
@@ -36,7 +21,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Attachment File name.
         /// </summary>
-        public const string AttachmentFileName = "TestSequence.xml";
+        public const string AttachmentFileName = "Sequence";
 
         /// <summary>
         /// Test Name Attribute.
