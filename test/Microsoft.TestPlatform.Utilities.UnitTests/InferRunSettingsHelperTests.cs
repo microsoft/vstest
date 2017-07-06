@@ -214,42 +214,57 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
                         XmlRunSettingsUtilities.OSArchitecture.ToString()));
         }
 
-        [TestMethod]
-        public void UpdateDesignModeShouldNotModifyXmlIfNavigatorIsNotAtRootNode()
+        [DataTestMethod]
+        [DataRow("DesignMode")]
+        [DataRow("CollectSourceInformation")]
+        public void UpdateRunSettingsShouldNotModifyXmlIfNavigatorIsNotAtRootNode(string settingName)
         {
             var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
             navigator.MoveToFirstChild();
 
-            InferRunSettingsHelper.UpdateDesignMode(navigator, true);
+            switch (settingName.ToUpperInvariant())
+            {
+                case "DESIGNMODE":
+                    InferRunSettingsHelper.UpdateDesignMode(navigator, true);
+                    break;
+
+                case "COLLECTSOURCEINFORMATION":
+                    InferRunSettingsHelper.UpdateCollectSourceInformation(navigator, true);
+                    break;
+            };
 
             navigator.MoveToRoot();
-            Assert.IsTrue(navigator.InnerXml.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
+            Assert.IsTrue(navigator.InnerXml.IndexOf(settingName, StringComparison.OrdinalIgnoreCase) < 0);
         }
 
         [TestMethod]
-        public void UpdateDesignModeShouldNotModifyXmlIfItAlreadyHasDesignModeNode()
+        public void UpdateDesignModeOrCsiShouldNotModifyXmlIfNodeIsAlreadyPresent()
         {
-            var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode></RunConfiguration></RunSettings>";
+            var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode><CollectSourceInformation>False</CollectSourceInformation></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
             InferRunSettingsHelper.UpdateDesignMode(navigator, true);
+            InferRunSettingsHelper.UpdateCollectSourceInformation(navigator, true);
 
             Assert.AreEqual("False", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/DesignMode"));
+            Assert.AreEqual("False", this.GetValueOf(navigator, "/RunSettings/RunConfiguration/CollectSourceInformation"));
         }
 
         [DataTestMethod]
         [DataRow(true)]
         [DataRow(false)]
-        public void UpdateDesignModeShouldModifyXmlToValueProvided(bool designModeValue)
+        public void UpdateDesignModeOrCsiShouldModifyXmlToValueProvided(bool val)
         {
             var settings = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             var navigator = this.GetNavigator(settings);
 
-            InferRunSettingsHelper.UpdateDesignMode(navigator, designModeValue);
+            InferRunSettingsHelper.UpdateDesignMode(navigator, val);
+            InferRunSettingsHelper.UpdateCollectSourceInformation(navigator, val);
 
-            Assert.AreEqual(designModeValue.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/DesignMode"));
-        }
+            Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/DesignMode"));
+            Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/CollectSourceInformation"));
+        }   
 
         #region private methods
 

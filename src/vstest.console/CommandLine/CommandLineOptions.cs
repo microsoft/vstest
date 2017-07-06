@@ -211,6 +211,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         }
 
         /// <summary>
+        /// If not already set from IDE in the runSettings, ShouldCollectSourceInformation defaults to IsDesignMode value        
+        /// </summary>
+        public bool ShouldCollectSourceInformation
+        {
+            get
+            {
+                return IsDesignMode;
+            }
+        }        
+
+        /// <summary>
         /// Specifies if /Platform has been specified on command line or not.
         /// </summary>
         internal bool ArchitectureSpecified { get; private set; }
