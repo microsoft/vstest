@@ -178,7 +178,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
-            Task<int> processId = this.testHostManager.LaunchTestHostAsync(startInfo);
+            Task<int> processId = this.testHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None);
             processId.Wait();
 
             Assert.AreEqual(Process.GetCurrentProcess().Id, processId.Result);
@@ -204,7 +204,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var currentProcess = Process.GetCurrentProcess();
             mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
 
-            Task<int> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo);
+            Task<int> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None);
             pid.Wait();
             mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
             Assert.AreEqual(currentProcess.Id, pid.Result);
@@ -216,7 +216,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string errorData = "Custom Error Strings";
             this.ErrorCallBackTestHelper(errorData, -1);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(errorData, this.errorMessage);
         }
@@ -227,7 +227,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string errorData = "Long Custom Error Strings";
             this.ErrorCallBackTestHelper(errorData, -1);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             // Ignore new line chars
             Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
@@ -240,7 +240,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string errorData = string.Empty;
             this.ErrorCallBackTestHelper(errorData, 0);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(null, this.errorMessage);
         }
@@ -252,7 +252,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.ErrorCallBackTestHelper(errorData, -1);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(this.errorMessage, string.Empty);
         }
@@ -264,7 +264,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.ExitCallBackTestHelper(exitCode);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(this.errorMessage, string.Empty);
             Assert.AreEqual(this.exitCode, exitCode);

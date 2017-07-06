@@ -143,9 +143,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+        public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            return await Task.Run(() => this.LaunchHost(testHostStartInfo), CancellationToken.None);
+            return await Task.Run(() => this.LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -304,18 +304,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
-        private int LaunchHost(TestProcessStartInfo testHostStartInfo)
+        private int LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-            if (this.testHostLauncher == null)
+            try
             {
-                EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
+                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+                if (this.testHostLauncher == null)
+                {
+                    EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+
+                    cancellationToken.ThrowIfCancellationRequested();
+                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
+                }
+                else
+                {
+                    var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
+                    this.testHostProcess = Process.GetProcessById(processId);
+                }
             }
-            else
+            catch (OperationCanceledException ex)
             {
-                var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
-                this.testHostProcess = Process.GetProcessById(processId);
+                this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
+                throw;
             }
 
             var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;

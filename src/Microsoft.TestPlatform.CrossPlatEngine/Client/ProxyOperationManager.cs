@@ -7,11 +7,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using System.Threading;
-    using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -19,8 +20,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
-    using System.Reflection;
-    using System.Linq;
 
     /// <summary>
     /// Base class for any operations that the client needs to drive through the engine.
@@ -94,15 +93,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // Get the test process start info
                 var testHostStartInfo = this.UpdateTestProcessStartInfo(this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo));
-
-                // Launch the test host.
-                var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo);
-
                 try
                 {
+                    // Launch the test host.
+                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, CancellationToken.None);
                     this.testHostProcessId = hostLaunchedTask.Result;
                 }
                 catch (OperationCanceledException ex)
+                {
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
+                }
+                catch (AggregateException ex)
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
                 }
@@ -113,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
                     ConsoleOutput.Instance.WriteLine(
-                        string.Format("Process Id: {0}, Name: {1}", hostLaunchedTask.Result, this.processHelper.GetProcessName(hostLaunchedTask.Result)),
+                        string.Format("Process Id: {0}, Name: {1}", this.testHostProcessId, this.processHelper.GetProcessName(this.testHostProcessId)),
                         OutputLevel.Information);
 
                     // Increase connection timeout when debugging is enabled.
@@ -125,7 +126,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
-                    if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError.ToString()))
+                    if (!string.IsNullOrWhiteSpace(this.testHostProcessStdError))
                     {
                         // Testhost failed with error
                         errorMsg = string.Format(CrossPlatEngineResources.TestHostExitedWithError, this.testHostProcessStdError);
@@ -205,7 +206,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         protected string GetTimestampedLogFile(string logFile)
         {
             if (string.IsNullOrWhiteSpace(logFile))
+            {
                 return null;
+            }
 
             return Path.ChangeExtension(
                 logFile,

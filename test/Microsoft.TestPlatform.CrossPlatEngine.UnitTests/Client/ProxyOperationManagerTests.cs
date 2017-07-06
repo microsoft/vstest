@@ -57,7 +57,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo)), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.Is<TestProcessStartInfo>(si => si == expectedStartInfo), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
@@ -197,7 +197,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testOperationManager.Close();
 
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
-            this.mockTestHostManager.Verify(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.Exactly(2));
+            this.mockTestHostManager.Verify(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Exactly(2));
         }
 
         [TestMethod]
@@ -205,7 +205,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // Ensure testhost start returns a dummy process id
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
-            this.mockTestHostManager.Setup(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>())).Returns(() => Task.FromResult<int>(123));
+            this.mockTestHostManager.Setup(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult<int>(123));
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>());
 
             this.testOperationManager.Close();
@@ -256,7 +256,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 return new TestProcessStartInfo();
             }
 
-            public override async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            public override async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
                 return await Task.Run(() => { return 0; });
             }

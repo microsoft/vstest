@@ -177,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.Shared = !config.DisableAppDomain;
             }
 
-            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -245,7 +245,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.Shared = !config.DisableAppDomain;
             }
 
-            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }

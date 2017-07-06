@@ -5,12 +5,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System.Threading;
 
     /// <summary>
     /// Interface for TestRuntimeProvider which manages test host processes for test engine.
@@ -65,8 +65,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// Launches the test host for discovery/execution.
         /// </summary>
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-        Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo);
+        Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the start parameters for the test host.
@@ -83,14 +84,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// mechanism. E.g. for .net core, extensions are discovered from the <c>testproject.deps.json</c> file.
         /// </summary>
         /// <param name="sources">List of test sources.</param>
+        /// <param name="extensions"></param>
         /// <returns>List of paths to extension assemblies.</returns>
         IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions);
 
         /// <summary>
         /// Terminate the test host process.
         /// </summary>
-        /// <param name="processId">Process identifier for the test host.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <param name="processId">
+        /// Process identifier for the test host.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// Cancellation token.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Task"/>.
+        /// </returns>
         Task TerminateAsync(int processId, CancellationToken cancellationToken);
     }
 
