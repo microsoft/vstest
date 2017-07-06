@@ -138,7 +138,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestTestAdapterPath))
             {
-                allArgs.Add("--testAdapterPath:" + this.VSTestTestAdapterPath.AddDoubleQuote());
+                allArgs.Add("--testAdapterPath:" + (this.VSTestTestAdapterPath + " ").AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestFramework))
@@ -164,7 +164,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
             {
-                allArgs.Add("--resultsDirectory:" + this.VSTestResultsDirectory.AddDoubleQuote());
+                allArgs.Add("--resultsDirectory:" + (this.VSTestResultsDirectory + " ").AddDoubleQuote());
             }
 
             if (!string.IsNullOrEmpty(this.VSTestListTests))

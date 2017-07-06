@@ -31,10 +31,10 @@ namespace Microsoft.TestPlatform.Build.UnitTests
         }
 
         [TestMethod]
-        public void CreateArgumentShouldPassResultsDirectoryCorrectly()
+        public void CreateArgumentShouldAddSpaceAtTheEndOfResultsDirectory()
         {
-            const string resultsDirectoryValue = @"C:\tmp\ResultsDirectory";
-            var vstestTask = new VSTestTask {  VSTestResultsDirectory = resultsDirectoryValue };
+            const string resultsDirectoryValue = @"C:\tmp\ResultsDirectory\";
+            var vstestTask = new VSTestTask { VSTestResultsDirectory = resultsDirectoryValue };
 
             // Add values for required properties.
             vstestTask.TestFileFullPath = "abc";
@@ -42,7 +42,22 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var result = vstestTask.CreateArgument().ToArray();
 
-            Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue}\"", result[1]);
+            Assert.AreEqual($"--resultsDirectory:\"{resultsDirectoryValue} \"", result[1]);
+        }
+
+        [TestMethod]
+        public void CreateArgumentShouldAddSpaceAtTheEndOfTestAdapterPath()
+        {
+            const string testAdapterPath = @"C:\tmp\TestAdapterPath\";
+            var vstestTask = new VSTestTask { VSTestTestAdapterPath = testAdapterPath };
+
+            // Add values for required properties.
+            vstestTask.TestFileFullPath = "abc";
+            vstestTask.VSTestFramework = "abc";
+
+            var result = vstestTask.CreateArgument().ToArray();
+
+            Assert.AreEqual($"--testAdapterPath:\"{testAdapterPath} \"", result[0]);
         }
 
         [TestMethod]
