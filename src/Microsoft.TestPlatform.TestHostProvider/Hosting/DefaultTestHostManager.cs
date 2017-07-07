@@ -261,10 +261,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             catch (OperationCanceledException ex)
             {
                 this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
-                throw;
             }
 
-            var pId = this.testHostProcess?.Id ?? 0;
+            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
             this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
             return pId;
         }

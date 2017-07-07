@@ -325,7 +325,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             catch (OperationCanceledException ex)
             {
                 this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
-                throw;
             }
 
             var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;

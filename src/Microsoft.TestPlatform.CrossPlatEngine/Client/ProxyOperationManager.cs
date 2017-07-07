@@ -99,15 +99,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, CancellationToken.None);
                     this.testHostProcessId = hostLaunchedTask.Result;
                 }
-                catch (OperationCanceledException ex)
+                catch (Exception ex)
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
                 }
-                catch (AggregateException ex)
-                {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
-                }
-
+                
                 // Warn the user that execution will wait for debugger attach.
                 var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
                 if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
