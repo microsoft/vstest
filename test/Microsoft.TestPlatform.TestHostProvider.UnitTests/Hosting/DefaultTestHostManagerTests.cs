@@ -185,6 +185,23 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void LaunchTestHostAsyncShouldNotStartHostProcessIfCancellationTokenIsSet()
+        {
+            this.testableTestHostManager = new TestableTestHostManager(
+                Architecture.X64,
+                Framework.DefaultFramework,
+                this.mockProcessHelper.Object,
+                true,
+                this.maxStdErrStringLength,
+                this.mockMessageLogger.Object);
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            Assert.ThrowsException<System.AggregateException>(() => this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
+        }
+
+        [TestMethod]
         public void PropertiesShouldReturnEmptyDictionary()
         {
             Assert.AreEqual(0, this.testHostManager.Properties.Count);

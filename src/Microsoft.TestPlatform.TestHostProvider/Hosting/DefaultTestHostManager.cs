@@ -30,14 +30,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// This works for Desktop local scenarios
     /// </summary>
     [ExtensionUri(DefaultTestHostUri)]
-    [FriendlyName(DefaultTestHostFriendltName)]
+    [FriendlyName(DefaultTestHostFriendlyName)]
     public class DefaultTestHostManager : ITestRuntimeProvider
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
 
         private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
-        private const string DefaultTestHostFriendltName = "DefaultTestHost";
+        private const string DefaultTestHostFriendlyName = "DefaultTestHost";
 
         private Architecture architecture;
 
@@ -261,6 +261,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             catch (OperationCanceledException ex)
             {
                 this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
+                return -1;
             }
 
             var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;

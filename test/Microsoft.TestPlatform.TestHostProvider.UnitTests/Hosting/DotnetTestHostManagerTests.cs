@@ -209,6 +209,20 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void LaunchTestHostAsyncShouldNotStartHostProcessIfCancellationTokenIsSet()
+        {
+            var expectedProcessId = Process.GetCurrentProcess().Id;
+            this.mockTestHostLauncher.Setup(thl => thl.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(expectedProcessId);
+            this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
+            var startInfo = this.GetDefaultStartInfo();
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            Assert.ThrowsException<AggregateException>(() => this.dotnetHostManager.LaunchTestHostAsync(startInfo, cancellationTokenSource.Token).Wait());
+        }
+
+        [TestMethod]
         public void LaunchTestHostShouldLaunchProcessWithEnvironmentVariables()
         {
             var variables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };

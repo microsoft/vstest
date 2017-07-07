@@ -39,11 +39,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// intentional since we want to move this to a separate assembly (with some runtime extensibility discovery).
     /// </remarks>
     [ExtensionUri(DotnetTestHostUri)]
-    [FriendlyName(DotnetTestHostFriendltName)]
+    [FriendlyName(DotnetTestHostFriendlyName)]
     public class DotnetTestHostManager : ITestRuntimeProvider
     {
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
-        private const string DotnetTestHostFriendltName = "DotnetTestHost";
+        private const string DotnetTestHostFriendlyName = "DotnetTestHost";
         private const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
 
         private IDotnetHostHelper dotnetHostHelper;
@@ -325,6 +325,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             catch (OperationCanceledException ex)
             {
                 this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
+                return -1;
             }
 
             var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
