@@ -390,16 +390,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
             Output.WriteLine(string.Empty, OutputLevel.Information);
+
+            // Printing Run-level Attachments		
             var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
-            
-            // Printing Run-level Attachments
             if (runLevelAttachementCount > 0)
             {
                 Output.Information(CommandLineResources.AttachmentsBanner);
-            }
-
-            if (runLevelAttachementCount > 0)
-            {
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
                     foreach (var uriDataAttachment in attachmentSet.Attachments)

@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.CollectArgumentProcessorHelpPriority;
     }
-    
+
     /// <inheritdoc />
     internal class CollectArgumentExecutor : IArgumentExecutor
     {
