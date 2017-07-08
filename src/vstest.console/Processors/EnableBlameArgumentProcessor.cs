@@ -4,14 +4,13 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using System.Diagnostics.Contracts;
+
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
-    using System.Diagnostics.Contracts;
-    using Microsoft.VisualStudio.TestPlatform.Common;
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+
+    using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
     {
@@ -91,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// Blame logger and data collector friendly name
         /// </summary>
-        private static string BlameFriendlyName = "Blame";
+        private static string BlameFriendlyName = "blame";
 
         /// <summary>
         /// Test logger manager instance
@@ -123,26 +122,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             // Add Blame Logger
-            this.loggerManager.UpdateLoggerList(BlameFriendlyName.ToLower(), BlameFriendlyName.ToLower(), null);
+            this.loggerManager.UpdateLoggerList(BlameFriendlyName, BlameFriendlyName, null);
 
             // Add Blame Data Collector
-            CollectArgumentExecutor.EnabledDataCollectors.Add(BlameFriendlyName.ToLower());
-
-            var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
-            if (settings == null)
-            {
-                this.runSettingsManager.AddDefaultRunSettings();
-                settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
-            }
-
-            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
-            if (dataCollectionRunSettings == null)
-            {
-                dataCollectionRunSettings = new DataCollectionRunSettings();
-            }
-
-            CollectArgumentExecutor.EnableDataCollectorUsingFriendlyName(BlameFriendlyName, dataCollectionRunSettings);
-            this.runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+            CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager);
         }
 
         /// <summary>

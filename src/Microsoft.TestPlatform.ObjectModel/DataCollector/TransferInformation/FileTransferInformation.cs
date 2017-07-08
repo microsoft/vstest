@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// Represents required and optional information needed for requesting a file transfer.
     /// </summary>
     public class FileTransferInformation : BasicTransferInformation
-    {
+    { 
         #region Constructor
 
         /// <summary>

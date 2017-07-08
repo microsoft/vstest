@@ -1,17 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.BlameDataCollector
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Xml;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+    /// <summary>
+    /// The blame collector.
+    /// </summary>
     [DataCollectorFriendlyName("Blame")]
-    [DataCollectorTypeUri("datacollector://microsoft/blame/1.0")]
+    [DataCollectorTypeUri("datacollector://Microsoft/TestPlatform/Extensions/Blame")]
     public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         private DataCollectionSink dataCollectionSink;
@@ -23,7 +28,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         private int testEndCount;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
+        /// Initializes a new instance of the <see cref="BlameCollector"/> class. 
         /// Using XmlReaderWriter by default
         /// </summary>
         public BlameCollector()
@@ -32,10 +37,12 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BlameDataCollector"/> class.
+        /// Initializes a new instance of the <see cref="BlameCollector"/> class. 
         /// </summary>
-        /// <param name="blameReaderWriter">BlameReaderWriter instance.</param>
-        public BlameCollector(IBlameReaderWriter blameReaderWriter)
+        /// <param name="blameReaderWriter">
+        /// BlameReaderWriter instance.
+        /// </param>
+        protected BlameCollector(IBlameReaderWriter blameReaderWriter)
         {
             this.blameReaderWriter = blameReaderWriter;
         }
@@ -46,7 +53,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <returns>Environment variables that should be set in the test execution environment</returns>
         public IEnumerable<KeyValuePair<string, string>> GetTestExecutionEnvironmentVariables()
         {
-            return new List<KeyValuePair<string, string>> { };
+            return Enumerable.Empty<KeyValuePair<string, string>>();
         }
 
         /// <summary>
@@ -57,40 +64,48 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <param name="dataSink">A data collection sink for data transfer</param>
         /// <param name="logger">Data Collection Logger to send messages to the client </param>
         /// <param name="environmentContext">Context of data collector environment</param>
-        public override void Initialize(XmlElement configurationElement,
-            DataCollectionEvents events, DataCollectionSink dataSink,
-            DataCollectionLogger logger, DataCollectionEnvironmentContext environmentContext)
+        public override void Initialize(
+            XmlElement configurationElement,
+            DataCollectionEvents events, 
+            DataCollectionSink dataSink,
+            DataCollectionLogger logger, 
+            DataCollectionEnvironmentContext environmentContext)
         {
             ValidateArg.NotNull(logger, nameof(logger));
 
             this.events = events;
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
-            testSequence = new List<TestCase>();
+            this.testSequence = new List<TestCase>();
 
             // Subscribing to events
             this.events.SessionEnd += this.SessionEnded_Handler;
-            this.events.TestCaseStart += this.Events_TestCaseStart;
-            this.events.TestCaseEnd += this.Events_TestCaseEnd;
+            this.events.TestCaseStart += this.EventsTestCaseStart;
+            this.events.TestCaseEnd += this.EventsTestCaseEnd;
         }
 
         /// <summary>
         /// Called when Test Case Start event is invoked 
         /// </summary>
-        private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
+        private void EventsTestCaseStart(object sender, TestCaseStartEventArgs e)
         {
-            EqtTrace.Info("Blame Collector : Test Case Start");
-            TestCase testcase = new TestCase(e.TestElement.FullyQualifiedName, e.TestElement.ExecutorUri, e.TestElement.Source);
-            this.testSequence.Add(testcase);
+            if(EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Blame Collector : Test Case Start");
+            }
+            this.testSequence.Add(e.TestElement);
             this.testStartCount++;
         }
 
         /// <summary>
         /// Called when Test Case End event is invoked 
         /// </summary>
-        private void Events_TestCaseEnd(object sender, TestCaseEndEventArgs e)
+        private void EventsTestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
-            EqtTrace.Info("Blame Collector : Test Case End");
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Blame Collector : Test Case End");
+            }     
             this.testEndCount++;
         }
 
@@ -99,17 +114,22 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// </summary>
         private void SessionEnded_Handler(object sender, SessionEndEventArgs args)
         {
-            EqtTrace.Info("Blame Collector : Session End");
-            
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Blame Collector : Session End");
+            }
+
             // If the last test crashes, it will not invoke a test case end and therefore 
             // In case of crash testStartCount will be greater than testEndCount and we need to send write the sequence
             if (this.testStartCount > this.testEndCount)
             {
                 var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
                 filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, filepath);
-                this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filepath, true);
+                var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
+                this.dataCollectionSink.SendFileAsync(fileTranferInformation);
             }
-            DeregisterEvents();
+
+            this.DeregisterEvents();
         }
 
         /// <summary>
@@ -118,30 +138,8 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         private void DeregisterEvents()
         {
             this.events.SessionEnd -= this.SessionEnded_Handler;
-            this.events.TestCaseStart -= this.Events_TestCaseStart;
-            this.events.TestCaseEnd -= this.Events_TestCaseEnd;
-        }
-
-        /// <summary>
-        /// Getter method
-        /// </summary>
-        internal int TestStartCount
-        {
-            get
-            {
-                return this.testStartCount;
-            }
-        }
-
-        /// <summary>
-        /// Getter method
-        /// </summary>
-        internal int TestEndCount
-        {
-            get
-            {
-                return this.testEndCount;
-            }
+            this.events.TestCaseStart -= this.EventsTestCaseStart;
+            this.events.TestCaseEnd -= this.EventsTestCaseEnd;
         }
     }
 }

@@ -30,8 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         #region Constants
         private const string TestMessageFormattingPrefix = " ";
 
-        private const string BlameDataCollectorName = "Blame";
-
         /// <summary>
         /// Uri used to uniquely identify the console logger.
         /// </summary>

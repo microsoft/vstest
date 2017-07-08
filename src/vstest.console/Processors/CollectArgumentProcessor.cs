@@ -87,7 +87,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override HelpContentPriority HelpPriority => HelpContentPriority.CollectArgumentProcessorHelpPriority;
     }
-
+    
     /// <inheritdoc />
     internal class CollectArgumentExecutor : IArgumentExecutor
     {
@@ -114,31 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     argument));
             }
 
-            EnabledDataCollectors.Add(argument.ToLower());
-
-            var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
-            if (settings == null)
-            {
-                this.runSettingsManager.AddDefaultRunSettings();
-                settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
-            }
-
-            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
-            if (dataCollectionRunSettings == null)
-            {
-                dataCollectionRunSettings = new DataCollectionRunSettings();
-            }
-            else
-            {
-                // By default, all data collectors present in run settings are enabled, if enabled attribute is not specified.
-                // So explicitely disable those data collectors and enable those which are specified. 
-                DisableUnConfiguredDataCollectors(dataCollectionRunSettings);
-            }
-
-            // Add data collectors if not already present, enable if already present.
-            EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
-
-            this.runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+            AddDataCollectorToRunSettings(argument, this.runSettingsManager);
         }
 
         /// <inheritdoc />
@@ -194,6 +170,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             return false;
+        }
+
+        internal static void AddDataCollectorToRunSettings(string argument, IRunSettingsProvider runSettingsManager)
+        {
+            EnabledDataCollectors.Add(argument.ToLower());
+
+            var settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            if (settings == null)
+            {
+                runSettingsManager.AddDefaultRunSettings();
+                settings = runSettingsManager.ActiveRunSettings?.SettingsXml;
+            }
+
+            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
+            if (dataCollectionRunSettings == null)
+            {
+                dataCollectionRunSettings = new DataCollectionRunSettings();
+            }
+            else
+            {
+                // By default, all data collectors present in run settings are enabled, if enabled attribute is not specified.
+                // So explicitely disable those data collectors and enable those which are specified. 
+                DisableUnConfiguredDataCollectors(dataCollectionRunSettings);
+            }
+
+            // Add data collectors if not already present, enable if already present.
+            EnableDataCollectorUsingFriendlyName(argument, dataCollectionRunSettings);
+
+            runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
         }
     }
 }

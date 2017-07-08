@@ -8,11 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Microsoft.TestPlatform.BlameDataCollector.Resources {
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
     using System;
     using System.Reflection;
-    
-    
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -40,7 +39,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.BlameDataCollector.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources.Resources", typeof(Resources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -60,9 +59,9 @@ namespace Microsoft.TestPlatform.BlameDataCollector.Resources {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
-        ///   Looks up a localized string similar to The active Test Run was aborted because the host process exited unexpectedly while executing test .
+        ///   Looks up a localized string similar to The active Test Run was aborted because the host process exited unexpectedly while executing test..
         /// </summary>
         internal static string AbortedTestRun {
             get {

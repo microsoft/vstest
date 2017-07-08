@@ -268,7 +268,7 @@ function Publish-Package
     }
 
     # Publish Datacollector
-    $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.BlameDataCollector\bin\$TPB_Configuration"
+    $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
     $blameDataCollectorNet46 = Join-Path $blameDataCollector $TPB_TargetFramework
     $blameDataCollectorNetCore = Join-Path $blameDataCollector $TPB_TargetFrameworkCore
     Copy-Item $blameDataCollectorNet46\* $fullCLRExtensionsDir -Force

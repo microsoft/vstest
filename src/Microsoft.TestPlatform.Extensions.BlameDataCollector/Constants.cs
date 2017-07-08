@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.BlameDataCollector
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     /// <summary>
     /// Class for constants used across the files.
@@ -37,10 +37,5 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// Friendly name of the data collector
         /// </summary>
         public const string BlameDataCollectorName = "Blame";
-
-        /// <summary>
-        /// Test run Abort 
-        /// </summary>
-        public const string TestRunAbortReason = "The test run was aborted because the host process crashed unexpectedly while executing test ";
     }
 }

@@ -4,6 +4,7 @@
     <body>
       <trans-unit id="AbortedTestRun">
         <source>The active Test Run was aborted because the host process exited unexpectedly while executing test </source>
+        <target state="new">The active Test Run was aborted because the host process exited unexpectedly while executing test </target>
         <note></note>
       </trans-unit>
     </body>

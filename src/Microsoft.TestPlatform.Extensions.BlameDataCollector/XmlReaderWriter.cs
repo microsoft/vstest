@@ -1,29 +1,43 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.TestPlatform.BlameDataCollector
+namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
-    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// XmlReaderWriter class for reading and writing test sequences to file
     /// </summary>
     public class XmlReaderWriter : IBlameReaderWriter
     {
+        /// <summary>
+        /// The file helper.
+        /// </summary>
         private readonly IFileHelper fileHelper;
 
         #region  Constructor
-        
-        public XmlReaderWriter()
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="XmlReaderWriter"/> class.
+        /// </summary>
+        internal XmlReaderWriter()
             : this(new FileHelper())
-        { }
-        
-        public XmlReaderWriter(IFileHelper fileHelper)
+        {
+        }
+
+        /// <summary>
+        /// Protected for testing purposes
+        /// </summary>
+        /// <param name="fileHelper">
+        /// The file helper.
+        /// </param>
+        protected XmlReaderWriter(IFileHelper fileHelper)
         {
             this.fileHelper = fileHelper;
         }
@@ -33,6 +47,12 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         /// <summary>
         /// Adds tests to document and saves document to file
         /// </summary>
+        /// <param name="testSequence">
+        /// The test Sequence.
+        /// </param>
+        /// <param name="filePath">
+        /// The file Path.
+        /// </param>
         public string WriteTestSequence(List<TestCase> testSequence, string filePath)
         {
             ValidateArg.NotNull(testSequence, nameof(testSequence));
@@ -59,6 +79,7 @@ namespace Microsoft.TestPlatform.BlameDataCollector
             {
                 xmlDocument.Save(stream);
             }
+
             return filePath;
         }
 
@@ -71,12 +92,12 @@ namespace Microsoft.TestPlatform.BlameDataCollector
         {
             ValidateArg.NotNull(filePath, nameof(filePath));
 
-            if (!fileHelper.Exists(filePath))
+            if (!this.fileHelper.Exists(filePath))
             {
                 throw new FileNotFoundException();
             }
 
-            List<TestCase> testCaseList = new List<TestCase>();
+            var testCaseList = new List<TestCase>();
             try
             {
                 // Reading test sequence 
@@ -88,9 +109,12 @@ namespace Microsoft.TestPlatform.BlameDataCollector
                 var root = xmlDocument.LastChild;
                 foreach (XmlNode node in root)
                 {
-                    TestCase testCase = new TestCase();
-                    testCase.FullyQualifiedName = node.Attributes[Constants.TestNameAttribute].Value;
-                    testCase.Source = node.Attributes[Constants.TestSourceAttribute].Value;
+                    var testCase = new TestCase
+                                       {
+                                           FullyQualifiedName =
+                                               node.Attributes[Constants.TestNameAttribute].Value,
+                                           Source = node.Attributes[Constants.TestSourceAttribute].Value
+                                       };
                     testCaseList.Add(testCase);
                 }
             }
