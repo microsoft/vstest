@@ -391,7 +391,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             Output.WriteLine(string.Empty, OutputLevel.Information);
 
-            // Printing Run-level Attachments		
+            // Printing Run-level Attachments
             var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
             if (runLevelAttachementCount > 0)
             {
