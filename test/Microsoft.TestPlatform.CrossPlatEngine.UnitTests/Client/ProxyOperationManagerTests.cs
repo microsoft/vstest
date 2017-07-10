@@ -8,15 +8,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
+
     using Moq;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class ProxyOperationManagerTests
@@ -39,11 +40,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.testOperationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, this.mockTestHostManager.Object, this.connectionTimeout);
 
-            this.mockTestHostManager.Setup(m =>
-                            m.GetTestHostProcessStartInfo(It.IsAny<IEnumerable<string>>(),
-                            It.IsAny<IDictionary<string, string>>(),
-                            It.IsAny<TestRunnerConnectionInfo>()))
+            this.mockTestHostManager.Setup(
+                    m => m.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<IDictionary<string, string>>(),
+                        It.IsAny<TestRunnerConnectionInfo>()))
                 .Returns(new TestProcessStartInfo());
+
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
         }
 
         [TestMethod]
@@ -118,7 +122,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelShouldWaitForTestHostConnection()
         {
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
+            var testableHostManager = new TestableTestHostManager();
+
+            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testableHostManager, this.connectionTimeout);
+
+            operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
 
             this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Once);
         }
@@ -126,8 +134,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void SetupChannelShouldNotWaitForTestHostConnectionIfConnectionIsInitialized()
         {
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
-            this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
+            var testableHostManager = new TestableTestHostManager();
+
+            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testableHostManager, this.connectionTimeout);
+
+            operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
+            operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
 
             this.mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout), Times.Exactly(1));
         }
@@ -137,7 +149,11 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(false);
 
-            Assert.ThrowsException<TestPlatformException>(() => this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None));
+            var testableHostManager = new TestableTestHostManager();
+
+            var operationManager = new TestableProxyOperationManager(this.mockRequestSender.Object, testableHostManager, this.connectionTimeout);
+
+            Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None));
         }
 
         [TestMethod]
@@ -214,12 +230,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // Ensure testhost start returns a dummy process id
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
-            this.mockTestHostManager.Setup(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult<int>(123));
+            this.mockTestHostManager.Setup(th => th.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult<bool>(true));
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
 
             this.testOperationManager.Close();
 
-            this.mockTestHostManager.Verify(th => th.CleanTestHostAsync(123, CancellationToken.None), Times.Once);
+            this.mockTestHostManager.Verify(th => th.CleanTestHostAsync(CancellationToken.None), Times.Once);
         }
 
         [TestMethod]
@@ -258,16 +274,37 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             internal override bool IsVersionCheckRequired => this.isVersionCheckRequired;
 
-            public override TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources,
-            IDictionary<string, string> environmentVariables,
-            TestRunnerConnectionInfo connectionInfo)
+            public override TestProcessStartInfo GetTestHostProcessStartInfo(
+                IEnumerable<string> sources,
+                IDictionary<string, string> environmentVariables,
+                TestRunnerConnectionInfo connectionInfo)
             {
                 return new TestProcessStartInfo();
             }
 
-            public override async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+            public override async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
-                return await Task.Run(() => { return 0; });
+                return await Task.Run(() => true);
+            }
+        }
+
+        private class TestableTestHostManager : DefaultTestHostManager
+        {
+            public override async Task<bool> LaunchTestHostAsync(
+                TestProcessStartInfo testHostStartInfo,
+                CancellationToken cancellationToken)
+            {
+                return await Task.Run(
+                           () =>
+                               {
+                                   this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched"));
+                                   return true;
+                               });
+            }
+
+            protected override void OnHostLaunched(HostProviderEventArgs e)
+            {
+                base.OnHostLaunched(e);
             }
         }
     }

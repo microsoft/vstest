@@ -20,13 +20,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         #region events
         /// <summary>
         /// Raised when host is launched successfully
+        /// Consumed by TestPlatform to initialize connection b/w test host and testplatform
         /// </summary>
         event EventHandler<HostProviderEventArgs> HostLaunched;
-
-        /// <summary>
-        /// Raised when host launch reports an Error
-        /// </summary>
-        event EventHandler<HostProviderEventArgs> HostLaunchFailure;
 
         /// <summary>
         /// Raised when host is cleaned up and removes all it's dependecies
@@ -72,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-        Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken);
+        Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken);
 
         /// <summary>
         /// Gets the start parameters for the test host.
@@ -96,16 +92,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// <summary>
         /// Terminate the test host process.
         /// </summary>
-        /// <param name="processId">
-        /// Process identifier for the test host.
-        /// </param>
         /// <param name="cancellationToken">
         /// Cancellation token.
         /// </param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task CleanTestHostAsync(int processId, CancellationToken cancellationToken);
+        Task CleanTestHostAsync(CancellationToken cancellationToken);
     }
 
     /// <summary>

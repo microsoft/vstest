@@ -5,6 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -51,6 +52,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default setup test host manager as shared (desktop)
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
         }
 
         [TestMethod]
@@ -82,10 +84,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testDiscoveryManager.Initialize();
 
                 // Also verify that we have waited for client connection.
-                this.mockRequestSender.Verify(s => s.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
-                this.mockRequestSender.Verify(
-                    s => s.InitializeDiscovery(extensions, true),
-                    Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(extensions, true), Times.Once);
             }
             finally
             {
@@ -169,8 +168,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
         {
             // Setup mocks.
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
             Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
             // Act.
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);

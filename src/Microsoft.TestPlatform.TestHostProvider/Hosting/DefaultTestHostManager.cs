@@ -79,9 +79,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public event EventHandler<HostProviderEventArgs> HostExited;
 
         /// <inheritdoc/>
-        public event EventHandler<HostProviderEventArgs> HostLaunchFailure;
-
-        /// <inheritdoc/>
         public bool Shared { get; private set; }
 
         /// <summary>
@@ -117,7 +114,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+        public virtual async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             return await Task.Run(() => this.LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
         }
@@ -205,11 +202,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public Task CleanTestHostAsync(int processId, CancellationToken cancellationToken)
+        public Task CleanTestHostAsync(CancellationToken cancellationToken)
         {
             try
             {
-                this.processHelper.TerminateProcess(processId);
+                this.processHelper.TerminateProcess(this.testHostProcess.Id);
             }
             catch (Exception ex)
             {
@@ -225,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Raises HostLaunched event
         /// </summary>
         /// <param name="e">hostprovider event args</param>
-        private void OnHostLaunched(HostProviderEventArgs e)
+        protected virtual void OnHostLaunched(HostProviderEventArgs e)
         {
             this.HostLaunched.SafeInvoke(this, e, "HostProviderEvents.OnHostLaunched");
         }
@@ -234,7 +231,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Raises HostExited event
         /// </summary>
         /// <param name="e">hostprovider event args</param>
-        private void OnHostExited(HostProviderEventArgs e)
+        protected virtual void OnHostExited(HostProviderEventArgs e)
         {
             if (!this.hostExitedEventRaised)
             {
@@ -243,12 +240,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
-        private void OnHostLaunchFailure(HostProviderEventArgs e)
-        {
-            this.HostLaunchFailure.SafeInvoke(this, e, "HostProviderEvents.HostLaunchError");
-        }
-
-        private int LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+        private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             try
             {
@@ -270,13 +262,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             catch (OperationCanceledException ex)
             {
-                this.OnHostLaunchFailure(new HostProviderEventArgs(ex.Message, -1, 0));
-                return -1;
+                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.Message);
+                return false;
             }
 
-            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
-            return pId;
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
+            return this.testHostProcess != null;
         }
     }
 }

@@ -93,9 +93,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc />
         public event EventHandler<HostProviderEventArgs> HostExited;
 
-        /// <inheritdoc />
-        public event EventHandler<HostProviderEventArgs> HostLaunchFailure;
-
         /// <summary>
         /// Gets a value indicating whether gets a value indicating if the test host can be shared for multiple sources.
         /// </summary>
@@ -145,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+        public virtual async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             return await Task.Run(() => this.LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
         }
@@ -270,11 +267,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public Task CleanTestHostAsync(int processId, CancellationToken cancellationToken)
+        public Task CleanTestHostAsync(CancellationToken cancellationToken)
         {
             try
             {
-                this.processHelper.TerminateProcess(processId);
+                this.processHelper.TerminateProcess(this.testHostProcess.Id);
             }
             catch (Exception ex)
             {
@@ -308,12 +305,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
-        private void OnHostLaunchFailure(HostProviderEventArgs e)
-        {
-            this.HostLaunchFailure.SafeInvoke(this, e, "HostProviderEvents.HostLaunchFailure");
-        }
-
-        private int LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
+        private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             try
             {
@@ -333,14 +325,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             catch (OperationCanceledException ex)
             {
-                this.OnHostLaunchFailure(new HostProviderEventArgs(ex.Message, -1, 0));
-                return -1;
+                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.Message);
+                return false;
             }
 
-            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
 
-            return pId;
+            return this.testHostProcess != null;
         }
 
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)

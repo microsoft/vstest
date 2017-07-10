@@ -31,11 +31,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly int connectionTimeout;
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
-        private readonly ManualResetEventSlim testHostLaunchError = new ManualResetEventSlim(false);
+        private readonly ManualResetEventSlim testHostConnectionTimeOut = new ManualResetEventSlim(false);
 
         private bool initialized;
         private string testHostProcessStdError;
-        private int testHostProcessId;
+        private bool testHostLaunchSuccess;
 
         #region Constructors
 
@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
             this.initialized = false;
-            this.testHostProcessId = -1;
+            this.testHostLaunchSuccess = false;
         }
 
         #endregion
@@ -70,6 +70,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #region IProxyOperationManager implementation.
 
+        // ToDo: change SetupChannel to return bool, which will specify that a successfull connection with testhost was established or not
+
         /// <summary>
         /// Ensure that the engine is ready for test operations.
         /// Usually includes starting up the test host process.
@@ -78,8 +80,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="cancellationToken"></param>
         public virtual void SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
-            var connTimeout = this.connectionTimeout;
-
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
@@ -92,36 +92,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
                 this.testHostManager.HostExited += this.TestHostManagerHostExited;
-                this.testHostManager.HostLaunchFailure += this.TestHostManagerHostLaunchFailure;
-
+                
                 // Get the test process start info
                 var testHostStartInfo = this.UpdateTestProcessStartInfo(this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo));
                 try
                 {
                     // Launch the test host.
                     var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, cancellationToken);
-                    this.testHostProcessId = hostLaunchedTask.Result;
+                    this.testHostLaunchSuccess = hostLaunchedTask.Result;
                 }
                 catch (Exception ex)
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
                 }
-                
-                // Warn the user that execution will wait for debugger attach.
-                var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
-                if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
-                {
-                    ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
-                    ConsoleOutput.Instance.WriteLine(
-                        string.Format("Process Id: {0}, Name: {1}", this.testHostProcessId, this.processHelper.GetProcessName(this.testHostProcessId)),
-                        OutputLevel.Information);
 
-                    // Increase connection timeout when debugging is enabled.
-                    connTimeout = 5 * this.connectionTimeout;
-                }
-
-                // Wait for a timeout for the client to connect.
-                if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
+                // test host launched failed because of user cancellation or any other runtime exception
+                // or connection with test host did not happen
+                if (!this.testHostLaunchSuccess || this.testHostConnectionTimeOut.Wait(0))
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
@@ -161,7 +148,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 // do not send message if host did not launch
-                if (this.testHostProcessId != -1)
+                if (this.testHostLaunchSuccess)
                 {
                     this.RequestSender.EndSession();
                 }
@@ -179,15 +166,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // We don't need to terminate if the test host has already terminated.
                 // If the host launch fails, please clean test host. 
                 // The upper bound for wait should be 100ms.
-                if ((this.testHostProcessId != -1 && !this.testHostExited.Wait(100)) || this.testHostLaunchError.Wait(0))
+                if (!this.testHostExited.Wait(100))
                 {
                     EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
-                    this.testHostManager.CleanTestHostAsync(this.testHostProcessId, CancellationToken.None).Wait();
+                    this.testHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
                 }
 
                 this.testHostManager.HostExited -= this.TestHostManagerHostExited;
                 this.testHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
-                this.testHostManager.HostLaunchFailure -= this.TestHostManagerHostLaunchFailure;
             }
         }
 
@@ -224,9 +210,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     Path.GetExtension(logFile))).AddDoubleQuote();
         }
 
-        private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
+        public void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
         {
-            EqtTrace.Verbose(e.Data);
+            var connTimeout = this.connectionTimeout;
+
+            // Warn the user that execution will wait for debugger attach.
+            var hostDebugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
+            if (!string.IsNullOrEmpty(hostDebugEnabled) && hostDebugEnabled.Equals("1", StringComparison.Ordinal))
+            {
+                ConsoleOutput.Instance.WriteLine(CrossPlatEngineResources.HostDebuggerWarning, OutputLevel.Warning);
+                ConsoleOutput.Instance.WriteLine(
+                    string.Format("Process Id: {0}, Name: {1}", e.ProcessId, this.processHelper.GetProcessName(e.ProcessId)),
+                    OutputLevel.Information);
+
+                // Increase connection timeout when debugging is enabled.
+                connTimeout = 5 * this.connectionTimeout;
+            }
+
+            // Wait for a timeout for the client to connect.
+            if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
+            {
+                this.testHostConnectionTimeOut.Set();
+            }
         }
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
@@ -236,12 +241,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
             this.testHostExited.Set();
-        }
-
-        private void TestHostManagerHostLaunchFailure(object sender, HostProviderEventArgs e)
-        {
-            EqtTrace.Verbose(e.Data);
-            this.testHostLaunchError.Set();
         }
     }
 }
