@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.Extensions.DependencyModel;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -93,6 +92,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         /// <inheritdoc />
         public event EventHandler<HostProviderEventArgs> HostExited;
+
+        /// <inheritdoc />
+        public event EventHandler<HostProviderEventArgs> HostLaunchFailure;
 
         /// <summary>
         /// Gets a value indicating whether gets a value indicating if the test host can be shared for multiple sources.
@@ -268,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public Task TerminateAsync(int processId, CancellationToken cancellationToken)
+        public Task CleanTestHostAsync(int processId, CancellationToken cancellationToken)
         {
             try
             {
@@ -278,6 +280,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 EqtTrace.Warning("DotnetTestHostManager: Unable to terminate test host process: " + ex);
             }
+
+            this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
         }
@@ -304,6 +308,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
+        private void OnHostLaunchFailure(HostProviderEventArgs e)
+        {
+            this.HostLaunchFailure.SafeInvoke(this, e, "HostProviderEvents.HostLaunchFailure");
+        }
+
         private int LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             try
@@ -324,7 +333,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             catch (OperationCanceledException ex)
             {
-                this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
+                this.OnHostLaunchFailure(new HostProviderEventArgs(ex.Message, -1, 0));
                 return -1;
             }
 

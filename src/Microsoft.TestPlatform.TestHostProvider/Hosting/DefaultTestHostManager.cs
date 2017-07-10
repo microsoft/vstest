@@ -79,6 +79,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public event EventHandler<HostProviderEventArgs> HostExited;
 
         /// <inheritdoc/>
+        public event EventHandler<HostProviderEventArgs> HostLaunchFailure;
+
+        /// <inheritdoc/>
         public bool Shared { get; private set; }
 
         /// <summary>
@@ -202,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public Task TerminateAsync(int processId, CancellationToken cancellationToken)
+        public Task CleanTestHostAsync(int processId, CancellationToken cancellationToken)
         {
             try
             {
@@ -212,6 +215,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             {
                 EqtTrace.Warning("DefaultTestHostManager: Unable to terminate test host process: " + ex);
             }
+
+            this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
         }
@@ -234,8 +239,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (!this.hostExitedEventRaised)
             {
                 this.hostExitedEventRaised = true;
-                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
+                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
             }
+        }
+
+        private void OnHostLaunchFailure(HostProviderEventArgs e)
+        {
+            this.HostLaunchFailure.SafeInvoke(this, e, "HostProviderEvents.HostLaunchError");
         }
 
         private int LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
@@ -260,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             catch (OperationCanceledException ex)
             {
-                this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
+                this.OnHostLaunchFailure(new HostProviderEventArgs(ex.Message, -1, 0));
                 return -1;
             }
 

@@ -31,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly int connectionTimeout;
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
+        private readonly ManualResetEventSlim testHostLaunchError = new ManualResetEventSlim(false);
 
         private bool initialized;
         private string testHostProcessStdError;
@@ -74,7 +75,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Usually includes starting up the test host process.
         /// </summary>
         /// <param name="sources">List of test sources.</param>
-        public virtual void SetupChannel(IEnumerable<string> sources)
+        /// <param name="cancellationToken"></param>
+        public virtual void SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
             var connTimeout = this.connectionTimeout;
 
@@ -90,13 +92,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
                 this.testHostManager.HostExited += this.TestHostManagerHostExited;
+                this.testHostManager.HostLaunchFailure += this.TestHostManagerHostLaunchFailure;
 
                 // Get the test process start info
                 var testHostStartInfo = this.UpdateTestProcessStartInfo(this.testHostManager.GetTestHostProcessStartInfo(sources, null, connectionInfo));
                 try
                 {
                     // Launch the test host.
-                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, CancellationToken.None);
+                    var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, cancellationToken);
                     this.testHostProcessId = hostLaunchedTask.Result;
                 }
                 catch (Exception ex)
@@ -157,7 +160,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                this.RequestSender.EndSession();
+                // do not send message if host did not launch
+                if (this.testHostProcessId != -1)
+                {
+                    this.RequestSender.EndSession();
+                }
             }
             catch (Exception ex)
             {
@@ -169,16 +176,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.initialized = false;
 
-                // We don't need to terminate if the test host has already terminated. The upper bound
-                // for wait should be 100ms.
-                if (this.testHostProcessId != -1 && !this.testHostExited.Wait(100))
+                // We don't need to terminate if the test host has already terminated.
+                // If the host launch fails, please clean test host. 
+                // The upper bound for wait should be 100ms.
+                if ((this.testHostProcessId != -1 && !this.testHostExited.Wait(100)) || this.testHostLaunchError.Wait(0))
                 {
                     EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
-                    this.testHostManager.TerminateAsync(this.testHostProcessId, CancellationToken.None).Wait();
+                    this.testHostManager.CleanTestHostAsync(this.testHostProcessId, CancellationToken.None).Wait();
                 }
 
                 this.testHostManager.HostExited -= this.TestHostManagerHostExited;
                 this.testHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
+                this.testHostManager.HostLaunchFailure -= this.TestHostManagerHostLaunchFailure;
             }
         }
 
@@ -227,6 +236,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.RequestSender.OnClientProcessExit(this.testHostProcessStdError);
 
             this.testHostExited.Set();
+        }
+
+        private void TestHostManagerHostLaunchFailure(object sender, HostProviderEventArgs e)
+        {
+            EqtTrace.Verbose(e.Data);
+            this.testHostLaunchError.Set();
         }
     }
 }

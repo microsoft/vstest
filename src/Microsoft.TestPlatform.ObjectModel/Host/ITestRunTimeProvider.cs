@@ -24,7 +24,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         event EventHandler<HostProviderEventArgs> HostLaunched;
 
         /// <summary>
-        /// Raised when host is reports Error
+        /// Raised when host launch reports an Error
+        /// </summary>
+        event EventHandler<HostProviderEventArgs> HostLaunchFailure;
+
+        /// <summary>
+        /// Raised when host is cleaned up and removes all it's dependecies
         /// </summary>
         event EventHandler<HostProviderEventArgs> HostExited;
 
@@ -100,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        Task TerminateAsync(int processId, CancellationToken cancellationToken);
+        Task CleanTestHostAsync(int processId, CancellationToken cancellationToken);
     }
 
     /// <summary>

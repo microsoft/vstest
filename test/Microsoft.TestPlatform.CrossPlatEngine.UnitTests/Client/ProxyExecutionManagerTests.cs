@@ -183,7 +183,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }));
+            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None));
         }
 
         [TestMethod]
@@ -262,16 +262,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void CloseShouldSignalServerSessionEnd()
+        public void CloseShouldSignalToServerSessionEndIfTestHostWasLaunched()
         {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None);
+
             this.testExecutionManager.Close();
 
             this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
         }
 
         [TestMethod]
+        public void CloseShouldNotSendSignalToServerSessionEndIfTestHostWasNotLaunched()
+        {
+            this.testExecutionManager.Close();
+
+            this.mockRequestSender.Verify(s => s.EndSession(), Times.Never);
+        }
+
+        [TestMethod]
         public void CloseShouldSignalServerSessionEndEachTime()
         {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None);
+
             this.testExecutionManager.Close();
             this.testExecutionManager.Close();
 
@@ -284,6 +300,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             Task.Delay(200).Wait();
 
             manualResetEvent.Set();
+        }
+
+        private void SetupWaitForTestHostExit()
+        {
+            // Raise host exited when end session is called
+            this.mockRequestSender.Setup(rs => rs.EndSession())
+                .Callback(() => this.mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty)));
         }
     }
 }

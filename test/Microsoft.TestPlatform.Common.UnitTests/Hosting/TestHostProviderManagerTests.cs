@@ -142,6 +142,8 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             public event EventHandler<HostProviderEventArgs> HostExited;
 
+            public event EventHandler<HostProviderEventArgs> HostLaunchFailure;
+
             public bool Shared { get; private set; }
 
 
@@ -192,12 +194,17 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
+            public void OnHostLaunchFailure(HostProviderEventArgs e)
+            {
+                this.HostLaunchFailure.Invoke(this, new HostProviderEventArgs("Error"));
+            }
+
             public void SetCustomLauncher(ITestHostLauncher customLauncher)
             {
                 throw new NotImplementedException();
             }
 
-            public Task TerminateAsync(int testHostId, CancellationToken cancellationToken)
+            public Task CleanTestHostAsync(int processId, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -210,6 +217,8 @@ namespace TestPlatform.Common.UnitTests.Logging
             public event EventHandler<HostProviderEventArgs> HostLaunched;
 
             public event EventHandler<HostProviderEventArgs> HostExited;
+
+            public event EventHandler<HostProviderEventArgs> HostLaunchFailure;
 
             public bool Shared { get; private set; }
 
@@ -260,12 +269,17 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
+            public void OnHostLaunchFailure(HostProviderEventArgs e)
+            {
+                this.HostLaunchFailure.Invoke(this, new HostProviderEventArgs("Error"));
+            }
+
             public void SetCustomLauncher(ITestHostLauncher customLauncher)
             {
                 throw new NotImplementedException();
             }
 
-            public Task TerminateAsync(int testHostId, CancellationToken cancellationToken)
+            public Task CleanTestHostAsync(int processId, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
