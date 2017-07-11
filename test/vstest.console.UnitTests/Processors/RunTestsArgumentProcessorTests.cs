@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Client;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -268,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Setup mocks.
             var mockFileHelper = new Mock<IFileHelper>();
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), ".*.dll", SearchOption.TopDirectoryOnly))
+            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), new Regex(".*.dll", RegexOptions.Compiled | RegexOptions.IgnoreCase), SearchOption.TopDirectoryOnly))
                 .Callback(callback)
                 .Returns(extensions);
 

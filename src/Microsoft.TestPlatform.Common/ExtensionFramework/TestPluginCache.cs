@@ -345,7 +345,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
         internal virtual string[] GetFilesInDirectory(string path, string searchPattern)
         {
-            return this.fileHelper.EnumerateFiles(path, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
+            var regex = new Regex(searchPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            return this.fileHelper.EnumerateFiles(path, regex, SearchOption.TopDirectoryOnly).ToArray();
         }
 
         /// <summary>

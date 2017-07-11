@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
@@ -81,7 +82,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<Regex>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
 
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
@@ -107,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         {
             var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<Regex>(), System.IO.SearchOption.TopDirectoryOnly)).Returns(additionalExtensions);
 
             this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
             this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);

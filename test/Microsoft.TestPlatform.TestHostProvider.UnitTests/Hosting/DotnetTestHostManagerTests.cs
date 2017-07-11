@@ -10,6 +10,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.Linq;
     using System.Runtime.InteropServices;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -308,7 +309,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestPlatformExtensionsShouldReturnLibariesFromSourceDirectory()
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.TestAdapter.dll" });
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<Regex>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.TestAdapter.dll" });
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
 
             CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
@@ -319,7 +320,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             // Parent directory is empty since the input source is file "test.dll"
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.dll" });
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<Regex>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.dll" });
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, Enumerable.Empty<string>());
 
             Assert.AreEqual(0, extensions.Count());

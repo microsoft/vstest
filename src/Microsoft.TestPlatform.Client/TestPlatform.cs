@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Client.Discovery;
     using Microsoft.VisualStudio.TestPlatform.Client.Execution;
@@ -184,8 +185,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                     }
 
                     var patterns = new string[] { TestPlatformConstants.TestAdapterRegexPattern, TestPlatformConstants.TestLoggerRegexPattern, TestPlatformConstants.RunTimeRegexPattern, TestPlatformConstants.SettingsProviderRegexPattern };
-
-                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, patterns, SearchOption.AllDirectories));
+                    var regex = new Regex(string.Join("|", patterns), RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, regex, SearchOption.AllDirectories));
                     if (extensionAssemblies.Count > 0)
                     {
                         this.UpdateExtensions(extensionAssemblies, true);
@@ -217,7 +218,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var sourceDirectory = Path.GetDirectoryName(source);
                 if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.TopDirectoryOnly));
+                    var regex = new Regex(TestPlatformConstants.TestLoggerRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, regex, SearchOption.TopDirectoryOnly));
                 }
             }
 
@@ -237,7 +239,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
             if (fileHelper.DirectoryExists(extensionsFolder))
             {
-                var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, new string[] { ".*.dll", ".*.exe" }, SearchOption.TopDirectoryOnly);
+                var regex = new Regex(".*.dll|.*.exe", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, regex, SearchOption.TopDirectoryOnly);
                 TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
             }
         }

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
     using System.Collections.Generic;
     using System.IO;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// The FileHelper interface.
@@ -51,19 +52,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// Enumerates files which match a pattern (case insensitive) in a directory.
         /// </summary>
         /// <param name="directory">Parent directory to search.</param>
-        /// <param name="pattern">Search pattern.</param>
+        /// <param name="regex">Regex search pattern.</param>
         /// <param name="searchOption"><see cref="SearchOption"/> for directory.</param>
         /// <returns>List of files matching the pattern.</returns>
-        IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption);
-
-        /// <summary>
-        /// Enumerates files which match multiple patterns (case insensitive) in a directory.
-        /// </summary>
-        /// <param name="directory">Parent directory to search.</param>
-        /// <param name="patterns">Search patterns.</param>
-        /// <param name="searchOption"><see cref="SearchOption"/> for directory.</param>
-        /// <returns>List of files matching the pattern.</returns>
-        IEnumerable<string> EnumerateFiles(string directory, string[] patterns, SearchOption searchOption);
+        IEnumerable<string> EnumerateFiles(string directory, Regex regex, SearchOption searchOption);
 
         /// <summary>
         /// Gets attributes of a file.

@@ -47,16 +47,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption)
+        public IEnumerable<string> EnumerateFiles(string directory, Regex regex, SearchOption searchOption)
         {
-            var regex = new Regex(pattern, RegexOptions.IgnoreCase);
             return Directory.EnumerateFiles(directory, "*", searchOption).Where(f => regex.IsMatch(f));
-        }
-
-        /// <inheritdoc/>
-        public IEnumerable<string> EnumerateFiles(string directory, string[] patterns, SearchOption searchOption)
-        {
-            return this.EnumerateFiles(directory, string.Join("|", patterns), searchOption);
         }
 
         /// <inheritdoc/>

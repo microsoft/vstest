@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -331,6 +332,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     var fileHelper = new FileHelper();
 
                     List<string> extensionAssemblies = new List<string>();
+                    var regex = new Regex(TestPlatformConstants.DataCollectorRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                     foreach (var customTestAdaptersPath in customTestAdaptersPaths)
                     {
                         var adapterPath =
@@ -344,7 +346,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         extensionAssemblies.AddRange(
                             fileHelper.EnumerateFiles(
                                 adapterPath,
-                                TestPlatformConstants.DataCollectorRegexPattern,
+                                regex,
                                 SearchOption.AllDirectories));
                     }
 
