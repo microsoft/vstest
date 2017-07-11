@@ -9,6 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyModel;
@@ -245,7 +246,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
-                return this.fileHelper.EnumerateFiles(sourceDirectory, TestAdapterRegexPattern, SearchOption.TopDirectoryOnly);
+                var regex = new Regex(TestAdapterRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, regex, SearchOption.TopDirectoryOnly);
             }
 
             return Enumerable.Empty<string>();
