@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         event EventHandler<HostProviderEventArgs> HostLaunched;
 
         /// <summary>
-        /// Raised when host is cleaned up and removes all it's dependecies
+        /// Raised when host is cleaned up and removes all it's dependencies
         /// </summary>
         event EventHandler<HostProviderEventArgs> HostExited;
 

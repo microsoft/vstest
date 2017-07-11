@@ -308,12 +308,5 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             manualResetEvent.Set();
         }
-
-        private void SetupWaitForTestHostExit()
-        {
-            // Raise host exited when end session is called
-            this.mockRequestSender.Setup(rs => rs.EndSession())
-                .Callback(() => this.mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty)));
-        }
     }
 }

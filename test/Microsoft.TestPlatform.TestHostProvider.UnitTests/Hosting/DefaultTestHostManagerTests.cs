@@ -179,7 +179,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
-            this.testHostManager.HostLaunched += this.TestHostManagerHostLaunced;
+            this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
 
             Task<bool> processId = this.testHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None);
             processId.Wait();
@@ -226,7 +226,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var currentProcess = Process.GetCurrentProcess();
             mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
 
-            this.testHostManager.HostLaunched += this.TestHostManagerHostLaunced;
+            this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
 
             Task<bool> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None);
             pid.Wait();
@@ -297,7 +297,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task TerminateAsyncShouldKillTestHostProcess()
+        public async Task CleanTestHostAsyncShouldKillTestHostProcess()
         {
             this.ExitCallBackTestHelper(0);
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
@@ -307,7 +307,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task TerminateAsyncShouldNotThrowIfTestHostIsNotStarted()
+        public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
         {
             this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<int>())).Throws<Exception>();
             this.ExitCallBackTestHelper(0);
@@ -332,7 +332,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             }
         }
 
-        private void TestHostManagerHostLaunced(object sender, HostProviderEventArgs e)
+        private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
         {
             this.testHostId = e.ProcessId;
         }

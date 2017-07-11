@@ -649,7 +649,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task TerminateAsyncShouldKillTestHostProcess()
+        public async Task CleanTestHostAsyncShouldKillTestHostProcess()
         {
             this.ExitCallBackTestHelper(0);
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
@@ -660,7 +660,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
-        public async Task TerminateAsyncShouldNotThrowIfTestHostIsNotStarted()
+        public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
         {
             this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<int>())).Throws<Exception>();
 

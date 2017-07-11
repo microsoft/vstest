@@ -159,7 +159,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void SetupChannelShouldThrowIfLauchTestHostFails()
+        public void SetupChannelShouldThrowIfLaunchTestHostFails()
         {
             SetupTestHostLaunched(false);
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
@@ -209,7 +209,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void CloseShouldEndSessionIfHostWasLaucnhed()
+        public void CloseShouldEndSessionIfHostWasLaunched()
         {
             this.mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(this.connectionTimeout)).Returns(true);
             this.testOperationManager.SetupChannel(Enumerable.Empty<string>(), CancellationToken.None);
