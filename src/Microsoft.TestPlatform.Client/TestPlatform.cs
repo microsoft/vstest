@@ -235,11 +235,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             var fileHelper = new FileHelper();
             var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
-            var defaultExtensionPaths = new List<string>();
             if (fileHelper.DirectoryExists(extensionsFolder))
             {
-                var dlls = fileHelper.EnumerateFiles(extensionsFolder, new string[] { ".*.dll", ".*.exe" }, SearchOption.TopDirectoryOnly);
-                defaultExtensionPaths.AddRange(dlls);
+                var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, new string[] { ".*.dll", ".*.exe" }, SearchOption.TopDirectoryOnly);
                 TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
             }
         }
