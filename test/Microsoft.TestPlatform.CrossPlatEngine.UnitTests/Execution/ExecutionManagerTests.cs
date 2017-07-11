@@ -99,8 +99,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             TestPluginCacheTests.SetupMockExtensions(
                 new string[] { assemblyLocation },
                 () => { });
-            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(".*.TestAdapter.dll");
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(".*.TestAdapter.dll");
+            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(TestExecutorExtensionManager.Regex);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestDiscoveryExtensionManager.Regex);
 
 
             var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
