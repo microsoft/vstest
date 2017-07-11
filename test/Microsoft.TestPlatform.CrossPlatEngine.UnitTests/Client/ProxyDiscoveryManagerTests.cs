@@ -4,6 +4,8 @@
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 {
     using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -21,6 +23,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ProxyDiscoveryManagerTests
     {
+        private readonly DiscoveryCriteria discoveryCriteria;
+
         private ProxyDiscoveryManager testDiscoveryManager;
 
         private Mock<ITestRuntimeProvider> mockTestHostManager;
@@ -33,8 +37,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
         private int testableClientConnectionTimeout = 400;
-
-        private readonly DiscoveryCriteria discoveryCriteria;
 
         public ProxyDiscoveryManagerTests()
         {
@@ -50,6 +52,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default setup test host manager as shared (desktop)
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
+                .Callback(
+                    () =>
+                        {
+                            this.mockTestHostManager.Raise(thm => thm.HostLaunched += null, new HostProviderEventArgs(string.Empty));
+                        })
+                .Returns(Task.FromResult(true));
         }
 
         [TestMethod]
@@ -81,10 +90,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testDiscoveryManager.Initialize();
 
                 // Also verify that we have waited for client connection.
-                this.mockRequestSender.Verify(s => s.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
-                this.mockRequestSender.Verify(
-                    s => s.InitializeDiscovery(extensions, true),
-                    Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeDiscovery(extensions, true), Times.Once);
             }
             finally
             {
@@ -148,7 +154,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.AtMostOnce);
         }
 
         [TestMethod]
@@ -161,15 +167,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
         public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
         {
             // Setup mocks.
-            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
             Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
             // Act.
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
