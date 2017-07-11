@@ -71,8 +71,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         #region IProxyOperationManager implementation.
 
-        // ToDo: change SetupChannel to return bool, which will specify that a successfull connection with testhost was established or not
-
         /// <summary>
         /// Ensure that the engine is ready for test operations.
         /// Usually includes starting up the test host process.
@@ -81,6 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="cancellationToken"></param>
         public virtual void SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
+            // ToDo: change SetupChannel to return bool, which will specify that a successfull connection with testhost was established or not
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
@@ -107,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
                 }
 
-                // test host launched failed because of user cancellation or any other runtime exception
+                // Test host launched failed because of user cancellation or any other runtime exception
                 // or connection with test host did not happen
                 if (!this.testHostLaunched || !this.channelConnected)
                 {

@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// </summary>
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
+        /// <returns>Returns whether the test host lauched successfully or not.</returns>
         Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken);
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions);
 
         /// <summary>
-        /// Terminate the test host process.
+        /// Cleanup the test host process and it's dependencies.
         /// </summary>
         /// <param name="cancellationToken">
         /// Cancellation token.
