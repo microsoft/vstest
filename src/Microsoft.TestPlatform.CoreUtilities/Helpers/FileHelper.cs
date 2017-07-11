@@ -54,6 +54,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
+        public IEnumerable<string> EnumerateFiles(string directory, string[] patterns, SearchOption searchOption)
+        {
+            return this.EnumerateFiles(directory, string.Join("|", patterns), searchOption);
+        }
+
+        /// <inheritdoc/>
         public FileAttributes GetFileAttributes(string path)
         {
             return new FileInfo(path).Attributes;

@@ -57,6 +57,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption);
 
         /// <summary>
+        /// Enumerates files which match a pattern (case insensitive) in a directory.
+        /// </summary>
+        /// <param name="directory">Parent directory to search.</param>
+        /// <param name="patterns">Search patterns.</param>
+        /// <param name="searchOption"><see cref="SearchOption"/> for directory.</param>
+        /// <returns>List of files matching the pattern.</returns>
+        IEnumerable<string> EnumerateFiles(string directory, string[] patterns, SearchOption searchOption);
+
+        /// <summary>
         /// Gets attributes of a file.
         /// </summary>
         /// <param name="path">Full path of the file.</param>
