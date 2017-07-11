@@ -824,9 +824,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
-        <target state="translated">La versione di .NET Framework {0} non è valida. Specificare il nome completo della versione di .NET Framework di destinazione. Altre versioni di .NET Framework supportate: Framework35, Framework40 e Framework45.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
+        <target state="new">La versione di .NET Framework {0} non è valida. Specificare il nome completo della versione di .NET Framework di destinazione. Altre versioni di .NET Framework supportate: Framework35, Framework40 e Framework45.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">.Net valida versione Framework: {0}. assegnare fullname del TargetFramework. Altro supportato di .net Framework versioni sono Framework35, Framework40 e Framework45.</target>
         </alt-trans>
