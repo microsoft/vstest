@@ -48,6 +48,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default to shared test host
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
+                .Callback(
+                    () =>
+                        {
+                            this.mockTestHostManager.Raise(thm => thm.HostLaunched += null, new HostProviderEventArgs(string.Empty));
+                        })
+                .Returns(Task.FromResult(true));
         }
 
         [TestMethod]
@@ -76,10 +83,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 this.testExecutionManager.Initialize();
 
                 // Also verify that we have waited for client connection.
-                this.mockRequestSender.Verify(s => s.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
-                this.mockRequestSender.Verify(
-                    s => s.InitializeExecution(extensions, false),
-                    Times.Once);
+                this.mockRequestSender.Verify(s => s.InitializeExecution(extensions, false), Times.Once);
             }
             finally
             {
@@ -123,7 +127,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             // We are updating extension with testadapter only to make it easy to test.
             // In product code it filter out testadapter from extension
-            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll"}, false);
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { "abc.TestAdapter.dll", "xyz.TestAdapter.dll" }, false);
             try
             {
                 this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
@@ -151,7 +155,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.AtMostOnce);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.AtMostOnce);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.AtMostOnce);
         }
 
         [TestMethod]
@@ -162,7 +166,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, null);
 
             this.mockRequestSender.Verify(s => s.InitializeCommunication(), Times.Once);
-            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>()), Times.Once);
+            this.mockTestHostManager.Verify(thl => thl.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [TestMethod]
@@ -182,14 +186,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void SetupChannelShouldThrowExceptionIfClientConnectionTimeout()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
-            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }));
+            Assert.ThrowsException<TestPlatformException>(() => this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None));
         }
 
         [TestMethod]
         public void StartTestRunShouldCatchExceptionAndCallHandleTestRunComplete()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
             Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
@@ -201,6 +207,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void StartTestRunShouldCatchExceptionAndCallHandleRawMessageAndHandleLogMessage()
         {
             this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(false));
 
             Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
@@ -262,16 +269,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void CloseShouldSignalServerSessionEnd()
+        public void CloseShouldSignalToServerSessionEndIfTestHostWasLaunched()
         {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None);
+
             this.testExecutionManager.Close();
 
             this.mockRequestSender.Verify(s => s.EndSession(), Times.Once);
         }
 
         [TestMethod]
+        public void CloseShouldNotSendSignalToServerSessionEndIfTestHostWasNotLaunched()
+        {
+            this.testExecutionManager.Close();
+
+            this.mockRequestSender.Verify(s => s.EndSession(), Times.Never);
+        }
+
+        [TestMethod]
         public void CloseShouldSignalServerSessionEndEachTime()
         {
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            this.testExecutionManager.SetupChannel(new List<string> { "source.dll" }, CancellationToken.None);
+
             this.testExecutionManager.Close();
             this.testExecutionManager.Close();
 
