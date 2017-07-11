@@ -31,6 +31,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(false, runConfiguration.DisableAppDomain);
             Assert.AreEqual(false, runConfiguration.DisableParallelization);
             Assert.AreEqual(false, runConfiguration.DesignMode);
+            Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
         }
 
         [TestMethod]
@@ -69,6 +70,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <BatchSize>5</BatchSize>
                        <TestAdaptersPaths>C:\a\b;D:\x\y</TestAdaptersPaths>
                        <BinariesRoot>E:\x\z</BinariesRoot>
+                       <DesignMode>true</DesignMode>
+                       <CollectSourceInformation>false</CollectSourceInformation>
                      </RunConfiguration>
                 </RunSettings>";
 
@@ -94,6 +97,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(5, runConfiguration.BatchSize);
             Assert.AreEqual(true, runConfiguration.DisableAppDomain);
             Assert.AreEqual(true, runConfiguration.DisableParallelization);
+            Assert.AreEqual(true, runConfiguration.DesignMode);
+            Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
         }
 
         [TestMethod]
@@ -169,6 +174,49 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var runConfiguration = new RunConfiguration { DesignMode = true };
 
             StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<DesignMode>True</DesignMode>");
+        }
+
+        [DataRow(true)]
+        [DataRow(false)]
+        [DataTestMethod]
+        public void RunConfigurationShouldReadValueForCollectSourceInformation(bool val)
+        {
+            string settingsXml = string.Format(
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <CollectSourceInformation>{0}</CollectSourceInformation>
+                     </RunConfiguration>
+                </RunSettings>", val);
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+
+            Assert.AreEqual(val, runConfiguration.ShouldCollectSourceInformation);
+        }
+
+        [TestMethod]
+        public void RunConfigurationShouldSetCollectSourceInformationSameAsDesignModeByDefault()
+        {
+            string settingsXml =
+              @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TargetPlatform>x64</TargetPlatform>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
+            
+            Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
+        }
+
+        [DataTestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void RunConfigurationToXmlShouldProvideCollectSourceInformationSameAsDesignMode(bool val)
+        {
+            var runConfiguration = new RunConfiguration { DesignMode = val };
+            StringAssert.Contains(runConfiguration.ToXml().InnerXml.ToUpperInvariant(), $"<CollectSourceInformation>{val}</CollectSourceInformation>".ToUpperInvariant());
         }
     }
 }
