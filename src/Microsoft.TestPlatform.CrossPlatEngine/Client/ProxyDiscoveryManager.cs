@@ -28,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
+        private bool isCommunicationEstablished;
 
         #region Constructors
 
@@ -66,6 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
             this.cancellationTokenSource = new CancellationTokenSource();
+            this.isCommunicationEstablished = false;
         }
 
         #endregion
@@ -77,12 +79,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Initialize()
         {
-            if (this.testHostManager.Shared)
-            {
-                // If the test host manager supports sharing the test host across sources, we can
-                // initialize it early and assign sources later.
-                this.InitializeExtensions(Enumerable.Empty<string>());
-            }
         }
 
         /// <summary>
@@ -94,15 +90,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                if (!this.testHostManager.Shared)
+                this.InitializeExtensions(discoveryCriteria.Sources);
+                if (this.isCommunicationEstablished)
                 {
-                    // If the test host doesn't support sharing across sources, we must initialize it
-                    // with sources.
-                    this.InitializeExtensions(discoveryCriteria.Sources);
+                    this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }
-
-                this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
-                this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
             }
             catch (Exception exception)
             {
@@ -147,11 +139,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
-            // Only send this if needed.
-            if (platformExtensions.Any())
-            {
-                this.SetupChannel(sourceList, this.cancellationTokenSource.Token);
+            this.isCommunicationEstablished = this.SetupChannel(sourceList, this.cancellationTokenSource.Token);
 
+            // Only send this if needed.
+            if (platformExtensions.Any() && this.isCommunicationEstablished)
+            {
                 this.RequestSender.InitializeDiscovery(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
         }
