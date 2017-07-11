@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     {
         #region Fields
         public static Regex Regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         private static TestDiscoveryExtensionManager testDiscoveryExtensionManager;
 
         #endregion

@@ -57,8 +57,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new string[] { typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
-            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(".*.TestAdapter.dll");
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(".*.TestAdapter.dll");
+            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(TestExecutorExtensionManager.Regex);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestDiscoveryExtensionManager.Regex);
         }
 
         [TestCleanup]
