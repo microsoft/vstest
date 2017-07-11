@@ -218,8 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var sourceDirectory = Path.GetDirectoryName(source);
                 if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    var regex = new Regex(TestPlatformConstants.TestLoggerRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, regex, SearchOption.TopDirectoryOnly));
+                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, TestLoggerExtensionManager.Regex, SearchOption.TopDirectoryOnly));
                 }
             }
 

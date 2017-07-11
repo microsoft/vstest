@@ -80,7 +80,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                TestPlatformConstants.TestAdapterRegexPattern,
+                TestDiscoveryExtensionManager.Regex,
                 out unfilteredTestExtensions,
                 out testExtensions);
 
@@ -99,13 +99,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             IEnumerable<LazyExtension<ITestDiscoverer, ITestDiscovererCapabilities>> testExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                TestPlatformConstants.TestAdapterRegexPattern,
+                TestDiscoveryExtensionManager.Regex,
                 out unfilteredTestExtensions,
                 out testExtensions);
 
             // Call this again to verify that discovery is not called again.
             TestPluginManager.Instance.GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                TestPlatformConstants.TestAdapterRegexPattern,
+                TestDiscoveryExtensionManager.Regex,
                 out unfilteredTestExtensions,
                 out testExtensions);
 

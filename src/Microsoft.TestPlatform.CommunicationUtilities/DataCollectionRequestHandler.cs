@@ -332,7 +332,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                     var fileHelper = new FileHelper();
 
                     List<string> extensionAssemblies = new List<string>();
-                    var regex = new Regex(TestPlatformConstants.DataCollectorRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
                     foreach (var customTestAdaptersPath in customTestAdaptersPaths)
                     {
                         var adapterPath =
@@ -346,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         extensionAssemblies.AddRange(
                             fileHelper.EnumerateFiles(
                                 adapterPath,
-                                regex,
+                                DataCollectorExtensionManager.Regex,
                                 SearchOption.AllDirectories));
                     }
 

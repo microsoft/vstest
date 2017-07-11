@@ -139,8 +139,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (TestPluginCache.Instance.PathToExtensions != null)
             {
-                var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => regex.IsMatch(ext)));
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => TestDiscoveryExtensionManager.Regex.IsMatch(ext)));
             }
 
             extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);

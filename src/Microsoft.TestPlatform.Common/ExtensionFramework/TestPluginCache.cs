@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// The <see cref="Dictionary"/>. of test plugin info.
         /// </returns>
         [System.Security.SecurityCritical]
-        public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string regexPattern)
+        public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(Regex regexPattern)
             where TPluginInfo : TestPluginInformation
         {
             // Return the cached value if cache is valid.
@@ -340,12 +340,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets files in a directory.
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="searchPattern"></param>
+        /// <param name="regex"></param>
         /// <returns></returns>
         /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
-        internal virtual string[] GetFilesInDirectory(string path, string searchPattern)
+        internal virtual string[] GetFilesInDirectory(string path, Regex regex)
         {
-            var regex = new Regex(searchPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return this.fileHelper.EnumerateFiles(path, regex, SearchOption.TopDirectoryOnly).ToArray();
         }
 
@@ -355,15 +354,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="extensions">
         /// The extensions.
         /// </param>
-        /// <param name="searchPattern">
+        /// <param name="regex">
         /// Regex search pattern of extension.
         /// </param>
         /// <returns>
         /// The list of files which match the regex pattern
         /// </returns>
-        internal virtual List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
+        internal virtual List<string> GetFilteredExtensions(List<string> extensions, Regex regex)
         {
-            var regex = new Regex(searchPattern, RegexOptions.IgnoreCase);
             return extensions.Where(ext => regex.IsMatch(ext)).ToList();
         }
 

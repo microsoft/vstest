@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -139,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Receives test extensions filtered by Identifier data
         /// </param>
         public void GetSpecificTestExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(
-            string regexPattern,
+            Regex regexPattern,
             out IEnumerable<LazyExtension<IExtension, Dictionary<string, object>>> unfiltered,
             out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
         {

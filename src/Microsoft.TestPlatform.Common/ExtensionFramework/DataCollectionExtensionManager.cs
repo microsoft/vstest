@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -17,6 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     /// </summary>
     internal class DataCollectorExtensionManager : TestExtensionManager<DataCollector, IDataCollectorCapabilities>
     {
+        public static Regex Regex = new Regex(TestPlatformConstants.DataCollectorRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -55,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<DataCollector, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
-                TestPlatformConstants.DataCollectorRegexPattern,
+                DataCollectorExtensionManager.Regex,
                 out unfilteredTestExtensions,
                 out filteredTestExtensions);
 

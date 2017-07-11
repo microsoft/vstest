@@ -8,6 +8,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -280,7 +281,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             SetupMockAdditionalPathExtensions();
 
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestDiscoveryExtensionManager.Regex);
 
             Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
@@ -293,7 +294,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             SetupMockAdditionalPathExtensions();
 
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestDiscoveryExtensionManager.Regex);
 
             Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
             Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestExtensionsCached<TestDiscovererPluginInformation>());
@@ -377,7 +378,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
         }
 
-        internal override List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
+        internal override List<string> GetFilteredExtensions(List<string> extensions, Regex searchPattern)
         {
             this.Action?.Invoke();
             return extensions;

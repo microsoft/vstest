@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
 {
     using System.Collections.Generic;
+    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -17,6 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
     /// </summary>
     internal class TestRuntimeExtensionManager : TestExtensionManager<ITestRuntimeProvider, ITestRuntimeCapabilities>
     {
+        public static Regex Regex = new Regex(TestPlatformConstants.RunTimeRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRuntimeExtensionManager"/> class. 
         /// Default constructor.
@@ -56,7 +59,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
             IEnumerable<LazyExtension<ITestRuntimeProvider, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestRuntimePluginInformation, ITestRuntimeProvider, ITestRuntimeCapabilities, TestRuntimeMetadata>(
-                TestPlatformConstants.RunTimeRegexPattern,
+                TestRuntimeExtensionManager.Regex,
                 out unfilteredTestExtensions,
                 out filteredTestExtensions);
 
