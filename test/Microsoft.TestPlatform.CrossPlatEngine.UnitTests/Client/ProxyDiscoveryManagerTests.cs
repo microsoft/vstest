@@ -23,6 +23,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     [TestClass]
     public class ProxyDiscoveryManagerTests
     {
+        private readonly DiscoveryCriteria discoveryCriteria;
+
         private ProxyDiscoveryManager testDiscoveryManager;
 
         private Mock<ITestRuntimeProvider> mockTestHostManager;
@@ -35,8 +37,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         /// The client connection timeout in milliseconds for unit tests.
         /// </summary>
         private int testableClientConnectionTimeout = 400;
-
-        private readonly DiscoveryCriteria discoveryCriteria;
 
         public ProxyDiscoveryManagerTests()
         {
@@ -52,7 +52,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // Default setup test host manager as shared (desktop)
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
-            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
+                .Callback(
+                    () =>
+                        {
+                            this.mockTestHostManager.Raise(thm => thm.HostLaunched += null, new HostProviderEventArgs(string.Empty));
+                        })
+                .Returns(Task.FromResult(true));
         }
 
         [TestMethod]

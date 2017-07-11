@@ -31,11 +31,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly int connectionTimeout;
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
-        private readonly ManualResetEventSlim testHostConnectionTimeOut = new ManualResetEventSlim(false);
 
+        private bool channelConnected;
         private bool initialized;
         private string testHostProcessStdError;
-        private bool testHostLaunchSuccess;
+        private bool testHostLaunched;
 
         #region Constructors
 
@@ -52,7 +52,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostManager = testHostManager;
             this.processHelper = new ProcessHelper();
             this.initialized = false;
-            this.testHostLaunchSuccess = false;
+            this.testHostLaunched = false;
+            this.channelConnected = false;
         }
 
         #endregion
@@ -99,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     // Launch the test host.
                     var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, cancellationToken);
-                    this.testHostLaunchSuccess = hostLaunchedTask.Result;
+                    this.testHostLaunched = hostLaunchedTask.Result;
                 }
                 catch (Exception ex)
                 {
@@ -108,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 // test host launched failed because of user cancellation or any other runtime exception
                 // or connection with test host did not happen
-                if (!this.testHostLaunchSuccess || this.testHostConnectionTimeOut.Wait(0))
+                if (!this.testHostLaunched || !this.channelConnected)
                 {
                     var errorMsg = CrossPlatEngineResources.InitializationFailed;
 
@@ -148,9 +149,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 // do not send message if host did not launch
-                if (this.testHostLaunchSuccess)
+                if (this.testHostLaunched)
                 {
                     this.RequestSender.EndSession();
+
+                    // We want to give test host a chance to safely close.
+                    // The upper bound for wait should be 100ms.
+                    this.testHostExited.Wait(100);
                 }
             }
             catch (Exception ex)
@@ -163,14 +168,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.initialized = false;
 
-                // We don't need to terminate if the test host has already terminated.
-                // If the host launch fails, please clean test host. 
-                // The upper bound for wait should be 100ms.
-                if (!this.testHostExited.Wait(100))
-                {
-                    EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
-                    this.testHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
-                }
+                EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
+                
+                // please clean up test host. 
+                this.testHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
 
                 this.testHostManager.HostExited -= this.TestHostManagerHostExited;
                 this.testHostManager.HostLaunched -= this.TestHostManagerHostLaunched;
@@ -210,7 +211,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     Path.GetExtension(logFile))).AddDoubleQuote();
         }
 
-        public void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
+        private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
         {
             var connTimeout = this.connectionTimeout;
 
@@ -230,8 +231,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Wait for a timeout for the client to connect.
             if (!this.RequestSender.WaitForRequestHandlerConnection(connTimeout))
             {
-                this.testHostConnectionTimeOut.Set();
+                this.channelConnected = false;
+                return;
             }
+
+            this.channelConnected = true;
         }
 
         private void TestHostManagerHostExited(object sender, HostProviderEventArgs e)
