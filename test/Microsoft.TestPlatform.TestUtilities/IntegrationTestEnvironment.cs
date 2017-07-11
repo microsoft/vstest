@@ -32,8 +32,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             // If the variables are not set, valid defaults are assumed.
             if (string.IsNullOrEmpty(this.TargetFramework))
             {
-                // Run integration tests for net46 by default.
-                this.TargetFramework = "net46";
+                // Run integration tests for net451 by default.
+                this.TargetFramework = "net451";
             }
 
             if (string.IsNullOrEmpty(this.TargetRuntime))
@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             // Need to remove this assumption when we move to a CDP.
             this.PackageDirectory = Path.Combine(this.testPlatformRootDirectory, @"packages");
             this.ToolsDirectory = Path.Combine(this.testPlatformRootDirectory, @"tools");
-            this.RunnerFramework = "net46";
+            this.RunnerFramework = "net451";
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         /// <summary>
         /// Gets the target framework.
-        /// Supported values = <c>net46</c>, <c>netcoreapp1.0</c>.
+        /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
         /// </summary>
         public string TargetFramework
         {
@@ -170,7 +170,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         /// <summary>
         /// Gets the application type.
-        /// Supported values = <c>net46</c>, <c>netcoreapp1.0</c>.
+        /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
         /// </summary>
         public string RunnerFramework
         {

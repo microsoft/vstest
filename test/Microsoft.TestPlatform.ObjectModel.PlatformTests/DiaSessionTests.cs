@@ -13,13 +13,13 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
     [TestClass]
     public class DiaSessionTests : IntegrationTestBase
     {
-        private const string NET46 = "net46";
+        private const string NET46 = "net451";
         private const string NETCOREAPP10 = "netcoreapp1.0";
 
         public static string GetAndSetTargetFrameWork(IntegrationTestEnvironment testEnvironment)
         {
             var currentTargetFrameWork = testEnvironment.TargetFramework;
-#if NET46
+#if NET451
             testEnvironment.TargetFramework = NET46;
 #else
             testEnvironment.TargetFramework = NETCOREAPP10;

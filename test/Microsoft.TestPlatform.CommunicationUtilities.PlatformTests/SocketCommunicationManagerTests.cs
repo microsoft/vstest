@@ -42,7 +42,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.tcpListener.Stop();
-            this.tcpClient.Dispose();
+#if !NET451
+            this.tcpClient?.Dispose();
+#endif
 
             this.communicationManager.StopServer();
             this.communicationManager.StopClient();

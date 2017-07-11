@@ -41,7 +41,7 @@
         }
       }
     },
-    "net46": {}
+    "net451": {}
   },
 
   "testRunner": "mstest"

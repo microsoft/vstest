@@ -35,7 +35,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 {
                     foreach (var kvp in envVariables)
                     {
+#if NET451
+                        process.StartInfo.EnvironmentVariables.Add(kvp.Key, kvp.Value);
+#else
                         process.StartInfo.Environment.Add(kvp.Key, kvp.Value);
+#endif
                     }
                 }
 

@@ -87,7 +87,7 @@ DOTNET_RUNTIME_VERSION="2.0.0-preview2-25331-01"
 # Build configuration
 #
 TPB_Solution="TestPlatform.sln"
-TPB_TargetFramework="net46"
+TPB_TargetFramework="net451"
 TPB_TargetFrameworkCore="netcoreapp2.0"
 TPB_TargetFrameworkCore10="netcoreapp1.0"
 TPB_Configuration=$CONFIGURATION
@@ -275,7 +275,7 @@ function publish_package()
             $TP_ROOT_DIR/src/datacollector/datacollector.csproj
         )
 
-        if [ "$framework" == "net46" ] && ! $TPB_HasMono; then
+        if [ "$framework" == "net451" ] && ! $TPB_HasMono; then
             # Skip publish if mono is not available
             continue
         fi
@@ -287,13 +287,13 @@ function publish_package()
             $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
         done
 
-        # Copy TestHost for desktop targets if we've built net46
+        # Copy TestHost for desktop targets if we've built net451
         # packages with mono
         if $TPB_HasMono; then
             local testhost=$packageDir/TestHost
             mkdir -p $testhost
-            cp -r src/testhost/bin/$TPB_Configuration/net46/win7-x64/* $testhost
-            cp -r src/testhost.x86/bin/$TPB_Configuration/net46/win7-x64/* $testhost
+            cp -r src/testhost/bin/$TPB_Configuration/net451/win7-x64/* $testhost
+            cp -r src/testhost.x86/bin/$TPB_Configuration/net451/win7-x64/* $testhost
         fi
         
         # Copy over the logger assemblies to the Extensions folder.

@@ -13,7 +13,7 @@
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <dependencies>
-      <group targetFramework="net46">
+      <group targetFramework="net451">
         <dependency id="Newtonsoft.Json" version="9.0.1"/>
         <dependency id="Microsoft.TestPlatform.ObjectModel" version="$Version$"/>
       </group>
@@ -43,12 +43,12 @@
     <!-- Add a third party notice file -->
     <file src="ThirdPartyNotices.txt" target="" />
     
-    <file src="net46\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net46\" />
-    <file src="net46\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.XML" target="lib\net46\" />
-    <file src="net46\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\net46\" />
-    <file src="net46\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net46\" />    
-    <file src="net46\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\net46\" />
-    <file src="net46\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\net46\" />
+    <file src="net451\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\net451\" />
+    <file src="net451\$Runtime$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.XML" target="lib\net451\" />
+    <file src="net451\$Runtime$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="lib\net451\" />
+    <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net451\" />    
+    <file src="net451\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\net451\" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\net451\" />
 
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.dll" target="lib\netstandard1.5\" />
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.XML" target="lib\netstandard1.5\" />
@@ -58,61 +58,61 @@
     <file src="$NetCoreTargetFramework$\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netstandard1.5\" />
 
     <!-- Add localized resources -->
-    <file src="net46\$Runtime$\cs\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\cs" />
-    <file src="net46\$Runtime$\de\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\de" />
-    <file src="net46\$Runtime$\es\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\es" />
-    <file src="net46\$Runtime$\fr\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\fr" />
-    <file src="net46\$Runtime$\it\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\it" />
-    <file src="net46\$Runtime$\ja\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\ja" />
-    <file src="net46\$Runtime$\ko\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\ko" />
-    <file src="net46\$Runtime$\pl\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\pl" />
-    <file src="net46\$Runtime$\pt-BR\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\pt-BR" />
-    <file src="net46\$Runtime$\ru\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\ru" />
-    <file src="net46\$Runtime$\tr\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\tr" />
-    <file src="net46\$Runtime$\zh-Hans\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\zh-Hans" />
-    <file src="net46\$Runtime$\zh-Hant\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net46\zh-Hant" />
+    <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\cs" />
+    <file src="net451\$Runtime$\de\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\de" />
+    <file src="net451\$Runtime$\es\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\es" />
+    <file src="net451\$Runtime$\fr\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\fr" />
+    <file src="net451\$Runtime$\it\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\it" />
+    <file src="net451\$Runtime$\ja\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\ja" />
+    <file src="net451\$Runtime$\ko\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\ko" />
+    <file src="net451\$Runtime$\pl\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\pl" />
+    <file src="net451\$Runtime$\pt-BR\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\pt-BR" />
+    <file src="net451\$Runtime$\ru\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\ru" />
+    <file src="net451\$Runtime$\tr\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\tr" />
+    <file src="net451\$Runtime$\zh-Hans\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\zh-Hans" />
+    <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\net451\zh-Hant" />
 
-    <file src="net46\$Runtime$\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\cs" />
-    <file src="net46\$Runtime$\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\de" />
-    <file src="net46\$Runtime$\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\es" />
-    <file src="net46\$Runtime$\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\fr" />
-    <file src="net46\$Runtime$\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\it" />
-    <file src="net46\$Runtime$\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\ja" />
-    <file src="net46\$Runtime$\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\ko" />
-    <file src="net46\$Runtime$\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\pl" />
-    <file src="net46\$Runtime$\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\pt-BR" />
-    <file src="net46\$Runtime$\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\ru" />
-    <file src="net46\$Runtime$\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\tr" />
-    <file src="net46\$Runtime$\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\zh-Hans" />
-    <file src="net46\$Runtime$\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net46\zh-Hant" />
+    <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\cs" />
+    <file src="net451\$Runtime$\de\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\de" />
+    <file src="net451\$Runtime$\es\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\es" />
+    <file src="net451\$Runtime$\fr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\fr" />
+    <file src="net451\$Runtime$\it\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\it" />
+    <file src="net451\$Runtime$\ja\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\ja" />
+    <file src="net451\$Runtime$\ko\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\ko" />
+    <file src="net451\$Runtime$\pl\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\pl" />
+    <file src="net451\$Runtime$\pt-BR\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\pt-BR" />
+    <file src="net451\$Runtime$\ru\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\ru" />
+    <file src="net451\$Runtime$\tr\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\tr" />
+    <file src="net451\$Runtime$\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\zh-Hans" />
+    <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\net451\zh-Hant" />
 
-    <file src="net46\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\cs" />
-    <file src="net46\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\de" />
-    <file src="net46\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\es" />
-    <file src="net46\$Runtime$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\fr" />
-    <file src="net46\$Runtime$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\it" />
-    <file src="net46\$Runtime$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\ja" />
-    <file src="net46\$Runtime$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\ko" />
-    <file src="net46\$Runtime$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\pl" />
-    <file src="net46\$Runtime$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\pt-BR" />
-    <file src="net46\$Runtime$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\ru" />
-    <file src="net46\$Runtime$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\tr" />
-    <file src="net46\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\zh-Hans" />
-    <file src="net46\$Runtime$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\zh-Hant" />
+    <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\cs" />
+    <file src="net451\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\de" />
+    <file src="net451\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\es" />
+    <file src="net451\$Runtime$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\fr" />
+    <file src="net451\$Runtime$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\it" />
+    <file src="net451\$Runtime$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ja" />
+    <file src="net451\$Runtime$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ko" />
+    <file src="net451\$Runtime$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pl" />
+    <file src="net451\$Runtime$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pt-BR" />
+    <file src="net451\$Runtime$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ru" />
+    <file src="net451\$Runtime$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\tr" />
+    <file src="net451\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hans" />
+    <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hant" />
 
-    <file src="net46\$Runtime$\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\cs" />
-    <file src="net46\$Runtime$\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\de" />
-    <file src="net46\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\es" />
-    <file src="net46\$Runtime$\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\fr" />
-    <file src="net46\$Runtime$\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\it" />
-    <file src="net46\$Runtime$\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\ja" />
-    <file src="net46\$Runtime$\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\ko" />
-    <file src="net46\$Runtime$\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\pl" />
-    <file src="net46\$Runtime$\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\pt-BR" />
-    <file src="net46\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\ru" />
-    <file src="net46\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\tr" />
-    <file src="net46\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\zh-Hans" />
-    <file src="net46\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net46\zh-Hant" />
+    <file src="net451\$Runtime$\cs\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\cs" />
+    <file src="net451\$Runtime$\de\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\de" />
+    <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\es" />
+    <file src="net451\$Runtime$\fr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\fr" />
+    <file src="net451\$Runtime$\it\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\it" />
+    <file src="net451\$Runtime$\ja\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\ja" />
+    <file src="net451\$Runtime$\ko\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\ko" />
+    <file src="net451\$Runtime$\pl\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\pl" />
+    <file src="net451\$Runtime$\pt-BR\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\pt-BR" />
+    <file src="net451\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\ru" />
+    <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\tr" />
+    <file src="net451\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\zh-Hans" />
+    <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" target="lib\net451\zh-Hant" />
 
     <file src="$NetCoreTargetFramework$\cs\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\netstandard1.5\cs" />
     <file src="$NetCoreTargetFramework$\de\Microsoft.TestPlatform.VsTestConsole.TranslationLayer.resources.dll" target="lib\netstandard1.5\de" />

@@ -35,7 +35,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.socketClient.Stop();
+#if !NET451
             this.tcpClient?.Dispose();
+#endif
             this.tcpListener.Stop();
         }
 
@@ -93,7 +95,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var waitEvent = this.SetupClientDisconnect(out ICommunicationChannel _);
 
             // Close the communication from server side
-            this.Client.Dispose();
+#if !NET451
+            this.tcpClient?.Dispose();
+#endif
 
             Assert.IsTrue(waitEvent.WaitOne(TIMEOUT));
         }

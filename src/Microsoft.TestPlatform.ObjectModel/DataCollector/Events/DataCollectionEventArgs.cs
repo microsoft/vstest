@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Base class for all execution event arguments
     /// </summary>
-#if NET46
+#if NET451
     [Serializable] 
 #endif
     public abstract class DataCollectionEventArgs : EventArgs

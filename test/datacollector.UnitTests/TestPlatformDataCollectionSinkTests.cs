@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Microsoft.TestPlatform.TestUtilities;
 
     using Moq;
 
@@ -24,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         private TestPlatformDataCollectionSink dataCollectionSink;
 
         private bool isEventHandlerInvoked = false;
+        private static readonly string appDomainBaseDir = FileUtility.GetAppDomainBaseDir();
 
         public TestPlatformDataCollectionSinkTests()
         {
@@ -36,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestCleanup]
         public void Cleanup()
         {
-            File.Delete(Path.Combine(AppContext.BaseDirectory, "filename.txt"));
+            File.Delete(Path.Combine(appDomainBaseDir, "filename.txt"));
         }
 
         [TestMethod]
@@ -51,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfo()
         {
-            var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+            var filename = Path.Combine(appDomainBaseDir, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
             var guid = Guid.NewGuid();
@@ -68,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SendFileAsyncShouldInvokeSendFileCompletedIfRegistered()
         {
-            var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+            var filename = Path.Combine(appDomainBaseDir, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
             var guid = Guid.NewGuid();
@@ -78,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
             var fileTransferInfo = new FileTransferInformation(context, filename, false);
 
             var attachmentManager = new DataCollectionAttachmentManager();
-            attachmentManager.Initialize(sessionId, AppContext.BaseDirectory, new Mock<IMessageSink>().Object);
+            attachmentManager.Initialize(sessionId, appDomainBaseDir, new Mock<IMessageSink>().Object);
 
             this.dataCollectionSink = new TestPlatformDataCollectionSink(attachmentManager, this.dataCollectorConfig);
             this.dataCollectionSink.SendFileCompleted += SendFileCompleted_Handler;
@@ -93,7 +95,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfoOverLoaded1()
         {
-            var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+            var filename = Path.Combine(appDomainBaseDir, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
             var guid = Guid.NewGuid();
@@ -108,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector.UnitTests
         [TestMethod]
         public void SendFileAsyncShouldInvokeAttachmentManagerWithValidFileTransferInfoOverLoaded2()
         {
-            var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+            var filename = Path.Combine(appDomainBaseDir, "filename.txt");
             File.WriteAllText(filename, string.Empty);
 
             var guid = Guid.NewGuid();

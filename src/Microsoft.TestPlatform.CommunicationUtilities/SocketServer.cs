@@ -123,7 +123,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // is a no-op if called a second time.
                 this.channel?.Dispose();
                 this.stream?.Dispose();
+#if !NET451
                 this.tcpClient?.Dispose();
+#endif
 
                 this.cancellation.Dispose();
 

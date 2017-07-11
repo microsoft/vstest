@@ -33,7 +33,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.socketServer.Stop();
-            this.tcpClient.Dispose();
+#if !NET451
+            this.tcpClient?.Dispose();
+#endif
         }
 
         [TestMethod]
@@ -122,7 +124,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var channel = this.SetupChannel(out ConnectedEventArgs clientConnected);
 
             // Close the client channel. Message loop should stop.
-            this.tcpClient.Dispose();
+#if !NET451
+            this.tcpClient?.Dispose();
+#endif
 
             Assert.IsTrue(waitEvent.WaitOne(1000));
             Assert.IsTrue(clientDisconnected.Error is IOException);

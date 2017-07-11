@@ -71,7 +71,7 @@ $env:MSBUILD_VERSION = "15.0"
 #
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
-$TPB_TargetFramework = "net46"
+$TPB_TargetFramework = "net451"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
 $TPB_Configuration = $Configuration
@@ -154,8 +154,8 @@ function Restore-Package
 
     Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
     & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
-    Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
-    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
+    #Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
+    #& $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -392,8 +392,8 @@ function Create-NugetPackages
 function Copy-PackageItems($packageName)
 {
     # Packages published separately are copied into their own artifacts directory
-    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net46\* is copied
-    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net46
+    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
+    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
     $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
@@ -558,7 +558,7 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
+    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.

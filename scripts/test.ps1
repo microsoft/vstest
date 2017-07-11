@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("netcoreapp1.0", "net46")]
+    [ValidateSet("netcoreapp1.0", "net451")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -69,7 +69,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Test configuration
 #
-$TPT_TargetFrameworkFullCLR = "net46"
+$TPT_TargetFrameworkFullCLR = "net451"
 $TPT_TargetFrameworkCore = "netcoreapp1.0"
 $TPT_TargetFramework20Core = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."

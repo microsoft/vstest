@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-#if NET46
+#if NET451
     using System.Threading;
 #else
     using System.Runtime.Loader;
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // and that succeeds.
             // Because of this assembly failure, below domain.CreateInstanceAndUnwrap() call fails with error
             // "Unable to cast transparent proxy to type 'Microsoft.VisualStudio.TestPlatform.Core.TestPluginsFramework.TestPluginDiscoverer"
-#if NET46
+#if NET451
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomainAssemblyResolve);
 #else
             AssemblyLoadContext.Default.Resolving += this.CurrentDomainAssemblyResolve;
@@ -200,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.LogExtensions();
             }
-#if NET46
+#if NET451
                 catch (ThreadAbortException)
                 {
                     // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
@@ -218,7 +218,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
             finally
             {
-#if NET46
+#if NET451
                 AppDomain.CurrentDomain.AssemblyResolve -= new ResolveEventHandler(CurrentDomainAssemblyResolve);
 #else
                 AssemblyLoadContext.Default.Resolving -= this.CurrentDomainAssemblyResolve;
@@ -509,7 +509,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
         }
 
-#if NET46
+#if NET451
         private Assembly CurrentDomainAssemblyResolve(object sender, ResolveEventArgs args)
 #else
         private Assembly CurrentDomainAssemblyResolve(AssemblyLoadContext loadContext, AssemblyName args)

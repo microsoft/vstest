@@ -3,6 +3,7 @@
 
 namespace OutOfProcDataCollector
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -42,14 +43,14 @@ namespace OutOfProcDataCollector
         private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
         {
             this.logger.LogWarning(this.context.SessionDataCollectionContext, "TestCaseStarted " + e.TestCaseName);
-            var filename = Path.Combine(AppContext.BaseDirectory, "testcasefilename" + i++ + ".txt");
+            var filename = Path.Combine(FileUtility.GetAppDomainBaseDir(), "testcasefilename" + i++ + ".txt");
             File.WriteAllText(filename, string.Empty);
             this.dataCollectionSink.SendFileAsync(e.Context, filename, true);
         }
 
         private void SessionStarted_Handler(object sender, SessionStartEventArgs args)
         {
-            var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+            var filename = Path.Combine(FileUtility.GetAppDomainBaseDir(), "filename.txt");
             File.WriteAllText(filename, string.Empty);
             this.dataCollectionSink.SendFileAsync(this.context.SessionDataCollectionContext, filename, true);
             this.logger.LogWarning(this.context.SessionDataCollectionContext, "SessionStarted");

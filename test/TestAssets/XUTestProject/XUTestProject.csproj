@@ -6,7 +6,7 @@
   <Import Project="..\..\..\scripts\build\TestAssets.props" />
   <PropertyGroup>
     <AssemblyName>XUTestProject</AssemblyName>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net451</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="xunit">

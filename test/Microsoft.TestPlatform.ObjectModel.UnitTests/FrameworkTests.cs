@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void DefaultFrameworkShouldBeNet46OnDesktop()
         {
-#if NET46
+#if NET451
             Assert.AreEqual(".NETFramework,Version=v4.6", Framework.DefaultFramework.Name);
 #endif
         }
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         [TestMethod]
         public void DefaultFrameworkShouldBeNetCoreApp10OnNonDesktop()
         {
-#if !NET46
+#if !NET451
             Assert.AreEqual(".NETCoreApp,Version=v1.0", Framework.DefaultFramework.Name);
 #endif
         }

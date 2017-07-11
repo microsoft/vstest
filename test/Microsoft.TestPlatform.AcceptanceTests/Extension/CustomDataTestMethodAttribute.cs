@@ -80,7 +80,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     }
 
     /// <summary>
-    /// The attribute defining runner framework, target framework and target runtime for net46.
+    /// The attribute defining runner framework, target framework and target runtime for net451.
     /// </summary>
     public class NET46TargetFramework : Attribute
     {

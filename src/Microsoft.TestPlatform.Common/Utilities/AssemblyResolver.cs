@@ -12,7 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
-#if !NET46
+#if !NET451
     using System.Runtime.Loader;
 #endif
 
@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 this.searchDirectories = new HashSet<string>(directories);
             }
-#if NET46
+#if NET451
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(OnResolve);
 #else
             AssemblyLoadContext.Default.Resolving += this.OnResolve;
@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
-#if NET46
+#if NET451
         private Assembly OnResolve(object senderAppDomain, ResolveEventArgs args)
 #else
         private Assembly OnResolve(AssemblyLoadContext loadContext, AssemblyName args)
@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                                 continue;
                             }
 
-#if NET46
+#if NET451
                             AssemblyName foundName = AssemblyName.GetAssemblyName(assemblyPath);
                             if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
                             {
@@ -246,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 if (disposing)
                 {
-#if NET46
+#if NET451
                     AppDomain.CurrentDomain.AssemblyResolve -= new ResolveEventHandler(OnResolve);
 #else
                     AssemblyLoadContext.Default.Resolving -= this.OnResolve;

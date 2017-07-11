@@ -187,7 +187,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopClient()
         {
-            this.tcpClient?.Dispose();
+#if !NET451
+                this.tcpClient?.Dispose();
+#endif
             this.tcpClient = null;
             this.binaryReader?.Dispose();
             this.binaryWriter?.Dispose();
