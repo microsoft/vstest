@@ -41,8 +41,8 @@
       <Version>14.0.12-pre</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="RoslynTools.Microsoft.LocateVS">
-      <Version>0.2.4-beta</Version>
+    <PackageReference Include="vswhere">
+      <Version>2.0.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Internal.TestPlatform.Extensions">

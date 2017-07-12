@@ -18,7 +18,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <param name="isAborted">Specifies if discovery has been aborted.</param>
         public DiscoveryCompleteEventArgs(long totalTests, bool isAborted)
         {
+            // This event is always raised from the client side, while the total count of tests is maintained
+            // only at the testhost end. In case of a discovery abort (various reasons including crash), it is
+            // not possible to get a list of total tests from testhost. Hence we enforce a -1 count.
             Debug.Assert((isAborted ? -1 == totalTests : true), "If discovery request is aborted totalTest should be -1.");
+
             this.TotalCount = totalTests;
             this.IsAborted = isAborted;            
         }
