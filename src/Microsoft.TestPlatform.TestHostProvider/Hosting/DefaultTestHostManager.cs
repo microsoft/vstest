@@ -30,14 +30,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// This works for Desktop local scenarios
     /// </summary>
     [ExtensionUri(DefaultTestHostUri)]
-    [FriendlyName(DefaultTestHostFriendltName)]
+    [FriendlyName(DefaultTestHostFriendlyName)]
     public class DefaultTestHostManager : ITestRuntimeProvider
     {
         private const string X64TestHostProcessName = "testhost.exe";
         private const string X86TestHostProcessName = "testhost.x86.exe";
 
         private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
-        private const string DefaultTestHostFriendltName = "DefaultTestHost";
+        private const string DefaultTestHostFriendlyName = "DefaultTestHost";
 
         private Architecture architecture;
 
@@ -114,9 +114,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+        public async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            return await Task.Run(() => this.LaunchHost(testHostStartInfo), CancellationToken.None);
+            return await Task.Run(() => this.LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -202,16 +202,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public Task TerminateAsync(int processId, CancellationToken cancellationToken)
+        public Task CleanTestHostAsync(CancellationToken cancellationToken)
         {
             try
             {
-                this.processHelper.TerminateProcess(processId);
+                this.processHelper.TerminateProcess(this.testHostProcess.Id);
             }
             catch (Exception ex)
             {
                 EqtTrace.Warning("DefaultTestHostManager: Unable to terminate test host process: " + ex);
             }
+
+            this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
         }
@@ -234,11 +236,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (!this.hostExitedEventRaised)
             {
                 this.hostExitedEventRaised = true;
-                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostError");
+                this.HostExited.SafeInvoke(this, e, "HostProviderEvents.OnHostExited");
             }
         }
 
-        private int LaunchHost(TestProcessStartInfo testHostStartInfo)
+        private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             try
             {
@@ -248,6 +250,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
                 if (this.customTestHostLauncher == null)
                 {
                     EqtTrace.Verbose("DefaultTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+
+                    cancellationToken.ThrowIfCancellationRequested();
                     this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
                 }
                 else
@@ -258,13 +262,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             catch (OperationCanceledException ex)
             {
-                this.OnHostExited(new HostProviderEventArgs(ex.Message, -1, 0));
-                return -1;
+                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.Message);
+                return false;
             }
 
-            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
-            return pId;
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
+            return this.testHostProcess != null;
         }
     }
 }
