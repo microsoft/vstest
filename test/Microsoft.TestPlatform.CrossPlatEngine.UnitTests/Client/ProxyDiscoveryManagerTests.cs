@@ -75,6 +75,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void DiscoverTestsShouldNotInitializeExtensionsOnCommunicationFailure()
+        {
+            // Make sure TestPlugincache is refreshed.
+            TestPluginCache.Instance = null;
+
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
+
+            Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler>();
+
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+
+            this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
+        }
+
+
+        [TestMethod]
         public void DiscoverTestsShouldNotSendDiscoveryRequestIfCommunicationFails()
         {
             this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))

@@ -88,6 +88,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
+                
                 var testSources = testRunCriteria.Sources;
 
                 // If the test execution is with a test filter, group them by sources
@@ -96,10 +97,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
                 }
 
-                this.InitializeExtensions(testSources);
+                this.isCommunicationEstablished = this.SetupChannel(testSources, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
+                    this.InitializeExtensions(testSources);
+
                     var executionContext = new TestExecutionContext(
                         testRunCriteria.FrequencyOfRunStatsChangeEvent,
                         testRunCriteria.RunStatsChangeEventTimeout,
@@ -191,10 +194,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
-            this.isCommunicationEstablished = this.SetupChannel(sourceList, this.cancellationTokenSource.Token);
-
             // Only send this if needed.
-            if (platformExtensions.Any() && this.isCommunicationEstablished)
+            if (platformExtensions.Any())
             {
                 this.RequestSender.InitializeExecution(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }

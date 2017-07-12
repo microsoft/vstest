@@ -90,9 +90,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                this.InitializeExtensions(discoveryCriteria.Sources);
+                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
+
                 if (this.isCommunicationEstablished)
                 {
+                    this.InitializeExtensions(discoveryCriteria.Sources);
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }
             }
@@ -143,10 +145,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var sourceList = sources.ToList();
             var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
-            this.isCommunicationEstablished = this.SetupChannel(sourceList, this.cancellationTokenSource.Token);
-
             // Only send this if needed.
-            if (platformExtensions.Any() && this.isCommunicationEstablished)
+            if (platformExtensions.Any())
             {
                 this.RequestSender.InitializeDiscovery(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
