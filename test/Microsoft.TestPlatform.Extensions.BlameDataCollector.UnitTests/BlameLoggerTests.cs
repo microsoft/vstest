@@ -112,7 +112,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         /// </summary>
         [TestMethod]
         public void TestRunCompleteHandlerShouldNotReadFileIfTestRunNotAborted()
-        { 
+        {
             // Initialize Blame Logger
             this.blameLogger.Initialize(this.events.Object, null);
 
@@ -154,9 +154,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         internal class TestableTestLoggerManager : TestLoggerManager
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="TestableTestLoggerManager"/> class. 
+            /// Initializes a new instance of the <see cref="TestableTestLoggerManager"/> class.
             /// </summary>
-            internal TestableTestLoggerManager() : base(TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
+            internal TestableTestLoggerManager()
+                : base(TestSessionMessageLogger.Instance, new InternalTestLoggerEvents(TestSessionMessageLogger.Instance))
             {
             }
         }
@@ -167,7 +168,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         internal class TestableBlameLogger : BlameLogger
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="TestableBlameLogger"/> class. 
+            /// Initializes a new instance of the <see cref="TestableBlameLogger"/> class.
             /// </summary>
             /// <param name="output">
             /// The output.

@@ -8,7 +8,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System.IO;
     using System.Linq;
     using System.Xml;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 
@@ -16,7 +15,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     /// The blame collector.
     /// </summary>
     [DataCollectorFriendlyName("Blame")]
-    [DataCollectorTypeUri("datacollector://Microsoft/TestPlatform/Extensions/Blame")]
+    [DataCollectorTypeUri("datacollector://Microsoft/TestPlatform/Extensions/Blame/v1")]
     public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     {
         private DataCollectionSink dataCollectionSink;
@@ -24,11 +23,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         private DataCollectionEvents events;
         private List<TestCase> testSequence;
         private IBlameReaderWriter blameReaderWriter;
+        private XmlElement configurationElement;
         private int testStartCount;
         private int testEndCount;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BlameCollector"/> class. 
+        /// Initializes a new instance of the <see cref="BlameCollector"/> class.
         /// Using XmlReaderWriter by default
         /// </summary>
         public BlameCollector()
@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BlameCollector"/> class. 
+        /// Initializes a new instance of the <see cref="BlameCollector"/> class.
         /// </summary>
         /// <param name="blameReaderWriter">
         /// BlameReaderWriter instance.
@@ -66,9 +66,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="environmentContext">Context of data collector environment</param>
         public override void Initialize(
             XmlElement configurationElement,
-            DataCollectionEvents events, 
+            DataCollectionEvents events,
             DataCollectionSink dataSink,
-            DataCollectionLogger logger, 
+            DataCollectionLogger logger,
             DataCollectionEnvironmentContext environmentContext)
         {
             ValidateArg.NotNull(logger, nameof(logger));
@@ -76,6 +76,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.events = events;
             this.dataCollectionSink = dataSink;
             this.context = environmentContext;
+            this.configurationElement = configurationElement;
             this.testSequence = new List<TestCase>();
 
             // Subscribing to events
@@ -85,33 +86,41 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <summary>
-        /// Called when Test Case Start event is invoked 
+        /// Called when Test Case Start event is invoked
         /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">TestCaseStartEventArgs</param>
         private void EventsTestCaseStart(object sender, TestCaseStartEventArgs e)
         {
-            if(EqtTrace.IsInfoEnabled)
+            if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("Blame Collector : Test Case Start");
             }
+
             this.testSequence.Add(e.TestElement);
             this.testStartCount++;
         }
 
         /// <summary>
-        /// Called when Test Case End event is invoked 
+        /// Called when Test Case End event is invoked
         /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">TestCaseEndEventArgs</param>
         private void EventsTestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
             if (EqtTrace.IsInfoEnabled)
             {
                 EqtTrace.Info("Blame Collector : Test Case End");
-            }     
+            }
+
             this.testEndCount++;
         }
 
         /// <summary>
-        /// Called when Session End event is invoked 
+        /// Called when Session End event is invoked
         /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="args">SessionEndEventArgs</param>
         private void SessionEnded_Handler(object sender, SessionEndEventArgs args)
         {
             if (EqtTrace.IsInfoEnabled)
@@ -119,11 +128,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 EqtTrace.Info("Blame Collector : Session End");
             }
 
-            // If the last test crashes, it will not invoke a test case end and therefore 
-            // In case of crash testStartCount will be greater than testEndCount and we need to send write the sequence
+            // If the last test crashes, it will not invoke a test case end and therefore
+            // In case of crash testStartCount will be greater than testEndCount and we need to write the sequence
+            // And send the attachment
             if (this.testStartCount > this.testEndCount)
             {
-                var filepath = Path.Combine(AppContext.BaseDirectory, Constants.AttachmentFileName);
+                var filepath = Path.Combine(this.GetResultsDirectory(), Constants.AttachmentFileName);
                 filepath = this.blameReaderWriter.WriteTestSequence(this.testSequence, filepath);
                 var fileTranferInformation = new FileTransferInformation(this.context.SessionDataCollectionContext, filepath, true);
                 this.dataCollectionSink.SendFileAsync(fileTranferInformation);
@@ -140,6 +150,25 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.events.SessionEnd -= this.SessionEnded_Handler;
             this.events.TestCaseStart -= this.EventsTestCaseStart;
             this.events.TestCaseEnd -= this.EventsTestCaseEnd;
+        }
+
+        private string GetResultsDirectory()
+        {
+            try
+            {
+                XmlElement resultsDirectoryElement = this.configurationElement["ResultsDirectory"];
+                string resultsDirectory = resultsDirectoryElement != null ? resultsDirectoryElement.InnerText : string.Empty;
+                return resultsDirectory;
+            }
+            catch (NullReferenceException exception)
+            {
+                if (EqtTrace.IsErrorEnabled)
+                {
+                    EqtTrace.Error("Blame Collector : " + exception);
+                }
+
+                return string.Empty;
+            }
         }
     }
 }

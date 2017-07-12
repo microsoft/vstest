@@ -155,6 +155,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Exte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests", "test\Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests\Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests.csproj", "{488675EC-C8BB-40E0-AD4F-91F623D548B3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlameUnitTestProject", "test\TestAssets\BlameUnitTestProject\BlameUnitTestProject.csproj", "{6B2B841C-CCFF-469A-9939-EB07EA0401AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -813,6 +815,18 @@ Global
 		{488675EC-C8BB-40E0-AD4F-91F623D548B3}.Release|x64.Build.0 = Release|Any CPU
 		{488675EC-C8BB-40E0-AD4F-91F623D548B3}.Release|x86.ActiveCfg = Release|Any CPU
 		{488675EC-C8BB-40E0-AD4F-91F623D548B3}.Release|x86.Build.0 = Release|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Debug|x86.Build.0 = Debug|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Release|x64.Build.0 = Release|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Release|x86.ActiveCfg = Release|Any CPU
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -881,5 +895,6 @@ Global
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
 		{76D4BB7E-D981-42D5-BE96-6FAD8DEF9A4A} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
 		{488675EC-C8BB-40E0-AD4F-91F623D548B3} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
+		{6B2B841C-CCFF-469A-9939-EB07EA0401AE} = {8DA7CBD9-F17E-41B6-90C4-CFF55848A25A}
 	EndGlobalSection
 EndGlobal

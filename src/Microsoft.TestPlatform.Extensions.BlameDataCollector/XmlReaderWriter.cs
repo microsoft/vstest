@@ -32,6 +32,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="XmlReaderWriter"/> class.
         /// Protected for testing purposes
         /// </summary>
         /// <param name="fileHelper">
@@ -53,6 +54,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <param name="filePath">
         /// The file Path.
         /// </param>
+        /// <returns>File path</returns>
         public string WriteTestSequence(List<TestCase> testSequence, string filePath)
         {
             ValidateArg.NotNull(testSequence, nameof(testSequence));
@@ -74,6 +76,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
                 blameTestRoot.AppendChild(testElement);
             }
+
             xmlDocument.AppendChild(blameTestRoot);
             using (var stream = this.fileHelper.GetStream(filePath, FileMode.Create))
             {
@@ -88,7 +91,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         /// <param name="filePath">The path of test sequence file</param>
         /// <returns>Test Case List</returns>
-        public List<TestCase> ReadTestSequence(string filePath) 
+        public List<TestCase> ReadTestSequence(string filePath)
         {
             ValidateArg.NotNull(filePath, nameof(filePath));
 
@@ -100,12 +103,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             var testCaseList = new List<TestCase>();
             try
             {
-                // Reading test sequence 
+                // Reading test sequence
                 var xmlDocument = new XmlDocument();
                 using (var stream = this.fileHelper.GetStream(filePath, FileMode.Open))
                 {
                     xmlDocument.Load(stream);
                 }
+
                 var root = xmlDocument.LastChild;
                 foreach (XmlNode node in root)
                 {
@@ -122,6 +126,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 EqtTrace.Warning("XmlReaderWriter : Exception ", xmlException);
             }
+
             return testCaseList;
         }
     }

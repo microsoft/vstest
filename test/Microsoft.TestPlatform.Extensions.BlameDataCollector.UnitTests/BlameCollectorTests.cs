@@ -29,6 +29,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private Mock<DataCollectionSink> mockDataCollectionSink;
         private Mock<IBlameReaderWriter> mockBlameReaderWriter;
         private XmlElement configurationElement;
+        private string filepath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameCollectorTests"/> class.
@@ -47,6 +48,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.dataCollectionContext = new DataCollectionContext(testcase);
             this.configurationElement = null;
             this.context = new DataCollectionEnvironmentContext(this.dataCollectionContext);
+
+            this.filepath = Path.Combine(Path.GetTempPath(), "Test");
+            FileStream stream = File.Create(this.filepath);
+            stream.Dispose();
         }
 
         /// <summary>
@@ -70,39 +75,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         /// The trigger session ended handler should write to file if test start count is greater.
         /// </summary>
         [TestMethod]
-        public void TriggerSessionEndedHandlerShouldWriteToFileIfTestStartCountIsGreater()
-        { 
-            // Initializing Blame Data Collector
-            this.blameDataCollector.Initialize(
-                this.configurationElement,
-                this.mockDataColectionEvents.Object,
-                this.mockDataCollectionSink.Object,
-                this.mockLogger.Object,
-                this.context);
-
-            var filepath = Path.Combine(AppContext.BaseDirectory, "Test");
-            TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
-            using (var fs = File.Create(filepath))
-            {
-            }
-
-            // Setup and Raise TestCaseStart and Session End Event
-            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()))
-                .Returns(filepath);
-
-            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
-            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
-
-            // Verify WriteTestSequence Call
-            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()), Times.Once);
-            File.Delete(filepath);
-        }
-
-        /// <summary>
-        /// The trigger session ended handler should not write to file if test start count is same as test end count.
-        /// </summary>
-        [TestMethod]
-        public void TriggerSessionEndedHandlerShouldNotWriteToFileIfTestStartCountIsSameAsTestEndCount()
+        public void TriggerSessionEndedHandlerShouldWriteToFileIfTestHostCrash()
         {
             // Initializing Blame Data Collector
             this.blameDataCollector.Initialize(
@@ -112,16 +85,49 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
                 this.mockLogger.Object,
                 this.context);
 
-            var filepath = Path.Combine(AppContext.BaseDirectory, "TestSequence.xml");
             TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
 
             // Setup and Raise TestCaseStart and Session End Event
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()))
+                .Returns(this.filepath);
+
+            this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
+            this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
+
+            // Verify WriteTestSequence Call
+            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>()), Times.Once);
+        }
+
+        /// <summary>
+        /// The trigger session ended handler should not write to file if test start count is same as test end count.
+        /// </summary>
+        [TestMethod]
+        public void TriggerSessionEndedHandlerShouldNotWriteToFileIfNoTestHostCrash()
+        {
+            // Initializing Blame Data Collector
+            this.blameDataCollector.Initialize(
+                this.configurationElement,
+                this.mockDataColectionEvents.Object,
+                this.mockDataCollectionSink.Object,
+                this.mockLogger.Object,
+                this.context);
+
+            TestCase testcase = new TestCase("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
+
+            // Setup and Raise TestCaseStart and Session End Event
+            this.mockBlameReaderWriter.Setup(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), It.IsAny<string>())).Returns(this.filepath);
             this.mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
             this.mockDataColectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
             this.mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(this.dataCollectionContext));
 
             // Verify WriteTestSequence Call
-            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), filepath), Times.Never);
+            this.mockBlameReaderWriter.Verify(x => x.WriteTestSequence(It.IsAny<List<TestCase>>(), this.filepath), Times.Never);
+        }
+
+        [TestCleanup]
+        public void CleanUp()
+        {
+            File.Delete(this.filepath);
         }
 
         /// <summary>

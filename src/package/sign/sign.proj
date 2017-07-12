@@ -56,6 +56,7 @@
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.Resource.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.Tips.UnitTest.ObjectModel.dll" />
       <AssembliesToSign Include="$(ArtifactsDirectory)TestHost\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll" />
+      <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
 
       <!-- DataCollector related dlls -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Microsoft.IntelliTrace.Core.dll" />
@@ -95,6 +96,7 @@
       <!-- NetFullExtensions -->
       <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
 	  <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
+          <AssembliesToSign Include="$(ArtifactsDirectory)Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
 
       <!-- Localized resources -->
       <AssembliesToSign Include="$(ArtifactsDirectory)%(ResxLang.Identity)\*.*" />

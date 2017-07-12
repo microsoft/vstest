@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Test Source Attribute.
         /// </summary>
         public const string TestSourceAttribute = "Source";
-        
+
         /// <summary>
         /// Friendly name of the data collector
         /// </summary>

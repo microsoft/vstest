@@ -3,8 +3,8 @@
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using System.Collections.Generic;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     public interface IBlameReaderWriter
     {
@@ -13,6 +13,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         /// <param name="testSequence">List of tests in sequence</param>
         /// <param name="filePath">The path of file</param>
+        /// <returns>File Path</returns>
         string WriteTestSequence(List<TestCase> testSequence, string filePath);
 
         /// <summary>

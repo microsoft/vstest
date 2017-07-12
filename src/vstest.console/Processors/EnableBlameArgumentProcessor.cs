@@ -11,6 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using System.Xml;
 
     internal class EnableBlameArgumentProcessor : IArgumentProcessor
     {
@@ -75,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Diag;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Logging;
 
         public override string HelpContentResourceName => CommandLineResources.EnableBlameUsage;
 
@@ -126,6 +131,55 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             // Add Blame Data Collector
             CollectArgumentExecutor.AddDataCollectorToRunSettings(BlameFriendlyName, this.runSettingsManager);
+
+            // Get results directory from RunSettingsManager
+            var runSettings = this.runSettingsManager.ActiveRunSettings;
+            string resultsDirectory = null;
+            if (runSettings != null)
+            {
+                try
+                {
+                    RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings.SettingsXml);
+                    resultsDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfiguration);
+                }
+                catch (SettingsException se)
+                {
+                    if (EqtTrace.IsErrorEnabled)
+                    {
+                        EqtTrace.Error("EnableBlameArgumentProcessor: Unable to get the test results directory: Error {0}", se);
+                    }
+                }
+            }
+
+            // Add configuration element
+            var settings = runSettings?.SettingsXml;
+            if (settings == null)
+            {
+                runSettingsManager.AddDefaultRunSettings();
+                settings = runSettings?.SettingsXml;
+            }
+
+            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
+            if (dataCollectionRunSettings == null)
+            {
+                dataCollectionRunSettings = new DataCollectionRunSettings();
+            }
+
+            var XmlDocument = new XmlDocument();
+            var outernode = XmlDocument.CreateElement("Configuration");
+            var node = XmlDocument.CreateElement("ResultsDirectory");
+            outernode.AppendChild(node);
+            node.InnerText = resultsDirectory;
+
+            foreach(var item in dataCollectionRunSettings.DataCollectorSettingsList)
+            {
+                if( item.FriendlyName.Equals(BlameFriendlyName))
+                {
+                    item.Configuration = outernode;
+                }
+            }
+
+            runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
         }
 
         /// <summary>

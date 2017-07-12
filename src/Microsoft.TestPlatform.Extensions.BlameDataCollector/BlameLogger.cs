@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <summary>
         /// Uri used to uniquely identify the Blame logger.
         /// </summary>
-        public const string ExtensionUri = "logger://Microsoft/TestPlatform/Extensions/Blame";
+        public const string ExtensionUri = "logger://Microsoft/TestPlatform/Extensions/Blame/v1";
 
         /// <summary>
         /// Alternate user friendly string to uniquely identify the Blame logger.
@@ -39,12 +39,12 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         private readonly IOutput output;
 
-        #endregion      
+        #endregion
 
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BlameLogger"/> class. 
+        /// Initializes a new instance of the <see cref="BlameLogger"/> class.
         /// </summary>
         public BlameLogger()
             : this(ConsoleOutput.Instance, new XmlReaderWriter())
@@ -52,6 +52,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="BlameLogger"/> class.
         /// Constructor added for testing purpose
         /// </summary>
         /// <param name="output">Output Instance</param>
@@ -77,14 +78,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             {
                 throw new ArgumentNullException(nameof(events));
             }
+
             events.TestRunComplete += this.TestRunCompleteHandler;
         }
 
         /// <summary>
         /// Called when a test run is complete.
         /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">TestRunCompleteEventArgs</param>
         private void TestRunCompleteHandler(object sender, TestRunCompleteEventArgs e)
         {
+            if (sender == null)
+            {
+                throw new ArgumentNullException(nameof(sender));
+            }
+
             ValidateArg.NotNull<object>(sender, "sender");
             ValidateArg.NotNull<TestRunCompleteEventArgs>(e, "e");
 
@@ -95,13 +104,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.output.WriteLine(string.Empty, OutputLevel.Information);
 
-            // Gets the faulty test case if test aborted 
+            // Gets the faulty test case if test aborted
             var testCaseName = this.GetFaultyTestCase(e);
             if (testCaseName == string.Empty)
             {
                 return;
             }
-          
+
             var reason = Resources.Resources.AbortedTestRun + testCaseName;
             this.output.Error(reason);
         }
@@ -109,7 +118,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         #endregion
 
         #region Faulty test case fetch
-        
+
         /// <summary>
         /// Fetches faulty test case
         /// </summary>
@@ -132,7 +141,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         var testCaseList = this.blameReaderWriter.ReadTestSequence(filepath);
                         if (testCaseList.Count > 0)
                         {
-                            var testcase = testCaseList[testCaseList.Count - 1];
+                            var testcase = testCaseList.Last();
                             return testcase.FullyQualifiedName;
                         }
                     }
@@ -143,7 +152,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             return string.Empty;
         }
-        
+
         #endregion
     }
 }

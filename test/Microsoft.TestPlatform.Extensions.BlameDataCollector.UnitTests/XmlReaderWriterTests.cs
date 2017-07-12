@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private TestableXmlReaderWriter xmlReaderWriter;
         private Mock<IFileHelper> mockFileHelper;
         private Mock<Stream> mockStream;
-        List<TestCase> testCaseList;
+        private List<TestCase> testCaseList;
         private TestCase testcase;
 
         /// <summary>
@@ -115,7 +115,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Verify Call to stream read
             this.mockStream.Verify(x => x.Read(It.IsAny<byte[]>(), It.IsAny<int>(), It.IsAny<int>()));
-
         }
 
         /// <summary>
