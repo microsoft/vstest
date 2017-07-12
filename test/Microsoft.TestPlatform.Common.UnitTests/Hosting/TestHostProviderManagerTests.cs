@@ -3,20 +3,20 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     /// <summary>
     /// Tests the behaviors of the TestLoggerManager class.
@@ -24,8 +24,7 @@ namespace TestPlatform.Common.UnitTests.Logging
     [TestClass]
     public class TestHostProviderManagerTests
     {
-        [TestInitialize]
-        public void Initialize()
+        public TestHostProviderManagerTests()
         {
             TestPluginCacheTests.SetupMockExtensions();
         }
@@ -34,7 +33,7 @@ namespace TestPlatform.Common.UnitTests.Logging
         public void TestHostProviderManagerShouldReturnTestHostWhenAppropriateCustomUriProvided()
         {
             var manager = TestRuntimeProviderManager.Instance;
-            Assert.IsNotNull(manager.GetTestHostManagerByUri("executor://CustomTestHost/"));
+            Assert.IsNotNull(manager.GetTestHostManagerByUri("executor://DesktopTestHost/"));
         }
 
         [TestMethod]
@@ -98,7 +97,7 @@ namespace TestPlatform.Common.UnitTests.Logging
 
             var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
 
-            Assert.AreEqual(typeof(DotnetTestHostManager), testHostManager.GetType());
+            Assert.AreEqual(typeof(TestableTestHostManager), testHostManager.GetType());
         }
 
         [TestMethod]
@@ -135,8 +134,8 @@ namespace TestPlatform.Common.UnitTests.Logging
 
         #region implementations
 
-        [ExtensionUri("executor://CustomTestHost")]
-        [FriendlyName("CustomHost")]
+        [ExtensionUri("executor://DesktopTestHost")]
+        [FriendlyName("DesktopTestHost")]
         private class CustomTestHost : ITestRuntimeProvider
         {
             public event EventHandler<HostProviderEventArgs> HostLaunched;
@@ -162,16 +161,6 @@ namespace TestPlatform.Common.UnitTests.Logging
                 return true;
             }
 
-            public void DeregisterForExitNotification()
-            {
-                throw new NotImplementedException();
-            }
-
-            public CancellationTokenSource GetCancellationTokenSource()
-            {
-                throw new NotImplementedException();
-            }
-
             public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
             {
                 throw new NotImplementedException();
@@ -188,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.Shared = !config.DisableAppDomain;
             }
 
-            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -203,27 +192,26 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
-            public void RegisterForExitNotification(Action abortCallback)
+            public void SetCustomLauncher(ITestHostLauncher customLauncher)
             {
                 throw new NotImplementedException();
             }
 
-            public void SetCustomLauncher(ITestHostLauncher customLauncher)
+            public Task CleanTestHostAsync(CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
         }
 
-        [ExtensionUri("executor://DotnetTestHostManager")]
-        [FriendlyName("DotnetTestHostManager")]
-        private class DotnetTestHostManager : ITestRuntimeProvider
+        [ExtensionUri("executor://NetCoreTestHost")]
+        [FriendlyName("NetCoreTestHost")]
+        private class TestableTestHostManager : ITestRuntimeProvider
         {
             public event EventHandler<HostProviderEventArgs> HostLaunched;
 
             public event EventHandler<HostProviderEventArgs> HostExited;
 
             public bool Shared { get; private set; }
-
 
             public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
             {
@@ -241,16 +229,6 @@ namespace TestPlatform.Common.UnitTests.Logging
                 return false;
             }
 
-            public void DeregisterForExitNotification()
-            {
-                throw new NotImplementedException();
-            }
-
-            public CancellationTokenSource GetCancellationTokenSource()
-            {
-                throw new NotImplementedException();
-            }
-
             public TestProcessStartInfo GetTestHostProcessStartInfo(IEnumerable<string> sources, IDictionary<string, string> environmentVariables, TestRunnerConnectionInfo connectionInfo)
             {
                 throw new NotImplementedException();
@@ -267,7 +245,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.Shared = !config.DisableAppDomain;
             }
 
-            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -282,12 +260,12 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.HostLaunched.Invoke(this, new HostProviderEventArgs("Error"));
             }
 
-            public void RegisterForExitNotification(Action abortCallback)
+            public void SetCustomLauncher(ITestHostLauncher customLauncher)
             {
                 throw new NotImplementedException();
             }
 
-            public void SetCustomLauncher(ITestHostLauncher customLauncher)
+            public Task CleanTestHostAsync(CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }

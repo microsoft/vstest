@@ -113,6 +113,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.StdOutputContains("filename.txt");
             this.StdOutputContains("TestCaseStarted");
             this.StdOutputContains("TestCaseEnded");
+            this.StdOutputContains("SampleUnitTestProject2.UnitTest1.PassingTest2");
+            this.StdOutputContains("SampleUnitTestProject2.UnitTest1.FailingTest2");
             this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionStarted");
             this.StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
             this.StdOutputContains("Data collector 'SampleDataCollector' message: my warning");

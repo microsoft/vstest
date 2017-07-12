@@ -43,6 +43,7 @@ namespace OutOfProcDataCollector
         private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
         {
             this.logger.LogWarning(this.context.SessionDataCollectionContext, "TestCaseStarted " + e.TestCaseName);
+            this.logger.LogWarning(this.context.SessionDataCollectionContext, "TestCaseStarted " + e.TestElement.FullyQualifiedName);
             var filename = Path.Combine(FileUtility.GetAppDomainBaseDir(), "testcasefilename" + i++ + ".txt");
             File.WriteAllText(filename, string.Empty);
             this.dataCollectionSink.SendFileAsync(e.Context, filename, true);

@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -26,6 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
+        private CancellationTokenSource cancellationTokenSource;
 
         #region Constructors
 
@@ -50,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">
         /// Test host Manager instance
         /// </param>
+        /// <param name="dataSerializer"></param>
         /// <param name="clientConnectionTimeout">
         /// The client Connection Timeout
         /// </param>
@@ -62,6 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
+            this.cancellationTokenSource = new CancellationTokenSource();
         }
 
         #endregion
@@ -97,7 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.InitializeExtensions(discoveryCriteria.Sources);
                 }
 
-                this.SetupChannel(discoveryCriteria.Sources);
+                this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
                 this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
             }
             catch (Exception exception)
@@ -110,8 +114,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 eventHandler.HandleRawMessage(rawMessage);
 
                 // Log to vstest.console
+                // Send a discovery complete to caller. Similar logic is also used in ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager
+                // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
+                // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
+                // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(0, new List<ObjectModel.TestCase>(), false);
+                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
             }
         }
 
@@ -146,7 +154,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.SetupChannel(sourceList);
+                this.SetupChannel(sourceList, this.cancellationTokenSource.Token);
 
                 this.RequestSender.InitializeDiscovery(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }

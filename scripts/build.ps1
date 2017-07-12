@@ -16,7 +16,7 @@ Param(
     # E.g. VS 2017 Update 1 Preview will have version 15.1.1
     [Parameter(Mandatory=$false)]
     [Alias("v")]
-    [System.String] $Version = "15.3.0",
+    [System.String] $Version = "15.5.0",
 
     [Parameter(Mandatory=$false)]
     [Alias("vs")]
@@ -63,7 +63,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
 $env:DOTNET_CLI_VERSION = "2.1.0-preview1-006329"
 $env:DOTNET_RUNTIME_VERSION = "2.0.0-preview2-25331-01"
-$env:LOCATE_VS_API_VERSION = "0.2.4-beta"
+$env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
 
 #
@@ -232,10 +232,6 @@ function Publish-Package
 
     # Copy over the Full CLR built datacollector package assemblies to the Core CLR package folder along with testhost
     Publish-PackageInternal $dataCollectorProject $TPB_TargetFramework $fullDestDir
-    # Overwrite datacollector.config file for netcore
-    $dataCollectorNetCoreConfigSource = Join-Path $env:TP_ROOT_DIR ".\src\datacollector\app_netcore.config"
-    $dataCollectorNetCoreConfigDest = Join-Path $fullDestDir "datacollector.exe.config"
-    Copy-Item $dataCollectorNetCoreConfigSource  $dataCollectorNetCoreConfigDest  -Force 
 
     $fullDestDir = Join-Path $fullCLRPackageDir $netFull_Dir
     New-Item -ItemType directory -Path $fullDestDir -Force | Out-Null
@@ -298,8 +294,8 @@ function Publish-Package
 
 function Publish-PackageInternal($packagename, $framework, $output)
 {
-    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal"
-    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+    Write-Verbose "$dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild"
+    & $dotnetExe publish $packagename --configuration $TPB_Configuration --framework $framework --output $output -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 }
 
 function Create-VsixPackage
@@ -342,7 +338,7 @@ function Create-VsixPackage
     }
     else
     {
-        Write-Log ".. Create-VsixPackage: Can not generate vsix as msbuild.exe not found"
+        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
@@ -489,7 +485,7 @@ function Locate-MSBuildPath
 
     if([string]::IsNullOrEmpty($vsInstallPath))
     {
-      return $null
+        return $null
     }
 
     $vsInstallPath = Resolve-Path -path $vsInstallPath
@@ -501,37 +497,34 @@ function Locate-MSBuildPath
 
 function Locate-VsInstallPath
 {
-   $locateVsApi = Locate-LocateVsApi
+   $vswhere = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "vswhere\$env:VSWHERE_VERSION\tools\vswhere.exe"
+   if (!(Test-Path -path $vswhere)) {
+       throw "Unable to locate vswhere in path '$vswhere'."
+   }
 
-   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.Roslyn.Compiler", "Microsoft.VisualStudio.Component.VSSDK")
+   Write-Verbose "Using '$vswhere' to locate VS installation path."
 
+   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.VSSDK")
    Write-Verbose "VSInstallation requirements : $requiredPackageIds"
 
-   Add-Type -path $locateVsApi
    Try
    {
-     $vsInstallPath = [LocateVS.Instance]::GetInstallPath($env:MSBUILD_VERSION, $requiredPackageIds)
+       Write-Verbose "VSWhere command line: $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath"
+       if ($TPB_CIBuild) {
+           $vsInstallPath = & $vswhere -latest -products * -requires $requiredPackageIds -property installationPath
+       }
+       else {
+           # Allow using pre release versions of VS for dev builds
+           $vsInstallPath = & $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath
+       }
    }
    Catch [System.Management.Automation.MethodInvocationException]
    {
-      Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
+       Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
    }
 
    Write-Verbose "VSInstallPath is : $vsInstallPath"
-
    return $vsInstallPath
-}
-
-function Locate-LocateVsApi
-{
-  $locateVsApi = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "RoslynTools.Microsoft.LocateVS\$env:LOCATE_VS_API_VERSION\tools\LocateVS.dll"
-
-  if (!(Test-Path -path $locateVsApi)) {
-    throw "The specified LocateVS API version ($env:LOCATE_VS_API_VERSION) could not be located."
-  }
-
-  Write-Verbose "locateVsApi is : $locateVsApi"
-  return $locateVsApi
 }
 
 function Update-VsixVersion($vsixProjectDir)

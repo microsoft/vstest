@@ -22,7 +22,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// The server stream read timeout constant (in microseconds).
         /// </summary>
         private const int STREAMREADTIMEOUT = 1000 * 1000;
-        private const int BUFFERSIZE = 8 * 1024;
 
         /// <summary>
         /// TCP Listener to host TCP channel and listen
@@ -68,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Stream to use read timeout
         /// </summary>
-        private Stream stream;
+        private NetworkStream stream;
 
         private Socket socket;
 
@@ -95,6 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             var endpoint = new IPEndPoint(IPAddress.Loopback, 0);
             this.tcpListener = new TcpListener(endpoint);
+
             this.tcpListener.Start();
 
             var portNumber = ((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
@@ -115,8 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 var client = await this.tcpListener.AcceptTcpClientAsync();
                 this.socket = client.Client;
-                this.socket.NoDelay = true;
-                this.stream = new BufferedStream(client.GetStream(), BUFFERSIZE);
+                this.stream = client.GetStream();
                 this.binaryReader = new BinaryReader(this.stream);
                 this.binaryWriter = new BinaryWriter(this.stream);
 
@@ -160,10 +159,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.clientConnectionAcceptedEvent.Reset();
             EqtTrace.Info("Trying to connect to server on port : {0}", portNumber);
-            this.tcpClient = new TcpClient { NoDelay = true };
+            this.tcpClient = new TcpClient();
             this.socket = this.tcpClient.Client;
             await this.tcpClient.ConnectAsync(IPAddress.Loopback, portNumber);
-            this.stream = new BufferedStream(this.tcpClient.GetStream(), BUFFERSIZE);
+            this.stream = this.tcpClient.GetStream();
             this.binaryReader = new BinaryReader(this.stream);
             this.binaryWriter = new BinaryWriter(this.stream);
             this.clientConnectionAcceptedEvent.Set();
@@ -327,8 +326,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         && socketException.SocketErrorCode == SocketError.TimedOut)
                     {
                         EqtTrace.Info(
-                        "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
-                        ioException);
+                            "SocketCommunicationManager ReceiveMessage: failed to receive message because read timeout {0}",
+                            ioException);
                     }
                     else
                     {

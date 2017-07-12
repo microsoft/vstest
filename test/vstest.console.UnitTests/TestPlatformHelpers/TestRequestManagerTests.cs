@@ -534,7 +534,7 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         [DataTestMethod]
         [DataRow(true)]
         [DataRow(false)]
-        public void DiscoverTestsShouldUpdateDesignMode(bool designModeValue)
+        public void DiscoverTestsShouldUpdateDesignModeAndCollectSourceInformation(bool designModeValue)
         {
             var runsettings = "<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETFramework,Version=v4.5</TargetFrameworkVersion></RunConfiguration></RunSettings>";
             var discoveryPayload = CreateDiscoveryPayload(runsettings);
@@ -545,6 +545,10 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
             var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
             this.mockTestPlatform.Verify(
                 tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
+
+            var collectSourceInformation = $"<CollectSourceInformation>{designModeValue}</CollectSourceInformation>";
+            this.mockTestPlatform.Verify(
+                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<ProtocolConfig>()));
         }
 
         [TestMethod]
@@ -605,6 +609,21 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
 
             var designmode = $"<DesignMode>{designModeValue}</DesignMode>";
             this.mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.Is<TestRunCriteria>(rc => rc.TestRunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
+        }
+
+        [DataTestMethod]
+        [DataRow(true)]
+        [DataRow(false)]
+        public void DiscoverTestsShouldNotUpdateCollectSourceInformationIfUserHasSetItInRunSettings(bool val)
+        {
+            var runsettings = $"<RunSettings><RunConfiguration><CollectSourceInformation>{val}</CollectSourceInformation></RunConfiguration></RunSettings>";
+            var discoveryPayload = CreateDiscoveryPayload(runsettings);
+            
+            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
+
+            var collectSourceInformation = $"<CollectSourceInformation>{val}</CollectSourceInformation>";
+            this.mockTestPlatform.Verify(
+                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(collectSourceInformation)), It.IsAny<ProtocolConfig>()));
         }
 
         private static DiscoveryRequestPayload CreateDiscoveryPayload(string runsettings)

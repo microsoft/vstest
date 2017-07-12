@@ -16,7 +16,7 @@ NOCOLOR='\033[0m'
 #
 CONFIGURATION="Debug"
 TARGET_RUNTIME="ubuntu.16.04-x64"
-VERSION="15.3.0"
+VERSION="15.5.0"
 VERSION_SUFFIX="dev"
 FAIL_FAST=false
 DISABLE_LOCALIZED_BUILD=false
@@ -284,7 +284,7 @@ function publish_package()
         for project in "${projects[@]}" ;
         do
             log ".. Package: Publish $project"
-            $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+            $dotnet publish $project --configuration $TPB_Configuration --framework $framework --output $packageDir -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
         done
 
         # Copy TestHost for desktop targets if we've built net451
@@ -321,7 +321,7 @@ function publish_package()
     log ".. Package: Publish testhost.csproj"
     local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
     local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore10
-    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+    $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild -p:LocalizedBuild=$TPB_LocalizedBuild
 
     # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     packageName="Microsoft.TestPlatform.Build"
@@ -412,7 +412,7 @@ log "Test platform build variables: "
 
 if $TPB_HasMono; then
     # Workaround for https://github.com/dotnet/sdk/issues/335
-    export FrameworkPathOverride=/usr/lib/mono/4.5/
+    export FrameworkPathOverride=$(dirname $(which mono))/../lib/mono/4.5/
 fi
 
 if [ -z "$PROJECT_NAME_PATTERNS" ]
