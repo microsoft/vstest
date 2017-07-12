@@ -154,8 +154,8 @@ function Restore-Package
 
     Write-Log ".. .. Restore-Package: Source: $TPB_Solution"
     & $dotnetExe restore $TPB_Solution --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
-    #Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
-    #& $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
+    Write-Log ".. .. Restore-Package: Source: $env:TP_ROOT_DIR\src\package\external\external.csproj"
+    & $dotnetExe restore $env:TP_ROOT_DIR\src\package\external\external.csproj --packages $env:TP_PACKAGES_DIR -v:minimal -warnaserror -p:Version=$TPB_Version
     Write-Log ".. .. Restore-Package: Complete."
 
     if ($lastExitCode -ne 0) {
@@ -247,9 +247,9 @@ function Publish-Package
 
     # Publish platform abstractions
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
-    $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
+    $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
-    Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
+    Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
     
     # Copy over the logger assemblies to the Extensions folder.
@@ -342,7 +342,7 @@ function Create-VsixPackage
     }
     else
     {
-        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found"
+        Write-Log ".. Create-VsixPackage: Can not generate vsix as msbuild.exe not found"
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"

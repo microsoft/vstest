@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         public void ChutzpahRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [Ignore] // https://github.com/Microsoft/vstest/issues/689
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -52,7 +52,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         public void NUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void XUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
