@@ -309,7 +309,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
         {
-            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<object>())).Throws<Exception>();
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Throws<Exception>();
             this.ExitCallBackTestHelper(0);
 
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
