@@ -47,7 +47,7 @@ namespace vstest.console.UnitTests.Processors
 
             Assert.AreEqual("/Blame", capabilities.CommandName);
             Assert.AreEqual(false, capabilities.IsAction);
-            Assert.AreEqual(ArgumentProcessorPriority.Diag, capabilities.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.Logging, capabilities.Priority);
             Assert.AreEqual(HelpContentPriority.EnableDiagArgumentProcessorHelpPriority, capabilities.HelpPriority);
             Assert.AreEqual(CommandLineResources.EnableBlameUsage, capabilities.HelpContentResourceName);
 
