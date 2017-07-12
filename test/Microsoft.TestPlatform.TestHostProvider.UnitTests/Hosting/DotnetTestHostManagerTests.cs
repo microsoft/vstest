@@ -669,7 +669,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             await this.dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(It.IsAny<object>()), Times.Once);
+            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(It.IsAny<Process>()), Times.Once);
         }
 
         private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
