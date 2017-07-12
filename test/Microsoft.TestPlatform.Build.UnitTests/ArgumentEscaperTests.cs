@@ -11,10 +11,32 @@ namespace Microsoft.TestPlatform.Build.Utils.UnitTests
         [TestMethod]
         public void EscapeArgForProcessStartShouldAddDoubleQuoteIfThereIsSpace()
         {
-            string stringWithDoubleQuote = "Some string";
+            string stringWithSpace = "Some string";
 
             string expected = "\"Some string\"";
-            string result = ArgumentEscaper.EscapeArgForProcessStart(stringWithDoubleQuote);
+            string result = ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(stringWithSpace);
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void EscapeArgForProcessStartShouldAddDoubleQuoteIfThereIsSpaceAtEnd()
+        {
+            string stringWithSpaceAtEnd = "Some string  ";
+
+            string expected = "\"Some string  \"";
+            string result = ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(stringWithSpaceAtEnd);
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void EscapeArgForProcessStartShouldHandleForwardSlash()
+        {
+            string stringWithForwardSlash = "Some/string";
+
+            string expected = "Some/string";
+            string result = ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(stringWithForwardSlash);
 
             Assert.AreEqual(expected, result);
         }
@@ -25,7 +47,18 @@ namespace Microsoft.TestPlatform.Build.Utils.UnitTests
             string stringWithDoubleQuote = "Some\"string";
 
             string expected = "Some\\\"string";
-            string result = ArgumentEscaper.EscapeArgForProcessStart(stringWithDoubleQuote);
+            string result = ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(stringWithDoubleQuote);
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [TestMethod]
+        public void EscapeArgForProcessStartShouldPreserveSingleQuote()
+        {
+            string stringWithSingleQuote = "Some'string";
+
+            string expected = "Some'string";
+            string result = ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(stringWithSingleQuote);
 
             Assert.AreEqual(expected, result);
         }
@@ -33,10 +66,10 @@ namespace Microsoft.TestPlatform.Build.Utils.UnitTests
         [TestMethod]
         public void EscapeArgForProcessStartShouldPreserveBackSlash()
         {
-            string stringWithDoubleQuote = @"Some\\string";
+            string stringWithBackSlash = @"Some\\string";
 
             string expected = "Some\\\\string";
-            string result = ArgumentEscaper.EscapeArgForProcessStart(stringWithDoubleQuote);
+            string result = ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(stringWithBackSlash);
 
             Assert.AreEqual(expected, result);
         }
@@ -44,10 +77,10 @@ namespace Microsoft.TestPlatform.Build.Utils.UnitTests
         [TestMethod]
         public void EscapeArgForProcessStartShouldPreserveBackSlashIfStringHasWhiteSpace()
         {
-            string stringWithDoubleQuote = @"Some string With Space\\";
+            string stringWithBackSlash = @"Some string With Space\\";
 
             string expected = @"""Some string With Space\\\\""";
-            string result = ArgumentEscaper.EscapeArgForProcessStart(stringWithDoubleQuote);
+            string result = ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(stringWithBackSlash);
 
             Assert.AreEqual(expected, result);
         }

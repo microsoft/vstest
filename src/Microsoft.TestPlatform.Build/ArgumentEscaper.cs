@@ -15,14 +15,17 @@ namespace Microsoft.TestPlatform.Build.Utils
         /// </summary>
         /// <param name="arg"></param>
         /// <returns>Return original string passed by client</returns>
-        public static string EscapeArgForProcessStart(string arg)
+        public static string HandleEscapeSequenceInArgForProcessStart(string arg)
         {
             var sb = new StringBuilder();
 
             var needsQuotes = ShouldSurroundWithQuotes(arg);
             var isQuoted = needsQuotes || IsSurroundedWithQuotes(arg);
 
-            if (needsQuotes) sb.Append("\"");
+            if (needsQuotes)
+            {
+                sb.Append("\"");
+            }
 
             for (int i = 0; i < arg.Length; ++i)
             {
@@ -66,7 +69,10 @@ namespace Microsoft.TestPlatform.Build.Utils
                 }
             }
 
-            if (needsQuotes) sb.Append("\"");
+            if (needsQuotes)
+            {
+                sb.Append("\"");
+            }
 
             return sb.ToString();
         }

@@ -132,46 +132,46 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // TODO log arguments in task
             if (!string.IsNullOrEmpty(this.VSTestSetting))
             {
-                allArgs.Add("--settings:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestSetting));
+                allArgs.Add("--settings:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestSetting));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestAdapterPath))
             {
-                allArgs.Add("--testAdapterPath:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestTestAdapterPath));
+                allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestAdapterPath));
             }
             else
             {
                 // For Full CLR, add source directory as test adapter path.
                 if (this.VSTestFramework.StartsWith(".NETFramework", StringComparison.OrdinalIgnoreCase))
                 {
-                    allArgs.Add("--testAdapterPath:" + ArgumentEscaper.EscapeArgForProcessStart(Path.GetDirectoryName(this.TestFileFullPath)));
+                    allArgs.Add("--testAdapterPath:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(Path.GetDirectoryName(this.TestFileFullPath)));
                 }
             }
 
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
-                allArgs.Add("--framework:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestFramework));
+                allArgs.Add("--framework:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestFramework));
             }
 
             // vstest.console only support x86 and x64 for argument platform
             if (!string.IsNullOrEmpty(this.VSTestPlatform) && !this.VSTestPlatform.Contains("AnyCPU"))
             {
-                allArgs.Add("--platform:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestPlatform));
+                allArgs.Add("--platform:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestPlatform));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestTestCaseFilter))
             {
-                allArgs.Add("--testCaseFilter:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestTestCaseFilter));
+                allArgs.Add("--testCaseFilter:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestTestCaseFilter));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestLogger))
             {
-                allArgs.Add("--logger:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestLogger));
+                allArgs.Add("--logger:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestLogger));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestResultsDirectory))
             {
-                allArgs.Add("--resultsDirectory:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestResultsDirectory));
+                allArgs.Add("--resultsDirectory:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestResultsDirectory));
             }
 
             if (!string.IsNullOrEmpty(this.VSTestListTests))
@@ -181,7 +181,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
 
             if (!string.IsNullOrEmpty(this.VSTestDiag))
             {
-                allArgs.Add("--Diag:" + ArgumentEscaper.EscapeArgForProcessStart(this.VSTestDiag));
+                allArgs.Add("--Diag:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.VSTestDiag));
             }
 
             if (string.IsNullOrEmpty(this.TestFileFullPath))
@@ -190,7 +190,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             }
             else
             {
-                allArgs.Add(ArgumentEscaper.EscapeArgForProcessStart(this.TestFileFullPath));
+                allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(this.TestFileFullPath));
             }
 
             if (!string.IsNullOrWhiteSpace(this.VSTestVerbosity) &&
@@ -217,7 +217,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 allArgs.Add("--");
                 foreach (var arg in this.VSTestCLIRunSettings)
                 {
-                    allArgs.Add(ArgumentEscaper.EscapeArgForProcessStart(arg));
+                    allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
                 }
             }
 
@@ -225,7 +225,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             {
                 foreach (var arg in this.VSTestCollect)
                 {
-                    allArgs.Add("--collect:" + ArgumentEscaper.EscapeArgForProcessStart(arg));
+                    allArgs.Add("--collect:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
                 }
             }
 
