@@ -90,18 +90,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         [TestMethod]
         public void DiscoveryTestsShouldProcessAllSourcesOnDiscoveryAbortsForAnySource()
         {
-            // Since the hosts are aborted, total aggregated tests sent across will be 0
+            // Since the hosts are aborted, total aggregated tests sent across will be -1
             var discoveryManagerMock = new Mock<IProxyDiscoveryManager>();
             this.createdMockManagers.Add(discoveryManagerMock);
-            var parallelDiscoveryManager = this.SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: 0);
+            var parallelDiscoveryManager = this.SetupDiscoveryManager(() => discoveryManagerMock.Object, 1, true, totalTests: -1);
 
             Task.Run(() =>
             {
                 parallelDiscoveryManager.DiscoverTests(this.testDiscoveryCriteria, this.mockHandler.Object);
             });
 
-            //Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
-            Assert.IsTrue(this.discoveryCompleted.Wait(60 * ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
+            Assert.IsTrue(this.discoveryCompleted.Wait(ParallelProxyDiscoveryManagerTests.taskTimeout), "Test discovery not completed.");
             Assert.AreEqual(2, processedSources.Count, "All Sources must be processed.");
         }
 
@@ -114,7 +113,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.createdMockManagers[1].Reset();
             this.createdMockManagers[1].Setup(dm => dm.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler>()))
                 .Throws<NotImplementedException>();
-            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(10, null, true))
+            this.mockHandler.Setup(mh => mh.HandleDiscoveryComplete(-1, null, true))
                 .Callback<long, IEnumerable<TestCase>, bool>((t, l, a) => { this.discoveryCompleted.Set(); });
 
             Task.Run(() =>
