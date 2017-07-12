@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldUpdatTestAdapterPathInRunSettings()
+        public void InitializeShouldUpdateTestAdapterPathInRunSettings()
         {
             RunSettingsManager.Instance.AddDefaultRunSettings();
 
@@ -159,7 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         }
 
         [TestMethod]
-        public void InitializeShouldUpdatTestAdapterPathsInRunSettings()
+        public void InitializeShouldUpdateTestAdapterPathsInRunSettings()
         {
             RunSettingsManager.Instance.AddDefaultRunSettings();
 

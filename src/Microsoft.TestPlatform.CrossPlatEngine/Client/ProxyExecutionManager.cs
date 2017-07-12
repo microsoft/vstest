@@ -143,7 +143,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Log to vstest.console
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
 
-                var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
+                // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
+                // created to replace the current one. This will help if the current execution manager is aborted due to irreparable error
+                // and the test host is lost as well.
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
 
