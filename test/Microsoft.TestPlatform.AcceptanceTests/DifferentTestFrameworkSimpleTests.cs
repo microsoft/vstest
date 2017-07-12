@@ -72,8 +72,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public void XUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            string testAssemblyPath = null;
+
+            // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
+            if (this.testEnvironment.TargetFramework.Equals("net451"))
+            {
+                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll", targetFramework: "net46");
+            }
+            else
+            {
+                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll");
+            }
+
             var arguments = PrepareArguments(
-                this.GetAssetFullPath("XUTestProject.dll"),
+                testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty,
                 this.FrameworkArgValue);

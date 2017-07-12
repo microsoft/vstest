@@ -190,7 +190,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.xproj</c> must 
         /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\SimpleUnitTest.dll</c>
         /// </remarks>
-        public string GetTestAsset(string assetName)
+        public string GetTestAsset(string assetName, string targetFramework = null)
         {
             var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
             var assetPath = Path.Combine(
@@ -198,7 +198,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 simpleAssetName,
                 "bin",
                 this.BuildConfiguration,
-                this.TargetFramework,
+                targetFramework??this.TargetFramework,
                 assetName);
 
             Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}.", assetPath);

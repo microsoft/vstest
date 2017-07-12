@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                 // Stop accepting any other connections
                 this.tcpListener.Stop();
-                
+
                 // Close the client and dispose the underlying stream
 #if !NET451
                 this.tcpClient?.Dispose();

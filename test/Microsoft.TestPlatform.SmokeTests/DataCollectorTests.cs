@@ -39,7 +39,17 @@ namespace Microsoft.TestPlatform.SmokeTests
         private string GetInProcDataCollectionRunsettingsFile()
         {
             var runSettings = Path.Combine(Path.GetDirectoryName(testEnvironment.GetTestAsset(DataCollectorTests.InProDataCollectorTestProject)), "runsettingstest.runsettings");
-            var inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll");
+            string inprocasm = null;
+
+            // SimpleDataCollector has dependency on TestPlatform OM, which targets net46. This can be removed after this PR merge.
+            if (this.testEnvironment.TargetFramework.Equals("net451"))
+            {
+                inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll", targetFramework: "net46");
+            }
+            else
+            {
+                inprocasm = testEnvironment.GetTestAsset("XUTestProject.dll");
+            }
 
             var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
