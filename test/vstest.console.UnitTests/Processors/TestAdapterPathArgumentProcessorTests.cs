@@ -130,7 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 
             try
             {
-                executor.Initialize(folder.AddDoubleQuote());
+                executor.Initialize(folder);
             }
             catch (Exception ex)
             {
