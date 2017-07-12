@@ -303,19 +303,19 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
             await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(Process.GetCurrentProcess().Id), Times.Once);
+            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(It.IsAny<Process>()), Times.Once);
         }
 
         [TestMethod]
         public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
         {
-            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<int>())).Throws<Exception>();
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<object>())).Throws<Exception>();
             this.ExitCallBackTestHelper(0);
 
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
             await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(Process.GetCurrentProcess().Id), Times.Once);
+            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(It.IsAny<Process>()), Times.Once);
         }
 
         private void TestableTestHostManagerHostExited(object sender, HostProviderEventArgs e)
