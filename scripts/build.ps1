@@ -504,7 +504,7 @@ function Locate-VsInstallPath
 
    Write-Verbose "Using '$vswhere' to locate VS installation path."
 
-   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.Roslyn.Compiler", "Microsoft.VisualStudio.Component.VSSDK")
+   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.VSSDK")
    Write-Verbose "VSInstallation requirements : $requiredPackageIds"
 
    Try
