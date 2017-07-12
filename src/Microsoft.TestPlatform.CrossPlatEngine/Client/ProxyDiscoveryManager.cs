@@ -114,8 +114,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 eventHandler.HandleRawMessage(rawMessage);
 
                 // Log to vstest.console
+                // Send a discovery complete to caller. Similar logic is also used in ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager
+                // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
+                // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
+                // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(0, new List<ObjectModel.TestCase>(), false);
+                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
             }
         }
 

@@ -171,7 +171,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void DiscoverTestsShouldcatchExceptionAndCallHandleDiscoveryComplete()
+        public void DiscoverTestsShouldCatchExceptionAndCallHandleDiscoveryComplete()
         {
             // Setup mocks.
             Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
@@ -181,7 +181,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
             // Verify
-            mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(0, It.IsAny<IEnumerable<TestCase>>(), false));
+            mockTestDiscoveryEventsHandler.Verify(s => s.HandleDiscoveryComplete(-1, It.IsAny<IEnumerable<TestCase>>(), true));
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleRawMessage(It.IsAny<string>()));
             mockTestDiscoveryEventsHandler.Verify(s => s.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()));
         }
