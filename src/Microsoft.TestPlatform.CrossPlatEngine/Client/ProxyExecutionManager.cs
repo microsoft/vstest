@@ -7,7 +7,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using System.Text.RegularExpressions;
+    using System.Threading;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -20,8 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
-    using System.Text.RegularExpressions;
-    using Microsoft.VisualStudio.TestPlatform.Common;
 
     /// <summary>
     /// Orchestrates test execution operations for the engine communicating with the client.
@@ -30,17 +31,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
+        private CancellationTokenSource cancellationTokenSource;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
-
 
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProxyExecutionManager"/> class. 
         /// </summary>
-        /// <param name="testRequestSender">Test request sender instance.</param>
+        /// <param name="requestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager for this proxy.</param>
         public ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager) : this(requestSender, testHostManager, JsonDataSerializer.Instance, Constants.ClientConnectionTimeout)
         {
@@ -52,12 +53,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="requestSender">Request Sender instance</param>
         /// <param name="testHostManager">Test host manager instance</param>
+        /// <param name="dataSerializer"></param>
         /// <param name="clientConnectionTimeout">The client Connection Timeout</param>
         internal ProxyExecutionManager(ITestRequestSender requestSender, ITestRuntimeProvider testHostManager, IDataSerializer dataSerializer, int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
             this.dataSerializer = dataSerializer;
+            this.cancellationTokenSource = new CancellationTokenSource();
         }
 
         #endregion
@@ -76,6 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is shared. SetupChannel it early.");
                 this.InitializeExtensions(Enumerable.Empty<string>());
             }
+
             this.IsInitialized = true;
         }
 
@@ -105,7 +109,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     this.InitializeExtensions(testSources);
                 }
 
-                this.SetupChannel(testRunCriteria.Sources);
+                this.SetupChannel(testRunCriteria.Sources, this.cancellationTokenSource.Token);
 
                 var executionContext = new TestExecutionContext(
                     testRunCriteria.FrequencyOfRunStatsChangeEvent,
@@ -195,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.SetupChannel(sourceList);
+                this.SetupChannel(sourceList, this.cancellationTokenSource.Token);
 
                 this.RequestSender.InitializeExecution(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
