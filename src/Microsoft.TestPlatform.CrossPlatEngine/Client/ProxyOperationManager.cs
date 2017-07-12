@@ -75,13 +75,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Ensure that the engine is ready for test operations.
         /// Usually includes starting up the test host process.
         /// </summary>
-        /// <param name="sources">List of test sources.</param>
-        /// <param name="cancellationToken"></param>
-        public virtual void SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
+        /// <param name="sources">
+        /// List of test sources.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// </param>
+        /// <returns>
+        /// Returns true if Communation is established b/w runner and host
+        /// </returns>
+        public virtual bool SetupChannel(IEnumerable<string> sources, CancellationToken cancellationToken)
         {
             var connTimeout = this.connectionTimeout;
 
-            // ToDo: change SetupChannel to return bool, which will specify that a successfull connection with testhost was established or not
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
@@ -152,6 +157,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 this.initialized = true;
             }
+
+            return true;
         }
 
         /// <summary>
