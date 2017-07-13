@@ -299,11 +299,16 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public async Task CleanTestHostAsyncShouldKillTestHostProcess()
         {
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>()))
+                .Callback<object>(p => isVerified = ((Process)p).Id == pid);
+
             this.ExitCallBackTestHelper(0);
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
             await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(It.IsAny<Process>()), Times.Once);
+            Assert.IsTrue(isVerified);
         }
 
         [TestMethod]
@@ -311,7 +316,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Throws<Exception>();
             this.ExitCallBackTestHelper(0);
-
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
             await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
