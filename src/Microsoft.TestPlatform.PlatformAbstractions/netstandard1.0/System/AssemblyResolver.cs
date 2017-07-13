@@ -6,11 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System;
     using System.Collections.Generic;
 
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     public class AssemblyResolver : IAssemblyResolver
     {
-        public AssemblyResolver(IEnumerable<string> directories)
+        public AssemblyResolver(IEnumerable<string> directories, IPlatformEqtTrace platformEqtTrace)
         {
             throw new NotImplementedException();
         }

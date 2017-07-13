@@ -23,14 +23,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     {
         public static string ErrorOnInitialization { get; set; }
 
-        public static IPlatformEqtTrace Instance
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public void WriteLine(PlatformTraceLevel level, string message)
         {
             throw new NotImplementedException();

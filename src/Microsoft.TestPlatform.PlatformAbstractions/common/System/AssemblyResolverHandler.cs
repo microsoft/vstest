@@ -17,11 +17,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
    
-    internal class AssemblyResolverUtility
+    internal class AssemblyResolverHandler
     {
         private static readonly string[] SupportedFileExtensions = { ".dll", ".exe" };
 
-        private static IPlatformEqtTrace traceImpl = PlatformEqtTrace.Instance;
+        private IPlatformEqtTrace platformEqtTrace;
 
         /// <summary>
         /// The directories to look for assemblies to resolve.
@@ -35,12 +35,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         private Dictionary<string, Assembly> resolvedAssemblies;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyResolverUtility"/> class.
+        /// Initializes a new instance of the <see cref="AssemblyResolverHandler"/> class.
         /// </summary>
         /// <param name="directories"> The search directories. </param>
-        public AssemblyResolverUtility(IEnumerable<string> directories)
+        /// <param name="platformEqtTrace">To trace failures</param>
+        public AssemblyResolverHandler(IEnumerable<string> directories, IPlatformEqtTrace platformEqtTrace)
         {
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
+
+            this.platformEqtTrace = platformEqtTrace;
 
             if (directories == null || !directories.Any())
             {
@@ -259,13 +262,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             return true;
         }
 
-        private static void WriteToEqtTrace(string format, params object[] args)
+        private void WriteToEqtTrace(string format, params object[] args)
         {
-            if (traceImpl.ShouldTrace(PlatformTraceLevel.Info))
+            if (this.platformEqtTrace.ShouldTrace(PlatformTraceLevel.Info))
             {
                 string message = string.Format(CultureInfo.InvariantCulture, format, args);
 
-                traceImpl.WriteLine(PlatformTraceLevel.Info, message);
+                this.platformEqtTrace.WriteLine(PlatformTraceLevel.Info, message);
             }
         }
     }

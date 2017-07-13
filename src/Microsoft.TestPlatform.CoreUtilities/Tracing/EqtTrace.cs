@@ -23,7 +23,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public static class EqtTrace
     {
-        private static IPlatformEqtTrace traceImpl = PlatformEqtTrace.Instance;
+        private static IPlatformEqtTrace traceImpl = new PlatformEqtTrace();
 
 #if NET46
         public static void SetupRemoteEqtTraceListeners(AppDomain childDomain)
@@ -63,6 +63,14 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 #endif
+
+        public static IPlatformEqtTrace PlatformTrace
+        {
+            get
+            {
+                return traceImpl;
+            }
+        }
 
         public static string LogFile
         {

@@ -7,10 +7,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.Collections.Generic;
 
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     public class AssemblyResolver : IAssemblyResolver
     {
-        public AssemblyResolver(IEnumerable<string> directories)
+        public AssemblyResolver(IEnumerable<string> directories, IPlatformEqtTrace platformEqtTrace)
         {
         }
 

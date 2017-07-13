@@ -96,16 +96,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private static int traceFileSize = 0;
         private static int defaultTraceFileSize = 10240; // 10Mb.
 
-        private static IPlatformEqtTrace instance;
-
-        public static IPlatformEqtTrace Instance
-        {
-            get
-            {
-                return instance ?? (instance = new PlatformEqtTrace());
-            }
-        }
-
         public static string LogFile
         {
             get;

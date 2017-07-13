@@ -8,10 +8,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.Reflection;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using System.Runtime.Loader;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     public class AssemblyResolver : IAssemblyResolver
     {
-        private AssemblyResolverUtility resolverUtility;
+        private AssemblyResolverHandler resolverHandler;
 
         /// <summary>
         /// Specifies whether the resolver is disposed or not
@@ -23,9 +24,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// </summary>
         /// <param name="directories"> The search directories. </param>
         [System.Security.SecurityCritical]
-        public AssemblyResolver(IEnumerable<string> directories)
+        public AssemblyResolver(IEnumerable<string> directories, IPlatformEqtTrace platformEqtTrace)
         {
-            this.resolverUtility = new AssemblyResolverUtility(directories);
+            this.resolverHandler = new AssemblyResolverHandler(directories, platformEqtTrace);
 
             AssemblyLoadContext.Default.Resolving += this.AssemblyResolverEvent;
         }
@@ -43,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         [System.Security.SecurityCritical]
         public void AddSearchDirectories(IEnumerable<string> directories)
         {
-            this.resolverUtility.AddSearchDirectories(directories);
+            this.resolverHandler.AddSearchDirectories(directories);
         }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             AssemblyName args = eventArgs as AssemblyName;
 
-            return args == null ? null : this.resolverUtility.AssemblyResolverEventHandler(args.Name);
+            return args == null ? null : this.resolverHandler.AssemblyResolverEventHandler(args.Name);
         }
 
         public void Dispose()
@@ -81,19 +82,21 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             }
         }
 
+        /// <inheritdoc />
         public void SetCurrentDomainAssemblyResolve()
         {
             AssemblyLoadContext.Default.Resolving += this.CurrentDomainAssemblyResolve;
-        }
-
-        private Assembly CurrentDomainAssemblyResolve(AssemblyLoadContext loadContext, AssemblyName args)
-        {
-            return this.resolverUtility.CurrentDomainAssemblyResolveHelper(args.Name);
         }
 
         public void RemoveCurrentDomainAssemblyResolve()
         {
             AssemblyLoadContext.Default.Resolving -= this.CurrentDomainAssemblyResolve;
         }
+
+        private Assembly CurrentDomainAssemblyResolve(AssemblyLoadContext loadContext, AssemblyName args)
+        {
+            return this.resolverHandler.CurrentDomainAssemblyResolveHelper(args.Name);
+        }
+
     }
 }
