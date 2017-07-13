@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Xml;
-
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
+    using System.IO;
+    using System.Xml;
+
     [TestClass]
     public class BlameDataCollectorTests : AcceptanceTestBase
     {
@@ -63,7 +62,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             Assert.IsTrue(isAttachmentReceived);
             Assert.IsTrue(isValid);
-
         }
 
         private bool IsValidXml(string xmlFilePath)

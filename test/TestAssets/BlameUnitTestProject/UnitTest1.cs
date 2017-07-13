@@ -13,13 +13,11 @@ namespace BlameUnitTestProject
         [TestMethod]
         public void TestMethod1()
         {
-            Thread.Sleep(5000);
         }
 
         [TestMethod]
         public void TestMethod2()
         {
-            Thread.Sleep(5000);
             Environment.Exit(1);
         }
     }
