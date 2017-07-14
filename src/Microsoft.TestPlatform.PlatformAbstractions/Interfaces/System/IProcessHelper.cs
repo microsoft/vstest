@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <summary>
         /// Terminates a process.
         /// </summary>
-        /// <param name="processId">Id of the process to terminate.</param>
-        void TerminateProcess(int processId);
+        /// <param name="process">Reference of process to terminate.</param>
+        void TerminateProcess(object process);
     }
 }
