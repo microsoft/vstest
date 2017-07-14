@@ -34,7 +34,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
 
             SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
-            var assemblyPaths = this.BuildMultipleAssemblyPath("BlameUnitTestProject.dll").Trim('\"');
+            var assemblyPaths = this.GetAssetFullPath("BlameUnitTestProject.dll");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, $" /Blame");
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}");
