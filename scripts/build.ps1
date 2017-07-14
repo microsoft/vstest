@@ -270,9 +270,9 @@ function Publish-Package
     # Publish Datacollector
     $TPB_TargetFrameworkStandard = "netstandard1.5"
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
-    $blameDataCollectorNet46 = Join-Path $blameDataCollector $TPB_TargetFramework
+    $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
-    Copy-Item $blameDataCollectorNet46\* $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\* $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\* $coreCLRExtensionsDir -Force
 	
 	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.

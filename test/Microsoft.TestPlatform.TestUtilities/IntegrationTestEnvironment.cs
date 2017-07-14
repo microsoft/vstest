@@ -199,7 +199,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Gets the full path to a test asset.
         /// </summary>
         /// <param name="assetName">Name of the asset with extension. E.g. <c>SimpleUnitTest.dll</c></param>
-        /// <param name="targetFramework">asset project target framework. E.g <c>net46</c></param>
+        /// <param name="targetFramework">asset project target framework. E.g <c>net451</c></param>
         /// <returns>Full path to the test asset.</returns>
         /// <remarks>
         /// Test assets follow several conventions:

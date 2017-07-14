@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         }
 
         [TestMethod]
-        public void DefaultFrameworkShouldBeNet46OnDesktop()
+        public void DefaultFrameworkShouldBeNet451OnDesktop()
         {
 #if NET451
             Assert.AreEqual(".NETFramework,Version=v4.5.1", Framework.DefaultFramework.Name);
