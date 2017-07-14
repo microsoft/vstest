@@ -299,23 +299,30 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public async Task CleanTestHostAsyncShouldKillTestHostProcess()
         {
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>()))
+                .Callback<object>(p => isVerified = ((Process)p).Id == pid);
+
             this.ExitCallBackTestHelper(0);
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
             await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(Process.GetCurrentProcess().Id), Times.Once);
+            Assert.IsTrue(isVerified);
         }
 
         [TestMethod]
         public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
         {
-            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<int>())).Throws<Exception>();
-            this.ExitCallBackTestHelper(0);
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
 
+            this.ExitCallBackTestHelper(0);
             await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
             await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(Process.GetCurrentProcess().Id), Times.Once);
+            Assert.IsTrue(isVerified);
         }
 
         private void TestableTestHostManagerHostExited(object sender, HostProviderEventArgs e)
