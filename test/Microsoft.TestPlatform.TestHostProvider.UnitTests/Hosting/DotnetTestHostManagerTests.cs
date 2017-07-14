@@ -667,14 +667,16 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
         {
-            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Throws<Exception>();
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
 
             this.ExitCallBackTestHelper(0);
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
 
             await this.dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(It.IsAny<Process>()), Times.Once);
+            Assert.IsTrue(isVerified);
         }
 
         private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)
