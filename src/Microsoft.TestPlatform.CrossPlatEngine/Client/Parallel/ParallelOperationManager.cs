@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using System.Collections.Concurrent;
 
     /// <summary>
     /// Abstract class having common parallel manager implementation
@@ -132,7 +133,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 // not initialized yet
                 // create rest of concurrent clients other than default one
-                this.concurrentManagerHandlerMap = new Dictionary<T, U>();
+                this.concurrentManagerHandlerMap = new ConcurrentDictionary<T, U>();
                 for (int i = 0; i < newParallelLevel; i++)
                 {
                     this.AddManager(this.CreateNewConcurrentManager(), default(U));
@@ -153,18 +154,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     // If number of concurrent clients is more than the new level
                     // Dispose off the extra ones
-                    int numerOfMangersToRemove = currentParallelLevel - newParallelLevel;
+                    int managersCount = currentParallelLevel - newParallelLevel;
 
                     foreach(var concurrentManager in this.GetConcurrentManagerInstances())
                     {
-                        if (numerOfMangersToRemove == 0)
+                        if (managersCount == 0)
                         {
                             break;
                         }
                         else
                         {
                             this.RemoveManager(concurrentManager);
-                            numerOfMangersToRemove--;
+                            managersCount--;
                         }
                     }
                 }

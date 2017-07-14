@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
     public class VsTestTaskTests
     {
         [TestMethod]
-        public void CreateArgumentShouldAddDoubleQuotesForCLIRunSettings()
+        public void CreateArgumentShouldAddOneEntryForCLIRunSettings()
         {
             const string arg1 = "RunConfiguration.ResultsDirectory=Path having Space";
             const string arg2 = "MSTest.DeploymentEnabled";
@@ -27,13 +27,13 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             // First, second and third args would be --framework:abc, testfilepath and -- respectively.
             Assert.AreEqual($"\"{arg1}\"", result[3]);
-            Assert.AreEqual($"\"{arg2}\"", result[4]);
+            Assert.AreEqual($"{arg2}", result[4]);
         }
 
         [TestMethod]
         public void CreateArgumentShouldPassResultsDirectoryCorrectly()
         {
-            const string resultsDirectoryValue = @"C:\tmp\ResultsDirectory";
+            const string resultsDirectoryValue = @"C:\tmp\Results Directory";
             var vstestTask = new VSTestTask {  VSTestResultsDirectory = resultsDirectoryValue };
 
             // Add values for required properties.
@@ -57,8 +57,8 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = vstestTask.CreateArgument().ToArray();
 
-            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"Console;Verbosity=normal\"")));
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:\"Console;Verbosity=quiet\"")));
+            Assert.IsNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=normal")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--logger:Console;Verbosity=quiet")));
         }
 
         [TestMethod]
@@ -231,7 +231,7 @@ namespace Microsoft.TestPlatform.Build.UnitTests
 
             var allArguments = vstestTask.CreateArgument().ToArray();
 
-            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name1\"")));
+            Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:name1")));
             Assert.IsNotNull(allArguments.FirstOrDefault(arg => arg.Contains("--collect:\"name 2\"")));
         }
     }

@@ -825,9 +825,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
-        <target state="translated">Недопустимая версия .NET Framework: {0}. Укажите полное имя целевой платформы. Другие поддерживаемые версии .NET Framework: Framework35, Framework40 и Framework45.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
+        <target state="new">Недопустимая версия .NET Framework: {0}. Укажите полное имя целевой платформы. Другие поддерживаемые версии .NET Framework: Framework35, Framework40 и Framework45.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Недопустимый .net Framework версии: {0}. Укажите имя fullname TargetFramework. Другие поддерживаемые .net Framework версии, Framework35, Framework40 и Framework45.</target>
         </alt-trans>
