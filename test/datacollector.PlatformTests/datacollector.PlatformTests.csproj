@@ -29,7 +29,6 @@
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Common\Microsoft.TestPlatform.Common.csproj">
       <FromP2P>true</FromP2P>
     </ProjectReference>
-    <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
 
     <Content Include="$(TestPlatformRoot)src\datacollector\bin\$(Configuration)\$(TargetFramework)\datacollector*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

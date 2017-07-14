@@ -577,7 +577,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         /// <summary>
         ///   Looks up a localized string similar to --Framework|/Framework:&lt;Framework Version&gt;
         ///      Target .Net Framework version to be used for test execution. 
-        ///      Valid values are &quot;.NETFramework,Version=v4.6&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
+        ///      Valid values are &quot;.NETFramework,Version=v4.5.1&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
         ///      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10..
         /// </summary>
         public static string FrameworkArgumentHelp
@@ -589,7 +589,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:&quot;.NETFramework,Version=v4.6&quot;.
+        ///   Looks up a localized string similar to The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:&quot;.NETFramework,Version=v4.5.1&quot;.
         /// </summary>
         public static string FrameworkVersionRequired
         {

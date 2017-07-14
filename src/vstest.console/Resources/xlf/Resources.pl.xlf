@@ -799,13 +799,13 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;wersja struktury&gt;
+        <target state="new">--Framework|/Framework:&lt;wersja struktury&gt;
       Docelowa wersja programu .NET Framework, która zostanie użyta na potrzeby wykonania testu. 
       Prawidłowe wartości to ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" itp.
       Inne obsługiwane wartości to Framework35, Framework40, Framework45 i FrameworkCore10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework w wersji &gt;
       Cel systemu .net Framework w wersji używanego do wykonania testu. 
@@ -815,9 +815,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
-        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="translated">Argument /Framework wymaga docelowej wersji programu .NET Framework na potrzeby uruchomienia testu. Przykład: /Framework:".NETFramework,Version=v4.6"</target>
-        <note />
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
+        <target state="new">Argument /Framework wymaga docelowej wersji programu .NET Framework na potrzeby uruchomienia testu. Przykład: /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">Argument ramy wymaga obiektu docelowego systemu .net Framework w wersji dla testu.   Przykład: Ramy: ". NETFramework, wersja = v4.6 "</target>
         </alt-trans>

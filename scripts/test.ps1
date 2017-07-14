@@ -248,6 +248,13 @@ function Invoke-Test
                 $testContainers |  % {
                     # Fill in the framework in test containers
                     $testContainer = [System.String]::Format($_, $fx)
+
+                    if (-not (Test-Path $testContainer))
+                    {
+                        # Test project may not targetting all frameworks. Example: Microsoft.TestPlatform.Build.UnitTests won't target net451.
+                        continue
+                    }
+
                     $trxLogFileName =  [System.String]::Format("{0}_{1}_{2}", ($(Get-ChildItem $testContainer).Name), $fx, $Script:TPT_DefaultTrxFileName)
 
                     # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break

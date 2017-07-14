@@ -26,7 +26,6 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
     using TrxLoggerObjectModel = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
     using TrxLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TrxLogger.Resources.TrxResource;
     using Microsoft.TestPlatform.Extensions.TrxLogger.Utility;
-    using Microsoft.TestPlatform.TestUtilities;
 
     [TestClass]
     public class TrxLoggerTests
@@ -34,7 +33,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private Mock<TestLoggerEvents> events;
         private TestableTrxLogger testableTrxLogger;
         private Dictionary<string, string> parameters;
-        private static string DefaultTestRunDirectory = FileUtility.GetAppDomainBaseDir();
+        private static string DefaultTestRunDirectory = Path.GetTempPath();
         private static string DefaultLogFileNameParameterValue = "logfilevalue.trx";
 
         [TestInitialize]

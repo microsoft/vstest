@@ -11,7 +11,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
-    <ProjectReference Include="..\..\..\src\Microsoft.TestPlatform.Utilities\Microsoft.TestPlatform.Utilities.csproj" />
-    <ProjectReference Include="..\..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
   </ItemGroup>
 </Project>
