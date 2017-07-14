@@ -271,7 +271,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         {
             try
             {
-                this.processHelper.TerminateProcess(this.testHostProcess.Id);
+                this.processHelper.TerminateProcess(this.testHostProcess);
             }
             catch (Exception ex)
             {
