@@ -35,10 +35,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.socketClient.Stop();
-#if !NET451
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.tcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netcoreapp1.0
             this.tcpClient?.Dispose();
 #endif
-            this.tcpListener.Stop();
         }
 
         [TestMethod]
@@ -95,10 +98,14 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var waitEvent = this.SetupClientDisconnect(out ICommunicationChannel _);
 
             // Close the communication from server side
-#if !NET451
+            this.tcpClient.GetStream().Dispose();
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.tcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netcoreapp1.0
             this.tcpClient?.Dispose();
 #endif
-
             Assert.IsTrue(waitEvent.WaitOne(TIMEOUT));
         }
 

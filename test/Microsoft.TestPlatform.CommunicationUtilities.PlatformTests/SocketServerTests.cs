@@ -33,7 +33,11 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.socketServer.Stop();
-#if !NET451
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.tcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netcoreapp1.0
             this.tcpClient?.Dispose();
 #endif
         }
@@ -124,10 +128,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             var channel = this.SetupChannel(out ConnectedEventArgs clientConnected);
 
             // Close the client channel. Message loop should stop.
-#if !NET451
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.tcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netcoreapp1.0
             this.tcpClient?.Dispose();
 #endif
-
             Assert.IsTrue(waitEvent.WaitOne(1000));
             Assert.IsTrue(clientDisconnected.Error is IOException);
         }
