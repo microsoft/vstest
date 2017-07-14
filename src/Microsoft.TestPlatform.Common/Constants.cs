@@ -45,28 +45,28 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
     public static class TestPlatformConstants
     {
         /// <summary>
-        /// Regex pattern used to find the test adapters
+        /// Pattern used to find the test adapters library using String.EndWith
         /// </summary>
-        public const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
+        public const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
         /// <summary>
-        /// Regex pattern used to find the test logger
+        /// Pattern used to find the test loggers library using String.EndWith
         /// </summary>
-        public const string TestLoggerRegexPattern = @".*.TestLogger.dll";
+        public const string TestLoggerEndsWithPattern = @"TestLogger.dll";
 
         /// <summary>
-        /// Regex pattern used to find the data collector.
+        /// Pattern used to find the data collectors library using String.EndWith
         /// </summary>
-        public const string DataCollectorRegexPattern = @".*Collector.dll";
+        public const string DataCollectorEndsWithPattern = @"Collector.dll";
 
         /// <summary>
-        /// Regex pattern used to find the run time provider.
+        /// Pattern used to find the run time providers library using String.EndWith
         /// </summary>
-        public const string RunTimeRegexPattern = @".*RuntimeProvider.dll";
+        public const string RunTimeEndsWithPattern = @"RuntimeProvider.dll";
 
         /// <summary>
-        /// Regex pattern used to find the settings provider.
+        /// Pattern used to find the settings providers library using String.EndWith
         /// </summary>
-        public const string SettingsProviderRegexPattern = @".*SettingsProvider.dll";
+        public const string SettingsProviderEndsWithPattern = @"SettingsProvider.dll";
     }
 }

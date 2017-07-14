@@ -4,12 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
-
-    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -103,24 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         public void Initialize(string argument)
         {
             // Add this enabled data collectors list, this will ensure Code Coverage isn't disabled when other DCs are configured using /Collect.
-            CollectArgumentExecutor.EnabledDataCollectors.Add(FriendlyName.ToLower());
-
-            var settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
-            if (settings == null)
-            {
-                this.runSettingsManager.AddDefaultRunSettings();
-                settings = this.runSettingsManager.ActiveRunSettings?.SettingsXml;
-            }
-
-            var dataCollectionRunSettings = XmlRunSettingsUtilities.GetDataCollectionRunSettings(settings);
-            if (dataCollectionRunSettings == null)
-            {
-                dataCollectionRunSettings = new DataCollectionRunSettings();
-            }
-
-            CollectArgumentExecutor.EnableDataCollectorUsingFriendlyName(FriendlyName, dataCollectionRunSettings);
-
-            this.runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.DataCollectionRunSettingsName, dataCollectionRunSettings.ToXml().InnerXml);
+            CollectArgumentExecutor.AddDataCollectorToRunSettings(argument, this.runSettingsManager);
         }
 
         /// <inheritdoc />

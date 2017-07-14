@@ -9,9 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 
     /// <summary>
     /// Manages test plugins information.
@@ -129,8 +126,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <typeparam name="TMetadata">
         /// Concrete type of metadata
         /// </typeparam>
-        /// <param name="regexPattern">
-        /// The regex Pattern.
+        /// <param name="endsWithPattern">
+        /// Pattern used to select files using String.EndsWith
         /// </param>
         /// <param name="unfiltered">
         /// Receives unfiltered list of test extensions
@@ -139,11 +136,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Receives test extensions filtered by Identifier data
         /// </param>
         public void GetSpecificTestExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(
-            string regexPattern,
+            string endsWithPattern,
             out IEnumerable<LazyExtension<IExtension, Dictionary<string, object>>> unfiltered,
             out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
         {
-            var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, IExtension>(regexPattern);
+            var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, IExtension>(endsWithPattern);
             this.GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
         }
 

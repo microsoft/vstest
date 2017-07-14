@@ -131,10 +131,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
-        public void TerminateProcess(int processId)
+        public void TerminateProcess(object process)
         {
-            var process = Process.GetProcessById(processId);
-            process.Kill();
+            var proc = process as Process;
+            if (proc != null && !proc.HasExited)
+            {
+                proc.Kill();
+            }
         }
     }
 }
