@@ -47,26 +47,26 @@ namespace Microsoft.VisualStudio.TestPlatform.Common
         /// <summary>
         /// Regex pattern used to find the test adapters
         /// </summary>
-        public const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
+        public const string TestAdapterRegexPattern = @"TestAdapter.dll";
 
         /// <summary>
         /// Regex pattern used to find the test logger
         /// </summary>
-        public const string TestLoggerRegexPattern = @".*.TestLogger.dll";
+        public const string TestLoggerRegexPattern = @"TestLogger.dll";
 
         /// <summary>
         /// Regex pattern used to find the data collector.
         /// </summary>
-        public const string DataCollectorRegexPattern = @".*Collector.dll";
+        public const string DataCollectorRegexPattern = @"Collector.dll";
 
         /// <summary>
         /// Regex pattern used to find the run time provider.
         /// </summary>
-        public const string RunTimeRegexPattern = @".*RuntimeProvider.dll";
+        public const string RunTimeRegexPattern = @"RuntimeProvider.dll";
 
         /// <summary>
         /// Regex pattern used to find the settings provider.
         /// </summary>
-        public const string SettingsProviderRegexPattern = @".*SettingsProvider.dll";
+        public const string SettingsProviderRegexPattern = @"SettingsProvider.dll";
     }
 }

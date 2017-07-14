@@ -8,6 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.Linq;
     using System.Reflection;
 
+    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -57,8 +58,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new string[] { typeof(RunTestsWithSourcesTests).GetTypeInfo().Assembly.Location },
                 () => { });
 
-            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(TestExecutorExtensionManager.Regex);
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestDiscoveryExtensionManager.Regex);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(TestPlatformConstants.TestAdapterRegexPattern);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
         }
 
         [TestCleanup]

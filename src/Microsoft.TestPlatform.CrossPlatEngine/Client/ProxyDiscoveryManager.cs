@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -137,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (TestPluginCache.Instance.PathToExtensions != null)
             {
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => TestDiscoveryExtensionManager.Regex.IsMatch(ext)));
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterRegexPattern, StringComparison.OrdinalIgnoreCase)));
             }
 
             extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);

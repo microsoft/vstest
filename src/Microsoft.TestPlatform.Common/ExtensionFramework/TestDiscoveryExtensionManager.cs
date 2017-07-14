@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
     using System;
     using System.Collections.Generic;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -18,8 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestDiscoveryExtensionManager
     {
         #region Fields
-        public static Regex Regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         private static TestDiscoveryExtensionManager testDiscoveryExtensionManager;
 
         #endregion
@@ -82,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 TestPluginManager.Instance
                     .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                        TestDiscoveryExtensionManager.Regex,
+                        TestPlatformConstants.TestAdapterRegexPattern,
                         out unfilteredTestExtensions,
                         out testExtensions);
 

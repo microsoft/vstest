@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -47,9 +46,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> EnumerateFiles(string directory, Regex regex, SearchOption searchOption)
+        public IEnumerable<string> EnumerateFiles(string directory, SearchOption searchOption, params string[] endsWithSearchPatterns)
         {
-            return Directory.EnumerateFiles(directory, "*", searchOption).Where(f => regex.IsMatch(f));
+            if (endsWithSearchPatterns == null || endsWithSearchPatterns.Length == 0)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            var files = Directory.EnumerateFiles(directory, "*", searchOption);
+
+            return files.Where(
+                    file => endsWithSearchPatterns.Any(pattern => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)));
         }
 
         /// <inheritdoc/>

@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -21,8 +20,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
     {
         #region Fields
-        public static Regex Regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         private static TestExecutorExtensionManager testExecutorExtensionManager;
         private static object synclock = new object();
 
@@ -70,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
-                                TestExecutorExtensionManager.Regex,
+                                TestPlatformConstants.TestAdapterRegexPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
 

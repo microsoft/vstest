@@ -44,7 +44,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     {
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
         private const string DotnetTestHostFriendlyName = "DotnetTestHost";
-        private const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
+        private const string TestAdapterRegexPattern = @"TestAdapter.dll";
 
         private IDotnetHostHelper dotnetHostHelper;
 
@@ -246,7 +246,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
                 var regex = new Regex(TestAdapterRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                return this.fileHelper.EnumerateFiles(sourceDirectory, regex, SearchOption.TopDirectoryOnly);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestAdapterRegexPattern);
             }
 
             return Enumerable.Empty<string>();

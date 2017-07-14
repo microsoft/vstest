@@ -4,7 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
 {
     using System.Collections.Generic;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -18,8 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
     /// </summary>
     internal class TestLoggerExtensionManager : TestExtensionManager<ITestLogger, ITestLoggerCapabilities>
     {
-        public static Regex Regex = new Regex(TestPlatformConstants.TestLoggerRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TestLoggerExtensionManager"/> class. 
         /// </summary>
@@ -58,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>(
-                TestLoggerExtensionManager.Regex,
+                TestPlatformConstants.TestLoggerRegexPattern,
                 out unfilteredTestExtensions,
                 out filteredTestExtensions);
 

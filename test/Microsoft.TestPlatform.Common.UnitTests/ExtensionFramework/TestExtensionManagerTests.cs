@@ -30,7 +30,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
             TestPluginCacheTests.SetupMockExtensions();
             messageLogger = TestSessionMessageLogger.Instance;
             TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>
-                (TestLoggerExtensionManager.Regex, out unfilteredTestExtensions, out filteredTestExtensions);
+                (TestPlatformConstants.TestLoggerRegexPattern, out unfilteredTestExtensions, out filteredTestExtensions);
         }
 
         [TestCleanup]

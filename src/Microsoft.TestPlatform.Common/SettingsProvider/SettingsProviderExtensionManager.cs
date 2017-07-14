@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -30,8 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     public class SettingsProviderExtensionManager
     {
         #region Fields
-        public static Regex Regex = new Regex(TestPlatformConstants.SettingsProviderRegexPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         private static SettingsProviderExtensionManager settingsProviderExtensionManager;
         private static object synclock = new object();
 
@@ -118,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
-                                SettingsProviderExtensionManager.Regex,
+                                TestPlatformConstants.SettingsProviderRegexPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
 
