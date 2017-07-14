@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf" Version="$version$" Language="en-US" Publisher="Microsoft" />
+    <Identity Id="Microsoft.TestPlatform.VSIX.Microsoft.0e51abf6-9f5f-401e-a812-4043b87acabf" Version="42.42.42" Language="en-US" Publisher="Microsoft" />
     <DisplayName>Microsoft Visual Studio Test Platform</DisplayName>
     <Description xml:space="preserve">Extensible Test Platform that allows developers to discover, execute and analyze automated tests.</Description>
     <License>License.rtf</License>
