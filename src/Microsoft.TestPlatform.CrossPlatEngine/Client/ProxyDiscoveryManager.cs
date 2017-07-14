@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (TestPluginCache.Instance.PathToExtensions != null)
             {
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterRegexPattern, StringComparison.OrdinalIgnoreCase)));
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterEndsWithPattern, StringComparison.OrdinalIgnoreCase)));
             }
 
             extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);

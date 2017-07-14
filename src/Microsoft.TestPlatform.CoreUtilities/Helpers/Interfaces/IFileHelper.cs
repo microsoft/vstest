@@ -52,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// </summary>
         /// <param name="directory">Parent directory to search.</param>
         /// <param name="searchOption"><see cref="SearchOption"/> for directory.</param>
-        /// <param name="endsWithSearchPatterns"></param>
+        /// <param name="endsWithSearchPatterns">Patterns used to select files using String.EndsWith</param>
         /// <returns>List of files matching the pattern.</returns>
         IEnumerable<string> EnumerateFiles(string directory, SearchOption searchOption, params string[] endsWithSearchPatterns);
 

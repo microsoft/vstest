@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             out IEnumerable<LazyExtension<IExtension, Dictionary<string, object>>> unfiltered,
             out IEnumerable<LazyExtension<IExtension, IMetadata>> filtered) where TMetadata : IMetadata where TPluginInfo : TestPluginInformation
         {
-            var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, IExtension>(regexPattern);
+            var extensions = TestPluginCache.Instance.DiscoverTestExtensions<TPluginInfo, IExtension>(endsWithPattern);
             this.GetExtensions<TPluginInfo, IExtension, IMetadata, TMetadata>(extensions, out unfiltered, out filtered);
         }
 

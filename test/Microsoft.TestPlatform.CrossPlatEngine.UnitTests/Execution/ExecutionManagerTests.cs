@@ -9,7 +9,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.Reflection;
 
     using Common.UnitTests.ExtensionFramework;
-
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -101,8 +100,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             TestPluginCacheTests.SetupMockExtensions(
                 new string[] { assemblyLocation },
                 () => { });
-            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(TestPlatformConstants.TestAdapterRegexPattern);
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestExecutorPluginInformation, ITestExecutor>(TestPlatformConstants.TestAdapterEndsWithPattern);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterEndsWithPattern);
 
 
             var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();

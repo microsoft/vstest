@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                         continue;
                     }
 
-                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestPlatformConstants.TestAdapterRegexPattern, TestPlatformConstants.TestLoggerRegexPattern, TestPlatformConstants.RunTimeRegexPattern, TestPlatformConstants.SettingsProviderRegexPattern));
+                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestPlatformConstants.TestAdapterEndsWithPattern, TestPlatformConstants.TestLoggerEndsWithPattern, TestPlatformConstants.RunTimeEndsWithPattern, TestPlatformConstants.SettingsProviderEndsWithPattern));
                     if (extensionAssemblies.Count > 0)
                     {
                         this.UpdateExtensions(extensionAssemblies, true);
@@ -215,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var sourceDirectory = Path.GetDirectoryName(source);
                 if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestPlatformConstants.TestLoggerRegexPattern));
+                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestPlatformConstants.TestLoggerEndsWithPattern));
                 }
             }
 

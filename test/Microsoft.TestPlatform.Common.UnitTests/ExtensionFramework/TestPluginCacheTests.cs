@@ -8,7 +8,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -281,7 +280,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             SetupMockAdditionalPathExtensions();
 
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterEndsWithPattern);
 
             Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
@@ -294,7 +293,7 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         {
             SetupMockAdditionalPathExtensions();
 
-            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterRegexPattern);
+            TestPluginCache.Instance.DiscoverTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(TestPlatformConstants.TestAdapterEndsWithPattern);
 
             Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
             Assert.IsTrue(TestPluginCache.Instance.TestExtensions.AreTestExtensionsCached<TestDiscovererPluginInformation>());

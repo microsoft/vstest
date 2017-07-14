@@ -125,7 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         #region Public Methods
 
         /// <summary>
-        /// Performs discovery of specific type of test extensions ending with the specified pattern.
+        /// Performs discovery of specific type of test extensions in files ending with the specified pattern.
         /// </summary>
         /// <typeparam name="TPluginInfo">
         /// Type of Plugin info.
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Type of extension.
         /// </typeparam>
         /// <param name="endsWithPattern">
-        /// Pattern used to select files for discovering extensions using String.EndsWith
+        /// Pattern used to select files using String.EndsWith
         /// </param>
         /// <returns>
         /// The <see cref="Dictionary"/>. of test plugin info.
@@ -170,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
                 if (this.pathToExtensions != null)
                 {
-                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, regexPattern);
+                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, endsWithPattern);
                     allExtensionPaths.AddRange(filteredExtensions);
                 }
 
@@ -344,7 +344,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
         internal virtual string[] GetFilesInDirectory(string path, string endsWithPattern)
         {
-            return this.fileHelper.EnumerateFiles(path, SearchOption.TopDirectoryOnly, regex).ToArray();
+            return this.fileHelper.EnumerateFiles(path, SearchOption.TopDirectoryOnly, endsWithPattern).ToArray();
         }
 
         /// <summary>

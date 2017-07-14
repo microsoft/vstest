@@ -115,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
-                                TestPlatformConstants.SettingsProviderRegexPattern,
+                                TestPlatformConstants.SettingsProviderEndsWithPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
 

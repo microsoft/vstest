@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     internal class TestExecutorExtensionManager : TestExtensionManager<ITestExecutor, ITestExecutorCapabilities>
     {
         #region Fields
+
         private static TestExecutorExtensionManager testExecutorExtensionManager;
         private static object synclock = new object();
 
@@ -67,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestExecutorPluginInformation, ITestExecutor, ITestExecutorCapabilities, TestExecutorMetadata>(
-                                TestPlatformConstants.TestAdapterRegexPattern,
+                                TestPlatformConstants.TestAdapterEndsWithPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
 

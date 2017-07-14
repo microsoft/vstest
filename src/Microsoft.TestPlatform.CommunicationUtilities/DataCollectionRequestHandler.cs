@@ -6,7 +6,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Text.RegularExpressions;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -346,7 +345,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                             fileHelper.EnumerateFiles(
                                 adapterPath,
                                 SearchOption.AllDirectories,
-                                TestPlatformConstants.DataCollectorRegexPattern));
+                                TestPlatformConstants.DataCollectorEndsWithPattern));
                     }
 
                     if (extensionAssemblies.Count > 0)
