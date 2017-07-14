@@ -344,8 +344,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
                         extensionAssemblies.AddRange(
                             fileHelper.EnumerateFiles(
                                 adapterPath,
-                                TestPlatformConstants.DataCollectorRegexPattern,
-                                SearchOption.AllDirectories));
+                                SearchOption.AllDirectories,
+                                TestPlatformConstants.DataCollectorEndsWithPattern));
                     }
 
                     if (extensionAssemblies.Count > 0)
