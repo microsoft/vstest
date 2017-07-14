@@ -8,7 +8,6 @@
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger</AssemblyName>
     <WarningsAsErrors>true</WarningsAsErrors>
     <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.5' ">$(PackageTargetFallback);dnxcore50;portable-net45+win8</PackageTargetFallback>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\TrxResource.resx" />

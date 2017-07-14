@@ -187,10 +187,28 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Test assets follow several conventions:
         /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
         /// (b) They are built for provided build configuration.
-        /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.xproj</c> must 
-        /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\SimpleUnitTest.dll</c>
+        /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
+        /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
         /// </remarks>
-        public string GetTestAsset(string assetName, string targetFramework = null)
+        public string GetTestAsset(string assetName)
+        {
+            return GetTestAsset(assetName, this.TargetFramework);
+        }
+
+        /// <summary>
+        /// Gets the full path to a test asset.
+        /// </summary>
+        /// <param name="assetName">Name of the asset with extension. E.g. <c>SimpleUnitTest.dll</c></param>
+        /// <param name="targetFramework">asset project target framework. E.g <c>net46</c></param>
+        /// <returns>Full path to the test asset.</returns>
+        /// <remarks>
+        /// Test assets follow several conventions:
+        /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
+        /// (b) They are built for provided build configuration.
+        /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
+        /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
+        /// </remarks>
+        public string GetTestAsset(string assetName, string targetFramework)
         {
             var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
             var assetPath = Path.Combine(
@@ -198,7 +216,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 simpleAssetName,
                 "bin",
                 this.BuildConfiguration,
-                targetFramework??this.TargetFramework,
+                targetFramework,
                 assetName);
 
             Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}.", assetPath);

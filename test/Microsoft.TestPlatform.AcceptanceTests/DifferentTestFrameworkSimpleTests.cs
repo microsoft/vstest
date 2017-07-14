@@ -77,7 +77,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
             if (this.testEnvironment.TargetFramework.Equals("net451"))
             {
-                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll", targetFramework: "net46");
+                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
             }
             else
             {

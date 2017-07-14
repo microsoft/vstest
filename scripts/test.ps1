@@ -195,7 +195,7 @@ function Invoke-Test
                 $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFramework20Core $targetRuntime) $vstestConsoleFileName
             } else {
 
-                $testFrameWork = ".NETFramework,Version=v4.6"
+                $testFrameWork = ".NETFramework,Version=v4.5.1"
                 $vstestConsoleFileName = "vstest.console.exe"
                 $targetRunTime = $Script:TPT_TargetRuntime
                 $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkFullCLR $targetRuntime) $vstestConsoleFileName
