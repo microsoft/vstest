@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Logging
             IEnumerable<LazyExtension<ITestLogger, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestLoggerPluginInformation, ITestLogger, ITestLoggerCapabilities, TestLoggerMetadata>(
-                TestPlatformConstants.TestLoggerRegexPattern,
+                TestPlatformConstants.TestLoggerEndsWithPattern,
                 out unfilteredTestExtensions,
                 out filteredTestExtensions);
 

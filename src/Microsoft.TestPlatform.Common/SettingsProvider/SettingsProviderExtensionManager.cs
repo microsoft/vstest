@@ -29,7 +29,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
     public class SettingsProviderExtensionManager
     {
         #region Fields
-
         private static SettingsProviderExtensionManager settingsProviderExtensionManager;
         private static object synclock = new object();
 
@@ -116,7 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider
 
                         TestPluginManager.Instance
                             .GetSpecificTestExtensions<TestSettingsProviderPluginInformation, ISettingsProvider, ISettingsProviderCapabilities, TestSettingsProviderMetadata>(
-                                TestPlatformConstants.SettingsProviderRegexPattern,
+                                TestPlatformConstants.SettingsProviderEndsWithPattern,
                                 out unfilteredTestExtensions,
                                 out testExtensions);
 
