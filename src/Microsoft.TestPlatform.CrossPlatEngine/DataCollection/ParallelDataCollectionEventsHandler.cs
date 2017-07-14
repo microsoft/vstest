@@ -1,13 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
@@ -16,20 +16,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
-
     internal class ParallelDataCollectionEventsHandler : ParallelRunEventsHandler
     {
         private readonly ParallelRunDataAggregator runDataAggregator;
 
-        public ParallelDataCollectionEventsHandler(IProxyExecutionManager proxyExecutionManager, 
-            ITestRunEventsHandler actualRunEventsHandler, 
+        public ParallelDataCollectionEventsHandler(
+            IProxyExecutionManager proxyExecutionManager,
+            ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager, 
             ParallelRunDataAggregator runDataAggregator) : 
             this(proxyExecutionManager, actualRunEventsHandler, parallelProxyExecutionManager, runDataAggregator, JsonDataSerializer.Instance)
         {
         }
 
-        internal ParallelDataCollectionEventsHandler(IProxyExecutionManager proxyExecutionManager,
+        internal ParallelDataCollectionEventsHandler(
+            IProxyExecutionManager proxyExecutionManager,
             ITestRunEventsHandler actualRunEventsHandler,
             IParallelProxyExecutionManager parallelProxyExecutionManager,
             ParallelRunDataAggregator runDataAggregator,
@@ -42,6 +43,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <summary>
         /// Handles the Run Complete event from a parallel proxy manager
         /// </summary>
+        /// <param name="testRunCompleteArgs">
+        /// The test Run Complete Args.
+        /// </param>
+        /// <param name="lastChunkArgs">
+        /// The last Chunk Args.
+        /// </param>
+        /// <param name="runContextAttachments">
+        /// The run Context Attachments.
+        /// </param>
+        /// <param name="executorUris">
+        /// The executor Uris.
+        /// </param>
         public override void HandleTestRunComplete(
             TestRunCompleteEventArgs testRunCompleteArgs,
             TestRunChangedEventArgs lastChunkArgs,
@@ -74,7 +87,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
                     }
                 }
 
-                var completedArgs = new TestRunCompleteEventArgs(this.runDataAggregator.GetAggregatedRunStats(),
+                var completedArgs = new TestRunCompleteEventArgs(
+                    this.runDataAggregator.GetAggregatedRunStats(),
                     this.runDataAggregator.IsCanceled,
                     this.runDataAggregator.IsAborted,
                     this.runDataAggregator.GetAggregatedException(),

@@ -276,6 +276,16 @@ function Publish-Package
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
+	
+	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    $coverageLogger = @("Microsoft.TestPlatform.Extensions.Coverage.TestLogger.dll", "Microsoft.TestPlatform.Extensions.Coverage.TestLogger.pdb")
+    foreach($file in $coverageLogger) {
+        Write-Verbose "Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force"
+        Move-Item $fullCLRPackageDir\$file $fullCLRExtensionsDir -Force
+        
+        Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
+        Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
+    }
 
     # Copy dependency of Microsoft.TestPlatform.TestHostRuntimeProvider
     $newtonsoft = Join-Path $env:TP_PACKAGES_DIR "newtonsoft.json\9.0.1\lib\net45\Newtonsoft.Json.dll"

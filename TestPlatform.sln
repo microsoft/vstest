@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26326.0
+VisualStudioVersion = 15.0.26510.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED0C35EB-7F31-4841-A24F-8EB708FFA959}"
 EndProject
@@ -150,6 +150,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.TestHostProvider.UnitTests", "test\Microsoft.TestPlatform.TestHostProvider.UnitTests\Microsoft.TestPlatform.TestHostProvider.UnitTests.csproj", "{FBF74C8F-695C-4967-84AC-358EEFB1376D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.TestHostProvider", "src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj", "{11ECCB8B-6958-42A7-BD58-88C09CB149B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.CoverageLogger", "src\Microsoft.TestPlatform.Extensions.CoverageLogger\Microsoft.TestPlatform.Extensions.CoverageLogger.csproj", "{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.Extensions.CoverageLogger.UnitTests", "test\Microsoft.TestPlatform.Extensions.CoverageLogger.UnitTests\Microsoft.TestPlatform.Extensions.CoverageLogger.UnitTests.csproj", "{A722EF55-4BFC-437A-AE76-EEE756028599}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -785,6 +789,30 @@ Global
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2}.Release|x64.Build.0 = Release|Any CPU
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2}.Release|x86.ActiveCfg = Release|Any CPU
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2}.Release|x86.Build.0 = Release|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Debug|x64.Build.0 = Debug|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Debug|x86.Build.0 = Debug|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Release|x64.ActiveCfg = Release|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Release|x64.Build.0 = Release|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Release|x86.ActiveCfg = Release|Any CPU
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78}.Release|x86.Build.0 = Release|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Debug|x64.Build.0 = Debug|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Debug|x86.Build.0 = Debug|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Release|x64.ActiveCfg = Release|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Release|x64.Build.0 = Release|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Release|x86.ActiveCfg = Release|Any CPU
+		{A722EF55-4BFC-437A-AE76-EEE756028599}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -851,5 +879,7 @@ Global
 		{7B48115A-B766-4B55-93A8-C08A42C37710} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{FBF74C8F-695C-4967-84AC-358EEFB1376D} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{11ECCB8B-6958-42A7-BD58-88C09CB149B2} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
+		{613A7FE8-E506-47CD-BEA7-CC3C4E326C78} = {5E7F18A8-F843-4C8A-AB02-4C7D9205C6CF}
+		{A722EF55-4BFC-437A-AE76-EEE756028599} = {020E15EA-731F-4667-95AF-226671E0C3AE}
 	EndGlobalSection
 EndGlobal
