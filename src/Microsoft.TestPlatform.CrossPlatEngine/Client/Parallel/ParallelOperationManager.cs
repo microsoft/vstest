@@ -153,18 +153,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     // If number of concurrent clients is more than the new level
                     // Dispose off the extra ones
-                    int numerOfMangersToRemove = currentParallelLevel - newParallelLevel;
+                    int managersCount = currentParallelLevel - newParallelLevel;
 
                     foreach(var concurrentManager in this.GetConcurrentManagerInstances())
                     {
-                        if (numerOfMangersToRemove == 0)
+                        if (managersCount == 0)
                         {
                             break;
                         }
                         else
                         {
                             this.RemoveManager(concurrentManager);
-                            numerOfMangersToRemove--;
+                            managersCount--;
                         }
                     }
                 }
