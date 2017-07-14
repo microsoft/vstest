@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             ExceptionUtilities.ThrowsException<CommandLineException>(
                 () => this.executor.Initialize("foo"),
-                "Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.",
+                "Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.",
                 "foo");
         }
 

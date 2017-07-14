@@ -3,8 +3,7 @@
 
 namespace Microsoft.TestPlatform.Build.Tasks
 {
-    using Microsoft.TestPlatform.Build.Extensions;
-
+    using Microsoft.TestPlatform.Build.Utils;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -24,7 +23,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             // Ensure that path to vstest.console is whitespace friendly. User may install
             // dotnet-cli to any folder containing whitespace (e.g. VS installs to program files).
             // Arguments are already whitespace friendly.
-            this.allArgs.Add(vsTestExePath.AddDoubleQuote());
+            this.allArgs.Add(ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(vsTestExePath));
             this.allArgs.AddRange(argsToForward);
         }
 
