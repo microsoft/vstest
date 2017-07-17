@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.UnitTests
         private Mock<TestLoggerEvents> events;
         private TestableTrxLogger testableTrxLogger;
         private Dictionary<string, string> parameters;
-        private static string DefaultTestRunDirectory = AppContext.BaseDirectory;
+        private static string DefaultTestRunDirectory = Path.GetTempPath();
         private static string DefaultLogFileNameParameterValue = "logfilevalue.trx";
 
         [TestInitialize]

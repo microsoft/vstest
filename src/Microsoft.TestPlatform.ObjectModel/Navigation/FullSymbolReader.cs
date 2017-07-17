@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 {
-#if NET46
+#if NET451
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;

@@ -4,7 +4,7 @@
 namespace Microsoft.TestPlatform.TestUtilities
 {
     using System.Reflection;
-#if !NET46
+#if !NET451
     using System.Runtime.Loader;
 #endif
 
@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <returns></returns>
         public static AssemblyName GetAssemblyName(string assemblyPath)
         {
-#if !NET46
+#if !NET451
             return AssemblyLoadContext.GetAssemblyName(assemblyPath);
 #else
             return AssemblyName.GetAssemblyName(assemblyPath);

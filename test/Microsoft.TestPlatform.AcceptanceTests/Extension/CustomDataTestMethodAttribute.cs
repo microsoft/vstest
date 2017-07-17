@@ -29,10 +29,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             List<DataRowAttribute> dataRows = new List<DataRowAttribute>();
 
-            var net46Rows = testMethod.GetAttributes<NET46TargetFramework>(false);
-            if (net46Rows != null && net46Rows.Length > 0 && net46Rows[0].DataRows.Count > 0)
+            var netFullRows = testMethod.GetAttributes<NETFullTargetFramework>(false);
+            if (netFullRows != null && netFullRows.Length > 0 && netFullRows[0].DataRows.Count > 0)
             {
-                dataRows.AddRange(net46Rows[0].DataRows);
+                dataRows.AddRange(netFullRows[0].DataRows);
             }
 
             var netcoreappRows = testMethod.GetAttributes<NETCORETargetFramework>(false);
@@ -80,14 +80,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     }
 
     /// <summary>
-    /// The attribute defining runner framework, target framework and target runtime for net46.
+    /// The attribute defining runner framework, target framework and target runtime for net451.
     /// </summary>
-    public class NET46TargetFramework : Attribute
+    public class NETFullTargetFramework : Attribute
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NET46TargetFramework"/> class.
+        /// Initializes a new instance of the <see cref="NETFullTargetFramework"/> class.
         /// </summary>
-        public NET46TargetFramework()
+        public NETFullTargetFramework()
         {
             this.DataRows = new List<DataRowAttribute>(2);
             this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));

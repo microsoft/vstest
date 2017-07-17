@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.Reflection;
     using System.Threading.Tasks;
 
-#if !NET46
+#if !NET451
     using System.Runtime.Loader;
 #endif
 
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             Assembly assembly = null;
             try
             {
-#if NET46
+#if NET451
                 assembly = Assembly.LoadFrom(codeBase);
 #else
                 assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(codeBase);

@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
 {
     using System;
-#if !NET46
+#if !NET451
     using System.Runtime.Loader;
 #endif
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;

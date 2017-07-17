@@ -32,7 +32,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void ExecuteTestsWithDataCollection(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void ExecuteTestsWithDataCollectionUsingCollectArgument(string runnerFramework, string targetFramework, string targetRuntime)
         {
