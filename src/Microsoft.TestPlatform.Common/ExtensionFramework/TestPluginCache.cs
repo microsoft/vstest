@@ -218,7 +218,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
             finally
             {
-                this.platformAssemblyResolver.AssemblyResolve -= this.CurrentDomainAssemblyResolve;
+                if(this.platformAssemblyResolver !=null )
+                {
+                    this.platformAssemblyResolver.AssemblyResolve -= this.CurrentDomainAssemblyResolve;
+                    this.platformAssemblyResolver.Dispose();
+                }
+                
                 // clear the assemblies
                 lock (this.resolvedAssemblies)
                 {

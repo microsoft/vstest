@@ -3,8 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using System;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc />
     public class PlatformEnvironment : IEnvironment

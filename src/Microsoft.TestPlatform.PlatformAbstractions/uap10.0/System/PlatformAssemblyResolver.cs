@@ -3,10 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System.Collections.Generic;
-
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <inheritdoc/>
     public class PlatformAssemblyResolver : IAssemblyResolver

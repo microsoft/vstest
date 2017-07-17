@@ -7,6 +7,16 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     using System.Reflection;
 
     /// <summary>
+    /// Represents a method that handles the AssemblyResolve event of an Platform.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="args">The event data.</param>
+    /// <returns>The assembly that resolves the type, assembly, or resource; or null if the assembly
+    /// cannot be resolved.
+    /// </returns>
+    public delegate Assembly AssemblyResolveEventHandler(object sender, AssemblyResolveEventArgs args);
+
+    /// <summary>
     /// The AssemblyResolver interface.
     /// </summary>
     public interface IAssemblyResolver : IDisposable
@@ -18,21 +28,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     }
 
     /// <summary>
-    /// Represents a method that handles the AssemblyResolve event of an Platform.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="args">The event data.</param>
-    /// <returns>The assembly that resolves the type, assembly, or resource; or null if the assembly
-    /// cannot be resolved.
-    /// </returns>
-    public delegate Assembly AssemblyResolveEventHandler(object sender, AssemblyResolveEventArgs args);
-
-    /// <summary>
     /// Provides data for loader resolution events, such as the AppDomain.AssemblyResolve events.
     /// </summary>
     public class AssemblyResolveEventArgs : EventArgs
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblyResolveEventArgs"/> class.
         /// Initializes a new instance of the System.ResolveEventArgs class, specifying the
         /// name of the item to resolve.
         /// </summary>

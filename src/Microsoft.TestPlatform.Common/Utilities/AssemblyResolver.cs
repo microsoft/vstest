@@ -14,10 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
-#if !NET46
-    using System.Runtime.Loader;
-#endif
-
     internal class AssemblyResolver : IDisposable
     {
         /// <summary>
@@ -36,7 +32,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </summary>
         private bool isDisposed;
 
+        /// <summary>
+        /// Assembly resolver for platform
+        /// </summary>
         private IAssemblyResolver platformAssemblyResolver;
+
+        private IAssembly platformAssembly;
 
         private static readonly string[] SupportedFileExtensions = new string[] { ".dll", ".exe" };
 
@@ -59,6 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             this.platformAssemblyResolver = new PlatformAssemblyResolver();
+            this.platformAssembly = new PlatformAssembly();
 
             this.platformAssemblyResolver.AssemblyResolve += this.OnResolve;
         }
@@ -142,23 +144,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                                 continue;
                             }
 
-#if NET46
-                            AssemblyName foundName = AssemblyName.GetAssemblyName(assemblyPath);
-                            if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
-                            {
-                                continue;   // File exists but version/public key is wrong. Try next extension.
-                            }
+                            AssemblyName foundName = this.platformAssembly.GetAssemblyNameFromPath(assemblyPath);
 
-                            // When file does not exist it throws FileNotFoundException.
-                            assembly = Assembly.LoadFrom(assemblyPath);
-#else
-                            AssemblyName foundName = AssemblyLoadContext.GetAssemblyName(assemblyPath);
                             if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
                             {
                                 continue;   // File exists but version/public key is wrong. Try next extension.
                             }
-                            assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
+                            assembly = this.platformAssembly.LoadAssemblyFromPath(assemblyPath);
                             this.resolvedAssemblies[args.Name] = assembly;
 
                             EqtTrace.Info("AssemblyResolver: {0}: Resolved assembly. ", args.Name);
@@ -245,6 +237,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                 if (disposing)
                 {
                     this.platformAssemblyResolver.AssemblyResolve -= this.OnResolve;
+                    this.platformAssemblyResolver.Dispose();
                 }
 
                 this.isDisposed = true;

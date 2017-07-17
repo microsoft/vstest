@@ -131,24 +131,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set;
         }
 
-        /// <summary>
-        /// Setup trace listeners. It should be called when setting trace listener for child domain.
-        /// </summary>
-        /// <param name="listener">New listener.</param>
-        internal static void SetupRemoteListeners(TraceListener listener)
-        {
-            lock (isInitializationLock)
-            {
-                // Add new listeners.
-                if (listener != null)
-                {
-                    Source.Listeners.Add(listener);
-                }
-
-                isInitialized = true;
-            }
-        }
-
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
@@ -187,6 +169,110 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public string GetLogFile()
         {
             return LogFile;
+        }
+
+        /// <inheritdoc/>
+        public void WriteLine(PlatformTraceLevel level, string message)
+        {
+            Debug.Assert(message != null, "message != null");
+            Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
+
+            if (EnsureTraceIsInitialized())
+            {
+                // The format below is a CSV so that Excel could be used easily to
+                // view/filter the logs.
+                var log = string.Format(
+                    CultureInfo.InvariantCulture,
+                    "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
+                    ProcessId,
+                    Thread.CurrentThread.ManagedThreadId,
+                    DateTime.Now,
+                    ProcessName,
+                    message,
+                    Stopwatch.GetTimestamp());
+
+                try
+                {
+                    Source.TraceEvent(TraceLevelEventTypeMap[this.MapPlatformTraceToTrace(level)], 0, log);
+                    Source.Flush();
+                }
+                catch (Exception e)
+                {
+                    // valid suppress
+                    // Log exception from tracing into event viewer.
+                    LogIgnoredException(e);
+                }
+            }
+        }
+
+        /// <inheritdoc/>
+        public void SetTraceLevel(PlatformTraceLevel value)
+        {
+            Source.Switch.Level = TraceSourceLevelsMap[this.MapPlatformTraceToTrace(value)];
+        }
+
+        public PlatformTraceLevel GetTraceLevel()
+        {
+            return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
+        }
+
+        public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
+        {
+            switch (traceLevel)
+            {
+                case PlatformTraceLevel.Off:
+                    return TraceLevel.Off;
+                case PlatformTraceLevel.Error:
+                    return TraceLevel.Error;
+                case PlatformTraceLevel.Warning:
+                    return TraceLevel.Warning;
+                case PlatformTraceLevel.Info:
+                    return TraceLevel.Info;
+                case PlatformTraceLevel.Verbose:
+                    return TraceLevel.Verbose;
+                default:
+                    Debug.Fail("Should never get here!");
+                    return TraceLevel.Verbose;
+            }
+        }
+
+        /// <summary>
+        /// Setup trace listeners. It should be called when setting trace listener for child domain.
+        /// </summary>
+        /// <param name="listener">New listener.</param>
+        internal static void SetupRemoteListeners(TraceListener listener)
+        {
+            lock (isInitializationLock)
+            {
+                // Add new listeners.
+                if (listener != null)
+                {
+                    Source.Listeners.Add(listener);
+                }
+
+                isInitialized = true;
+            }
+        }
+
+        /// <summary>
+        /// Auxiliary method: logs the exception that is being ignored.
+        /// </summary>
+        /// <param name="e">The exception to log.</param>
+        private static void LogIgnoredException(Exception e)
+        {
+            Debug.Assert(e != null, "e != null");
+
+            try
+            {
+                EnsureTraceIsInitialized();
+
+                // Note: Debug.WriteLine may throw if there is a problem in .config file.
+                Debug.WriteLine("Ignore exception: " + e);
+            }
+            catch
+            {
+                // Ignore everything at this point.
+            }
         }
 
         /// <summary>
@@ -297,93 +383,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 Debug.Fail("Could not get process id: " + e);
                 LogIgnoredException(e);
                 return -1;
-            }
-        }
-
-
-        /// <inheritdoc/>
-        public void WriteLine(PlatformTraceLevel level, string message)
-        {
-            Debug.Assert(message != null, "message != null");
-            Debug.Assert(!string.IsNullOrEmpty(ProcessName), "!string.IsNullOrEmpty(ProcessName)");
-
-            if (EnsureTraceIsInitialized())
-            {
-                // The format below is a CSV so that Excel could be used easily to
-                // view/filter the logs.
-                var log = string.Format(
-                    CultureInfo.InvariantCulture,
-                    "{0}, {1}, {2:yyyy}/{2:MM}/{2:dd}, {2:HH}:{2:mm}:{2:ss}.{2:fff}, {5}, {3}, {4}",
-                    ProcessId,
-                    Thread.CurrentThread.ManagedThreadId,
-                    DateTime.Now,
-                    ProcessName,
-                    message,
-                    Stopwatch.GetTimestamp());
-
-                try
-                {
-                    Source.TraceEvent(TraceLevelEventTypeMap[MapPlatformTraceToTrace(level)], 0, log);
-                    Source.Flush();
-                }
-                catch (Exception e)
-                {
-                    // valid suppress
-                    // Log exception from tracing into event viewer.
-                    LogIgnoredException(e);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Auxiliary method: logs the exception that is being ignored.
-        /// </summary>
-        /// <param name="e">The exception to log.</param>
-        private static void LogIgnoredException(Exception e)
-        {
-            Debug.Assert(e != null, "e != null");
-
-            try
-            {
-                EnsureTraceIsInitialized();
-
-                // Note: Debug.WriteLine may throw if there is a problem in .config file.
-                Debug.WriteLine("Ignore exception: " + e);
-            }
-            catch
-            {
-                // Ignore everything at this point.
-            }
-        }
-
-        /// <inheritdoc/>
-        public void SetTraceLevel(PlatformTraceLevel value)
-        {
-            Source.Switch.Level = TraceSourceLevelsMap[MapPlatformTraceToTrace(value)];
-        }
-
-        public PlatformTraceLevel GetTraceLevel()
-        {
-            return (PlatformTraceLevel)SourceTraceLevelsMap[Source.Switch.Level];
-        }
-
-        public TraceLevel MapPlatformTraceToTrace(PlatformTraceLevel traceLevel)
-        {
-            switch (traceLevel)
-            {
-                case PlatformTraceLevel.Off:
-                    return TraceLevel.Off;
-                case PlatformTraceLevel.Error:
-                    return TraceLevel.Error;
-                case PlatformTraceLevel.Warning:
-                    return TraceLevel.Warning;
-                case PlatformTraceLevel.Info:
-                    return TraceLevel.Info;
-                case PlatformTraceLevel.Verbose:
-                    return TraceLevel.Verbose;
-                default:
-                    Debug.Fail("Should never get here!");
-                    return TraceLevel.Verbose;
             }
         }
 

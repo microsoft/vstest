@@ -4,10 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
-    using System.Collections.Generic;
     using System.Reflection;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using System.Runtime.Loader;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc/>
     public class PlatformAssemblyResolver : IAssemblyResolver
@@ -17,11 +16,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// </summary>
         private bool isDisposed;
 
-        /// <inheritdoc/>
-        public event AssemblyResolveEventHandler AssemblyResolve;
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyResolver"/> class.
+        /// Initializes a new instance of the <see cref="PlatformAssemblyResolver"/> class.
         /// </summary>
         /// <param name="directories"> The search directories. </param>
         [System.Security.SecurityCritical]
@@ -30,23 +26,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             AssemblyLoadContext.Default.Resolving += this.AssemblyResolverEvent;
         }
 
-        /// <inheritdoc />
         ~PlatformAssemblyResolver()
         {
             this.Dispose(false);
         }
 
-        /// <summary>
-        /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
-        private Assembly AssemblyResolverEvent(object sender, object eventArgs)
-        {
-            AssemblyName args = eventArgs as AssemblyName;
-
-            return args == null ? null : this.AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
-        }
+        /// <inheritdoc/>
+        public event AssemblyResolveEventHandler AssemblyResolve;
 
         public void Dispose()
         {
@@ -69,6 +55,27 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
                 this.isDisposed = true;
             }
+        }
+
+        /// <summary>
+        /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="eventArgs">
+        /// The event Args.
+        /// </param>
+        /// <returns>
+        /// The <see cref="Assembly"/>.
+        /// </returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "<Justification>")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom", Justification = "<Justification>")]
+        private Assembly AssemblyResolverEvent(object sender, object eventArgs)
+        {
+            AssemblyName args = eventArgs as AssemblyName;
+
+            return args == null ? null : this.AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
         }
     }
 }
