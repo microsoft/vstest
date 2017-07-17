@@ -106,7 +106,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
-                ".NETFramework,Version=v4.6",
+                ".NETFramework,Version=v4.5.1",
                 "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
             var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
@@ -122,7 +122,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
-                ".NETFramework,Version=v4.6",
+                ".NETFramework,Version=v4.5.1",
                 "</TargetFrameworkVersion><DisableAppDomain>true</DisableAppDomain></RunConfiguration></RunSettings> ");
 
             var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);

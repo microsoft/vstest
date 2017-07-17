@@ -32,8 +32,8 @@ namespace Microsoft.TestPlatform.TestUtilities
             // If the variables are not set, valid defaults are assumed.
             if (string.IsNullOrEmpty(this.TargetFramework))
             {
-                // Run integration tests for net46 by default.
-                this.TargetFramework = "net46";
+                // Run integration tests for net451 by default.
+                this.TargetFramework = "net451";
             }
 
             if (string.IsNullOrEmpty(this.TargetRuntime))
@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             // Need to remove this assumption when we move to a CDP.
             this.PackageDirectory = Path.Combine(this.testPlatformRootDirectory, @"packages");
             this.ToolsDirectory = Path.Combine(this.testPlatformRootDirectory, @"tools");
-            this.RunnerFramework = "net46";
+            this.RunnerFramework = "net451";
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         /// <summary>
         /// Gets the target framework.
-        /// Supported values = <c>net46</c>, <c>netcoreapp1.0</c>.
+        /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
         /// </summary>
         public string TargetFramework
         {
@@ -170,7 +170,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         /// <summary>
         /// Gets the application type.
-        /// Supported values = <c>net46</c>, <c>netcoreapp1.0</c>.
+        /// Supported values = <c>net451</c>, <c>netcoreapp1.0</c>.
         /// </summary>
         public string RunnerFramework
         {
@@ -187,10 +187,28 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Test assets follow several conventions:
         /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
         /// (b) They are built for provided build configuration.
-        /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.xproj</c> must 
-        /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\SimpleUnitTest.dll</c>
+        /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
+        /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
         /// </remarks>
         public string GetTestAsset(string assetName)
+        {
+            return GetTestAsset(assetName, this.TargetFramework);
+        }
+
+        /// <summary>
+        /// Gets the full path to a test asset.
+        /// </summary>
+        /// <param name="assetName">Name of the asset with extension. E.g. <c>SimpleUnitTest.dll</c></param>
+        /// <param name="targetFramework">asset project target framework. E.g <c>net451</c></param>
+        /// <returns>Full path to the test asset.</returns>
+        /// <remarks>
+        /// Test assets follow several conventions:
+        /// (a) They are built for supported frameworks. See <see cref="TargetFramework"/>.
+        /// (b) They are built for provided build configuration.
+        /// (c) Name of the test asset matches the parent directory name. E.g. <c>TestAssets\SimpleUnitTest\SimpleUnitTest.csproj</c> must
+        /// produce <c>TestAssets\SimpleUnitTest\bin\Debug\net451\SimpleUnitTest.dll</c>
+        /// </remarks>
+        public string GetTestAsset(string assetName, string targetFramework)
         {
             var simpleAssetName = Path.GetFileNameWithoutExtension(assetName);
             var assetPath = Path.Combine(
@@ -198,7 +216,7 @@ namespace Microsoft.TestPlatform.TestUtilities
                 simpleAssetName,
                 "bin",
                 this.BuildConfiguration,
-                this.TargetFramework,
+                targetFramework,
                 assetName);
 
             Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: {0}.", assetPath);

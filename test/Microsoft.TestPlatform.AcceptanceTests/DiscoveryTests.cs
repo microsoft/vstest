@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class DiscoveryTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void DiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void MultipleSourcesDiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime)
         {

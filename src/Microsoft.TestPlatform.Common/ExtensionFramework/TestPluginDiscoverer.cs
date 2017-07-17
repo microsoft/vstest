@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-#if !NET46
+#if !NET451
     using System.Runtime.Loader;
 #endif
 

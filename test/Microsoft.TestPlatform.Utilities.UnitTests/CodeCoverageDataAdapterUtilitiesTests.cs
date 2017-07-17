@@ -59,7 +59,7 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
         private static IXPathNavigable GetXPathNavigable(XmlDocument doc)
         {
-#if NET46
+#if NET451
             return doc;
 #else
             return doc.ToXPathNavigable();

@@ -798,13 +798,13 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
+        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
       A versão do .Net Framework de destino a ser usada para a execução de teste.
       Os valores válidos são ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
       Outros valores com suporte são Framework35, Framework40, Framework45 e FrameworkCore10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-Framework | / Framework: &lt; versão do Framework &gt;
       Direcionar o .net Framework versão a ser usada para a execução do teste. 
@@ -814,9 +814,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
-        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="translated">O argumento /Framework requer a versão do .Net Framework de destino para a execução de teste. Exemplo: /Framework:".NETFramework,Version=v4.6"</target>
-        <note />
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
+        <target state="new">O argumento /Framework requer a versão do .Net Framework de destino para a execução de teste. Exemplo: /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">O argumento /Framework requer o destino .net Framework versão para a execução do teste.   Exemplo: /Framework: ". NETFramework, versão = v 4.6 "</target>
         </alt-trans>

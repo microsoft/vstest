@@ -63,7 +63,7 @@ namespace Microsoft.TestPlatform.Extensions.TrxLogger.Utility
             // trx files from different batches).
             Guid testId = GetTmiTestId(rockSteadyTestCase);
 
-#if NET46
+#if NET451
             if (Guid.Empty.Equals(testId))
             {
                 testId = rockSteadyTestCase.Id;

@@ -15,7 +15,7 @@ namespace SimpleClassLibrary
 
         public async Task AsyncTestMethod()
         {
-            await Task.CompletedTask;
+            await Task.Delay(0);
         }
 
         public void OverLoadedMethod()

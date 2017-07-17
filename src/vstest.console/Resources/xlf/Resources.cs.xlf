@@ -799,13 +799,13 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Verze rozhraní&gt;
+        <target state="new">--Framework|/Framework:&lt;Verze rozhraní&gt;
       Cílová verze rozhraní .NET Framework, která se použije k provedení testu. 
       Platné hodnoty jsou ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" atd.
       Dalšími podporovanými hodnotami jsou Framework35, Framework40, Framework45 a FrameworkCore10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework verze &gt;
       Cílové rozhraní .net Framework verze pro spuštění testu. 
@@ -815,9 +815,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
-        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="translated">Argument /Framework vyžaduje cílovou verzi rozhraní .NET Framework pro testovací běh.   Příklad:  /Framework:".NETFramework,Version=v4.6"</target>
-        <note />
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
+        <target state="new">Argument /Framework vyžaduje cílovou verzi rozhraní .NET Framework pro testovací běh.   Příklad:  /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/Framework argument vyžaduje cílové rozhraní .net Framework verze pro test spustit.   Příklad: /Framework: ". NETFramework, verze = v4.6 "</target>
         </alt-trans>

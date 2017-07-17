@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         public void ChutzpahRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [Ignore] // https://github.com/Microsoft/vstest/issues/689
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -52,7 +52,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         public void NUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -67,13 +67,25 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void XUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            string testAssemblyPath = null;
+
+            // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
+            if (this.testEnvironment.TargetFramework.Equals("net451"))
+            {
+                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll", "net46");
+            }
+            else
+            {
+                testAssemblyPath = testEnvironment.GetTestAsset("XUTestProject.dll");
+            }
+
             var arguments = PrepareArguments(
-                this.GetAssetFullPath("XUTestProject.dll"),
+                testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty,
                 this.FrameworkArgValue);

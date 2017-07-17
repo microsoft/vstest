@@ -40,7 +40,6 @@ namespace Microsoft.TestPlatform.SmokeTests
         {
             var runSettings = Path.Combine(Path.GetDirectoryName(testEnvironment.GetTestAsset(DataCollectorTests.InProDataCollectorTestProject)), "runsettingstest.runsettings");
             var inprocasm = testEnvironment.GetTestAsset("SimpleDataCollector.dll");
-
             var fileContents = @"<RunSettings>
                                     <InProcDataCollectionRunSettings>
                                         <InProcDataCollectors>

@@ -186,7 +186,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopClient()
         {
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.tcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netstandard1.5.
             this.tcpClient?.Dispose();
+#endif
             this.tcpClient = null;
             this.binaryReader?.Dispose();
             this.binaryWriter?.Dispose();
