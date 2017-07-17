@@ -56,7 +56,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Hosting
             IEnumerable<LazyExtension<ITestRuntimeProvider, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<TestRuntimePluginInformation, ITestRuntimeProvider, ITestRuntimeCapabilities, TestRuntimeMetadata>(
-                TestPlatformConstants.RunTimeRegexPattern,
+                TestPlatformConstants.RunTimeEndsWithPattern,
                 out unfilteredTestExtensions,
                 out filteredTestExtensions);
 

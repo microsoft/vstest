@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Text.RegularExpressions;
 
 #if NET46
     using System.Threading;
@@ -129,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         #region Public Methods
 
         /// <summary>
-        /// Performs discovery of specific type of test extensions.
+        /// Performs discovery of specific type of test extensions in files ending with the specified pattern.
         /// </summary>
         /// <typeparam name="TPluginInfo">
         /// Type of Plugin info.
@@ -137,14 +136,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <typeparam name="TExtension">
         /// Type of extension.
         /// </typeparam>
-        /// <param name="regexPattern">
-        /// The regex Pattern.
+        /// <param name="endsWithPattern">
+        /// Pattern used to select files using String.EndsWith
         /// </param>
         /// <returns>
         /// The <see cref="Dictionary"/>. of test plugin info.
         /// </returns>
         [System.Security.SecurityCritical]
-        public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string regexPattern)
+        public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
             where TPluginInfo : TestPluginInformation
         {
             // Return the cached value if cache is valid.
@@ -172,7 +171,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
                 if (this.pathToExtensions != null)
                 {
-                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, regexPattern);
+                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, endsWithPattern);
                     allExtensionPaths.AddRange(filteredExtensions);
                 }
 
@@ -336,12 +335,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets files in a directory.
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="searchPattern"></param>
+        /// <param name="endsWithPattern"></param>
         /// <returns></returns>
         /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
-        internal virtual string[] GetFilesInDirectory(string path, string searchPattern)
+        internal virtual string[] GetFilesInDirectory(string path, string endsWithPattern)
         {
-            return this.fileHelper.EnumerateFiles(path, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
+            return this.fileHelper.EnumerateFiles(path, SearchOption.TopDirectoryOnly, endsWithPattern).ToArray();
         }
 
         /// <summary>
@@ -350,16 +349,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="extensions">
         /// The extensions.
         /// </param>
-        /// <param name="searchPattern">
-        /// Regex search pattern of extension.
+        /// <param name="endsWithPattern">
+        /// Pattern used to select files using String.EndsWith
         /// </param>
         /// <returns>
         /// The list of files which match the regex pattern
         /// </returns>
-        internal virtual List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
+        internal virtual List<string> GetFilteredExtensions(List<string> extensions, string endsWithPattern)
         {
-            var regex = new Regex(searchPattern, RegexOptions.IgnoreCase);
-            return extensions.Where(ext => regex.IsMatch(ext)).ToList();
+            return extensions.Where(ext => ext.EndsWith(endsWithPattern, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
         /// <summary>

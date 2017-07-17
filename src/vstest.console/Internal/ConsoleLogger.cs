@@ -432,6 +432,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
         }
         #endregion
-
     }
 }

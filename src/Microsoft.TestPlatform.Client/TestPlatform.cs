@@ -175,15 +175,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                     var adapterPath = Path.GetFullPath(Environment.ExpandEnvironmentVariables(customTestAdaptersPath));
                     if (!Directory.Exists(adapterPath))
                     {
-                        EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                        if (EqtTrace.IsWarningEnabled)
+                        {
+                            EqtTrace.Warning(string.Format("AdapterPath Not Found:", adapterPath));
+                        }
+
                         continue;
                     }
 
-                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestAdapterRegexPattern, SearchOption.AllDirectories));
-                    extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.AllDirectories));
-                    extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.RunTimeRegexPattern, SearchOption.AllDirectories));
-                    extensionAssemblies.AddRange(this.fileHelper.EnumerateFiles(adapterPath, TestPlatformConstants.SettingsProviderRegexPattern, SearchOption.AllDirectories));
-
+                    var extensionAssemblies = new List<string>(this.fileHelper.EnumerateFiles(adapterPath, SearchOption.AllDirectories, TestPlatformConstants.TestAdapterEndsWithPattern, TestPlatformConstants.TestLoggerEndsWithPattern, TestPlatformConstants.RunTimeEndsWithPattern, TestPlatformConstants.SettingsProviderEndsWithPattern));
                     if (extensionAssemblies.Count > 0)
                     {
                         this.UpdateExtensions(extensionAssemblies, true);
@@ -215,7 +215,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
                 var sourceDirectory = Path.GetDirectoryName(source);
                 if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
                 {
-                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, TestPlatformConstants.TestLoggerRegexPattern, SearchOption.TopDirectoryOnly).ToList());
+                    loggersToUpdate.AddRange(this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestPlatformConstants.TestLoggerEndsWithPattern));
                 }
             }
 
@@ -233,13 +233,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             var fileHelper = new FileHelper();
             var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
-            var defaultExtensionPaths = new List<string>();
             if (fileHelper.DirectoryExists(extensionsFolder))
             {
-                var dlls = fileHelper.EnumerateFiles(extensionsFolder, ".*.dll", SearchOption.TopDirectoryOnly);
-                defaultExtensionPaths.AddRange(dlls);
-                var exes = fileHelper.EnumerateFiles(extensionsFolder, ".*.exe", SearchOption.TopDirectoryOnly);
-                defaultExtensionPaths.AddRange(exes);
+                var defaultExtensionPaths = fileHelper.EnumerateFiles(extensionsFolder, SearchOption.TopDirectoryOnly, ".dll", ".exe");
                 TestPluginCache.Instance.DefaultExtensionPaths = defaultExtensionPaths;
             }
         }
