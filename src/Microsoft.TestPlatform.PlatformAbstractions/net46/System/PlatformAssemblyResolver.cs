@@ -4,48 +4,34 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
-    using System.Collections.Generic;
     using System.Reflection;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
-    public class AssemblyResolver : IAssemblyResolver
+    /// <inheritdoc/>
+    public class PlatformAssemblyResolver : IAssemblyResolver
     {
-        private AssemblyResolverHandler resolverHandler;
-        
         /// <summary>
         /// Specifies whether the resolver is disposed or not
         /// </summary>
         private bool isDisposed;
 
+        /// <inheritdoc/>
+        public event AssemblyResolveEventHandler AssemblyResolve;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AssemblyResolver"/> class.
         /// </summary>
-        /// <param name="directories"> The search directories. </param>
-        /// <param name="platformEqtTrace"></param>
+        
         [System.Security.SecurityCritical]
-        public AssemblyResolver(IEnumerable<string> directories, IPlatformEqtTrace platformEqtTrace)
+        public PlatformAssemblyResolver()
         {
-            this.resolverHandler = new AssemblyResolverHandler(directories, platformEqtTrace);
-
             AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolverEvent;
         }
 
         /// <inheritdoc />
-        ~AssemblyResolver()
+        ~PlatformAssemblyResolver()
         {
             this.Dispose(false);
-        }
-
-        /// <summary>
-        /// Set the directories from which assemblies should be searched
-        /// </summary>
-        /// <param name="directories"> The search directories. </param>
-        [System.Security.SecurityCritical]
-        public void AddSearchDirectories(IEnumerable<string> directories)
-        {
-            this.resolverHandler.AddSearchDirectories(directories);
         }
 
         /// <summary>
@@ -65,7 +51,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         private Assembly AssemblyResolverEvent(object sender, object eventArgs)
         {
             ResolveEventArgs args = eventArgs as ResolveEventArgs;
-            return args == null ? null : this.resolverHandler.AssemblyResolverEventHandler(args.Name);
+
+            return args == null ? null : this.AssemblyResolve(this, new AssemblyResolveEventArgs(args.Name));
         }
 
         public void Dispose()
@@ -89,21 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
                 this.isDisposed = true;
             }
-        }
-
-        public void SetCurrentDomainAssemblyResolve()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += this.CurrentDomainAssemblyResolve;
-        }
-
-        public void RemoveCurrentDomainAssemblyResolve()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve -= this.CurrentDomainAssemblyResolve;
-        }
-
-        private Assembly CurrentDomainAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            return this.resolverHandler.CurrentDomainAssemblyResolveHelper(args.Name);
         }
     }
 }

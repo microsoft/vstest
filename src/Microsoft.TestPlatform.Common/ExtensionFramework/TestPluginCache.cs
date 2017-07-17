@@ -16,10 +16,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// The test plugin cache.
@@ -29,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     {
         #region Private Members
 
+        private readonly Dictionary<string, Assembly> resolvedAssemblies;
         private readonly IFileHelper fileHelper;
 
         /// <summary>
@@ -44,7 +46,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <summary>
         /// Assembly resolver used to resolve the additional extensions
         /// </summary>
-        private IAssemblyResolver assemblyResolver;
+        private AssemblyResolver assemblyResolver;
+
+        private IAssemblyResolver platformAssemblyResolver;
 
         /// <summary>
         /// Lock for extensions update
@@ -67,6 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// </param>
         protected TestPluginCache(IFileHelper fileHelper)
         {
+            this.resolvedAssemblies = new Dictionary<string, Assembly>();
             this.pathToExtensions = null;
             this.loadOnlyWellKnownExtensions = false;
             this.lockForExtensionsUpdate = new object();
@@ -150,13 +155,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             Dictionary<string, TPluginInfo> pluginInfos = null;
             this.SetupAssemblyResolver(null);
+            this.platformAssemblyResolver = new PlatformAssemblyResolver();
 
             // Some times TestPlatform.core.dll assembly fails to load in the current appdomain (from devenv.exe).
             // Reason for failures are not known. Below handler, again calls assembly.load() in failing assembly
             // and that succeeds.
             // Because of this assembly failure, below domain.CreateInstanceAndUnwrap() call fails with error
             // "Unable to cast transparent proxy to type 'Microsoft.VisualStudio.TestPlatform.Core.TestPluginsFramework.TestPluginDiscoverer"
-            this.assemblyResolver.SetCurrentDomainAssemblyResolve();
+            this.platformAssemblyResolver.AssemblyResolve += this.CurrentDomainAssemblyResolve;
 
             try
             {
@@ -213,7 +219,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
             finally
             {
-                this.assemblyResolver.RemoveCurrentDomainAssemblyResolve();
+                this.platformAssemblyResolver.AssemblyResolve -= this.CurrentDomainAssemblyResolve;
+                // clear the assemblies
+                lock (this.resolvedAssemblies)
+                {
+                    this.resolvedAssemblies?.Clear();
+                }
             }
 
             return pluginInfos;
@@ -486,11 +497,48 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // Add assembly resolver which can resolve the extensions from the specified directory.
             if (this.assemblyResolver == null)
             {
-                this.assemblyResolver = new AssemblyResolver(resolutionPaths, EqtTrace.PlatformTrace);
+                this.assemblyResolver = new AssemblyResolver(resolutionPaths);
             }
             else
             {
                 this.assemblyResolver.AddSearchDirectories(resolutionPaths);
+            }
+        }
+
+        private Assembly CurrentDomainAssemblyResolve(object sender, AssemblyResolveEventArgs args)
+        {
+            var assemblyName = new AssemblyName(args.Name);
+
+            Assembly assembly = null;
+            lock (this.resolvedAssemblies)
+            {
+                try
+                {
+                    EqtTrace.Verbose("CurrentDomain_AssemblyResolve: Resolving assembly '{0}'.", args.Name);
+
+                    if (this.resolvedAssemblies.TryGetValue(args.Name, out assembly))
+                    {
+                        return assembly;
+                    }
+
+                    // Put it in the resolved assembly so that if below Assembly.Load call
+                    // triggers another assembly resolution, then we dont end up in stack overflow
+                    this.resolvedAssemblies[args.Name] = null;
+
+                    assembly = Assembly.Load(assemblyName);
+
+                    // Replace the value with the loaded assembly
+                    this.resolvedAssemblies[args.Name] = assembly;
+
+                    return assembly;
+                }
+                finally
+                {
+                    if (null == assembly)
+                    {
+                        EqtTrace.Verbose("CurrentDomainAssemblyResolve: Failed to resolve assembly '{0}'.", args.Name);
+                    }
+                }
             }
         }
 

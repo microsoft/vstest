@@ -4,7 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
 {
     using System;
-    using System.Collections.Generic;
+    using System.Reflection;
 
     /// <summary>
     /// The AssemblyResolver interface.
@@ -12,19 +12,39 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     public interface IAssemblyResolver : IDisposable
     {
         /// <summary>
-        /// Sets up the Assembly resovler for current Appdomain
+        /// Occurs when the resolution of an assembly fails
         /// </summary>
-        void SetCurrentDomainAssemblyResolve();
+        event AssemblyResolveEventHandler AssemblyResolve;
+    }
+
+    /// <summary>
+    /// Represents a method that handles the AssemblyResolve event of an Platform.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="args">The event data.</param>
+    /// <returns>The assembly that resolves the type, assembly, or resource; or null if the assembly
+    /// cannot be resolved.
+    /// </returns>
+    public delegate Assembly AssemblyResolveEventHandler(object sender, AssemblyResolveEventArgs args);
+
+    /// <summary>
+    /// Provides data for loader resolution events, such as the AppDomain.AssemblyResolve events.
+    /// </summary>
+    public class AssemblyResolveEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Initializes a new instance of the System.ResolveEventArgs class, specifying the
+        /// name of the item to resolve.
+        /// </summary>
+        /// <param name="name">The name of an item to resolve.</param>
+        public AssemblyResolveEventArgs(string name)
+        {
+            this.Name = name;
+        }
 
         /// <summary>
-        /// Removes the Assembly resolver from current Appdomain
+        /// Gets or sets the name of the item to resolve.
         /// </summary>
-        void RemoveCurrentDomainAssemblyResolve();
-
-        /// <summary>
-        /// Add the probing directories look for in case of Aseembly Resolve Event
-        /// </summary>
-        /// <param name="directories"></param>
-        void AddSearchDirectories(IEnumerable<string> directories);
+        public string Name { get; set; }
     }
 }

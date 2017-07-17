@@ -1,28 +1,25 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
+namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
+
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 #if !NET46
     using System.Runtime.Loader;
 #endif
 
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-   
-    internal class AssemblyResolverHandler
+    internal class AssemblyResolver : IDisposable
     {
-        private static readonly string[] SupportedFileExtensions = { ".dll", ".exe" };
-
-        private IPlatformEqtTrace platformEqtTrace;
-
         /// <summary>
         /// The directories to look for assemblies to resolve.
         /// </summary>
@@ -35,15 +32,22 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         private Dictionary<string, Assembly> resolvedAssemblies;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyResolverHandler"/> class.
+        /// Specifies whether the resolver is disposed or not
+        /// </summary>
+        private bool isDisposed;
+
+        private IAssemblyResolver platformAssemblyResolver;
+
+        private static readonly string[] SupportedFileExtensions = new string[] { ".dll", ".exe" };
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblyResolver"/> class.
         /// </summary>
         /// <param name="directories"> The search directories. </param>
-        /// <param name="platformEqtTrace">To trace failures</param>
-        public AssemblyResolverHandler(IEnumerable<string> directories, IPlatformEqtTrace platformEqtTrace)
+        [System.Security.SecurityCritical]
+        public AssemblyResolver(IEnumerable<string> directories)
         {
             this.resolvedAssemblies = new Dictionary<string, Assembly>();
-
-            this.platformEqtTrace = platformEqtTrace;
 
             if (directories == null || !directories.Any())
             {
@@ -53,6 +57,10 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             {
                 this.searchDirectories = new HashSet<string>(directories);
             }
+
+            this.platformAssemblyResolver = new PlatformAssemblyResolver();
+
+            this.platformAssemblyResolver.AssemblyResolve += this.OnResolve;
         }
 
         /// <summary>
@@ -60,7 +68,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// </summary>
         /// <param name="directories"> The search directories. </param>
         [System.Security.SecurityCritical]
-        public void AddSearchDirectories(IEnumerable<string> directories)
+        internal void AddSearchDirectories(IEnumerable<string> directories)
         {
             foreach (var directory in directories)
             {
@@ -68,18 +76,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             }
         }
 
+
         /// <summary>
         /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
         /// </summary>
-        /// <param name="assemblyName">
-        /// The assembly Name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Assembly"/>.
-        /// </returns>
-        public Assembly AssemblyResolverEventHandler(string assemblyName)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
+        private Assembly OnResolve(object sender, AssemblyResolveEventArgs args)
         {
-            if (string.IsNullOrEmpty(assemblyName))
+            if (string.IsNullOrEmpty(args?.Name))
             {
                 Debug.Assert(false, "AssemblyResolver.OnResolve: args.Name is null or empty.");
                 return null;
@@ -90,33 +95,33 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 return null;
             }
 
-            WriteToEqtTrace("AssemblyResolver: {0}: Resolving assembly.", assemblyName);
+            EqtTrace.Info("AssemblyResolver: {0}: Resolving assembly.", args.Name);
 
             // args.Name is like: "Microsoft.VisualStudio.TestTools.Common, Version=[VersionMajor].0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a".
+
             lock (this.resolvedAssemblies)
             {
-                if (this.resolvedAssemblies.TryGetValue(assemblyName, out Assembly assembly))
+                Assembly assembly;
+                if (this.resolvedAssemblies.TryGetValue(args.Name, out assembly))
                 {
-                    if (assembly != null)
-                    {
-                        WriteToEqtTrace("AssemblyResolver: {0}: Resolved from cache.", assemblyName);
-                    }
-
-                    return assembly;
+                    EqtTrace.Info("AssemblyResolver: {0}: Resolved from cache.", args.Name);
+                    return (assembly);
                 }
 
                 AssemblyName requestedName = null;
                 try
                 {
                     // Can throw ArgumentException, FileLoadException if arg is empty/wrong format, etc. Should not return null.
-                    requestedName = new AssemblyName(assemblyName);
+                    requestedName = new AssemblyName(args.Name);
                 }
                 catch (Exception ex)
                 {
-                    WriteToEqtTrace("AssemblyResolver: {0}: Failed to create assemblyName. Reason:{1} ", assemblyName, ex);
+                    if (EqtTrace.IsInfoEnabled)
+                    {
+                        EqtTrace.Info("AssemblyResolver: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
+                    }
                     return null;
                 }
-
                 Debug.Assert(requestedName != null && !string.IsNullOrEmpty(requestedName.Name), "AssemblyResolver.OnResolve: requested is null or name is empty!");
 
                 foreach (var dir in this.searchDirectories)
@@ -125,6 +130,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     {
                         continue;
                     }
+
 
                     foreach (var extension in SupportedFileExtensions)
                     {
@@ -151,19 +157,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                             {
                                 continue;   // File exists but version/public key is wrong. Try next extension.
                             }
-
                             assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
 #endif
-                            this.resolvedAssemblies[assemblyName] = assembly;
+                            this.resolvedAssemblies[args.Name] = assembly;
 
-                            WriteToEqtTrace("AssemblyResolver: {0}: Resolved assembly. ", assemblyName);
+                            EqtTrace.Info("AssemblyResolver: {0}: Resolved assembly. ", args.Name);
 
                             return assembly;
                         }
                         catch (FileLoadException ex)
                         {
-                            WriteToEqtTrace("AssemblyResolver: {0}: Failed to load assembly. Reason:{1} ", assemblyName, ex);
-                            
+                            EqtTrace.Info("AssemblyResolver: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
+
                             // Rethrow FileLoadException, because this exception means that the assembly
                             // was found, but could not be loaded. This will allow us to report a more
                             // specific error message to the user for things like access denied.
@@ -171,7 +176,8 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                         }
                         catch (Exception ex)
                         {
-                            WriteToEqtTrace("AssemblyResolver: {0}: Failed to load assembly. Reason:{1} ", assemblyName, ex);
+                            // For all other exceptions, try the next extension.
+                            EqtTrace.Info("AssemblyResolver: {0}: Failed to load assembly. Reason:{1} ", args.Name, ex);
                         }
                     }
                 }
@@ -180,57 +186,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             return null;
         }
 
-        public Assembly CurrentDomainAssemblyResolveHelper(string assemblyNameArgs)
-        {
-            var assemblyName = new AssemblyName(assemblyNameArgs);
-
-            Assembly assembly = null;
-            lock (this.resolvedAssemblies)
-            {
-                try
-                {
-                    WriteToEqtTrace("CurrentDomain_AssemblyResolve: Resolving assembly '{0}'.", assemblyName);
-
-                    if (this.resolvedAssemblies.TryGetValue(assemblyNameArgs, out assembly))
-                    {
-                        return assembly;
-                    }
-
-                    // Put it in the resolved assembly so that if below Assembly.Load call
-                    // triggers another assembly resolution, then we dont end up in stack overflow
-                    this.resolvedAssemblies[assemblyNameArgs] = null;
-
-                    assembly = Assembly.Load(assemblyName);
-
-                    // Replace the value with the loaded assembly
-                    this.resolvedAssemblies[assemblyNameArgs] = assembly;
-
-                    return assembly;
-                }
-                finally
-                {
-                    if (assembly == null)
-                    {
-                        WriteToEqtTrace("CurrentDomainAssemblyResolve: Failed to resolve assembly '{0}'.", assemblyName);
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Verifies that found assembly name matches requested to avoid security issues.
         /// Looks only at PublicKeyToken and Version, empty matches anything.
         /// VSWhidbey 415774.
         /// </summary>
-        /// <param name="requestedName">
-        /// The requested Name.
-        /// </param>
-        /// <param name="foundName">
-        /// The found Name.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
         private bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
         {
             Debug.Assert(requestedName != null);
@@ -262,13 +222,32 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             return true;
         }
 
-        private void WriteToEqtTrace(string format, params object[] args)
-        {
-            if (this.platformEqtTrace.ShouldTrace(PlatformTraceLevel.Info))
-            {
-                string message = string.Format(CultureInfo.InvariantCulture, format, args);
 
-                this.platformEqtTrace.WriteLine(PlatformTraceLevel.Info, message);
+        ~AssemblyResolver()
+        {
+            this.Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // Use SupressFinalize in case a subclass
+            // of this type implements a finalizer.
+            GC.SuppressFinalize(this);
+        }
+
+        [System.Security.SecurityCritical]
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                if (disposing)
+                {
+                    this.platformAssemblyResolver.AssemblyResolve -= this.OnResolve;
+                }
+
+                this.isDisposed = true;
             }
         }
     }
