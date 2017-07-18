@@ -58,6 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                         {
                         }
 
+                        // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.
                         exitCallBack(p);
                     };
                 }
