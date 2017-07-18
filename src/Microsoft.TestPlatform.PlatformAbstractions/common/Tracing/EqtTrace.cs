@@ -25,15 +25,31 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public partial class PlatformEqtTrace : IPlatformEqtTrace
     {
+        // This is added to ensure that traceSource should not be instantiated in when creating appdomains if EqtTrace is not enabled.
+        internal static bool DoNotInitialize = false;
+
         /// <summary>
         /// Name of the trace listener.
         /// </summary>
         private const string ListenerName = "TptTraceListener";
 
+        private static TraceSource traceSource;
+
         /// <summary>
-        /// Use a custom trace source. This doesn't pollute the default tracing for user applications.
+        /// Gets a custom trace source. This doesn't pollute the default tracing for user applications.
         /// </summary>
-        private static readonly TraceSource Source = new TraceSource("TpTrace", SourceLevels.Off);
+        private static TraceSource Source
+        {
+            get
+            {
+                if (traceSource == null)
+                {
+                    traceSource = new TraceSource("TpTrace", SourceLevels.Off);
+                }
+
+                return traceSource;
+            }
+        }
 
         /// <summary>
         /// Create static maps for TraceLevel to SourceLevels. The APIs need to provide TraceLevel
@@ -86,7 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Specifies whether the trace is initialized or not
         /// </summary>
-        private static bool isInitialized = false;
+        private static bool isInitialized = false;        
 
         /// <summary>
         /// Lock over initialization
@@ -159,6 +175,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
+            if (DoNotInitialize)
+            {
+                return false;
+            }
+
             switch (traceLevel)
             {
                 case PlatformTraceLevel.Off:
