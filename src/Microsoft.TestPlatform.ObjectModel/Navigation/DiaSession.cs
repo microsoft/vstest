@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private static ISymbolReader GetSymbolReader(string binaryPath)
         {
-#if NET46
+#if NET451
             var pdbFilePath = Path.ChangeExtension(binaryPath, ".pdb");
             using (var stream = new FileHelper().GetStream(pdbFilePath, FileMode.Open, FileAccess.Read))
             {

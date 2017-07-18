@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class ResultsDirectoryTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void TrxFileShouldBeCreatedInResultsDirectory(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -31,7 +31,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void ResultsDirectoryRelativePathShouldWork(string runnerFramework, string targetFramework, string targetRuntime)
         {

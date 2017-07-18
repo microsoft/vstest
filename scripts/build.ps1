@@ -71,7 +71,7 @@ $env:MSBUILD_VERSION = "15.0"
 #
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
-$TPB_TargetFramework = "net46"
+$TPB_TargetFramework = "net451"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
 $TPB_Configuration = $Configuration
@@ -243,9 +243,9 @@ function Publish-Package
 
     # Publish platform abstractions
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
-    $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
+    $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
-    Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
+    Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
     
     # Copy over the logger assemblies to the Extensions folder.
@@ -270,10 +270,10 @@ function Publish-Package
     # Copy Blame Datacollector to Extensions folder.
     $TPB_TargetFrameworkStandard = "netstandard1.5"
     $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
-    $blameDataCollectorNet46 = Join-Path $blameDataCollector $TPB_TargetFramework
+    $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
-    Copy-Item $blameDataCollectorNet46\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
-    Copy-Item $blameDataCollectorNet46\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
 	
@@ -398,8 +398,8 @@ function Create-NugetPackages
 function Copy-PackageItems($packageName)
 {
     # Packages published separately are copied into their own artifacts directory
-    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net46\* is copied
-    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net46
+    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
+    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
     $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
@@ -561,7 +561,7 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
+    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.

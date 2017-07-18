@@ -91,7 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     }
                     throw;
                 }
-#if NET46
+#if NET451
                 else if (ex is SystemException)
                 {
                     if (EqtTrace.IsErrorEnabled)

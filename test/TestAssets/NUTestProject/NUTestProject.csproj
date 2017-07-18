@@ -4,11 +4,11 @@
   <Import Project="..\..\..\scripts\build\TestPlatform.Dependencies.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
     <AssemblyName>NUTestProject</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net46'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
     <PackageReference Include="NUnit">
       <Version>$(NUnitFrameworkVersion)</Version>
     </PackageReference>
@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <!-- Allow build in unix machines -->
-  <ItemGroup Condition="'$(TargetFramework)' != 'net46'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net451'">
     <PackageReference Include="NUnit">
       <Version>$(NUnit3FrameworkVersion)</Version>
     </PackageReference>

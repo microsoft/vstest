@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Command line run settings should have high precedence among settings file, cli runsettings and cli switches
         /// </summary>
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void CommandLineRunSettingsShouldWinAmongAllOptions(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// Command line run settings should have high precedence btween cli runsettings and cli switches.
         /// </summary>
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void CLIRunsettingsShouldWinBetweenCLISwitchesAndCLIRunsettings(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// <param name="targetFramework"></param>
         /// <param name="targetRuntime"></param>
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void CommandLineSwitchesShouldWinBetweenSettingsFileAndCommandLineSwitches(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -117,7 +117,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         #endregion
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSettingsWithoutParallelAndPlatformX86(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -138,7 +138,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSettingsParamsAsArguments(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -162,7 +162,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSettingsAndRunSettingsParamsAsArguments(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -196,7 +196,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         // Check destIndex and length, and the array's lower bounds. Test Run Failed."
         // Issue: https://github.com/Microsoft/vstest/issues/292
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSettingsWithParallelAndPlatformX64(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -221,7 +221,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void TestAdapterPathFromRunSettings(string runnerFramework, string targetFramework, string targetRuntime)
         {

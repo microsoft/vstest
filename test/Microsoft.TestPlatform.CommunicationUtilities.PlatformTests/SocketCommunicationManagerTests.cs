@@ -42,8 +42,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.tcpListener.Stop();
-            this.tcpClient.Dispose();
-
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.tcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netcoreapp1.0
+            this.tcpClient?.Dispose();
+#endif
             this.communicationManager.StopServer();
             this.communicationManager.StopClient();
         }

@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         private static IEngineInvoker GetEngineInvoker(IDictionary<string, string> argsDictionary)
         {
             IEngineInvoker invoker = null;
-#if NET46
+#if NET451
             // If Args contains test source argument, invoker Engine in new appdomain 
             string testSourcePath;
             if (argsDictionary.TryGetValue(TestSourceArgumentString, out testSourcePath) && !string.IsNullOrWhiteSpace(testSourcePath))

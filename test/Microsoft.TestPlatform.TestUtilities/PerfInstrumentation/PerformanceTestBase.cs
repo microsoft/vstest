@@ -39,14 +39,14 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void RunExecutionPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
         {
             // Start session and listen
-#if NET46
+#if NET451
             this.perfAnalyzer.EnableProvider();
 #endif
             // Run Test
             this.InvokeVsTestForExecution(testAsset, testAdapterPath, runSettings);
             
             // Stop Listening
-#if NET46
+#if NET451
             this.perfAnalyzer.DisableProvider();
 #endif
         }
@@ -66,14 +66,14 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public void RunDiscoveryPerformanceTests(string testAsset, string testAdapterPath, string runSettings)
         {
             // Start session and listen
-#if NET46
+#if NET451
             this.perfAnalyzer.EnableProvider();
 #endif
             // Run Test
             this.InvokeVsTestForDiscovery(testAsset, testAdapterPath, runSettings);
 
             // Stop Listening
-#if NET46
+#if NET451
             this.perfAnalyzer.DisableProvider();
 #endif
         }

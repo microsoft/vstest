@@ -34,7 +34,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
 
         private void SessionStarted_Handler(object sender, SessionStartEventArgs args)
         {
-            var filename = Path.Combine(AppContext.BaseDirectory, "filename.txt");
+            var filename = Path.Combine(Path.GetTempPath(), "filename.txt");
             File.WriteAllText(filename, string.Empty);
             this.dataCollectionSink.SendFileAsync(context.SessionDataCollectionContext, filename, true);
             this.logger.LogWarning(this.context.SessionDataCollectionContext, "SessionEnded");
