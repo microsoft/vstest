@@ -53,11 +53,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                         try
                         {
                             p.WaitForExit();
-                            exitCallBack(p);
                         }
                         catch (InvalidOperationException)
                         {
                         }
+
+                        exitCallBack(p);
                     };
                 }
 
