@@ -11,8 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     internal class AssemblyResolver : IDisposable
     {
@@ -78,10 +78,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
         }
 
-
         /// <summary>
         /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Assembly"/>.
+        /// </returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
         private Assembly OnResolve(object sender, AssemblyResolveEventArgs args)
@@ -100,7 +102,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             EqtTrace.Info("AssemblyResolver: {0}: Resolving assembly.", args.Name);
 
             // args.Name is like: "Microsoft.VisualStudio.TestTools.Common, Version=[VersionMajor].0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a".
-
             lock (this.resolvedAssemblies)
             {
                 Assembly assembly;
@@ -122,8 +123,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     {
                         EqtTrace.Info("AssemblyResolver: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
                     }
+
                     return null;
                 }
+
                 Debug.Assert(requestedName != null && !string.IsNullOrEmpty(requestedName.Name), "AssemblyResolver.OnResolve: requested is null or name is empty!");
 
                 foreach (var dir in this.searchDirectories)
@@ -132,7 +135,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     {
                         continue;
                     }
-
 
                     foreach (var extension in SupportedFileExtensions)
                     {
@@ -150,6 +152,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                             {
                                 continue;   // File exists but version/public key is wrong. Try next extension.
                             }
+
                             assembly = this.platformAssembly.LoadAssemblyFromPath(assemblyPath);
                             this.resolvedAssemblies[args.Name] = assembly;
 
@@ -183,6 +186,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// Looks only at PublicKeyToken and Version, empty matches anything.
         /// VSWhidbey 415774.
         /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         private bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
         {
             Debug.Assert(requestedName != null);
@@ -213,7 +219,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
 
             return true;
         }
-
 
         ~AssemblyResolver()
         {

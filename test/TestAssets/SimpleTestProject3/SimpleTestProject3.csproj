@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <AssemblyName>SimpleTestProject3</AssemblyName>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;net451</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestFramework">

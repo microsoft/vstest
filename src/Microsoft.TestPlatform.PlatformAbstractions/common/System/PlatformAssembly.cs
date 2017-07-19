@@ -7,7 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System.IO;
     using System.Reflection;
 
-#if !NET46
+#if !NET451
     using System.Runtime.Loader;
 #endif
 
@@ -27,7 +27,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
         {
-#if NET46
+#if NET451
             return AssemblyName.GetAssemblyName(assemblyPath);
 #else
             return AssemblyLoadContext.GetAssemblyName(assemblyPath);
@@ -42,7 +42,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         public Assembly LoadAssemblyFromPath(string assemblyPath)
         {
-#if NET46
+#if NET451
             return Assembly.LoadFrom(assemblyPath);
 #else
             return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);

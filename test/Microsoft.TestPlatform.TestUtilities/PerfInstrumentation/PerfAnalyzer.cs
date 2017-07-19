@@ -5,7 +5,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
 {
     using System.Collections.Generic;
 
-#if NET46
+#if NET451
     using Microsoft.Diagnostics.Tracing;
     using Microsoft.Diagnostics.Tracing.Parsers;
     using Microsoft.Diagnostics.Tracing.Session;
@@ -23,7 +23,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         private const string ETWSessionProviderName = "TestPlatform";
 
-#if NET46
+#if NET451
         private string perfDataFileName;
         private TraceEventSession traceEventSession;
         private Dictionary<string, List<TestPlatformTask>> testPlatformTaskMap;
@@ -34,7 +34,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public PerfAnalyzer()
         {
-#if NET46
+#if NET451
             this.perfDataFileName = "TestPlatformEventsData.etl";
             this.testPlatformTaskMap = new Dictionary<string, List<TestPlatformTask>>();
             this.traceEventSession = new TraceEventSession("TestPlatformSession", this.perfDataFileName);
@@ -46,7 +46,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public void EnableProvider()
         {
-#if NET46
+#if NET451
             this.traceEventSession.StopOnDispose = true;
             this.traceEventSession.EnableProvider(ETWSessionProviderName);
 #endif
@@ -57,7 +57,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public void DisableProvider()
         {
-#if NET46
+#if NET451
             this.traceEventSession.Dispose();
 #endif
         }
@@ -67,7 +67,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         /// </summary>
         public void AnalyzeEventsData()
         {
-#if NET46
+#if NET451
             using (var source = new ETWTraceEventSource(this.perfDataFileName))
             {
                 // Open the file
@@ -121,7 +121,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public double GetElapsedTimeByTaskName(string taskName)
         {
             var timeTaken = 0.0;
-#if NET46
+#if NET451
             var key = GetEventKey(taskName);
 
             if (key != null)
@@ -145,7 +145,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public IDictionary<string, string> GetEventDataByTaskName(string taskName)
         {
             IDictionary<string, string> properties = new Dictionary<string, string>();
-#if NET46
+#if NET451
             var key = GetEventKey(taskName);
 
             if(key != null)
@@ -159,7 +159,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public double GetAdapterExecutionTime(string executorUri)
         {
             var timeTaken = 0.0;
-#if NET46
+#if NET451
             var key = GetEventKey(Constants.AdapterExecutionTask);
 
             if(key != null)
@@ -174,7 +174,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
         public long GetAdapterExecutedTests(string executorUri)
         {
             long totalTestsExecuted = 0;
-#if NET46
+#if NET451
             var key = GetEventKey(Constants.AdapterExecutionTask);
 
             if (key != null)
@@ -186,7 +186,7 @@ namespace Microsoft.TestPlatform.TestUtilities.PerfInstrumentation
             return totalTestsExecuted;
         }
 
-#if NET46
+#if NET451
 
         private string GetEventKey(string taskName)
         {

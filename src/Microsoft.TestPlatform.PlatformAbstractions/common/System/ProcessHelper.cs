@@ -35,7 +35,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 {
                     foreach (var kvp in envVariables)
                     {
-                        process.StartInfo.Environment.Add(kvp.Key, kvp.Value);
+                        process.StartInfo.AddEnvironmentVariable(kvp.Key, kvp.Value);
                     }
                 }
 
@@ -50,7 +50,15 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                     {
                         // Call WaitForExit again to ensure all streams are flushed
                         var p = sender as Process;
-                        p.WaitForExit();
+                        try
+                        {
+                            p.WaitForExit();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                        }
+
+                        // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.
                         exitCallBack(p);
                     };
                 }
@@ -103,10 +111,16 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         public bool TryGetExitCode(object process, out int exitCode)
         {
             var proc = process as Process;
-            if (proc != null && proc.HasExited)
+            try
             {
-                exitCode = proc.ExitCode;
-                return true;
+                if (proc != null && proc.HasExited)
+                {
+                    exitCode = proc.ExitCode;
+                    return true;
+                }
+            }
+            catch (InvalidOperationException)
+            {
             }
 
             exitCode = 0;
@@ -120,18 +134,24 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) =>
-                {
-                    callbackAction.Invoke();
-                };
+            {
+                callbackAction.Invoke();
+            };
         }
 
         /// <inheritdoc/>
         public void TerminateProcess(object process)
         {
             var proc = process as Process;
-            if (proc != null && !proc.HasExited)
+            try
             {
-                proc.Kill();
+                if (proc != null && !proc.HasExited)
+                {
+                    proc.Kill();
+                }
+            }
+            catch (InvalidOperationException)
+            {
             }
         }
     }

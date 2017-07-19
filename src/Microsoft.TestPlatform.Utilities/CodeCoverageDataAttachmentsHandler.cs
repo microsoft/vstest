@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.IO;
     using System.Linq;
     using System.Reflection;
-#if !NET46
+#if !NET451
     using System.Runtime.Loader;
 #endif
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             try
             {
                 Assembly assembly = null;
-#if NET46
+#if NET451
                 assembly = Assembly.LoadFrom(assemblyPath);
 #else
                 assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);

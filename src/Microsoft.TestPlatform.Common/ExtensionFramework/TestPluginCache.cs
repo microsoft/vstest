@@ -3,23 +3,22 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
+#if NET451
+    using System.Threading;
+#endif
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
 
-#if NET46
-    using System.Threading;
-#endif
-
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// The test plugin cache.
@@ -200,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.LogExtensions();
             }
-#if NET46
+#if NET451
                 catch (ThreadAbortException)
                 {
                     // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
@@ -218,7 +217,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
             finally
             {
-                if(this.platformAssemblyResolver !=null )
+                if (this.platformAssemblyResolver != null)
                 {
                     this.platformAssemblyResolver.AssemblyResolve -= this.CurrentDomainAssemblyResolve;
                     this.platformAssemblyResolver.Dispose();
@@ -537,7 +536,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
                 finally
                 {
-                    if (null == assembly)
+                    if (assembly == null)
                     {
                         EqtTrace.Verbose("CurrentDomainAssemblyResolve: Failed to resolve assembly '{0}'.", args.Name);
                     }

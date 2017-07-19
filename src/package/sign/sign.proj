@@ -8,7 +8,7 @@
   <PropertyGroup>
     <RootDirectory>$(MSBuildThisFileDirectory)..\..\..\</RootDirectory>
     <BuildConfiguration Condition="'$(BuildConfiguration)' == ''">Release</BuildConfiguration>
-    <TargetFramework Condition="'$(TargetFramework)' == ''">net46</TargetFramework>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net451</TargetFramework>
     <TargetRuntime Condition="'$(TargetRuntime)' == ''">win7-x64</TargetRuntime>
     <IncludeLegacyComponents Condition="'$(IncludeLegacyComponents)' == ''">False</IncludeLegacyComponents>
 
@@ -154,19 +154,19 @@
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.TestPlatform.CoreUtilities.dll" />
 
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.TestPlatform.CommunicationUtilities.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.TestPlatform.CrossPlatEngine.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.TestPlatform.Utilities.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.Common.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\testhost.exe" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\testhost.x86.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.TestPlatform.CommunicationUtilities.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.TestPlatform.CoreUtilities.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.TestPlatform.CrossPlatEngine.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.TestPlatform.PlatformAbstractions.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.TestPlatform.Utilities.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.Common.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.exe" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\testhost.x86.exe" />
 
       <!-- Localized resources -->
       <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\netcoreapp1.0\%(ResxLang.Identity)\*.*" />
-      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net46\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
+      <TestHostCoreAssembliesToSign Include="$(ArtifactsBaseDirectory)Microsoft.TestPlatform.TestHost\net451\$(TargetRuntime)\%(ResxLang.Identity)\*.*" />
     </ItemGroup>
 
     <ItemGroup>
