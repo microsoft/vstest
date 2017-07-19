@@ -33,6 +33,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private const string ListenerName = "TptTraceListener";
 
+        private static object lockObject = new Object();
+
         private static TraceSource traceSource;
 
         /// <summary>
@@ -44,7 +46,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 if (traceSource == null)
                 {
-                    traceSource = new TraceSource("TpTrace", SourceLevels.Off);
+                    lock (lockObject)
+                    {
+                        if (traceSource == null)
+                        {
+                            traceSource = new TraceSource("TpTrace", SourceLevels.Off);
+                        }
+                    }
                 }
 
                 return traceSource;
@@ -102,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Specifies whether the trace is initialized or not
         /// </summary>
-        private static bool isInitialized = false;        
+        private static bool isInitialized = false;
 
         /// <summary>
         /// Lock over initialization
