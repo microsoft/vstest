@@ -413,7 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             var extensionDirectory = Path.GetDirectoryName(Path.GetFullPath(extensionAssembly));
             resolutionPaths.Add(extensionDirectory);
 
-            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
+            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation());
             if (!resolutionPaths.Contains(currentDirectory))
             {
                 resolutionPaths.Add(currentDirectory);
@@ -443,7 +443,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 resolutionPaths.AddRange(extensionDirectories);
             }
 
-            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
+            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation());
 
             if (!resolutionPaths.Contains(currentDirectory))
             {
