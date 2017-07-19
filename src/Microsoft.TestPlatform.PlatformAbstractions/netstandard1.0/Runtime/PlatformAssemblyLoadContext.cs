@@ -7,23 +7,21 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc/>
-    public class PlatformAssembly : IAssembly
+    public class PlatformAssemblyLoadContext : IAssemblyLoadContext
     {
+        /// <inheritdoc/>
         public string GetAssemblyLocation(Assembly assembly)
         {
             throw new System.NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
         {
             throw new System.NotImplementedException();
         }
 
-        public Assembly GetProcessEntryAssembly()
-        {
-            throw new System.NotImplementedException();
-        }
-
+        /// <inheritdoc/>
         public Assembly LoadAssemblyFromPath(string assemblyPath)
         {
             throw new System.NotImplementedException();

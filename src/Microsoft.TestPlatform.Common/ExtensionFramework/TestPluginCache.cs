@@ -153,13 +153,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
             Dictionary<string, TPluginInfo> pluginInfos = null;
             this.SetupAssemblyResolver(null);
-            this.platformAssemblyResolver = new PlatformAssemblyResolver();
 
             // Some times TestPlatform.core.dll assembly fails to load in the current appdomain (from devenv.exe).
             // Reason for failures are not known. Below handler, again calls assembly.load() in failing assembly
             // and that succeeds.
             // Because of this assembly failure, below domain.CreateInstanceAndUnwrap() call fails with error
             // "Unable to cast transparent proxy to type 'Microsoft.VisualStudio.TestPlatform.Core.TestPluginsFramework.TestPluginDiscoverer"
+            this.platformAssemblyResolver = new PlatformAssemblyResolver();
             this.platformAssemblyResolver.AssemblyResolve += this.CurrentDomainAssemblyResolve;
 
             try
@@ -222,7 +222,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     this.platformAssemblyResolver.AssemblyResolve -= this.CurrentDomainAssemblyResolve;
                     this.platformAssemblyResolver.Dispose();
                 }
-                
+
                 // clear the assemblies
                 lock (this.resolvedAssemblies)
                 {

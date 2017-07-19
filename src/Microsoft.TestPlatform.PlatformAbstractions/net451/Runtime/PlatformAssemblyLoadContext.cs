@@ -3,32 +3,32 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
+    using System;
     using System.IO;
     using System.Reflection;
+
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc/>
-    public class PlatformAssembly : IAssembly
+    public class PlatformAssemblyLoadContext : IAssemblyLoadContext
     {
+        /// <inheritdoc/>
         public string GetAssemblyLocation(Assembly assembly)
         {
-            throw new System.NotImplementedException();
+            Type type = assembly.GetType();
+            PropertyInfo property = type.GetTypeInfo().GetDeclaredProperty("Location");
+            return Path.GetDirectoryName(property.GetMethod.Invoke(assembly, null) as string);
         }
 
+        /// <inheritdoc/>
         public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
         {
-            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(assemblyPath);
-            return new AssemblyName(fileNameWithoutExtension);
-        }
-
-        public Assembly GetProcessEntryAssembly()
-        {
-            throw new System.NotImplementedException();
+            return AssemblyName.GetAssemblyName(assemblyPath);
         }
 
         public Assembly LoadAssemblyFromPath(string assemblyPath)
         {
-            return Assembly.Load(this.GetAssemblyNameFromPath(assemblyPath));
+            return Assembly.LoadFrom(assemblyPath);
         }
     }
 }

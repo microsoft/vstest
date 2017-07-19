@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
         private void DummyEventThrower()
         {
+            // need to raise this event, else compiler throws error
             this.AssemblyResolve(this, null);
         }
     }

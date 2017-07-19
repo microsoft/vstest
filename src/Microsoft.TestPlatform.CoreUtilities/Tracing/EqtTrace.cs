@@ -64,14 +64,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 #endif
 
-        public static IPlatformEqtTrace PlatformTrace
-        {
-            get
-            {
-                return traceImpl;
-            }
-        }
-
         public static string LogFile
         {
             get

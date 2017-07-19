@@ -6,15 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System;
     using System.IO;
     using System.Reflection;
-
-#if !NET451
     using System.Runtime.Loader;
-#endif
 
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc/>
-    public class PlatformAssembly : IAssembly
+    public class PlatformAssemblyLoadContext : IAssemblyLoadContext
     {
         /// <inheritdoc/>
         public string GetAssemblyLocation(Assembly assembly)
@@ -27,26 +24,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
         {
-#if NET451
-            return AssemblyName.GetAssemblyName(assemblyPath);
-#else
             return AssemblyLoadContext.GetAssemblyName(assemblyPath);
-#endif
-        }
-
-        /// <inheritdoc/>
-        public Assembly GetProcessEntryAssembly()
-        {
-            return Assembly.GetEntryAssembly();
         }
 
         public Assembly LoadAssemblyFromPath(string assemblyPath)
         {
-#if NET451
-            return Assembly.LoadFrom(assemblyPath);
-#else
             return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
         }
     }
 }

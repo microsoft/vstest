@@ -34,10 +34,9 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AssemblyResolveEventArgs"/> class.
-        /// Initializes a new instance of the System.ResolveEventArgs class, specifying the
         /// name of the item to resolve.
         /// </summary>
-        /// <param name="name">The name of an item to resolve.</param>
+        /// <param name="name">The Full name of an assembly to resolve.</param>
         public AssemblyResolveEventArgs(string name)
         {
             this.Name = name;

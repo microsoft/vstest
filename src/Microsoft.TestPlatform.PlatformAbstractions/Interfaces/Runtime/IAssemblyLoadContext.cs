@@ -8,20 +8,14 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     /// <summary>
     /// Abstraction for Assembly Methods
     /// </summary>
-    public interface IAssembly
+    public interface IAssemblyLoadContext
     {
         /// <summary>
-        /// Gets the loation of current assembly
+        /// Gets the location of current assembly
         /// </summary>
         /// <param name="assembly">Assembly</param>
         /// <returns>Assembly location</returns>
         string GetAssemblyLocation(Assembly assembly);
-
-        /// <summary>
-        /// Gets the Entry Assembly on current platform
-        /// </summary>
-        /// <returns>Entry Assembly on current platform</returns>
-        Assembly GetProcessEntryAssembly();
 
         /// <summary>
         /// Loads assembly from given path
