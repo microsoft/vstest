@@ -26,5 +26,17 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 throw new NotImplementedException();
             }
         }
+
+        /// <inheritdoc />
+        public void ExitCurrentProcess(int exitcode)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public int GetCurrentManagedThreadId()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

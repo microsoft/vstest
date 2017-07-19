@@ -3,19 +3,15 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Threading.Tasks;
 
-#if !NET451
-    using System.Runtime.Loader;
-#endif
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Class representing an InProcDataCollector loaded by InProcDataCollectionExtensionManager
@@ -44,9 +40,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var assembly = this.LoadInProcDataCollectorExtension(codeBase);
             this.dataCollectorType =
                 assembly?.GetTypes()
-                    .FirstOrDefault(x => (x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x)));
+                    .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo()));
 
-            this.AssemblyQualifiedName = (dataCollectorType?.AssemblyQualifiedName);
+            this.AssemblyQualifiedName = this.dataCollectorType?.AssemblyQualifiedName;
         }
 
         /// <summary>
@@ -98,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             MethodInfo methodInfo = null;
 
             var typeInfo = type.GetTypeInfo();
-            methodInfo = typeInfo?.GetMethod(funcName, argumentTypes);
+            methodInfo = typeInfo.AsType()?.GetMethod(funcName, argumentTypes);
             return methodInfo;
         }
 
@@ -107,7 +103,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             object obj = null;
 
             var typeInfo = type.GetTypeInfo();
-            var constructorInfo = typeInfo?.GetConstructor(Type.EmptyTypes);
+            var constructorInfo = typeInfo.AsType()?.GetConstructor(Type.EmptyTypes);
             obj = constructorInfo?.Invoke(new object[] { });
 
             return obj;
@@ -123,12 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             Assembly assembly = null;
             try
             {
-#if NET451
-                assembly = Assembly.LoadFrom(codeBase);
-#else
-                assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(codeBase);
-#endif
-
+                assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(codeBase);
             }
             catch (Exception ex)
             {

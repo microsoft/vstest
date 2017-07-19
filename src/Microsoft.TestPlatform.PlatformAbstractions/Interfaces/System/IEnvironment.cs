@@ -3,8 +3,6 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
 {
-    using System;
-
     /// <summary>
     /// Operating system environment abstractions.
     /// </summary>
@@ -19,5 +17,17 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// Operating System name.
         /// </summary>
         PlatformOperatingSystem OperatingSystem { get; }
+
+        /// <summary>
+        /// Exits the current process as per Operating System
+        /// </summary>
+        /// <param name="exitcode">Exit code set by user</param>
+        void ExitCurrentProcess(int exitcode);
+
+        /// <summary>
+        /// Returns Operating System managed thread Id
+        /// </summary>
+        /// <returns>Returns the thread Id</returns>
+        int GetCurrentManagedThreadId();
     }
 }

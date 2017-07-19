@@ -26,5 +26,17 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 throw new NotImplementedException();
             }
         }
+
+        /// <inheritdoc />
+        public void ExitCurrentProcess(int exitcode)
+        {
+            Environment.FailFast("Process terminating with exit code: " + exitcode);
+        }
+
+        /// <inheritdoc />
+        public int GetCurrentManagedThreadId()
+        {
+            return Environment.CurrentManagedThreadId;
+        }
     }
 }

@@ -17,6 +17,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using System.Linq;
 
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+
     /// <summary>
     /// The design mode client.
     /// </summary>
@@ -108,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.Dispose();
 
             EqtTrace.Info("DesignModeClient: Parent process exited, Exiting myself..");
-            Environment.Exit(1);
+            new PlatformEnvironment().ExitCurrentProcess(1);
         }
 
         /// <summary>
