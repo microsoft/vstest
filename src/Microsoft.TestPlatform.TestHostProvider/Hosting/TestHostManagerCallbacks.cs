@@ -61,7 +61,16 @@ namespace Microsoft.TestPlatform.TestHostProvider.Hosting
                 EqtTrace.Error("Test host exited with error: '{0}'", testHostProcessStdErrorStr);
             }
 
-            onHostExited(new HostProviderEventArgs(testHostProcessStdErrorStr, exitCode, (process as Process).Id));
+            int procId = -1;
+            try
+            {
+                procId = (process as Process).Id;
+            }
+            catch (InvalidOperationException)
+            {
+            }
+
+            onHostExited(new HostProviderEventArgs(testHostProcessStdErrorStr, exitCode, procId));
         }
     }
 }
