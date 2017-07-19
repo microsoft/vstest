@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// </summary>
         private IAssemblyResolver platformAssemblyResolver;
 
-        private IAssembly platformAssembly;
+        private IAssemblyLoadContext platformAssemblyLoadContext;
 
         private static readonly string[] SupportedFileExtensions = new string[] { ".dll", ".exe" };
 
@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
 
             this.platformAssemblyResolver = new PlatformAssemblyResolver();
-            this.platformAssembly = new PlatformAssembly();
+            this.platformAssemblyLoadContext = new PlatformAssemblyLoadContext();
 
             this.platformAssemblyResolver.AssemblyResolve += this.OnResolve;
         }
@@ -146,14 +146,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                                 continue;
                             }
 
-                            AssemblyName foundName = this.platformAssembly.GetAssemblyNameFromPath(assemblyPath);
+                            AssemblyName foundName = this.platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
 
                             if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
                             {
                                 continue;   // File exists but version/public key is wrong. Try next extension.
                             }
 
-                            assembly = this.platformAssembly.LoadAssemblyFromPath(assemblyPath);
+                            assembly = this.platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
                             this.resolvedAssemblies[args.Name] = assembly;
 
                             EqtTrace.Info("AssemblyResolver: {0}: Resolved assembly. ", args.Name);
