@@ -14,13 +14,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <summary>
         /// Specifies whether the resolver is disposed or not
         /// </summary>
-        private bool isDisposed;
+        private bool disposed;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PlatformAssemblyResolver"/> class.
         /// </summary>
         /// <param name="directories"> The search directories. </param>
-        [System.Security.SecurityCritical]
         public PlatformAssemblyResolver()
         {
             AssemblyLoadContext.Default.Resolving += this.AssemblyResolverEvent;
@@ -43,17 +42,16 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             GC.SuppressFinalize(this);
         }
 
-        [System.Security.SecurityCritical]
         protected void Dispose(bool disposing)
         {
-            if (!this.isDisposed)
+            if (!this.disposed)
             {
                 if (disposing)
                 {
                     AssemblyLoadContext.Default.Resolving -= this.AssemblyResolverEvent;
                 }
 
-                this.isDisposed = true;
+                this.disposed = true;
             }
         }
 
