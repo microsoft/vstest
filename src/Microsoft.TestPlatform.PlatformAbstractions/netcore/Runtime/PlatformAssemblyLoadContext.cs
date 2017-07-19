@@ -14,14 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     public class PlatformAssemblyLoadContext : IAssemblyLoadContext
     {
         /// <inheritdoc/>
-        public string GetAssemblyLocation(Assembly assembly)
-        {
-            Type type = assembly.GetType();
-            PropertyInfo property = type.GetTypeInfo().GetDeclaredProperty("Location");
-            return Path.GetDirectoryName(property.GetMethod.Invoke(assembly, null) as string);
-        }
-
-        /// <inheritdoc/>
         public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
         {
             return AssemblyLoadContext.GetAssemblyName(assemblyPath);
