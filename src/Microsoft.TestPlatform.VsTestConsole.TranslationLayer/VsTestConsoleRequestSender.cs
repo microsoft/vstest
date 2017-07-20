@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     /// <summary>
     /// VstestConsoleRequestSender for sending requests to Vstest.console.exe
     /// </summary>
-    internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
+    internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender, ITranslationLayerRequestSenderAsync
     {
         private readonly ICommunicationManager communicationManager;
 
