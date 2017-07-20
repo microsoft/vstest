@@ -252,7 +252,7 @@ function Invoke-Test
                     if (-not (Test-Path $testContainer))
                     {
                         # Test project may not targetting all frameworks. Example: Microsoft.TestPlatform.Build.UnitTests won't target net451.
-                        continue
+                        return
                     }
 
                     $trxLogFileName =  [System.String]::Format("{0}_{1}_{2}", ($(Get-ChildItem $testContainer).Name), $fx, $Script:TPT_DefaultTrxFileName)

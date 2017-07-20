@@ -1,11 +1,13 @@
-﻿using System;
-using System.Diagnostics;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-    
+    using System;
+    using System.Diagnostics;
+
     public partial interface IPlatformEqtTrace
-    {   
+    {
         /// <summary>
         /// Setup remote trace listener in the child domain.
         /// If calling domain, doesn't have tracing enabled nothing is done.
@@ -21,6 +23,5 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// The listener.
         /// </param>
         void SetupListener(TraceListener listener);
-
     }
 }

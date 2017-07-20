@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System.Diagnostics;
+
     public static class ProcessStartInfoExtensions
     {
         /// <summary>
