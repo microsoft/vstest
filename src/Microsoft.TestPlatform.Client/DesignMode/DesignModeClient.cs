@@ -110,6 +110,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.Dispose();
 
             EqtTrace.Info("DesignModeClient: Parent process exited, Exiting myself..");
+
+            // ToDo: Initialize this in .ctor, so that it is mockable
             new PlatformEnvironment().ExitCurrentProcess(1);
         }
 

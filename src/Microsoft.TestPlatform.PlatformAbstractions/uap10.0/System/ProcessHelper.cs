@@ -58,7 +58,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public void SetExitCallback(int parentProcessId, Action callbackAction)
         {
-            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
