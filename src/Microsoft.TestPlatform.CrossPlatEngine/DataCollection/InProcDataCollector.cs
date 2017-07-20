@@ -93,8 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             MethodInfo methodInfo = null;
 
-            var typeInfo = type.GetTypeInfo();
-            methodInfo = typeInfo.AsType()?.GetMethod(funcName, argumentTypes);
+            methodInfo = type?.GetMethod(funcName, argumentTypes);
             return methodInfo;
         }
 
@@ -102,8 +101,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         {
             object obj = null;
 
-            var typeInfo = type.GetTypeInfo();
-            var constructorInfo = typeInfo.AsType()?.GetConstructor(Type.EmptyTypes);
+            var constructorInfo = type?.GetConstructor(Type.EmptyTypes);
             obj = constructorInfo?.Invoke(new object[] { });
 
             return obj;
