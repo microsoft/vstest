@@ -659,4 +659,10 @@
     <value>--Blame|/Blame
       Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</value>
   </data>
+  <data name="TestRunAborted" xml:space="preserve">
+    <value>Test Run Aborted.</value>
+  </data>
+  <data name="TestRunCanceled" xml:space="preserve">
+    <value>Test Run Canceled.</value>
+  </data>
 </root>

@@ -77,5 +77,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Resources {
                 return ResourceManager.GetString("WaitForCompletionOperationIsNotAllowedWhenNoTestRunIsActive", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Canceling test run as it crossed testSessionTimeout: {0} milliseconds..
+        /// </summary>
+        internal static string TestSessionTimeoutMessage
+        {
+            get
+            {
+                return ResourceManager.GetString("TestSessionTimeoutMessage", resourceCulture);
+            }
+        }
     }
 }

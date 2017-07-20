@@ -34,6 +34,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private CancellationTokenSource cancellationTokenSource;
         private bool isCommunicationEstablished;
 
+        private object locObject = new Object();
+
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
 
@@ -96,7 +98,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
                 }
 
-                this.isCommunicationEstablished = this.SetupChannel(testSources, this.cancellationTokenSource.Token);
+                lock (locObject)
+                {
+                    this.isCommunicationEstablished = this.SetupChannel(testSources, this.cancellationTokenSource.Token);
+                }
 
                 if (this.isCommunicationEstablished)
                 {
@@ -162,7 +167,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         public virtual void Cancel()
         {
             // Cancel fast, try to stop testhost deployment/launch
-            this.cancellationTokenSource.Cancel();
+            lock (locObject)
+            {
+                this.cancellationTokenSource.Cancel();
+            }
             if (this.isCommunicationEstablished)
             {
                 this.RequestSender.SendTestRunCancel();

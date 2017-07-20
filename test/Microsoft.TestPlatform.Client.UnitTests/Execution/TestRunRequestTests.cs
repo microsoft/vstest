@@ -6,10 +6,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
 
     using Client.Execution;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -138,6 +140,66 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             testRunRequest.ExecuteAsync();
             testRunRequest.CancelAsync();
             executionManager.Verify(dm => dm.Cancel(), Times.Once);
+        }
+
+
+        [TestMethod]
+        public void OnTestSessionTimeoutShouldCallCancel()
+        {
+            this.testRunRequest.ExecuteAsync();
+            this.testRunRequest.OnTestSessionTimeout(null);
+            this.executionManager.Verify(o => o.Cancel(), Times.Once);
+        }
+
+        [TestMethod]
+        public void OnTestSessionTimeoutShouldLogMessage()
+        {
+            bool handleLogMessageCalled = false;
+            bool handleRawMessageCalled = false;
+
+            this.testRunRequest.TestRunMessage += (object sender, TestRunMessageEventArgs e) =>
+                {
+                    handleLogMessageCalled = true;
+                };
+
+            this.testRunRequest.OnRawMessageReceived += (object sender, string message) =>
+                {
+                    handleRawMessageCalled = true;
+                };
+
+            this.testRunRequest.OnTestSessionTimeout(null);
+
+            Assert.IsTrue(handleLogMessageCalled, "OnTestSessionTimeout should call HandleLogMessage");
+            Assert.IsTrue(handleRawMessageCalled, "OnTestSessionTimeout should call HandleRawMessage");
+        }
+
+        [TestMethod]
+        public void OnTestSessionTimeoutShouldGetCalledWhenExecutionCrossedTestSessionTimeout()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TestSessionTimeout>1000</TestSessionTimeout>
+                     </RunConfiguration>
+                </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "foo" }, 1, true, settingsXml);
+            var executionManager = new Mock<IProxyExecutionManager>();
+            var testRunRequest = new TestRunRequest(testRunCriteria, executionManager.Object);
+
+            ManualResetEvent onTestSessionTimeoutCalled = new ManualResetEvent(true);
+
+            executionManager.Setup(o => o.StartTestRun(testRunCriteria, testRunRequest)).Callback(() => { System.Threading.Thread.Sleep(3 * 1000); });
+
+            executionManager.Setup(o => o.Cancel()).Callback(() => onTestSessionTimeoutCalled.Set());
+
+            testRunRequest.ExecuteAsync();
+
+            onTestSessionTimeoutCalled.WaitOne(20 * 1000);
+
+            executionManager.Verify(o => o.Cancel(), Times.Once);
+
         }
 
         [TestMethod]
