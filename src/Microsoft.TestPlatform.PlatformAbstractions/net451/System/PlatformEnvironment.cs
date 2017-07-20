@@ -3,8 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using System;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc />
     public class PlatformEnvironment : IEnvironment
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
                 // Ensure the value is detected appropriately for Desktop CLR, Mono CLR 1.x and Mono
                 // CLR 2.x. See below link for more information:
                 // http://www.mono-project.com/docs/faq/technical/#how-to-detect-the-execution-platform
-                int p = (int) System.Environment.OSVersion.Platform;
+                int p = (int)System.Environment.OSVersion.Platform;
                 if ((p == 4) || (p == 6) || (p == 128))
                 {
                     return PlatformOperatingSystem.Unix;

@@ -1,34 +1,12 @@
-﻿namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-    //
-    // Summary:
-    //     Specifies what messages to output for the System.Diagnostics.Debug, System.Diagnostics.Trace
-    //     and System.Diagnostics.TraceSwitch classes.
-    public enum PlatformTraceLevel
-    {
-        //
-        // Summary:
-        //     Output no tracing and debugging messages.
-        Off = 0,
-        //
-        // Summary:
-        //     Output error-handling messages.
-        Error = 1,
-        //
-        // Summary:
-        //     Output warnings and error-handling messages.
-        Warning = 2,
-        //
-        // Summary:
-        //     Output informational messages, warnings, and error-handling messages.
-        Info = 3,
-        //
-        // Summary:
-        //     Output all debugging and tracing messages.
-        Verbose = 4
-    }
-
-
+    /// <summary>
+    /// Specifies what messages to output for the System.Diagnostics.Debug, System.Diagnostics.Trace
+    /// and System.Diagnostics.TraceSwitch classes.
+    /// </summary>
     public partial interface IPlatformEqtTrace
     {
         /// <summary>
@@ -44,7 +22,12 @@
         /// Initializes the verbose tracing with custom log file
         /// And overrides if any trace is set before
         /// </summary>
-        /// <param name="customLogFile">A custom log file for trace messages.</param>
+        /// <param name="customLogFile">
+        /// A custom log file for trace messages.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         bool InitializeVerboseTrace(string customLogFile);
 
         /// <summary>
@@ -63,12 +46,17 @@
         /// <summary>
         /// Sets platfrom specific trace value for tracing verbosity.
         /// </summary>
-        /// <param name="traceLevel">PlatformTraceLevel.</param>
+        /// <param name="value">
+        /// The value.
+        /// </param>
         void SetTraceLevel(PlatformTraceLevel value);
 
         /// <summary>
         /// Gets platfrom specific trace value for tracing verbosity.
         /// </summary>
+        /// <returns>
+        /// The <see cref="PlatformTraceLevel"/>.
+        /// </returns>
         PlatformTraceLevel GetTraceLevel();
     }
 }

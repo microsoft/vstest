@@ -126,17 +126,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Initializes the verbose tracing with custom log file
         /// And overrides if any trace is set before
         /// </summary>
-        /// <param name="customLogFile">A custom log file for trace messages.</param>
+        /// <param name="customLogFile">
+        /// A custom log file for trace messages.
+        /// </param>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         public static bool InitializeVerboseTrace(string customLogFile)
         {
-            if(!traceImpl.InitializeVerboseTrace(customLogFile))
+            if (!traceImpl.InitializeVerboseTrace(customLogFile))
             {
                 ErrorOnInitialization = PlatformEqtTrace.ErrorOnInitialization;
                 return false;
             }
+
             return true;
         }
-
 
         /// <summary>
         /// Prints an error message and prompts with a Debug dialog
