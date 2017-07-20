@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             IEnumerable<LazyExtension<DataCollector, Dictionary<string, object>>> unfilteredTestExtensions;
 
             TestPluginManager.Instance.GetSpecificTestExtensions<DataCollectorConfig, DataCollector, IDataCollectorCapabilities, DataCollectorMetadata>(
-                TestPlatformConstants.DataCollectorRegexPattern,
+                TestPlatformConstants.DataCollectorEndsWithPattern,
                 out unfilteredTestExtensions,
                 out filteredTestExtensions);
 

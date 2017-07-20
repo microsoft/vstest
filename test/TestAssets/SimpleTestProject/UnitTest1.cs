@@ -31,7 +31,7 @@ namespace SampleUnitTestProject
         [TestMethod]
         public void FailingTest()
         {
-#if NET46
+#if NET451
             // current App domain should be write to file to test DisableAppDomain acceptance test.
             var appDomainFilePath = Path.Combine(Path.GetTempPath(), "appdomain_test.txt");
             File.WriteAllText(appDomainFilePath, "AppDomain FriendlyName: " + AppDomain.CurrentDomain.FriendlyName);

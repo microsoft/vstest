@@ -11,7 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     /// Class that holds collection of traits
     /// </summary>
-#if NET46
+#if NET451
     [Serializable]
 #endif
     public class TraitCollection : IEnumerable<Trait>
@@ -20,7 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         private static readonly TestProperty TraitsProperty = TestProperty.Register(
             TraitPropertyId,
-#if !NET46
+#if !NET451
             // TODO: Fix this with proper resourcing for UWP and Win 8.1 Apps
             // Trying to access resources will throw "MissingManifestResourceException" percolated as "TypeInitialization" exception
             "Traits",
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 #pragma warning restore 618
             typeof(TestObject));
 
-#if NET46
+#if NET451
         [NonSerialized]
 #endif
         private readonly TestObject testObject;

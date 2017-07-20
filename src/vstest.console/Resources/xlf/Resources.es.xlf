@@ -802,15 +802,15 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;VersiónDeMarco&gt;
+        <target state="new">--Framework|/Framework:&lt;VersiónDeMarco&gt;
       Versión de .Net Framework de destino que debe usarse para
       la ejecución de pruebas. Los valores válidos son: 
       ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0", etc.
       Otros valores admitidos son: Framework35, Framework40, 
       Framework45 y FrameworkCore10.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; versión de Framework &gt;
       Trabajar en .net Framework versión que se utilizará para la ejecución de la prueba. 
@@ -820,9 +820,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
-        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="translated">El argumento /Framework requiere la versión de .Net Framework de destino para la serie de pruebas. Ejemplo: /Framework:".NETFramework,Version=v4.6"</target>
-        <note />
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
+        <target state="new">El argumento /Framework requiere la versión de .Net Framework de destino para la serie de pruebas. Ejemplo: /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">El argumento de /Framework requiere el destino .net Framework versión para la ejecución de pruebas.   Ejemplo: /Framework: ". NETFramework, Version = v4.6 "</target>
         </alt-trans>
@@ -1558,6 +1558,13 @@
       <trans-unit id="DbgTrcMessagesBanner">
         <source>Debug Traces Messages:</source>
         <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnableBlameUsage">
+        <source>--Blame|/Blame
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
+        <target state="new">--Blame|/Blame
+      Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
         <note></note>
       </trans-unit>
     </body>

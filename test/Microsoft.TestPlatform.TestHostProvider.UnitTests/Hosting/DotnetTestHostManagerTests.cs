@@ -258,7 +258,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             char separator = ';';
             var dotnetExeName = "dotnet.exe";
-#if !NET46
+#if !NET451
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 separator = ':';
@@ -331,7 +331,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestPlatformExtensionsShouldReturnLibariesFromSourceDirectory()
         {
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.TestAdapter.dll" });
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.TestAdapter.dll" });
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(new[] { $".{Path.DirectorySeparatorChar}foo.dll" }, Enumerable.Empty<string>());
 
             CollectionAssert.AreEqual(new[] { "foo.TestAdapter.dll" }, extensions.ToArray());
@@ -342,7 +342,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             // Parent directory is empty since the input source is file "test.dll"
             this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.TopDirectoryOnly)).Returns(new[] { "foo.dll" });
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(new[] { "foo.dll" });
             var extensions = this.dotnetHostManager.GetTestPlatformExtensions(this.testSource, Enumerable.Empty<string>());
 
             Assert.AreEqual(0, extensions.Count());
@@ -651,25 +651,32 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public async Task CleanTestHostAsyncShouldKillTestHostProcess()
         {
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>()))
+                .Callback<object>(p => isVerified = ((Process)p).Id == pid);
+
             this.ExitCallBackTestHelper(0);
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
 
             await this.dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(Process.GetCurrentProcess().Id), Times.Once);
+            Assert.IsTrue(isVerified);
         }
 
         [TestMethod]
         public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
         {
-            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<int>())).Throws<Exception>();
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
 
             this.ExitCallBackTestHelper(0);
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
 
             await this.dotnetHostManager.CleanTestHostAsync(CancellationToken.None);
 
-            this.mockProcessHelper.Verify(ph => ph.TerminateProcess(Process.GetCurrentProcess().Id), Times.Once);
+            Assert.IsTrue(isVerified);
         }
 
         private void DotnetHostManagerExitCodeTesterHostExited(object sender, HostProviderEventArgs e)

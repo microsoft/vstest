@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class ExecutionTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunMultipleTestAssemblies(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -30,9 +30,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         // Randomly failing with error "The active test run was aborted. Reason: Destination array was not long enough.
         // Check destIndex and length, and the array's lower bounds. Test Run Failed."
         // Issue: https://github.com/Microsoft/vstest/issues/292
-        [Ignore]
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunMultipleTestAssembliesInParallel(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -79,7 +78,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void WorkingDirectoryIsSourceDirectory(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -94,7 +93,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -134,7 +133,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(string runnerFramework, string targetFramework, string targetRuntime)
         {

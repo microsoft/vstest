@@ -159,9 +159,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             try
             {
-                // Remove leading and trailing ' " ' chars...
-                argument = argument.Trim().Trim(new char[] { '\"' });
-
                 customAdaptersPath = Path.GetFullPath(argument);
                 if (!fileHelper.DirectoryExists(customAdaptersPath))
                 {

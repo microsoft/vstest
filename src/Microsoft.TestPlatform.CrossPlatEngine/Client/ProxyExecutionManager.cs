@@ -32,6 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
+        private bool isCommunicationEstablished;
 
         /// <inheritdoc/>
         public bool IsInitialized { get; private set; } = false;
@@ -61,6 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             this.testHostManager = testHostManager;
             this.dataSerializer = dataSerializer;
             this.cancellationTokenSource = new CancellationTokenSource();
+            this.isCommunicationEstablished = false;
         }
 
         #endregion
@@ -72,14 +74,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public virtual void Initialize()
         {
-            if (this.testHostManager.Shared)
-            {
-                // Shared test hosts don't require test source information to launch. Start them early
-                // to allow fail fast.
-                EqtTrace.Verbose("ProxyExecutionManager: Test host is shared. SetupChannel it early.");
-                this.InitializeExtensions(Enumerable.Empty<string>());
-            }
-
             this.IsInitialized = true;
         }
 
@@ -93,52 +87,50 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                if (!this.testHostManager.Shared)
+                EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
+                var testSources = testRunCriteria.Sources;
+
+                // If the test execution is with a test filter, group them by sources
+                if (testRunCriteria.HasSpecificTests)
                 {
-                    // Non shared test host requires test source information to launch. Provide the sources
-                    // information and create the channel.
-                    EqtTrace.Verbose("ProxyExecutionManager: Test host is non shared. Lazy initialize.");
-                    var testSources = testRunCriteria.Sources;
+                    testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                }
 
-                    // If the test execution is with a test filter, group them by sources
-                    if (testRunCriteria.HasSpecificTests)
-                    {
-                        testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
-                    }
+                this.isCommunicationEstablished = this.SetupChannel(testSources, this.cancellationTokenSource.Token);
 
+                if (this.isCommunicationEstablished)
+                {
                     this.InitializeExtensions(testSources);
-                }
 
-                this.SetupChannel(testRunCriteria.Sources, this.cancellationTokenSource.Token);
+                    var executionContext = new TestExecutionContext(
+                        testRunCriteria.FrequencyOfRunStatsChangeEvent,
+                        testRunCriteria.RunStatsChangeEventTimeout,
+                        inIsolation: false,
+                        keepAlive: testRunCriteria.KeepAlive,
+                        isDataCollectionEnabled: false,
+                        areTestCaseLevelEventsRequired: false,
+                        hasTestRun: true,
+                        isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
+                        testCaseFilter: testRunCriteria.TestCaseFilter);
 
-                var executionContext = new TestExecutionContext(
-                    testRunCriteria.FrequencyOfRunStatsChangeEvent,
-                    testRunCriteria.RunStatsChangeEventTimeout,
-                    inIsolation: false,
-                    keepAlive: testRunCriteria.KeepAlive,
-                    isDataCollectionEnabled: false,
-                    areTestCaseLevelEventsRequired: false,
-                    hasTestRun: true,
-                    isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
-                    testCaseFilter: testRunCriteria.TestCaseFilter);
+                    if (testRunCriteria.HasSpecificSources)
+                    {
+                        var runRequest = new TestRunCriteriaWithSources(
+                            testRunCriteria.AdapterSourceMap,
+                            testRunCriteria.TestRunSettings,
+                            executionContext);
 
-                if (testRunCriteria.HasSpecificSources)
-                {
-                    var runRequest = new TestRunCriteriaWithSources(
-                        testRunCriteria.AdapterSourceMap,
-                        testRunCriteria.TestRunSettings,
-                        executionContext);
+                        this.RequestSender.StartTestRun(runRequest, eventHandler);
+                    }
+                    else
+                    {
+                        var runRequest = new TestRunCriteriaWithTests(
+                            testRunCriteria.Tests,
+                            testRunCriteria.TestRunSettings,
+                            executionContext);
 
-                    this.RequestSender.StartTestRun(runRequest, eventHandler);
-                }
-                else
-                {
-                    var runRequest = new TestRunCriteriaWithTests(
-                        testRunCriteria.Tests,
-                        testRunCriteria.TestRunSettings,
-                        executionContext);
-
-                    this.RequestSender.StartTestRun(runRequest, eventHandler);
+                        this.RequestSender.StartTestRun(runRequest, eventHandler);
+                    }
                 }
             }
             catch (Exception exception)
@@ -153,7 +145,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Log to vstest.console
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
 
-                var completeArgs = new TestRunCompleteEventArgs(null, false, false, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
+                // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
+                // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
+                // created to replace the current one. This will help if the current execution manager is aborted due to irreparable error
+                // and the test host is lost as well.
+                var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);
                 eventHandler.HandleTestRunComplete(completeArgs, null, null, null);
             }
 
@@ -165,7 +161,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public virtual void Cancel()
         {
-            this.RequestSender.SendTestRunCancel();
+            // Cancel fast, try to stop testhost deployment/launch
+            this.cancellationTokenSource.Cancel();
+            if (this.isCommunicationEstablished)
+            {
+                this.RequestSender.SendTestRunCancel();
+            }
         }
 
         /// <summary>
@@ -184,8 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (TestPluginCache.Instance.PathToExtensions != null)
             {
-                var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => regex.IsMatch(ext)));
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterEndsWithPattern, StringComparison.OrdinalIgnoreCase)));
             }
 
             extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
@@ -195,8 +195,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.SetupChannel(sourceList, this.cancellationTokenSource.Token);
-
                 this.RequestSender.InitializeExecution(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
         }

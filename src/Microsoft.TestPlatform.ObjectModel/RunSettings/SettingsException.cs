@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// Exception thrown by Run Settings when an error with a settings provider
     /// is encountered.
     /// </summary>
-#if NET46
+#if NET451
     [Serializable]
 #endif
     public class SettingsException : Exception
@@ -43,7 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
         }
 
-#if NET46
+#if NET451
         /// <summary>
         /// Seralization constructor.
         /// </summary>

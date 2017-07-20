@@ -799,13 +799,13 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework Sürümü&gt;
+        <target state="new">--Framework|/Framework:&lt;Framework Sürümü&gt;
       Test yürütmesi için kullanılacak hedef .NET Framework sürümü. 
       Geçerli değerler ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" vb.
       Framework35, Framework40, Framework45 ve FrameworkCore10 desteklenen diğer değerlerdir.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">--Framework | / Framework: &lt; Framework sürüm &gt;
       Hedef .net Framework sürümünü test yürütmesi için kullanılacak. 
@@ -815,9 +815,9 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
-        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="translated">/Framework bağımsız değişkeni test çalıştırması için hedef .NET Framework sürümünü gerektirir. Örnek: /Framework:".NETFramework,Version=v4.6"</target>
-        <note />
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
+        <target state="new">/Framework bağımsız değişkeni test çalıştırması için hedef .NET Framework sürümünü gerektirir. Örnek: /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/Framework bağımsız değişken gerektirir hedef .net Framework sürümünü test çalıştırması için.   Örnek: /Framework: ". NETFramework, sürüm v4.6 = "</target>
         </alt-trans>
@@ -1550,6 +1550,13 @@
       <trans-unit id="DbgTrcMessagesBanner">
         <source>Debug Traces Messages:</source>
         <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnableBlameUsage">
+        <source>--Blame|/Blame
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
+        <target state="new">--Blame|/Blame
+      Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
         <note></note>
       </trans-unit>
     </body>

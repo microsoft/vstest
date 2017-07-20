@@ -144,7 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             {
                 var settingsXml = runSettingsProvider.ActiveRunSettings.SettingsXml;
 
-#if NET46
+#if NET451
                 using (var reader = XmlReader.Create(new StringReader(settingsXml), new XmlReaderSettings() { XmlResolver = null, CloseInput = true, DtdProcessing = DtdProcessing.Prohibit }))
                 {
 #else
@@ -158,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities
             }
             else
             {
-#if NET46
+#if NET451
                 doc = (XmlDocument) XmlRunSettingsUtilities.CreateDefaultRunSettings();
 #else
                 using (

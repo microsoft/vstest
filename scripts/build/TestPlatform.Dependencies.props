@@ -4,10 +4,10 @@
     <VSSdkBuildToolsVersion>15.0.26201</VSSdkBuildToolsVersion>
 
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
-    <NETTestSdkPreviousVersion>15.0.0</NETTestSdkPreviousVersion>
+    <NETTestSdkPreviousVersion>15.3.0-preview-20170628-02</NETTestSdkPreviousVersion>
 
-    <MSTestFrameworkVersion>1.1.18</MSTestFrameworkVersion>
-    <MSTestAdapterVersion>1.1.18</MSTestAdapterVersion>
+    <MSTestFrameworkVersion>1.2.0-beta</MSTestFrameworkVersion>
+    <MSTestAdapterVersion>1.2.0-beta</MSTestAdapterVersion>
     <MSTestAssertExtensionVersion>1.0.3-preview</MSTestAssertExtensionVersion>
     
     <XUnitFrameworkVersion>2.2.0</XUnitFrameworkVersion>
@@ -20,6 +20,6 @@
     <ChutzpahAdapterVersion>4.2.4</ChutzpahAdapterVersion>
 
     <JsonNetVersion>9.0.1</JsonNetVersion>
-    <MoqVersion>4.7.25</MoqVersion>
+    <MoqVersion>4.7.63</MoqVersion>
   </PropertyGroup>
 </Project>
