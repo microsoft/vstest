@@ -25,39 +25,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public partial class PlatformEqtTrace : IPlatformEqtTrace
     {
-        // This is added to ensure that traceSource should not be instantiated in when creating appdomains if EqtTrace is not enabled.
-        internal static bool DoNotInitialize = false;
-
         /// <summary>
         /// Name of the trace listener.
         /// </summary>
         private const string ListenerName = "TptTraceListener";
-
-        private static object lockObject = new Object();
-
-        private static TraceSource traceSource;
-
-        /// <summary>
-        /// Gets a custom trace source. This doesn't pollute the default tracing for user applications.
-        /// </summary>
-        private static TraceSource Source
-        {
-            get
-            {
-                if (traceSource == null)
-                {
-                    lock (lockObject)
-                    {
-                        if (traceSource == null)
-                        {
-                            traceSource = new TraceSource("TpTrace", SourceLevels.Off);
-                        }
-                    }
-                }
-
-                return traceSource;
-            }
-        }
 
         /// <summary>
         /// Create static maps for TraceLevel to SourceLevels. The APIs need to provide TraceLevel
@@ -107,6 +78,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         private static readonly int ProcessId = GetProcessId();
 
+        private static object lockObject = new object();
+
+        private static TraceSource traceSource;
+
         /// <summary>
         /// Specifies whether the trace is initialized or not
         /// </summary>
@@ -153,6 +128,35 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         {
             get;
             set;
+        }
+
+        // This is added to ensure that traceSource should not be instantiated in when creating appdomains if EqtTrace is not enabled.
+        internal static bool DoNotInitialize
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets a custom trace source. This doesn't pollute the default tracing for user applications.
+        /// </summary>
+        private static TraceSource Source
+        {
+            get
+            {
+                if (traceSource == null)
+                {
+                    lock (lockObject)
+                    {
+                        if (traceSource == null)
+                        {
+                            traceSource = new TraceSource("TpTrace", SourceLevels.Off);
+                        }
+                    }
+                }
+
+                return traceSource;
+            }
         }
 
         /// <inheritdoc/>
