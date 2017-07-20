@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     /// </summary>
     public class IntegrationTestBase
     {
-        public const string DesktopRunnerFramework = "net46";
+        public const string DesktopRunnerFramework = "net451";
         public const string CoreRunnerFramework = "netcoreapp2.0";
         private const string TestSummaryStatusMessageFormat = "Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}";
         private string standardTestOutput = string.Empty;
@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Text of run settings.</param>
         /// <param name="framework"></param>
         /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.6")
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.5.1")
         {
             var arguments = testAssembly.AddDoubleQuote();
 

@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class TestCaseFilterTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithAndOperatorTrait(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -26,7 +26,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithCategoryTrait(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithClassNameTrait(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithFullyQualifiedNameTrait(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -79,7 +79,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithNameTrait(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -96,7 +96,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithOrOperatorTrait(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void RunSelectedTestsWithPriorityTrait(string runnerFramework, string targetFramework, string targetRuntime)
         {
@@ -134,7 +134,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// this command should provide same results as /TestCaseFilter:"FullyQualifiedName~UnitTest1".
         /// </summary>
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(string runnerFramework, string targetFramework, string targetRuntime)
         {

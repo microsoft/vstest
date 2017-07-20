@@ -268,7 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             // Setup mocks.
             var mockFileHelper = new Mock<IFileHelper>();
             mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), ".*.dll", SearchOption.TopDirectoryOnly))
+            mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), SearchOption.TopDirectoryOnly, new[] { ".dll" }))
                 .Callback(callback)
                 .Returns(extensions);
 

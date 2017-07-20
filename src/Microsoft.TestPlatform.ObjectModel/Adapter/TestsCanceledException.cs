@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 {
     using System;
 
-#if NET46
+#if NET451
     using System.Runtime.Serialization;
 #endif
 
@@ -13,7 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
     /// Exception thrown by the framework when an executor attempts to send 
     /// test result to the framework when the test is canceled.  
     /// </summary>
-#if NET46
+#if NET451
     [Serializable]
 #endif
     public class TestCanceledException : Exception
@@ -46,7 +46,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
         {
         }
 
-#if NET46
+#if NET451
         /// <summary>
         /// Seralization constructor.
         /// </summary>

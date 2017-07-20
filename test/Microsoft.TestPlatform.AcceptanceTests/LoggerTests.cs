@@ -13,7 +13,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class LoggerTests : AcceptanceTestBase
     {
         [CustomDataTestMethod]
-        [NET46TargetFramework]
+        [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void TrxLoggerShouldProperlyOverwriteFile(string runnerFramework, string targetFramework, string targetRuntime)
         {

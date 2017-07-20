@@ -87,6 +87,7 @@ namespace vstest.console.UnitTests.Processors
         [TestMethod]
         public void InitializeShouldNotDisableOtherDataCollectors()
         {
+            CollectArgumentExecutor.EnabledDataCollectors.Add("mydatacollector1");
             var runsettingsString = string.Format(DefaultRunSettings, "<DataCollector friendlyName=\"Code Coverage\" enabled=\"False\" /><DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />");
             var runsettings = new RunSettings();
             runsettings.LoadSettingsXml(runsettingsString);
