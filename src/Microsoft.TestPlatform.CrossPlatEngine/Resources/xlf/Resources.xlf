@@ -86,6 +86,10 @@
       <trans-unit id="CancelationRequested">
         <source>Canceling test run as cancelation requested.</source>
         <target state="new">Canceling test run as cancelation requested.</target>
+      </trans-unit>
+      <trans-unit id="FailedToLaunchTestHost">
+        <source>Failed to launch testhost with error: {0}</source>
+        <target state="new">Failed to launch testhost with error: {0}</target>
         <note></note>
       </trans-unit>
     </body>

@@ -180,4 +180,7 @@
   <data name="CancelationRequested" xml:space="preserve">
     <value>Canceling test run as cancelation requested.</value>
   </data>
+  <data name="FailedToLaunchTestHost" xml:space="preserve">
+    <value>Failed to launch testhost with error: {0}</value>
+  </data>
 </root>
