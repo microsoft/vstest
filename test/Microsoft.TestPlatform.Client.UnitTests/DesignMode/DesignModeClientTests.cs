@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
     using System;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.Client.DesignMode;
     using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
@@ -14,18 +15,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
 
     using Newtonsoft.Json.Linq;
-    using System.Threading.Tasks;
-
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
     [TestClass]
     public class DesignModeClientTests
     {
+        private const int Timeout = 15 * 1000;
+
         private const int PortNumber = 123;
 
         private readonly Mock<ITestRequestManager> mockTestRequestManager;
@@ -38,13 +40,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
         private readonly AutoResetEvent complateEvent;
 
-        private const int Timeout = 15 * 1000;
+        private readonly Mock<IEnvironment> mockPlatformEnvrironment;
 
         public DesignModeClientTests()
         {
             this.mockTestRequestManager = new Mock<ITestRequestManager>();
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
-            this.designModeClient = new DesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+            this.mockPlatformEnvrironment = new Mock<IEnvironment>();
+            this.designModeClient = new DesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
             this.complateEvent = new AutoResetEvent(false);
         }
 
@@ -159,8 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                         {
                             allTasksComplete.Set();
                             receivedTestRunPayload = trp;
-                        }
-                    );
+                        });
 
             this.mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage())
                 .Returns(getProcessStartInfoMessage)
@@ -256,10 +258,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
         }
 
-        [Ignore("Enable after having ability to mock Environment.Exit()")]
         [TestMethod]
         public void DesignModeClientShouldStopCommunicationOnParentProcessExit()
         {
+            this.mockPlatformEnvrironment.Setup(pe => pe.Exit(It.IsAny<int>()));
             this.designModeClient.HandleParentProcessExit();
 
             this.mockCommunicationManager.Verify(cm => cm.StopClient(), Times.Once);
@@ -268,7 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [TestMethod]
         public void DesignModeClientLaunchCustomHostMustReturnIfAckComes()
         {
-            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
 
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
 
@@ -291,7 +293,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
         [ExpectedException(typeof(TestPlatformException))]
         public void DesignModeClientLaunchCustomHostMustThrowIfInvalidAckComes()
         {
-            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance);
+            var testableDesignModeClient = new TestableDesignModeClient(this.mockCommunicationManager.Object, JsonDataSerializer.Instance, this.mockPlatformEnvrironment.Object);
 
             this.mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(true);
 
@@ -301,11 +303,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
                 testableDesignModeClient.InvokeCustomHostLaunchAckCallback(expectedProcessId, "Dummy");
             };
 
-            this.mockCommunicationManager.Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>())).
-                Callback(() => Task.Run(sendMessageAction));
+            this.mockCommunicationManager
+                .Setup(cm => cm.SendMessage(MessageType.CustomTestHostLaunch, It.IsAny<object>()))
+                .Callback(() => Task.Run(sendMessageAction));
 
             var info = new TestProcessStartInfo();
-            var processId = testableDesignModeClient.LaunchCustomHost(info);
+            testableDesignModeClient.LaunchCustomHost(info);
         }
 
         [TestMethod]
@@ -318,8 +321,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.DiscoveryComplete, It.IsAny<DiscoveryCompletePayload>()))
                 .Callback(() => complateEvent.Set());
-            this.mockTestRequestManager.Setup(rm => rm.DiscoverTests(It.IsAny<DiscoveryRequestPayload>(),
-                It.IsAny<ITestDiscoveryEventsRegistrar>(), It.IsAny<ProtocolConfig>())).Throws(new Exception());
+            this.mockTestRequestManager.Setup(
+                    rm => rm.DiscoverTests(
+                        It.IsAny<DiscoveryRequestPayload>(),
+                        It.IsAny<ITestDiscoveryEventsRegistrar>(),
+                        It.IsAny<ProtocolConfig>()))
+                .Throws(new Exception());
 
             this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
 
@@ -338,9 +345,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
             this.mockCommunicationManager
                 .Setup(cm => cm.SendMessage(MessageType.ExecutionComplete, It.IsAny<TestRunCompletePayload>()))
                 .Callback(() => this.complateEvent.Set());
-            this.mockTestRequestManager.Setup(rm => rm.RunTests(It.IsAny<TestRunRequestPayload>(),
-                null,
-                It.IsAny<DesignModeTestEventsRegistrar>(),
+            this.mockTestRequestManager.Setup(
+                rm => rm.RunTests(
+                    It.IsAny<TestRunRequestPayload>(),
+                    null,
+                    It.IsAny<DesignModeTestEventsRegistrar>(),
                 It.IsAny<ProtocolConfig>())).Throws(new Exception());
 
             this.designModeClient.ConnectToClientAndProcessRequests(PortNumber, this.mockTestRequestManager.Object);
@@ -352,9 +361,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.DesignMode
 
         private class TestableDesignModeClient : DesignModeClient
         {
-            internal TestableDesignModeClient(ICommunicationManager communicationManager,
-                IDataSerializer dataSerializer)
-                : base(communicationManager, dataSerializer)
+            internal TestableDesignModeClient(
+                ICommunicationManager communicationManager,
+                IDataSerializer dataSerializer,
+                IEnvironment platformEnvironment)
+                : base(communicationManager, dataSerializer, platformEnvironment)
             {
             }
 

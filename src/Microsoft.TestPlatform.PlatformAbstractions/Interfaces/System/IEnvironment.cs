@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// Exits the current process as per Operating System
         /// </summary>
         /// <param name="exitcode">Exit code set by user</param>
-        void ExitCurrentProcess(int exitcode);
+        void Exit(int exitcode);
 
         /// <summary>
         /// Returns Operating System managed thread Id

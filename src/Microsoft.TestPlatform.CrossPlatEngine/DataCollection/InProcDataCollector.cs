@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
     /// Class representing an InProcDataCollector loaded by InProcDataCollectionExtensionManager
@@ -33,9 +34,37 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         private string configXml;
 
-        public InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string configXml)
+        /// <summary>
+        /// AssemblyLoadContext for current platform
+        /// </summary>
+        private IAssemblyLoadContext assemblyLoadContext;
+
+        public InProcDataCollector(
+            string codeBase,
+            string assemblyQualifiedName,
+            TypeInfo interfaceTypeInfo,
+            string configXml)
+            : this(codeBase, assemblyQualifiedName, interfaceTypeInfo, configXml, new PlatformAssemblyLoadContext())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InProcDataCollector"/> class.
+        /// </summary>
+        /// <param name="codeBase">
+        /// </param>
+        /// <param name="assemblyQualifiedName">
+        /// </param>
+        /// <param name="interfaceTypeInfo">
+        /// </param>
+        /// <param name="configXml">
+        /// </param>
+        /// <param name="assemblyLoadContext">
+        /// </param>
+        internal InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string configXml, IAssemblyLoadContext assemblyLoadContext)
         {
             this.configXml = configXml;
+            this.assemblyLoadContext = assemblyLoadContext;
 
             var assembly = this.LoadInProcDataCollectorExtension(codeBase);
             this.dataCollectorType =
@@ -91,17 +120,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private static MethodInfo GetMethodInfoFromType(Type type, string funcName, Type[] argumentTypes)
         {
-            MethodInfo methodInfo = null;
-
-            methodInfo = type?.GetMethod(funcName, argumentTypes);
-            return methodInfo;
+            return type.GetMethod(funcName, argumentTypes);
         }
 
         private static object CreateObjectFromType(Type type)
         {
             object obj = null;
 
-            var constructorInfo = type?.GetConstructor(Type.EmptyTypes);
+            var constructorInfo = type.GetConstructor(Type.EmptyTypes);
             obj = constructorInfo?.Invoke(new object[] { });
 
             return obj;
@@ -117,7 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             Assembly assembly = null;
             try
             {
-                assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(codeBase);
+                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
             }
             catch (Exception ex)
             {

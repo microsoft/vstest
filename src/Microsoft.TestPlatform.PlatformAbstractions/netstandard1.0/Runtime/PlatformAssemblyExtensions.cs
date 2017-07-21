@@ -3,14 +3,14 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using System.IO;
+    using System;
     using System.Reflection;
 
-    public static class PlatformAssemblyExtension
+    public static class PlatformAssemblyExtensions
     {
         public static string GetAssemblyLocation(this Assembly assembly)
         {
-            return Directory.GetCurrentDirectory();
+            throw new NotImplementedException();
         }
     }
 }

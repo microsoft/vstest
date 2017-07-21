@@ -5,8 +5,16 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System.Reflection;
 
-    public static class PlatformAssemblyExtension
+    /// <summary>
+    /// Assembly Extensions
+    /// </summary>
+    public static class PlatformAssemblyExtensions
     {
+        /// <summary>
+        /// Get current assembly location as per current platform
+        /// </summary>
+        /// <param name="assembly">Assembly</param>
+        /// <returns>Returns Assembly location as per platform</returns>
         public static string GetAssemblyLocation(this Assembly assembly)
         {
             return assembly.Location;

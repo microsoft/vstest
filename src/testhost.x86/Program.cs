@@ -45,6 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
+        // In UWP(App models) Run will act as entry point from Application end, so making this method public
         public static void Run(string[] args)
         {
             WaitForDebuggerIfEnabled();

@@ -47,7 +47,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc />
-        public void ExitCurrentProcess(int exitcode)
+        public void Exit(int exitcode)
         {
             Environment.Exit(exitcode);
         }

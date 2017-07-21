@@ -70,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                         () =>
                             {
                                 EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
-                                new PlatformEnvironment().ExitCurrentProcess(1);
+                                new PlatformEnvironment().Exit(1);
                             });
                 }
 
