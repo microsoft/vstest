@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// The test extension information.
@@ -307,7 +308,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilitie
                 {
                     var testPluginInformation = extension.Value as TestPluginInformation;
                     var extensionType = Type.GetType(testPluginInformation?.AssemblyQualifiedName);
-                    if (string.Equals(extensionType.GetTypeInfo().Assembly.Location, extensionAssembly))
+                    if (string.Equals(extensionType.GetTypeInfo().Assembly.GetAssemblyLocation(), extensionAssembly))
                     {
                         extensions.Add(extension.Key, extension.Value);
                     }

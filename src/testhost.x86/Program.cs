@@ -30,7 +30,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             try
             {
                 TestPlatformEventSource.Instance.TestHostStart();
-                WaitForDebuggerIfEnabled();
                 Run(args);
             }
             catch (Exception ex)
@@ -46,8 +45,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private static void Run(string[] args)
+        // In UWP(App models) Run will act as entry point from Application end, so making this method public
+        public static void Run(string[] args)
         {
+            WaitForDebuggerIfEnabled();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
             
             // Invoke the engine with arguments
@@ -91,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
                 while (!Debugger.IsAttached)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Tasks.Task.Delay(1000).Wait();
                 }
 
                 Debugger.Break();
