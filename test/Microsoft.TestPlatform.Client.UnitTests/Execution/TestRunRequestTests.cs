@@ -189,17 +189,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Execution
             var testRunRequest = new TestRunRequest(testRunCriteria, executionManager.Object);
 
             ManualResetEvent onTestSessionTimeoutCalled = new ManualResetEvent(true);
-
-            executionManager.Setup(o => o.StartTestRun(testRunCriteria, testRunRequest)).Callback(() => { System.Threading.Thread.Sleep(3 * 1000); });
-
+            onTestSessionTimeoutCalled.Reset();
             executionManager.Setup(o => o.Cancel()).Callback(() => onTestSessionTimeoutCalled.Set());
 
             testRunRequest.ExecuteAsync();
-
             onTestSessionTimeoutCalled.WaitOne(20 * 1000);
 
             executionManager.Verify(o => o.Cancel(), Times.Once);
-
         }
 
         [TestMethod]

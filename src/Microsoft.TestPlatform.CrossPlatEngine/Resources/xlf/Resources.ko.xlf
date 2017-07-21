@@ -172,6 +172,11 @@
         <target state="translated">{0} 파일에 TestHost Diagnostics 로깅 중</target>
         <note />
       </trans-unit>
+      <trans-unit id="CancelationRequested">
+        <source>Canceling test run as cancelation requested.</source>
+        <target state="new">Canceling test run as cancelation requested.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

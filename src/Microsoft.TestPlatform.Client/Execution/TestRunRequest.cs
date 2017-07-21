@@ -21,6 +21,39 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
     public class TestRunRequest : ITestRunRequest, ITestRunEventsHandler
     {
+        /// <summary>
+        /// The criteria/config for this test run request.
+        /// </summary>
+        internal TestRunCriteria testRunCriteria;
+
+        /// <summary>
+        /// Specifies whether the run is disposed or not
+        /// </summary>
+        private bool disposed;
+
+        /// <summary>
+        /// Sync object for various operations
+        /// </summary>
+        private object syncObject = new Object();
+
+        /// <summary>
+        /// The run completion event which will be signalled on completion of test run.
+        /// </summary>
+        private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
+
+        /// <summary>
+        /// Tracks the time taken by each run request
+        /// </summary>
+        private Stopwatch runRequestTimeTracker;
+
+        private IDataSerializer dataSerializer;
+
+        /// <summary>
+        /// Time out for run provided by client.
+        /// </summary>
+        private long testSessionTimeout;
+
+        private Timer timer;
 
         internal TestRunRequest(TestRunCriteria testRunCriteria, IProxyExecutionManager executionManager) :
             this(testRunCriteria, executionManager, JsonDataSerializer.Instance)
@@ -81,6 +114,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
                     if (testSessionTimeout > 0)
                     {
+                        if (EqtTrace.IsVerboseEnabled)
+                        {
+                            EqtTrace.Verbose(String.Format("TestRunRequest.ExecuteAsync: TestSessionTimeout is {0} milliseconds.", testSessionTimeout));
+                        }
+
                         this.timer = new Timer(this.OnTestSessionTimeout, null, TimeSpan.FromMilliseconds(testSessionTimeout), TimeSpan.FromMilliseconds(0));
                     }
 
@@ -103,6 +141,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
         internal void OnTestSessionTimeout(object obj)
         {
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(String.Format("TestRunRequest.OnTestSessionTimeout: calling cancelation as test run exceeded testSessionTimeout {0} milliseconds", testSessionTimeout));
+            }
+
             string message = String.Format(ClientResources.TestSessionTimeoutMessage, this.testSessionTimeout);
             var testMessagePayload = new CommunicationObjectModel.TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = message };
             var rawMessage = this.dataSerializer.SerializePayload(CommunicationObjectModel.MessageType.TestMessage, testMessagePayload);
@@ -467,36 +510,5 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Execution
 
             EqtTrace.Info("TestRunRequest.Dispose: Completed.");
         }
-
-        /// <summary>
-        /// The criteria/config for this test run request.
-        /// </summary>
-        internal TestRunCriteria testRunCriteria;
-
-        /// <summary>
-        /// Specifies whether the run is disposed or not
-        /// </summary>
-        private bool disposed;
-
-        /// <summary>
-        /// Sync object for various operations
-        /// </summary>
-        private object syncObject = new Object();
-
-        /// <summary>
-        /// The run completion event which will be signalled on completion of test run. 
-        /// </summary>
-        private ManualResetEvent runCompletionEvent = new ManualResetEvent(true);
-
-        /// <summary>
-        /// Tracks the time taken by each run request
-        /// </summary>
-        private Stopwatch runRequestTimeTracker;
-
-        private IDataSerializer dataSerializer;
-
-        private long testSessionTimeout;
-
-        private Timer timer;
     }
 }

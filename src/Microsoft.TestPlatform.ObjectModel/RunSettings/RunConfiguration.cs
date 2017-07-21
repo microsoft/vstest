@@ -162,7 +162,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets or sets the frequency of the runStats/discoveredTests event. Should be non-negative integer.
+        /// Gets or sets the testSessionTimeout. Should be non-negative integer.
         /// </summary>
         public long TestSessionTimeout
         {

@@ -27,9 +27,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(2, 2, 2);
         }
 
-        // Randomly failing with error "The active test run was aborted. Reason: Destination array was not long enough.
-        // Check destIndex and length, and the array's lower bounds. Test Run Failed."
-        // Issue: https://github.com/Microsoft/vstest/issues/292
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
@@ -75,6 +72,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 numOfProcessCreatedTask.Result,
                 $"Number of {testhostProcessName} process created, expected: {expectedNumOfProcessCreated} actual: {numOfProcessCreatedTask.Result}");
             this.ValidateSummaryStatus(2, 2, 2);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
+        public void TestSessionTimeOutTests(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest");
+
+            // set TestSessionTimeOut = 7 sec
+            arguments = string.Concat(arguments, " -- RunConfiguration.TestSessionTimeout=7000");
+            this.InvokeVsTest(arguments);
+
+            this.StdErrorContains("Test Run Canceled.");
+            this.StdErrorContains("Canceling test run as it exceeded TestSessionTimeout: 7000 milliseconds.");
+            this.StdOutputDoesNotContains("Total tests: 6");
         }
 
         [CustomDataTestMethod]

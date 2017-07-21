@@ -172,6 +172,11 @@
         <target state="translated">Ведение журналов диагностики TestHost в файле: {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="CancelationRequested">
+        <source>Canceling test run as cancelation requested.</source>
+        <target state="new">Canceling test run as cancelation requested.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

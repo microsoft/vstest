@@ -39,7 +39,7 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="14" adjWordcount="11.9" curWordcount="11.9"</note>
       </trans-unit>
       <trans-unit id="TestSessionTimeoutMessage">
-        <source>Canceling test run as it crossed testSessionTimeout: {0} milliseconds.</source>
+        <source>Canceling test run as it exceeded TestSessionTimeout: {0} milliseconds.</source>
         <target state="new">Canceling test run as it crossed testSessionTimeout: {0} milliseconds.</target>
         <note></note>
       </trans-unit>

@@ -172,6 +172,11 @@
         <target state="translated">Die TestHost-Diagnose wird in der Datei {0} protokolliert.</target>
         <note />
       </trans-unit>
+      <trans-unit id="CancelationRequested">
+        <source>Canceling test run as cancelation requested.</source>
+        <target state="new">Canceling test run as cancelation requested.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
