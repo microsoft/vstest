@@ -110,7 +110,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
                 catch (Exception ex)
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
+                    EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
                 }
 
                 // Warn the user that execution will wait for debugger attach.
