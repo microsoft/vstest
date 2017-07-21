@@ -115,6 +115,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to launch testhost with error: {0}.
+        /// </summary>
+        internal static string FailedToLaunchTestHost {
+            get {
+                return ResourceManager.GetString("FailedToLaunchTestHost", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Could not find file {0}..
         /// </summary>
         internal static string FileNotFound {
