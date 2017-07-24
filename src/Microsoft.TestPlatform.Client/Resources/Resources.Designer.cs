@@ -79,7 +79,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to Canceling test run as it exceeded TestSessionTimeout: {0} milliseconds..
+        ///   Looks up a localized string similar to Canceling test run : test run timeout of {0} milliseconds exceeded..
         /// </summary>
         internal static string TestSessionTimeoutMessage
         {
