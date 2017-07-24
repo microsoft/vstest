@@ -13,9 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class DefaultEngineInvoker :
 #if NET451
@@ -62,14 +60,19 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 // Attach to exit of parent process
                 var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
                 EqtTrace.Info("DefaultEngineInvoker: Monitoring parent process with id: '{0}'", parentProcessId);
-                var processHelper = new ProcessHelper();
-                processHelper.SetExitCallback(
-                    parentProcessId,
-                    () =>
-                        {
-                            EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
-                            Environment.Exit(1);
-                        });
+
+                // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
+                if (parentProcessId != -1)
+                {
+                    var processHelper = new ProcessHelper();
+                    processHelper.SetExitCallback(
+                        parentProcessId,
+                        () =>
+                            {
+                                EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
+                                new PlatformEnvironment().Exit(1);
+                            });
+                }
 
                 // Initialize Communication
                 EqtTrace.Info("DefaultEngineInvoker: Initialize communication on port number: '{0}'", portNumber);

@@ -11,13 +11,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
     public interface IAssemblyLoadContext
     {
         /// <summary>
-        /// Gets the location of current assembly
-        /// </summary>
-        /// <param name="assembly">Assembly</param>
-        /// <returns>Assembly location</returns>
-        string GetAssemblyLocation(Assembly assembly);
-
-        /// <summary>
         /// Loads assembly from given path
         /// </summary>
         /// <param name="assemblyPath">Assembly path</param>
