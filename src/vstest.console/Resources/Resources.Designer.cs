@@ -1116,6 +1116,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Error opening response file {0}
+        /// </summary>
+        public static string OpenResponseFileError
+        {
+            get
+            {
+                return ResourceManager.GetString("OpenResponseFileError", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to -o|--Output|/o|/Output:&lt;Output&gt;
         ///      The directory containing the binaries to run..
         /// </summary>
@@ -1265,6 +1276,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
             get
             {
                 return ResourceManager.GetString("ResultsDirectoryValueRequired", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to @&lt;file&gt;
+        ///      Read response file for more options.
+        /// </summary>
+        public static string ResponseFileArgumentHelp
+        {
+            get
+            {
+                return ResourceManager.GetString("ResponseFileArgumentHelp", resourceCulture);
             }
         }
 
