@@ -1567,6 +1567,16 @@
       Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAborted">
+        <source>Test Run Aborted.</source>
+        <target state="new">Test Run Aborted.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunCanceled">
+        <source>Test Run Canceled.</source>
+        <target state="new">Test Run Canceled.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

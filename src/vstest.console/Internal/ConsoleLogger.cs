@@ -412,7 +412,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 Output.Information(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, testsTotal, testsPassed, testsFailed, testsSkipped));
 
-                if (this.testOutcome == TestOutcome.Failed)
+                if (e.IsCanceled)
+                {
+                    Output.Error(CommandLineResources.TestRunCanceled);
+                }
+                else if(e.IsAborted)
+                {
+                    Output.Error(CommandLineResources.TestRunAborted);
+                }
+                else if(this.testOutcome == TestOutcome.Failed)
                 {
                     Output.Error(CommandLineResources.TestRunFailed);
                 }
