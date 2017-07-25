@@ -11,6 +11,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// <inheritdoc/>
     public class SocketTransport : ITransport
     {
+        /// <summary>
+        /// Specifies whether the resolver is disposed or not
+        /// </summary>
+        private bool disposed;
+
         private ConnectionInfo connectionInfo;
 
         private ICommunicationManager communicationManager;
@@ -50,6 +55,35 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public bool WaitForConnectionToEstablish(int connectionTimeout)
         {
             return this.connectionInfo.Role == ConnectionRole.Client ? this.communicationManager.WaitForServerConnection(connectionTimeout) : this.communicationManager.WaitForClientConnection(connectionTimeout);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+
+            // Use SupressFinalize in case a subclass
+            // of this type implements a finalizer.
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!this.disposed)
+            {
+                if (disposing)
+                {
+                    if (this.connectionInfo.Role == ConnectionRole.Client)
+                    {
+                        this.communicationManager?.StopClient();
+                    }
+                    else
+                    {
+                        this.communicationManager?.StopServer();
+                    }
+                }
+
+                this.disposed = true;
+            }
         }
     }
 }

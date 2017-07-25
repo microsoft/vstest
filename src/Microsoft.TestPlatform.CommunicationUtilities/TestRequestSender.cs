@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void Dispose()
         {
-            this.communicationManager?.StopServer();
+            this.transport.Dispose();
         }
 
         /// <inheritdoc/>

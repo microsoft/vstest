@@ -3,10 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
+    using System;
+
     /// <summary>
     /// The transport Layer Interface
     /// </summary>
-    public interface ITransport
+    public interface ITransport : IDisposable
     {
         /// <summary>
         /// Initializes Transport Layer depending upon TransportProtocol

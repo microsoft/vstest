@@ -59,11 +59,50 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void InitializeCommunicationShouldSetUpClientIfTestRunnerIsClient()
+        {
+            this.mockCommunicationManager.Setup(mc => mc.SetupClientAsync(IPAddress.Loopback + ":0"));
+
+            // These settings are that of Test runtime(testhost)
+            this.connectionInfo = new ConnectionInfo
+                                      {
+                                          Endpoint = IPAddress.Loopback + ":0",
+                                          Role = ConnectionRole.Host,
+                                          Channel = TransportChannel.Sockets
+                                      };
+            this.testRequestSender = new TestRequestSender(this.mockCommunicationManager.Object, this.connectionInfo, this.mockDataSerializer.Object, this.protocolConfig);
+            this.CheckAndSetProtocolVersion();
+
+            this.testRequestSender.InitializeCommunication();
+
+            this.mockCommunicationManager.Verify(mc => mc.SetupClientAsync(IPAddress.Loopback + ":0"), Times.Once);
+        }
+
+        [TestMethod]
         public void WaitForRequestHandlerConnectionShouldCallWaitForClientConnection()
         {
             this.testRequestSender.WaitForRequestHandlerConnection(123);
 
             this.mockCommunicationManager.Verify(mc => mc.WaitForClientConnection(123), Times.Once);
+        }
+
+        [TestMethod]
+        public void WaitForRequestHandlerConnectionShouldCallWaitForServerConnectionIfTestRunnerIsClient()
+        {
+            // These settings are that of Test runtime(testhost)
+            this.connectionInfo = new ConnectionInfo
+                                      {
+                                          Endpoint = IPAddress.Loopback + ":0",
+                                          Role = ConnectionRole.Host,
+                                          Channel = TransportChannel.Sockets
+                                      };
+
+            this.testRequestSender = new TestRequestSender(this.mockCommunicationManager.Object, this.connectionInfo, this.mockDataSerializer.Object, this.protocolConfig);
+            this.CheckAndSetProtocolVersion();
+
+            this.testRequestSender.WaitForRequestHandlerConnection(123);
+
+            this.mockCommunicationManager.Verify(mc => mc.WaitForServerConnection(123), Times.Once);
         }
 
         [TestMethod]
