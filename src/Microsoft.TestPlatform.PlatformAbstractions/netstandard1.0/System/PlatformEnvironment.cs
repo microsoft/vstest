@@ -3,8 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using System;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc />
     public class PlatformEnvironment : IEnvironment
@@ -25,6 +25,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             {
                 throw new NotImplementedException();
             }
+        }
+
+        /// <inheritdoc />
+        public void Exit(int exitcode)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public int GetCurrentManagedThreadId()
+        {
+            throw new NotImplementedException();
         }
     }
 }

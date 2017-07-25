@@ -11,10 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
     using System.Reflection;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
-#if !NET451
-    using System.Runtime.Loader;
-#endif
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     internal class AssemblyResolver : IDisposable
     {
@@ -33,6 +31,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// Specifies whether the resolver is disposed or not
         /// </summary>
         private bool isDisposed;
+
+        /// <summary>
+        /// Assembly resolver for platform
+        /// </summary>
+        private IAssemblyResolver platformAssemblyResolver;
+
+        private IAssemblyLoadContext platformAssemblyLoadContext;
 
         private static readonly string[] SupportedFileExtensions = new string[] { ".dll", ".exe" };
 
@@ -53,13 +58,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 this.searchDirectories = new HashSet<string>(directories);
             }
-#if NET451
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(OnResolve);
-#else
-            AssemblyLoadContext.Default.Resolving += this.OnResolve;
-#endif
-        }
 
+            this.platformAssemblyResolver = new PlatformAssemblyResolver();
+            this.platformAssemblyLoadContext = new PlatformAssemblyLoadContext();
+
+            this.platformAssemblyResolver.AssemblyResolve += this.OnResolve;
+        }
 
         /// <summary>
         /// Set the directories from which assemblies should be searched
@@ -74,17 +78,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             }
         }
 
-
         /// <summary>
         /// Assembly Resolve event handler for App Domain - called when CLR loader cannot resolve assembly.
         /// </summary>
+        /// <returns>
+        /// The <see cref="Assembly"/>.
+        /// </returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.Reflection.Assembly.LoadFrom")]
-#if NET451
-        private Assembly OnResolve(object senderAppDomain, ResolveEventArgs args)
-#else
-        private Assembly OnResolve(AssemblyLoadContext loadContext, AssemblyName args)
-#endif
+        private Assembly OnResolve(object sender, AssemblyResolveEventArgs args)
         {
             if (string.IsNullOrEmpty(args?.Name))
             {
@@ -100,7 +102,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             EqtTrace.Info("AssemblyResolver: {0}: Resolving assembly.", args.Name);
 
             // args.Name is like: "Microsoft.VisualStudio.TestTools.Common, Version=[VersionMajor].0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a".
-
             lock (this.resolvedAssemblies)
             {
                 Assembly assembly;
@@ -122,8 +123,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     {
                         EqtTrace.Info("AssemblyResolver: {0}: Failed to create assemblyName. Reason:{1} ", args.Name, ex);
                     }
+
                     return null;
                 }
+
                 Debug.Assert(requestedName != null && !string.IsNullOrEmpty(requestedName.Name), "AssemblyResolver.OnResolve: requested is null or name is empty!");
 
                 foreach (var dir in this.searchDirectories)
@@ -132,7 +135,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                     {
                         continue;
                     }
-
 
                     foreach (var extension in SupportedFileExtensions)
                     {
@@ -144,23 +146,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
                                 continue;
                             }
 
-#if NET451
-                            AssemblyName foundName = AssemblyName.GetAssemblyName(assemblyPath);
+                            AssemblyName foundName = this.platformAssemblyLoadContext.GetAssemblyNameFromPath(assemblyPath);
+
                             if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
                             {
                                 continue;   // File exists but version/public key is wrong. Try next extension.
                             }
 
-                            // When file does not exist it throws FileNotFoundException.
-                            assembly = Assembly.LoadFrom(assemblyPath);
-#else
-                            AssemblyName foundName = AssemblyLoadContext.GetAssemblyName(assemblyPath);
-                            if (!this.RequestedAssemblyNameMatchesFound(requestedName, foundName))
-                            {
-                                continue;   // File exists but version/public key is wrong. Try next extension.
-                            }
-                            assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
+                            assembly = this.platformAssemblyLoadContext.LoadAssemblyFromPath(assemblyPath);
                             this.resolvedAssemblies[args.Name] = assembly;
 
                             EqtTrace.Info("AssemblyResolver: {0}: Resolved assembly. ", args.Name);
@@ -193,6 +186,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
         /// Looks only at PublicKeyToken and Version, empty matches anything.
         /// VSWhidbey 415774.
         /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
         private bool RequestedAssemblyNameMatchesFound(AssemblyName requestedName, AssemblyName foundName)
         {
             Debug.Assert(requestedName != null);
@@ -224,7 +220,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             return true;
         }
 
-
         ~AssemblyResolver()
         {
             this.Dispose(false);
@@ -238,7 +233,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             // of this type implements a finalizer.
             GC.SuppressFinalize(this);
         }
-        
+
         [System.Security.SecurityCritical]
         protected virtual void Dispose(bool disposing)
         {
@@ -246,11 +241,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Utilities
             {
                 if (disposing)
                 {
-#if NET451
-                    AppDomain.CurrentDomain.AssemblyResolve -= new ResolveEventHandler(OnResolve);
-#else
-                    AssemblyLoadContext.Default.Resolving -= this.OnResolve;
-#endif
+                    this.platformAssemblyResolver.AssemblyResolve -= this.OnResolve;
+                    this.platformAssemblyResolver.Dispose();
                 }
 
                 this.isDisposed = true;

@@ -110,7 +110,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 }
                 catch (Exception ex)
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, ex.Message));
+                    EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
+                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
                 }
 
                 // Warn the user that execution will wait for debugger attach.
@@ -227,7 +228,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 string.Format(
                     "host.{0}_{1}{2}",
                     DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff"),
-                    Thread.CurrentThread.ManagedThreadId,
+                    new PlatformEnvironment().GetCurrentManagedThreadId(),
                     Path.GetExtension(logFile))).AddDoubleQuote();
         }
 

@@ -13,9 +13,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-#if !NET451
-    using System.Runtime.Loader;
-#endif
 
     /// <summary>
     /// Discovers test extensions in a directory.
@@ -133,11 +130,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             Debug.Assert(pluginInfos != null, "null pluginInfos");
 
             // TODO: Do not see why loadOnlyWellKnowExtensions is still needed.
-            //AssemblyName executingAssemblyName = null;
-            //if (loadOnlyWellKnownExtensions)
-            //{
+            // AssemblyName executingAssemblyName = null;
+            // if (loadOnlyWellKnownExtensions)
+            // {
             //    executingAssemblyName = new AssemblyName(typeof(TestPluginDiscoverer).GetTypeInfo().Assembly.FullName);
-            //}
+            // }
 
             // Scan each of the files for data extensions.
             foreach (var file in files)
@@ -153,15 +150,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     }
 
                     // Check whether this assembly is known or not.
-                    //if (loadOnlyWellKnownExtensions && assembly != null)
-                    //{
+                    // if (loadOnlyWellKnownExtensions && assembly != null)
+                    // {
                     //    var extensionAssemblyName = new AssemblyName(assembly.FullName);
                     //    if (!AssemblyUtilities.PublicKeyTokenMatches(extensionAssemblyName, executingAssemblyName))
                     //    {
                     //        EqtTrace.Warning("TestPluginDiscoverer: Ignoring extensions in assembly {0} as it is not a known assembly.", assembly.FullName);
                     //        continue;
                     //    }
-                    //}
+                    // }
                 }
                 catch (Exception e)
                 {

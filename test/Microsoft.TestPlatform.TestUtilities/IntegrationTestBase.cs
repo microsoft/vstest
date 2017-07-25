@@ -179,6 +179,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             Assert.IsTrue(this.standardTestOutput.Contains(substring));
         }
 
+        public void StdOutputDoesNotContains(string substring)
+        {
+            Assert.IsFalse(this.standardTestOutput.Contains(substring));
+        }
+
         /// <summary>
         /// Validates if the test results have the specified set of passed tests.
         /// </summary>
