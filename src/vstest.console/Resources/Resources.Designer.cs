@@ -1733,6 +1733,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Test Run Canceled..
+        /// </summary>
+        public static string TestRunCanceled
+        {
+            get
+            {
+                return ResourceManager.GetString("TestRunCanceled", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test Run Aborted..
+        /// </summary>
+        public static string TestRunAborted
+        {
+            get
+            {
+                return ResourceManager.GetString("TestRunAborted", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Total tests: {0}. Passed: {1}. Failed: {2}. Skipped: {3}..
         /// </summary>
         public static string TestRunSummary
