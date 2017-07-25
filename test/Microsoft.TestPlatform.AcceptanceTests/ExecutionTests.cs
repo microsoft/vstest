@@ -91,7 +91,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.InvokeVsTest(arguments);
 
             this.StdErrorContains("Test Run Canceled.");
-            this.StdErrorContains("Canceling test run : test run timeout of 700 milliseconds exceeded.");
+            this.StdErrorContains("Canceling test run : test run timeout of 7000 milliseconds exceeded.");
             this.StdOutputDoesNotContains("Total tests: 6");
         }
 
