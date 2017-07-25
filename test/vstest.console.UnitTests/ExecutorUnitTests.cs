@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
 {
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -129,6 +130,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
             File.Delete(testSourceDllPath);
         }
 
+        [TestMethod]
+        public void ExecuteShouldExitWithErrorOnResponseFileException()
+        {
+            string[] args = { "@FileDoesNotExist.rsp" };
+            var mockOutput = new MockOutput();
+
+            var exitCode = new Executor(mockOutput, this.mockTestPlatformEventSource.Object).Execute(args);
+
+            var errorMessageCount = mockOutput.Messages.Count(msg => msg.Level == OutputLevel.Error && msg.Message.Contains(
+                string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, args[0].Substring(1))));
+            Assert.AreEqual(1, errorMessageCount, "Response File Exception should display error.");
+            Assert.AreEqual(1, exitCode, "Response File Exception execution should exit with error.");
+        }
 
         private class MockOutput : IOutput
         {
