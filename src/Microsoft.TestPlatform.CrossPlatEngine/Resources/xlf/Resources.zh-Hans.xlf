@@ -139,9 +139,9 @@
         <note from="bb-metadata">fuzzyMatch="0" wordcount="0" adjWordcount="0" curWordcount="0"</note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
-        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
-        <target state="translated">没有与筛选器匹配的测试，因为该筛选器包含一个或多个无效属性 ({0})。请指定包含有效属性 ({1}) 的筛选器表达式，然后重试。</target>
-        <note />
+        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
+        <target state="new">没有与筛选器匹配的测试，因为该筛选器包含一个或多个无效属性 ({0})。请指定包含有效属性 ({1}) 的筛选器表达式，然后重试。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">没有测试匹配筛选器，因为它包含一个或多个属性无效 ({0})。指定筛选器表达式，其中包含有效的属性 ({1})，然后重试。</target>
         </alt-trans>
@@ -171,6 +171,11 @@
         <source>Logging TestHost Diagnostics in file: {0}</source>
         <target state="translated">在文件 {0} 中记录 TestHost 诊断</target>
         <note />
+      </trans-unit>
+      <trans-unit id="FailedToLaunchTestHost">
+        <source>Failed to launch testhost with error: {0}</source>
+        <target state="new">Failed to launch testhost with error: {0}</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

@@ -55,7 +55,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="UnsupportedPropertiesInTestCaseFilter">
-        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}) and try again.</source>
+        <source>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</source>
         <note></note>
       </trans-unit>
       <trans-unit id="NoDotnetExeFound">
@@ -81,6 +81,11 @@
       <trans-unit id="TesthostDiagLogOutputFile">
         <source>Logging TestHost Diagnostics in file: {0}</source>
         <target state="new">Logging TestHost Diagnostics in file: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="FailedToLaunchTestHost">
+        <source>Failed to launch testhost with error: {0}</source>
+        <target state="new">Failed to launch testhost with error: {0}</target>
         <note></note>
       </trans-unit>
     </body>

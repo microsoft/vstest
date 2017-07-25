@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
             this.TestRunStatistics = stats;
             this.IsCanceled = isCanceled;
             this.IsAborted = isAborted;
-            this.Error = null; // Passing error value as null, should be pass exception. Issue: https://github.com/Microsoft/vstest/issues/618
+            this.Error = error;
             this.AttachmentSets = attachmentSets;
             this.ElapsedTimeInRunningTests = elapsedTime;
         }

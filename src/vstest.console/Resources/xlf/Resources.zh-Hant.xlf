@@ -799,13 +799,13 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework 版本&gt;
+        <target state="new">--Framework|/Framework:&lt;Framework 版本&gt;
       要用於測試執行的目標 .Net Framework 版本。
       有效值為 ".NETFramework,Version=v4.6"、".NETCoreApp,Version=v1.0" 等
       其他支援的值為 Framework35、Framework40、Framework45 和 FrameworkCore10。</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">— 框架 | / 框架︰ &lt; 框架版本 &gt;
       目标.Net Framework 版本以用于测试执行。
@@ -815,18 +815,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
-        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="translated">/Framework 引數需要測試回合的目標 .NET Framework 版本。範例:  /Framework:".NETFramework,Version=v4.6"</target>
-        <note />
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
+        <target state="new">/Framework 引數需要測試回合的目標 .NET Framework 版本。範例:  /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/Framework 参数要求目标.Net Framework 版本的测试运行。  例如︰ /Framework:"。NETFramework、 版本 = v4.6"</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
-        <target state="translated">.NET Framework 版本無效: {0}。請指定 TargetFramework 的全名。其他支援的 .Net Framework 版本為 Framework35、Framework40 和 Framework45。</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
+        <target state="new">.NET Framework 版本無效: {0}。請指定 TargetFramework 的全名。其他支援的 .Net Framework 版本為 Framework35、Framework40 和 Framework45。</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">无效的.Net Framework 版本︰ {0}。 请给 TargetFramework 的全名。其他受支持的.Net Framework 版本是 Framework35、 Framework40 和 Framework45。</target>
         </alt-trans>
@@ -1546,6 +1546,18 @@
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
         <target state="translated">資料收集器的易記名稱 '{0}' 無效。該資料收集器將予忽略。</target>
         <note />
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnableBlameUsage">
+        <source>--Blame|/Blame
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
+        <target state="new">--Blame|/Blame
+      Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Specifies whether the Fakes automatic configuration should be disabled.
         /// </summary>
-        public bool DisableAutoFakes { get; set; }
+        public bool DisableAutoFakes { get; set; } = false;
 
         /// <summary>
         /// Specifies whether vsixExtensions is enabled or not. 
@@ -209,6 +209,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             get;
             set;
         }
+
+        /// <summary>
+        /// If not already set from IDE in the runSettings, ShouldCollectSourceInformation defaults to IsDesignMode value        
+        /// </summary>
+        public bool ShouldCollectSourceInformation
+        {
+            get
+            {
+                return IsDesignMode;
+            }
+        }        
 
         /// <summary>
         /// Specifies if /Platform has been specified on command line or not.

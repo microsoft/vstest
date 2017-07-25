@@ -13,15 +13,16 @@
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <copyright>© Microsoft Corporation. All rights reserved.</copyright>
     <dependencies>
-      <group targetFramework="net46">
+      <group targetFramework="net451">
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.3.0, )" />
+        <dependency id="System.Reflection.Metadata" version="[1.3.0, )" />
       </group>
       <group targetFramework="netstandard1.5">
         <dependency id="NETStandard.Library" version="[1.6.1, )" />
         <dependency id="System.ComponentModel.EventBasedAsync" version="[4.3.0, )" />
         <dependency id="System.ComponentModel.TypeConverter" version="[4.3.0, )" />
         <dependency id="System.Reflection.TypeExtensions" version="[4.3.0, )" />
-        <dependency id="System.Reflection.Metadata" version="[1.4.2, )" />
+        <dependency id="System.Reflection.Metadata" version="[1.3.0, )" />
         <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.3.0, )" />
         <dependency id="System.Runtime.Loader" version="[4.3.0, )" />
         <dependency id="System.Runtime.Serialization.Primitives" version="[4.3.0, )" />
@@ -47,42 +48,42 @@
     </frameworkAssemblies>
   </metadata>
   <files>	
-    <file src="net46\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net46\" />
-    <file src="net46\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net46\" />
-    <file src="net46\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\net46\" />
+    <file src="net451\$Runtime$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\net451\" />
+    <file src="net451\$Runtime$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\net451\" />
+    <file src="net451\$Runtime$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\net451\" />
 
     <file src="$NetCoreTargetFramework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.5\" />
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.5\" />
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard1.5\" />
 
     <!-- Add localized resources -->
-    <file src="net46\$Runtime$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\cs" />
-    <file src="net46\$Runtime$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\de" />
-    <file src="net46\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\es" />
-    <file src="net46\$Runtime$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\fr" />
-    <file src="net46\$Runtime$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\it" />
-    <file src="net46\$Runtime$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\ja" />
-    <file src="net46\$Runtime$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\ko" />
-    <file src="net46\$Runtime$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\pl" />
-    <file src="net46\$Runtime$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\pt-BR" />
-    <file src="net46\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\ru" />
-    <file src="net46\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\tr" />
-    <file src="net46\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\zh-Hans" />
-    <file src="net46\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net46\zh-Hant" />
+    <file src="net451\$Runtime$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\cs" />
+    <file src="net451\$Runtime$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\de" />
+    <file src="net451\$Runtime$\es\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\es" />
+    <file src="net451\$Runtime$\fr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\fr" />
+    <file src="net451\$Runtime$\it\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\it" />
+    <file src="net451\$Runtime$\ja\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ja" />
+    <file src="net451\$Runtime$\ko\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ko" />
+    <file src="net451\$Runtime$\pl\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\pl" />
+    <file src="net451\$Runtime$\pt-BR\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\pt-BR" />
+    <file src="net451\$Runtime$\ru\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\ru" />
+    <file src="net451\$Runtime$\tr\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\tr" />
+    <file src="net451\$Runtime$\zh-Hans\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hans" />
+    <file src="net451\$Runtime$\zh-Hant\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\zh-Hant" />
 
-    <file src="net46\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\cs" />
-    <file src="net46\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\de" />
-    <file src="net46\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\es" />
-    <file src="net46\$Runtime$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\fr" />
-    <file src="net46\$Runtime$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\it" />
-    <file src="net46\$Runtime$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\ja" />
-    <file src="net46\$Runtime$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\ko" />
-    <file src="net46\$Runtime$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\pl" />
-    <file src="net46\$Runtime$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\pt-BR" />
-    <file src="net46\$Runtime$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\ru" />
-    <file src="net46\$Runtime$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\tr" />
-    <file src="net46\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\zh-Hans" />
-    <file src="net46\$Runtime$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net46\zh-Hant" />
+    <file src="net451\$Runtime$\cs\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\cs" />
+    <file src="net451\$Runtime$\de\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\de" />
+    <file src="net451\$Runtime$\es\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\es" />
+    <file src="net451\$Runtime$\fr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\fr" />
+    <file src="net451\$Runtime$\it\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\it" />
+    <file src="net451\$Runtime$\ja\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ja" />
+    <file src="net451\$Runtime$\ko\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ko" />
+    <file src="net451\$Runtime$\pl\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pl" />
+    <file src="net451\$Runtime$\pt-BR\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\pt-BR" />
+    <file src="net451\$Runtime$\ru\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\ru" />
+    <file src="net451\$Runtime$\tr\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\tr" />
+    <file src="net451\$Runtime$\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hans" />
+    <file src="net451\$Runtime$\zh-Hant\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="lib\net451\zh-Hant" />
 
     <file src="$NetCoreTargetFramework$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.5\cs" />
     <file src="$NetCoreTargetFramework$\de\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\netstandard1.5\de" />

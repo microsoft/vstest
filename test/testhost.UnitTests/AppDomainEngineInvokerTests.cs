@@ -3,7 +3,7 @@
 
 namespace testhost.UnitTests
 {
-#if NET46
+#if NET451
     using Microsoft.VisualStudio.TestPlatform.TestHost;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;

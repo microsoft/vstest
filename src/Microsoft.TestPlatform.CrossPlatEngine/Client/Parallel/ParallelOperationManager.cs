@@ -6,15 +6,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using System.Collections.Concurrent;
 
     /// <summary>
     /// Abstract class having common parallel manager implementation
     /// </summary>
-    internal abstract class ParallelOperationManager<T> : IParallelOperationManager, IDisposable
+    internal abstract class ParallelOperationManager<T, U> : IParallelOperationManager, IDisposable
     {
         #region ConcurrentManagerInstanceData
 
@@ -25,7 +26,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         protected bool SharedHosts { get; private set; }
 
-        protected T[] concurrentManagerInstances;
+        private IDictionary<T, U> concurrentManagerHandlerMap;
 
         /// <summary>
         /// Singleton Instance of this class
@@ -59,52 +60,115 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
+        /// Remove and dispose a manager from concurrent list of manager.
+        /// </summary>
+        /// <param name="manager">Manager to remove</param>
+        public void RemoveManager(T manager)
+        {
+            this.concurrentManagerHandlerMap.Remove(manager);
+            this.DisposeInstance(manager);
+        }
+
+        /// <summary>
+        /// Add a manager in concurrent list of manager.
+        /// </summary>
+        /// <param name="manager">Manager to add</param>
+        /// <param name="handler">eventHandler of the manager</param>
+        public void AddManager(T manager, U handler)
+        {
+            this.concurrentManagerHandlerMap.Add(manager, handler);
+        }
+
+        /// <summary>
+        /// Update event handler for the manager.
+        /// If it is a new manager, add this.
+        /// </summary>
+        /// <param name="manager">Manager to update</param>
+        /// <param name="handler">event handler to update for manager</param>
+        public void UpdateHandlerForManager(T manager, U handler)
+        {
+            if(this.concurrentManagerHandlerMap.ContainsKey(manager))
+            {
+                this.concurrentManagerHandlerMap[manager] = handler;
+            }
+            else
+            {
+                this.AddManager(manager, handler);
+            }
+        }
+
+        /// <summary>
+        /// Get the event handler associated with the manager.
+        /// </summary>
+        /// <param name="manager">Manager</param>
+        public U GetHandlerForGivenManager(T manager)
+        {
+            return this.concurrentManagerHandlerMap[manager];
+        }
+
+        /// <summary>
+        /// Get total number of active concurrent manager
+        /// </summary>
+        public int GetConcurrentManagersCount()
+        {
+            return this.concurrentManagerHandlerMap.Count;
+        }
+
+        /// <summary>
+        /// Get instances of all active concurrent manager
+        /// </summary>
+        public IEnumerable<T> GetConcurrentManagerInstances()
+        {
+            return this.concurrentManagerHandlerMap.Keys.ToList();
+        }
+
+
+        /// <summary>
         /// Updates the Concurrent Executors according to new parallel setting
         /// </summary>
         /// <param name="newParallelLevel">Number of Parallel Executors allowed</param>
         public void UpdateParallelLevel(int newParallelLevel)
         {
-            if (this.concurrentManagerInstances == null)
+            if (this.concurrentManagerHandlerMap == null)
             {
                 // not initialized yet
                 // create rest of concurrent clients other than default one
-                this.concurrentManagerInstances = new T[newParallelLevel];
+                this.concurrentManagerHandlerMap = new ConcurrentDictionary<T, U>();
                 for (int i = 0; i < newParallelLevel; i++)
                 {
-                    this.concurrentManagerInstances[i] = this.CreateNewConcurrentManager();
+                    this.AddManager(this.CreateNewConcurrentManager(), default(U));
                 }
             }
             else if (this.currentParallelLevel != newParallelLevel)
             {
-                var newManagerInstances = new List<T>();
-
                 // If number of concurrent clients is less than the new level
                 // Create more concurrent clients and update the list
                 if (this.currentParallelLevel < newParallelLevel)
                 {
-                    newManagerInstances.AddRange(this.concurrentManagerInstances);
                     for (int i = 0; i < newParallelLevel - this.currentParallelLevel; i++)
                     {
-                        newManagerInstances.Add(this.CreateNewConcurrentManager());
+                        this.AddManager(this.CreateNewConcurrentManager(), default(U));
                     }
                 }
                 else
                 {
                     // If number of concurrent clients is more than the new level
                     // Dispose off the extra ones
-                    for (int i = 0; i < newParallelLevel; i++)
-                    {
-                        newManagerInstances.Add(this.concurrentManagerInstances[i]);
-                    }
+                    int managersCount = currentParallelLevel - newParallelLevel;
 
-                    for (int i = newParallelLevel; i < this.currentParallelLevel; i++)
+                    foreach(var concurrentManager in this.GetConcurrentManagerInstances())
                     {
-                        this.DisposeInstance(this.concurrentManagerInstances[i]);
+                        if (managersCount == 0)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            this.RemoveManager(concurrentManager);
+                            managersCount--;
+                        }
                     }
                 }
-
-                // Update the current concurrent executor collection
-                this.concurrentManagerInstances = newManagerInstances.ToArray();
             }
 
             // Update current parallel setting to new one
@@ -113,9 +177,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         public void Dispose()
         {
-            if (this.concurrentManagerInstances != null)
+            if (this.concurrentManagerHandlerMap != null)
             {
-                foreach (var managerInstance in this.concurrentManagerInstances)
+                foreach (var managerInstance in this.GetConcurrentManagerInstances())
                 {
                     this.DisposeInstance(managerInstance);
                 }
@@ -126,16 +190,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         protected void DoActionOnAllManagers(Action<T> action, bool doActionsInParallel = false)
         {
-            if (this.concurrentManagerInstances != null && this.concurrentManagerInstances.Length > 0)
+            if (this.concurrentManagerHandlerMap != null && this.concurrentManagerHandlerMap.Count > 0)
             {
-                var actionTasks = new Task[this.concurrentManagerInstances.Length];
-                for (int i = 0; i < this.concurrentManagerInstances.Length; i++)
+                int i = 0;
+                var actionTasks = new Task[this.concurrentManagerHandlerMap.Count];
+                foreach (var client in this.GetConcurrentManagerInstances())
                 {
                     // Read the array before firing the task - beware of closures
-                    var client = this.concurrentManagerInstances[i];
                     if (doActionsInParallel)
                     {
                         actionTasks[i] = Task.Run(() => action(client));
+                        i++;
                     }
                     else
                     {
@@ -179,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var hasNext = false;
             lock (this.sourceEnumeratorLockObject)
             {
-                if (enumerator.MoveNext())
+                if (enumerator != null && enumerator.MoveNext())
                 {
                     source = (Y)enumerator.Current;
                     hasNext = source != null;

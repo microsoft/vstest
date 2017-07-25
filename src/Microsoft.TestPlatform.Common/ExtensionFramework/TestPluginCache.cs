@@ -3,23 +3,22 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 {
+#if NET451
+    using System.Threading;
+#endif
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
-#if NET46
-    using System.Threading;
-#else
-    using System.Runtime.Loader;
-#endif
 
     /// <summary>
     /// The test plugin cache.
@@ -46,6 +45,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Assembly resolver used to resolve the additional extensions
         /// </summary>
         private AssemblyResolver assemblyResolver;
+
+        private IAssemblyResolver platformAssemblyResolver;
 
         /// <summary>
         /// Lock for extensions update
@@ -126,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         #region Public Methods
 
         /// <summary>
-        /// Performs discovery of specific type of test extensions.
+        /// Performs discovery of specific type of test extensions in files ending with the specified pattern.
         /// </summary>
         /// <typeparam name="TPluginInfo">
         /// Type of Plugin info.
@@ -134,14 +135,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <typeparam name="TExtension">
         /// Type of extension.
         /// </typeparam>
-        /// <param name="regexPattern">
-        /// The regex Pattern.
+        /// <param name="endsWithPattern">
+        /// Pattern used to select files using String.EndsWith
         /// </param>
         /// <returns>
         /// The <see cref="Dictionary"/>. of test plugin info.
         /// </returns>
         [System.Security.SecurityCritical]
-        public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string regexPattern)
+        public Dictionary<string, TPluginInfo> DiscoverTestExtensions<TPluginInfo, TExtension>(string endsWithPattern)
             where TPluginInfo : TestPluginInformation
         {
             // Return the cached value if cache is valid.
@@ -158,11 +159,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             // and that succeeds.
             // Because of this assembly failure, below domain.CreateInstanceAndUnwrap() call fails with error
             // "Unable to cast transparent proxy to type 'Microsoft.VisualStudio.TestPlatform.Core.TestPluginsFramework.TestPluginDiscoverer"
-#if NET46
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomainAssemblyResolve);
-#else
-            AssemblyLoadContext.Default.Resolving += this.CurrentDomainAssemblyResolve;
-#endif
+            this.platformAssemblyResolver = new PlatformAssemblyResolver();
+            this.platformAssemblyResolver.AssemblyResolve += this.CurrentDomainAssemblyResolve;
+
             try
             {
                 EqtTrace.Verbose("TestPluginCache: Discovering the extensions using extension path.");
@@ -171,7 +170,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 var allExtensionPaths = new List<string>(this.DefaultExtensionPaths);
                 if (this.pathToExtensions != null)
                 {
-                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, regexPattern);
+                    var filteredExtensions = this.GetFilteredExtensions(this.pathToExtensions, endsWithPattern);
                     allExtensionPaths.AddRange(filteredExtensions);
                 }
 
@@ -200,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 this.LogExtensions();
             }
-#if NET46
+#if NET451
                 catch (ThreadAbortException)
                 {
                     // Nothing to do here, we just do not want to do an EqtTrace.Fail for this thread
@@ -218,11 +217,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
             finally
             {
-#if NET46
-                AppDomain.CurrentDomain.AssemblyResolve -= new ResolveEventHandler(CurrentDomainAssemblyResolve);
-#else
-                AssemblyLoadContext.Default.Resolving -= this.CurrentDomainAssemblyResolve;
-#endif
+                if (this.platformAssemblyResolver != null)
+                {
+                    this.platformAssemblyResolver.AssemblyResolve -= this.CurrentDomainAssemblyResolve;
+                    this.platformAssemblyResolver.Dispose();
+                }
 
                 // clear the assemblies
                 lock (this.resolvedAssemblies)
@@ -274,7 +273,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 // directory. The path to nuget directory is automatically setup for CLR to resolve.
                 // Test platform tries to load every extension by assembly name. If it is not resolved, we don't
                 // an error.
-
                 if (this.pathToExtensions != null)
                 {
                     extensions.AddRange(this.pathToExtensions);
@@ -316,6 +314,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             {
                 return this.defaultExtensionPaths;
             }
+
             set
             {
                 if (value != null)
@@ -340,12 +339,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// Gets files in a directory.
         /// </summary>
         /// <param name="path"></param>
-        /// <param name="searchPattern"></param>
+        /// <param name="endsWithPattern"></param>
         /// <returns></returns>
         /// <remarks>Added to mock out FileSystem interaction for unit testing.</remarks>
-        internal virtual string[] GetFilesInDirectory(string path, string searchPattern)
+        internal virtual string[] GetFilesInDirectory(string path, string endsWithPattern)
         {
-            return this.fileHelper.EnumerateFiles(path, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
+            return this.fileHelper.EnumerateFiles(path, SearchOption.TopDirectoryOnly, endsWithPattern).ToArray();
         }
 
         /// <summary>
@@ -354,16 +353,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         /// <param name="extensions">
         /// The extensions.
         /// </param>
-        /// <param name="searchPattern">
-        /// Regex search pattern of extension.
+        /// <param name="endsWithPattern">
+        /// Pattern used to select files using String.EndsWith
         /// </param>
         /// <returns>
         /// The list of files which match the regex pattern
         /// </returns>
-        internal virtual List<string> GetFilteredExtensions(List<string> extensions, string searchPattern)
+        internal virtual List<string> GetFilteredExtensions(List<string> extensions, string endsWithPattern)
         {
-            var regex = new Regex(searchPattern, RegexOptions.IgnoreCase);
-            return extensions.Where(ext => regex.IsMatch(ext)).ToList();
+            return extensions.Where(ext => ext.EndsWith(endsWithPattern, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
         /// <summary>
@@ -415,7 +413,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             var extensionDirectory = Path.GetDirectoryName(Path.GetFullPath(extensionAssembly));
             resolutionPaths.Add(extensionDirectory);
 
-            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
+            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation());
             if (!resolutionPaths.Contains(currentDirectory))
             {
                 resolutionPaths.Add(currentDirectory);
@@ -445,7 +443,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 resolutionPaths.AddRange(extensionDirectories);
             }
 
-            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.Location);
+            var currentDirectory = Path.GetDirectoryName(typeof(TestPluginCache).GetTypeInfo().Assembly.GetAssemblyLocation());
 
             if (!resolutionPaths.Contains(currentDirectory))
             {
@@ -509,11 +507,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
         }
 
-#if NET46
-        private Assembly CurrentDomainAssemblyResolve(object sender, ResolveEventArgs args)
-#else
-        private Assembly CurrentDomainAssemblyResolve(AssemblyLoadContext loadContext, AssemblyName args)
-#endif
+        private Assembly CurrentDomainAssemblyResolve(object sender, AssemblyResolveEventArgs args)
         {
             var assemblyName = new AssemblyName(args.Name);
 
@@ -542,7 +536,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
                 finally
                 {
-                    if (null == assembly)
+                    if (assembly == null)
                     {
                         EqtTrace.Verbose("CurrentDomainAssemblyResolve: Failed to resolve assembly '{0}'.", args.Name);
                     }

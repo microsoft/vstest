@@ -6,7 +6,7 @@
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
          Sets the AssemblyVersion, AssemblyFileVersion and AssemblyInformationalVersion -->
-    <Version Condition="'$(Version)' == ''">15.3.0-dev</Version>
+    <Version Condition="'$(Version)' == ''">15.5.0-dev</Version>
 
     <!-- Override the AssemblyVersion as 15.0.0 since protocol depends on this version for
          serialization. This is also defined in build script. -->
@@ -83,7 +83,7 @@
           <Version>$(MSTestAdapterVersion)</Version>
         </PackageReference>
         <PackageReference Include="Moq">
-          <Version>4.6.38-*</Version>
+          <Version>$(MoqVersion)</Version>
         </PackageReference>
         <PackageReference Include="MSTest.Assert.Extensions">
           <Version>$(MSTestAssertExtensionVersion)</Version>

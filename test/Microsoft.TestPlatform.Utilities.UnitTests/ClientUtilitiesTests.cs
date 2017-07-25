@@ -159,5 +159,29 @@ namespace Microsoft.TestPlatform.Utilities.Tests
 
             Assert.AreEqual(runSettingsXML, finalSettingsXml);
         }
+
+        [TestMethod]
+        public void FixRelativePathsInRunSettingsShouldExpandEnvironmentVariable()
+        {
+            var runSettingsXML = "<RunSettings><RunConfiguration><ResultsDirectory>%temp%\\results</ResultsDirectory></RunConfiguration></RunSettings>";
+
+            var doc = new XmlDocument();
+            doc.LoadXml(runSettingsXML);
+
+            var currentAssemblyLocation = typeof(ClientUtilitiesTests).GetTypeInfo().Assembly.Location;
+
+            ClientUtilities.FixRelativePathsInRunSettings(doc, currentAssemblyLocation);
+
+            var finalSettingsXml = doc.OuterXml;
+
+            var expectedPath = Environment.ExpandEnvironmentVariables("%temp%\\results");
+
+            var expectedSettingsXml = string.Concat(
+                "<RunSettings><RunConfiguration><ResultsDirectory>",
+                expectedPath,
+                "</ResultsDirectory></RunConfiguration></RunSettings>");
+
+            Assert.AreEqual(expectedSettingsXml, finalSettingsXml);
+        }
     }
 }

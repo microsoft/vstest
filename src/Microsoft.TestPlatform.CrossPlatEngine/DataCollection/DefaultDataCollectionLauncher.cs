@@ -9,7 +9,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     using System.IO;
     using System.Reflection;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -17,34 +18,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
     /// The datacollection launcher.
     /// This works for Desktop local scenarios
     /// </summary>
-    internal class DefaultDataCollectionLauncher : IDataCollectionLauncher
+    internal class DefaultDataCollectionLauncher : DataCollectionLauncher
     {
         private const string DataCollectorProcessName = "datacollector.exe";
-        private IProcessHelper processHelper;
 
         /// <summary>
         /// The constructor.
         /// </summary>
         public DefaultDataCollectionLauncher()
-            : this(new ProcessHelper())
+            : this(new ProcessHelper(), TestSessionMessageLogger.Instance)
         {
         }
 
         /// <summary>
-        /// Gets the data collector process info.
-        /// </summary>
-        public Process DataCollectorProcess
-        {
-            get; private set;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DotnetDataCollectionLauncher"/> class.
+        /// Initializes a new instance of the <see cref="DefaultDataCollectionLauncher"/> class. 
         /// </summary>
         /// <param name="processHelper">
         /// The process helper. 
         /// </param>
-        internal DefaultDataCollectionLauncher(IProcessHelper processHelper)
+        /// <param name="messageLogger">
+        /// The message Logger.
+        /// </param>
+        internal DefaultDataCollectionLauncher(IProcessHelper processHelper, IMessageLogger messageLogger) : base(processHelper, messageLogger)
         {
             this.processHelper = processHelper;
             this.DataCollectorProcess = null;
@@ -56,10 +51,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// <param name="environmentVariables">Environment variables for the process.</param>
         /// <param name="commandLineArguments">The command line arguments to pass to the process.</param>
         /// <returns>ProcessId of launched Process. 0 means not launched.</returns>
-        public virtual int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
+        public override int LaunchDataCollector(IDictionary<string, string> environmentVariables, IList<string> commandLineArguments)
         {
             string dataCollectorProcessPath = null, processWorkingDirectory = null;
-            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.Location);
+            var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultDataCollectionLauncher).GetTypeInfo().Assembly.GetAssemblyLocation());
 
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
@@ -78,7 +73,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var argumentsString = string.Join(" ", commandLineArguments);
 
-            this.DataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, processWorkingDirectory, environmentVariables, null, null) as Process;
+            this.DataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, processWorkingDirectory, environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
             return this.DataCollectorProcess?.Id ?? 0;
         }
     }

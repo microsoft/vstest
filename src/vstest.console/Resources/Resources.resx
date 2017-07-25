@@ -276,11 +276,11 @@
   <data name="FrameworkArgumentHelp" xml:space="preserve">
     <value>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</value>
   </data>
   <data name="FrameworkVersionRequired" xml:space="preserve">
-    <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</value>
+    <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</value>
   </data>
   <data name="HelpArgumentHelp" xml:space="preserve">
     <value>-?|--Help|/?|/Help
@@ -318,7 +318,7 @@
     <value>Argument {0} is not expected in the 'EnableCodeCoverage' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /EnableCodeCoverage) and try again.</value>
   </data>
   <data name="InvalidFrameworkVersion" xml:space="preserve">
-    <value>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</value>
+    <value>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</value>
   </data>
   <data name="InvalidInIsolationCommand" xml:space="preserve">
     <value>Argument {0} is not expected in the 'InIsolation' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InIsolation) and try again.</value>
@@ -651,5 +651,12 @@
   </data>
   <data name="DataCollectorFriendlyNameInvalid" xml:space="preserve">
     <value>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</value>
+  </data>
+  <data name="DbgTrcMessagesBanner" xml:space="preserve">
+    <value>Debug Traces Messages:</value>
+  </data>
+  <data name="EnableBlameUsage" xml:space="preserve">
+    <value>--Blame|/Blame
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</value>
   </data>
 </root>

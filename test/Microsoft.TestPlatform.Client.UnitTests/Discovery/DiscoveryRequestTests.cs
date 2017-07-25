@@ -87,11 +87,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             this.discoveryManager.Verify(dm => dm.Abort(), Times.Once);
         }
 
-
         [TestMethod]
         public void AbortIfDiscoveryIsNotInProgressShouldNotCallDiscoveryManagerAbort()
         {
-            // DiscoveryAsyn has not been called, discoveryInProgress should be false
+            // DiscoveryAsync has not been called, discoveryInProgress should be false
             this.discoveryRequest.Abort();
             this.discoveryManager.Verify(dm => dm.Abort(), Times.Never);
         }
@@ -111,6 +110,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests.Discovery
             eventsHandler.HandleDiscoveryComplete(1, Enumerable.Empty<TestCase>(), false);
 
             this.discoveryManager.Verify(dm => dm.Close(), Times.Once);
+        }
+
+        [TestMethod]
+        public void HandleDiscoveryCompleteShouldCloseDiscoveryManagerBeforeRaiseDiscoveryComplete()
+        {
+            var events = new List<string>();
+            this.discoveryManager.Setup(dm => dm.Close()).Callback(() => events.Add("close"));
+            this.discoveryRequest.OnDiscoveryComplete += (s, e) => events.Add("complete");
+            var eventsHandler = this.discoveryRequest as ITestDiscoveryEventsHandler;
+
+            eventsHandler.HandleDiscoveryComplete(1, Enumerable.Empty<TestCase>(), false);
+
+            Assert.AreEqual(2, events.Count);
+            Assert.AreEqual("close", events[0]);
+            Assert.AreEqual("complete", events[1]);
         }
     }
 }

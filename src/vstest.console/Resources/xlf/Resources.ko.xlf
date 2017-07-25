@@ -799,13 +799,13 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
-        <target state="translated">--Framework|/Framework:&lt;프레임워크 버전&gt;
+        <target state="new">--Framework|/Framework:&lt;프레임워크 버전&gt;
       테스트 실행에 사용할 대상 .NET Framework 버전입니다. 
       올바른 값은 ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" 등입니다.
       지원되는 기타 값은 Framework35, Framework40, Framework45 및 FrameworkCore10입니다.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">-프레임 워크 | / 프레임 워크: &lt; 프레임 워크 버전 &gt;
       대상.Net Framework 버전 테스트 실행에 사용할 수 있습니다. 
@@ -815,18 +815,18 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="31" adjWordcount="26.35" curWordcount="26.35"</note>
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
-        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</source>
-        <target state="translated">/Framework 인수에는 테스트 실행의 대상 .NET Framework 버전이 필요합니다. 예: /Framework:".NETFramework,Version=v4.6"</target>
-        <note />
+        <source>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</source>
+        <target state="new">/Framework 인수에는 테스트 실행의 대상 .NET Framework 버전이 필요합니다. 예: /Framework:".NETFramework,Version=v4.6"</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/Framework 인수가 필요 대상.Net Framework 버전 테스트 실행에 대 한.   예: /Framework: ". NETFramework, 버전 v4.6 = "</target>
         </alt-trans>
         <note from="bb-metadata">fuzzyMatch="15" wordcount="16" adjWordcount="13.6" curWordcount="13.6"</note>
       </trans-unit>
       <trans-unit id="InvalidFrameworkVersion">
-        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40 and Framework45.</source>
-        <target state="translated">.Net Framework 버전 {0}이(가) 잘못되었습니다. TargetFramework의 전체 경로를 지정하세요. 지원되는 다른 .Net Framework 버전은 Framework35, Framework40 및 Framework45입니다.</target>
-        <note />
+        <source>Invalid .Net Framework version:{0}. Please give the fullname of the TargetFramework. Other supported .Net Framework versions are Framework35, Framework40, Framework45 and FrameworkCore10.</source>
+        <target state="new">.Net Framework 버전 {0}이(가) 잘못되었습니다. TargetFramework의 전체 경로를 지정하세요. 지원되는 다른 .Net Framework 버전은 Framework35, Framework40 및 Framework45입니다.</target>
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">잘못 된.Net Framework 버전: {0}. fullname은 TargetFramework의 이름을 입력 하십시오. 지원 되는 다른.Net Framework 버전은 Framework35, Framework40 및 Framework45.</target>
         </alt-trans>
@@ -1546,6 +1546,18 @@
         <source>The Data Collector friendly name '{0}' is not valid.  The Data Collector will be ignored.</source>
         <target state="translated">데이터 수집기 이름 ‘{0}’이(가) 잘못되었습니다. 데이터 수집기가 무시됩니다.</target>
         <note />
+      </trans-unit>
+      <trans-unit id="DbgTrcMessagesBanner">
+        <source>Debug Traces Messages:</source>
+        <target state="new">Debug Traces Messages:</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="EnableBlameUsage">
+        <source>--Blame|/Blame
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</source>
+        <target state="new">--Blame|/Blame
+      Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
+        <note></note>
       </trans-unit>
     </body>
   </file>

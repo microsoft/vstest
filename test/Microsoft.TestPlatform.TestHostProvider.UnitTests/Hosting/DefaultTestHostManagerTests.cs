@@ -8,16 +8,19 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
 
 #pragma warning disable SA1600
@@ -27,21 +30,26 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestProcessStartInfo startInfo;
         private readonly Mock<IMessageLogger> mockMessageLogger;
         private readonly Mock<IProcessHelper> mockProcessHelper;
+        private readonly Mock<IDotnetHostHelper> mockDotnetHostHelper;
+        private readonly Mock<IEnvironment> mockEnvironment;
 
         private DefaultTestHostManager testHostManager;
         private TestableTestHostManager testableTestHostManager;
         private int maxStdErrStringLength = 22;
         private string errorMessage;
         private int exitCode;
+        private int testHostId;
 
         public DefaultTestHostManagerTests()
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
+            this.mockDotnetHostHelper = new Mock<IDotnetHostHelper>();
+            this.mockEnvironment = new Mock<IEnvironment>();
 
             this.mockMessageLogger = new Mock<IMessageLogger>();
 
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object, this.mockEnvironment.Object, this.mockDotnetHostHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
@@ -49,7 +57,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void ConstructorShouldSetX86ProcessForX86Architecture()
         {
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
@@ -110,17 +117,50 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeTestSourcePathInArgumentsIfNonShared()
         {
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{true}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
-
             var source = "C:\temp\a.dll";
+
             var info = this.testHostManager.GetTestHostProcessStartInfo(
                 new List<string>() { source },
                 null,
                 connectionInfo);
 
             Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + source.AddDoubleQuote(), info.Arguments);
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldUseMonoAsHostOnNonWindowsIfNotStartedWithMono()
+        {
+            this.mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/dotnet");
+            this.mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
+            var source = "C:\temp\a.dll";
+
+            var info = this.testHostManager.GetTestHostProcessStartInfo(
+                new List<string>() { source },
+                null,
+                default(TestRunnerConnectionInfo));
+
+            Assert.AreEqual("/usr/bin/mono", info.FileName);
+            StringAssert.Contains(info.Arguments, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
+        }
+
+        [TestMethod]
+        public void GetTestHostProcessStartInfoShouldNotUseMonoAsHostOnNonWindowsIfStartedWithMono()
+        {
+            this.mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/mono");
+            this.mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+            this.mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
+            var source = "C:\temp\a.dll";
+
+            var info = this.testHostManager.GetTestHostProcessStartInfo(
+                new List<string>() { source },
+                null,
+                default(TestRunnerConnectionInfo));
+
+            StringAssert.Contains(info.FileName, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
+            Assert.IsFalse(info.Arguments.Contains("TestHost" + Path.DirectorySeparatorChar + "testhost.exe"));
         }
 
         [TestMethod]
@@ -136,14 +176,34 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                         It.IsAny<Action<object, string>>(),
                         It.IsAny<Action<object>>())).Returns(Process.GetCurrentProcess());
 
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             var startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
 
-            Task<int> processId = this.testHostManager.LaunchTestHostAsync(startInfo);
+            this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
+
+            Task<bool> processId = this.testHostManager.LaunchTestHostAsync(startInfo, CancellationToken.None);
             processId.Wait();
 
-            Assert.AreEqual(Process.GetCurrentProcess().Id, processId.Result);
+            Assert.IsTrue(processId.Result);
+
+            Assert.AreEqual(Process.GetCurrentProcess().Id, this.testHostId);
+        }
+
+        [TestMethod]
+        public void LaunchTestHostAsyncShouldNotStartHostProcessIfCancellationTokenIsSet()
+        {
+            this.testableTestHostManager = new TestableTestHostManager(
+                Architecture.X64,
+                Framework.DefaultFramework,
+                this.mockProcessHelper.Object,
+                true,
+                this.maxStdErrStringLength,
+                this.mockMessageLogger.Object);
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            Assert.ThrowsException<System.AggregateException>(() => this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), cancellationTokenSource.Token).Wait());
         }
 
         [TestMethod]
@@ -166,10 +226,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             var currentProcess = Process.GetCurrentProcess();
             mockCustomLauncher.Setup(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>())).Returns(currentProcess.Id);
 
-            Task<int> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo);
+            this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
+
+            Task<bool> pid = this.testHostManager.LaunchTestHostAsync(this.startInfo, CancellationToken.None);
             pid.Wait();
             mockCustomLauncher.Verify(mc => mc.LaunchTestHost(It.IsAny<TestProcessStartInfo>()), Times.Once);
-            Assert.AreEqual(currentProcess.Id, pid.Result);
+
+            Assert.IsTrue(pid.Result);
+            Assert.AreEqual(currentProcess.Id, this.testHostId);
         }
 
         [TestMethod]
@@ -178,7 +242,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string errorData = "Custom Error Strings";
             this.ErrorCallBackTestHelper(errorData, -1);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(errorData, this.errorMessage);
         }
@@ -189,7 +253,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string errorData = "Long Custom Error Strings";
             this.ErrorCallBackTestHelper(errorData, -1);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             // Ignore new line chars
             Assert.AreEqual(this.maxStdErrStringLength - Environment.NewLine.Length, this.errorMessage.Length);
@@ -202,7 +266,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             string errorData = string.Empty;
             this.ErrorCallBackTestHelper(errorData, 0);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(null, this.errorMessage);
         }
@@ -214,7 +278,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.ErrorCallBackTestHelper(errorData, -1);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(this.errorMessage, string.Empty);
         }
@@ -226,11 +290,39 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         {
             this.ExitCallBackTestHelper(exitCode);
 
-            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo());
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
 
             Assert.AreEqual(this.errorMessage, string.Empty);
-
             Assert.AreEqual(this.exitCode, exitCode);
+        }
+
+        [TestMethod]
+        public async Task CleanTestHostAsyncShouldKillTestHostProcess()
+        {
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>()))
+                .Callback<object>(p => isVerified = ((Process)p).Id == pid);
+
+            this.ExitCallBackTestHelper(0);
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
+            await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
+
+            Assert.IsTrue(isVerified);
+        }
+
+        [TestMethod]
+        public async Task CleanTestHostAsyncShouldNotThrowIfTestHostIsNotStarted()
+        {
+            var pid = Process.GetCurrentProcess().Id;
+            bool isVerified = false;
+            this.mockProcessHelper.Setup(ph => ph.TerminateProcess(It.IsAny<Process>())).Callback<object>(p => isVerified = ((Process)p).Id == pid).Throws<Exception>();
+
+            this.ExitCallBackTestHelper(0);
+            await this.testableTestHostManager.LaunchTestHostAsync(this.GetDefaultStartInfo(), CancellationToken.None);
+            await this.testableTestHostManager.CleanTestHostAsync(CancellationToken.None);
+
+            Assert.IsTrue(isVerified);
         }
 
         private void TestableTestHostManagerHostExited(object sender, HostProviderEventArgs e)
@@ -245,6 +337,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             {
                 this.errorMessage = e.Data.TrimEnd(Environment.NewLine.ToCharArray());
             }
+        }
+
+        private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)
+        {
+            this.testHostId = e.ProcessId;
         }
 
         private void ErrorCallBackTestHelper(string errorMessage, int exitCode)
@@ -325,9 +422,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 bool shared,
                 int errorLength,
                 IMessageLogger logger)
-                : base(processHelper)
+                : base(processHelper, new PlatformEnvironment(), new DotnetHostHelper())
             {
-                this.TimeOut = 30000;
                 this.ErrorLength = errorLength;
                 this.Initialize(logger, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{architecture}</TargetPlatform> <TargetFrameworkVersion>{framework}</TargetFrameworkVersion> <DisableAppDomain>{!shared}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             }

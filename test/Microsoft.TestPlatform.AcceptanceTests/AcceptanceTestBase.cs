@@ -9,7 +9,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     public class AcceptanceTestBase : IntegrationTestBase
     {
-        public const string DesktopTargetFramework = "net46";
+        public const string DesktopTargetFramework = "net451";
         public const string CoreTargetFramework = "netcoreapp1.0";
         public const string Core11TargetFramework = "netcoreapp1.1";
         public const string Core20TargetFramework = "netcoreapp2.0";
@@ -17,7 +17,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public const string CoreFrameworkArgValue = ".NETCoreApp,Version=v1.0";
         public const string Core11FrameworkArgValue = ".NETCoreApp,Version=v1.1";
         public const string Core20FrameworkArgValue = ".NETCoreApp,Version=v2.0";
-        public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.6";
+        public const string DesktopFrameworkArgValue = ".NETFramework,Version=v4.5.1";
         public const string DesktopRunnerTargetRuntime = "win7-x64";
         public const string CoreRunnerTargetRuntime = "";
 

@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     /// Base exception for all Rocksteady service exceptions
     /// </summary>
-#if NET46
+#if NET451
     [Serializable]
 #endif
     [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]
@@ -96,7 +96,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     }
 #endif
 
-#if NET46
+#if NET451
     [Serializable]
 #endif
     [SuppressMessage("Microsoft.Design", "CA1032:ImplementStandardExceptionConstructors")]

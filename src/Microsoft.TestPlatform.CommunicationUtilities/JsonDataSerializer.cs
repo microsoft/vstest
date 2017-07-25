@@ -32,7 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateParseHandling = DateParseHandling.DateTimeOffset,
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                TypeNameHandling = TypeNameHandling.None
+                TypeNameHandling = TypeNameHandling.None,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
 
             payloadSerializer = JsonSerializer.Create(jsonSettings);
@@ -41,9 +42,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             payloadSerializer.ContractResolver = new TestPlatformContractResolver1();
             payloadSerializer2.ContractResolver = new DefaultTestPlatformContractResolver();
 
-#if DEBUG
+#if TRACE_JSON_SERIALIZATION
             // MemoryTraceWriter can help diagnose serialization issues. Enable it for
             // debug builds only.
+            // Note that MemoryTraceWriter is not thread safe, please don't use it in parallel
+            // test runs. See https://github.com/JamesNK/Newtonsoft.Json/issues/1279
             payloadSerializer.TraceWriter = new MemoryTraceWriter();
             payloadSerializer2.TraceWriter = new MemoryTraceWriter();
 #endif

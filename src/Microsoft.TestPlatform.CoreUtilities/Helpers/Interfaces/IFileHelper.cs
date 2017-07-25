@@ -51,10 +51,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// Enumerates files which match a pattern (case insensitive) in a directory.
         /// </summary>
         /// <param name="directory">Parent directory to search.</param>
-        /// <param name="pattern">Search pattern.</param>
         /// <param name="searchOption"><see cref="SearchOption"/> for directory.</param>
+        /// <param name="endsWithSearchPatterns">Patterns used to select files using String.EndsWith</param>
         /// <returns>List of files matching the pattern.</returns>
-        IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption);
+        IEnumerable<string> EnumerateFiles(string directory, SearchOption searchOption, params string[] endsWithSearchPatterns);
 
         /// <summary>
         /// Gets attributes of a file.
@@ -62,5 +62,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="path">Full path of the file.</param>
         /// <returns>Attributes of the file.</returns>
         FileAttributes GetFileAttributes(string path);
+
+        /// <summary>
+        /// Copy a file in the file system.
+        /// </summary>
+        /// <param name="sourcePath">Full path of the file.</param>
+        /// <param name="destinationPath">Target path for the file.</param>
+        void CopyFile(string sourcePath, string destinationPath);
+
+        /// <summary>
+        /// Moves a file in the file system.
+        /// </summary>
+        /// <param name="sourcePath">Full path of the file.</param>
+        /// <param name="destinationPath">Target path for the file.</param>
+        void MoveFile(string sourcePath, string destinationPath);
     }
 }

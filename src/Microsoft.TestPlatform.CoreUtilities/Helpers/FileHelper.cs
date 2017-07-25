@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text.RegularExpressions;
 
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -47,16 +46,35 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> EnumerateFiles(string directory, string pattern, SearchOption searchOption)
+        public IEnumerable<string> EnumerateFiles(string directory, SearchOption searchOption, params string[] endsWithSearchPatterns)
         {
-            var regex = new Regex(pattern, RegexOptions.IgnoreCase);
-            return Directory.EnumerateFiles(directory, "*", searchOption).Where(f => regex.IsMatch(f));
+            if (endsWithSearchPatterns == null || endsWithSearchPatterns.Length == 0)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            var files = Directory.EnumerateFiles(directory, "*", searchOption);
+
+            return files.Where(
+                    file => endsWithSearchPatterns.Any(pattern => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase)));
         }
 
         /// <inheritdoc/>
         public FileAttributes GetFileAttributes(string path)
         {
             return new FileInfo(path).Attributes;
+        }
+
+        /// <inheritdoc/>
+        public void CopyFile(string sourcePath, string destinationPath)
+        {
+            File.Copy(sourcePath, destinationPath);
+        }
+
+        /// <inheritdoc/>
+        public void MoveFile(string sourcePath, string destinationPath)
+        {
+            File.Move(sourcePath, destinationPath);
         }
     }
 }

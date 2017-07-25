@@ -6,25 +6,24 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
-#if !NET46
-    using System.Runtime.Loader;
-#endif
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachments
     {
         private const string CoverageUri = "datacollector://microsoft/CodeCoverage/2.0";
         private const string CoverageFileExtension = ".coverage";
-        private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
         private const string CoverageFriendlyName = "Code Coverage";
 
         private const string CodeCoverageAnalysisAssemblyName = "Microsoft.VisualStudio.Coverage.Analysis";
         private const string MergeMethodName = "MergeCoverageFiles";
         private const string CoverageInfoTypeName = "CoverageInfo";
+
+        private static readonly Uri CodeCoverageDataCollectorUri = new Uri(CoverageUri);
 
         public Uri GetExtensionUri()
         {
@@ -44,6 +43,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                     attachmentSet.Attachments.Add(new UriDataAttachment(new Uri(outputFile), CoverageFriendlyName));
                     return new Collection<AttachmentSet> { attachmentSet };
                 }
+
                 // In case merging fails(esp in dotnet core we cannot merge), so return filtered list of Code Coverage Attachments
                 return dataCollectionAttachments;
             }
@@ -53,21 +53,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private string MergeCodeCoverageFiles(IList<string> files)
         {
-            string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CoverageFileExtension);
+            string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
             string outputfileName = files[0];
 
             File.Create(fileName).Dispose();
-
-            var assemblyPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), CodeCoverageAnalysisAssemblyName + ".dll");
+            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageAnalysisAssemblyName + ".dll");
 
             try
             {
-                Assembly assembly = null;
-#if NET46
-                assembly = Assembly.LoadFrom(assemblyPath);
-#else
-                assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
+                Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
                 var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
 
                 var methodInfo = type?.GetMethod(MergeMethodName);
@@ -84,6 +78,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                     File.Delete(fileName);
                 }
+
                 return outputfileName;
             }
             catch (Exception ex)

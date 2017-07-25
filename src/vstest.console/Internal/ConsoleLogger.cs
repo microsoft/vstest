@@ -180,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         }
 
         /// <summary>
-        ///       Constructs a well formatted string using the given prefix before every message content on each line.
+        /// Constructs a well formatted string using the given prefix before every message content on each line.
         /// </summary>
         private static string GetFormattedOutput(Collection<TestResultMessage> testMessageCollection)
         {
@@ -190,8 +190,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 foreach (var message in testMessageCollection)
                 {
                     var prefix = String.Format(CultureInfo.CurrentCulture, "{0}{1}", Environment.NewLine, TestMessageFormattingPrefix);
-                    var messageText = message.Text.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
-                    sb.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, messageText);
+                    var messageText = message.Text?.Replace(Environment.NewLine, prefix).TrimEnd(TestMessageFormattingPrefix.ToCharArray());
+
+                    if (!string.IsNullOrWhiteSpace(messageText))
+                    {
+                        sb.AppendFormat(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, messageText);
+                    }
                 }
                 return sb.ToString();
             }
@@ -238,8 +242,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 addAdditionalNewLine = false;
                 var stdOutMessages = GetFormattedOutput(stdOutMessagesCollection);
-                Output.Information(CommandLineResources.StdOutMessagesBanner);
-                Output.Information(stdOutMessages);
+
+                if (!string.IsNullOrEmpty(stdOutMessages))
+                {
+                    Output.Information(CommandLineResources.StdOutMessagesBanner);
+                    Output.Information(stdOutMessages);
+                }
             }
 
             var stdErrMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardErrorCategory);
@@ -247,18 +255,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             {
                 addAdditionalNewLine = false;
                 var stdErrMessages = GetFormattedOutput(stdErrMessagesCollection);
-                Output.Information(ConsoleColor.Red, CommandLineResources.StdErrMessagesBanner);
-                Output.Information(ConsoleColor.Red, stdErrMessages);
+
+                if (!string.IsNullOrEmpty(stdErrMessages))
+                {
+                    Output.Information(ConsoleColor.Red, CommandLineResources.StdErrMessagesBanner);
+                    Output.Information(ConsoleColor.Red, stdErrMessages);
+                }
+            }
+
+            var DbgTrcMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.DebugTraceCategory);
+            if (DbgTrcMessagesCollection.Count > 0)
+            {
+                addAdditionalNewLine = false;
+                var dbgTrcMessages = GetFormattedOutput(DbgTrcMessagesCollection);
+
+                if (!string.IsNullOrEmpty(dbgTrcMessages))
+                {
+                    Output.Information(CommandLineResources.DbgTrcMessagesBanner);
+                    Output.Information(dbgTrcMessages);
+                }
             }
 
             var addnlInfoMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.AdditionalInfoCategory);
             if (addnlInfoMessagesCollection.Count > 0)
             {
                 addAdditionalNewLine = false;
-                Output.Information(CommandLineResources.AddnlInfoMessagesBanner);
                 var addnlInfoMessages = GetFormattedOutput(addnlInfoMessagesCollection);
-                Output.Information(addnlInfoMessages);
+
+                if (!string.IsNullOrEmpty(addnlInfoMessages))
+                {
+                    Output.Information(CommandLineResources.AddnlInfoMessagesBanner);
+                    Output.Information(addnlInfoMessages);
+                }
             }
+
             if (addAdditionalNewLine)
             {
                 Output.WriteLine(String.Empty, OutputLevel.Information);
@@ -338,6 +368,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
                     Output.Information(output);
+                    DisplayFullInformation(e.Result);
                 }
                 this.testsPassed++;
             }
@@ -401,6 +432,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             }
         }
         #endregion
-
     }
 }

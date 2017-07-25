@@ -136,7 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             var batchSize = runConfiguration.BatchSize;
 
             var runsettings = discoveryPayload.RunSettings;
-            if (this.TryUpdateDesignMode(runsettings, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -205,7 +205,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
             TestRunCriteria runCriteria = null;
             var runsettings = testRunRequestPayload.RunSettings;
-            if (this.TryUpdateDesignMode(runsettings, out string updatedRunsettings))
+            if (this.UpdateRunSettingsIfRequired(runsettings, out string updatedRunsettings))
             {
                 runsettings = updatedRunsettings;
             }
@@ -264,34 +264,46 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         #endregion
 
-        private bool TryUpdateDesignMode(string runsettingsXml, out string updatedRunSettingsXml)
+        private bool UpdateRunSettingsIfRequired(string runsettingsXml, out string updatedRunSettingsXml)
         {
+            bool settingsUpdated = false;
             updatedRunSettingsXml = runsettingsXml;
 
-            // If user is already setting DesignMode via runsettings or CLI args; we skip. We also skip if the target framework
-            // is not known or current run is targeted to netcoreapp (since it is a breaking change; user may be running older
-            // NET.Test.Sdk; we will remove this constraint in 15.1).
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-            if (runConfiguration.DesignModeSet || !runConfiguration.TargetFrameworkSet ||
-                runConfiguration.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                runConfiguration.TargetFrameworkVersion.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (!string.IsNullOrEmpty(runsettingsXml))
             {
-                return false;
+                // TargetFramework is full CLR. Set DesignMode based on current context.
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+
+                    var navigator = document.CreateNavigator();
+
+                    // If user is already setting DesignMode via runsettings or CLI args; we skip. We also skip if the target framework
+                    // is not known or current run is targeted to netcoreapp (since it is a breaking change; user may be running older
+                    // NET.Test.Sdk; we will remove this constraint in 15.1).
+                    var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
+
+                    if (!runConfiguration.DesignModeSet && runConfiguration.TargetFrameworkSet &&
+                        runConfiguration.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) < 0 &&
+                        runConfiguration.TargetFrameworkVersion.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) < 0)
+                    {
+                        InferRunSettingsHelper.UpdateDesignMode(navigator, this.commandLineOptions.IsDesignMode);
+                        settingsUpdated = true;
+                    }
+
+                    if (!runConfiguration.CollectSourceInformationSet)
+                    {
+                        InferRunSettingsHelper.UpdateCollectSourceInformation(navigator, this.commandLineOptions.ShouldCollectSourceInformation);
+                        settingsUpdated = true;
+                    }
+
+                    updatedRunSettingsXml = navigator.OuterXml;
+                }
             }
 
-            // TargetFramework is full CLR. Set DesignMode based on current context.
-            using (var stream = new StringReader(runsettingsXml))
-            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
-            {
-                var document = new XmlDocument();
-                document.Load(reader);
-
-                var navigator = document.CreateNavigator();
-                InferRunSettingsHelper.UpdateDesignMode(navigator, this.commandLineOptions.IsDesignMode);
-                updatedRunSettingsXml = navigator.OuterXml;
-            }
-
-            return true;
+            return settingsUpdated;
         }
 
         private bool RunTests(TestRunCriteria testRunCriteria, ITestRunEventsRegistrar testRunEventsRegistrar, ProtocolConfig protocolConfig)

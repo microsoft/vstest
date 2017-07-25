@@ -233,7 +233,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 new ResultsDirectoryArgumentProcessor(),
                 new InIsolationArgumentProcessor(), 
                 new CollectArgumentProcessor(),
-                new EnableCodeCoverageArgumentProcessor()
+                new EnableCodeCoverageArgumentProcessor(),
+                new DisableAutoFakesArgumentProcessor(),
+                new EnableBlameArgumentProcessor()
         };
 
         /// <summary>

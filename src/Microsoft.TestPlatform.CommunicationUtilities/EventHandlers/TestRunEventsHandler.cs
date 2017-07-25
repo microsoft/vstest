@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         /// <summary>
         /// Initializes a new instance of the <see cref="TestRunEventsHandler"/> class.
         /// </summary>
-        /// <param name="client"> The client. </param>
+        /// <param name="requestHandler">test request handler</param>
         public TestRunEventsHandler(ITestRequestHandler requestHandler)
         {
             this.requestHandler = requestHandler;
@@ -91,6 +91,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
         /// Adapter get to call into this to launch any additional processes under debugger
         /// </summary>
         /// <param name="testProcessStartInfo">Process start info</param>
+        /// <returns>ProcessId of the launched process</returns>
         public int LaunchProcessWithDebuggerAttached(TestProcessStartInfo testProcessStartInfo)
         {
             EqtTrace.Info("Sending LaunchProcessWithDebuggerAttached on additional test process: {0}", testProcessStartInfo?.FileName);

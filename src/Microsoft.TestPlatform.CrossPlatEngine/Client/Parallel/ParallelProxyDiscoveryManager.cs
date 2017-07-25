@@ -10,23 +10,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using System.Linq;
 
     /// <summary>
     /// ParallelProxyDiscoveryManager that manages parallel discovery
     /// </summary>
-    internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager>, IParallelProxyDiscoveryManager
+    internal class ParallelProxyDiscoveryManager : ParallelOperationManager<IProxyDiscoveryManager, ITestDiscoveryEventsHandler>, IParallelProxyDiscoveryManager
     {
         #region DiscoverySpecificData
 
         private int discoveryCompletedClients = 0;
+        private int availableTestSources = -1;
 
         private DiscoveryCriteria actualDiscoveryCriteria;
 
         private IEnumerator<string> sourceEnumerator;
         
         private Task lastParallelDiscoveryCleanUpTask = null;
-
-        private IDictionary<IProxyDiscoveryManager, ITestDiscoveryEventsHandler> concurrentManagerHandlerMap;
 
         private ITestDiscoveryEventsHandler currentDiscoveryEventsHandler;
 
@@ -57,14 +57,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         }
 
         /// <inheritdoc/>
-        void IProxyDiscoveryManager.DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
+        public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
         {
             this.actualDiscoveryCriteria = discoveryCriteria;
                 
             // Set the enumerator for parallel yielding of sources
             // Whenever a concurrent executor becomes free, it picks up the next source using this enumerator
             this.sourceEnumerator = discoveryCriteria.Sources.GetEnumerator();
+            this.availableTestSources = discoveryCriteria.Sources.Count();
             
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("ParallelProxyDiscoveryManager: Start discovery. Total sources: " + this.availableTestSources);
+            }
             this.DiscoverTestsPrivate(eventHandler);
         }
 
@@ -88,53 +93,62 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         public bool HandlePartialDiscoveryComplete(IProxyDiscoveryManager proxyDiscoveryManager, long totalTests, IEnumerable<TestCase> lastChunk, bool isAborted)
         {
             var allDiscoverersCompleted = false;
-
-            if (!this.SharedHosts)
+            lock (this.discoveryStatusLockObject)
             {
-                this.concurrentManagerHandlerMap.Remove(proxyDiscoveryManager);
-                proxyDiscoveryManager.Close();
+                // Each concurrent Executor calls this method 
+                // So, we need to keep track of total discoverycomplete calls
+                this.discoveryCompletedClients++;
+
+                // If there are no more sources/testcases, a parallel executor is truly done with discovery
+                allDiscoverersCompleted = this.discoveryCompletedClients == this.availableTestSources;
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Total completed clients = {0}, Discovery complete = {1}.", this.discoveryCompletedClients, allDiscoverersCompleted);
+                }
+            }
+
+            // Discovery is completed. Schedule the clean up for managers and handlers.
+            if (allDiscoverersCompleted)
+            {
+                // Reset enumerators
+                this.sourceEnumerator = null;
+
+                this.currentDiscoveryDataAggregator = null;
+                this.currentDiscoveryEventsHandler = null;
+
+                // Dispose concurrent executors
+                // Do not do the cleanuptask in the current thread as we will unncessarily add to discovery time
+                this.lastParallelDiscoveryCleanUpTask = Task.Run(() => this.UpdateParallelLevel(0));
+
+                return true;
+            }
+
+            // Discovery is not complete.
+            // First, clean up the used proxy discovery manager if the last run was aborted
+            // or this run doesn't support shared hosts (netcore tests)
+            if (!this.SharedHosts || isAborted)
+            {
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("ParallelProxyDiscoveryManager: HandlePartialDiscoveryComplete: Replace discovery manager. Shared: {0}, Aborted: {1}.", this.SharedHosts, isAborted);
+                }
+
+                this.RemoveManager(proxyDiscoveryManager);
 
                 proxyDiscoveryManager = this.CreateNewConcurrentManager();
-
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                                                proxyDiscoveryManager,
                                                this.currentDiscoveryEventsHandler,
                                                this,
                                                this.currentDiscoveryDataAggregator);
-                this.concurrentManagerHandlerMap.Add(proxyDiscoveryManager, parallelEventsHandler);
+                this.AddManager(proxyDiscoveryManager, parallelEventsHandler);
             }
 
-            // In Case of Cancel or Abort, no need to trigger discovery for rest of the data
-            // If there are no more sources/testcases, a parallel executor is truly done with discovery
-            if (isAborted || !this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager))
-            {
-                lock (this.discoveryStatusLockObject)
-                {
-                    // Each concurrent Executor calls this method 
-                    // So, we need to keep track of total discoverycomplete calls
-                    this.discoveryCompletedClients++;
-                    allDiscoverersCompleted = this.discoveryCompletedClients == this.concurrentManagerInstances.Length;
-                }
+            // Second, let's attempt to trigger discovery for the next source.
+            this.DiscoverTestsOnConcurrentManager(proxyDiscoveryManager);
 
-                // verify that all executors are done with the discovery and there are no more sources/testcases to execute
-                if (allDiscoverersCompleted)
-                {
-                    // Reset enumerators
-                    this.sourceEnumerator = null;
-
-                    this.currentDiscoveryDataAggregator = null;
-                    this.currentDiscoveryEventsHandler = null;
-
-                    // Dispose concurrent executors
-                    // Do not do the cleanuptask in the current thread as we will unncessarily add to discovery time
-                    this.lastParallelDiscoveryCleanUpTask = Task.Run(() =>
-                    {
-                        this.UpdateParallelLevel(0);
-                    });
-                }
-            }
-
-            return allDiscoverersCompleted;
+            return false;
         }
 
         #endregion
@@ -153,9 +167,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
                 {
                     managerInstance.Close();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // ignore any exceptions
+                    EqtTrace.Error("ParallelProxyDiscoveryManager: Failed to dispose discovery manager. Exception: " + ex);
                 }
             }
         }
@@ -172,6 +187,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
             {
                 try
                 {
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose("ProxyParallelDiscoveryManager: Wait for last cleanup to complete.");
+                    }
+
                     this.lastParallelDiscoveryCleanUpTask.Wait();
                 }
                 catch (Exception ex)
@@ -191,20 +211,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
 
             // One data aggregator per parallel discovery
             this.currentDiscoveryDataAggregator = new ParallelDiscoveryDataAggregator();
-            this.concurrentManagerHandlerMap = new Dictionary<IProxyDiscoveryManager, ITestDiscoveryEventsHandler>();
 
-            for (int i = 0; i < this.concurrentManagerInstances.Length; i++)
+            foreach (var concurrentManager in this.GetConcurrentManagerInstances())
             {
-                var concurrentManager = this.concurrentManagerInstances[i];
-
                 var parallelEventsHandler = new ParallelDiscoveryEventsHandler(
                                                 concurrentManager,
                                                 discoveryEventsHandler,
                                                 this,
                                                 this.currentDiscoveryDataAggregator);
-                this.concurrentManagerHandlerMap.Add(concurrentManager, parallelEventsHandler);
 
-                Task.Run(() => this.DiscoverTestsOnConcurrentManager(concurrentManager));
+                this.UpdateHandlerForManager(concurrentManager, parallelEventsHandler);
+                this.DiscoverTestsOnConcurrentManager(concurrentManager);
             }
         }
 
@@ -213,25 +230,51 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel
         /// Each concurrent discoverer calls this method, once its completed working on previous data
         /// </summary>
         /// <param name="ProxyDiscoveryManager">Proxy discovery manager instance.</param>
-        /// <returns>True, if discovery triggered</returns>
-        private bool DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager)
+        private void DiscoverTestsOnConcurrentManager(IProxyDiscoveryManager proxyDiscoveryManager)
         {
-            DiscoveryCriteria discoveryCriteria = null;
-
-            string nextSource = null;
-            if (this.TryFetchNextSource(this.sourceEnumerator, out nextSource))
+            // Peek to see if we have sources to trigger a discovery
+            if (this.TryFetchNextSource(this.sourceEnumerator, out string nextSource))
             {
-                EqtTrace.Info("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", nextSource);
-                discoveryCriteria = new DiscoveryCriteria(new List<string>() { nextSource }, this.actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, this.actualDiscoveryCriteria.DiscoveredTestEventTimeout, this.actualDiscoveryCriteria.RunSettings);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("ProxyParallelDiscoveryManager: Triggering test discovery for next source: {0}", nextSource);
+                }
+
+                // Kick off another discovery task for the next source
+                var discoveryCriteria = new DiscoveryCriteria(new[] { nextSource }, this.actualDiscoveryCriteria.FrequencyOfDiscoveredTestsEvent, this.actualDiscoveryCriteria.DiscoveredTestEventTimeout, this.actualDiscoveryCriteria.RunSettings);
+                Task.Run(() =>
+                    {
+                        if (EqtTrace.IsVerboseEnabled)
+                        {
+                            EqtTrace.Verbose("ParallelProxyDiscoveryManager: Discovery started.");
+                        }
+
+                        proxyDiscoveryManager.DiscoverTests(discoveryCriteria, this.GetHandlerForGivenManager(proxyDiscoveryManager));
+                    })
+                    .ContinueWith(t =>
+                    {
+                        // Just in case, the actual discovery couldn't start for an instance. Ensure that
+                        // we call discovery complete since we have already fetched a source. Otherwise
+                        // discovery will not terminate
+                        if (EqtTrace.IsWarningEnabled)
+                        {
+                            EqtTrace.Warning("ParallelProxyDiscoveryManager: Failed to trigger discovery. Exception: " + t.Exception);
+                        }
+
+                        // Send discovery complete. Similar logic is also used in ProxyDiscoveryManager.DiscoverTests.
+                        // Differences:
+                        // Total tests must be zero here since parallel discovery events handler adds the count
+                        // Keep `lastChunk` as null since we don't want a message back to the IDE (discovery didn't even begin)
+                        // Set `isAborted` as true since we want this instance of discovery manager to be replaced
+                        this.GetHandlerForGivenManager(proxyDiscoveryManager).HandleDiscoveryComplete(-1, null, true);
+                    },
+                    TaskContinuationOptions.OnlyOnFaulted);
             }
 
-            if (discoveryCriteria != null)
+            if (EqtTrace.IsVerboseEnabled)
             {
-                proxyDiscoveryManager.DiscoverTests(discoveryCriteria, this.concurrentManagerHandlerMap[proxyDiscoveryManager]);
-                return true;
+                EqtTrace.Verbose("ProxyParallelDiscoveryManager: No sources available for discovery.");
             }
-
-            return false;
         }
     }
 }

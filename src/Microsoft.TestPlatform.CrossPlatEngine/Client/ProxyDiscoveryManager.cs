@@ -6,12 +6,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.RegularExpressions;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -24,6 +25,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     public class ProxyDiscoveryManager : ProxyOperationManager, IProxyDiscoveryManager
     {
         private readonly ITestRuntimeProvider testHostManager;
+        private IDataSerializer dataSerializer;
+        private CancellationTokenSource cancellationTokenSource;
+        private bool isCommunicationEstablished;
 
         #region Constructors
 
@@ -33,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testRequestSender">Test request sender instance.</param>
         /// <param name="testHostManager">Test host manager instance.</param>
         public ProxyDiscoveryManager(ITestRequestSender testRequestSender, ITestRuntimeProvider testHostManager)
-            : this(testRequestSender, testHostManager, CrossPlatEngine.Constants.ClientConnectionTimeout)
+            : this(testRequestSender, testHostManager, JsonDataSerializer.Instance, CrossPlatEngine.Constants.ClientConnectionTimeout)
         {
             this.testHostManager = testHostManager;
         }
@@ -48,16 +52,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">
         /// Test host Manager instance
         /// </param>
+        /// <param name="dataSerializer"></param>
         /// <param name="clientConnectionTimeout">
         /// The client Connection Timeout
         /// </param>
         internal ProxyDiscoveryManager(
             ITestRequestSender requestSender,
             ITestRuntimeProvider testHostManager,
+            IDataSerializer dataSerializer,
             int clientConnectionTimeout)
             : base(requestSender, testHostManager, clientConnectionTimeout)
         {
+            this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
+            this.cancellationTokenSource = new CancellationTokenSource();
+            this.isCommunicationEstablished = false;
         }
 
         #endregion
@@ -69,12 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Initialize()
         {
-            if (this.testHostManager.Shared)
-            {
-                // If the test host manager supports sharing the test host across sources, we can
-                // initialize it early and assign sources later.
-                this.InitializeExtensions(Enumerable.Empty<string>());
-            }
         }
 
         /// <summary>
@@ -86,21 +89,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                if (!this.testHostManager.Shared)
-                {
-                    // If the test host doesn't support sharing across sources, we must initialize it
-                    // with sources.
-                    this.InitializeExtensions(discoveryCriteria.Sources);
-                }
+                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
 
-                this.SetupChannel(discoveryCriteria.Sources);
-                this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
+                if (this.isCommunicationEstablished)
+                {
+                    this.InitializeExtensions(discoveryCriteria.Sources);
+                    this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
+                }
             }
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyDiscoveryManager.DiscoverTests: Failed to discover tests: {0}", exception);
+
+                // Log to vs ide test output
+                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.Message };
+                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+                eventHandler.HandleRawMessage(rawMessage);
+
+                // Log to vstest.console
+                // Send a discovery complete to caller. Similar logic is also used in ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager
+                // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
+                // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
+                // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(0, new List<ObjectModel.TestCase>(), false);
+                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
             }
         }
 
@@ -120,20 +132,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
-            var sourceList = sources.ToList();
-            var extensions = this.testHostManager.GetTestPlatformExtensions(sourceList, TestPluginCache.Instance.DefaultExtensionPaths).ToList();
+            var extensions = new List<string>();
+
             if (TestPluginCache.Instance.PathToExtensions != null)
             {
-                var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => regex.IsMatch(ext)));
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterEndsWithPattern, StringComparison.OrdinalIgnoreCase)));
             }
 
-            // Only send this if needed.
-            if (extensions.Count() > 0)
-            {
-                this.SetupChannel(sourceList);
+            extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
+            var sourceList = sources.ToList();
+            var platformExtensions = this.testHostManager.GetTestPlatformExtensions(sourceList, extensions).ToList();
 
-                this.RequestSender.InitializeDiscovery(extensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
+            // Only send this if needed.
+            if (platformExtensions.Any())
+            {
+                this.RequestSender.InitializeDiscovery(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
         }
     }
