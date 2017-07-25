@@ -1569,6 +1569,18 @@
         <target state="new">Test Run Canceled.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="OpenResponseFileError">
+        <source>Error opening response file '{0}'</source>
+        <target state="new">Error opening response file '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ResponseFileArgumentHelp">
+        <source>@&lt;file&gt;
+      Read response file for more options.</source>
+        <target state="new">@&lt;file&gt;
+      Read response file for more options.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
