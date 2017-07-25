@@ -655,6 +655,13 @@
   <data name="DbgTrcMessagesBanner" xml:space="preserve">
     <value>Debug Traces Messages:</value>
   </data>
+  <data name="OpenResponseFileError" xml:space="preserve">
+    <value>Error opening response file '{0}'</value>
+  </data>
+  <data name="ResponseFileArgumentHelp" xml:space="preserve">
+    <value>@&lt;file&gt;
+      Read response file for more options.</value>
+  </data>
   <data name="EnableBlameUsage" xml:space="preserve">
     <value>--Blame|/Blame
       Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</value>
