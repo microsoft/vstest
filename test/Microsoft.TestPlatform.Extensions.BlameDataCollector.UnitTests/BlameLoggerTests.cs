@@ -6,14 +6,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-
     using Microsoft.TestPlatform.Extensions.BlameDataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
     using Moq;
 
     /// <summary>
@@ -28,6 +28,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         private Mock<IBlameReaderWriter> mockBlameReaderWriter;
         private TestLoggerManager testLoggerManager;
         private BlameLogger blameLogger;
+        private Mock<IEnvironment> mockEnvironment;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlameLoggerTests"/> class.
@@ -39,7 +40,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             this.events = new Mock<TestLoggerEvents>();
             this.mockOutput = new Mock<IOutput>();
             this.mockBlameReaderWriter = new Mock<IBlameReaderWriter>();
-            this.blameLogger = new TestableBlameLogger(this.mockOutput.Object, this.mockBlameReaderWriter.Object);
+            this.mockEnvironment = new Mock<IEnvironment>();
+            this.blameLogger = new TestableBlameLogger(this.mockOutput.Object, this.mockBlameReaderWriter.Object, this.mockEnvironment.Object);
 
             // Create Instance of TestLoggerManager
             this.testLoggerManager = new TestableTestLoggerManager();
@@ -88,14 +90,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var attachmentSetList = new List<AttachmentSet> { attachmentSet };
 
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
-
-            var testCaseList =
-                new List<TestCase>
-                    {
-                        new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath"),
-                        new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath")
-                    };
+            this.blameLogger.Initialize(this.events.Object, (string)null);
+            var testCaseList = this.GetTestCaseList();
 
             // Setup and Raise event
             this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
@@ -114,7 +110,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void TestRunCompleteHandlerShouldNotReadFileIfTestRunNotAborted()
         {
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            this.blameLogger.Initialize(this.events.Object, (string)null);
 
             // Setup and Raise event
             this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>()));
@@ -137,7 +133,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             var attachmentSetList = new List<AttachmentSet> { attachmentSet };
 
             // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
+            this.blameLogger.Initialize(this.events.Object, (string)null);
 
             // Setup and Raise event
             this.testRunRequest.Raise(
@@ -146,6 +142,88 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
+        }
+
+        /// <summary>
+        /// The test run complete handler should print dump folder name if os is windows and dump is enabled
+        /// </summary>
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldPrintDumpsFolderIfDumpFileObtained()
+        {
+            // Initialize
+            var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
+            var uriDataAttachment = new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description");
+            attachmentSet.Attachments.Add(uriDataAttachment);
+            var attachmentSetList = new List<AttachmentSet> { attachmentSet };
+
+            var param = new Dictionary<string, string>();
+            param["dump"] = string.Empty;
+
+            BlameLogger.AddFileToDumpList("C:\\dumps\\testhost.exe.1439.dmp");
+
+            var testCaseList = this.GetTestCaseList();
+
+            // Setup
+            this.mockEnvironment.Setup(x => x.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
+
+            // Initialize Blame Logger
+            this.blameLogger.Initialize(this.events.Object, param);
+
+            // Raise event
+            this.testRunRequest.Raise(
+                m => m.OnRunCompletion += null,
+                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+
+            // Verify
+            this.mockOutput.Verify(x => x.WriteLine("  " + "C:\\dumps\\testhost.exe.1439.dmp", OutputLevel.Information), Times.Once);
+        }
+
+        /// <summary>
+        /// The test run complete handler should print Guidance Link If no dump file obtained
+        /// </summary>
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldPrintGuidanceLinkIfNoDumpFileObtained()
+        {
+            // Initialize
+            var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
+            var uriDataAttachment = new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description");
+            attachmentSet.Attachments.Add(uriDataAttachment);
+            var attachmentSetList = new List<AttachmentSet> { attachmentSet };
+
+            var testCaseList = this.GetTestCaseList();
+            var param = new Dictionary<string, string>();
+            param["dump"] = string.Empty;
+
+            // Setup
+            this.mockEnvironment.Setup(x => x.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
+
+            // Initialize Blame Logger
+            this.blameLogger.Initialize(this.events.Object, param);
+
+            // Raise event
+            this.testRunRequest.Raise(
+                m => m.OnRunCompletion += null,
+                new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+
+            // Verify
+            this.mockOutput.Verify(x => x.WriteLine(Resources.Resources.EnableLocalCrashDumpGuidance + LocalCrashDumpUtilities.EnableLocalCrashDumpForwardLink, OutputLevel.Information), Times.Once);
+        }
+
+        [TestCleanup]
+        public void CleanUp()
+        {
+            BlameLogger.ClearDumpList();
+        }
+
+        private List<TestCase> GetTestCaseList()
+        {
+            return new List<TestCase>
+                    {
+                        new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath"),
+                        new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath")
+                    };
         }
 
         /// <summary>
@@ -176,8 +254,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
             /// <param name="blameReaderWriter">
             /// The blame Reader Writer.
             /// </param>
-            internal TestableBlameLogger(IOutput output, IBlameReaderWriter blameReaderWriter)
-                : base(output, blameReaderWriter)
+            /// <param name="environment">
+            /// Environment Helper
+            /// </param>
+            internal TestableBlameLogger(IOutput output, IBlameReaderWriter blameReaderWriter, IEnvironment environment)
+                : base(output, blameReaderWriter, environment)
             {
             }
         }

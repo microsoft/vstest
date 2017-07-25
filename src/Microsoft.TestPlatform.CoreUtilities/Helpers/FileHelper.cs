@@ -76,5 +76,17 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers
         {
             File.Move(sourcePath, destinationPath);
         }
+
+        /// <inheritdoc/>
+        public string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
+        {
+            return Directory.GetFiles(path, searchPattern, searchOption);
+        }
+
+        /// <inheritdoc/>
+        public DateTime GetLastWriteTime(string path)
+        {
+            return File.GetLastWriteTime(path);
+        }
     }
 }

@@ -68,5 +68,28 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
                 return ResourceManager.GetString("AbortedTestRun", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Dump file created for aborted test run :..
+        /// </summary>
+        internal static string LocalCrashDumpLink
+        {
+            get
+            {
+                return ResourceManager.GetString("LocalCrashDumpLink", resourceCulture);
+            }
+        }
+
+
+        /// <summary>
+        ///   Looks up a localized string similar to To investigate further, enable local crash dump either at machine level or for process and use --..
+        /// </summary>
+        internal static string EnableLocalCrashDumpGuidance
+        {
+            get
+            {
+                return ResourceManager.GetString("EnableLocalCrashDumpGuidance", resourceCulture);
+            }
+        }
     }
 }

@@ -37,5 +37,10 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Friendly name of the data collector
         /// </summary>
         public const string BlameDataCollectorName = "Blame";
+
+        /// <summary>
+        /// Dump key
+        /// </summary>
+        public const string DumpKey = "dump";
     }
 }
