@@ -16,5 +16,21 @@
   <files>
     <file src="Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.Build.dll" target="lib\netstandard1.3" />
     <file src="Microsoft.TestPlatform.Build\netstandard1.3\Microsoft.TestPlatform.targets" target="runtimes\any\native" />
+
+    <!-- Add localized resources -->
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\cs\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\cs" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\de\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\de" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\es\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\es" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\fr\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\fr" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\it\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\it" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\ja\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\ja" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\ko\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\ko" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\pl\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\pl" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\pt-BR\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\pt-BR" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\ru\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\ru" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\tr\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\tr" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\zh-Hans\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\zh-Hans" />
+    <file src="Microsoft.TestPlatform.Build\netstandard1.3\zh-Hant\Microsoft.TestPlatform.Build.resources.dll" target="lib\netstandard1.3\zh-Hant" />
+
   </files>
 </package>
