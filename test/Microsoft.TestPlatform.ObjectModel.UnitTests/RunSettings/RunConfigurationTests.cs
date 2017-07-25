@@ -22,6 +22,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(Constants.DefaultPlatform, runConfiguration.TargetPlatform);
             Assert.AreEqual(Framework.DefaultFramework, runConfiguration.TargetFrameworkVersion);
             Assert.AreEqual(Constants.DefaultBatchSize, runConfiguration.BatchSize);
+            Assert.AreEqual(0, runConfiguration.TestSessionTimeout);
             Assert.AreEqual(Constants.DefaultResultsDirectory, runConfiguration.ResultsDirectory);
             Assert.AreEqual(null, runConfiguration.SolutionDirectory);
             Assert.AreEqual(Constants.DefaultTreatTestAdapterErrorsAsWarnings, runConfiguration.TreatTestAdapterErrorsAsWarnings);
@@ -68,6 +69,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <DisableParallelization>true</DisableParallelization>
                        <MaxCpuCount>2</MaxCpuCount>
                        <BatchSize>5</BatchSize>
+                       <TestSessionTimeout>10000</TestSessionTimeout>
                        <TestAdaptersPaths>C:\a\b;D:\x\y</TestAdaptersPaths>
                        <BinariesRoot>E:\x\z</BinariesRoot>
                        <DesignMode>true</DesignMode>
@@ -95,6 +97,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(@"C:\a\b;D:\x\y", runConfiguration.TestAdaptersPaths);
             Assert.AreEqual(2, runConfiguration.MaxCpuCount);
             Assert.AreEqual(5, runConfiguration.BatchSize);
+            Assert.AreEqual(10000, runConfiguration.TestSessionTimeout);
             Assert.AreEqual(true, runConfiguration.DisableAppDomain);
             Assert.AreEqual(true, runConfiguration.DisableParallelization);
             Assert.AreEqual(true, runConfiguration.DesignMode);
@@ -116,6 +119,23 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.That.Throws<SettingsException>(
                     () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
                     .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'Foo' specified for 'BatchSize'.");
+        }
+
+        [TestMethod]
+        public void RunConfigurationFromXmlThrowsSettingsExceptionIfTestSessionTimeoutIsIsInvalid()
+        {
+            string settingsXml =
+             @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <TestSessionTimeout>0</TestSessionTimeout>
+                     </RunConfiguration>
+                </RunSettings>";
+
+
+            Assert.That.Throws<SettingsException>(
+                    () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+                    .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '0' specified for 'TestSessionTimeout'.");
         }
 
         [TestMethod]

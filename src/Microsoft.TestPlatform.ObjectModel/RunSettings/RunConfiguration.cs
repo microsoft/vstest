@@ -39,6 +39,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private long batchSize;
 
         /// <summary>
+        /// Specifies the Test Session Timeout in milliseconds
+        /// </summary>
+        private long testSessionTimeout;
+
+        /// <summary>
         /// Directory in which rocksteady/adapter should keep their run specific data. 
         /// </summary>
         private string resultsDirectory;
@@ -87,6 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.testAdaptersPaths = null;
             this.maxCpuCount = Constants.DefaultCpuCount;
             this.batchSize = Constants.DefaultBatchSize;
+            this.testSessionTimeout = 0;
             this.disableAppDomain = false;
             this.disableParallelization = false;
             this.designMode = false;
@@ -152,6 +158,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.batchSize = value;
                 this.BatchSizeSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the testSessionTimeout. Should be non-negative integer.
+        /// </summary>
+        public long TestSessionTimeout
+        {
+            get
+            {
+                return this.testSessionTimeout;
+            }
+            set
+            {
+                this.testSessionTimeout = value;
+                this.TestSessionTimeoutSet = true;
             }
         }
 
@@ -315,6 +337,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets a value indicating testSessionTimeout is set
+        /// </summary>
+        public bool TestSessionTimeoutSet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets a value indicating whether design mode is set.
         /// </summary>
         public bool DesignModeSet
@@ -404,6 +435,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement batchSize = doc.CreateElement("BatchSize");
             batchSize.InnerXml = this.BatchSize.ToString();
             root.AppendChild(batchSize);
+
+            XmlElement testSessionTimeout = doc.CreateElement("TestSessionTimeout");
+            testSessionTimeout.InnerXml = this.TestSessionTimeout.ToString();
+            root.AppendChild(testSessionTimeout);
 
             XmlElement designMode = doc.CreateElement("DesignMode");
             designMode.InnerXml = this.DesignMode.ToString();
@@ -523,6 +558,25 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             }
 
                             runConfiguration.BatchSize = size;
+                            break;
+
+                        case "TestSessionTimeout":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string testSessionTimeout = reader.ReadElementContentAsString();
+                            long sessionTimeout;
+                            if (!long.TryParse(testSessionTimeout, out sessionTimeout) || sessionTimeout <= 0)
+                            {
+                                throw new SettingsException(
+                                    string.Format(
+                                        CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsIncorrectValue,
+                                        Constants.RunConfigurationSettingsName,
+                                        testSessionTimeout,
+                                        elementName));
+                            }
+
+                            runConfiguration.TestSessionTimeout = sessionTimeout;
                             break;
 
                         case "DesignMode":

@@ -20,18 +20,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -57,6 +58,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Canceling test run as cancelation requested..
+        /// </summary>
+        internal static string CancelationRequested {
+            get {
+                return ResourceManager.GetString("CancelationRequested", resourceCulture);
             }
         }
         

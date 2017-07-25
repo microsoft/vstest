@@ -80,6 +80,30 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.CommandLine
             Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
         }
 
+        [TestMethod]
+        public void TestRunCompletionHandlerForCanceledRunShouldSetsOutcomeToFailed()
+        {
+            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>();
+            testOutcomeDict.Add(TestOutcome.Passed, 1);
+            var stats = new TestableTestRunStats(testOutcomeDict);
+
+            var messageArgs = new TestRunCompleteEventArgs(stats, true, false, null, null, new TimeSpan());
+            this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
+            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+        }
+
+        [TestMethod]
+        public void TestRunCompletionHandlerForAbortedRunShouldSetsOutcomeToFailed()
+        {
+            var testOutcomeDict = new System.Collections.Generic.Dictionary<TestOutcome, long>();
+            testOutcomeDict.Add(TestOutcome.Passed, 1);
+            var stats = new TestableTestRunStats(testOutcomeDict);
+
+            var messageArgs = new TestRunCompleteEventArgs(stats, false, true, null, null, new TimeSpan());
+            this.mockTestRunRequest.Raise(tr => tr.OnRunCompletion += null, messageArgs);
+            Assert.AreEqual(TestOutcome.Failed, resultAggregator.Outcome);
+        }
+
         #region implementation
 
         private class TestableTestRunStats : ITestRunStatistics

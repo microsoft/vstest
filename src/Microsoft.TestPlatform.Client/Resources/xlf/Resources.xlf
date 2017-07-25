@@ -10,6 +10,11 @@
         <source>Wait for completion operation is not allowed when there is no active test run. </source>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestSessionTimeoutMessage">
+        <source>Canceling test run: test run timeout of {0} milliseconds exceeded.</source>
+        <target state="new">Canceling test run as it crossed testSessionTimeout: {0} milliseconds.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
