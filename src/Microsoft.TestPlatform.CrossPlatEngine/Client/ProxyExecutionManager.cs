@@ -7,7 +7,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using System.Text.RegularExpressions;
     using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
@@ -100,6 +99,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 if (this.isCommunicationEstablished)
                 {
+                    if (this.cancellationTokenSource.IsCancellationRequested)
+                    {
+                        if (EqtTrace.IsVerboseEnabled)
+                        {
+                            EqtTrace.Verbose("ProxyExecutionManager.StartTestRun: Canceling the current run after getting cancelation request.");
+                        }
+                        throw new TestPlatformException(Resources.Resources.CancelationRequested);
+                    }
+
                     this.InitializeExtensions(testSources);
 
                     var executionContext = new TestExecutionContext(

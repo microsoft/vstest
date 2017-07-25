@@ -107,13 +107,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// </summary>
         private void TestRunCompletionHandler(object sender, TestRunCompleteEventArgs e)
         {
-            if (e.TestRunStatistics == null)
+            if (e.TestRunStatistics == null || e.IsCanceled || e.IsAborted)
             {
                 this.Outcome = TestOutcome.Failed;
-                return;
             }
-
-            if (e.TestRunStatistics[TestOutcome.Failed] > 0)
+            else if (e.TestRunStatistics[TestOutcome.Failed] > 0)
             {
                 this.Outcome = TestOutcome.Failed;
             }
