@@ -14,6 +14,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
+
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -22,6 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     public sealed class TestRequestSender : ITestRequestSender
     {
         private ICommunicationManager communicationManager;
+
+        private ITransport transport;
 
         private bool sendMessagesToRemoteHost = true;
 
@@ -44,8 +48,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
         /// </summary>
         /// <param name="protocolConfig">Protocol related information</param>
-        public TestRequestSender(ProtocolConfig protocolConfig)
-            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance, protocolConfig)
+        /// <param name="connectionInfo">Transport layer to set up connection</param>
+        public TestRequestSender(ProtocolConfig protocolConfig, ConnectionInfo connectionInfo)
+            : this(new SocketCommunicationManager(), connectionInfo, JsonDataSerializer.Instance, protocolConfig)
         {
         }
 
@@ -53,12 +58,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
         /// </summary>
         /// <param name="communicationManager">Communication Manager for sending and receiving messages.</param>
+        /// <param name="connectionInfo">ConnectionInfo to set up transport layer</param>
         /// <param name="dataSerializer">Serializer for serialization and deserialization of the messages.</param>
         /// <param name="protocolConfig">Protocol related information</param>
-        internal TestRequestSender(ICommunicationManager communicationManager, IDataSerializer dataSerializer, ProtocolConfig protocolConfig)
+        internal TestRequestSender(ICommunicationManager communicationManager, ConnectionInfo connectionInfo, IDataSerializer dataSerializer, ProtocolConfig protocolConfig)
         {
             this.highestSupportedVersion = protocolConfig.Version;
             this.communicationManager = communicationManager;
+
+            // The connectionInfo here is that of RuntimeProvider, so reverse the role of runner.
+            connectionInfo.Role = connectionInfo.Role == ConnectionRole.Host
+                                                ? ConnectionRole.Client
+                                                : ConnectionRole.Host;
+
+            this.transport = new SocketTransport(communicationManager, connectionInfo);
             this.dataSerializer = dataSerializer;
         }
 
@@ -67,15 +80,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.clientExitCancellationSource = new CancellationTokenSource();
             this.clientExitErrorMessage = string.Empty;
-            var port = this.communicationManager.HostServer();
-            this.communicationManager.AcceptClientAsync();
-            return port;
+
+            return this.transport.InitializeTransportLayer();
         }
 
         /// <inheritdoc/>
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
-            return this.communicationManager.WaitForClientConnection(clientConnectionTimeout);
+            return this.transport.WaitForConnectionToEstablish(clientConnectionTimeout);
         }
 
         /// <inheritdoc/>

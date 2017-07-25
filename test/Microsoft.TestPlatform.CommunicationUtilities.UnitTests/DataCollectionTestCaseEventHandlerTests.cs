@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Net;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -16,6 +17,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+
     using Newtonsoft.Json.Linq;
 
     [TestClass]
@@ -37,17 +39,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void InitializeShouldInitializeConnection()
         {
-            this.mockCommunicationManager.Setup(x => x.HostServer()).Returns(1);
+            this.mockCommunicationManager.Setup(x => x.HostServer(IPAddress.Loopback + ":0")).Returns(1);
             this.requestHandler.InitializeCommunication();
 
-            this.mockCommunicationManager.Verify(x => x.HostServer(), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.HostServer(IPAddress.Loopback + ":0"), Times.Once);
             this.mockCommunicationManager.Verify(x => x.AcceptClientAsync(), Times.Once);
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfExceptionIsThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.HostServer()).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.HostServer(IPAddress.Loopback + ":0")).Throws<Exception>();
             Assert.ThrowsException<Exception>(() =>
             {
                 this.requestHandler.InitializeCommunication();

@@ -6,7 +6,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #pragma warning disable SA1600
@@ -16,11 +16,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void ToCommandLineOptionsShouldIncludePort()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123 };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets } };
 
             var options = connectionInfo.ToCommandLineOptions();
 
-            StringAssert.StartsWith(options, "--port 123");
+            StringAssert.StartsWith(options, "--port 123 --endpoint 127.0.0.0:123 --role client");
         }
 
         [TestMethod]

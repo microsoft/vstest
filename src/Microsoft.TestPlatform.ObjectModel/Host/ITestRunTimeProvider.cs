@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
 
     /// <summary>
     /// Interface for TestRuntimeProvider which manages test host processes for test engine.
@@ -63,6 +64,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         void SetCustomLauncher(ITestHostLauncher customLauncher);
 
         /// <summary>
+        /// Gets the end point address and behaviour of TestRuntime
+        /// E.g. for phone device EndPoint:127.0.0.1:8080, ConnectionRole Host, TransportProtocol: Sockets
+        /// </summary>
+        /// <returns> Socket where the service is hosted by TestRuntime. Empty otherwise</returns>
+        ConnectionInfo GetTestHostConnectionInfo();
+
+        /// <summary>
         /// Launches the test host for discovery/execution.
         /// </summary>
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
@@ -99,39 +107,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// The <see cref="Task"/>.
         /// </returns>
         Task CleanTestHostAsync(CancellationToken cancellationToken);
-    }
-
-    /// <summary>
-    /// Connection information for a test host to communicate with test runner.
-    /// </summary>
-    public struct TestRunnerConnectionInfo
-    {
-        /// <summary>
-        /// Gets or sets the port opened by test runner for host communication.
-        /// </summary>
-        public int Port
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the diagnostics log file.
-        /// </summary>
-        public string LogFile
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the runner process id.
-        /// </summary>
-        public int RunnerProcessId
-        {
-            get;
-            set;
-        }
     }
 
     public class HostProviderEventArgs : EventArgs

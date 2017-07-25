@@ -69,19 +69,19 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void InitializeCommunicationShouldInitializeCommunication()
         {
-            this.requestHandler.InitializeCommunication(123);
+            this.requestHandler.InitializeCommunication("123");
 
-            this.mockCommunicationManager.Verify(x => x.SetupClientAsync(123), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.SetupClientAsync("123"), Times.Once);
         }
 
         [TestMethod]
         public void InitializeCommunicationShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<int>())).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<string>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
                 {
-                    this.requestHandler.InitializeCommunication(123);
+                    this.requestHandler.InitializeCommunication("123");
                 });
         }
 

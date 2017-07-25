@@ -143,9 +143,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc />
-        public void InitializeCommunication(int port)
+        public void InitializeCommunication(string endPoint)
         {
-            this.communicationManager.SetupClientAsync(port);
+            this.communicationManager.SetupClientAsync(endPoint);
         }
 
         /// <inheritdoc />

@@ -11,8 +11,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <summary>
         /// Setups client based on port
         /// </summary>
-        /// <param name="port">port number to connect</param>
-        void InitializeCommunication(int port);
+        /// <param name="endPoint">EndPoint to connect</param>
+        void InitializeCommunication(string endPoint);
 
         /// <summary>
         /// Waits for Request Handler to connect to Request Sender

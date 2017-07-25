@@ -4,9 +4,8 @@
 namespace Microsoft.TestPlatform.PerformanceTests
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Text;
+    using System.Net;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
@@ -79,8 +78,8 @@ namespace Microsoft.TestPlatform.PerformanceTests
             var client = new SocketCommunicationManager();
             var watch = new Stopwatch();
 
-            int port = server.HostServer();
-            client.SetupClientAsync(port).Wait();
+            int port = server.HostServer(IPAddress.Loopback + ":0");
+            client.SetupClientAsync(IPAddress.Loopback + ":" + port).Wait();
             server.AcceptClientAsync().Wait();
 
             server.WaitForClientConnection(1000);

@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     internal class DefaultEngineInvoker :
@@ -26,7 +27,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = 5 * 1000;
 
-        private const string PortArgument = "--port";
+        private const string EndPointArgument = "--endpoint";
+
+        private const string RoleArgument = "--role";
 
         private const string ParentProcessIdArgument = "--parentprocessid";
 
@@ -52,10 +55,11 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
 
             // Get port number and initialize communication
-            var portNumber = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, PortArgument);
+            string endPoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndPointArgument);
+            ConnectionRole connectionRole = string.Equals(CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument), "client", StringComparison.OrdinalIgnoreCase) ? ConnectionRole.Client : ConnectionRole.Host;
 
             // Start Processing of requests
-            using (var requestHandler = new TestRequestHandler())
+            using (var requestHandler = new TestRequestHandler(new ConnectionInfo { Endpoint = endPoint, Role = connectionRole, Channel = TransportChannel.Sockets }))
             {
                 // Attach to exit of parent process
                 var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
@@ -75,8 +79,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 }
 
                 // Initialize Communication
-                EqtTrace.Info("DefaultEngineInvoker: Initialize communication on port number: '{0}'", portNumber);
-                requestHandler.InitializeCommunication(portNumber);
+                EqtTrace.Info("DefaultEngineInvoker: Initialize communication on endpoint address: '{0}'", endPoint);
+                requestHandler.InitializeCommunication();
 
                 // Initialize DataCollection Communication if data collection port is provided.
                 var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);

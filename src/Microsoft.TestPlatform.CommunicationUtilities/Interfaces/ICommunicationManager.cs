@@ -14,8 +14,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// Host a server and listens on endpoint for requests
         /// </summary>
+        /// <param name="endPointAddress">End point where server is hosted</param>
         /// <returns>Port number of the listening endpoint</returns>
-        int HostServer();
+        int HostServer(string endPointAddress);
 
         /// <summary>
         /// Accepts client connection asynchronously
@@ -49,9 +50,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// Creates a Client Channel and connects to server on given port number
         /// </summary>
-        /// <param name="portNumber">Port number for client to connect to</param>
+        /// <param name="endPointAddress">End point for client to connect to</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task SetupClientAsync(int portNumber);
+        Task SetupClientAsync(string endPointAddress);
 
         /// <summary>
         /// Stops any client connected to server

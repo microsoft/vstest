@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection
 {
-    using System;
+    using System.Net;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollector.Interfaces;
@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <inheritdoc />
         public int InitializeCommunication()
         {
-            var port = this.communicationManager.HostServer();
+            var port = this.communicationManager.HostServer(IPAddress.Loopback + ":0");
             this.communicationManager.AcceptClientAsync();
             return port;
         }

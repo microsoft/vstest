@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
 {
     using System;
     using System.Collections.ObjectModel;
+    using System.Net;
 
     using Microsoft.TestPlatform.CommunicationUtilities.UnitTests.TestDoubles;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -36,13 +37,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.dataCollectionTestCaseEventSender.InitializeCommunication(123);
 
-            this.mockCommunicationManager.Verify(x => x.SetupClientAsync(123), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.SetupClientAsync(IPAddress.Loopback + ":123"), Times.Once);
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<int>())).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<string>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
                 {

@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
 {
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.Net;
 
     using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -54,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <returns>Port number</returns>
         public int InitializeCommunication()
         {
-            var port = this.communicationManager.HostServer();
+            var port = this.communicationManager.HostServer(IPAddress.Loopback + ":0");
             this.communicationManager.AcceptClientAsync();
             return port;
         }
