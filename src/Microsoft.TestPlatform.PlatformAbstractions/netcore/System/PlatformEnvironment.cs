@@ -3,9 +3,10 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
-    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using System;
     using System.Runtime.InteropServices;
+    using System.Threading;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc />
     public class PlatformEnvironment : IEnvironment
@@ -43,6 +44,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 
                 return PlatformOperatingSystem.Unix;
             }
+        }
+
+        /// <inheritdoc />
+        public void Exit(int exitcode)
+        {
+            Environment.Exit(exitcode);
+        }
+
+        /// <inheritdoc />
+        public int GetCurrentManagedThreadId()
+        {
+            return Thread.CurrentThread.ManagedThreadId;
         }
     }
 }

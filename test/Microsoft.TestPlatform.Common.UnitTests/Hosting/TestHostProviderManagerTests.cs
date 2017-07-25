@@ -3,20 +3,20 @@
 
 namespace TestPlatform.Common.UnitTests.Logging
 {
-    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Threading;
-    using TestPlatform.Common.UnitTests.ExtensionFramework;
     using System.Threading.Tasks;
 
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    using TestPlatform.Common.UnitTests.ExtensionFramework;
 
     /// <summary>
     /// Tests the behaviors of the TestLoggerManager class.
@@ -106,7 +106,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
-                ".NETFramework,Version=v4.6",
+                ".NETFramework,Version=v4.5.1",
                 "</TargetFrameworkVersion></RunConfiguration></RunSettings> ");
 
             var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
@@ -122,7 +122,7 @@ namespace TestPlatform.Common.UnitTests.Logging
             string runSettingsXml = string.Concat(
                 @"<?xml version=""1.0"" encoding=""utf-8""?><RunSettings>
 <RunConfiguration><MaxCpuCount>0</MaxCpuCount><TargetPlatform> x86 </TargetPlatform><TargetFrameworkVersion>",
-                ".NETFramework,Version=v4.6",
+                ".NETFramework,Version=v4.5.1",
                 "</TargetFrameworkVersion><DisableAppDomain>true</DisableAppDomain></RunConfiguration></RunSettings> ");
 
             var testHostManager = TestRuntimeProviderManager.Instance.GetTestHostManagerByRunConfiguration(runSettingsXml);
@@ -177,7 +177,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.Shared = !config.DisableAppDomain;
             }
 
-            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -197,7 +197,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public Task TerminateAsync(int testHostId, CancellationToken cancellationToken)
+            public Task CleanTestHostAsync(CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -245,7 +245,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 this.Shared = !config.DisableAppDomain;
             }
 
-            public Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+            public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }
@@ -265,7 +265,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public Task TerminateAsync(int testHostId, CancellationToken cancellationToken)
+            public Task CleanTestHostAsync(CancellationToken cancellationToken)
             {
                 throw new NotImplementedException();
             }

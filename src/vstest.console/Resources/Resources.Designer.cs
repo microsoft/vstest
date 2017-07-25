@@ -476,6 +476,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to --Blame|/Blame 
+        ///      Enable Blame mode for diagnosis of faulty test case
+        /// </summary>
+        public static string EnableBlameUsage
+        {
+            get
+            {
+                return ResourceManager.GetString("EnableBlameUsage", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to --logger|/logger:&lt;Logger Uri/FriendlyName&gt;
         ///      Specify a logger for test results.  For example, to log results into a 
         ///      Visual Studio Test Results File (TRX) use /logger:trx [;LogFileName=&lt;Defaults to unique file name&gt;]
@@ -577,7 +589,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         /// <summary>
         ///   Looks up a localized string similar to --Framework|/Framework:&lt;Framework Version&gt;
         ///      Target .Net Framework version to be used for test execution. 
-        ///      Valid values are &quot;.NETFramework,Version=v4.6&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
+        ///      Valid values are &quot;.NETFramework,Version=v4.5.1&quot;, &quot;.NETCoreApp,Version=v1.0&quot; etc.
         ///      Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10..
         /// </summary>
         public static string FrameworkArgumentHelp
@@ -589,7 +601,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:&quot;.NETFramework,Version=v4.6&quot;.
+        ///   Looks up a localized string similar to The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:&quot;.NETFramework,Version=v4.5.1&quot;.
         /// </summary>
         public static string FrameworkVersionRequired
         {

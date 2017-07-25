@@ -24,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             throw new NotImplementedException();
         }
-        
+
         /// <inheritdoc/>
         public string GetCurrentProcessFileName()
         {
@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         }
 
         /// <inheritdoc/>
-        public void TerminateProcess(int processId)
+        public void TerminateProcess(object process)
         {
             throw new NotImplementedException();
         }

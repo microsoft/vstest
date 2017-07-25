@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.diagProcessor = new TestableEnableDiagArgumentProcessor(this.mockFileHelper.Object);
 
             // Saving the EqtTrace state
-#if NET46
+#if NET451
             traceLevel = EqtTrace.TraceLevel;
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else
@@ -49,7 +49,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             // Restoring to initial state for EqtTrace
             EqtTrace.InitializeVerboseTrace(traceFileName);
-#if NET46
+#if NET451
             EqtTrace.TraceLevel = traceLevel;
 #else
             EqtTrace.TraceLevel = (PlatformTraceLevel)traceLevel;
@@ -116,7 +116,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             this.diagProcessor.Executor.Value.Initialize(this.dummyFilePath);
 
             Assert.IsTrue(!EqtTrace.IsVerboseEnabled);
-#if NET46
+#if NET451
             EqtTrace.TraceLevel = TraceLevel.Off;
 #else
             EqtTrace.TraceLevel = PlatformTraceLevel.Off;

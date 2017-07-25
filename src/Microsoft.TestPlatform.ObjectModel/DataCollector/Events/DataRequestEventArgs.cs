@@ -9,7 +9,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// <summary>
     /// Data Request event arguments
     /// </summary>
-#if NET46
+#if NET451
     [Serializable]
 #endif
     public sealed class DataRequestEventArgs : TestCaseEventArgs
@@ -140,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection
     /// collectors have sent into the result sink, and then append a token at the end, to
     /// indicate that all the data has been flushed into the result sink.
     /// </summary>
-#if NET46
+#if NET451
     [Serializable] 
 #endif
     internal sealed class FlushDataEventArgs : DataCollectionEventArgs

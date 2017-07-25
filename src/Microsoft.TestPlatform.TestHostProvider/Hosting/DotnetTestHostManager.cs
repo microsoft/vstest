@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.Extensions.DependencyModel;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
-    using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
@@ -39,12 +38,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     /// intentional since we want to move this to a separate assembly (with some runtime extensibility discovery).
     /// </remarks>
     [ExtensionUri(DotnetTestHostUri)]
-    [FriendlyName(DotnetTestHostFriendltName)]
+    [FriendlyName(DotnetTestHostFriendlyName)]
     public class DotnetTestHostManager : ITestRuntimeProvider
     {
         private const string DotnetTestHostUri = "HostProvider://DotnetTestHost";
-        private const string DotnetTestHostFriendltName = "DotnetTestHost";
-        private const string TestAdapterRegexPattern = @".*.TestAdapter.dll";
+        private const string DotnetTestHostFriendlyName = "DotnetTestHost";
+        private const string TestAdapterRegexPattern = @"TestAdapter.dll";
 
         private IDotnetHostHelper dotnetHostHelper;
 
@@ -143,9 +142,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public virtual async Task<int> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo)
+        public async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            return await Task.Run(() => this.LaunchHost(testHostStartInfo), CancellationToken.None);
+            return await Task.Run(() => this.LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
         }
 
         /// <inheritdoc/>
@@ -245,7 +244,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
             if (!string.IsNullOrEmpty(sourceDirectory) && this.fileHelper.DirectoryExists(sourceDirectory))
             {
-                return this.fileHelper.EnumerateFiles(sourceDirectory, TestAdapterRegexPattern, SearchOption.TopDirectoryOnly);
+                return this.fileHelper.EnumerateFiles(sourceDirectory, SearchOption.TopDirectoryOnly, TestAdapterRegexPattern);
             }
 
             return Enumerable.Empty<string>();
@@ -268,16 +267,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public Task TerminateAsync(int processId, CancellationToken cancellationToken)
+        public Task CleanTestHostAsync(CancellationToken cancellationToken)
         {
             try
             {
-                this.processHelper.TerminateProcess(processId);
+                this.processHelper.TerminateProcess(this.testHostProcess);
             }
             catch (Exception ex)
             {
                 EqtTrace.Warning("DotnetTestHostManager: Unable to terminate test host process: " + ex);
             }
+
+            this.testHostProcess?.Dispose();
 
             return Task.FromResult(true);
         }
@@ -304,24 +305,33 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
         }
 
-        private int LaunchHost(TestProcessStartInfo testHostStartInfo)
+        private bool LaunchHost(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
-            this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
-            if (this.testHostLauncher == null)
+            try
             {
-                EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
-                this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
+                this.testHostProcessStdError = new StringBuilder(this.ErrorLength, this.ErrorLength);
+                if (this.testHostLauncher == null)
+                {
+                    EqtTrace.Verbose("DotnetTestHostManager: Starting process '{0}' with command line '{1}'", testHostStartInfo.FileName, testHostStartInfo.Arguments);
+
+                    cancellationToken.ThrowIfCancellationRequested();
+                    this.testHostProcess = this.processHelper.LaunchProcess(testHostStartInfo.FileName, testHostStartInfo.Arguments, testHostStartInfo.WorkingDirectory, testHostStartInfo.EnvironmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
+                }
+                else
+                {
+                    var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
+                    this.testHostProcess = Process.GetProcessById(processId);
+                }
             }
-            else
+            catch (OperationCanceledException ex)
             {
-                var processId = this.testHostLauncher.LaunchTestHost(testHostStartInfo);
-                this.testHostProcess = Process.GetProcessById(processId);
+                this.messageLogger.SendMessage(TestMessageLevel.Error, ex.Message);
+                return false;
             }
 
-            var pId = this.testHostProcess != null ? this.testHostProcess.Id : 0;
-            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched with Pid: " + pId));
+            this.OnHostLaunched(new HostProviderEventArgs("Test Runtime launched", 0, this.testHostProcess.Id));
 
-            return pId;
+            return this.testHostProcess != null;
         }
 
         private string GetTestHostPath(string runtimeConfigDevPath, string depsFilePath, string sourceDirectory)

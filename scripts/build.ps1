@@ -63,7 +63,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 $env:NUGET_EXE_Version = "3.4.3"
 $env:DOTNET_CLI_VERSION = "2.1.0-preview1-006329"
 $env:DOTNET_RUNTIME_VERSION = "2.0.0-preview2-25331-01"
-$env:LOCATE_VS_API_VERSION = "0.2.4-beta"
+$env:VSWHERE_VERSION = "2.0.2"
 $env:MSBUILD_VERSION = "15.0"
 
 #
@@ -71,7 +71,7 @@ $env:MSBUILD_VERSION = "15.0"
 #
 Write-Verbose "Setup build configuration."
 $TPB_Solution = "TestPlatform.sln"
-$TPB_TargetFramework = "net46"
+$TPB_TargetFramework = "net451"
 $TPB_TargetFrameworkCore = "netcoreapp1.0"
 $TPB_TargetFrameworkCore20 = "netcoreapp2.0"
 $TPB_Configuration = $Configuration
@@ -243,9 +243,9 @@ function Publish-Package
 
     # Publish platform abstractions
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
-    $platformAbstractionNet46 = Join-Path $platformAbstraction $TPB_TargetFramework
+    $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
-    Copy-Item $platformAbstractionNet46\* $fullCLRPackageDir -Force
+    Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
     
     # Copy over the logger assemblies to the Extensions folder.
@@ -266,6 +266,16 @@ function Publish-Package
         Write-Verbose "Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force"
         Move-Item $coreCLR20PackageDir\$file $coreCLRExtensionsDir -Force
     }
+
+    # Copy Blame Datacollector to Extensions folder.
+    $TPB_TargetFrameworkStandard = "netstandard1.5"
+    $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
+    $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework
+    $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
+    Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $fullCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $coreCLRExtensionsDir -Force
+    Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
 	
 	# Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
     $runtimeproviders = @("Microsoft.TestPlatform.TestHostRuntimeProvider.dll", "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
@@ -338,7 +348,7 @@ function Create-VsixPackage
     }
     else
     {
-        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found"
+        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
@@ -388,8 +398,8 @@ function Create-NugetPackages
 function Copy-PackageItems($packageName)
 {
     # Packages published separately are copied into their own artifacts directory
-    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net46\* is copied
-    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net46
+    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
+    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
     $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
@@ -485,7 +495,7 @@ function Locate-MSBuildPath
 
     if([string]::IsNullOrEmpty($vsInstallPath))
     {
-      return $null
+        return $null
     }
 
     $vsInstallPath = Resolve-Path -path $vsInstallPath
@@ -497,37 +507,34 @@ function Locate-MSBuildPath
 
 function Locate-VsInstallPath
 {
-   $locateVsApi = Locate-LocateVsApi
+   $vswhere = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "vswhere\$env:VSWHERE_VERSION\tools\vswhere.exe"
+   if (!(Test-Path -path $vswhere)) {
+       throw "Unable to locate vswhere in path '$vswhere'."
+   }
 
-   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.Roslyn.Compiler", "Microsoft.VisualStudio.Component.VSSDK")
+   Write-Verbose "Using '$vswhere' to locate VS installation path."
 
+   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.VSSDK")
    Write-Verbose "VSInstallation requirements : $requiredPackageIds"
 
-   Add-Type -path $locateVsApi
    Try
    {
-     $vsInstallPath = [LocateVS.Instance]::GetInstallPath($env:MSBUILD_VERSION, $requiredPackageIds)
+       Write-Verbose "VSWhere command line: $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath"
+       if ($TPB_CIBuild) {
+           $vsInstallPath = & $vswhere -latest -products * -requires $requiredPackageIds -property installationPath
+       }
+       else {
+           # Allow using pre release versions of VS for dev builds
+           $vsInstallPath = & $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath
+       }
    }
    Catch [System.Management.Automation.MethodInvocationException]
    {
-      Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
+       Write-Verbose "Failed to find VS installation with requirements : $requiredPackageIds"
    }
 
    Write-Verbose "VSInstallPath is : $vsInstallPath"
-
    return $vsInstallPath
-}
-
-function Locate-LocateVsApi
-{
-  $locateVsApi = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "RoslynTools.Microsoft.LocateVS\$env:LOCATE_VS_API_VERSION\tools\LocateVS.dll"
-
-  if (!(Test-Path -path $locateVsApi)) {
-    throw "The specified LocateVS API version ($env:LOCATE_VS_API_VERSION) could not be located."
-  }
-
-  Write-Verbose "locateVsApi is : $locateVsApi"
-  return $locateVsApi
 }
 
 function Update-VsixVersion($vsixProjectDir)
@@ -554,7 +561,7 @@ function Build-SpecificProjects
 {
     Write-Log "Build-SpecificProjects: Started for pattern: $ProjectNamePatterns"
     # FrameworksAndOutDirs format ("<target_framework>", "<output_dir>").
-    $FrameworksAndOutDirs =( ("net46", "net46\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
+    $FrameworksAndOutDirs =( ("net451", "net451\win7-x64"), ("netstandard1.5", "netcoreapp2.0"), ("netcoreapp1.0", "netcoreapp2.0"), ("netcoreapp2.0", "netcoreapp2.0"))
     $dotnetPath = Get-DotNetPath
 
     # Get projects to build.

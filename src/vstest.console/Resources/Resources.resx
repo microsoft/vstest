@@ -276,11 +276,11 @@
   <data name="FrameworkArgumentHelp" xml:space="preserve">
     <value>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.6", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
       Other supported values are Framework35, Framework40, Framework45 and FrameworkCore10.</value>
   </data>
   <data name="FrameworkVersionRequired" xml:space="preserve">
-    <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.6"</value>
+    <value>The /Framework argument requires the target .Net Framework version for the test run.   Example:  /Framework:".NETFramework,Version=v4.5.1"</value>
   </data>
   <data name="HelpArgumentHelp" xml:space="preserve">
     <value>-?|--Help|/?|/Help
@@ -661,5 +661,9 @@
   <data name="ResponseFileArgumentHelp" xml:space="preserve">
     <value>@&lt;file&gt;
       Read response file for more options.</value>
+  </data>
+  <data name="EnableBlameUsage" xml:space="preserve">
+    <value>--Blame|/Blame
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash. It creates an output file in the current directory as "Sequence.xml", that captures the order of execution of test before the crash.</value>
   </data>
 </root>

@@ -3,19 +3,16 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Threading.Tasks;
 
-#if !NET46
-    using System.Runtime.Loader;
-#endif
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollector.InProcDataCollector;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
     /// Class representing an InProcDataCollector loaded by InProcDataCollectionExtensionManager
@@ -37,16 +34,44 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         /// </summary>
         private string configXml;
 
-        public InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string configXml)
+        /// <summary>
+        /// AssemblyLoadContext for current platform
+        /// </summary>
+        private IAssemblyLoadContext assemblyLoadContext;
+
+        public InProcDataCollector(
+            string codeBase,
+            string assemblyQualifiedName,
+            TypeInfo interfaceTypeInfo,
+            string configXml)
+            : this(codeBase, assemblyQualifiedName, interfaceTypeInfo, configXml, new PlatformAssemblyLoadContext())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InProcDataCollector"/> class.
+        /// </summary>
+        /// <param name="codeBase">
+        /// </param>
+        /// <param name="assemblyQualifiedName">
+        /// </param>
+        /// <param name="interfaceTypeInfo">
+        /// </param>
+        /// <param name="configXml">
+        /// </param>
+        /// <param name="assemblyLoadContext">
+        /// </param>
+        internal InProcDataCollector(string codeBase, string assemblyQualifiedName, TypeInfo interfaceTypeInfo, string configXml, IAssemblyLoadContext assemblyLoadContext)
         {
             this.configXml = configXml;
+            this.assemblyLoadContext = assemblyLoadContext;
 
             var assembly = this.LoadInProcDataCollectorExtension(codeBase);
             this.dataCollectorType =
                 assembly?.GetTypes()
-                    .FirstOrDefault(x => (x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x)));
+                    .FirstOrDefault(x => x.AssemblyQualifiedName.Equals(assemblyQualifiedName) && interfaceTypeInfo.IsAssignableFrom(x.GetTypeInfo()));
 
-            this.AssemblyQualifiedName = (dataCollectorType?.AssemblyQualifiedName);
+            this.AssemblyQualifiedName = this.dataCollectorType?.AssemblyQualifiedName;
         }
 
         /// <summary>
@@ -95,19 +120,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
         private static MethodInfo GetMethodInfoFromType(Type type, string funcName, Type[] argumentTypes)
         {
-            MethodInfo methodInfo = null;
-
-            var typeInfo = type.GetTypeInfo();
-            methodInfo = typeInfo?.GetMethod(funcName, argumentTypes);
-            return methodInfo;
+            return type.GetMethod(funcName, argumentTypes);
         }
 
         private static object CreateObjectFromType(Type type)
         {
             object obj = null;
 
-            var typeInfo = type.GetTypeInfo();
-            var constructorInfo = typeInfo?.GetConstructor(Type.EmptyTypes);
+            var constructorInfo = type.GetConstructor(Type.EmptyTypes);
             obj = constructorInfo?.Invoke(new object[] { });
 
             return obj;
@@ -123,12 +143,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             Assembly assembly = null;
             try
             {
-#if NET46
-                assembly = Assembly.LoadFrom(codeBase);
-#else
-                assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(codeBase);
-#endif
-
+                assembly = this.assemblyLoadContext.LoadAssemblyFromPath(codeBase);
             }
             catch (Exception ex)
             {

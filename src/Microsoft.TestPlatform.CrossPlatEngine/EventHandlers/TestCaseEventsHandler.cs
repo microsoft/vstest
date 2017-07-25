@@ -4,9 +4,6 @@
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
 {
     using System;
-#if !NET46
-    using System.Runtime.Loader;
-#endif
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
@@ -19,9 +16,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers
     internal class TestCaseEventsHandler : ITestCaseEventsHandler, ITestEventsPublisher
     {
         public event EventHandler<SessionStartEventArgs> SessionStart;
+
         public event EventHandler<SessionEndEventArgs> SessionEnd;
+
         public event EventHandler<TestCaseStartEventArgs> TestCaseStart;
+
         public event EventHandler<TestCaseEndEventArgs> TestCaseEnd;
+
         public event EventHandler<TestResultEventArgs> TestResult;
 
         /// <summary>

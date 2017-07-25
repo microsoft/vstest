@@ -7,10 +7,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
     using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
-#if !NET46
-    using System.Runtime.Loader;
-#endif
 
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 
     /// <summary>
@@ -96,16 +94,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     // At this point, the assembly should be already loaded into the load context. We query for a reference to
                     // find the types and cache the symbol information. Let the loader follow default lookup order instead of
                     // forcing load from a specific path.
-#if NET46
-                    var asm = Assembly.Load(AssemblyName.GetAssemblyName(binaryPath));
-#else
-                    var asm = Assembly.Load(AssemblyLoadContext.GetAssemblyName(binaryPath));
-#endif
+                    var asm = Assembly.Load(new PlatformAssemblyLoadContext().GetAssemblyNameFromPath(binaryPath));
 
                     foreach (var type in asm.GetTypes())
                     {
                         // Get declared method infos
-                        var methodInfoList = ((TypeInfo)type.GetTypeInfo()).DeclaredMethods;
+                        var methodInfoList = type.GetTypeInfo().DeclaredMethods;
                         var methodsNavigationData = new Dictionary<string, DiaNavigationData>();
 
                         foreach (var methodInfo in methodInfoList)

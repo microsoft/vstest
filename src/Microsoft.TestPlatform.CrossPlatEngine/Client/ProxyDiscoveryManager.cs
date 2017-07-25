@@ -6,7 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text.RegularExpressions;
+    using System.Threading;
 
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
@@ -26,6 +26,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     {
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
+        private CancellationTokenSource cancellationTokenSource;
+        private bool isCommunicationEstablished;
 
         #region Constructors
 
@@ -50,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManager">
         /// Test host Manager instance
         /// </param>
+        /// <param name="dataSerializer"></param>
         /// <param name="clientConnectionTimeout">
         /// The client Connection Timeout
         /// </param>
@@ -62,6 +65,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.dataSerializer = dataSerializer;
             this.testHostManager = testHostManager;
+            this.cancellationTokenSource = new CancellationTokenSource();
+            this.isCommunicationEstablished = false;
         }
 
         #endregion
@@ -73,12 +78,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Initialize()
         {
-            if (this.testHostManager.Shared)
-            {
-                // If the test host manager supports sharing the test host across sources, we can
-                // initialize it early and assign sources later.
-                this.InitializeExtensions(Enumerable.Empty<string>());
-            }
         }
 
         /// <summary>
@@ -90,15 +89,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
-                if (!this.testHostManager.Shared)
-                {
-                    // If the test host doesn't support sharing across sources, we must initialize it
-                    // with sources.
-                    this.InitializeExtensions(discoveryCriteria.Sources);
-                }
+                this.isCommunicationEstablished = this.SetupChannel(discoveryCriteria.Sources, this.cancellationTokenSource.Token);
 
-                this.SetupChannel(discoveryCriteria.Sources);
-                this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
+                if (this.isCommunicationEstablished)
+                {
+                    this.InitializeExtensions(discoveryCriteria.Sources);
+                    this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
+                }
             }
             catch (Exception exception)
             {
@@ -110,8 +107,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 eventHandler.HandleRawMessage(rawMessage);
 
                 // Log to vstest.console
+                // Send a discovery complete to caller. Similar logic is also used in ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager
+                // Aborted is `true`: in case of parallel discovery (or non shared host), an aborted message ensures another discovery manager
+                // created to replace the current one. This will help if the current discovery manager is aborted due to irreparable error
+                // and the test host is lost as well.
                 eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
-                eventHandler.HandleDiscoveryComplete(0, new List<ObjectModel.TestCase>(), false);
+                eventHandler.HandleDiscoveryComplete(-1, new List<ObjectModel.TestCase>(), true);
             }
         }
 
@@ -135,8 +136,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
             if (TestPluginCache.Instance.PathToExtensions != null)
             {
-                var regex = new Regex(TestPlatformConstants.TestAdapterRegexPattern, RegexOptions.IgnoreCase);
-                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => regex.IsMatch(ext)));
+                extensions.AddRange(TestPluginCache.Instance.PathToExtensions.Where(ext => ext.EndsWith(TestPlatformConstants.TestAdapterEndsWithPattern, StringComparison.OrdinalIgnoreCase)));
             }
 
             extensions.AddRange(TestPluginCache.Instance.DefaultExtensionPaths);
@@ -146,8 +146,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             // Only send this if needed.
             if (platformExtensions.Any())
             {
-                this.SetupChannel(sourceList);
-
                 this.RequestSender.InitializeDiscovery(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
         }

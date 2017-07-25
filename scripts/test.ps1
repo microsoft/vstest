@@ -14,7 +14,7 @@ Param(
     [System.String] $TargetRuntime = "win7-x64",
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("netcoreapp1.0", "net46")]
+    [ValidateSet("netcoreapp1.0", "net451")]
     [Alias("f")]
     [System.String] $TargetFramework,
 
@@ -69,7 +69,7 @@ $env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
 #
 # Test configuration
 #
-$TPT_TargetFrameworkFullCLR = "net46"
+$TPT_TargetFrameworkFullCLR = "net451"
 $TPT_TargetFrameworkCore = "netcoreapp1.0"
 $TPT_TargetFramework20Core = "netcoreapp2.0"
 Write-Verbose "Setup build configuration."
@@ -195,7 +195,7 @@ function Invoke-Test
                 $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFramework20Core $targetRuntime) $vstestConsoleFileName
             } else {
 
-                $testFrameWork = ".NETFramework,Version=v4.6"
+                $testFrameWork = ".NETFramework,Version=v4.5.1"
                 $vstestConsoleFileName = "vstest.console.exe"
                 $targetRunTime = $Script:TPT_TargetRuntime
                 $vstestConsolePath = Join-Path (Get-PackageDirectory $TPT_TargetFrameworkFullCLR $targetRuntime) $vstestConsoleFileName
@@ -248,6 +248,13 @@ function Invoke-Test
                 $testContainers |  % {
                     # Fill in the framework in test containers
                     $testContainer = [System.String]::Format($_, $fx)
+
+                    if (-not (Test-Path $testContainer))
+                    {
+                        # Test project may not targetting all frameworks. Example: Microsoft.TestPlatform.Build.UnitTests won't target net451.
+                        return
+                    }
+
                     $trxLogFileName =  [System.String]::Format("{0}_{1}_{2}", ($(Get-ChildItem $testContainer).Name), $fx, $Script:TPT_DefaultTrxFileName)
 
                     # Remove already existed trx file name as due to which warning will get generated and since we are expecting result in a particular format, that will break

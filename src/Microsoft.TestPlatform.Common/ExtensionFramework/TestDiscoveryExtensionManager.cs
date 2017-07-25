@@ -80,7 +80,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 TestPluginManager.Instance
                     .GetSpecificTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer, ITestDiscovererCapabilities, TestDiscovererMetadata>(
-                        TestPlatformConstants.TestAdapterRegexPattern,
+                        TestPlatformConstants.TestAdapterEndsWithPattern,
                         out unfilteredTestExtensions,
                         out testExtensions);
 
