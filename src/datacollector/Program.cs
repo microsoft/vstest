@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
 {
     using System;
     using System.Diagnostics;
-    using System.Net;
     using System.Net.Sockets;
     using System.Threading.Tasks;
 
@@ -100,7 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector
                 throw new ArgumentException("Incorrect/No Port number");
             }
 
-            requestHandler.InitializeCommunication(IPAddress.Loopback + ":" + port);
+            requestHandler.InitializeCommunication(port);
 
             // Can only do this after InitializeCommunication because datacollector cannot "Send Log" unless communications are initialized
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))

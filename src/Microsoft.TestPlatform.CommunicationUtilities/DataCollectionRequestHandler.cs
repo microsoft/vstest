@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -143,9 +144,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         }
 
         /// <inheritdoc />
-        public void InitializeCommunication(string endPoint)
+        public void InitializeCommunication(int port)
         {
-            this.communicationManager.SetupClientAsync(endPoint);
+            this.communicationManager.SetupClientAsync(IPAddress.Loopback + ":" + port);
         }
 
         /// <inheritdoc />
