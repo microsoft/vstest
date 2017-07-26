@@ -12,10 +12,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
 

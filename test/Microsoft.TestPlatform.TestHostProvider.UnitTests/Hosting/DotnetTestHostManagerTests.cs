@@ -188,6 +188,21 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
+        {
+            var connectionInfo = new ConnectionInfo
+                                     {
+                                         Endpoint = "127.0.0.1:0",
+                                         Role = ConnectionRole.Client,
+                                         Channel = TransportChannel.Sockets
+                                     };
+
+            var info = this.dotnetHostManager.GetTestHostConnectionInfo();
+
+            Assert.AreEqual(connectionInfo, info);
+        }
+
+        [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeEnvironmentVariables()
         {
             var environmentVariables = new Dictionary<string, string> { { "k1", "v1" }, { "k2", "v2" } };

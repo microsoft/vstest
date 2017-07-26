@@ -24,6 +24,26 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         }
 
         [TestMethod]
+        public void ToCommandLineOptionsShouldIncludeEndpoint()
+        {
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets } };
+
+            var options = connectionInfo.ToCommandLineOptions();
+
+            StringAssert.Contains(options, "--endpoint 127.0.0.0:123");
+        }
+
+        [TestMethod]
+        public void ToCommandLineOptionsShouldIncludeRole()
+        {
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets } };
+
+            var options = connectionInfo.ToCommandLineOptions();
+
+            StringAssert.Contains(options, "--role client");
+        }
+
+        [TestMethod]
         public void ToCommandLineOptionsShouldIncludeParentProcessId()
         {
             var connectionInfo = new TestRunnerConnectionInfo { RunnerProcessId = 123 };
