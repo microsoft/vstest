@@ -65,15 +65,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             Assert.IsNotNull(TestPluginCache.Instance.TestExtensions);
 
-            // Discoverers
-            Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestDiscoverers.Count > 0);
-            var allDiscoverers = TestDiscoveryExtensionManager.Create().Discoverers;
-
-            foreach (var discoverer in allDiscoverers)
-            {
-                Assert.IsTrue(discoverer.IsExtensionCreated);
-            }
-
             // Executors
             Assert.IsTrue(TestPluginCache.Instance.TestExtensions.TestExecutors.Count > 0);
             var allExecutors = TestExecutorExtensionManager.Create().TestExtensions;
