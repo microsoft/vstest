@@ -219,12 +219,12 @@ function invoke_build()
             Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions:netstandard1.0 \
             package/package/package:netcoreapp1.0 \
             Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel:netstandard1.4 \
-            Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Microsoft.TestPlatform.VsTestConsole.TranslationLayer:netstandard1.4 \
+            Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Microsoft.TestPlatform.VsTestConsole.TranslationLayer:netstandard1.5 \
             datacollector/datacollector:netcoreapp2.0 \
             vstest.console/vstest.console:netcoreapp2.0 \
             Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common:netstandard1.4 \
             Microsoft.TestPlatform.Client/Microsoft.TestPlatform.Client:netstandard1.4 \
-            Microsoft.TestPlatform.Extensions.TrxLogger/Microsoft.TestPlatform.Extensions.TrxLogger:netstandard1.4 \
+            Microsoft.TestPlatform.Extensions.TrxLogger/Microsoft.TestPlatform.Extensions.TrxLogger:netstandard1.5 \
             Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities:netstandard1.4 \
             Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities:netstandard1.4 \
             Microsoft.TestPlatform.Build/Microsoft.TestPlatform.Build:netstandard1.3 \
