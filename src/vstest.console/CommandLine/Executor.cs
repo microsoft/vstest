@@ -104,9 +104,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             this.PrintSplashScreen();
 
+            // Flatten arguments and process response files.
+            string[] flattenedArguments;
+            exitCode |= this.FlattenArguments(args, out flattenedArguments);
+
             // Get the argument processors for the arguments.
             List<IArgumentProcessor> argumentProcessors;
-            exitCode |= this.GetArgumentProcessors(args, out argumentProcessors);
+            exitCode |= this.GetArgumentProcessors(flattenedArguments, out argumentProcessors);
 
             // Verify that the arguments are valid.
             exitCode |= this.IdentifyDuplicateArguments(argumentProcessors);
@@ -343,6 +347,90 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
 
             this.Output.WriteLine(CommandLineResources.CopyrightCommandLineTitle, OutputLevel.Information);
             this.Output.WriteLine(string.Empty, OutputLevel.Information);
+        }
+
+        /// <summary>
+        /// Flattens command line arguments by processing response files.
+        /// </summary>
+        /// <param name="arguments">Arguments provided to perform execution with.</param>
+        /// <param name="flattenedArguments">Array of flattened arguments.</param>
+        /// <returns>0 if successful and 1 otherwise.</returns>
+        /// <see href="https://github.com/dotnet/roslyn/blob/bcdcafc2d407635bc7de205d63d0182e81ef9faa/src/Compilers/Core/Portable/CommandLine/CommonCommandLineParser.cs#L297"/>
+        private int FlattenArguments(IEnumerable<string> arguments, out string[] flattenedArguments)
+        {
+            List<string> outputArguments = new List<string>();
+            int result = 0;
+
+            foreach (var arg in arguments)
+            {
+                if (arg.StartsWith("@", StringComparison.Ordinal))
+                {
+                    // response file:
+                    string path = arg.Substring(1).TrimEnd(null);
+                    result |= ParseResponseFile(path, out var responseFileArguments);
+                    outputArguments.AddRange(responseFileArguments.Reverse());
+                }
+                else
+                {
+                    outputArguments.Add(arg);
+                }
+            }
+
+            flattenedArguments = outputArguments.ToArray();
+            return result;
+        }
+
+        /// <summary>
+        /// Parse a response file into a set of arguments. Errors opening the response file are output as errors.
+        /// </summary>
+        /// <param name="fullPath">Full path to the response file.</param>
+        /// <param name="responseFileArguments">Enumeration of the response file arguments.</param>
+        /// <returns>0 if successful and 1 otherwise.</returns>
+        /// <see href="https://github.com/dotnet/roslyn/blob/bcdcafc2d407635bc7de205d63d0182e81ef9faa/src/Compilers/Core/Portable/CommandLine/CommonCommandLineParser.cs#L517"/>
+        private int ParseResponseFile(string fullPath, out IEnumerable<string> responseFileArguments)
+        {
+            int result = 0;
+            List<string> lines = new List<string>();
+            try
+            {
+                using (var reader = new StreamReader(
+                    new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+                                   detectEncodingFromByteOrderMarks: true))
+                {
+                    string str;
+                    while ((str = reader.ReadLine()) != null)
+                    {
+                        lines.Add(str);
+                    }
+                }
+
+                responseFileArguments = ParseResponseLines(lines);
+            }
+            catch (Exception)
+            {
+                this.Output.Error(string.Format(CultureInfo.CurrentCulture, CommandLineResources.OpenResponseFileError, fullPath));
+                responseFileArguments = new string[0];
+                result = 1;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Take a string of lines from a response file, remove comments,
+        /// and split into a set of command line arguments.
+        /// </summary>
+        /// <see href="https://github.com/dotnet/roslyn/blob/bcdcafc2d407635bc7de205d63d0182e81ef9faa/src/Compilers/Core/Portable/CommandLine/CommonCommandLineParser.cs#L545"/>
+        private static IEnumerable<string> ParseResponseLines(IEnumerable<string> lines)
+        {
+            List<string> arguments = new List<string>();
+
+            foreach (string line in lines)
+            {
+                arguments.AddRange(CommandLineUtilities.SplitCommandLineIntoArguments(line, removeHashComments: true));
+            }
+
+            return arguments;
         }
 
         #endregion
