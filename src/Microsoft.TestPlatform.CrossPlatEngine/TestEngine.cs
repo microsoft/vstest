@@ -59,6 +59,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
 
+            if(ShouldRunInNoIsolation(discoveryCriteria.RunSettings))
+            {
+                return new NoIsolationProxyDiscoveryManager();
+            }
+
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
             {
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
@@ -66,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 return new ProxyDiscoveryManager(new TestRequestSender(protocolConfig), hostManager);
             };
-                
+
             return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
         }
 
@@ -192,6 +197,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             return parallelLevelToUse;
+        }
+
+        private bool ShouldRunInNoIsolation(string runsettings)
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
+            if(runConfiguration.NoIsolation && !runConfiguration.DesignMode && !(runConfiguration.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
+                || runConfiguration.TargetFrameworkVersion.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

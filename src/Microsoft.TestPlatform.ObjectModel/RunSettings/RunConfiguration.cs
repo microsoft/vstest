@@ -59,6 +59,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool disableAppDomain;
 
         /// <summary>
+        /// Specify to not run tests in isolation.
+        /// </summary>
+        private bool noIsolation;
+
+        /// <summary>
         /// Indication to adapters to disable parallelization.
         /// </summary>
         private bool disableParallelization;
@@ -94,6 +99,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.batchSize = Constants.DefaultBatchSize;
             this.testSessionTimeout = 0;
             this.disableAppDomain = false;
+            this.noIsolation = false;
             this.disableParallelization = false;
             this.designMode = false;
             this.shouldCollectSourceInformation = false;
@@ -229,6 +235,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to run tests in isolation or not.
+        /// </summary>
+        public bool NoIsolation
+        {
+            get
+            {
+                return this.noIsolation;
+            }
+
+            set
+            {
+                this.noIsolation = value;
+                this.NoIsolationSet = true;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating whether parallelism needs to be disabled by the adapters.
         /// </summary>
         public bool DisableParallelization
@@ -355,9 +378,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets a value indicating whether app domain needs to be disabled by the adapters.
+        /// Gets a value indicating whether disable appdomain is set.
         /// </summary>
         public bool DisableAppDomainSet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether NoIsolation is set.
+        /// </summary>
+        public bool NoIsolationSet
         {
             get;
             private set;
@@ -451,6 +483,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement disableAppDomain = doc.CreateElement("DisableAppDomain");
             disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
             root.AppendChild(disableAppDomain);
+
+            XmlElement noIsolation = doc.CreateElement("NoIsolation");
+            noIsolation.InnerXml = this.NoIsolation.ToString();
+            root.AppendChild(noIsolation);
 
             XmlElement disableParallelization = doc.CreateElement("DisableParallelization");
             disableParallelization.InnerXml = this.DisableParallelization.ToString();
@@ -603,6 +639,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableAppDomainValueString, elementName));
                             }
                             runConfiguration.DisableAppDomain = disableAppDomainCheck;
+                            break;
+
+                        case "NoIsolation":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string noIsolationValueString = reader.ReadElementContentAsString();
+                            bool noIsolationCheck;
+                            if (!bool.TryParse(noIsolationValueString, out noIsolationCheck))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, noIsolationValueString, elementName));
+                            }
+                            runConfiguration.NoIsolation = noIsolationCheck;
                             break;
 
                         case "DisableParallelization":
