@@ -387,6 +387,7 @@ function create_package()
 
     for i in ${projectFiles[@]}; do
         log "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
+        && $DOTNET_PATH restore $stagingDir/${i} \
         && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
     done
 
