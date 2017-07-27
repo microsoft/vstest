@@ -91,6 +91,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
+            if (parallelLevel <= 1 && !isDataCollectorEnabled && ShouldRunInNoIsolation(testRunCriteria.TestRunSettings))
+            {
+                return new NoIsolationProxyexecutionManager();
+            }
+
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
             {
