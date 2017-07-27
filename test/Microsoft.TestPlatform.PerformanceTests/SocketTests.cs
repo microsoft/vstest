@@ -78,8 +78,8 @@ namespace Microsoft.TestPlatform.PerformanceTests
             var client = new SocketCommunicationManager();
             var watch = new Stopwatch();
 
-            int port = server.HostServer(IPAddress.Loopback + ":0");
-            client.SetupClientAsync(IPAddress.Loopback + ":" + port).Wait();
+            int port = server.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            client.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port)).Wait();
             server.AcceptClientAsync().Wait();
 
             server.WaitForClientConnection(1000);

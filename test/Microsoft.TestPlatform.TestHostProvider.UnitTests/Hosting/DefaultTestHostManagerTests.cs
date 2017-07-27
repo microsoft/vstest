@@ -18,7 +18,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -84,7 +83,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets }, RunnerProcessId = 101 };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
             var info = this.testHostManager.GetTestHostProcessStartInfo(
                 Enumerable.Empty<string>(),
                 null,
@@ -96,11 +95,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
         {
-            var connectionInfo = new ConnectionInfo
+            var connectionInfo = new TestHostConnectionInfo
                                      {
                                          Endpoint = "127.0.0.1:0",
                                          Role = ConnectionRole.Client,
-                                         Channel = TransportChannel.Sockets
+                                         Transport = Transport.Sockets
                                      };
 
             var info = this.testHostManager.GetTestHostConnectionInfo();
@@ -134,7 +133,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeTestSourcePathInArgumentsIfNonShared()
         {
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{true}</DisableAppDomain> </RunConfiguration> </RunSettings>");
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets }, RunnerProcessId = 101 };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
             var source = "C:\temp\a.dll";
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(

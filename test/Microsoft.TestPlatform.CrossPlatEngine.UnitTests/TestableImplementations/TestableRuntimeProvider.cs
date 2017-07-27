@@ -12,7 +12,6 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementatio
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
 
     [ExtensionUri("executor://TestableTestHost")]
     [FriendlyName("TestableTestHost")]
@@ -46,14 +45,9 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementatio
         {
         }
 
-        public ConnectionInfo GetTestHostConnectionInfo()
+        public TestHostConnectionInfo GetTestHostConnectionInfo()
         {
-            return new ConnectionInfo
-                {
-                    Endpoint = "127.0.0.1:0",
-                    Role = ConnectionRole.Client,
-                    Channel = TransportChannel.Sockets
-                };
+            return new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
         }
 
         public Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)

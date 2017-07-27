@@ -72,13 +72,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         {
             this.requestHandler.InitializeCommunication(123);
 
-            this.mockCommunicationManager.Verify(x => x.SetupClientAsync(IPAddress.Loopback + ":123"), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, 123)), Times.Once);
         }
 
         [TestMethod]
         public void InitializeCommunicationShouldThrowExceptionIfThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<string>())).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<IPEndPoint>())).Throws<Exception>();
 
             Assert.ThrowsException<Exception>(() =>
                 {

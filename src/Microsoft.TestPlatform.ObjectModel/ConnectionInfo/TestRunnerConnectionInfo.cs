@@ -1,15 +1,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     /// <summary>
     /// Details of EndPoint address for connection b/w test runtime, test runnner
     /// </summary>
-    public struct ConnectionInfo
+    public struct TestHostConnectionInfo
     {
         /// <summary>
-        /// Endpoint where the service is hosted, This endpoint is specific to Transport Protocol
+        /// Endpoint where the service is hosted, This endpoint is specific to Transport
         /// e.g. 127.0.0.0:8080 for socktes
         /// </summary>
         public string Endpoint
@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionIn
         }
 
         /// <summary>
-        /// Gets or sets the role played by Application during communication.
+        /// Gets or sets the role played by TestRuntime during communication.
         /// </summary>
         public ConnectionRole Role
         {
@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionIn
         /// <summary>
         /// Gets or sets the trasport protocol supported by test runtime
         /// </summary>
-        public TransportChannel Channel
+        public Transport Transport
         {
             get;
             set;
@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionIn
     /// Specifies the underneath Transport channel to be used
     /// E.g. For UWP/Desktop it is Sockets, for Android it could be SSH
     /// </summary>
-    public enum TransportChannel
+    public enum Transport
     {
         /// <summary>
         /// Act as server host
@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionIn
         /// <summary>
         /// Gets or sets the details of endpoint by test runner for host communication.
         /// </summary>
-        public ConnectionInfo ConnectionInfo
+        public TestHostConnectionInfo ConnectionInfo
         {
             get;
             set;

@@ -55,9 +55,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollect
         /// <returns>Port number</returns>
         public int InitializeCommunication()
         {
-            var port = this.communicationManager.HostServer(IPAddress.Loopback + ":0");
+            var endpoint = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
             this.communicationManager.AcceptClientAsync();
-            return port;
+            return endpoint.Port;
         }
 
         /// <summary>

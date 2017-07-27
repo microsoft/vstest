@@ -39,17 +39,17 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void InitializeShouldInitializeConnection()
         {
-            this.mockCommunicationManager.Setup(x => x.HostServer(IPAddress.Loopback + ":0")).Returns(1);
+            this.mockCommunicationManager.Setup(x => x.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, 1));
             this.requestHandler.InitializeCommunication();
 
-            this.mockCommunicationManager.Verify(x => x.HostServer(IPAddress.Loopback + ":0"), Times.Once);
+            this.mockCommunicationManager.Verify(x => x.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
             this.mockCommunicationManager.Verify(x => x.AcceptClientAsync(), Times.Once);
         }
 
         [TestMethod]
         public void InitializeShouldThrowExceptionIfExceptionIsThrownByCommunicationManager()
         {
-            this.mockCommunicationManager.Setup(x => x.HostServer(IPAddress.Loopback + ":0")).Throws<Exception>();
+            this.mockCommunicationManager.Setup(x => x.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Throws<Exception>();
             Assert.ThrowsException<Exception>(() =>
             {
                 this.requestHandler.InitializeCommunication();

@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -28,11 +27,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// </summary>
     public class TestRequestHandler : IDisposable, ITestRequestHandler
     {
-        /// <summary>
-        /// The timeout for the client to connect to the server.
-        /// </summary>
-        private const int LaunchProcessWithDebuggerTimeout = 5 * 1000;
-
         private ICommunicationManager communicationManager;
 
         private ITransport transport;
@@ -47,12 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // that implies runner is using version 1
         private int protocolVersion = 1;
 
-        public TestRequestHandler(ConnectionInfo connectionInfo)
+        public TestRequestHandler(TestHostConnectionInfo connectionInfo)
             : this(new SocketCommunicationManager(), connectionInfo, JsonDataSerializer.Instance)
         {
         }
 
-        internal TestRequestHandler(ICommunicationManager communicationManager, ConnectionInfo connectionInfo, IDataSerializer dataSerializer)
+        internal TestRequestHandler(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
         {
             this.communicationManager = communicationManager;
             this.transport = new SocketTransport(communicationManager, connectionInfo);
@@ -62,13 +56,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void InitializeCommunication()
         {
-            this.transport.InitializeTransportLayer();
+            this.transport.Initialize();
         }
 
         /// <inheritdoc/>
         public bool WaitForRequestSenderConnection(int connectionTimeout)
         {
-            return this.transport.WaitForConnectionToEstablish(connectionTimeout);
+            return this.transport.WaitForConnection(connectionTimeout);
         }
 
         /// <summary>

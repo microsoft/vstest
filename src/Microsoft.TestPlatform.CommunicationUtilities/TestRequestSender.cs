@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
 
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
@@ -49,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         /// <param name="protocolConfig">Protocol related information</param>
         /// <param name="connectionInfo">Transport layer to set up connection</param>
-        public TestRequestSender(ProtocolConfig protocolConfig, ConnectionInfo connectionInfo)
+        public TestRequestSender(ProtocolConfig protocolConfig, TestHostConnectionInfo connectionInfo)
             : this(new SocketCommunicationManager(), connectionInfo, JsonDataSerializer.Instance, protocolConfig)
         {
         }
@@ -61,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <param name="connectionInfo">ConnectionInfo to set up transport layer</param>
         /// <param name="dataSerializer">Serializer for serialization and deserialization of the messages.</param>
         /// <param name="protocolConfig">Protocol related information</param>
-        internal TestRequestSender(ICommunicationManager communicationManager, ConnectionInfo connectionInfo, IDataSerializer dataSerializer, ProtocolConfig protocolConfig)
+        internal TestRequestSender(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer, ProtocolConfig protocolConfig)
         {
             this.highestSupportedVersion = protocolConfig.Version;
             this.communicationManager = communicationManager;
@@ -80,14 +79,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.clientExitCancellationSource = new CancellationTokenSource();
             this.clientExitErrorMessage = string.Empty;
-
-            return this.transport.InitializeTransportLayer();
+            return this.transport.Initialize().Port;
         }
 
         /// <inheritdoc/>
         public bool WaitForRequestHandlerConnection(int clientConnectionTimeout)
         {
-            return this.transport.WaitForConnectionToEstablish(clientConnectionTimeout);
+            return this.transport.WaitForConnection(clientConnectionTimeout);
         }
 
         /// <inheritdoc/>

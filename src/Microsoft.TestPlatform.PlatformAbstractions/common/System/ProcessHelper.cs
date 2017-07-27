@@ -154,5 +154,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             {
             }
         }
+
+        /// <inheritdoc/>
+        public int GetProcessId(object process)
+        {
+            var proc = process as Process;
+            return proc?.Id ?? -1;
+        }
     }
 }

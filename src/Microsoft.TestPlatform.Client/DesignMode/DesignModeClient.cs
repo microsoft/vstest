@@ -93,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
         {
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
-            this.communicationManager.SetupClientAsync(IPAddress.Loopback + ":" + port);
+            this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
             // Wait for the connection to the server and listen for requests.
             if (this.communicationManager.WaitForServerConnection(ClientListenTimeOut))

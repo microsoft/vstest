@@ -13,7 +13,6 @@ namespace TestPlatform.Common.UnitTests.Logging
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -203,7 +202,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public ConnectionInfo GetTestHostConnectionInfo()
+            public TestHostConnectionInfo GetTestHostConnectionInfo()
             {
                 throw new NotImplementedException();
             }
@@ -276,7 +275,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public ConnectionInfo GetTestHostConnectionInfo()
+            public TestHostConnectionInfo GetTestHostConnectionInfo()
             {
                 throw new NotImplementedException();
             }

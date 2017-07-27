@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public void InitializeCommunication(int port)
         {
-            this.communicationManager.SetupClientAsync(IPAddress.Loopback + ":" + port);
+            this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
         }
 
         /// <inheritdoc />

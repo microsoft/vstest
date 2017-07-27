@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Time for which the client wait for executor/runner process to start, and host server
         /// </summary>
-        private const int ConnectionRetryTimeOut = 50 * 1000;
+        private const int CONNECTIONRETRYTIMEOUT = 50 * 1000;
 
         /// <summary>
         /// The server stream read timeout constant (in microseconds).
@@ -95,20 +95,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Host TCP Socket Server and start listening
         /// </summary>
-        /// <param name="endPointAddress">End point where server is hosted</param>
+        /// <param name="endpoint">End point where server is hosted</param>
         /// <returns>Port of the listener</returns>
-        public int HostServer(string endPointAddress)
+        public IPEndPoint HostServer(IPEndPoint endpoint)
         {
-            var endPoint = endPointAddress.Split(':');
-            var endpoint = new IPEndPoint(IPAddress.Parse(endPoint[0]), int.Parse(endPoint[1]));
             this.tcpListener = new TcpListener(endpoint);
 
             this.tcpListener.Start();
+            EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)this.tcpListener.LocalEndpoint);
 
-            var portNumber = ((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
-            EqtTrace.Info("Listening on port : {0}", portNumber);
-
-            return portNumber;
+            return (IPEndPoint)this.tcpListener.LocalEndpoint;
         }
 
         /// <summary>
@@ -161,13 +157,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <summary>
         /// Connects to server async
         /// </summary>
-        /// <param name="endPointAddress">EndPointAddress for client to connect</param>
+        /// <param name="endpoint">EndPointAddress for client to connect</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task SetupClientAsync(string endPointAddress)
+        public async Task SetupClientAsync(IPEndPoint endpoint)
         {
+            // ToDo: pass cancellationtoken, if user cancels the operation, so we don't wait 50 secs to connect.
             this.clientConnectionAcceptedEvent.Reset();
-            var endPoint = endPointAddress.Split(':');
-            EqtTrace.Info("Trying to connect to server on socket : {0} : {1}", endPoint[0], endPoint[1]);
+            EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
             this.tcpClient = new TcpClient();
             this.socket = this.tcpClient.Client;
 
@@ -177,7 +173,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 try
                 {
-                    await this.tcpClient.ConnectAsync(IPAddress.Parse(endPoint[0]), int.Parse(endPoint[1]));
+                    await this.tcpClient.ConnectAsync(endpoint.Address, endpoint.Port);
 
                     if (this.tcpClient.Connected)
                     {
@@ -193,7 +189,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Verbose("Connection Failed with error {0}, retrying", ex.Message);
                 }
             }
-            while (!this.tcpClient.Connected && watch.ElapsedMilliseconds < ConnectionRetryTimeOut);
+            while (!this.tcpClient.Connected && watch.ElapsedMilliseconds < CONNECTIONRETRYTIMEOUT);
         }
 
         /// <summary>

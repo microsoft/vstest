@@ -19,7 +19,6 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -63,7 +62,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockMessageLogger = new Mock<IMessageLogger>();
             var mockEnvironment = new Mock<IEnvironment>();
-            this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
+            this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
 
             string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
             this.defaultTestHostPath = @"\tmp\testhost.dll";
@@ -179,7 +178,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets }, RunnerProcessId = 101 };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
@@ -190,12 +189,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
         {
-            var connectionInfo = new ConnectionInfo
-                                     {
-                                         Endpoint = "127.0.0.1:0",
-                                         Role = ConnectionRole.Client,
-                                         Channel = TransportChannel.Sockets
-                                     };
+            var connectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
 
             var info = this.dotnetHostManager.GetTestHostConnectionInfo();
 

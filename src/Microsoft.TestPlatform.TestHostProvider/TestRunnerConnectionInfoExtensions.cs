@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Extension methods for <see cref="TestRunnerConnectionInfo"/>.

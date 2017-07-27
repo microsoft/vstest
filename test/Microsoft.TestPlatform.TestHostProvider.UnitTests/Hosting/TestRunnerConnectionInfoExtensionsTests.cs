@@ -6,7 +6,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using System;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #pragma warning disable SA1600
@@ -16,7 +16,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void ToCommandLineOptionsShouldIncludePort()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets } };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets } };
 
             var options = connectionInfo.ToCommandLineOptions();
 
@@ -26,7 +26,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void ToCommandLineOptionsShouldIncludeEndpoint()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets } };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets } };
 
             var options = connectionInfo.ToCommandLineOptions();
 
@@ -36,7 +36,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void ToCommandLineOptionsShouldIncludeRole()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new ConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Channel = TransportChannel.Sockets } };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets } };
 
             var options = connectionInfo.ToCommandLineOptions();
 

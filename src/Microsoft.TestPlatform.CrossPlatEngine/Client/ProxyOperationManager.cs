@@ -15,7 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.TestRunnerConnectionInfo;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -91,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
-                ConnectionInfo testHostConnectionInfo = this.testHostManager.GetTestHostConnectionInfo();
+                TestHostConnectionInfo testHostConnectionInfo = this.testHostManager.GetTestHostConnectionInfo();
                 var portNumber = 0;
 
                 if (testHostConnectionInfo.Role == ConnectionRole.Client)

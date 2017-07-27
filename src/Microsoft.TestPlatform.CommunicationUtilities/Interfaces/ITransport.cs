@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
 {
     using System;
+    using System.Net;
 
     /// <summary>
     /// The transport Layer Interface
@@ -11,16 +12,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
     public interface ITransport : IDisposable
     {
         /// <summary>
-        /// Initializes Transport Layer depending upon TransportProtocol
+        /// Initializes Transport Layer
         /// </summary>
-        /// <returns>Commnunication Manager</returns>
-        int InitializeTransportLayer();
+        /// <returns>Endpoint</returns>
+        IPEndPoint Initialize();
 
         /// <summary>
         /// Waits for the connection over transport layer to established
         /// </summary>
         /// <param name="connectionTimeout">Time to wait for connection</param>
         /// <returns>True if connection is established</returns>
-        bool WaitForConnectionToEstablish(int connectionTimeout);
+        bool WaitForConnection(int connectionTimeout);
     }
 }

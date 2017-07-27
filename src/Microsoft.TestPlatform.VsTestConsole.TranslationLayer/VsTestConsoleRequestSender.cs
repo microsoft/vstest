@@ -75,7 +75,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             int port = -1;
             try
             {
-                port = this.communicationManager.HostServer(IPAddress.Loopback + ":0");
+                port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
                 this.communicationManager.AcceptClientAsync();
 
                 Task.Run(() =>
