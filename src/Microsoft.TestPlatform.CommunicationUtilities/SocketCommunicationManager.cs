@@ -161,7 +161,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task SetupClientAsync(IPEndPoint endpoint)
         {
-            // ToDo: pass cancellationtoken, if user cancels the operation, so we don't wait 50 secs to connect.
+            // ToDo: pass cancellationtoken, if user cancels the operation, so we don't wait 50 secs to connect
+            // for now added a check for validation of this.tcpclient
             this.clientConnectionAcceptedEvent.Reset();
             EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
             this.tcpClient = new TcpClient();
@@ -189,7 +190,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Verbose("Connection Failed with error {0}, retrying", ex.Message);
                 }
             }
-            while (!this.tcpClient.Connected && watch.ElapsedMilliseconds < CONNECTIONRETRYTIMEOUT);
+            while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < CONNECTIONRETRYTIMEOUT);
         }
 
         /// <summary>
