@@ -18,7 +18,12 @@ namespace BlameUnitTestProject
         [TestMethod]
         public void TestMethod2()
         {
-            Environment.Exit(1);
+            StackOverflowMethod();
+        }
+
+        void StackOverflowMethod()
+        {
+            StackOverflowMethod();
         }
     }
 }
