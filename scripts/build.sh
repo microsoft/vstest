@@ -213,20 +213,20 @@ function invoke_build()
     else
         # Need to target the appropriate targetframework for each project until netstandard2.0 ships
         PROJECTFRAMEWORKMAP=( \
-            Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine:netstandard1.5 \
+            Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine:netstandard1.4 \
             testhost.x86/testhost.x86:netcoreapp1.0 \
             Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions:netcoreapp1.0 \
             Microsoft.TestPlatform.PlatformAbstractions/Microsoft.TestPlatform.PlatformAbstractions:netstandard1.0 \
             package/package/package:netcoreapp1.0 \
-            Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel:netstandard1.5 \
+            Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel:netstandard1.4 \
             Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Microsoft.TestPlatform.VsTestConsole.TranslationLayer:netstandard1.5 \
             datacollector/datacollector:netcoreapp2.0 \
             vstest.console/vstest.console:netcoreapp2.0 \
-            Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common:netstandard1.5 \
-            Microsoft.TestPlatform.Client/Microsoft.TestPlatform.Client:netstandard1.5 \
+            Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common:netstandard1.4 \
+            Microsoft.TestPlatform.Client/Microsoft.TestPlatform.Client:netstandard1.4 \
             Microsoft.TestPlatform.Extensions.TrxLogger/Microsoft.TestPlatform.Extensions.TrxLogger:netstandard1.5 \
-            Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities:netstandard1.5 \
-            Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities:netstandard1.5 \
+            Microsoft.TestPlatform.Utilities/Microsoft.TestPlatform.Utilities:netstandard1.4 \
+            Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities:netstandard1.4 \
             Microsoft.TestPlatform.Build/Microsoft.TestPlatform.Build:netstandard1.3 \
             testhost/testhost:netcoreapp1.0 \
             Microsoft.TestPlatform.CoreUtilities/Microsoft.TestPlatform.CoreUtilities:netstandard1.4
@@ -387,6 +387,7 @@ function create_package()
 
     for i in ${projectFiles[@]}; do
         log "$DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version" \
+        && $DOTNET_PATH restore $stagingDir/${i} \
         && $DOTNET_PATH pack --no-build $stagingDir/${i} -o $packageOutputDir -p:Version=$TPB_Version
     done
 
