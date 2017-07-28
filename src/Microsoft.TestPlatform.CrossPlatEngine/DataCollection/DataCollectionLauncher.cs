@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Text;
 
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -41,7 +40,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         }
 
         /// <inheritdoc />
-        public Process DataCollectorProcess { get; protected set; }
+        public int DataCollectorProcessId { get; protected set; }
 
         /// <summary>
         /// Gets or sets the error length for data collector error stream.
