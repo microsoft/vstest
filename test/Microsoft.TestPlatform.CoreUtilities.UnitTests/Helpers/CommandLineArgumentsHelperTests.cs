@@ -5,8 +5,8 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
 {
     using System.Collections.Generic;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class CommandLineArgumentsHelperTests
@@ -38,6 +38,40 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Helpers
             Assert.IsTrue(argsDictionary.Count == 2);
             Assert.AreEqual("12312", argsDictionary["--port"]);
             Assert.AreEqual("2312", argsDictionary["--parentprocessid"]);
+        }
+
+        [TestMethod]
+        public void GetStringArgFromDictShouldReturnStringValueOrEmpty()
+        {
+            var args = new List<string>() { "--port", "12312", "--parentprocessid", "2312", "--testsourcepath", @"C:\temp\1.dll" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            string data = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, "--port");
+            Assert.AreEqual("12312", data);
+        }
+
+        [TestMethod]
+        public void GetStringArgFromDictShouldReturnNullIfValueIsNotPresent()
+        {
+            var args = new List<string>() { "--hello", "--world" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            string data = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, "--hello");
+
+            Assert.IsTrue(argsDictionary.Count == 2);
+            Assert.AreEqual(null, data);
+        }
+
+        [TestMethod]
+        public void GetStringArgFromDictShouldReturnEmptyStringIfKeyIsNotPresent()
+        {
+            var args = new List<string>() { "--hello", "--world" };
+            var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args.ToArray());
+
+            string data = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, "--port");
+
+            Assert.IsTrue(argsDictionary.Count == 2);
+            Assert.AreEqual(string.Empty, data);
         }
 
         [TestMethod]

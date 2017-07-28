@@ -90,11 +90,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             if (!this.initialized)
             {
                 this.testHostProcessStdError = string.Empty;
+                TestHostConnectionInfo testHostConnectionInfo = this.testHostManager.GetTestHostConnectionInfo();
+                var portNumber = 0;
 
-                var portNumber = this.RequestSender.InitializeCommunication();
+                if (testHostConnectionInfo.Role == ConnectionRole.Client)
+                {
+                    portNumber = this.RequestSender.InitializeCommunication();
+                    testHostConnectionInfo.Endpoint += portNumber;
+                }
+
                 var processId = this.processHelper.GetCurrentProcessId();
 
-                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
+                var connectionInfo = new TestRunnerConnectionInfo { Port = portNumber, ConnectionInfo = testHostConnectionInfo, RunnerProcessId = processId, LogFile = this.GetTimestampedLogFile(EqtTrace.LogFile) };
 
                 // Subscribe to TestHost Event
                 this.testHostManager.HostLaunched += this.TestHostManagerHostLaunched;
@@ -107,6 +114,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // Launch the test host.
                     var hostLaunchedTask = this.testHostManager.LaunchTestHostAsync(testHostStartInfo, cancellationToken);
                     this.testHostLaunched = hostLaunchedTask.Result;
+
+                    if (this.testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
+                    {
+                        // If test runtime is service host, try to poll for connection as client
+                        this.RequestSender.InitializeCommunication();
+                    }
                 }
                 catch (Exception ex)
                 {

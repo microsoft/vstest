@@ -81,7 +81,7 @@ namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests
                 proxyDataCollectionManager.Initialize();
                 proxyDataCollectionManager.BeforeTestRunStart(true, true, this.mockTestMessageEventHandler.Object);
 
-                var result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcess.Id);
+                var result = Process.GetProcessById(dataCollectionLauncher.DataCollectorProcessId);
                 Assert.IsNotNull(result);
 
                 socketCommManager.StopClient();
