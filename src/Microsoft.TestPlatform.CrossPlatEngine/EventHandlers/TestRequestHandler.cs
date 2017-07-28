@@ -19,6 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+
     using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
     /// <summary>
@@ -27,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     public class TestRequestHandler : IDisposable, ITestRequestHandler
     {
         private ICommunicationManager communicationManager;
+
+        private ITransport transport;
 
         private IDataSerializer dataSerializer;
 
@@ -38,34 +41,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         // that implies runner is using version 1
         private int protocolVersion = 1;
 
-        /// <summary>
-        /// The timeout for the client to connect to the server.
-        /// </summary>
-        private const int LaunchProcessWithDebuggerTimeout = 5 * 1000;
-
-        public TestRequestHandler()
-            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
+        public TestRequestHandler(TestHostConnectionInfo connectionInfo)
+            : this(new SocketCommunicationManager(), connectionInfo, JsonDataSerializer.Instance)
         {
         }
 
-        internal TestRequestHandler(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
+        internal TestRequestHandler(ICommunicationManager communicationManager, TestHostConnectionInfo connectionInfo, IDataSerializer dataSerializer)
         {
             this.communicationManager = communicationManager;
+            this.transport = new SocketTransport(communicationManager, connectionInfo);
             this.dataSerializer = dataSerializer;
         }
 
-        /// <summary>
-        /// Setups client based on port
-        /// </summary>
-        /// <param name="port">port number to connect</param>
-        public void InitializeCommunication(int port)
+        /// <inheritdoc/>
+        public void InitializeCommunication()
         {
-            this.communicationManager.SetupClientAsync(port);
+            this.transport.Initialize();
         }
 
+        /// <inheritdoc/>
         public bool WaitForRequestSenderConnection(int connectionTimeout)
         {
-            return this.communicationManager.WaitForServerConnection(connectionTimeout);
+            return this.transport.WaitForConnection(connectionTimeout);
         }
 
         /// <summary>
@@ -77,7 +74,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             bool isSessionEnd = false;
 
             var jobQueue = new JobQueue<Action>(
-                (action) => { action(); },
+                action => { action(); },
                 "TestHostOperationQueue",
                 500,
                 25000000,
@@ -100,10 +97,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                         {
                             this.SendLog(TestMessageLevel.Informational, string.Format(CrossPlatResources.TesthostDiagLogOutputFile, EqtTrace.LogFile));
                         }
-                        else if(!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
+                        else if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
                         {
                             this.SendLog(TestMessageLevel.Warning, EqtTrace.ErrorOnInitialization);
                         }
+
                         break;
 
                     case MessageType.DiscoveryInitialize:
@@ -111,8 +109,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Discovery Session Initialize.");
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetDiscoveryManager().Initialize(pathToAdditionalExtensions), 0);
+                                () => testHostManagerFactory.GetDiscoveryManager()
+                                    .Initialize(pathToAdditionalExtensions),
+                                0);
                             break;
                         }
 
@@ -123,9 +122,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             var discoveryEventsHandler = new TestDiscoveryEventHandler(this);
                             var discoveryCriteria = this.dataSerializer.DeserializePayload<DiscoveryCriteria>(message);
                             jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetDiscoveryManager()
-                                    .DiscoverTests(discoveryCriteria, discoveryEventsHandler), 0);
+                                () => testHostManagerFactory.GetDiscoveryManager()
+                                    .DiscoverTests(discoveryCriteria, discoveryEventsHandler),
+                                0);
 
                             break;
                         }
@@ -135,8 +134,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                             EqtTrace.Info("Discovery Session Initialize.");
                             var pathToAdditionalExtensions = this.dataSerializer.DeserializePayload<IEnumerable<string>>(message);
                             jobQueue.QueueJob(
-                                () =>
-                                testHostManagerFactory.GetExecutionManager().Initialize(pathToAdditionalExtensions), 0);
+                                () => testHostManagerFactory.GetExecutionManager()
+                                    .Initialize(pathToAdditionalExtensions),
+                                0);
                             break;
                         }
 
@@ -223,7 +223,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void Dispose()
         {
-            this.communicationManager?.StopClient();
+            this.transport.Dispose();
         }
 
         /// <inheritdoc/>
@@ -248,7 +248,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc/>
         public void SendLog(TestMessageLevel messageLevel, string message)
         {
-            var testMessagePayload = new TestMessagePayload {MessageLevel = messageLevel,Message = message};
+            var testMessagePayload = new TestMessagePayload { MessageLevel = messageLevel, Message = message };
             this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload, this.protocolVersion);
         }
 

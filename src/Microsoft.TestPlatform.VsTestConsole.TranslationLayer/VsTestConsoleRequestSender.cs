@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -74,7 +75,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             int port = -1;
             try
             {
-                port = this.communicationManager.HostServer();
+                port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
                 this.communicationManager.AcceptClientAsync();
 
                 Task.Run(() =>
@@ -194,7 +195,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.SendMessageAndListenAndReportTestResults(
                 MessageType.GetTestRunnerProcessStartInfoForRunSelected,
-                new TestRunRequestPayload()
+                new TestRunRequestPayload
                 {
                     TestCases = testCases.ToList(),
                     RunSettings = runSettings,
@@ -203,7 +204,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                 runEventsHandler,
                 customHostLauncher);
         }
-
 
         /// <summary>
         /// Send Cancel TestRun message
@@ -430,6 +430,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             catch (Exception ex)
             {
                 EqtTrace.Error("Error while launching custom host: {0}", ex);
+
                 // Vstest.console will send the abort message properly while cleaning up all the flow, so do not abort here
                 // Let the ack go through and let vstest.console handle the error
                 ackPayload.ErrorMessage = ex.Message;

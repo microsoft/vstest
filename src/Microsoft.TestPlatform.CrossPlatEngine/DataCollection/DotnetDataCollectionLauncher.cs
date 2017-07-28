@@ -57,8 +57,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         internal DotnetDataCollectionLauncher(IProcessHelper processHelper, IFileHelper fileHelper, IDotnetHostHelper dotnetHostHelper, IMessageLogger messageLogger) : base(processHelper, messageLogger)
         {
             this.processHelper = processHelper;
-            this.DataCollectorProcess = null;
             this.fileHelper = fileHelper;
+            this.DataCollectorProcessId = -1;
             this.dotnetHostHelper = dotnetHostHelper;
         }
 
@@ -127,8 +127,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
             var cliArgs = string.Join(" ", commandLineArguments);
             var argumentsString = string.Format("{0} {1} {2} ", args, dataCollectorAssemblyPath, cliArgs);
 
-            this.DataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory, environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
-            return this.DataCollectorProcess != null ? this.DataCollectorProcess.Id : 0;
+            var dataCollectorProcess = this.processHelper.LaunchProcess(currentProcessFileName, argumentsString, currentWorkingDirectory, environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack);
+            this.DataCollectorProcessId = this.processHelper.GetProcessId(dataCollectorProcess);
+            return this.DataCollectorProcessId;
         }
     }
 }

@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
 
@@ -42,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
         internal DefaultDataCollectionLauncher(IProcessHelper processHelper, IMessageLogger messageLogger) : base(processHelper, messageLogger)
         {
             this.processHelper = processHelper;
-            this.DataCollectorProcess = null;
+            this.DataCollectorProcessId = -1;
         }
 
         /// <summary>
@@ -73,8 +72,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection
 
             var argumentsString = string.Join(" ", commandLineArguments);
 
-            this.DataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, processWorkingDirectory, environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack) as Process;
-            return this.DataCollectorProcess?.Id ?? 0;
+            var dataCollectorProcess = this.processHelper.LaunchProcess(dataCollectorProcessPath, argumentsString, processWorkingDirectory, environmentVariables, this.ErrorReceivedCallback, this.ExitCallBack);
+            this.DataCollectorProcessId = this.processHelper.GetProcessId(dataCollectorProcess);
+            return this.DataCollectorProcessId;
         }
     }
 }
