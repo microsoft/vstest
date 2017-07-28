@@ -3,7 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
     /// <summary>
     /// Extension methods for <see cref="TestRunnerConnectionInfo"/>.
@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <returns>Command line option string.</returns>
         public static string ToCommandLineOptions(this TestRunnerConnectionInfo connectionInfo)
         {
-            var options = "--port " + connectionInfo.Port + " --parentprocessid " + connectionInfo.RunnerProcessId;
+            var options = "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role " + (connectionInfo.ConnectionInfo.Role == ConnectionRole.Client ? "client" : "host") + " --parentprocessid " + connectionInfo.RunnerProcessId;
             if (!string.IsNullOrEmpty(connectionInfo.LogFile))
             {
                 options += " --diag " + connectionInfo.LogFile;

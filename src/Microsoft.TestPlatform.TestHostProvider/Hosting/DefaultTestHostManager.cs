@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -111,6 +112,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
             this.customTestHostLauncher = customLauncher;
+        }
+
+        /// <inheritdoc/>
+        public TestHostConnectionInfo GetTestHostConnectionInfo()
+        {
+            return new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
         }
 
         /// <inheritdoc/>
