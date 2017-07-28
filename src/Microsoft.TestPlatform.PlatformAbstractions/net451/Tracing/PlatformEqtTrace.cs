@@ -29,7 +29,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public void SetupRemoteEqtTraceListeners(AppDomain childDomain)
         {
             Debug.Assert(childDomain != null, "domain");
-            if (childDomain != null && !Enum.Equals(TraceLevel, TraceLevel.Off))
+            if (childDomain != null && !Enum.Equals(TraceLevel, PlatformTraceLevel.Off))
             {
                 RemoteEqtTrace remoteEqtTrace = (RemoteEqtTrace)childDomain.CreateInstanceFromAndUnwrap(
                     typeof(RemoteEqtTrace).Assembly.Location,

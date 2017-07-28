@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the trace level.
         /// </summary>
-        public TraceLevel TraceLevel
+        public PlatformTraceLevel TraceLevel
         {
             get
             {
