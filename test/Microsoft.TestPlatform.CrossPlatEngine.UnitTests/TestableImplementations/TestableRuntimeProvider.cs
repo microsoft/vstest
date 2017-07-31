@@ -69,6 +69,11 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementatio
             return extensions;
         }
 
+        public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+        {
+            return sources;
+        }
+
         public Task CleanTestHostAsync(CancellationToken cancellationToken)
         {
             HostExited(this, null);

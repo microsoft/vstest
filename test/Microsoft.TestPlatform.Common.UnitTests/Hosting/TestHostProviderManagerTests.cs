@@ -171,6 +171,11 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
+            public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+            {
+                return sources;
+            }
+
             public void Initialize(IMessageLogger logger, string runsettingsXml)
             {
                 var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
@@ -278,6 +283,11 @@ namespace TestPlatform.Common.UnitTests.Logging
             public TestHostConnectionInfo GetTestHostConnectionInfo()
             {
                 throw new NotImplementedException();
+            }
+
+            public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+            {
+                return sources;
             }
         }
 

@@ -17,7 +17,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -84,8 +83,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             try
             {
                 EqtTrace.Info("TestDiscoveryManager.DoDiscovery: Background test discovery started.");
-
-
                 this.testDiscoveryEventsHandler = eventHandler;
 
                 var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
@@ -162,6 +159,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// Verify/Normalize the test source files.
         /// </summary>
         /// <param name="sources"> Paths to source file to look for tests in.  </param>
+        /// <param name="logger">logger</param>
         /// <returns> The list of verified sources. </returns>
         internal static IEnumerable<string> GetValidSources(IEnumerable<string> sources, IMessageLogger logger)
         {
@@ -170,7 +168,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             foreach (string source in sources)
             {
-                if (!File.Exists(source))
+                // It is possible that runtime provider sent relative source path for remote scenario.
+                string src = !Path.IsPathRooted(source) ? Path.Combine(Directory.GetCurrentDirectory(), source) : source;
+
+                if (!File.Exists(src))
                 {
                     var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FileNotFound, source);
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
@@ -182,8 +183,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 {
                     var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DuplicateSource, source);
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
-
-                    continue;
                 }
             }
 

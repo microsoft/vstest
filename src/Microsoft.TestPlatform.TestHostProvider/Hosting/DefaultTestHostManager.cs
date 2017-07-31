@@ -180,6 +180,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
+        public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+        {
+            return sources;
+        }
+
+        /// <inheritdoc/>
         public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
