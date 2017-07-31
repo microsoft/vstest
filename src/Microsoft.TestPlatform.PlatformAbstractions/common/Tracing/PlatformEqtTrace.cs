@@ -35,10 +35,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         private static readonly TraceSource Source = new TraceSource("TpTrace", SourceLevels.Off);
 
-        /// <summary>
-        /// Create static maps for SourceLevels to TraceLevel. The APIs need to provide TraceLevel
-        /// for backward compatibility with older versions of Object Model.
-        /// </summary>
         private static readonly Dictionary<SourceLevels, PlatformTraceLevel> SourcePlatformTraceLevelsMap =
             new Dictionary<SourceLevels, PlatformTraceLevel>
                 {
@@ -50,11 +46,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         { SourceLevels.All, PlatformTraceLevel.Verbose }
                 };
 
-        /// <summary>
-        /// Create static maps for SourceLevels to TraceLevel. The APIs need to provide TraceLevel
-        /// for backward compatibility with older versions of Object Model.
-        /// </summary>
-        private static readonly Dictionary<PlatformTraceLevel, TraceEventType> TraceLevelEventTypeMap =
+        private static readonly Dictionary<PlatformTraceLevel, SourceLevels> PlatformTraceSourceLevelsMap =
+            new Dictionary<PlatformTraceLevel, SourceLevels>
+                {
+                        { PlatformTraceLevel.Error, SourceLevels.Error },
+                        { PlatformTraceLevel.Info, SourceLevels.Information },
+                        { PlatformTraceLevel.Off, SourceLevels.Off },
+                        { PlatformTraceLevel.Verbose, SourceLevels.Verbose },
+                        { PlatformTraceLevel.Warning, SourceLevels.Warning }
+                };
+
+        private static readonly Dictionary<PlatformTraceLevel, TraceEventType> PlatformTraceLevelEventTypeMap =
             new Dictionary<PlatformTraceLevel, TraceEventType>
                 {
                         { PlatformTraceLevel.Error, TraceEventType.Error },
@@ -107,6 +109,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set
             {
                 traceLevel = value;
+
+                if (traceLevel != PlatformTraceLevel.Off)
+                {
+                    // Reset it only if it is the non default value.
+                    // This avoids a performance hit trying to initialize Source level when it is turned off.
+                    Source.Switch.Level = PlatformTraceSourceLevelsMap[traceLevel.Value];
+                }
             }
         }
 
@@ -167,7 +176,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
                 try
                 {
-                    Source.TraceEvent(TraceLevelEventTypeMap[level], 0, log);
+                    Source.TraceEvent(PlatformTraceLevelEventTypeMap[level], 0, log);
                     Source.Flush();
                 }
                 catch (Exception e)
