@@ -14,8 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     /// </summary>
     public static class OutputExtensions
     {
-        private const string DefaultFormat = "{0}";
-
         /// <summary>
         /// Output an error message.
         /// </summary>
@@ -26,7 +24,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             SetColorForAction(ConsoleColor.Red, () =>
             {
-                Output(output, OutputLevel.Error, DefaultFormat, format, args);
+                Output(output, OutputLevel.Error, Resources.CommandLineError, format, args);
             });
         }
 
@@ -40,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             SetColorForAction(ConsoleColor.Yellow, () =>
             {
-                Output(output, OutputLevel.Warning, DefaultFormat, format, args);
+                Output(output, OutputLevel.Warning, Resources.CommandLineWarning, format, args);
             });
         }
 
@@ -66,7 +64,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             SetColorForAction(foregroundColor, () =>
             {
-                Output(output, OutputLevel.Information, DefaultFormat, format, args);
+                Output(output, OutputLevel.Information, Resources.CommandLineInformational, format, args);
             });
         }
 
