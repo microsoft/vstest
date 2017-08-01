@@ -30,6 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
@@ -62,6 +64,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ICollection<string> executorUrisThatRanTests;
         private ITestPlatformEventSource testPlatformEventSource;
 
+        /// <summary>
+        /// To create thread in given apartment state.
+        /// </summary>
+        private IThread platformThread;
+
+        /// <summary>
+        /// Given ExecutionThreadApartmentState in runsettings.
+        /// </summary>
+        private PlatformApartmentState executionThreadApartmentState;
+
         #endregion
 
         #region Constructor
@@ -74,7 +86,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testCaseEventsHandler">The test case events handler.</param>
         /// <param name="testRunEventsHandler">The test run events handler.</param>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
-        protected BaseRunTests(string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, ITestPlatformEventSource testPlatformEventSource) :
+        protected BaseRunTests(string runSettings,
+            TestExecutionContext testExecutionContext,
+            ITestCaseEventsHandler testCaseEventsHandler,
+            ITestRunEventsHandler testRunEventsHandler,
+            ITestPlatformEventSource testPlatformEventSource) :
             this(
                 runSettings,
                 testExecutionContext,
@@ -105,6 +121,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testPlatformEventSource = testPlatformEventSource;
             this.testEventsPublisher = testEventsPublisher;
             this.SetContext();
+            this.platformThread = new PlatformThread();
+            this.executionThreadApartmentState = XmlRunSettingsUtilities.GetExecutionThreadApartmentStateKey(runSettings);
         }
 
         private void SetContext()
@@ -251,7 +269,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             isCancellationRequested = true;
             if (this.activeExecutor != null)
             {
-                Task.Run(() => CancelTestRunInternal(this.activeExecutor));
+                 this.platformThread.Run(() => CancelTestRunInternal(this.activeExecutor), this.executionThreadApartmentState, false);
             }
         }
 
@@ -266,7 +284,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 EqtTrace.Info("{0}.Cancel threw an exception: {1} ", executor.GetType().FullName, e);
             }
         }
-
         #endregion
 
         #region Abstract methods
@@ -344,7 +361,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
-                        this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
+                        if (this.executionThreadApartmentState == PlatformApartmentState.STA)
+                        {
+                            // Call adapter ExecuteTests in thread with STA.
+                            // Tests need to be run in STA thread when accessin COM objects.
+                            platformThread.Run(
+                                () => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext,
+                                    this.frameworkHandle), this.executionThreadApartmentState, true);
+                        }
+                        else
+                        {
+                            this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
+                        }
 
                         this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
 
@@ -493,7 +521,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
             }
         }
-
         #endregion
     }
 }

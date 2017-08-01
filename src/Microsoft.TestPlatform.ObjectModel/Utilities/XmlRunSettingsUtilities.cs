@@ -264,6 +264,73 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         }
 
         /// <summary>
+        /// Get InProc DataCollection Run settings
+        /// </summary>
+        /// <param name="runSettingsXml">
+        /// The run Settings Xml.
+        /// </param>
+        /// <returns>Data collection run settings.</returns>
+        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
+            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
+        public static DataCollectionRunSettings GetInProcDataCollectionRunSettings(string runSettingsXml)
+        {
+            // use XmlReader to avoid loading of the plugins in client code (mainly from VS).
+            if (!string.IsNullOrWhiteSpace(runSettingsXml))
+            {
+                runSettingsXml = runSettingsXml.Trim();
+                using (StringReader stringReader1 = new StringReader(runSettingsXml))
+                {
+                    XmlReader reader = XmlReader.Create(stringReader1, ReaderSettings);
+
+                    // read to the fist child
+                    XmlReaderUtilities.ReadToRootNode(reader);
+                    reader.ReadToNextElement();
+
+                    // Read till we reach In Proc IDC element or reach EOF
+                    while (!string.Equals(reader.Name, Constants.InProcDataCollectionRunSettingsName)
+                           &&
+                           !reader.EOF)
+                    {
+                        reader.SkipToNextElement();
+                    }
+
+                    // If reached EOF => IDC element not there
+                    if (reader.EOF)
+                    {
+                        return null;
+                    }
+
+                    // Reached here => In Proc IDC element present.
+                    return DataCollectionRunSettings.FromXml(reader, Constants.InProcDataCollectionRunSettingsName, Constants.InProcDataCollectorsSettingName, Constants.InProcDataCollectorSettingName);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Get ExecutionThreadApartmentStateKey from runsettings.
+        /// </summary>
+        /// <param name="settingsXml"> The runsettings. </param>
+        /// <returns> Thread Apartment State. </returns>
+        public static PlatformApartmentState GetExecutionThreadApartmentStateKey(string settingsXml)
+        {
+            PlatformApartmentState apartmentState = PlatformApartmentState.MTA;
+            if (!string.IsNullOrEmpty(settingsXml))
+            {
+                StringReader stringReader = new StringReader(settingsXml);
+                XmlReader reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
+
+                if (reader.ReadToFollowing("ExecutionThreadApartmentStateKey"))
+                {
+                    Enum.TryParse(reader.ReadInnerXml(), out apartmentState);
+                }
+            }
+
+            return apartmentState;
+        }
+
+        /// <summary>
         /// Throws a settings exception if the node the reader is on has attributes defined.
         /// </summary>
         /// <param name="reader"> The xml reader. </param>
@@ -339,51 +406,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 runSettingsNavigator.AppendChildElement(string.Empty, "DataCollectors", string.Empty, string.Empty);
                 runSettingsNavigator.MoveToChild("DataCollectors", string.Empty);
             }
-        }
-
-        /// <summary>
-        /// Get InProc DataCollection Run settings
-        /// </summary>
-        /// <param name="runSettingsXml">
-        /// The run Settings Xml.
-        /// </param>
-        /// <returns>Data collection run settings.</returns>
-        [SuppressMessage("Microsoft.Security.Xml", "CA3053:UseXmlSecureResolver",
-            Justification = "XmlReaderSettings.XmlResolver is not available in core. Suppress until fxcop issue is fixed.")]
-        public static DataCollectionRunSettings GetInProcDataCollectionRunSettings(string runSettingsXml)
-        {
-            // use XmlReader to avoid loading of the plugins in client code (mainly from VS).            
-            if (!string.IsNullOrWhiteSpace(runSettingsXml))
-            {
-                runSettingsXml = runSettingsXml.Trim();
-                using (StringReader stringReader1 = new StringReader(runSettingsXml))
-                {
-                    XmlReader reader = XmlReader.Create(stringReader1, ReaderSettings);
-
-                    // read to the fist child
-                    XmlReaderUtilities.ReadToRootNode(reader);
-                    reader.ReadToNextElement();
-
-                    // Read till we reach In Proc IDC element or reach EOF
-                    while (!string.Equals(reader.Name, Constants.InProcDataCollectionRunSettingsName)
-                            &&
-                            !reader.EOF)
-                    {
-                        reader.SkipToNextElement();
-                    }
-
-                    // If reached EOF => IDC element not there
-                    if (reader.EOF)
-                    {
-                        return null;
-                    }
-
-                    // Reached here => In Proc IDC element present. 
-                    return DataCollectionRunSettings.FromXml(reader, Constants.InProcDataCollectionRunSettingsName, Constants.InProcDataCollectorsSettingName, Constants.InProcDataCollectorSettingName);
-                }
-            }
-
-            return null;
         }
     }
 }
