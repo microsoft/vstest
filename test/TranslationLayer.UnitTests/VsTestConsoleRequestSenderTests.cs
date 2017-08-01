@@ -75,7 +75,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             await this.InitializeCommunicationAsync();
 
-            this.mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once);
@@ -85,7 +85,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         public void InitializeCommunicationShouldReturnInvalidPortNumberIfHostServerFails()
         {
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Throws(new Exception("Fail"));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask);
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false));
 
             var portOutput = this.requestSender.InitializeCommunication();
             Assert.IsTrue(portOutput < 0, "Negative port number must be returned if Hosting Server fails.");
@@ -103,12 +103,12 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         public async Task InitializeCommunicationAsyncShouldReturnInvalidPortNumberIfHostServerFails()
         {
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Throws(new Exception("Fail"));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask);
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false));
 
             var portOutput = await this.requestSenderAsync.InitializeCommunicationAsync(this.WaitTimeout);
             Assert.IsTrue(portOutput < 0, "Negative port number must be returned if Hosting Server fails.");
 
-            this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Never);
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()), Times.Never);
         }
@@ -118,7 +118,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Throws(new Exception("Fail"));
@@ -140,15 +140,15 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         public async Task InitializeCommunicationAsyncShouldFailConnectionIfMessageReceiveFailed()
         {
             var dummyPortInput = 123;
-            this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(dummyPortInput);
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("Fail"));
 
             var portOutput = await this.requestSenderAsync.InitializeCommunicationAsync(this.WaitTimeout);
 
             // Connection must not succeed as handshake failed
             Assert.AreEqual(-1, portOutput, "Connection must fail if handshake failed.");
-            this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
         }
 
@@ -157,7 +157,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
 
@@ -184,7 +184,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             var discoveryMessage = new Message() { MessageType = MessageType.StartDiscovery };
 
@@ -193,7 +193,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var portOutput = await this.requestSenderAsync.InitializeCommunicationAsync(this.WaitTimeout);
             Assert.AreEqual(-1, portOutput, "Connection must fail if version check failed.");
 
-            this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
 
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -205,7 +205,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
 
@@ -233,7 +233,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
 
@@ -243,7 +243,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var portOutput = await this.requestSenderAsync.InitializeCommunicationAsync(this.WaitTimeout);
             Assert.AreEqual(-1, portOutput, "Connection must fail if version check failed.");
 
-            this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
 
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()), Times.Once);
@@ -255,7 +255,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
@@ -294,7 +294,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
 
@@ -314,7 +314,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             var portOutput = await this.requestSenderAsync.InitializeCommunicationAsync(this.WaitTimeout);
             Assert.AreEqual(-1, portOutput, "Connection must fail if version check failed.");
 
-            this.mockCommunicationManager.Verify(cm => cm.HostServer(), Times.Once);
+            this.mockCommunicationManager.Verify(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0)), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.AcceptClientAsync(), Times.Once);
 
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessageAsync(It.IsAny<CancellationToken>()), Times.Exactly(2));
@@ -1832,7 +1832,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
                 .Callback((int timeout) => Task.Delay(200).Wait());
@@ -1858,7 +1858,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         {
             var dummyPortInput = 123;
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
-            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.CompletedTask).Callback(() => { });
+            this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
             var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };

@@ -116,7 +116,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             int port = -1;
             try
             {
-                port = this.communicationManager.HostServer();
+                port = this.communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
                 var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
                 await Task.Run(() => this.communicationManager.AcceptClientAsync(), timeoutSource.Token);
 
