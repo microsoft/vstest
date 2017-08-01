@@ -5,6 +5,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 {
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Reflection;
     
@@ -69,7 +70,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
 
             this.discoveryManager.DiscoverTests(criteria, mockLogger.Object);
 
-            var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", "imaginary.dll");
+            var errorMessage = string.Format(CultureInfo.CurrentCulture, "Could not find file {0}.", Path.Combine(Directory.GetCurrentDirectory(), "imaginary.dll"));
             mockLogger.Verify(
                 l =>
                 l.HandleLogMessage(

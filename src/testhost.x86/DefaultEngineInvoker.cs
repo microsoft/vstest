@@ -23,8 +23,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     {
         /// <summary>
         /// The timeout for the client to connect to the server.
+        /// Increasing Timeout to allow client to connect, not always the client can connect within 5 seconds
         /// </summary>
-        private const int ClientListenTimeOut = 5 * 1000;
+        private const int ClientListenTimeOut = 30 * 1000;
 
         private const string EndpointArgument = "--endpoint";
 
