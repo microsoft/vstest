@@ -40,13 +40,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public int GetCurrentProcessId()
         {
-            throw new NotImplementedException();
+            return -1;
         }
 
         /// <inheritdoc/>
         public string GetProcessName(int processId)
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
 
         /// <inheritdoc/>
@@ -58,13 +58,18 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public void SetExitCallback(int parentProcessId, Action callbackAction)
         {
-            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
         public void TerminateProcess(object process)
         {
             throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public int GetProcessId(object process)
+        {
+            return -1;
         }
     }
 }

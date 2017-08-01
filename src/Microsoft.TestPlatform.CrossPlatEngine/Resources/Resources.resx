@@ -177,4 +177,10 @@
   <data name="UnsupportedPropertiesInTestCaseFilter" xml:space="preserve">
     <value>No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1}).</value>
   </data>
+  <data name="CancelationRequested" xml:space="preserve">
+    <value>Canceling test run as cancelation requested.</value>
+  </data>
+  <data name="FailedToLaunchTestHost" xml:space="preserve">
+    <value>Failed to launch testhost with error: {0}</value>
+  </data>
 </root>

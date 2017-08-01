@@ -13,9 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     internal class DefaultEngineInvoker :
 #if NET451
@@ -28,7 +26,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
         /// </summary>
         private const int ClientListenTimeOut = 5 * 1000;
 
-        private const string PortArgument = "--port";
+        private const string EndpointArgument = "--endpoint";
+
+        private const string RoleArgument = "--role";
 
         private const string ParentProcessIdArgument = "--parentprocessid";
 
@@ -54,26 +54,32 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 #endif
 
             // Get port number and initialize communication
-            var portNumber = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, PortArgument);
+            string endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
+            ConnectionRole connectionRole = string.Equals(CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument), "client", StringComparison.OrdinalIgnoreCase) ? ConnectionRole.Client : ConnectionRole.Host;
 
             // Start Processing of requests
-            using (var requestHandler = new TestRequestHandler())
+            using (var requestHandler = new TestRequestHandler(new TestHostConnectionInfo { Endpoint = endpoint, Role = connectionRole, Transport = Transport.Sockets }))
             {
                 // Attach to exit of parent process
                 var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
                 EqtTrace.Info("DefaultEngineInvoker: Monitoring parent process with id: '{0}'", parentProcessId);
-                var processHelper = new ProcessHelper();
-                processHelper.SetExitCallback(
-                    parentProcessId,
-                    () =>
-                        {
-                            EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
-                            Environment.Exit(1);
-                        });
+
+                // In remote scenario we cannot monitor parent process, so we expect user to pass parentProcessId as -1
+                if (parentProcessId != -1)
+                {
+                    var processHelper = new ProcessHelper();
+                    processHelper.SetExitCallback(
+                        parentProcessId,
+                        () =>
+                            {
+                                EqtTrace.Info("DefaultEngineInvoker: ParentProcess '{0}' Exited.", parentProcessId);
+                                new PlatformEnvironment().Exit(1);
+                            });
+                }
 
                 // Initialize Communication
-                EqtTrace.Info("DefaultEngineInvoker: Initialize communication on port number: '{0}'", portNumber);
-                requestHandler.InitializeCommunication(portNumber);
+                EqtTrace.Info("DefaultEngineInvoker: Initialize communication on endpoint address: '{0}'", endpoint);
+                requestHandler.InitializeCommunication();
 
                 // Initialize DataCollection Communication if data collection port is provided.
                 var dcPort = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, DataCollectionPortArgument);

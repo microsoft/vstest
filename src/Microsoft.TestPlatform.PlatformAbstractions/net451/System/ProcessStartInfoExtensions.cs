@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <param name="value">Environment Variable value.</param>
         public static void AddEnvironmentVariable(this ProcessStartInfo startInfo, string name, string value)
         {
-            startInfo.EnvironmentVariables.Add(name, value);
+            startInfo.EnvironmentVariables[name] = value;
         }
     }
 }

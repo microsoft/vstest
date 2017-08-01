@@ -5,14 +5,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-
     using Microsoft.Build.Framework;
     using Microsoft.Build.Utilities;
-
-    using Trace;
+    using Microsoft.TestPlatform.Build.Resources;
     using Microsoft.TestPlatform.Build.Utils;
+    using Trace;
 
     public class VSTestTask : Task, ICancelableTask
     {
@@ -113,7 +111,7 @@ namespace Microsoft.TestPlatform.Build.Tasks
             vsTestForwardingApp = new VSTestForwardingApp(this.VSTestConsolePath, this.CreateArgument());
             if (!string.IsNullOrEmpty(this.VSTestFramework))
             {
-                Console.WriteLine("Test run for {0}({1})", this.TestFileFullPath, this.VSTestFramework);
+                Console.WriteLine(Resources.TestRunningSummary, this.TestFileFullPath, this.VSTestFramework);
             }
 
             return vsTestForwardingApp.Execute() == 0;

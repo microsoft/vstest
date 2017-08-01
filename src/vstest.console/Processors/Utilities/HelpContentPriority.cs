@@ -165,6 +165,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <summary>
         /// ListSettingProviderArgumentProcessor Help
         /// </summary>
-        ListSettingsProvidersArgumentProcessorHelpPriority
+        ListSettingsProvidersArgumentProcessorHelpPriority,
+
+        /// <summary>
+        /// ResponseFileArgumentProcessor Help
+        /// </summary>
+        ResponseFileArgumentProcessorHelpPriority,
     }
 }

@@ -23,7 +23,7 @@ def branch = GithubBranchName
                     def testString = """call test.cmd -c ${configuration}"""
                     def platformtestString = """call test.cmd -c ${configuration} -p platformtests"""
                     def smoketestString = """call test.cmd -c ${configuration} -p smoke"""
-                    def acceptancetestString = """call test.cmd -c ${configuration} -p AcceptanceTests -v"""
+                    def acceptancetestString = """call test.cmd -c ${configuration} -p AcceptanceTests -v -f net451"""
 
                     // Create a new job for windows build
                     newJob.with {

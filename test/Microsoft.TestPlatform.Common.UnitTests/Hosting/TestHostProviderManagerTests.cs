@@ -201,6 +201,11 @@ namespace TestPlatform.Common.UnitTests.Logging
             {
                 throw new NotImplementedException();
             }
+
+            public TestHostConnectionInfo GetTestHostConnectionInfo()
+            {
+                throw new NotImplementedException();
+            }
         }
 
         [ExtensionUri("executor://NetCoreTestHost")]
@@ -266,6 +271,11 @@ namespace TestPlatform.Common.UnitTests.Logging
             }
 
             public Task CleanTestHostAsync(CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
+
+            public TestHostConnectionInfo GetTestHostConnectionInfo()
             {
                 throw new NotImplementedException();
             }

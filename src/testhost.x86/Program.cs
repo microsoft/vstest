@@ -10,6 +10,8 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -30,7 +32,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             try
             {
                 TestPlatformEventSource.Instance.TestHostStart();
-                WaitForDebuggerIfEnabled();
                 Run(args);
             }
             catch (Exception ex)
@@ -46,8 +47,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private static void Run(string[] args)
+        // In UWP(App models) Run will act as entry point from Application end, so making this method public
+        public static void Run(string[] args)
         {
+            WaitForDebuggerIfEnabled();
             var argsDictionary = CommandLineArgumentsHelper.GetArgumentsDictionary(args);
             
             // Invoke the engine with arguments
@@ -79,19 +82,21 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private static void WaitForDebuggerIfEnabled()
         {
+            IProcessHelper processHelper = new ProcessHelper();
             var debugEnabled = Environment.GetEnvironmentVariable("VSTEST_HOST_DEBUG");
             if (!string.IsNullOrEmpty(debugEnabled) && debugEnabled.Equals("1", StringComparison.Ordinal))
             {
                 ConsoleOutput.Instance.WriteLine("Waiting for debugger attach...", OutputLevel.Information);
 
-                var currentProcess = Process.GetCurrentProcess();
+                var currentProcessId = processHelper.GetCurrentProcessId();
+                var currentProcessName = processHelper.GetProcessName(currentProcessId);
                 ConsoleOutput.Instance.WriteLine(
-                    string.Format("Process Id: {0}, Name: {1}", currentProcess.Id, currentProcess.ProcessName),
+                    string.Format("Process Id: {0}, Name: {1}", currentProcessId, currentProcessName),
                     OutputLevel.Information);
 
                 while (!Debugger.IsAttached)
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Tasks.Task.Delay(1000).Wait();
                 }
 
                 Debugger.Break();
