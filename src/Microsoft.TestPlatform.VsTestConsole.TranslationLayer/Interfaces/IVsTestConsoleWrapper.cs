@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -81,7 +82,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
         /// Abort the last test run.
         /// </summary>
         void AbortTestRun();
-        
+
         /// <summary>
         /// Ends the test session and stops processing requests.
         /// </summary>
