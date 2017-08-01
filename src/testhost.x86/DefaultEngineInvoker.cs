@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -92,10 +93,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
+                var processingThread = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
 
                 // Wait for processing to complete.
-                Task.WaitAny(processingTask);
+                processingThread.Join();
 
                 if (dcPort > 0)
                 {
@@ -105,9 +106,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
+        private Thread StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
-            return Task.Run(() =>
+            Thread thread = new Thread(()=>
             {
                 // Wait for the connection to the sender and start processing requests from sender
                 if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
@@ -120,6 +121,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                     throw new TimeoutException();
                 }
             });
+
+            thread.Start();
+            return thread;
         }
     }
 }

@@ -76,7 +76,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// The background thread which is processing the jobs.  Used when disposing to wait
         /// for the thread to complete.
         /// </summary>
-        private Task backgroundJobProcessor;
+        private Thread backgroundJobProcessor;
 
         /// <summary>
         /// Keeps track of if we are disposed.
@@ -140,7 +140,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             this.exceptionLogger = exceptionLogger;
 
             // Setup the background thread to process the jobs.
-            this.backgroundJobProcessor = Task.Run(() => this.BackgroundJobProcessor());
+            backgroundJobProcessor = new Thread(BackgroundJobProcessor);
+            backgroundJobProcessor.IsBackground = true;
+            backgroundJobProcessor.Name = "JobQueue: " + displayName;
+            backgroundJobProcessor.Start();
         }
 
         #endregion
@@ -177,7 +180,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Resume the processing of queued jobs.
         /// </summary>
         public void Resume()
-        {
+       {
             this.CheckDisposed();
 
             // Resume processing of jobs.
@@ -233,7 +236,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             this.InternalQueueJob(Job<T>.ShutdownJob);
 
             // Wait for the background thread to shutdown.
-            this.backgroundJobProcessor.Wait();
+            this.backgroundJobProcessor.Join();
 
             // Cleanup
             this.jobAdded.Dispose();
