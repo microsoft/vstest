@@ -338,7 +338,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.FlushLoggerMessages();
 
             this.mockOutput.Verify(o => o.WriteLine("Information: " + CommandLineResources.StdOutMessagesBanner, OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("Information: " + " " + message, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("Information:  " + message, OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -364,7 +364,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.FlushLoggerMessages();
 
             this.mockOutput.Verify(o => o.WriteLine("Information: " + CommandLineResources.DbgTrcMessagesBanner, OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("Information: " + " " + message, OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("Information:  " + message, OutputLevel.Information), Times.Once());
         }
 
 
