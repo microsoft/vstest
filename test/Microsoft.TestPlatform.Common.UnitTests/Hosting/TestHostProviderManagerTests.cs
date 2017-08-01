@@ -171,7 +171,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+            public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
             {
                 return sources;
             }
@@ -285,7 +285,7 @@ namespace TestPlatform.Common.UnitTests.Logging
                 throw new NotImplementedException();
             }
 
-            public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+            public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
             {
                 return sources;
             }

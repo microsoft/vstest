@@ -180,8 +180,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
-        public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+        public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
+            // We do not have scenario where full CLR tests are deployed to remote machine, so no need to udpate sources
             return sources;
         }
 

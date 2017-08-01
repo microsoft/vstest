@@ -173,15 +173,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (!File.Exists(src))
                 {
-                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FileNotFound, source);
+                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FileNotFound, src);
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
 
                     continue;
                 }
 
-                if (!verifiedSources.Add(source))
+                if (!verifiedSources.Add(src))
                 {
-                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DuplicateSource, source);
+                    var errorMessage = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.DuplicateSource, src);
                     logger.SendMessage(TestMessageLevel.Warning, errorMessage);
                 }
             }

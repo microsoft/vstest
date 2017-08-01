@@ -178,7 +178,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <param name="testRuntimeProvider">testhostmanager which updates the sources</param>
         private void UpdateTestSources(IEnumerable<string> sources, Dictionary<string, IEnumerable<string>> adapterSourceMap, ITestRuntimeProvider testRuntimeProvider)
         {
-            var updatedTestSources = testRuntimeProvider.UpdateTestSourcesInformation(sources);
+            var updatedTestSources = testRuntimeProvider.GetTestSources(sources);
             adapterSourceMap.Clear();
             adapterSourceMap.Add(ObjectModel.Constants.UnspecifiedAdapterPath, updatedTestSources);
         }

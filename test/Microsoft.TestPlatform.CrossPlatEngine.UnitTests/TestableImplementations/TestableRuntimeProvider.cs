@@ -69,7 +69,7 @@ namespace Microsoft.TestPlatform.CrossPlatEngine.UnitTests.TestableImplementatio
             return extensions;
         }
 
-        public IEnumerable<string> UpdateTestSourcesInformation(IEnumerable<string> sources)
+        public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
         {
             return sources;
         }
