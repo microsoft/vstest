@@ -5,7 +5,6 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -93,10 +92,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
                 // Start processing async in a different task
                 EqtTrace.Info("DefaultEngineInvoker: Start Request Processing.");
-                var processingThread = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
+                var processingTask = this.StartProcessingAsync(requestHandler, new TestHostManagerFactory());
 
                 // Wait for processing to complete.
-                processingThread.Join();
+                Task.WaitAny(processingTask);
 
                 if (dcPort > 0)
                 {
@@ -106,11 +105,12 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
         }
 
-        private Thread StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
+        private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
-            Thread thread = new Thread(()=>
-            {
-                // Wait for the connection to the sender and start processing requests from sender
+            var task = new Task(
+                () =>
+                    {
+                        // Wait for the connection to the sender and start processing requests from sender
                 if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
                 {
                     requestHandler.ProcessRequests(managerFactory);
@@ -119,11 +119,12 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     EqtTrace.Info("DefaultEngineInvoker: RequestHandler timed out while connecting to the Sender.");
                     throw new TimeoutException();
-                }
-            });
+                        }
+                    },
+                TaskCreationOptions.LongRunning);
 
-            thread.Start();
-            return thread;
+            task.Start();
+            return task;
         }
     }
 }
