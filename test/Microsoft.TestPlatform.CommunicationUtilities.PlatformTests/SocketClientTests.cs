@@ -45,20 +45,9 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         }
 
         [TestMethod]
-        public void SocketClientStartShouldConnectToLoopbackOnGivenPort()
-        {
-            var connectionInfo = this.StartLocalServer();
-
-            this.socketClient.Start(connectionInfo);
-
-            var acceptClientTask = this.tcpListener.AcceptTcpClientAsync();
-            Assert.IsTrue(acceptClientTask.Wait(TIMEOUT));
-            Assert.IsTrue(acceptClientTask.Result.Connected);
-        }
-
-        [TestMethod]
         public void SocketClientStartShouldThrowIfServerIsNotListening()
         {
+            System.Diagnostics.Debugger.Launch();
             var dummyConnectionInfo = "5345";
 
             this.socketClient.Start(dummyConnectionInfo);
@@ -79,6 +68,18 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
             }
 
             Assert.IsTrue(exceptionThrown);
+        }
+
+        [TestMethod]
+        public void SocketClientStartShouldConnectToLoopbackOnGivenPort()
+        {
+            var connectionInfo = this.StartLocalServer();
+
+            this.socketClient.Start(connectionInfo);
+
+            var acceptClientTask = this.tcpListener.AcceptTcpClientAsync();
+            Assert.IsTrue(acceptClientTask.Wait(TIMEOUT));
+            Assert.IsTrue(acceptClientTask.Result.Connected);
         }
 
         [TestMethod]
