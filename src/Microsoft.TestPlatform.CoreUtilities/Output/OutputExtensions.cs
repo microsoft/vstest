@@ -15,6 +15,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     public static class OutputExtensions
     {
         /// <summary>
+        /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
+        /// </summary>
+        internal static bool AppendPrefix;
+
+        private const string DefaultFormat = "{0}";
+
+        /// <summary>
         /// Output an error message.
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
@@ -24,7 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             SetColorForAction(ConsoleColor.Red, () =>
             {
-                Output(output, OutputLevel.Error, Resources.CommandLineError, format, args);
+                Output(output, OutputLevel.Error, AppendPrefix ? Resources.CommandLineError : DefaultFormat, format, args);
             });
         }
 
@@ -38,7 +45,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             SetColorForAction(ConsoleColor.Yellow, () =>
             {
-                Output(output, OutputLevel.Warning, Resources.CommandLineWarning, format, args);
+                Output(output, OutputLevel.Warning, AppendPrefix ? Resources.CommandLineWarning : DefaultFormat, format, args);
             });
         }
 
@@ -50,7 +57,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="args">Arguments to format into the format string.</param>
         public static void Information(this IOutput output, string format, params object[] args)
         {
-           Information(output, Console.ForegroundColor, format, args);
+            Information(output, Console.ForegroundColor, format, args);
         }
 
         /// <summary>
@@ -64,7 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         {
             SetColorForAction(foregroundColor, () =>
             {
-                Output(output, OutputLevel.Information, Resources.CommandLineInformational, format, args);
+                Output(output, OutputLevel.Information, AppendPrefix ? Resources.CommandLineInformational : DefaultFormat, format, args);
             });
         }
 

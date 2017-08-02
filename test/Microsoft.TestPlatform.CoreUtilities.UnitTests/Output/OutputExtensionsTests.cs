@@ -3,12 +3,10 @@
 
 namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
 {
-    using System;
-
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Moq;
+    using System;
 
     [TestClass]
     public class OutputExtensionsTests
@@ -48,7 +46,17 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         public void OutputErrorForSimpleMessageShouldOutputTheMessageString()
         {
             this.mockOutput.Object.Error("HelloError", null);
+            this.mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void OutputErrorForSimpleMessageShouldOutputTheMessageStringWithPrefixIfSet()
+        {
+            OutputExtensions.AppendPrefix = true;
+            this.mockOutput.Object.Error("HelloError", null);
             this.mockOutput.Verify(o => o.WriteLine("Error: HelloError", OutputLevel.Error), Times.Once());
+
+            OutputExtensions.AppendPrefix = false;
         }
 
         [TestMethod]
@@ -67,14 +75,14 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         public void OutputErrorForMessageWithParamsShouldOutputFormattedMessage()
         {
             this.mockOutput.Object.Error("HelloError {0} {1}", "Foo", "Bar");
-            this.mockOutput.Verify(o => o.WriteLine("Error: HelloError Foo Bar", OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("HelloError Foo Bar", OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
         public void OutputWarningForSimpleMessageShouldOutputTheMessageString()
         {
             this.mockOutput.Object.Warning("HelloWarning", null);
-            this.mockOutput.Verify(o => o.WriteLine("Warning: HelloWarning", OutputLevel.Warning), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("HelloWarning", OutputLevel.Warning), Times.Once());
         }
 
         [TestMethod]
@@ -93,14 +101,14 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         public void OutputWarningForMessageWithParamsShouldOutputFormattedMessage()
         {
             this.mockOutput.Object.Warning("HelloWarning {0} {1}", "Foo", "Bar");
-            this.mockOutput.Verify(o => o.WriteLine("Warning: HelloWarning Foo Bar", OutputLevel.Warning), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("HelloWarning Foo Bar", OutputLevel.Warning), Times.Once());
         }
 
         [TestMethod]
         public void OutputInformationForSimpleMessageShouldOutputTheMessageString()
         {
             this.mockOutput.Object.Information(ConsoleColor.Green, "HelloInformation", null);
-            this.mockOutput.Verify(o => o.WriteLine("Information: HelloInformation", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("HelloInformation", OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -119,7 +127,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
         public void OutputInformationForMessageWithParamsShouldOutputFormattedMessage()
         {
             this.mockOutput.Object.Information("HelloInformation {0} {1}", "Foo", "Bar");
-            this.mockOutput.Verify(o => o.WriteLine("Information: HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
         }
 
         [TestMethod]
@@ -137,7 +145,7 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Output
             });
 
             this.mockOutput.Object.Information("HelloInformation {0} {1}", "Foo", "Bar");
-            this.mockOutput.Verify(o => o.WriteLine("Information: HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("HelloInformation Foo Bar", OutputLevel.Information), Times.Once());
             Assert.IsTrue(color1 == color2);
         }
 

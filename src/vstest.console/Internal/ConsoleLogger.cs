@@ -45,6 +45,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// </summary>
         public const string VerbosityParam = "verbosity";
 
+        /// <summary>
+        /// Parameter for log message prefix
+        /// </summary>
+        public const string PrefixParam = "prefix";
+
         #endregion
 
         internal enum Verbosity
@@ -66,7 +71,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private int testsPassed = 0;
         private int testsFailed = 0;
         private int testsSkipped = 0;
-
         #endregion
 
         #region Constructor
@@ -89,7 +93,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        #region Properties
+        #region Properties        
+
         /// <summary>
         /// Gets instance of IOutput used for sending output.
         /// </summary>
@@ -148,6 +153,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (verbosityExists && Enum.TryParse(verbosity, true, out Verbosity verbosityLevel))
             {
                 this.verbosityLevel = verbosityLevel;
+            }
+
+            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out string prefix);
+            if (prefixExists)
+            {
+                bool.TryParse(prefix, out OutputExtensions.AppendPrefix);
             }
 
             this.Initialize(events, String.Empty);
@@ -416,11 +427,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     Output.Error(CommandLineResources.TestRunCanceled);
                 }
-                else if(e.IsAborted)
+                else if (e.IsAborted)
                 {
                     Output.Error(CommandLineResources.TestRunAborted);
                 }
-                else if(this.testOutcome == TestOutcome.Failed)
+                else if (this.testOutcome == TestOutcome.Failed)
                 {
                     Output.Error(CommandLineResources.TestRunFailed);
                 }
