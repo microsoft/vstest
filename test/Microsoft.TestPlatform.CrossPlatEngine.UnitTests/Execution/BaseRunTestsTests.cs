@@ -612,6 +612,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
+        public void RunTestsShouldThrowErrorOnThreadApartmentStateIsSTA()
+        {
+            this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
+            this.mockThread.Setup(
+                mt => mt.Run(It.IsAny<Action>(), It.IsAny<PlatformApartmentState>(), It.IsAny<bool>())).Throws<Exception>();
+            this.runTestsInstance.RunTests();
+
+            this.mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true), Times.Never);
+        }
+
+        [TestMethod]
         public void CancelShouldCreateSTAThreadIfExecutionThreadApartmentStateIsSTA()
         {
             this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
