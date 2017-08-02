@@ -313,7 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// </summary>
         /// <param name="settingsXml"> The runsettings. </param>
         /// <returns> Thread Apartment State. </returns>
-        public static PlatformApartmentState GetExecutionThreadApartmentStateKey(string settingsXml)
+        public static PlatformApartmentState GetExecutionThreadApartmentState(string settingsXml)
         {
             PlatformApartmentState apartmentState = PlatformApartmentState.MTA;
             if (!string.IsNullOrEmpty(settingsXml))
@@ -321,7 +321,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
                 StringReader stringReader = new StringReader(settingsXml);
                 XmlReader reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
 
-                if (reader.ReadToFollowing("ExecutionThreadApartmentStateKey"))
+                if (reader.ReadToFollowing("ExecutionThreadApartmentState"))
                 {
                     Enum.TryParse(reader.ReadInnerXml(), out apartmentState);
                 }

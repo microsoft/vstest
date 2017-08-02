@@ -110,7 +110,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testRunEventsHandler">The test run events handler.</param>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
         /// <param name="testEventsPublisher">Publisher for test events.</param>
-        protected BaseRunTests(string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, ITestPlatformEventSource testPlatformEventSource, ITestEventsPublisher testEventsPublisher)
+        protected BaseRunTests(string runSettings,
+            TestExecutionContext testExecutionContext,
+            ITestCaseEventsHandler testCaseEventsHandler,
+            ITestRunEventsHandler testRunEventsHandler,
+            ITestPlatformEventSource testPlatformEventSource,
+            ITestEventsPublisher testEventsPublisher):
+            this(runSettings,
+                testExecutionContext,
+                testCaseEventsHandler,
+                testRunEventsHandler,
+                testPlatformEventSource,
+                testEventsPublisher, new PlatformThread())
+        {
+        }
+
+        internal BaseRunTests(string runSettings,
+            TestExecutionContext testExecutionContext,
+            ITestCaseEventsHandler testCaseEventsHandler,
+            ITestRunEventsHandler testRunEventsHandler,
+            ITestPlatformEventSource testPlatformEventSource,
+            ITestEventsPublisher testEventsPublisher,
+            IThread platformThread)
         {
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;
@@ -121,8 +142,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.testPlatformEventSource = testPlatformEventSource;
             this.testEventsPublisher = testEventsPublisher;
             this.SetContext();
-            this.platformThread = new PlatformThread();
-            this.executionThreadApartmentState = XmlRunSettingsUtilities.GetExecutionThreadApartmentStateKey(runSettings);
+            this.platformThread = platformThread;
+            this.executionThreadApartmentState = XmlRunSettingsUtilities.GetExecutionThreadApartmentState(runSettings);
         }
 
         private void SetContext()
@@ -269,7 +290,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             isCancellationRequested = true;
             if (this.activeExecutor != null)
             {
-                 this.platformThread.Run(() => CancelTestRunInternal(this.activeExecutor), this.executionThreadApartmentState, false);
+                if (RequiredSTAThread())
+                {
+                    this.platformThread.Run(() => CancelTestRunInternal(this.activeExecutor),
+                        this.executionThreadApartmentState, false);
+                }
+                else
+                {
+                    Task.Run(() => CancelTestRunInternal(this.activeExecutor));
+                }
             }
         }
 
@@ -361,10 +390,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
-                        if (this.executionThreadApartmentState == PlatformApartmentState.STA)
+                        if (RequiredSTAThread())
                         {
                             // Call adapter ExecuteTests in thread with STA.
                             // Tests need to be run in STA thread when accessin COM objects.
+                            EqtTrace.Verbose("BaseRunTests.RunTestInternalWithExecutors: Using STA thread to call adapter ExecuteTests() API.");
                             platformThread.Run(
                                 () => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext,
                                     this.frameworkHandle), this.executionThreadApartmentState, true);
@@ -386,7 +416,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             EqtTrace.Verbose(
-                                "TestExecutionManager.RunTestInternalWithExecutors: Completed running tests for {0}",
+                                "BaseRunTests.RunTestInternalWithExecutors: Completed running tests for {0}",
                                 executor.Metadata.ExtensionUri);
                         }
                     }
@@ -397,7 +427,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         if (EqtTrace.IsErrorEnabled)
                         {
                             EqtTrace.Error(
-                                "TestExecutionManager.RunTestInternalWithExecutors: An exception occurred while invoking executor {0}. {1}.",
+                                "BaseRunTests.RunTestInternalWithExecutors: An exception occurred while invoking executor {0}. {1}.",
                                 executorUriExtensionTuple.Item1,
                                 e);
                         }
@@ -428,6 +458,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
 
             return exceptionsHitDuringRunTests;
+        }
+
+        private bool RequiredSTAThread()
+        {
+            return this.executionThreadApartmentState == PlatformApartmentState.STA;
         }
 
         private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)

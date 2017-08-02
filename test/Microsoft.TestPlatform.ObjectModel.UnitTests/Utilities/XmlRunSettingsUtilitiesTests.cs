@@ -8,6 +8,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -74,6 +75,15 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
     </DataCollectors>
   </DataCollectionRunSettings>
 </RunSettings>";
+
+        private readonly string ExecutionThreadApartmentStateSettingsFormat =
+                @"<RunSettings>
+                  <RunConfiguration>
+                     <ExecutionThreadApartmentState>{0}</ExecutionThreadApartmentState>
+                   </RunConfiguration>
+                </RunSettings>";
+
+        private readonly string EmptyRunSettings = "<RunSettings></RunSettings>";
 
         #endregion
 
@@ -305,7 +315,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void IsDataCollectionEnabledShouldReturnFalseIfDataCollectionNodeIsNotPresent()
         {
-            Assert.IsFalse(XmlRunSettingsUtilities.IsDataCollectionEnabled("<RunSettings></RunSettings>"));
+            Assert.IsFalse(XmlRunSettingsUtilities.IsDataCollectionEnabled(EmptyRunSettings));
         }
 
         [TestMethod]
@@ -334,7 +344,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionNodeIsNotPresent()
         {
-            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled("<RunSettings></RunSettings>"));
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(EmptyRunSettings));
         }
 
         [TestMethod]
@@ -362,7 +372,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void GetDataCollectionRunSettingsShouldReturnNullOnNoDataCollectorSettings()
         {
-            Assert.IsNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings("<RunSettings></RunSettings>"));
+            Assert.IsNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings(EmptyRunSettings));
         }
 
         [TestMethod]
@@ -381,6 +391,36 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         public void GetDataCollectionRunSettingsShouldThrowOnMalformedDataCollectorSettings()
         {
             Assert.ThrowsException<SettingsException>(() => XmlRunSettingsUtilities.GetDataCollectionRunSettings(this.runSettingsXmlWithIncorrectDataCollectorSettings));
+        }
+
+        [TestMethod]
+        public void GetExecutionThreadApartmentStateShouldReturnMTAByDefault()
+        {
+            Assert.AreEqual(PlatformApartmentState.MTA, XmlRunSettingsUtilities.GetExecutionThreadApartmentState(EmptyRunSettings));
+        }
+
+        [TestMethod]
+        public void GetExecutionThreadApartmentStateShouldReturnMTAForEmptyValue()
+        {
+            Assert.AreEqual(PlatformApartmentState.MTA, XmlRunSettingsUtilities.GetExecutionThreadApartmentState(string.Format(ExecutionThreadApartmentStateSettingsFormat, "")));
+        }
+
+        [TestMethod]
+        public void GetExecutionThreadApartmentStateShouldReturnMTAForCaseInsensitiveMTAValue()
+        {
+            Assert.AreEqual(PlatformApartmentState.MTA, XmlRunSettingsUtilities.GetExecutionThreadApartmentState(string.Format(ExecutionThreadApartmentStateSettingsFormat, "mta")));
+        }
+
+        [TestMethod]
+        public void GetExecutionThreadApartmentStateShouldReturnSTAForValueIsSTA()
+        {
+            Assert.AreEqual(PlatformApartmentState.STA, XmlRunSettingsUtilities.GetExecutionThreadApartmentState(string.Format(ExecutionThreadApartmentStateSettingsFormat, "STA")));
+        }
+
+        [TestMethod]
+        public void GetExecutionThreadApartmentStateShouldReturnMTAForInvalidValueValue()
+        {
+            Assert.AreEqual(PlatformApartmentState.MTA, XmlRunSettingsUtilities.GetExecutionThreadApartmentState(string.Format(ExecutionThreadApartmentStateSettingsFormat, "ABCD")));
         }
 
         #endregion

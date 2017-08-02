@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     public class PlatformThread : IThread
     {
         /// <inheritdoc/>
+        /// <remarks> ApartmentState is not honored in netcoreapp1.0. </remarks>
         public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
         {
             if (action == null)

@@ -10,7 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     public class PlatformThread : IThread
     {
         /// <inheritdoc />
-        public void Run(Action action, PlatformApartmentState platformApartmentState)
+        public void Run(Action action, PlatformApartmentState platformApartmentState, bool waitForCompletion)
         {
             throw new NotImplementedException();
         }

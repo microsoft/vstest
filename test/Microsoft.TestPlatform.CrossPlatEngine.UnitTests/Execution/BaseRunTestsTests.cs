@@ -8,6 +8,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using Common.UnitTests.ExtensionFramework;
 
@@ -16,12 +18,15 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -36,6 +41,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         private TestableBaseRunTests runTestsInstance;
 
         private Mock<ITestPlatformEventSource> mockTestPlatformEventSource;
+        private Mock<IThread> mockThread;
 
         private const string BaseRunTestsExecutorUri = "executor://BaseRunTestsExecutor/";
         private const string BadBaseRunTestsExecutorUri = "executor://BadBaseRunTestsExecutor/";
@@ -588,6 +594,55 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.mockTestRunEventsHandler.Verify(re => re.HandleLogMessage(TestMessageLevel.Error, "DummyMessage"));
         }
 
+        [TestMethod]
+        public void RunTestsShouldCreateSTAThreadIfExecutionThreadApartmentStateIsSTA()
+        {
+            this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
+            this.runTestsInstance.RunTests();
+            this.mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true));
+        }
+
+        [TestMethod]
+        public void RunTestsShouldNotCreateThreadIfExecutionThreadApartmentStateIsMTA()
+        {
+            this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.MTA);
+            this.runTestsInstance.RunTests();
+
+            this.mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true), Times.Never);
+        }
+
+        [TestMethod]
+        public void CancelShouldCreateSTAThreadIfExecutionThreadApartmentStateIsSTA()
+        {
+            this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
+            ManualResetEvent cancelEvent = new ManualResetEvent(false);
+            mockThread.Setup(mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()))
+                .Callback<Action, PlatformApartmentState, bool>((action, start, waitForCompletion) =>
+                {
+                    if (waitForCompletion)
+                    {
+                        // Callback for RunTests().
+                        cancelEvent.WaitOne();
+                    }
+                    else
+                    {
+                        // Callback for Cancel().
+                        cancelEvent.Set();
+                    }
+                });
+            Task.Run(() => this.runTestsInstance.RunTests());
+            // RunTests should be in progress to do Cancel.
+            // Adding sleep ensures RunTests task executes first.
+            Thread.Sleep(100);
+            Task.Run(() => this.runTestsInstance.Cancel());
+
+            Assert.IsTrue(cancelEvent.WaitOne(1500), "Timeout: Cancel should be called in STA thread.");
+            this.mockThread.Verify(
+                t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()),
+                Times.Exactly(2),
+                "Both RunTests() and Cancel() should create STA thread.");
+        }
+
         #endregion
 
         #region Private Methods
@@ -608,6 +663,31 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                     receivedExecutor = executor;
                 };
         }
+
+        private void SetupForExecutionThreadApartmentStateTests(PlatformApartmentState apartmentState)
+        {
+            this.mockThread = new Mock<IThread>();
+
+            this.runTestsInstance = new TestableBaseRunTests(
+                $@"<RunSettings>
+                  <RunConfiguration>
+                     <ExecutionThreadApartmentState>{apartmentState}</ExecutionThreadApartmentState>
+                   </RunConfiguration>
+                </RunSettings>",
+                testExecutionContext,
+                null,
+                this.mockTestRunEventsHandler.Object,
+                this.mockTestPlatformEventSource.Object,
+                null,
+                this.mockThread.Object);
+            TestPluginCacheTests.SetupMockExtensions(new string[] { typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location }, () => { });
+            var assemblyLocation = typeof(BaseRunTestsTests).GetTypeInfo().Assembly.Location;
+            var executorUriExtensionMap = new List<Tuple<Uri, string>>
+            {
+                new Tuple<Uri, string>(new Uri(BaseRunTestsExecutorUri), assemblyLocation)
+            };
+            this.runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => { return executorUriExtensionMap; };
+        }
         #endregion
 
         #region Testable Implementation
@@ -621,6 +701,18 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 ITestRunEventsHandler testRunEventsHandler,
                 ITestPlatformEventSource testPlatformEventSource)
                 : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
+            {
+            }
+
+            public TestableBaseRunTests(
+                string runSettings,
+                TestExecutionContext testExecutionContext,
+                ITestCaseEventsHandler testCaseEventsHandler,
+                ITestRunEventsHandler testRunEventsHandler,
+                ITestPlatformEventSource testPlatformEventSource,
+                ITestEventsPublisher testEventsPublisher,
+                IThread platformThread)
+                : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, testEventsPublisher, platformThread)
             {
             }
 

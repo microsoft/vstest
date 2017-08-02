@@ -27,9 +27,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(2, 2, 2);
         }
 
-        // Randomly failing with error "The active test run was aborted. Reason: Destination array was not long enough.
-        // Check destIndex and length, and the array's lower bounds. Test Run Failed."
-        // Issue: https://github.com/Microsoft/vstest/issues/292
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
@@ -112,7 +109,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " /tests:ExitWithStackoverFlow");
+            arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
             this.InvokeVsTest(arguments);
@@ -145,7 +142,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " /tests:ExitwithUnhandleException");
+            arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
             this.InvokeVsTest(arguments);
