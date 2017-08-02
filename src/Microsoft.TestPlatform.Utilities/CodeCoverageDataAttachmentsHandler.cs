@@ -9,11 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
     using System.IO;
     using System.Linq;
     using System.Reflection;
-#if !NET451
-    using System.Runtime.Loader;
-#endif
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachments
     {
@@ -55,21 +53,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
         private string MergeCodeCoverageFiles(IList<string> files)
         {
-            string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + CoverageFileExtension);
+            string fileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + CoverageFileExtension);
             string outputfileName = files[0];
 
             File.Create(fileName).Dispose();
-
-            var assemblyPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), CodeCoverageAnalysisAssemblyName + ".dll");
+            var assemblyPath = Path.Combine(Path.GetDirectoryName(typeof(CodeCoverageDataAttachmentsHandler).GetTypeInfo().Assembly.GetAssemblyLocation()), CodeCoverageAnalysisAssemblyName + ".dll");
 
             try
             {
-                Assembly assembly = null;
-#if NET451
-                assembly = Assembly.LoadFrom(assemblyPath);
-#else
-                assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
-#endif
+                Assembly assembly = new PlatformAssemblyLoadContext().LoadAssemblyFromPath(assemblyPath);
                 var type = assembly.GetType(CodeCoverageAnalysisAssemblyName + "." + CoverageInfoTypeName);
 
                 var methodInfo = type?.GetMethod(MergeMethodName);

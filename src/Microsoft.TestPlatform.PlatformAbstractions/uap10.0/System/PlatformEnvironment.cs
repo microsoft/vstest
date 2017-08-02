@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
+    using System.Runtime.InteropServices;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <inheritdoc />
@@ -14,7 +15,19 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             get
             {
-                throw new NotImplementedException();
+                switch (RuntimeInformation.OSArchitecture)
+                {
+                    case System.Runtime.InteropServices.Architecture.X86:
+                        return PlatformArchitecture.X86;
+                    case System.Runtime.InteropServices.Architecture.X64:
+                        return PlatformArchitecture.X64;
+                    case System.Runtime.InteropServices.Architecture.Arm:
+                        return PlatformArchitecture.ARM;
+                    case System.Runtime.InteropServices.Architecture.Arm64:
+                        return PlatformArchitecture.ARM64;
+                    default:
+                        throw new NotSupportedException();
+                }
             }
         }
 
@@ -23,8 +36,25 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             get
             {
-                throw new NotImplementedException();
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return PlatformOperatingSystem.Windows;
+                }
+
+                return PlatformOperatingSystem.Unix;
             }
+        }
+
+        /// <inheritdoc />
+        public void Exit(int exitcode)
+        {
+            Environment.FailFast("Process terminating with exit code: " + exitcode);
+        }
+
+        /// <inheritdoc />
+        public int GetCurrentManagedThreadId()
+        {
+            return Environment.CurrentManagedThreadId;
         }
     }
 }

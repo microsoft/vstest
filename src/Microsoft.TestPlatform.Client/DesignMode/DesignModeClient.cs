@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -15,33 +16,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using System.Linq;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
     /// The design mode client.
     /// </summary>
     public class DesignModeClient : IDesignModeClient
     {
-        private readonly ICommunicationManager communicationManager;
-
-        private readonly IDataSerializer dataSerializer;
-
-        protected Action<Message> onAckMessageReceived;
-
-        private object ackLockObject = new object();
-
-        ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
-
         /// <summary>
         /// The timeout for the client to connect to the server.
         /// </summary>
         private const int ClientListenTimeOut = 5 * 1000;
 
+        private readonly ICommunicationManager communicationManager;
+
+        private readonly IDataSerializer dataSerializer;
+
+        private object ackLockObject = new object();
+
+        private ProtocolConfig protocolConfig = Constants.DefaultProtocolConfig;
+
+        private IEnvironment platformEnvironment;
+
+        protected Action<Message> onAckMessageReceived;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DesignModeClient"/> class.
         /// </summary>
         public DesignModeClient()
-            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance)
+            : this(new SocketCommunicationManager(), JsonDataSerializer.Instance, new PlatformEnvironment())
         {
         }
 
@@ -54,10 +58,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="dataSerializer">
         /// The data Serializer.
         /// </param>
-        internal DesignModeClient(ICommunicationManager communicationManager, IDataSerializer dataSerializer)
+        /// <param name="platformEnvironment">
+        /// The platform Environment
+        /// </param>
+        internal DesignModeClient(ICommunicationManager communicationManager, IDataSerializer dataSerializer, IEnvironment platformEnvironment)
         {
             this.communicationManager = communicationManager;
             this.dataSerializer = dataSerializer;
+            this.platformEnvironment = platformEnvironment;
         }
 
         /// <summary>
@@ -85,7 +93,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         public void ConnectToClientAndProcessRequests(int port, ITestRequestManager testRequestManager)
         {
             EqtTrace.Info("Trying to connect to server on port : {0}", port);
-            this.communicationManager.SetupClientAsync(port);
+            this.communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
 
             // Wait for the connection to the server and listen for requests.
             if (this.communicationManager.WaitForServerConnection(ClientListenTimeOut))
@@ -108,7 +116,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
             this.Dispose();
 
             EqtTrace.Info("DesignModeClient: Parent process exited, Exiting myself..");
-            Environment.Exit(1);
+
+            this.platformEnvironment.Exit(1);
         }
 
         /// <summary>
@@ -205,7 +214,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                             }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     EqtTrace.Error("DesignModeClient: Error processing request: {0}", ex);
                     isSessionEnd = true;
@@ -221,6 +230,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
         /// <param name="testProcessStartInfo">
         /// The test Process Start Info.
         /// </param>
+        /// <returns>
+        /// The <see cref="int"/>.
+        /// </returns>
         public int LaunchCustomHost(TestProcessStartInfo testProcessStartInfo)
         {
             lock (ackLockObject)
@@ -279,13 +291,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
 
                     testRequestManager.RunTests(testRunPayload, customLauncher, new DesignModeTestEventsRegistrar(this), this.protocolConfig);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     EqtTrace.Error("DesignModeClient: Exception in StartTestRun: " + ex);
+
                     // If there is an exception during test run request creation or some time during the process
                     // In such cases, TestPlatform will never send a TestRunComplete event and IDE need to be sent a run complete message
                     // We need recoverability in translationlayer-designmode scenarios
-
                     var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                     this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
                     var runCompletePayload = new TestRunCompletePayload()
@@ -293,6 +305,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         TestRunCompleteArgs = new TestRunCompleteEventArgs(null, false, true, ex, null, TimeSpan.MinValue),
                         LastRunTests = null
                     };
+
                     // Send run complete to translation layer
                     this.communicationManager.SendMessage(MessageType.ExecutionComplete, runCompletePayload);
                 }
@@ -316,7 +329,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.DesignMode
                         // If there is an exception during test discovery request creation or some time during the process
                         // In such cases, TestPlatform will never send a DiscoveryComplete event and IDE need to be sent a discovery complete message
                         // We need recoverability in translationlayer-designmode scenarios
-
                         var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = ex.ToString() };
                         this.communicationManager.SendMessage(MessageType.TestMessage, testMessagePayload);
 

@@ -171,10 +171,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 // Load the extensions on creation so that we dont have to spend time during first execution.
                 EqtTrace.Verbose("TestExecutorService: Loading the extensions");
 
-                TestDiscoveryExtensionManager.LoadAndInitializeAllExtensions(false);
-
-                EqtTrace.Verbose("TestExecutorService: Loaded the discoverers");
-
                 TestExecutorExtensionManager.LoadAndInitializeAllExtensions(false);
 
                 EqtTrace.Verbose("TestExecutorService: Loaded the executors");

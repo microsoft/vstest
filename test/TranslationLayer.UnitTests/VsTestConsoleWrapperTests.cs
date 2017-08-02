@@ -105,7 +105,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         public void ProcessExitedEventShouldSetOnProcessExit()
         {
             this.mockProcessManager.Raise(pm => pm.ProcessExited += null, EventArgs.Empty);
-            
+
             this.mockRequestSender.Verify(rs => rs.OnProcessExited(), Times.Once);
         }
 

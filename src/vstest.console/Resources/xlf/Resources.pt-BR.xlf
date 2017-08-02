@@ -1558,6 +1558,28 @@
       Enable Blame mode to get name of the faulty test case in event of a test host crash.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunAborted">
+        <source>Test Run Aborted.</source>
+        <target state="new">Test Run Aborted.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="TestRunCanceled">
+        <source>Test Run Canceled.</source>
+        <target state="new">Test Run Canceled.</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="OpenResponseFileError">
+        <source>Error opening response file '{0}'</source>
+        <target state="new">Error opening response file '{0}'</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="ResponseFileArgumentHelp">
+        <source>@&lt;file&gt;
+      Read response file for more options.</source>
+        <target state="new">@&lt;file&gt;
+      Read response file for more options.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

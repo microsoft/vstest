@@ -77,6 +77,27 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
+        public void TestSessionTimeOutTests(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " /TestCaseFilter:TestSessionTimeoutTest");
+
+            // set TestSessionTimeOut = 7 sec
+            arguments = string.Concat(arguments, " -- RunConfiguration.TestSessionTimeout=7000");
+            this.InvokeVsTest(arguments);
+
+            this.StdErrorContains("Test Run Canceled.");
+            this.StdErrorContains("Canceling test run: test run timeout of 7000 milliseconds exceeded.");
+            this.StdOutputDoesNotContains("Total tests: 6");
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
         public void WorkingDirectoryIsSourceDirectory(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);

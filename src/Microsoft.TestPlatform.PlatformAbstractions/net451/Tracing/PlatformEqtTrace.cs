@@ -29,25 +29,32 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public void SetupRemoteEqtTraceListeners(AppDomain childDomain)
         {
             Debug.Assert(childDomain != null, "domain");
-            if (childDomain != null && !Enum.Equals(TraceLevel, TraceLevel.Off))
+            if (childDomain != null)
             {
                 RemoteEqtTrace remoteEqtTrace = (RemoteEqtTrace)childDomain.CreateInstanceFromAndUnwrap(
                     typeof(RemoteEqtTrace).Assembly.Location,
                     typeof(RemoteEqtTrace).FullName);
 
-                remoteEqtTrace.TraceLevel = TraceLevel;
-
-                TraceListener tptListner = null;
-                foreach (TraceListener listener in Trace.Listeners)
+                if (!Enum.Equals(TraceLevel, TraceLevel.Off))
                 {
-                    if (string.Equals(listener.Name, ListenerName, StringComparison.OrdinalIgnoreCase))
-                    {
-                        Debug.Assert(tptListner == null, "Multiple TptListeners found.");
-                        tptListner = listener;
-                    }
-                }
+                    remoteEqtTrace.TraceLevel = TraceLevel;
 
-                remoteEqtTrace.SetupRemoteListeners(tptListner);
+                    TraceListener tptListner = null;
+                    foreach (TraceListener listener in Trace.Listeners)
+                    {
+                        if (string.Equals(listener.Name, ListenerName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Debug.Assert(tptListner == null, "Multiple TptListeners found.");
+                            tptListner = listener;
+                        }
+                    }
+
+                    remoteEqtTrace.SetupRemoteListeners(tptListner);
+                }
+                else
+                {
+                    remoteEqtTrace.DoNotInitialize = true;
+                }
             }
         }
 

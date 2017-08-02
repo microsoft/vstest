@@ -25,32 +25,30 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         public void WriteLine(PlatformTraceLevel level, string message)
         {
-            throw new NotImplementedException();
         }
 
         public bool InitializeVerboseTrace(string customLogFile)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
         public string GetLogFile()
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
 
         public void SetTraceLevel(PlatformTraceLevel value)
         {
-            throw new NotImplementedException();
         }
 
         public PlatformTraceLevel GetTraceLevel()
         {
-            throw new NotImplementedException();
+            return PlatformTraceLevel.Off;
         }
     }
 }

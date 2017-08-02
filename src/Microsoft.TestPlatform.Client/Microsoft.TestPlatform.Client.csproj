@@ -6,7 +6,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <AssemblyName>Microsoft.VisualStudio.TestPlatform.Client</AssemblyName>
-    <TargetFrameworks>netstandard1.5;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard1.4;net451</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Resources.resx" />

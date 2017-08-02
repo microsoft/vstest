@@ -62,7 +62,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
             this.mockFileHelper = new Mock<IFileHelper>();
             this.mockMessageLogger = new Mock<IMessageLogger>();
             var mockEnvironment = new Mock<IEnvironment>();
-            this.defaultConnectionInfo = default(TestRunnerConnectionInfo);
+            this.defaultConnectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:123", Role = ConnectionRole.Client }, RunnerProcessId = 0 };
+
             string defaultSourcePath = Path.Combine($"{Path.DirectorySeparatorChar}tmp", "test.dll");
             this.defaultTestHostPath = @"\tmp\testhost.dll";
             this.dotnetHostManager = new TestableDotnetTestHostManager(
@@ -177,12 +178,22 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
             this.mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(true);
 
             var startInfo = this.dotnetHostManager.GetTestHostProcessStartInfo(this.testSource, null, connectionInfo);
 
-            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --parentprocessid 101");
+            StringAssert.Contains(startInfo.Arguments, "--port " + connectionInfo.Port + " --endpoint " + connectionInfo.ConnectionInfo.Endpoint + " --role client" + " --parentprocessid 101");
+        }
+
+        [TestMethod]
+        public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
+        {
+            var connectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
+
+            var info = this.dotnetHostManager.GetTestHostConnectionInfo();
+
+            Assert.AreEqual(connectionInfo, info);
         }
 
         [TestMethod]
@@ -351,7 +362,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public async Task LaunchTestHostShouldLaunchProcessWithConnectionInfo()
         {
-            var expectedArgs = "exec \"" + this.defaultTestHostPath + "\" --port 0 --parentprocessid 0";
+            var expectedArgs = "exec \"" + this.defaultTestHostPath + "\" --port 123 --endpoint 127.0.0.1:123 --role client --parentprocessid 0";
             this.dotnetHostManager.SetCustomLauncher(this.mockTestHostLauncher.Object);
             await this.dotnetHostManager.LaunchTestHostAsync(this.defaultTestProcessStartInfo, CancellationToken.None);
 

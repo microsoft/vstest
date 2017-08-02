@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;

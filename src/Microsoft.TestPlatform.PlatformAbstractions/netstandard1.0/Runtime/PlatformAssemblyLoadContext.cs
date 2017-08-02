@@ -10,12 +10,6 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     public class PlatformAssemblyLoadContext : IAssemblyLoadContext
     {
         /// <inheritdoc/>
-        public string GetAssemblyLocation(Assembly assembly)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        /// <inheritdoc/>
         public AssemblyName GetAssemblyNameFromPath(string assemblyPath)
         {
             throw new System.NotImplementedException();

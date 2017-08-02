@@ -3,12 +3,9 @@
 
 namespace Microsoft.TestPlatform.Build.Tasks
 {
-    using System.Collections.Generic;
-
-    using Microsoft.Build.Framework;
-    using Microsoft.Build.Utilities;
     using System;
-    using System.IO;
+    using Microsoft.Build.Utilities;
+    using Microsoft.TestPlatform.Build.Resources;
 
     public class BuildLogTask : Task
     {
@@ -22,11 +19,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
         {
             if (BuildStarted)
             {
-                Console.WriteLine("Build started, please wait...");
+                Console.WriteLine(Resources.BuildStarted);
             }
             else
             {
-                Console.WriteLine("Build completed.");
+                Console.WriteLine(Resources.BuildCompleted);
                 Console.WriteLine();
             }
             return true;
