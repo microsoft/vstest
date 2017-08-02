@@ -66,5 +66,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             throw new NotImplementedException();
         }
+
+        /// <inheritdoc/>
+        public int GetProcessId(object process)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

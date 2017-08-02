@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -93,6 +94,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
+            // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
+            UpdateTestSources(discoveryCriteria.Sources, discoveryCriteria.AdapterSourceMap, testHostManager);
+
             var discoveryManager = this.TestEngine.GetDiscoveryManager(testHostManager, discoveryCriteria, protocolConfig);
             discoveryManager.Initialize();
 
@@ -129,6 +133,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
             var testHostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(testRunCriteria.TestRunSettings);
             testHostManager.Initialize(TestSessionMessageLogger.Instance, testRunCriteria.TestRunSettings);
 
+            // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
+            // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
+            if (!testRunCriteria.HasSpecificTests)
+            {
+                UpdateTestSources(testRunCriteria.Sources, testRunCriteria.AdapterSourceMap, testHostManager);
+            }
+
             if (testRunCriteria.TestHostLauncher != null)
             {
                 testHostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
@@ -157,6 +168,19 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         {
             this.TestEngine.GetExtensionManager()
                    .UseAdditionalExtensions(pathToAdditionalExtensions, loadOnlyWellKnownExtensions);
+        }
+
+        /// <summary>
+        /// Update the AdapterSourceMap
+        /// </summary>
+        /// <param name="sources">test sources</param>
+        /// <param name="adapterSourceMap">Adapter Source Map</param>
+        /// <param name="testRuntimeProvider">testhostmanager which updates the sources</param>
+        private void UpdateTestSources(IEnumerable<string> sources, Dictionary<string, IEnumerable<string>> adapterSourceMap, ITestRuntimeProvider testRuntimeProvider)
+        {
+            var updatedTestSources = testRuntimeProvider.GetTestSources(sources);
+            adapterSourceMap.Clear();
+            adapterSourceMap.Add(ObjectModel.Constants.UnspecifiedAdapterPath, updatedTestSources);
         }
 
         /// <summary>

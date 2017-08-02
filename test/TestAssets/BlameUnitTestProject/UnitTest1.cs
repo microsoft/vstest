@@ -4,8 +4,7 @@
 namespace BlameUnitTestProject
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using System;
-    using System.Threading;
+    using System.Runtime.CompilerServices;
 
     [TestClass]
     public class UnitTest1
@@ -18,7 +17,13 @@ namespace BlameUnitTestProject
         [TestMethod]
         public void TestMethod2()
         {
-            Environment.Exit(1);
+            StackOverflowMethod();
+        }
+
+        [MethodImpl(MethodImplOptions.NoOptimization)]
+        void StackOverflowMethod()
+        {
+            StackOverflowMethod();
         }
     }
 }
