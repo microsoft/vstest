@@ -25,6 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string ResultsDirectoryNodeName = "ResultsDirectory";
         private const string TargetPlatformNodeName = "TargetPlatform";
         private const string TargetFrameworkNodeName = "TargetFrameworkVersion";
+        private const string TestSessionTimeoutNodeName = "TestSessionTimeout";
 
         private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
         private const string CollectSourceInformationNodePath = @"/RunSettings/RunConfiguration/CollectSourceInformation";
@@ -32,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
+        private const string TestSessionTimeoutNodePath = @"/RunSettings/RunConfiguration/TestSessionTimeout";
 
         /// <summary>
         /// Updates the run settings XML with the specified values.
@@ -100,6 +102,45 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         public static void UpdateCollectSourceInformation(XPathNavigator runSettingsNavigator, bool collectSourceInformationValue)
         {
             AddNodeIfNotPresent<bool>(runSettingsNavigator, CollectSourceInformationNodePath, CollectSourceInformationNodeName, collectSourceInformationValue);
+        }
+
+        /// <summary>
+        /// Remove the <c>RunConfiguration.DesignMode</c> value for a run settings.
+        /// </summary>
+        public static void RemoveDesignMode(XPathNavigator runSettingsNavigator)
+        {
+            RemoveNodeFromRunConfiguration(runSettingsNavigator, DesignModeNodePath, DesignModeNodeName);
+        }
+
+
+        /// <summary>
+        /// Remove the <c>RunConfiguration.CollectSourceInformation</c> value for a run settings.
+        /// </summary>
+        public static void RemoveCollectSourceInformation(XPathNavigator runSettingsNavigator)
+        {
+            RemoveNodeFromRunConfiguration(runSettingsNavigator, CollectSourceInformationNodePath, CollectSourceInformationNodeName);
+        }
+
+        /// <summary>
+        /// Remove the <c>RunConfiguration.CollectSourceInformation</c> value for a run settings.
+        /// </summary>
+        public static void RemoveTestSessionTimeout(XPathNavigator runSettingsNavigator)
+        {
+            RemoveNodeFromRunConfiguration(runSettingsNavigator, TestSessionTimeoutNodePath, TestSessionTimeoutNodeName);
+        }
+
+        private static void RemoveNodeFromRunConfiguration(XPathNavigator runSettingsNavigator, string nodePath, string nodeName)
+        {
+            // Navigator should be at Root of runsettings xml, attempt to move to /RunSettings/RunConfiguration
+            if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+                !runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+            {
+                EqtTrace.Error("InferRunSettingsHelper.RemoveNodeIfPresent: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                return;
+            }
+
+            XmlUtilities.RemoveChildNode(runSettingsNavigator, nodePath, nodeName);
+            runSettingsNavigator.MoveToRoot();
         }
 
         /// <summary>

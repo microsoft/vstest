@@ -108,6 +108,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         internal virtual bool IsVersionCheckRequired => !this.hostPackageVersion.StartsWith("15.0.0");
 
         /// <summary>
+        /// Gets a value indicating whether the test host supports protocol version check
+        /// </summary>
+        internal virtual bool TestHostCannotHandleNewRunSettingsNode => this.hostPackageVersion.StartsWith("15.0.0-preview");
+
+        /// <summary>
         /// Gets or sets the error length for runtime error stream.
         /// </summary>
         protected int ErrorLength { get; set; } = 4096;

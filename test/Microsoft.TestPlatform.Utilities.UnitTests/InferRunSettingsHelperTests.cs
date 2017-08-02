@@ -264,7 +264,75 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/DesignMode"));
             Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/CollectSourceInformation"));
-        }   
+        }
+
+        [DataTestMethod]
+        [DataRow("DesignMode")]
+        [DataRow("CollectSourceInformation")]
+        [DataRow("TestSessionTimeout")]
+        public void RemoveNodeFromRunConfigurationShouldNotModifyXmlIfNavigatorIsNotAtRootNode(string settingName)
+        {
+            var settings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <DesignMode>False</DesignMode>
+                                    <CollectSourceInformation>False</CollectSourceInformation>
+                                    <TestSessionTimeout>1000</TestSessionTimeout>
+                                </RunConfiguration>
+                            </RunSettings>";
+            var navigator = this.GetNavigator(settings);
+            navigator.MoveToFirstChild();
+
+            switch (settingName.ToUpperInvariant())
+            {
+                case "DESIGNMODE":
+                    InferRunSettingsHelper.RemoveDesignMode(navigator);
+                    break;
+
+                case "COLLECTSOURCEINFORMATION":
+                    InferRunSettingsHelper.RemoveCollectSourceInformation(navigator);
+                    break;
+
+                case "TESTSESSIONTIMEOUT":
+                    InferRunSettingsHelper.RemoveTestSessionTimeout(navigator);
+                    break;
+            };
+
+            navigator.MoveToRoot();
+            Assert.IsTrue(navigator.InnerXml.IndexOf(settingName, StringComparison.OrdinalIgnoreCase) > 0);
+        }
+
+        [TestMethod]
+        public void RemoveDesignModeShouldRemoveDesignModeNode()
+        {
+            var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.RemoveDesignMode(navigator);
+
+            Assert.IsTrue(navigator.InnerXml.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
+        }
+
+        [TestMethod]
+        public void RemoveCollectSourceInformationShouldRemoveCollectSourceInformationNode()
+        {
+            var settings = @"<RunSettings><RunConfiguration><CollectSourceInformation>False</CollectSourceInformation></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.RemoveCollectSourceInformation(navigator);
+
+            Assert.IsTrue(navigator.InnerXml.IndexOf("CollectSourceInformation", StringComparison.OrdinalIgnoreCase) < 0);
+        }
+
+        [TestMethod]
+        public void RemoveTestSessionTimeoutShouldRemoveTestSessionTimeoutNode()
+        {
+            var settings = @"<RunSettings><RunConfiguration><TestSessionTimeout>1000</TestSessionTimeout></RunConfiguration></RunSettings>";
+            var navigator = this.GetNavigator(settings);
+
+            InferRunSettingsHelper.RemoveTestSessionTimeout(navigator);
+
+            Assert.IsTrue(navigator.InnerXml.IndexOf("TestSessionTimeout", StringComparison.OrdinalIgnoreCase) < 0);
+        }
 
         #region private methods
 

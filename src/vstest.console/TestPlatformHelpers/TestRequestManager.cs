@@ -285,9 +285,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                     // NET.Test.Sdk; we will remove this constraint in 15.1).
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
 
-                    if (!runConfiguration.DesignModeSet && runConfiguration.TargetFrameworkSet &&
-                        runConfiguration.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) < 0 &&
-                        runConfiguration.TargetFrameworkVersion.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) < 0)
+                    if (!runConfiguration.DesignModeSet)
                     {
                         InferRunSettingsHelper.UpdateDesignMode(navigator, this.commandLineOptions.IsDesignMode);
                         settingsUpdated = true;

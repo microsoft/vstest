@@ -6,9 +6,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
-
+    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -20,7 +22,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
 
     /// <summary>
@@ -28,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     /// </summary>
     internal class ProxyExecutionManager : ProxyOperationManager, IProxyExecutionManager
     {
+        private readonly string oldTestHostPropertyName = "TestHostCannotHandleNewRunSettingsNode";
         private readonly ITestRuntimeProvider testHostManager;
         private IDataSerializer dataSerializer;
         private CancellationTokenSource cancellationTokenSource;
@@ -121,11 +125,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
                         testCaseFilter: testRunCriteria.TestCaseFilter);
 
+                    // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
+                    var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings);
                     if (testRunCriteria.HasSpecificSources)
                     {
                         var runRequest = new TestRunCriteriaWithSources(
                             testRunCriteria.AdapterSourceMap,
-                            testRunCriteria.TestRunSettings,
+                            runsettings,
                             executionContext);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
@@ -134,7 +140,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     {
                         var runRequest = new TestRunCriteriaWithTests(
                             testRunCriteria.Tests,
-                            testRunCriteria.TestRunSettings,
+                            runsettings,
                             executionContext);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
@@ -205,6 +211,43 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 this.RequestSender.InitializeExecution(platformExtensions, TestPluginCache.Instance.LoadOnlyWellKnownExtensions);
             }
+        }
+
+        /// <summary>
+        /// This function will remove the unknown runsettings node from runsettings for old testhost who throws exception for unknown node.
+        /// </summary>
+        /// <param name="runsettingsXml">runsettings string</param>
+        /// <returns>runsetting after removing unrequired nodes</returns>
+        private string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml)
+        {
+            var updatedRunSettingsXml = runsettingsXml;
+
+            var property = this.testHostManager.GetType().GetRuntimeProperties().FirstOrDefault(p => string.Equals(p.Name, oldTestHostPropertyName, StringComparison.OrdinalIgnoreCase));
+            if (property != null)
+            {
+                if ((bool)property.GetValue(this.testHostManager))
+                {
+                    if (!string.IsNullOrWhiteSpace(runsettingsXml))
+                    {
+                        using (var stream = new StringReader(runsettingsXml))
+                        using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                        {
+                            var document = new XmlDocument();
+                            document.Load(reader);
+
+                            var navigator = document.CreateNavigator();
+
+                            InferRunSettingsHelper.RemoveCollectSourceInformation(navigator);
+                            InferRunSettingsHelper.RemoveDesignMode(navigator);
+                            InferRunSettingsHelper.RemoveTestSessionTimeout(navigator);
+
+                            updatedRunSettingsXml = navigator.OuterXml;
+                        }
+                    }
+                }
+            }
+
+            return updatedRunSettingsXml;
         }
     }
 }
