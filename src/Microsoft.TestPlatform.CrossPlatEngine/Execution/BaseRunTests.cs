@@ -288,17 +288,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         internal void Cancel()
         {
             isCancellationRequested = true;
-            if (this.activeExecutor != null)
+
+            if (this.activeExecutor == null)
             {
-                if (RequiredSTAThread())
-                {
-                    this.platformThread.Run(() => CancelTestRunInternal(this.activeExecutor),
-                        this.executionThreadApartmentState, false);
-                }
-                else
-                {
-                    Task.Run(() => CancelTestRunInternal(this.activeExecutor));
-                }
+                return;
+            }
+
+            if (NotRequiredSTAThread() || !TryToRunInSTAThread(() => CancelTestRunInternal(this.activeExecutor), false))
+            {
+                Task.Run(() => CancelTestRunInternal(this.activeExecutor));
             }
         }
 
@@ -390,23 +388,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
-                        if (RequiredSTAThread())
-                        {
-                            // Call adapter ExecuteTests in thread with STA.
-                            // Tests need to be run in STA thread when accessin COM objects.
-                            EqtTrace.Verbose("BaseRunTests.RunTestInternalWithExecutors: Using STA thread to call adapter ExecuteTests() API.");
-                            platformThread.Run(
-                                () => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext,
-                                    this.frameworkHandle), this.executionThreadApartmentState, true);
-                        }
-                        else
+                        if (NotRequiredSTAThread() || !TryToRunInSTAThread(
+                            () => this.InvokeExecutor(executor,
+                                                      executorUriExtensionTuple,
+                                                      this.runContext,
+                                                      this.frameworkHandle),
+                                  true))
                         {
                             this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
                         }
 
                         this.testPlatformEventSource.AdapterExecutionStop(this.testRunCache.TotalExecutedTests - currentTotalTests);
 
-                        // Identify whether the executor did run any tests at all  
+                        // Identify whether the executor did run any tests at all
                         if (this.testRunCache.TotalExecutedTests > totalTests)
                         {
                             this.executorUrisThatRanTests.Add(executorUriExtensionTuple.Item1.AbsoluteUri);
@@ -460,9 +454,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             return exceptionsHitDuringRunTests;
         }
 
-        private bool RequiredSTAThread()
+        private bool NotRequiredSTAThread()
         {
-            return this.executionThreadApartmentState == PlatformApartmentState.STA;
+            return this.executionThreadApartmentState != PlatformApartmentState.STA;
         }
 
         private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
@@ -556,6 +550,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 }
             }
         }
+
+        private bool TryToRunInSTAThread(Action action, bool waitForCompletion)
+        {
+            bool success = true;
+            try
+            {
+                EqtTrace.Verbose("BaseRunTests.TryToRunInSTAThread: Using STA thread to call adapter API.");
+                this.platformThread.Run(action, PlatformApartmentState.STA, waitForCompletion);
+            }
+            catch (NotSupportedThreadApartmentStateException ex)
+            {
+                success = false;
+                EqtTrace.Warning("BaseRunTests.TryToRunInSTAThread: Failed to run in STA thread: {0}", ex);
+                this.TestRunEventsHandler.HandleLogMessage(TestMessageLevel.Warning, ex.ToString());
+            }
+
+            return success;
+        }
+
         #endregion
     }
 }

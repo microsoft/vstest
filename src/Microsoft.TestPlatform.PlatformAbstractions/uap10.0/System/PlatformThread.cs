@@ -4,6 +4,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     public class PlatformThread : IThread
@@ -11,7 +12,21 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <inheritdoc/>
         public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
         {
-            throw new NotImplementedException();
+            if (apartmentState == PlatformApartmentState.STA)
+            {
+                throw new NotSupportedThreadApartmentStateException("Currently STA Thread apartment state not supported for UAP10.0");
+            }
+
+            if (action == null)
+            {
+                return;
+            }
+
+            Task task = Task.Run(action);
+            if (waitForCompletion)
+            {
+                task.Wait();
+            }
         }
     }
 }

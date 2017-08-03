@@ -10,12 +10,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     public class PlatformThread : IThread
     {
         /// <inheritdoc/>
-        /// <remarks> ApartmentState is not honored in netcoreapp1.0. </remarks>
         public void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion)
         {
             if (apartmentState == PlatformApartmentState.STA)
             {
-                throw new Exception("Currently STA Thread apartment state not supported for .NetCore");
+                throw new NotSupportedThreadApartmentStateException("Currently STA Thread apartment state not supported for .NetCore");
             }
 
             if (action == null)

@@ -13,6 +13,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         /// <param name="action">The Action to be called.</param>
         /// <param name="apartmentState">The apartment state.</param>
         /// <param name="waitForCompletion"> True for running in Sync, False for running in Async</param>
+        /// <exception cref="NotSupportedThreadApartmentStateException"> When thread apartment state not supported for platform. </exception>>
         void Run(Action action, PlatformApartmentState apartmentState, bool waitForCompletion);
     }
 }

@@ -612,14 +612,21 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         }
 
         [TestMethod]
-        public void RunTestsShouldThrowErrorOnThreadApartmentStateIsSTA()
+        public void RunTestsShouldRunTestsInMTAThreadWhenRunningInSTAThreadFails()
         {
             this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
             this.mockThread.Setup(
-                mt => mt.Run(It.IsAny<Action>(), It.IsAny<PlatformApartmentState>(), It.IsAny<bool>())).Throws<Exception>();
+                mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>())).Throws<NotSupportedThreadApartmentStateException>();
+            bool isInvokeExecutorCalled = false;
+            this.runTestsInstance.InvokeExecutorCallback =
+                (executor, executorUriTuple, runcontext, frameworkHandle) =>
+                {
+                    isInvokeExecutorCalled = true;
+                };
             this.runTestsInstance.RunTests();
 
-            this.mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true), Times.Never);
+            Assert.IsTrue(isInvokeExecutorCalled, "InvokeExecutor() should be called when STA thread creation fails.");
+            this.mockThread.Verify(t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, true), Times.Once);
         }
 
         [TestMethod]
