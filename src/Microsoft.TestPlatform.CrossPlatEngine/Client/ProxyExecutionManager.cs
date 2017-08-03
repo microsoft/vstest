@@ -6,11 +6,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.IO;
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -22,7 +20,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
 
@@ -227,23 +224,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 if ((bool)property.GetValue(this.testHostManager))
                 {
-                    if (!string.IsNullOrWhiteSpace(runsettingsXml))
-                    {
-                        using (var stream = new StringReader(runsettingsXml))
-                        using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
-                        {
-                            var document = new XmlDocument();
-                            document.Load(reader);
-
-                            var navigator = document.CreateNavigator();
-
-                            InferRunSettingsHelper.RemoveCollectSourceInformation(navigator);
-                            InferRunSettingsHelper.RemoveDesignMode(navigator);
-                            InferRunSettingsHelper.RemoveTestSessionTimeout(navigator);
-
-                            updatedRunSettingsXml = navigator.OuterXml;
-                        }
-                    }
+                    updatedRunSettingsXml = InferRunSettingsHelper.MakeRunsettingsCompatible(runsettingsXml);
                 }
             }
 

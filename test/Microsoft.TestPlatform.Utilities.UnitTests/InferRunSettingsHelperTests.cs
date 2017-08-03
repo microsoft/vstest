@@ -266,72 +266,44 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
             Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/CollectSourceInformation"));
         }
 
-        [DataTestMethod]
-        [DataRow("DesignMode")]
-        [DataRow("CollectSourceInformation")]
-        [DataRow("TestSessionTimeout")]
-        public void RemoveNodeFromRunConfigurationShouldNotModifyXmlIfNavigatorIsNotAtRootNode(string settingName)
+        [TestMethod]
+        public void MakeRunsettingsCompatibleShouldDeleteNewlyAddedRunConfigurationNode()
+        {
+            var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode><CollectSourceInformation>False</CollectSourceInformation></RunConfiguration></RunSettings>";
+
+            var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
+
+            Assert.IsTrue(result.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
+        }
+
+        [TestMethod]
+        public void MakeRunsettingsCompatibleShouldNotDeleteOldRunConfigurationNode()
         {
             var settings = @"<RunSettings>
                                 <RunConfiguration>
                                     <DesignMode>False</DesignMode>
                                     <CollectSourceInformation>False</CollectSourceInformation>
-                                    <TestSessionTimeout>1000</TestSessionTimeout>
+                                    <TargetPlatform>x86</TargetPlatform>
+                                    <TargetFrameworkVersion>net46</TargetFrameworkVersion>
+                                    <TestAdaptersPaths>dummypath</TestAdaptersPaths>
+                                    <ResultsDirectory>dummypath</ResultsDirectory>
+                                    <SolutionDirectory>dummypath</SolutionDirectory>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <DisableParallelization>False</DisableParallelization>
+                                    <DisableAppDomain>False</DisableAppDomain>
                                 </RunConfiguration>
                             </RunSettings>";
-            var navigator = this.GetNavigator(settings);
-            navigator.MoveToFirstChild();
 
-            switch (settingName.ToUpperInvariant())
-            {
-                case "DESIGNMODE":
-                    InferRunSettingsHelper.RemoveDesignMode(navigator);
-                    break;
+            var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
 
-                case "COLLECTSOURCEINFORMATION":
-                    InferRunSettingsHelper.RemoveCollectSourceInformation(navigator);
-                    break;
-
-                case "TESTSESSIONTIMEOUT":
-                    InferRunSettingsHelper.RemoveTestSessionTimeout(navigator);
-                    break;
-            };
-
-            navigator.MoveToRoot();
-            Assert.IsTrue(navigator.InnerXml.IndexOf(settingName, StringComparison.OrdinalIgnoreCase) > 0);
-        }
-
-        [TestMethod]
-        public void RemoveDesignModeShouldRemoveDesignModeNode()
-        {
-            var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode></RunConfiguration></RunSettings>";
-            var navigator = this.GetNavigator(settings);
-
-            InferRunSettingsHelper.RemoveDesignMode(navigator);
-
-            Assert.IsTrue(navigator.InnerXml.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
-        }
-
-        [TestMethod]
-        public void RemoveCollectSourceInformationShouldRemoveCollectSourceInformationNode()
-        {
-            var settings = @"<RunSettings><RunConfiguration><CollectSourceInformation>False</CollectSourceInformation></RunConfiguration></RunSettings>";
-            var navigator = this.GetNavigator(settings);
-
-            InferRunSettingsHelper.RemoveCollectSourceInformation(navigator);
-
-            Assert.IsTrue(navigator.InnerXml.IndexOf("CollectSourceInformation", StringComparison.OrdinalIgnoreCase) < 0);
-        }
-
-        [TestMethod]
-        public void RemoveTestSessionTimeoutShouldRemoveTestSessionTimeoutNode()
-        {
-            var settings = @"<RunSettings><RunConfiguration><TestSessionTimeout>1000</TestSessionTimeout></RunConfiguration></RunSettings>";
-            var navigator = this.GetNavigator(settings);
-
-            InferRunSettingsHelper.RemoveTestSessionTimeout(navigator);
-
-            Assert.IsTrue(navigator.InnerXml.IndexOf("TestSessionTimeout", StringComparison.OrdinalIgnoreCase) < 0);
+            Assert.IsTrue(result.IndexOf("TargetPlatform", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("TargetFrameworkVersion", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("TestAdaptersPaths", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("ResultsDirectory", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("SolutionDirectory", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("MaxCpuCount", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("DisableParallelization", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("DisableAppDomain", StringComparison.OrdinalIgnoreCase) > 0);
         }
 
         #region private methods
