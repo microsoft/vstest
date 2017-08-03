@@ -10,6 +10,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <OutputType>Exe</OutputType>
     <PlatformTarget Condition="'$(TargetFramework)' == 'net451'">AnyCPU</PlatformTarget>
+    <Prefer32Bit Condition="'$(TargetFramework)' == 'net451'">true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' != 'netcoreapp2.0'">
     <RuntimeIdentifier>win7-x64</RuntimeIdentifier>
