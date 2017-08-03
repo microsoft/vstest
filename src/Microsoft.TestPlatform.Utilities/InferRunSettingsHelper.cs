@@ -27,7 +27,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string ResultsDirectoryNodeName = "ResultsDirectory";
         private const string TargetPlatformNodeName = "TargetPlatform";
         private const string TargetFrameworkNodeName = "TargetFrameworkVersion";
-        private const string TestSessionTimeoutNodeName = "TestSessionTimeout";
 
         private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
         private const string CollectSourceInformationNodePath = @"/RunSettings/RunConfiguration/CollectSourceInformation";
@@ -35,7 +34,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
-        private const string TestSessionTimeoutNodePath = @"/RunSettings/RunConfiguration/TestSessionTimeout";
 
 
         /// <summary>
