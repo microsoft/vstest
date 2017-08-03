@@ -240,7 +240,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("TestRunFailed_NoDiscovererFound_NoTestsAreAvailableInTheSources", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to execute in STA thread, Using MTA thread. Reason: {0}.
+        /// </summary>
+        internal static string UnableToExecuteInSTAThread {
+            get {
+                return ResourceManager.GetString("UnableToExecuteInSTAThread", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to No tests matched the filter because it contains one or more properties that are not valid ({0}). Specify filter expression containing valid properties ({1})..
         /// </summary>

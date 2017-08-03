@@ -183,4 +183,7 @@
   <data name="FailedToLaunchTestHost" xml:space="preserve">
     <value>Failed to launch testhost with error: {0}</value>
   </data>
+  <data name="UnableToExecuteInSTAThread" xml:space="preserve">
+    <value>Unable to execute in STA thread, Using MTA thread. Reason: {0}</value>
+  </data>
 </root>

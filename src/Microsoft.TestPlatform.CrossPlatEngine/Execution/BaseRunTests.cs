@@ -563,7 +563,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 success = false;
                 EqtTrace.Warning("BaseRunTests.TryToRunInSTAThread: Failed to run in STA thread: {0}", ex);
-                this.TestRunEventsHandler.HandleLogMessage(TestMessageLevel.Warning, ex.ToString());
+                this.TestRunEventsHandler.HandleLogMessage(TestMessageLevel.Warning,
+                    string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToExecuteInSTAThread, ex.Message));
             }
 
             return success;

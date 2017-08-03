@@ -10,7 +10,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        [NETCORETargetFramework]
         public void UITestShouldPassIfApartmentStateIsSTA(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -24,8 +23,22 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
         [NETCORETargetFramework]
+        public void WarningShouldBeShownWhenValueIsSTAForNetCore(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var assemblyPaths =
+                this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = string.Concat(arguments, " /testcasefilter:PassingTest2 -- RunConfiguration.ExecutionThreadApartmentState=STA");
+            this.InvokeVsTest(arguments);
+            this.StdOutputContains("Unable to execute in STA thread");
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
         public void UITestShouldFailWhenDefaultApartmentStateIsMTA(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
