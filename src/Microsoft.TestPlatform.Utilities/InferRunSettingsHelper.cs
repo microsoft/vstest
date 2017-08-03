@@ -67,7 +67,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                         var listOfInValidRunConfigurationSettings = new List<string>();
 
                         // These are the list of valid RunConfiguration setting name which old testhost understand.
-                        var listOfValidRunConfigurationSettings = new List<string>
+                        var listOfValidRunConfigurationSettings = new HashSet<string>
                         {
                             "TargetPlatform",
                             "TargetFrameworkVersion",
@@ -90,7 +90,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                         } while (runSettingsNavigator.MoveToNext());
 
-
                         // Delele all invalid RunConfiguration Settings
                         if (listOfInValidRunConfigurationSettings.Count > 0)
                         {
@@ -99,7 +98,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                                 string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
                                 EqtTrace.Warning(string.Format("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName));
                             }
-
 
                             // move navigator to RunConfiguration node
                             runSettingsNavigator.MoveToParent();
