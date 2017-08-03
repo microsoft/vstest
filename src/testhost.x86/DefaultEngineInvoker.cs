@@ -108,9 +108,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
-            return Task.Run(() =>
-            {
-                // Wait for the connection to the sender and start processing requests from sender
+            var task = new Task(
+                () =>
+                    {
+                        // Wait for the connection to the sender and start processing requests from sender
                 if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
                 {
                     requestHandler.ProcessRequests(managerFactory);
@@ -119,8 +120,12 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     EqtTrace.Info("DefaultEngineInvoker: RequestHandler timed out while connecting to the Sender.");
                     throw new TimeoutException();
-                }
-            });
+                        }
+                    },
+                TaskCreationOptions.LongRunning);
+
+            task.Start();
+            return task;
         }
     }
 }
