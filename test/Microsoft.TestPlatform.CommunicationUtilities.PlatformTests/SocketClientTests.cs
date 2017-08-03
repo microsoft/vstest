@@ -57,9 +57,13 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         }
 
         [TestMethod]
+        [Ignore]
         public void SocketClientStartShouldThrowIfServerIsNotListening()
         {
             var dummyConnectionInfo = "5345";
+            
+            this.socketClient.Start(dummyConnectionInfo);
+
             var exceptionThrown = false;
             try
             {
