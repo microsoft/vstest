@@ -89,7 +89,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
             catch(Exception e)
             {
-                this.testRunEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
+                this.testRunEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
                 this.Abort();
             }
             finally
@@ -128,7 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
             catch(Exception e)
             {
-                this.testRunEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.Message);
+                this.testRunEventsHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, e.ToString());
                 this.Abort();
             }
             finally

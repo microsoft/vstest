@@ -280,9 +280,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
                     var navigator = document.CreateNavigator();
 
-                    // If user is already setting DesignMode via runsettings or CLI args; we skip. We also skip if the target framework
-                    // is not known or current run is targeted to netcoreapp (since it is a breaking change; user may be running older
-                    // NET.Test.Sdk; we will remove this constraint in 15.1).
+                    // If user is already setting DesignMode via runsettings or CLI args; we skip.
                     var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
 
                     if (!runConfiguration.DesignModeSet)
