@@ -10,12 +10,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Linq;
     using System.Reflection;
     using System.Threading;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -33,7 +30,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         private readonly IProcessHelper processHelper;
         private readonly int connectionTimeout;
         private readonly string versionCheckPropertyName = "IsVersionCheckRequired";
-        private readonly string oldTestHostPropertyName = "TestHostCannotHandleNewRunSettingsNode";
+        private readonly string makeRunsettingsCompatiblePropertyName = "MakeRunsettingsCompatible";
+        private bool versionCheckRequired = true;
+        private bool makeRunsettingsCompatible;
+        private bool makeRunsettingsCompatibleSet;
         private readonly ManualResetEventSlim testHostExited = new ManualResetEventSlim(false);
 
         private int testHostProcessId;
@@ -161,14 +161,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 // Handling special case for dotnet core projects with older test hosts
                 // Older test hosts are not aware of protocol version check
                 // Hence we should not be sending VersionCheck message to these test hosts
-                bool checkRequired = true;
-                var property = this.testHostManager.GetType().GetRuntimeProperties().FirstOrDefault(p => string.Equals(p.Name, versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
-                if (property != null)
-                {
-                    checkRequired = (bool)property.GetValue(this.testHostManager);
-                }
+                this.CompatIssueWithVersionCheckAndRunsettings();
 
-                if (checkRequired)
+                if (this.versionCheckRequired)
                 {
                     this.RequestSender.CheckVersionWithTestHost();
                 }
@@ -207,7 +202,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 this.initialized = false;
 
                 EqtTrace.Warning("ProxyOperationManager: Timed out waiting for test host to exit. Will terminate process.");
-                
+
                 // please clean up test host. 
                 this.testHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
 
@@ -254,25 +249,39 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         /// <param name="runsettingsXml">runsettings string</param>
         /// <returns>runsetting after removing unrequired nodes</returns>
-        protected string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, ITestRunEventsHandler eventHandler)
+        protected string RemoveNodesFromRunsettingsIfRequired(string runsettingsXml, Action<TestMessageLevel, string> logMessage)
         {
             var updatedRunSettingsXml = runsettingsXml;
-
-            var property = this.testHostManager.GetType().GetRuntimeProperties().FirstOrDefault(p => string.Equals(p.Name, oldTestHostPropertyName, StringComparison.OrdinalIgnoreCase));
-            if (property != null)
+            if (!this.makeRunsettingsCompatibleSet)
             {
-                if ((bool)property.GetValue(this.testHostManager))
-                {
-                    var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Warning, Message = CrossPlatEngineResources.OldTestHostIsGettingUsed };
-                    var rawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, testMessagePayload);
-                    eventHandler.HandleLogMessage(TestMessageLevel.Warning, CrossPlatEngineResources.OldTestHostIsGettingUsed);
-                    eventHandler.HandleRawMessage(rawMessage);
+                this.CompatIssueWithVersionCheckAndRunsettings();
+            }
 
-                    updatedRunSettingsXml = InferRunSettingsHelper.MakeRunsettingsCompatible(runsettingsXml);
-                }
+            if (this.makeRunsettingsCompatible)
+            {
+                logMessage.Invoke(TestMessageLevel.Warning, CrossPlatEngineResources.OldTestHostIsGettingUsed);
+                updatedRunSettingsXml = InferRunSettingsHelper.MakeRunsettingsCompatible(runsettingsXml);
             }
 
             return updatedRunSettingsXml;
+        }
+
+        private void CompatIssueWithVersionCheckAndRunsettings()
+        {
+            var properties = this.testHostManager.GetType().GetRuntimeProperties();
+
+            var versionCheckProperty = properties.FirstOrDefault(p => string.Equals(p.Name, versionCheckPropertyName, StringComparison.OrdinalIgnoreCase));
+            if (versionCheckProperty != null)
+            {
+                this.versionCheckRequired = (bool)versionCheckProperty.GetValue(this.testHostManager);
+            }
+
+            var makeRunsettingsCompatibleProperty = properties.FirstOrDefault(p => string.Equals(p.Name, makeRunsettingsCompatiblePropertyName, StringComparison.OrdinalIgnoreCase));
+            if (makeRunsettingsCompatibleProperty != null)
+            {
+                this.makeRunsettingsCompatible = (bool)makeRunsettingsCompatibleProperty.GetValue(this.testHostManager);
+                this.makeRunsettingsCompatibleSet = true;
+            }
         }
 
         private void TestHostManagerHostLaunched(object sender, HostProviderEventArgs e)

@@ -120,7 +120,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         testCaseFilter: testRunCriteria.TestCaseFilter);
 
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
-                    var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, eventHandler);
+                    var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
                     if (testRunCriteria.HasSpecificSources)
                     {
                         var runRequest = new TestRunCriteriaWithSources(
@@ -144,14 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
-
-                // Log to vs ide test output
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.Message };
-                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-                eventHandler.HandleRawMessage(rawMessage);
-
-                // Log to vstest.console
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                this.LogMessage(TestMessageLevel.Error, exception.Message, eventHandler);
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
@@ -186,6 +179,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         #endregion
+
+        private void LogMessage(TestMessageLevel testMessageLevel, string message, ITestRunEventsHandler eventHandler)
+        {
+            // Log to vs ide test output
+            var testMessagePayload = new TestMessagePayload { MessageLevel = testMessageLevel, Message = message };
+            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+            eventHandler.HandleRawMessage(rawMessage);
+
+            // Log to vstest.console
+            eventHandler.HandleLogMessage(testMessageLevel, message);
+        }
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {
