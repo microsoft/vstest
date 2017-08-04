@@ -55,10 +55,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 #endif
 
-            // vstest.console < 15.5 won't send endpoint, role arguments.
+            // vstest.console < 15.5 won't send endpoint and role arguments.
             // So derive endpoint from port argument and Make connectionRole as Client.
             string endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
-            if (endpoint == string.Empty)
+            if (string.IsNullOrWhiteSpace(endpoint))
             {
                 var port = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
                 endpoint = IPAddress.Loopback + ":" + port;
@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
             ConnectionRole connectionRole = ConnectionRole.Client;
             string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
-            if (role != string.Empty && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
             {
                 connectionRole = ConnectionRole.Host;
             }
