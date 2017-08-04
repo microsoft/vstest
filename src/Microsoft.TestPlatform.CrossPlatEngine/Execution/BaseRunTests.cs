@@ -141,9 +141,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.isCancellationRequested = false;
             this.testPlatformEventSource = testPlatformEventSource;
             this.testEventsPublisher = testEventsPublisher;
-            this.SetContext();
             this.platformThread = platformThread;
-            this.executionThreadApartmentState = XmlRunSettingsUtilities.GetExecutionThreadApartmentState(runSettings);
+            this.SetContext();
         }
 
         private void SetContext()
@@ -180,6 +179,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.frameworkHandle.TestRunMessage += this.OnTestRunMessage;
 
             this.executorUrisThatRanTests = new List<string>();
+            this.executionThreadApartmentState = XmlRunSettingsUtilities.GetExecutionThreadApartmentState(runSettings);
         }
 
         #endregion
