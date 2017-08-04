@@ -10,6 +10,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.Xml;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Stores information about a test settings.
@@ -97,6 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.disableParallelization = false;
             this.designMode = false;
             this.shouldCollectSourceInformation = false;
+            this.ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         }
 
         #endregion
@@ -298,6 +300,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     this.TestAdaptersPathsSet = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the execution thread apartment state.
+        /// </summary>
+        public PlatformApartmentState ExecutionThreadApartmentState
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -723,6 +734,24 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                         case "BinariesRoot":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.BinariesRoot = reader.ReadElementContentAsString();
+                            break;
+                        case "ExecutionThreadApartmentState":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string executionThreadApartmentState = reader.ReadElementContentAsString();
+                            PlatformApartmentState apartmentState;
+                            if (!Enum.TryParse(executionThreadApartmentState, out apartmentState))
+                            {
+                                throw new SettingsException(
+                                    string.Format(
+                                        CultureInfo.CurrentCulture,
+                                        Resources.Resources.InvalidSettingsIncorrectValue,
+                                        Constants.RunConfigurationSettingsName,
+                                        executionThreadApartmentState,
+                                        elementName));
+                            }
+
+                            runConfiguration.ExecutionThreadApartmentState = apartmentState;
                             break;
 
                         default:

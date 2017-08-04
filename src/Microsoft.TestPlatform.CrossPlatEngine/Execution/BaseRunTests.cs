@@ -97,35 +97,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 testCaseEventsHandler,
                 testRunEventsHandler,
                 testPlatformEventSource,
-                testCaseEventsHandler as ITestEventsPublisher)
+                testCaseEventsHandler as ITestEventsPublisher,
+                new PlatformThread())
         {
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
-        /// </summary>
-        /// <param name="runSettings"> The run settings.</param>
-        /// <param name="testExecutionContext">The test execution context.</param>
-        /// <param name="testCaseEventsHandler">The test case events handler.</param>
-        /// <param name="testRunEventsHandler">The test run events handler.</param>
-        /// <param name="testPlatformEventSource">Test platform event source.</param>
-        /// <param name="testEventsPublisher">Publisher for test events.</param>
         protected BaseRunTests(string runSettings,
-            TestExecutionContext testExecutionContext,
-            ITestCaseEventsHandler testCaseEventsHandler,
-            ITestRunEventsHandler testRunEventsHandler,
-            ITestPlatformEventSource testPlatformEventSource,
-            ITestEventsPublisher testEventsPublisher):
-            this(runSettings,
-                testExecutionContext,
-                testCaseEventsHandler,
-                testRunEventsHandler,
-                testPlatformEventSource,
-                testEventsPublisher, new PlatformThread())
-        {
-        }
-
-        internal BaseRunTests(string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler testRunEventsHandler,
@@ -170,6 +147,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettings);
             this.runContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
             this.runContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
+            this.executionThreadApartmentState = runConfig.ExecutionThreadApartmentState;
 
             this.frameworkHandle = new FrameworkHandle(
                 this.testCaseEventsHandler,
@@ -179,7 +157,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             this.frameworkHandle.TestRunMessage += this.OnTestRunMessage;
 
             this.executorUrisThatRanTests = new List<string>();
-            this.executionThreadApartmentState = XmlRunSettingsUtilities.GetExecutionThreadApartmentState(runSettings);
         }
 
         #endregion
@@ -388,12 +365,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                         this.testPlatformEventSource.AdapterExecutionStart(executorUriExtensionTuple.Item1.AbsoluteUri);
 
                         // Run the tests.
-                        if (NotRequiredSTAThread() || !TryToRunInSTAThread(
-                            () => this.InvokeExecutor(executor,
-                                                      executorUriExtensionTuple,
-                                                      this.runContext,
-                                                      this.frameworkHandle),
-                                  true))
+                        if (NotRequiredSTAThread() || !TryToRunInSTAThread(() => this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle), true))
                         {
                             this.InvokeExecutor(executor, executorUriExtensionTuple, this.runContext, this.frameworkHandle);
                         }
