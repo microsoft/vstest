@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
 
                         } while (runSettingsNavigator.MoveToNext());
 
-                        // Delele all invalid RunConfiguration Settings
+                        // Delete all invalid RunConfiguration Settings
                         if (listOfInValidRunConfigurationSettings.Count > 0)
                         {
                             if(EqtTrace.IsWarningEnabled)

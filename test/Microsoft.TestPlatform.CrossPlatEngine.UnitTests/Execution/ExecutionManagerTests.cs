@@ -19,6 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
@@ -186,6 +187,54 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
 
             // Also verify that run stats are passed through.
             mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedTests()
+        {
+            var testExecutionContext = new TestExecutionContext(
+                                           frequencyOfRunStatsChangeEvent: 1,
+                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                           inIsolation: false,
+                                           keepAlive: false,
+                                           isDataCollectionEnabled: false,
+                                           areTestCaseLevelEventsRequired: false,
+                                           hasTestRun: false,
+                                           isDebug: false,
+                                           testCaseFilter: null);
+
+            var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            // Call StartTestRun with faulty runsettings so that it will throw exception
+            this.executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), @"<RunSettings><RunConfiguration><TestSessionTimeout>0</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
+
+            // Verify that TestRunComplete get called and error message are getting logged
+            mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
+            mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedSources()
+        {
+            var testExecutionContext = new TestExecutionContext(
+                                           frequencyOfRunStatsChangeEvent: 1,
+                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                           inIsolation: false,
+                                           keepAlive: false,
+                                           isDataCollectionEnabled: false,
+                                           areTestCaseLevelEventsRequired: false,
+                                           hasTestRun: false,
+                                           isDebug: false,
+                                           testCaseFilter: null);
+
+            var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            // Call StartTestRun with faulty runsettings so that it will throw exception
+            this.executionManager.StartTestRun(new Dictionary<string, IEnumerable<string>>(), @"<RunSettings><RunConfiguration><TestSessionTimeout>0</TestSessionTimeout></RunConfiguration></RunSettings>", testExecutionContext, null, mockTestRunEventsHandler.Object);
+
+            // Verify that TestRunComplete get called and error message are getting logged
+            mockTestRunEventsHandler.Verify(treh => treh.HandleTestRunComplete(It.IsAny<TestRunCompleteEventArgs>(), null, null, null), Times.Once);
+            mockTestRunEventsHandler.Verify(treh => treh.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
         }
     }
 }
