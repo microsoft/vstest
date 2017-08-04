@@ -52,6 +52,11 @@
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
       </PropertyGroup>
 
+      <!-- Test projects are not discovered in test window without test container capability -->
+      <ItemGroup>
+        <ProjectCapability Include="TestContainer" />
+      </ItemGroup>
+
       <!-- Test project references -->
       <ItemGroup>
         <!-- Test projects take a direct dependency on TestHost. Indirect dependencies must be included.
