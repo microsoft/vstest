@@ -73,13 +73,6 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
   </DataCollectionRunSettings>
 </RunSettings>";
 
-        private readonly string ExecutionThreadApartmentStateSettingsFormat =
-                @"<RunSettings>
-                  <RunConfiguration>
-                     <ExecutionThreadApartmentState>{0}</ExecutionThreadApartmentState>
-                   </RunConfiguration>
-                </RunSettings>";
-
         private readonly string EmptyRunSettings = "<RunSettings></RunSettings>";
 
         #endregion

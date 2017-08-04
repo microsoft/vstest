@@ -102,6 +102,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
+        /// </summary>
+        /// <param name="runSettings">The run settings.</param>
+        /// <param name="testExecutionContext">The test execution context.</param>
+        /// <param name="testCaseEventsHandler">The test case events handler.</param>
+        /// <param name="testRunEventsHandler">The test run events handler.</param>
+        /// <param name="testPlatformEventSource">Test platform event source.</param>
+        /// <param name="testEventsPublisher">Publisher for test events.</param>
+        /// <param name="platformThread">Platform Thread.</param>
         protected BaseRunTests(string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
