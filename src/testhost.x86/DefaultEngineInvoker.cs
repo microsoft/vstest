@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -54,9 +55,21 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 #endif
 
-            // Get port number and initialize communication
+            // vstest.console < 15.5 won't send endpoint and role arguments.
+            // So derive endpoint from port argument and Make connectionRole as Client.
             string endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
-            ConnectionRole connectionRole = string.Equals(CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument), "client", StringComparison.OrdinalIgnoreCase) ? ConnectionRole.Client : ConnectionRole.Host;
+            if (string.IsNullOrWhiteSpace(endpoint))
+            {
+                var port = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
+                endpoint = IPAddress.Loopback + ":" + port;
+            }
+
+            ConnectionRole connectionRole = ConnectionRole.Client;
+            string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
+            if (string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
+            {
+                connectionRole = ConnectionRole.Host;
+            }
 
             // Start Processing of requests
             using (var requestHandler = new TestRequestHandler(new TestHostConnectionInfo { Endpoint = endpoint, Role = connectionRole, Transport = Transport.Sockets }))
