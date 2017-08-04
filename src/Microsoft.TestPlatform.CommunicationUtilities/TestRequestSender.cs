@@ -19,7 +19,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     /// <summary>
     /// Test request sender implementation.
     /// </summary>
-    public class TestRequestSender2 : ITestRequestSender
+    public class TestRequestSender : ITestRequestSender
     {
         // Time to wait for test host exit (in seconds)
         private const int CLIENTPROCESSEXITWAIT = 10 * 1000;
@@ -54,22 +54,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private int highestSupportedVersion = 2;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRequestSender2"/> class.
+        /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
         /// </summary>
         /// <param name="protocolConfig">Protocol configuration.</param>
-        public TestRequestSender2(ProtocolConfig protocolConfig)
+        public TestRequestSender(ProtocolConfig protocolConfig)
             : this(new SocketServer(), JsonDataSerializer.Instance, protocolConfig, CLIENTPROCESSEXITWAIT)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TestRequestSender2"/> class.
+        /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
         /// </summary>
         /// <param name="server">Communication server implementation.</param>
         /// <param name="serializer">Serializer implementation.</param>
         /// <param name="protocolConfig">Protocol configuration.</param>
         /// <param name="clientExitedWaitTime">Time to wait for client process exit.</param>
-        protected TestRequestSender2(
+        protected TestRequestSender(
                 ICommunicationServer server,
                 IDataSerializer serializer,
                 ProtocolConfig protocolConfig,

@@ -16,7 +16,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
     using Moq;
 
     [TestClass]
-    public class TestRequestSenderTests2
+    public class TestRequestSenderTests
     {
         private const int DUMMYPROTOCOLVERSION = 42;
         private const int DEFAULTPROTOCOLVERSION = 1;
@@ -33,7 +33,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private readonly Mock<ITestRunEventsHandler> mockExecutionEventsHandler;
         private readonly TestRunCriteriaWithSources testRunCriteriaWithSources;
 
-        public TestRequestSenderTests2()
+        public TestRequestSenderTests()
         {
             this.mockChannel = new Mock<ICommunicationChannel>();
             this.mockServer = new Mock<ICommunicationServer>();
@@ -734,7 +734,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.mockChannel.Reset();
         }
 
-        private class TestableTestRequestSender : TestRequestSender2
+        private class TestableTestRequestSender : TestRequestSender
         {
             public TestableTestRequestSender(ICommunicationServer server, IDataSerializer serializer, ProtocolConfig protocolConfig)
                 : base(server, serializer, protocolConfig, 0)

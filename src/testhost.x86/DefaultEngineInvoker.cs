@@ -55,7 +55,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             var portNumber = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, PortArgument);
 
             // Start Processing of requests
-            using (var requestHandler = new TestRequestHandler2())
+            using (var requestHandler = new TestRequestHandler())
             {
                 // Attach to exit of parent process
                 var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessIdArgument);
