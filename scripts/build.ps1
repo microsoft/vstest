@@ -135,13 +135,19 @@ function Install-DotNetCli
 
     # Pull in additional shared frameworks.
     # Get netcoreapp1.0 shared components.
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.0.5' -Channel 'preview'
+    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\1.0.5")) {
+        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.0.5' -Channel 'preview'
+    }
     
     # Get netcoreapp1.1 shared components.
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
+    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\1.1.2")) {
+        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version '1.1.2' -Channel 'release/1.1.0'
+    }
 
     # Get shared components which is compatible with dotnet cli version $env:DOTNET_CLI_VERSION
-    & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
+    if (!(Test-Path "$dotnetInstallPath\shared\Microsoft.NETCore.App\$env:DOTNET_RUNTIME_VERSION")) {
+        & $dotnetInstallScript -InstallDir $dotnetInstallPath -SharedRuntime -Version $env:DOTNET_RUNTIME_VERSION -Channel 'master'
+    }
     
     Write-Log "Install-DotNetCli: Complete. {$(Get-ElapsedTime($timer))}"
 }
