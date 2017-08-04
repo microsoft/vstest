@@ -184,6 +184,9 @@
       <trans-unit id="UnableToExecuteInSTAThread">
         <source>Unable to execute in STA thread, Using MTA thread. Reason: {0}</source>
         <target state="new">Unable to execute in STA thread, Using MTA thread. Reason: {0}</target>
+      <trans-unit id="OldTestHostIsGettingUsed">
+        <source>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</source>
+        <target state="new">You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0</target>
         <note></note>
       </trans-unit>
     </body>

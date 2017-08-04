@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Threading;
-
     using Microsoft.VisualStudio.TestPlatform.Common;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -20,7 +19,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
     using Constants = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Constants;
 
     /// <summary>
@@ -121,11 +119,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
                         testCaseFilter: testRunCriteria.TestCaseFilter);
 
+                    // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
+                    var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
                     if (testRunCriteria.HasSpecificSources)
                     {
                         var runRequest = new TestRunCriteriaWithSources(
                             testRunCriteria.AdapterSourceMap,
-                            testRunCriteria.TestRunSettings,
+                            runsettings,
                             executionContext);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
@@ -134,7 +134,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     {
                         var runRequest = new TestRunCriteriaWithTests(
                             testRunCriteria.Tests,
-                            testRunCriteria.TestRunSettings,
+                            runsettings,
                             executionContext);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
@@ -144,14 +144,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             catch (Exception exception)
             {
                 EqtTrace.Error("ProxyExecutionManager.StartTestRun: Failed to start test run: {0}", exception);
-
-                // Log to vs ide test output
-                var testMessagePayload = new TestMessagePayload { MessageLevel = TestMessageLevel.Error, Message = exception.Message };
-                var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
-                eventHandler.HandleRawMessage(rawMessage);
-
-                // Log to vstest.console
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                this.LogMessage(TestMessageLevel.Error, exception.Message, eventHandler);
 
                 // Send a run complete to caller. Similar logic is also used in ParallelProxyExecutionManager.StartTestRunOnConcurrentManager
                 // Aborted is `true`: in case of parallel run (or non shared host), an aborted message ensures another execution manager
@@ -186,6 +179,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         #endregion
+
+        private void LogMessage(TestMessageLevel testMessageLevel, string message, ITestRunEventsHandler eventHandler)
+        {
+            // Log to vs ide test output
+            var testMessagePayload = new TestMessagePayload { MessageLevel = testMessageLevel, Message = message };
+            var rawMessage = this.dataSerializer.SerializePayload(MessageType.TestMessage, testMessagePayload);
+            eventHandler.HandleRawMessage(rawMessage);
+
+            // Log to vstest.console
+            eventHandler.HandleLogMessage(testMessageLevel, message);
+        }
 
         private void InitializeExtensions(IEnumerable<string> sources)
         {

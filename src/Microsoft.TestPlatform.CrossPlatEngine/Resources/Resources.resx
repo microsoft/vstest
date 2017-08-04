@@ -185,5 +185,7 @@
   </data>
   <data name="UnableToExecuteInSTAThread" xml:space="preserve">
     <value>Unable to execute in STA thread, Using MTA thread. Reason: {0}</value>
+  <data name="OldTestHostIsGettingUsed" xml:space="preserve">
+    <value>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</value>
   </data>
 </root>

@@ -96,6 +96,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [CustomDataTestMethod]
+        [NETCORETargetFramework]
+        public void TestPlatformShouldBeCompatibleWithOldTestHost(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SampleProjectWithOldTestHost.dll").Trim('\"');
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+
+            this.InvokeVsTest(arguments);
+
+            this.ValidateSummaryStatus(1, 0, 0);
+        }
+
+        [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
         public void WorkingDirectoryIsSourceDirectory(string runnerFramework, string targetFramework, string targetRuntime)
