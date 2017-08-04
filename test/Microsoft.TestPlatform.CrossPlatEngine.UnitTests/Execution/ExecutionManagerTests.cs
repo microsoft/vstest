@@ -32,6 +32,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
     public class ExecutionManagerTests
     {
         private ExecutionManager executionManager;
+        private TestExecutionContext testExecutionContext;
 
         [TestInitialize]
         public void TestInit()
@@ -39,6 +40,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             this.executionManager = new ExecutionManager();
 
             TestPluginCache.Instance = null;
+
+            testExecutionContext = new TestExecutionContext(
+                                           frequencyOfRunStatsChangeEvent: 1,
+                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
+                                           inIsolation: false,
+                                           keepAlive: false,
+                                           isDataCollectionEnabled: false,
+                                           areTestCaseLevelEventsRequired: false,
+                                           hasTestRun: false,
+                                           isDebug: false,
+                                           testCaseFilter: null);
         }
 
         [TestCleanup]
@@ -99,17 +111,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             var adapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             adapterSourceMap.Add(assemblyLocation, new List<string> { assemblyLocation });
 
-            var testExecutionContext = new TestExecutionContext(
-                                           frequencyOfRunStatsChangeEvent: 1,
-                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
-                                           inIsolation: false,
-                                           keepAlive: false,
-                                           isDataCollectionEnabled: false,
-                                           areTestCaseLevelEventsRequired: false,
-                                           hasTestRun: false,
-                                           isDebug: false,
-                                           testCaseFilter: null);
-
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             var isExecutorCalled = false;
@@ -148,17 +149,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 new TestCase("A.C.M1", new Uri(RunTestsWithSourcesTestsExecutorUri), assemblyLocation)
             };
 
-            var testExecutionContext = new TestExecutionContext(
-                                           frequencyOfRunStatsChangeEvent: 1,
-                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
-                                           inIsolation: false,
-                                           keepAlive: false,
-                                           isDataCollectionEnabled: false,
-                                           areTestCaseLevelEventsRequired: false,
-                                           hasTestRun: false,
-                                           isDebug: false,
-                                           testCaseFilter: null);
-
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             var isExecutorCalled = false;
@@ -192,17 +182,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedTests()
         {
-            var testExecutionContext = new TestExecutionContext(
-                                           frequencyOfRunStatsChangeEvent: 1,
-                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
-                                           inIsolation: false,
-                                           keepAlive: false,
-                                           isDataCollectionEnabled: false,
-                                           areTestCaseLevelEventsRequired: false,
-                                           hasTestRun: false,
-                                           isDebug: false,
-                                           testCaseFilter: null);
-
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             // Call StartTestRun with faulty runsettings so that it will throw exception
@@ -216,17 +195,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         [TestMethod]
         public void StartTestRunShouldAbortTheRunIfAnyExceptionComesForTheProvidedSources()
         {
-            var testExecutionContext = new TestExecutionContext(
-                                           frequencyOfRunStatsChangeEvent: 1,
-                                           runStatsChangeEventTimeout: TimeSpan.MaxValue,
-                                           inIsolation: false,
-                                           keepAlive: false,
-                                           isDataCollectionEnabled: false,
-                                           areTestCaseLevelEventsRequired: false,
-                                           hasTestRun: false,
-                                           isDebug: false,
-                                           testCaseFilter: null);
-
             var mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
 
             // Call StartTestRun with faulty runsettings so that it will throw exception
