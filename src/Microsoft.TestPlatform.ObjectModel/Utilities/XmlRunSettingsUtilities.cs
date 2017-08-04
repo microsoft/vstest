@@ -8,7 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
-    using System.Runtime.InteropServices;
     using System.Xml;
     using System.Xml.XPath;
 
@@ -306,28 +305,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Get ExecutionThreadApartmentStateKey from runsettings.
-        /// </summary>
-        /// <param name="settingsXml"> The runsettings. </param>
-        /// <returns> Thread Apartment State. </returns>
-        public static PlatformApartmentState GetExecutionThreadApartmentState(string settingsXml)
-        {
-            PlatformApartmentState apartmentState = PlatformApartmentState.MTA;
-            if (!string.IsNullOrEmpty(settingsXml))
-            {
-                StringReader stringReader = new StringReader(settingsXml);
-                XmlReader reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings);
-
-                if (reader.ReadToFollowing("ExecutionThreadApartmentState"))
-                {
-                    Enum.TryParse(reader.ReadInnerXml(), out apartmentState);
-                }
-            }
-
-            return apartmentState;
         }
 
         /// <summary>

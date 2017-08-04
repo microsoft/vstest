@@ -633,28 +633,17 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         public void CancelShouldCreateSTAThreadIfExecutionThreadApartmentStateIsSTA()
         {
             this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
-            ManualResetEvent cancelEvent = new ManualResetEvent(false);
             mockThread.Setup(mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()))
                 .Callback<Action, PlatformApartmentState, bool>((action, start, waitForCompletion) =>
                 {
                     if (waitForCompletion)
                     {
                         // Callback for RunTests().
-                        cancelEvent.WaitOne();
-                    }
-                    else
-                    {
-                        // Callback for Cancel().
-                        cancelEvent.Set();
+                        this.runTestsInstance.Cancel();
                     }
                 });
-            Task.Run(() => this.runTestsInstance.RunTests());
-            // RunTests should be in progress to do Cancel.
-            // Adding sleep ensures RunTests task executes first.
-            Thread.Sleep(100);
-            Task.Run(() => this.runTestsInstance.Cancel());
 
-            Assert.IsTrue(cancelEvent.WaitOne(1500), "Timeout: Cancel should be called in STA thread.");
+            this.runTestsInstance.RunTests();
             this.mockThread.Verify(
                 t => t.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>()),
                 Times.Exactly(2),

@@ -46,14 +46,7 @@ namespace SampleUnitTestProject3
         public void UITestWithSleep1()
         {
             Clipboard.SetText("Clipboard");
-            Thread.Sleep(1000 * 5);
-        }
-
-        [TestMethod]
-        public void UITestWithSleep2()
-        {
-            Clipboard.SetText("Clipboard");
-            Thread.Sleep(1000 * 10);
+            Thread.Sleep(1000 * 3);
         }
 #endif
     }
