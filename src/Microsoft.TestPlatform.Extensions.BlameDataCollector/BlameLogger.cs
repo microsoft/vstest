@@ -112,7 +112,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             }
 
             var reason = Resources.Resources.AbortedTestRun + testCaseName;
-            this.output.Error(reason);
+            this.output.Error(false, reason);
         }
 
         #endregion

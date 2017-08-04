@@ -25,13 +25,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Output an error message.
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
+        /// <param name="appendPrefix">Bool to decide whether Verbose level should be added as prefix or not in log messages.</param>
         /// <param name="format">Format string for the error message.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Error(this IOutput output, string format, params object[] args)
+        public static void Error(this IOutput output, bool appendPrefix, string format, params object[] args)
         {
             SetColorForAction(ConsoleColor.Red, () =>
             {
-                Output(output, OutputLevel.Error, AppendPrefix ? Resources.CommandLineError : DefaultFormat, format, args);
+                Output(output, OutputLevel.Error, appendPrefix ? Resources.CommandLineError : DefaultFormat, format, args);
             });
         }
 
@@ -39,13 +40,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Output a warning message.
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
+        /// <param name="appendPrefix">Bool to decide whether Verbose level should be added as prefix or not in log messages.</param>
         /// <param name="format">Format string for the warning message.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Warning(this IOutput output, string format, params object[] args)
+        public static void Warning(this IOutput output, bool appendPrefix, string format, params object[] args)
         {
             SetColorForAction(ConsoleColor.Yellow, () =>
             {
-                Output(output, OutputLevel.Warning, AppendPrefix ? Resources.CommandLineWarning : DefaultFormat, format, args);
+                Output(output, OutputLevel.Warning, appendPrefix ? Resources.CommandLineWarning : DefaultFormat, format, args);
             });
         }
 
@@ -53,25 +55,27 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// Output a informational message.
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
+        /// <param name="appendPrefix">Bool to decide whether Verbose level should be added as prefix or not in log messages.</param>
         /// <param name="format">Format string for the informational message.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Information(this IOutput output, string format, params object[] args)
+        public static void Information(this IOutput output, bool appendPrefix, string format, params object[] args)
         {
-            Information(output, Console.ForegroundColor, format, args);
+            Information(output, appendPrefix, Console.ForegroundColor, format, args);
         }
 
         /// <summary>
         /// Output a informational message.
         /// </summary>
         /// <param name="output">Output instance the method is being invoked with.</param>
-        /// <param name="format">Format string for the informational message.</param>
+        /// <param name="appendPrefix">Bool to decide whether Verbose level should be added as prefix or not in log messages.</param>
         /// <param name="foregroundColor">Color in which text prints.</param>
+        /// <param name="format">Format string for the informational message.</param>
         /// <param name="args">Arguments to format into the format string.</param>
-        public static void Information(this IOutput output, ConsoleColor foregroundColor, string format, params object[] args)
+        public static void Information(this IOutput output, bool appendPrefix, ConsoleColor foregroundColor, string format, params object[] args)
         {
             SetColorForAction(foregroundColor, () =>
             {
-                Output(output, OutputLevel.Information, AppendPrefix ? Resources.CommandLineInformational : DefaultFormat, format, args);
+                Output(output, OutputLevel.Information, appendPrefix ? Resources.CommandLineInformational : DefaultFormat, format, args);
             });
         }
 
