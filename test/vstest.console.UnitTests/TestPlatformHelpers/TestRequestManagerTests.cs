@@ -565,32 +565,6 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
                 tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
         }
 
-        [TestMethod]
-        public void DiscoverTestsShouldNotUpdateDesignModeIfTargetFrameworkIsNotSetInRunSettings()
-        {
-            var runsettings = "<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
-            var discoveryPayload = CreateDiscoveryPayload(runsettings);
-
-            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
-
-            var designmode = "DesignMode";
-            this.mockTestPlatform.Verify(
-                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => !dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
-        }
-
-        [TestMethod]
-        public void DiscoverTestsShouldNotUpdateDesignModeIfTargetFrameworkIsSetToNetCoreInRunSettings()
-        {
-            var runsettings = "<RunSettings><RunConfiguration><TargetFrameworkVersion>.NETCoreApp,Version=v1.0</TargetFrameworkVersion></RunConfiguration></RunSettings>";
-            var discoveryPayload = CreateDiscoveryPayload(runsettings);
-
-            this.testRequestManager.DiscoverTests(discoveryPayload, new Mock<ITestDiscoveryEventsRegistrar>().Object, It.IsAny<ProtocolConfig>());
-
-            var designmode = "DesignMode";
-            this.mockTestPlatform.Verify(
-                tp => tp.CreateDiscoveryRequest(It.Is<DiscoveryCriteria>(dc => !dc.RunSettings.Contains(designmode)), It.IsAny<ProtocolConfig>()));
-        }
-
         [DataTestMethod]
         [DataRow(true)]
         [DataRow(false)]

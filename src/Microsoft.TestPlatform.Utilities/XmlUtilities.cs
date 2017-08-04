@@ -101,5 +101,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
                 }
             }
         }
+
+        internal static void RemoveChildNode(XPathNavigator parentNavigator, string nodeXPath, string childName)
+        {
+            var childNodeNavigator = parentNavigator.SelectSingleNode(nodeXPath);
+            if (childNodeNavigator != null)
+            {
+                parentNavigator.MoveToChild(childName, string.Empty);
+                parentNavigator.DeleteSelf();
+            }
+        }
     }
 }

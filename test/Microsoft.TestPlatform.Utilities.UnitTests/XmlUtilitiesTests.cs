@@ -162,6 +162,36 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
         #endregion
 
+        #region AppendOrModifyChild tests
+
+        [TestMethod]
+        public void RemoveChildNodeShouldNotModifyExistingXmlIfNodeDoesnotExist()
+        {
+            var settingsXml = @"<RunSettings></RunSettings>";
+            var navigator = this.GetNavigator(settingsXml);
+
+            navigator.MoveToChild("RunSettings", string.Empty);
+
+            XmlUtilities.RemoveChildNode(navigator, @"/RunSettings/RC", "RC");
+
+            Assert.AreEqual(settingsXml, navigator.OuterXml);
+        }
+
+        [TestMethod]
+        public void RemoveChildNodeShouldRemoveXmlIfExist()
+        {
+            var settingsXml = @"<RunSettings><RC>abc</RC></RunSettings>";
+            var navigator = this.GetNavigator(settingsXml);
+
+            navigator.MoveToChild("RunSettings", string.Empty);
+
+            XmlUtilities.RemoveChildNode(navigator, @"/RunSettings/RC", "RC");
+
+            Assert.AreEqual(@"<RunSettings></RunSettings>", navigator.OuterXml);
+        }
+
+        #endregion
+
         #region private methods
 
         private XPathNavigator GetNavigator(string settingsXml)
