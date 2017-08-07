@@ -168,7 +168,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
             else
             {
-                startInfo.FileName = this.dotnetHostHelper.GetDotnetPath();
+                startInfo.FileName = this.dotnetHostHelper.GetDotnetHostFullPath();
             }
 
             EqtTrace.Verbose("DotnetTestHostmanager: Full path of dotnet.exe is {0}", startInfo.FileName);
