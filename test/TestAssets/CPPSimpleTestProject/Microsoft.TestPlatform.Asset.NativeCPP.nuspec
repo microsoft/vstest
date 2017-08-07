@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>Microsoft.TestPlatform.TestAsset.NativeCPP</id>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <title>Microsoft.TestPlatform.TestAsset.NativeCPP</title>
     <authors>Microsoft</authors>
     <owners>Microsoft</owners>
@@ -10,7 +10,7 @@
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <description>MSDia typelib for reading debug symbols from managed code.</description>
-    <copyright>Copyright © Microsoft Corporation</copyright>
+    <copyright>Copyright ï¿½ Microsoft Corporation</copyright>
     <contentFiles>
       <!-- Include Assets as Content -->
       <files include="**/*.*" buildAction="None" copyToOutput="true" flatten="false" />
