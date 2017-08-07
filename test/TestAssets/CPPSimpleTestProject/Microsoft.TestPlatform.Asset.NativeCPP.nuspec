@@ -10,7 +10,7 @@
     <licenseUrl>http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm</licenseUrl>
     <iconUrl>http://go.microsoft.com/fwlink/?LinkID=288859</iconUrl>
     <description>MSDia typelib for reading debug symbols from managed code.</description>
-    <copyright>Copyright � Microsoft Corporation</copyright>
+    <copyright>Copyright © Microsoft Corporation</copyright>
     <contentFiles>
       <!-- Include Assets as Content -->
       <files include="**/*.*" buildAction="None" copyToOutput="true" flatten="false" />
