@@ -17,6 +17,7 @@
     </contentFiles>
   </metadata>
   <files>
-    <file src="Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\" />
+    <file src="CPPSimpleProj\Release\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\" />
+    <file src="CPPSimpleProj\x64\Release\Microsoft.TestPlatform.TestAsset.NativeCPP.dll" target="contentFiles\any\any\x64" />
   </files>
 </package>
