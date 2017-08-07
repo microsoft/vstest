@@ -272,7 +272,7 @@ function publish_package()
         projectToPackage="${item%%:*}"
         packageOutputPath="${item##*:}"
         log "Package: Publish $projectToPackage"
-        $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+        $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore --output $packageOutputPath -v:minimal --p:Version=$TPB_Version -p:CIBuild=$TPB_CIBuild p:LocalizedBuild=$TPB_LocalizedBuild
     done
 
     # Publish TestHost for netcoreapp1.0 target
@@ -280,6 +280,35 @@ function publish_package()
     local projectToPackage=$TP_ROOT_DIR/src/testhost/testhost.csproj
     local packageOutputPath=$TP_OUT_DIR/$TPB_Configuration/Microsoft.TestPlatform.TestHost/$TPB_TargetFrameworkCore10
     $dotnet publish $projectToPackage --configuration $TPB_Configuration --framework $TPB_TargetFrameworkCore10 --output $packageOutputPath -v:minimal -p:LocalizedBuild=$TPB_LocalizedBuild
+
+    # Copy TestHost for desktop targets if we've built net46
+    # packages with mono
+    if $TPB_HasMono; then
+        local testhost=$coreCLRPackageDir/TestHost
+        mkdir -p $testhost
+        cp -r src/testhost/bin/$TPB_Configuration/net46/win7-x64/* $testhost
+        cp -r src/testhost.x86/bin/$TPB_Configuration/net46/win7-x64/* $testhost
+    fi
+    
+    # Copy over the logger assemblies to the Extensions folder.
+    coreCLRExtensionsDir="$coreCLRPackageDir/Extensions"
+    # Create an extensions directory.
+    mkdir -p $coreCLRExtensionsDir
+
+    # Note Note: If there are some dependencies for the logger assemblies, those need to be moved too. 
+    # Ideally we should just be publishing the loggers to the Extensions folder.
+    loggers=("Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.pdb")
+    for i in ${loggers[@]}; do
+        mv $coreCLRPackageDir/${i} $coreCLRExtensionsDir
+    done
+
+    # Note Note: If there are some dependencies for the TestHostRuntimeProvider assemblies, those need to be moved too.
+    runtimeproviders=("Microsoft.TestPlatform.TestHostRuntimeProvider.dll" "Microsoft.TestPlatform.TestHostRuntimeProvider.pdb")
+    for i in ${runtimeproviders[@]}; do
+        mv $coreCLRPackageDir/${i} $coreCLRExtensionsDir
+    done
+    newtonsoft=$TP_PACKAGES_DIR/newtonsoft.json/9.0.1/lib/netstandard1.0/Newtonsoft.Json.dll
+    cp $newtonsoft $coreCLRPackageDir
 
     # Copy TestHost for desktop targets if we've built net46
     # packages with mono
