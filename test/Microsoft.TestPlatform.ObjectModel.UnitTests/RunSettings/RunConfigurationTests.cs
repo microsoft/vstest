@@ -259,5 +259,13 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             var runConfiguration = new RunConfiguration { DesignMode = val };
             StringAssert.Contains(runConfiguration.ToXml().InnerXml.ToUpperInvariant(), $"<CollectSourceInformation>{val}</CollectSourceInformation>".ToUpperInvariant());
         }
+
+        [TestMethod]
+        public void RunConfigurationToXmlShouldProvideExecutionThreadApartmentState()
+        {
+            var runConfiguration = new RunConfiguration { ExecutionThreadApartmentState = PlatformApartmentState.STA };
+
+            StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>");
+        }
     }
 }

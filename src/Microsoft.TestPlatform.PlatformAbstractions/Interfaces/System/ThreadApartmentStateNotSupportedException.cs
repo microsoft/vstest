@@ -6,38 +6,38 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     using System;
 
     /// <summary>
-    /// Not supported thread aprtment state exception.
+    /// Thread apartment state not supported exception.
     /// </summary>
-    public class NotSupportedThreadApartmentStateException : Exception
+    public class ThreadApartmentStateNotSupportedException : Exception
     {
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotSupportedThreadApartmentStateException"/> class.
+        /// Initializes a new instance of the <see cref="ThreadApartmentStateNotSupportedException"/> class.
         /// Initializes with the message.
         /// </summary>
         /// <param name="message">Message for the exception.</param>
-        public NotSupportedThreadApartmentStateException()
+        public ThreadApartmentStateNotSupportedException()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotSupportedThreadApartmentStateException"/> class.
+        /// Initializes a new instance of the <see cref="ThreadApartmentStateNotSupportedException"/> class.
         /// Initializes with the message.
         /// </summary>
         /// <param name="message">Message for the exception.</param>
-        public NotSupportedThreadApartmentStateException(string message)
+        public ThreadApartmentStateNotSupportedException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NotSupportedThreadApartmentStateException"/> class.
+        /// Initializes a new instance of the <see cref="ThreadApartmentStateNotSupportedException"/> class.
         /// Initializes with message and inner exception.
         /// </summary>
         /// <param name="message">Message for the exception.</param>
         /// <param name="innerException">The inner exception.</param>
-        public NotSupportedThreadApartmentStateException(string message, Exception innerException)
+        public ThreadApartmentStateNotSupportedException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

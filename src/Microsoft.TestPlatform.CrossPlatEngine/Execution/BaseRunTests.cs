@@ -541,7 +541,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 EqtTrace.Verbose("BaseRunTests.TryToRunInSTAThread: Using STA thread to call adapter API.");
                 this.platformThread.Run(action, PlatformApartmentState.STA, waitForCompletion);
             }
-            catch (NotSupportedThreadApartmentStateException ex)
+            catch (ThreadApartmentStateNotSupportedException ex)
             {
                 success = false;
                 EqtTrace.Warning("BaseRunTests.TryToRunInSTAThread: Failed to run in STA thread: {0}", ex);

@@ -616,7 +616,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
         {
             this.SetupForExecutionThreadApartmentStateTests(PlatformApartmentState.STA);
             this.mockThread.Setup(
-                mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>())).Throws<NotSupportedThreadApartmentStateException>();
+                mt => mt.Run(It.IsAny<Action>(), PlatformApartmentState.STA, It.IsAny<bool>())).Throws<ThreadApartmentStateNotSupportedException>();
             bool isInvokeExecutorCalled = false;
             this.runTestsInstance.InvokeExecutorCallback =
                 (executor, executorUriTuple, runcontext, frameworkHandle) =>

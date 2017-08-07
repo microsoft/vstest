@@ -471,6 +471,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             targetFrameworkVersion.InnerXml = this.TargetFrameworkVersion.ToString();
             root.AppendChild(targetFrameworkVersion);
 
+            XmlElement executionThreadApartmentState = doc.CreateElement("ExecutionThreadApartmentState");
+            executionThreadApartmentState.InnerXml = this.ExecutionThreadApartmentState.ToString();
+            root.AppendChild(executionThreadApartmentState);
+
             if (this.TestAdaptersPaths != null)
             {
                 XmlElement testAdaptersPaths = doc.CreateElement("TestAdaptersPaths");
@@ -735,9 +739,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
                             runConfiguration.BinariesRoot = reader.ReadElementContentAsString();
                             break;
+
                         case "ExecutionThreadApartmentState":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-
                             string executionThreadApartmentState = reader.ReadElementContentAsString();
                             PlatformApartmentState apartmentState;
                             if (!Enum.TryParse(executionThreadApartmentState, out apartmentState))
