@@ -12,7 +12,7 @@
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
-    <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;net452</TargetFrameworks>
     <AssemblyName>XUPerfTestProject</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <PublicSign>false</PublicSign>
@@ -21,7 +21,7 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451'">
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452'">
     <DebugType>full</DebugType>
   </PropertyGroup>
   <ItemGroup>
