@@ -4,10 +4,12 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -15,10 +17,8 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     /// </summary>
     [FriendlyName(BlameLogger.FriendlyName)]
     [ExtensionUri(BlameLogger.ExtensionUri)]
-    public class BlameLogger : ITestLogger
+    public class BlameLogger : ITestLoggerWithParameters
     {
-        #region Constants
-
         /// <summary>
         /// Uri used to uniquely identify the Blame logger.
         /// </summary>
@@ -30,6 +30,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         public const string FriendlyName = "Blame";
 
         /// <summary>
+        /// List of dump files
+        /// </summary>
+        private static List<string> dumpList;
+
+        /// <summary>
         /// The blame reader writer.
         /// </summary>
         private readonly IBlameReaderWriter blameReaderWriter;
@@ -39,7 +44,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         private readonly IOutput output;
 
-        #endregion
+        /// <summary>
+        /// The Environment
+        /// </summary>
+        private IEnvironment environment;
+
+        /// <summary>
+        /// Is Dump Enabled
+        /// </summary>
+        private bool isDumpEnabled;
 
         #region Constructor
 
@@ -47,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// Initializes a new instance of the <see cref="BlameLogger"/> class.
         /// </summary>
         public BlameLogger()
-            : this(ConsoleOutput.Instance, new XmlReaderWriter())
+            : this(ConsoleOutput.Instance, new XmlReaderWriter(), new PlatformEnvironment())
         {
         }
 
@@ -57,10 +70,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// </summary>
         /// <param name="output">Output Instance</param>
         /// <param name="blameReaderWriter">BlameReaderWriter Instance</param>
-        protected BlameLogger(IOutput output, IBlameReaderWriter blameReaderWriter)
+        /// <param name="environment">Environment</param>
+        protected BlameLogger(IOutput output, IBlameReaderWriter blameReaderWriter, IEnvironment environment)
         {
             this.output = output;
             this.blameReaderWriter = blameReaderWriter;
+            this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            dumpList = new List<string>();
         }
 
         #endregion
@@ -83,6 +99,54 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         }
 
         /// <summary>
+        /// Initializes the Logger.
+        /// </summary>
+        /// <param name="events">Events that can be registered for.</param>
+        /// <param name="testRunDictionary">Test Run Directory</param>
+        public void Initialize(TestLoggerEvents events, Dictionary<string, string> testRunDictionary)
+        {
+            if (events == null)
+            {
+                throw new ArgumentNullException(nameof(events));
+            }
+
+            events.TestRunComplete += this.TestRunCompleteHandler;
+
+            if (testRunDictionary.ContainsKey(Constants.DumpKey))
+            {
+                this.isDumpEnabled = true;
+            }
+        }
+
+        internal static void AddFileToDumpList(string filename)
+        {
+            if (dumpList == null)
+            {
+                dumpList = new List<string>();
+            }
+
+            dumpList.Add(filename);
+        }
+
+        internal static int GetDumpListCount()
+        {
+            if (dumpList == null)
+            {
+                return 0;
+            }
+
+            return dumpList.Count;
+        }
+
+        internal static void ClearDumpList()
+        {
+            if (dumpList != null)
+            {
+                dumpList.Clear();
+            }
+        }
+
+        /// <summary>
         /// Called when a test run is complete.
         /// </summary>
         /// <param name="sender">Sender</param>
@@ -102,8 +166,6 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return;
             }
 
-            this.output.WriteLine(string.Empty, OutputLevel.Information);
-
             // Gets the faulty test case if test aborted
             var testCaseName = this.GetFaultyTestCase(e);
             if (testCaseName == string.Empty)
@@ -111,8 +173,34 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return;
             }
 
+            this.output.WriteLine(string.Empty, OutputLevel.Information);
             var reason = Resources.Resources.AbortedTestRun + testCaseName;
             this.output.Error(reason);
+
+            // Checks for operating system
+            // If windows, prints the dump folder name if obtained
+            if (this.environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
+            {
+                if (this.isDumpEnabled)
+                {
+                    if (dumpList.Count > 0)
+                    {
+                        this.output.WriteLine(string.Empty, OutputLevel.Information);
+                        this.output.WriteLine(Resources.Resources.LocalCrashDumpLink, OutputLevel.Information);
+                        this.output.WriteLine("  " + dumpList.FirstOrDefault(), OutputLevel.Information);
+                    }
+                    else
+                    {
+                        this.output.WriteLine(string.Empty, OutputLevel.Information);
+                        this.output.WriteLine(Resources.Resources.EnableLocalCrashDumpGuidance + LocalCrashDumpUtilities.EnableLocalCrashDumpForwardLink, OutputLevel.Information);
+                    }
+                }
+                else
+                {
+                    this.output.WriteLine(string.Empty, OutputLevel.Information);
+                    this.output.WriteLine(Resources.Resources.EnableLocalCrashDumpGuidance + LocalCrashDumpUtilities.EnableLocalCrashDumpForwardLink, OutputLevel.Information);
+                }
+            }
         }
 
         #endregion

@@ -120,4 +120,10 @@
   <data name="AbortedTestRun" xml:space="preserve">
     <value>The active Test Run was aborted because the host process exited unexpectedly while executing test </value>
   </data>
+  <data name="EnableLocalCrashDumpGuidance" xml:space="preserve">
+    <value>To investigate further, enable local crash dump either at machine level or for process and use --blame:dump|/blame:dump for getting dump file. Go to more details :</value>
+  </data>
+  <data name="LocalCrashDumpLink" xml:space="preserve">
+    <value>Dump file created for aborted test run :</value>
+  </data>
 </root>

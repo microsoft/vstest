@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -76,5 +77,21 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces
         /// <param name="sourcePath">Full path of the file.</param>
         /// <param name="destinationPath">Target path for the file.</param>
         void MoveFile(string sourcePath, string destinationPath);
+
+        /// <summary>
+        /// Gets all files in directory based on search pattern
+        /// </summary>
+        /// <param name="path">Directory Path</param>
+        /// <param name="searchPattern">searchPattern</param>
+        /// <param name="searchOption">searchOption</param>
+        /// <returns>Bool</returns>
+        string[] GetFiles(string path, string searchPattern, SearchOption searchOption);
+
+
+        /// <summary>
+        /// Gets last write time of file
+        /// </summary>
+        /// <param name="path">Full path of the file.</param>
+        DateTime GetLastWriteTime(string path);
     }
 }

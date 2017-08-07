@@ -25,6 +25,16 @@
         <target state="new">The active Test Run was aborted because the host process exited unexpectedly while executing test </target>
         <note></note>
       </trans-unit>
+      <trans-unit id="EnableLocalCrashDumpGuidance">
+        <source>To investigate further, enable local crash dump either at machine level or for process and use --blame:dump|/blame:dump for getting dump file. Go to more details :</source>
+        <target state="new">To investigate further, enable local crash dump either at machine level or for process and use --blame:dump|/blame:dump for getting dump file. Go to more details :</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="LocalCrashDumpLink">
+        <source>Dump file created for aborted test run :</source>
+        <target state="new">Dump file created for aborted test run :</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
