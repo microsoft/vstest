@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         {
             if (apartmentState == PlatformApartmentState.STA)
             {
-                throw new NotSupportedThreadApartmentStateException("Currently STA Thread apartment state not supported for UAP10.0");
+                throw new ThreadApartmentStateNotSupportedException();
             }
 
             if (action == null)

@@ -22,6 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.EventHandlers;
+    using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -70,9 +71,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private IThread platformThread;
 
         /// <summary>
-        /// Given ExecutionThreadApartmentState in runsettings.
+        /// The Run configuration. To determine framework and execution thread apartment state.
         /// </summary>
-        private PlatformApartmentState executionThreadApartmentState;
+        private RunConfiguration runConfiguration;
 
         #endregion
 
@@ -157,7 +158,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             var runConfig = XmlRunSettingsUtilities.GetRunConfigurationNode(this.runSettings);
             this.runContext.TestRunDirectory = RunSettingsUtilities.GetTestResultsDirectory(runConfig);
             this.runContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
-            this.executionThreadApartmentState = runConfig.ExecutionThreadApartmentState;
+            this.runConfiguration = runConfig;
 
             this.frameworkHandle = new FrameworkHandle(
                 this.testCaseEventsHandler,
@@ -438,7 +439,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private bool NotRequiredSTAThread()
         {
-            return this.executionThreadApartmentState != PlatformApartmentState.STA;
+            return this.runConfiguration.ExecutionThreadApartmentState != PlatformApartmentState.STA;
         }
 
         private TestExecutorExtensionManager GetExecutorExtensionManager(string extensionAssembly)
@@ -546,7 +547,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                 success = false;
                 EqtTrace.Warning("BaseRunTests.TryToRunInSTAThread: Failed to run in STA thread: {0}", ex);
                 this.TestRunEventsHandler.HandleLogMessage(TestMessageLevel.Warning,
-                    string.Format(CultureInfo.CurrentUICulture, Resources.Resources.UnableToExecuteInSTAThread, ex.Message));
+                    string.Format(CultureInfo.CurrentUICulture, Resources.ExecutionThreadApartmentStateNotSupportedForFramework, runConfiguration.TargetFrameworkVersion.ToString()));
             }
 
             return success;
