@@ -9,16 +9,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces
     public interface IDotnetHostHelper
     {
         /// <summary>
-        /// Gets the full path for of .net core host.
+        /// Get full path for the .net host
         /// </summary>
         /// <returns>Full path to <c>dotnet</c> executable</returns>
         /// <remarks>Debuggers require the full path of executable to launch it.</remarks>
-        string GetDotnetPath();
-
-        /// <summary>
-        /// Gets the full path of mono host.
-        /// </summary>
-        /// <returns>Full path to <c>mono</c> executable</returns>
-        string GetMonoPath();
+        string GetDotnetHostFullPath();
     }
 }
