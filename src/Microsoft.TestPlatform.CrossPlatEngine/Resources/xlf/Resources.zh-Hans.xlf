@@ -181,9 +181,9 @@
         <target state="new">Failed to launch testhost with error: {0}</target>
         <note></note>
       </trans-unit>
-      <trans-unit id="UnableToExecuteInSTAThread">
-        <source>Unable to execute in STA thread, Using MTA thread. Reason: {0}</source>
-        <target state="new">Unable to execute in STA thread, Using MTA thread. Reason: {0}</target>
+      <trans-unit id="ExecutionThreadApartmentStateNotSupportedForFramework">
+        <source>ExecutionThreadApartmentState option not supported for framework: {0}</source>
+        <target state="new">ExecutionThreadApartmentState option not supported for framework: {0}</target>
         <note></note>
       </trans-unit>
       <trans-unit id="OldTestHostIsGettingUsed">
