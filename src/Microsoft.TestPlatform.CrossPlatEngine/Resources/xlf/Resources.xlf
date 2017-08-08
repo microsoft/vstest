@@ -92,6 +92,11 @@
         <target state="new">Failed to launch testhost with error: {0}</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="ExecutionThreadApartmentStateNotSupportedForFramework">
+        <source>ExecutionThreadApartmentState option not supported for framework: {0}</source>
+        <target state="new">ExecutionThreadApartmentState option not supported for framework: {0}</target>
+        <note></note>
+      </trans-unit>
       <trans-unit id="OldTestHostIsGettingUsed">
         <source>You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0.</source>
         <target state="new">You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0</target>

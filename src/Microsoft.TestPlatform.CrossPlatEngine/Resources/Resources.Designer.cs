@@ -125,6 +125,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ExecutionThreadApartmentState option not supported for framework: {0}..
+        /// </summary>
+        internal static string ExecutionThreadApartmentStateNotSupportedForFramework {
+            get {
+                return ResourceManager.GetString("ExecutionThreadApartmentStateNotSupportedForFramework", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to launch testhost with error: {0}.
         /// </summary>
         internal static string FailedToLaunchTestHost {
