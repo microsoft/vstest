@@ -106,7 +106,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.output.WriteLine(string.Empty, OutputLevel.Information);
 
             // Gets the faulty test cases if test aborted
-            var testCaseNames = this.GetFaultyTestCases(e);
+            var testCaseNames = this.GetFaultyTestCaseNames(e);
             if (testCaseNames.Count() == 0)
             {
                 return;
@@ -136,9 +136,9 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>
         /// Faulty test cases name
         /// </returns>
-        private IEnumerable<string> GetFaultyTestCases(TestRunCompleteEventArgs e)
+        private IEnumerable<string> GetFaultyTestCaseNames(TestRunCompleteEventArgs e)
         {
-            var faultyTests = new List<string>();
+            var faultyTestCaseNames = new List<string>();
             foreach (var attachmentSet in e.AttachmentSets)
             {
                 if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
@@ -151,13 +151,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         if (testCaseList.Count > 0)
                         {
                             var testcase = testCaseList.Last();
-                            faultyTests.Add(testcase.FullyQualifiedName);
+                            faultyTestCaseNames.Add(testcase.FullyQualifiedName);
                         }
                     }
                 }
             }
 
-            return faultyTests;
+            return faultyTestCaseNames;
         }
 
         #endregion
