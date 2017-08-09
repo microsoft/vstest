@@ -144,7 +144,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " /tests:ExitWithStackoverFlow");
+            arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
             this.InvokeVsTest(arguments);
@@ -177,7 +177,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
-            arguments = string.Concat(arguments, " /tests:ExitwithUnhandleException");
+            arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
 
             this.InvokeVsTest(arguments);
