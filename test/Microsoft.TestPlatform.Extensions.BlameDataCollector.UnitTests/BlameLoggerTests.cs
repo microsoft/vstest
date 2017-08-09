@@ -108,6 +108,42 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         }
 
         /// <summary>
+        /// The test run complete handler should get faulty test run if test run aborted for multiple test project.
+        /// </summary>
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAbortedForMultipleProjects()
+        {
+            // Initialize
+            var attachmentSet1 = new AttachmentSet(new Uri("test://uri"), "Blame");
+            var attachmentSet2 = new AttachmentSet(new Uri("test://uri"), "Blame");
+            var uriDataAttachment1 = new UriDataAttachment(new Uri("C:/folder1/sequence1.xml"), "description");
+            var uriDataAttachment2 = new UriDataAttachment(new Uri("C:/folder1/sequence2.xml"), "description");
+            attachmentSet1.Attachments.Add(uriDataAttachment1);
+            attachmentSet2.Attachments.Add(uriDataAttachment2);
+
+            var attachmentSetList = new List<AttachmentSet> { attachmentSet1, attachmentSet2 };
+
+            // Initialize Blame Logger
+            this.blameLogger.Initialize(this.events.Object, null);
+
+            var testCaseList =
+                new List<TestCase>
+                    {
+                        new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath"),
+                        new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath")
+                    };
+
+            // Setup and Raise event
+            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
+            this.testRunRequest.Raise(
+               m => m.OnRunCompletion += null,
+               new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+
+            // Verify Call
+            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Exactly(2));
+        }
+
+        /// <summary>
         /// The test run complete handler should not read file if test run not aborted.
         /// </summary>
         [TestMethod]

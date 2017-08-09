@@ -4,6 +4,7 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -105,14 +106,17 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
             this.output.WriteLine(string.Empty, OutputLevel.Information);
 
             // Gets the faulty test case if test aborted
-            var testCaseName = this.GetFaultyTestCase(e);
-            if (testCaseName == string.Empty)
+            var testCaseNames = this.GetFaultyTestCase(e);
+            if (testCaseNames.Count() == 0)
             {
                 return;
             }
 
-            var reason = Resources.Resources.AbortedTestRun + testCaseName;
-            this.output.Error(reason);
+            this.output.Error(Resources.Resources.AbortedTestRun);
+            foreach (var tcn in testCaseNames)
+            {
+                this.output.Error(tcn);
+            }
         }
 
         #endregion
@@ -126,10 +130,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// The TestRunCompleteEventArgs.
         /// </param>
         /// <returns>
-        /// Faulty test case name
+        /// Faulty test cases name
         /// </returns>
-        private string GetFaultyTestCase(TestRunCompleteEventArgs e)
+        private IEnumerable<string> GetFaultyTestCase(TestRunCompleteEventArgs e)
         {
+            var faultyTests = new List<string>();
             foreach (var attachmentSet in e.AttachmentSets)
             {
                 if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
@@ -142,15 +147,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         if (testCaseList.Count > 0)
                         {
                             var testcase = testCaseList.Last();
-                            return testcase.FullyQualifiedName;
+                            faultyTests.Add(testcase.FullyQualifiedName);
                         }
                     }
-
-                    return string.Empty;
                 }
             }
 
-            return string.Empty;
+            return faultyTests;
         }
 
         #endregion

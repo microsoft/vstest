@@ -61,7 +61,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to The active Test Run was aborted because the host process exited unexpectedly while executing test..
+        ///   Looks up a localized string similar to The active Test Run was aborted because the host process exited unexpectedly while executing following tests:.
         /// </summary>
         internal static string AbortedTestRun {
             get {
