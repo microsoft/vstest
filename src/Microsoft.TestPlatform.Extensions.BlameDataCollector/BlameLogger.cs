@@ -6,7 +6,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
+    using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -105,18 +105,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.output.WriteLine(string.Empty, OutputLevel.Information);
 
-            // Gets the faulty test case if test aborted
-            var testCaseNames = this.GetFaultyTestCase(e);
+            // Gets the faulty test cases if test aborted
+            var testCaseNames = this.GetFaultyTestCases(e);
             if (testCaseNames.Count() == 0)
             {
                 return;
             }
 
             this.output.Error(Resources.Resources.AbortedTestRun);
+
+            StringBuilder sb = new StringBuilder();
             foreach (var tcn in testCaseNames)
             {
-                this.output.Error(tcn);
+                sb.Append(tcn).Append(Environment.NewLine);
             }
+
+            this.output.Error(sb.ToString());
         }
 
         #endregion
@@ -132,7 +136,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// <returns>
         /// Faulty test cases name
         /// </returns>
-        private IEnumerable<string> GetFaultyTestCase(TestRunCompleteEventArgs e)
+        private IEnumerable<string> GetFaultyTestCases(TestRunCompleteEventArgs e)
         {
             var faultyTests = new List<string>();
             foreach (var attachmentSet in e.AttachmentSets)

@@ -82,10 +82,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAborted()
         {
             // Initialize
-            var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
-            var uriDataAttachment = new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description");
-            attachmentSet.Attachments.Add(uriDataAttachment);
-            var attachmentSetList = new List<AttachmentSet> { attachmentSet };
+            var attachmentSetList = new List<AttachmentSet> { this.GetAttachmentSet() };
 
             // Initialize Blame Logger
             this.blameLogger.Initialize(this.events.Object, null);
@@ -114,14 +111,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAbortedForMultipleProjects()
         {
             // Initialize
-            var attachmentSet1 = new AttachmentSet(new Uri("test://uri"), "Blame");
-            var attachmentSet2 = new AttachmentSet(new Uri("test://uri"), "Blame");
-            var uriDataAttachment1 = new UriDataAttachment(new Uri("C:/folder1/sequence1.xml"), "description");
-            var uriDataAttachment2 = new UriDataAttachment(new Uri("C:/folder1/sequence2.xml"), "description");
-            attachmentSet1.Attachments.Add(uriDataAttachment1);
-            attachmentSet2.Attachments.Add(uriDataAttachment2);
-
-            var attachmentSetList = new List<AttachmentSet> { attachmentSet1, attachmentSet2 };
+            var attachmentSetList = new List<AttachmentSet> { this.GetAttachmentSet(), this.GetAttachmentSet() };
 
             // Initialize Blame Logger
             this.blameLogger.Initialize(this.events.Object, null);
@@ -182,6 +172,15 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
+        }
+
+        private AttachmentSet GetAttachmentSet()
+        {
+            var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
+            var uriDataAttachment = new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description");
+            attachmentSet.Attachments.Add(uriDataAttachment);
+
+            return attachmentSet;
         }
 
         /// <summary>
