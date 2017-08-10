@@ -45,6 +45,7 @@ Copyright (c) .NET Foundation. All rights reserved.
       VSTestResultsDirectory="$(VSTestResultsDirectory)"
       VSTestVerbosity="$(VSTestVerbosity)"
       VSTestCollect="$(VSTestCollect)"
+      VSTestBlame="$(VSTestBlame)"
     />
   </Target>
 
@@ -83,6 +84,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <Message Text="VSTestConsolePath = $(VSTestConsolePath)" Importance="low" />
     <Message Text="VSTestVerbosity = $(VSTestVerbosity)" Importance="low" />
     <Message Text="VSTestCollect = $(VSTestCollect)" Importance="low" />
+    <Message Text="VSTestBlame = $(VSTestBlame)" Importance="low" />
   </Target>
 
 </Project>
