@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using System;
     using System.IO;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -26,29 +27,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
-        [Ignore] // https://github.com/Microsoft/vstest/issues/689
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            CppRunAllTests(runnerFramework, "x86");
+        }
 
-            if (runnerFramework.StartsWith("netcoreapp"))
-            {
-                Assert.Inconclusive("CPP adapter not available for netcore runner in Extensions folder.");
-                return;
-            }
-
-            var assemblyRelativePath =
-                @"microsoft.testplatform.testasset.nativecpp\1.0.0\contentFiles\any\any\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            var arguments = PrepareArguments(
-                assemblyAbsolutePath,
-                string.Empty,
-                string.Empty,
-                this.FrameworkArgValue);
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        public void CPPRunAllTestExecutionPlatformx64(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            CppRunAllTests(runnerFramework, "x64");
         }
 
         [CustomDataTestMethod]
@@ -89,6 +81,31 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty,
                 this.FrameworkArgValue);
+            this.InvokeVsTest(arguments);
+            this.ValidateSummaryStatus(1, 1, 0);
+        }
+
+        private void CppRunAllTests(string runnerFramework, string platform)
+        {
+            if (runnerFramework.StartsWith("netcoreapp"))
+            {
+                Assert.Inconclusive("CPP tests not supported with .Netcore runner.");
+                return;
+            }
+
+            string assemblyRelativePathFormat =
+                @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\{0}\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+            var assemblyRelativePath = platform.Equals("x64", StringComparison.OrdinalIgnoreCase)
+                ? string.Format(assemblyRelativePathFormat, platform)
+                : string.Format(assemblyRelativePathFormat, "");
+            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+            var arguments = PrepareArguments(
+                assemblyAbsolutePath,
+                string.Empty,
+                string.Empty,
+                this.FrameworkArgValue);
+
+            arguments = string.Concat(arguments, $" /platform:{platform}");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }

@@ -4,8 +4,9 @@
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
-
+    using System.Text;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
@@ -104,15 +105,22 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
 
             this.output.WriteLine(string.Empty, OutputLevel.Information);
 
-            // Gets the faulty test case if test aborted
-            var testCaseName = this.GetFaultyTestCase(e);
-            if (testCaseName == string.Empty)
+            // Gets the faulty test cases if test aborted
+            var testCaseNames = this.GetFaultyTestCaseNames(e);
+            if (testCaseNames.Count() == 0)
             {
                 return;
             }
 
-            var reason = Resources.Resources.AbortedTestRun + testCaseName;
-            this.output.Error(false, reason);
+            this.output.Error(Resources.Resources.AbortedTestRun);
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var tcn in testCaseNames)
+            {
+                sb.Append(tcn).Append(Environment.NewLine);
+            }
+
+            this.output.Error(sb.ToString());
         }
 
         #endregion
@@ -126,10 +134,11 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
         /// The TestRunCompleteEventArgs.
         /// </param>
         /// <returns>
-        /// Faulty test case name
+        /// Faulty test cases name
         /// </returns>
-        private string GetFaultyTestCase(TestRunCompleteEventArgs e)
+        private IEnumerable<string> GetFaultyTestCaseNames(TestRunCompleteEventArgs e)
         {
+            var faultyTestCaseNames = new List<string>();
             foreach (var attachmentSet in e.AttachmentSets)
             {
                 if (attachmentSet.DisplayName.Equals(Constants.BlameDataCollectorName))
@@ -142,15 +151,13 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                         if (testCaseList.Count > 0)
                         {
                             var testcase = testCaseList.Last();
-                            return testcase.FullyQualifiedName;
+                            faultyTestCaseNames.Add(testcase.FullyQualifiedName);
                         }
                     }
-
-                    return string.Empty;
                 }
             }
 
-            return string.Empty;
+            return faultyTestCaseNames;
         }
 
         #endregion

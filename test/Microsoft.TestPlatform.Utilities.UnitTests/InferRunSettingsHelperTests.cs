@@ -264,7 +264,47 @@ namespace Microsoft.TestPlatform.Utilities.UnitTests
 
             Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/DesignMode"));
             Assert.AreEqual(val.ToString(), this.GetValueOf(navigator, "/RunSettings/RunConfiguration/CollectSourceInformation"));
-        }   
+        }
+
+        [TestMethod]
+        public void MakeRunsettingsCompatibleShouldDeleteNewlyAddedRunConfigurationNode()
+        {
+            var settings = @"<RunSettings><RunConfiguration><DesignMode>False</DesignMode><CollectSourceInformation>False</CollectSourceInformation></RunConfiguration></RunSettings>";
+
+            var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
+
+            Assert.IsTrue(result.IndexOf("DesignMode", StringComparison.OrdinalIgnoreCase) < 0);
+        }
+
+        [TestMethod]
+        public void MakeRunsettingsCompatibleShouldNotDeleteOldRunConfigurationNode()
+        {
+            var settings = @"<RunSettings>
+                                <RunConfiguration>
+                                    <DesignMode>False</DesignMode>
+                                    <CollectSourceInformation>False</CollectSourceInformation>
+                                    <TargetPlatform>x86</TargetPlatform>
+                                    <TargetFrameworkVersion>net46</TargetFrameworkVersion>
+                                    <TestAdaptersPaths>dummypath</TestAdaptersPaths>
+                                    <ResultsDirectory>dummypath</ResultsDirectory>
+                                    <SolutionDirectory>dummypath</SolutionDirectory>
+                                    <MaxCpuCount>2</MaxCpuCount>
+                                    <DisableParallelization>False</DisableParallelization>
+                                    <DisableAppDomain>False</DisableAppDomain>
+                                </RunConfiguration>
+                            </RunSettings>";
+
+            var result = InferRunSettingsHelper.MakeRunsettingsCompatible(settings);
+
+            Assert.IsTrue(result.IndexOf("TargetPlatform", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("TargetFrameworkVersion", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("TestAdaptersPaths", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("ResultsDirectory", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("SolutionDirectory", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("MaxCpuCount", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("DisableParallelization", StringComparison.OrdinalIgnoreCase) > 0);
+            Assert.IsTrue(result.IndexOf("DisableAppDomain", StringComparison.OrdinalIgnoreCase) > 0);
+        }
 
         #region private methods
 

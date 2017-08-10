@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using MSTest.TestFramework.AssertExtensions;
 
@@ -33,6 +34,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(false, runConfiguration.DisableParallelization);
             Assert.AreEqual(false, runConfiguration.DesignMode);
             Assert.AreEqual(runConfiguration.DesignMode, runConfiguration.ShouldCollectSourceInformation);
+            Assert.AreEqual(Constants.DefaultExecutionThreadApartmentState, runConfiguration.ExecutionThreadApartmentState);
         }
 
         [TestMethod]
@@ -74,6 +76,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
                        <BinariesRoot>E:\x\z</BinariesRoot>
                        <DesignMode>true</DesignMode>
                        <CollectSourceInformation>false</CollectSourceInformation>
+                       <ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>
                      </RunConfiguration>
                 </RunSettings>";
 
@@ -102,6 +105,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.AreEqual(true, runConfiguration.DisableParallelization);
             Assert.AreEqual(true, runConfiguration.DesignMode);
             Assert.AreEqual(false, runConfiguration.ShouldCollectSourceInformation);
+            Assert.AreEqual(PlatformApartmentState.STA, runConfiguration.ExecutionThreadApartmentState);
         }
 
         [TestMethod]
@@ -122,7 +126,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         }
 
         [TestMethod]
-        public void RunConfigurationFromXmlThrowsSettingsExceptionIfTestSessionTimeoutIsIsInvalid()
+        public void RunConfigurationFromXmlThrowsSettingsExceptionIfTestSessionTimeoutIsInvalid()
         {
             string settingsXml =
              @"<?xml version=""1.0"" encoding=""utf-8""?>
@@ -136,6 +140,23 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
             Assert.That.Throws<SettingsException>(
                     () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
                     .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value '0' specified for 'TestSessionTimeout'.");
+        }
+
+        [TestMethod]
+        public void RunConfigurationFromXmlThrowsSettingsExceptionIfExecutionThreadApartmentStateIsInvalid()
+        {
+            string settingsXml =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <ExecutionThreadApartmentState>RandomValue</ExecutionThreadApartmentState>
+                     </RunConfiguration>
+                </RunSettings>";
+
+
+            Assert.That.Throws<SettingsException>(
+                    () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml))
+                .WithExactMessage("Invalid settings 'RunConfiguration'.  Invalid value 'RandomValue' specified for 'ExecutionThreadApartmentState'.");
         }
 
         [TestMethod]
@@ -237,6 +258,14 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests
         {
             var runConfiguration = new RunConfiguration { DesignMode = val };
             StringAssert.Contains(runConfiguration.ToXml().InnerXml.ToUpperInvariant(), $"<CollectSourceInformation>{val}</CollectSourceInformation>".ToUpperInvariant());
+        }
+
+        [TestMethod]
+        public void RunConfigurationToXmlShouldProvideExecutionThreadApartmentState()
+        {
+            var runConfiguration = new RunConfiguration { ExecutionThreadApartmentState = PlatformApartmentState.STA };
+
+            StringAssert.Contains(runConfiguration.ToXml().InnerXml, "<ExecutionThreadApartmentState>STA</ExecutionThreadApartmentState>");
         }
     }
 }

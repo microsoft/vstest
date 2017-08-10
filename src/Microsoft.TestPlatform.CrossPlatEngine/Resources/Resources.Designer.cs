@@ -125,6 +125,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ExecutionThreadApartmentState option not supported for framework: {0}..
+        /// </summary>
+        internal static string ExecutionThreadApartmentStateNotSupportedForFramework {
+            get {
+                return ResourceManager.GetString("ExecutionThreadApartmentStateNotSupportedForFramework", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Failed to launch testhost with error: {0}.
         /// </summary>
         internal static string FailedToLaunchTestHost {
@@ -132,7 +141,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
                 return ResourceManager.GetString("FailedToLaunchTestHost", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Could not find file {0}..
         /// </summary>
@@ -202,6 +211,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources {
         internal static string NoValidSourceFoundForDiscovery {
             get {
                 return ResourceManager.GetString("NoValidSourceFoundForDiscovery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are using an older version of Microsoft.NET.Test.Sdk. Kindly move to a version equal or greater than 15.3.0..
+        /// </summary>
+        internal static string OldTestHostIsGettingUsed {
+            get {
+                return ResourceManager.GetString("OldTestHostIsGettingUsed", resourceCulture);
             }
         }
         
