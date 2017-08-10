@@ -31,6 +31,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private const string TestMessageFormattingPrefix = " ";
 
         /// <summary>
+        /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
+        /// </summary>
+        internal static bool AppendPrefix;
+
+        /// <summary>
         /// Uri used to uniquely identify the console logger.
         /// </summary>
         public const string ExtensionUri = "logger://Microsoft/TestPlatform/ConsoleLogger/v2";
@@ -158,7 +163,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out string prefix);
             if (prefixExists)
             {
-                bool.TryParse(prefix, out OutputExtensions.AppendPrefix);
+                bool.TryParse(prefix, out ConsoleLogger.AppendPrefix);
             }
 
             this.Initialize(events, String.Empty);
@@ -321,14 +326,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
-                    Output.Information(OutputExtensions.AppendPrefix, e.Message);
+                    Output.Information(ConsoleLogger.AppendPrefix, e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    Output.Warning(OutputExtensions.AppendPrefix, e.Message);
+                    Output.Warning(ConsoleLogger.AppendPrefix, e.Message);
                     break;
                 case TestMessageLevel.Error:
                     this.testOutcome = TestOutcome.Failed;
-                    Output.Error(OutputExtensions.AppendPrefix, e.Message);
+                    Output.Error(ConsoleLogger.AppendPrefix, e.Message);
                     break;
                 default:
                     Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());

@@ -114,14 +114,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var parameters = new Dictionary<string, string>();
 
-            Assert.IsFalse(OutputExtensions.AppendPrefix);
+            Assert.IsFalse(ConsoleLogger.AppendPrefix);
 
             parameters.Add("prefix", "true");
             this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-            Assert.IsTrue(OutputExtensions.AppendPrefix);
+            Assert.IsTrue(ConsoleLogger.AppendPrefix);
 
-            OutputExtensions.AppendPrefix = false;
+            ConsoleLogger.AppendPrefix = false;
         }
 
         [TestMethod]
