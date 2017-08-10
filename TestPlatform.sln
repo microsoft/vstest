@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26507.0
+VisualStudioVersion = 15.0.26703.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED0C35EB-7F31-4841-A24F-8EB708FFA959}"
 EndProject
@@ -158,6 +158,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlameUnitTestProject", "test\TestAssets\BlameUnitTestProject\BlameUnitTestProject.csproj", "{6B2B841C-CCFF-469A-9939-EB07EA0401AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleProjectWithOldTestHost", "test\TestAssets\SampleProjectWithOldTestHost\SampleProjectWithOldTestHost.csproj", "{DFF82C76-9498-4E8B-8B5E-D12E2B92FA46}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataCollectors", "DataCollectors", "{B705537C-B82C-4A30-AFA5-6244D9A7DAEB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Windows", "Windows", "{347F53C4-7E10-4B06-8989-88544C4FA21C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microsoft.TestPlatform.Extensions.EventLogCollector", "src\DataCollectors\Windows\Microsoft.TestPlatform.Extensions.EventLogCollector\Microsoft.TestPlatform.Extensions.EventLogCollector.csproj", "{2303A840-D026-4429-A7DD-08784F98DEA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -841,6 +847,18 @@ Global
 		{DFF82C76-9498-4E8B-8B5E-D12E2B92FA46}.Release|x64.Build.0 = Release|Any CPU
 		{DFF82C76-9498-4E8B-8B5E-D12E2B92FA46}.Release|x86.ActiveCfg = Release|Any CPU
 		{DFF82C76-9498-4E8B-8B5E-D12E2B92FA46}.Release|x86.Build.0 = Release|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Debug|x64.Build.0 = Debug|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Debug|x86.Build.0 = Debug|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Release|x64.ActiveCfg = Release|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Release|x64.Build.0 = Release|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Release|x86.ActiveCfg = Release|Any CPU
+		{2303A840-D026-4429-A7DD-08784F98DEA9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -911,5 +929,11 @@ Global
 		{488675EC-C8BB-40E0-AD4F-91F623D548B3} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}
 		{6B2B841C-CCFF-469A-9939-EB07EA0401AE} = {8DA7CBD9-F17E-41B6-90C4-CFF55848A25A}
 		{DFF82C76-9498-4E8B-8B5E-D12E2B92FA46} = {8DA7CBD9-F17E-41B6-90C4-CFF55848A25A}
+		{B705537C-B82C-4A30-AFA5-6244D9A7DAEB} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
+		{347F53C4-7E10-4B06-8989-88544C4FA21C} = {B705537C-B82C-4A30-AFA5-6244D9A7DAEB}
+		{2303A840-D026-4429-A7DD-08784F98DEA9} = {347F53C4-7E10-4B06-8989-88544C4FA21C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0541B30C-FF51-4E28-B172-83F5F3934BCD}
 	EndGlobalSection
 EndGlobal
