@@ -457,6 +457,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void TestRunCompleteHandlerShouldNotWriteTolatTestToConsoleIfTestsCanceled()
+        {
+            // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultObject(TestOutcome.Failed), null);
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, true, false, null, null, new TimeSpan(1, 0, 0, 0)));
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunCanceled, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldNotWriteTolatTestToConsoleIfTestsAborted()
+        {
+            // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
+            var eventArgs = new TestRunChangedEventArgs(null, this.GetTestResultObject(TestOutcome.Failed), null);
+            this.testRunRequest.Raise(m => m.OnRunStatsChange += null, eventArgs);
+
+            // Raise an event on mock object
+            this.testRunRequest.Raise(m => m.OnRunCompletion += null, new TestRunCompleteEventArgs(null, false, true, null, null, new TimeSpan(1, 0, 0, 0)));
+
+            this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, 0, 1, 0), OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunAborted, OutputLevel.Error), Times.Once());
+        }
+
+        [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsAborted()
         {
             // Raise an event on mock object raised to register test case count and mark Outcome as Outcome.Failed
