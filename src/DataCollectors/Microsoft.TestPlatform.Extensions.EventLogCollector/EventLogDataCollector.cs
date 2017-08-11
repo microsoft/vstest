@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
+namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 {
     using System;
     using System.Collections.Generic;
@@ -12,10 +12,9 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
     using System.Runtime.Serialization;
     using System.Xml;
 
-    using Microsoft.TestPlatform.Extensions.EventLogCollector;
+    using MSResources = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using Microsoft.TestPlatform.Extensions.EventLogCollector.Resources;
 
     /// <summary>
     /// A data collector that collects event log data
@@ -29,7 +28,7 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
         /// <summary>
         /// DataCollector URI.
         /// </summary>
-        private const string DEFAULT_URI = @"datacollector://Microsoft/EventLog/1.0";
+        private const string DEFAULT_URI = @"datacollector://Microsoft/EventLog/2.0";
 
         #endregion
 
@@ -88,8 +87,6 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
 
         private int maxEntries;
 
-        private bool collectForInnerTests;
-
         private Dictionary<DataCollectionContext, EventLogCollectorContextData> contextData =
             new Dictionary<DataCollectionContext, EventLogCollectorContextData>();
 
@@ -137,10 +134,9 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             DataCollectionLogger logger,
             DataCollectionEnvironmentContext dataCollectionEnvironmentContext)
         {
-            System.Diagnostics.Debugger.Launch();
-            Debug.Assert(events != null, "'events' is null");
-            Debug.Assert(dataSink != null, "'dataSink' is null");
-            Debug.Assert(logger != null, "'logger' is null");
+            ValidateArg.NotNull(events, nameof(events));
+            ValidateArg.NotNull(dataSink, nameof(dataSink));
+            ValidateArg.NotNull(logger, nameof(logger));
 
             this.events = events;
             this.dataSink = dataSink;
@@ -163,7 +159,7 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             {
                 // Default to collecting these standard logs
                 this.eventLogNames.Add("System");
-                // this.eventLogNames.Add("Security");
+                this.eventLogNames.Add("Security");
                 this.eventLogNames.Add("Application");
             }
 
@@ -234,46 +230,11 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
                 this.maxEntries = EventLogShared.DEFAULT_MAX_ENTRIES;
             }
 
-            this.collectForInnerTests = GetBoolConfigSetting(
-                nameValueSettings,
-                EventLogShared.SETTING_COLLECT_FOR_INNER_TESTS,
-                EventLogShared.DEFAULT_COLLECT_FOR_INNER_TESTS);
-
             // Register for events
             events.SessionStart += this.sessionStartEventHandler;
             events.SessionEnd += this.sessionEndEventHandler;
             events.TestCaseStart += this.testCaseStartEventHandler;
             events.TestCaseEnd += this.testCaseEndEventHandler;
-        }
-
-        private static bool GetBoolConfigSetting(
-            CollectorNameValueConfigurationManager nameValueSettings,
-            string settingName,
-            bool defaultValue)
-        {
-            bool settingValue;
-            string settingValuestring = nameValueSettings[settingName];
-            if (settingValuestring != null)
-            {
-                try
-                {
-                    settingValue = bool.Parse(settingValuestring);
-                }
-                catch (FormatException ex)
-                {
-                    throw new EventLogCollectorException(
-                        "",
-                        ex);
-                }
-
-                EqtTrace.Verbose("EventLogDataCollector configuration: " + settingName + "=" + settingValuestring);
-            }
-            else
-            {
-                settingValue = defaultValue;
-            }
-
-            return settingValue;
         }
 
         #endregion
@@ -284,10 +245,6 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
         /// Cleans up resources allocated by the data collector
         /// </summary>
         /// <param name="disposing">Not used since this class does not have a finalizer.</param>
-        [SuppressMessage(
-            "Microsoft.Usage",
-            "CA1816:CallGCSuppressFinalizeCorrectly",
-            Justification = "The real Dispose method is in the base class and FxCop doesn't seem to find it.")]
         protected override void Dispose(bool disposing)
         {
             // Unregister events
@@ -341,28 +298,10 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             }
 
             EqtTrace.Verbose(
-                "EventLogDataCollector: TestCaseStart received for {0} test '{1}'.",
-                e.IsChildTestCase ? "child" : "parent",
+                "EventLogDataCollector: TestCaseStart received for test '{1}'.",
                 e.TestCaseName);
 
-            if (this.collectForInnerTests || !e.IsChildTestCase)
-            {
-                this.StartCollectionForContext(e.Context, false);
-            }
-        }
-
-        private void OnDataRequest(object sender, DataRequestEventArgs e)
-        {
-            if (e == null)
-            {
-                throw new ArgumentNullException("e");
-            }
-
-            Debug.Assert(e.Context != null, "Context is null");
-
-            EqtTrace.Verbose("EventLogDataCollector: DataRequest received");
-
-            this.WriteCollectedEventLogEntries(e.Context, false, e.RequestedDuration, DateTime.Now);
+            this.StartCollectionForContext(e.Context, false);
         }
 
         private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
@@ -376,15 +315,11 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             Debug.Assert(e.Context.HasTestCase, "Context is not for a test case");
 
             EqtTrace.Verbose(
-                "EventLogDataCollector: TestCaseEnd received for {0} test '{1}' with Test Outcome: {2}.",
-                e.IsChildTestCase ? "child" : "parent",
+                "EventLogDataCollector: TestCaseEnd received for test '{1}' with Test Outcome: {2}.",
                 e.TestCaseName,
                 e.TestOutcome);
 
-            if (this.collectForInnerTests || !e.IsChildTestCase)
-            {
-                this.WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.Now);
-            }
+            this.WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.Now);
         }
 
         #endregion
@@ -524,7 +459,7 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
                             dataCollectionContext,
                             string.Format(
                                 CultureInfo.InvariantCulture,
-                                Resources.Execution_Agent_DataCollectors_EventLog_CleanupException,
+                                MSResources.Execution_Agent_DataCollectors_EventLog_CleanupException,
                                 eventLogContainer.EventLog,
                                 e.ToString()));
                     }
@@ -535,7 +470,7 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             string eventLogDirName = string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
-                Resources.Execution_Agent_DataCollectors_EventLog_FriendlyName,
+                MSResources.Execution_Agent_DataCollectors_EventLog_FriendlyName,
                 Environment.MachineName,
                 DateTime.Now);
 
@@ -630,7 +565,7 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             {
                 string msg = string.Format(
                     CultureInfo.InvariantCulture,
-                    Resources.Execution_Agent_DataCollectors_EventLog_ContextNotFoundException,
+                    MSResources.Execution_Agent_DataCollectors_EventLog_ContextNotFoundException,
                     dataCollectionContext.ToString());
                 throw new EventLogCollectorException(msg, null);
             }
@@ -638,7 +573,7 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             return eventLogContext;
         }
 
-        #endregion       
+        #endregion
 
         #region Internal Fields
 
@@ -654,7 +589,7 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
         {
             get
             {
-                return Resources.Execution_Agent_DataCollectors_EventLog_FriendlyName;
+                return MSResources.Execution_Agent_DataCollectors_EventLog_FriendlyName;
             }
         }
 
@@ -698,6 +633,14 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
             }
         }
 
+        internal List<string> EventLogNames
+        {
+            get
+            {
+                return this.eventLogNames;
+            }
+        }
+
         internal Dictionary<DataCollectionContext, EventLogCollectorContextData> ContextData
         {
             get
@@ -707,245 +650,5 @@ namespace Microsoft.VisualStudio.TestTools.DataCollection.EventLog
         }
 
         #endregion
-
-        internal class EventLogContainer
-        {
-            public EventLog EventLog { get; set; }
-
-            public int NextEntryIndexToCollect { get; set; }
-
-            public EventLogDataCollector DataCollector { get; set; }
-
-            public EventLogCollectorContextData ContextData { get; set; }
-
-            public EventLogContainer(
-                EventLog eventLog,
-                int nextEntryIndexToCollect,
-                EventLogDataCollector dataCollector,
-                EventLogCollectorContextData contextData)
-            {
-                this.EventLog = eventLog;
-                this.NextEntryIndexToCollect = nextEntryIndexToCollect;
-                this.DataCollector = dataCollector;
-                this.ContextData = contextData;
-            }
-
-            /// <summary>
-            /// This is the event handler for the EntryWritten event of the System.Diagnostics.EventLog class.
-            /// Note that the documentation for the EntryWritten event includes these remarks:
-            ///     "The system responds to WriteEntry only if the last write event occurred at least five seconds previously. 
-            ///      This implies you will only receive one EntryWritten event notification within a five-second interval, even if more
-            ///      than one event log change occurs. If you insert a sufficiently long sleep interval (around 10 seconds) between calls
-            ///      to WriteEntry, no events will be lost. However, if write events occur more frequently, the most recent write events 
-            ///      could be lost."
-            /// This complicates this data collector because we don't want to sleep to wait for all events or lose the most recent events.
-            /// To workaround, the implementation does several things:
-            /// 1. We get the EventLog entries to collect from the EventLog.Entries collection and ignore the EntryWrittenEventArgs.
-            /// 2. When event log collection ends for a data collection context, this method is called explicitly by the EventLogDataCollector
-            ///    passing null for EntryWrittenEventArgs (which is fine since the argument is ignored.
-            /// 3. We keep track of which EventLogEntry object in the EventLog.Entries we still need to collect.  We do this by inspecting
-            ///    the value of the EventLogEntry.Index property.  The value of this property is an integer that is incremented for each entry
-            ///    that is written to the event log, but is reset to 0 if the entire event log is cleared.
-            /// Another behavior of event logs that we need to account for is that if the event log reaches a size limit, older events are
-            /// automatically deleted.  In this case the collection EventLog.Entries contains only the entries remaining in the log,
-            /// and the value of the EventLog.Entries[0].Index will not be 0; it will be the index of the oldest entry still in the log.
-            /// For example, if the first 1000 entries written to an event log (since it was last completely cleared) are deleted because
-            /// of the size limitation, then EventLog.Entries[0].Index would have a value of 1000 (this value is saved in the local variable
-            /// "firstIndexInLog" in the method implementation.  Similarly "mostRecentIndexInLog" is the index of the last entry written
-            /// to the log at the time we examine it.
-            /// </summary>
-            /// <param name="source"></param>
-            /// <param name="e">The System.Diagnostics.EntryWrittenEventArgs object describing the entry that was written.</param>
-            public void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e)
-            {
-                while (this.ContextData.ProcessEvents)
-                {
-                    int currentCount = this.EventLog.Entries.Count;
-                    if (currentCount == 0)
-                    {
-                        break;
-                    }
-                    int firstIndexInLog = this.EventLog.Entries[0].Index;
-                    int mostRecentIndexInLog = this.EventLog.Entries[currentCount - 1].Index;
-
-                    if (mostRecentIndexInLog == this.NextEntryIndexToCollect - 1)
-                    {
-                        // We've already collected the most recent entry in the log
-                        break;
-                    }
-
-                    if (mostRecentIndexInLog < this.NextEntryIndexToCollect - 1)
-                    {
-                        /* Uncomment for debugging
-                        EqtTrace.Warning(string.Format(CultureInfo.InvariantCulture,
-                            "EventLogDataCollector: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
-                            firstIndexInLog, mostRecentIndexInLog, NextEntryIndexToCollect));
-                        */
-
-                        // Send warning; event log must have been cleared.
-                        foreach (DataCollectionContext collectionContext in this.DataCollector.ContextData.Keys)
-                        {
-                            this.DataCollector.Logger.LogWarning(
-                                collectionContext,
-                                string.Format(
-                                    CultureInfo.InvariantCulture,
-                                    Resources.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
-                                    this.EventLog.Log));
-                            break;
-                        }
-
-                        this.NextEntryIndexToCollect = 0;
-                        firstIndexInLog = 0;
-                    }
-
-                    for (; this.NextEntryIndexToCollect <= mostRecentIndexInLog; ++this.NextEntryIndexToCollect)
-                    {
-                        int nextEntryIndexInCurrentLog = this.NextEntryIndexToCollect - firstIndexInLog;
-                        EventLogEntry nextEntry = this.EventLog.Entries[nextEntryIndexInCurrentLog];
-
-                        // BILLBAR_TODO: Event sources can no longer be configured in the Test Settings Config UI (only by XML editor)
-                        //     Drop this feature, add to config UI, or leave as only configurable via XML editor?
-
-                        // If an explicit list of event sources was provided, only report log entries from those sources
-                        if (this.DataCollector.EventSources != null && this.DataCollector.EventSources.Count > 0)
-                        {
-                            bool eventSourceFound = false;
-                            foreach (string eventSource in this.DataCollector.EventSources)
-                            {
-                                if (string.Equals(nextEntry.Source, eventSource, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    eventSourceFound = true;
-                                    break;
-                                }
-                            }
-                            if (!eventSourceFound)
-                            {
-                                continue;
-                            }
-                        }
-
-                        if (this.DataCollector.EntryTypes != null && this.DataCollector.EntryTypes.Count > 0)
-                        {
-                            bool eventTypeFound = false;
-                            foreach (EventLogEntryType entryType in this.DataCollector.EntryTypes)
-                            {
-                                if (nextEntry.EntryType == entryType)
-                                {
-                                    eventTypeFound = true;
-                                    break;
-                                }
-                            }
-                            if (!eventTypeFound)
-                            {
-                                continue;
-                            }
-                        }
-
-                        lock (this.ContextData.EventLogEntries)
-                        {
-                            if (this.ContextData.EventLogEntries.Count < this.ContextData.MaxLogEntries)
-                            {
-                                this.ContextData.EventLogEntries.Add(nextEntry);
-                                /* Uncomment for debugging
-                                EqtTrace.Verbose(string.Format(CultureInfo.InvariantCulture,
-                                    "EventLogDataCollector.OnEventLogEntryWritten() add event with Id {0} from position {1} in the current {2} log",
-                                    nextEntry.Index, nextEntryIndexInCurrentLog, EventLog.Log));
-                                */
-                            }
-                            else
-                            {
-                                this.ContextData.LimitReached = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        internal class EventLogCollectorContextData
-        {
-            private bool limitReached;
-
-            private Dictionary<string, EventLogContainer> eventLogContainers;
-
-            private List<EventLogEntry> eventLogEntries;
-
-            private int maxLogEntries;
-
-            public bool ProcessEvents
-            {
-                get
-                {
-                    return !this.limitReached;
-                }
-            }
-
-            public Dictionary<string, EventLogContainer> EventLogContainers
-            {
-                get
-                {
-                    return this.eventLogContainers;
-                }
-            }
-
-            public List<EventLogEntry> EventLogEntries
-            {
-                get
-                {
-                    return this.eventLogEntries;
-                }
-            }
-
-            public int MaxLogEntries
-            {
-                get
-                {
-                    return this.maxLogEntries;
-                }
-            }
-
-            public EventLogCollectorContextData(int maxLogEntries)
-            {
-                this.maxLogEntries = maxLogEntries;
-                this.eventLogContainers = new Dictionary<string, EventLogContainer>();
-                this.eventLogEntries = new List<EventLogEntry>();
-            }
-
-            internal bool LimitReached
-            {
-                get
-                {
-                    return this.limitReached;
-                }
-
-                set
-                {
-                    this.limitReached = value;
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// Private Exception class used for event log exceptions
-    /// </summary>
-    [Serializable]
-    internal class EventLogCollectorException : Exception
-    {
-        /// <summary>
-        /// Constructs a new EventLogCollectorException
-        /// </summary>
-        /// <param name="localizedMessage">the localized exception message</param>
-        /// <param name="innerException">the inner exception</param>
-        public EventLogCollectorException(string localizedMessage, Exception innerException)
-            : base(localizedMessage, innerException)
-        {
-        }
-
-        protected EventLogCollectorException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
     }
 }

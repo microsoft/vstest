@@ -4,7 +4,6 @@
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 {
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -32,7 +31,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// The name/value pairs loaded from the configuration XML element
         /// </summary>
-        private Dictionary<string, string> nameValuePairs = new Dictionary<string, string>();
+        internal Dictionary<string, string> nameValuePairs = new Dictionary<string, string>();
 
         #endregion
 
@@ -46,7 +45,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <param name="configurationElement">
         /// XML element containing the configuration
         /// </param>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes", MessageId = "System.Xml.XmlNode")]
         public CollectorNameValueConfigurationManager(XmlElement configurationElement)
         {
             if (configurationElement == null)
@@ -70,7 +68,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 string settingName = settingElement.GetAttribute(SettingNameAttributeName);
                 if (string.IsNullOrEmpty(settingName))
                 {
-                    EqtTrace.Warning("Skipping configuration setting due to missing setting name");
+                    if (EqtTrace.IsWarningEnabled)
+                    {
+                        EqtTrace.Warning("Skipping configuration setting due to missing setting name");
+                    }
+
                     continue;
                 }
 
@@ -78,7 +80,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 string settingValue = settingElement.GetAttribute(SettingValueAttributeName);
                 if (string.IsNullOrEmpty(settingValue))
                 {
-                    EqtTrace.Warning("Skipping configuration setting '{0}' due to missing value", settingName);
+                    if (EqtTrace.IsWarningEnabled)
+                    {
+                        EqtTrace.Warning("Skipping configuration setting '{0}' due to missing value", settingName);
+                    }
+
                     continue;
                 }
 
@@ -86,9 +92,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 // overwritten with the last occurrance's value.
                 if (this.nameValuePairs.ContainsKey(settingName))
                 {
-                    EqtTrace.Verbose(
-                        "Duplicate configuration setting found for '{0}'. Using the last setting.",
-                        settingName);
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose(
+                            "Duplicate configuration setting found for '{0}'. Using the last setting.",
+                            settingName);
+                    }
                 }
 
                 this.nameValuePairs[settingName] = settingValue;
@@ -117,44 +126,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 this.nameValuePairs.TryGetValue(name, out settingValue);
                 return settingValue;
             }
-            set
-            {
-                this.nameValuePairs[name] = value;
-            }
+
+            set => this.nameValuePairs[name] = value;
         }
-
-        /// <summary>
-        /// Export the settings back to xml so it can be saved back to the configuration file
-        /// </summary>
-        /// <returns>XML in the format expected by DataCollectorSettings.Configuration</returns>
-        [SuppressMessage("Microsoft.Design", "CA1059:MembersShouldNotExposeCertainConcreteTypes")]
-        public XmlElement ExportToXml()
-        {
-            XmlDocument doc = new XmlDocument();
-            XmlNode mainnode = doc.CreateNode(XmlNodeType.Element, ConfigurationNodeName, string.Empty);
-            doc.AppendChild(mainnode);
-
-            foreach (string setting in this.nameValuePairs.Keys)
-            {
-                XmlNode node = doc.CreateNode(XmlNodeType.Element, SettingNodeName, string.Empty);
-
-                // create the attribute for the setting name
-                XmlAttribute attr = doc.CreateAttribute(SettingNameAttributeName);
-                attr.Value = setting;
-                node.Attributes.Append(attr);
-
-                // create the attribute for the setting value
-                attr = doc.CreateAttribute(SettingValueAttributeName);
-                attr.Value = this.nameValuePairs[setting];
-                node.Attributes.Append(attr);
-
-                mainnode.AppendChild(node);
-            }
-
-            return doc.DocumentElement;
-        }
-
         #endregion
     }
 }
-
