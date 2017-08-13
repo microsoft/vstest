@@ -269,7 +269,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 throw new ArgumentNullException("e");
             }
 
-            EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("EventLogDataCollector: SessionStart received");
+            }
+
             this.StartCollectionForContext(e.Context, true);
         }
 
@@ -380,7 +384,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 if (this.contextData.TryGetValue(dataCollectionContext, out eventLogContext))
                 {
-                    Debug.Fail("Context data already in dictionary");
+                    if (EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose(string.Format(
+                            CultureInfo.InvariantCulture,
+                            "EventLogDataCollector: Context data already in dictionary"));
+                    }
                 }
                 else
                 {
@@ -397,21 +406,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     // Create an EventLog object and add it to the eventLogContext if one does not already exist
                     if (!eventLogContext.EventLogContainers.ContainsKey(eventLogName))
                     {
-                        // Specifying machine name remaps a local path to a network share path format in 
-                        // System.Diagnostics.EventLogInternal.FormatMessageWrapper for the parameter passed to LoadLibraryEx().
-                        // In ARM machines, the network restrictions causes the access to the path to be blocked and  
-                        // fails after a delay of 8-9 seconds. This causes perf issues in the CreateBug scenario for Image ActionLog.
-                        EventLog eventLog = new EventLog(eventLogName);
-
-                        int currentCount = eventLog.Entries.Count;
-                        int nextEntryIndexToCollect =
-                            (currentCount == 0) ? 0 : eventLog.Entries[currentCount - 1].Index + 1;
-                        EventLogContainer eventLogContainer =
-                            new EventLogContainer(eventLog, nextEntryIndexToCollect, this, eventLogContext);
-
-                        eventLog.EntryWritten += new EntryWrittenEventHandler(eventLogContainer.OnEventLogEntryWritten);
-                        eventLog.EnableRaisingEvents = true;
-
+                        var eventLogContainer = this.CreateEventLogContainer(eventLogName, eventLogContext);
                         eventLogContext.EventLogContainers.Add(eventLogName, eventLogContainer);
                         EqtTrace.Verbose(
                             string.Format(
@@ -432,6 +427,21 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
+        internal virtual IEventLogContainer CreateEventLogContainer(string eventLogName, EventLogCollectorContextData eventLogContext)
+        {
+            EventLog eventLog = new EventLog(eventLogName);
+
+            int currentCount = eventLog.Entries.Count;
+            int nextEntryIndexToCollect =
+                (currentCount == 0) ? 0 : eventLog.Entries[currentCount - 1].Index + 1;
+            EventLogContainer eventLogContainer =
+                new EventLogContainer(eventLog, nextEntryIndexToCollect, this, eventLogContext);
+
+            eventLog.EntryWritten += eventLogContainer.OnEventLogEntryWritten;
+            eventLog.EnableRaisingEvents = true;
+            return eventLogContainer;
+        }
+
         private void WriteCollectedEventLogEntries(
             DataCollectionContext dataCollectionContext,
             bool terminateCollectionForContext,
@@ -443,12 +453,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             if (terminateCollectionForContext)
             {
-                foreach (EventLogContainer eventLogContainer in eventLogContext.EventLogContainers.Values)
+                foreach (IEventLogContainer eventLogContainer in eventLogContext.EventLogContainers.Values)
                 {
                     try
                     {
-                        eventLogContainer.EventLog.EntryWritten -=
-                            new EntryWrittenEventHandler(eventLogContainer.OnEventLogEntryWritten);
+                        eventLogContainer.EventLog.EntryWritten -= eventLogContainer.OnEventLogEntryWritten;
                         eventLogContainer.EventLog.EnableRaisingEvents = false;
                         eventLogContainer.OnEventLogEntryWritten(eventLogContainer.EventLog, null);
                         eventLogContainer.EventLog.Dispose();

@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     {
         private bool limitReached;
 
-        private Dictionary<string, EventLogContainer> eventLogContainers;
+        private Dictionary<string, IEventLogContainer> eventLogContainers;
 
         private List<EventLogEntry> eventLogEntries;
 
@@ -24,7 +24,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        public Dictionary<string, EventLogContainer> EventLogContainers
+        public Dictionary<string, IEventLogContainer> EventLogContainers
         {
             get
             {
@@ -51,7 +51,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         public EventLogCollectorContextData(int maxLogEntries)
         {
             this.maxLogEntries = maxLogEntries;
-            this.eventLogContainers = new Dictionary<string, EventLogContainer>();
+            this.eventLogContainers = new Dictionary<string, IEventLogContainer>();
             this.eventLogEntries = new List<EventLogEntry>();
         }
 

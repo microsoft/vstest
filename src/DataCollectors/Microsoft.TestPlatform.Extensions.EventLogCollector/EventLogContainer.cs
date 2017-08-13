@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     using MSResources = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
 
 
-    internal class EventLogContainer
+    internal class EventLogContainer : IEventLogContainer
     {
         public EventLog EventLog { get; set; }
 
