@@ -69,7 +69,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
                 hostManager?.Initialize(TestSessionMessageLogger.Instance, discoveryCriteria.RunSettings);
 
-                return new ProxyDiscoveryManager(new TestRequestSender(protocolConfig), hostManager);
+                return new ProxyDiscoveryManager(new TestRequestSender(protocolConfig, hostManager.GetTestHostConnectionInfo()), hostManager);
             };
 
             return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
@@ -108,7 +108,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                     hostManager.SetCustomLauncher(testRunCriteria.TestHostLauncher);
                 }
 
-                var requestSender = new TestRequestSender(config);
+                var requestSender = new TestRequestSender(config, hostManager.GetTestHostConnectionInfo());
 
                 return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestSender, hostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
                                                 : new ProxyExecutionManager(requestSender, hostManager);

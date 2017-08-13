@@ -140,7 +140,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
             this.exceptionLogger = exceptionLogger;
 
             // Setup the background thread to process the jobs.
-            this.backgroundJobProcessor = Task.Run(() => this.BackgroundJobProcessor());
+            this.backgroundJobProcessor = new Task(() => this.BackgroundJobProcessor(), TaskCreationOptions.LongRunning);
+            this.backgroundJobProcessor.Start();
         }
 
         #endregion

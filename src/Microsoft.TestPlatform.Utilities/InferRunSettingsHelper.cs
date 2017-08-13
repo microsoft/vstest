@@ -4,7 +4,9 @@
 namespace Microsoft.VisualStudio.TestPlatform.Utilities
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Xml;
     using System.Xml.XPath;
 
@@ -32,6 +34,90 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
         private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
         private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
+
+
+        /// <summary>
+        /// Make runsettings compatible with testhost of version 15.0.0-preview
+        /// Due to bug https://github.com/Microsoft/vstest/issues/970 we need this function
+        /// </summary>
+        /// <param name="runsettingsXml">string content of runsettings </param>
+        /// <returns>compatible runsettings</returns>
+        public static string MakeRunsettingsCompatible(string runsettingsXml)
+        {
+            var updatedRunSettingsXml = runsettingsXml;
+
+            if (!string.IsNullOrWhiteSpace(runsettingsXml))
+            {
+                using (var stream = new StringReader(runsettingsXml))
+                using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
+                {
+                    var document = new XmlDocument();
+                    document.Load(reader);
+
+                    var runSettingsNavigator = document.CreateNavigator();
+
+                    // Move navigator to RunConfiguration node
+                    if (!runSettingsNavigator.MoveToChild(RunSettingsNodeName, string.Empty) ||
+                        !runSettingsNavigator.MoveToChild(RunConfigurationNodeName, string.Empty))
+                    {
+                        EqtTrace.Error("InferRunSettingsHelper.MakeRunsettingsCompatible: Unable to navigate to RunConfiguration. Current node: " + runSettingsNavigator.LocalName);
+                    }
+                    else if(runSettingsNavigator.HasChildren)
+                    {
+                        var listOfInValidRunConfigurationSettings = new List<string>();
+
+                        // These are the list of valid RunConfiguration setting name which old testhost understand.
+                        var listOfValidRunConfigurationSettings = new HashSet<string>
+                        {
+                            "TargetPlatform",
+                            "TargetFrameworkVersion",
+                            "TestAdaptersPaths",
+                            "ResultsDirectory",
+                            "SolutionDirectory",
+                            "MaxCpuCount",
+                            "DisableParallelization",
+                            "DisableAppDomain"
+                        };
+
+                        // Find all invalid RunConfiguration Settings 
+                        runSettingsNavigator.MoveToFirstChild();
+                        do
+                        {
+                            if(!listOfValidRunConfigurationSettings.Contains(runSettingsNavigator.LocalName))
+                            {
+                                listOfInValidRunConfigurationSettings.Add(runSettingsNavigator.LocalName);
+                            }
+
+                        } while (runSettingsNavigator.MoveToNext());
+
+                        // Delete all invalid RunConfiguration Settings
+                        if (listOfInValidRunConfigurationSettings.Count > 0)
+                        {
+                            if(EqtTrace.IsWarningEnabled)
+                            {
+                                string settingsName = string.Join(", ", listOfInValidRunConfigurationSettings);
+                                EqtTrace.Warning(string.Format("InferRunSettingsHelper.MakeRunsettingsCompatible: Removing the following settings: {0} from RunSettings file. To use those settings please move to latest version of Microsoft.NET.Test.Sdk", settingsName));
+                            }
+
+                            // move navigator to RunConfiguration node
+                            runSettingsNavigator.MoveToParent();
+
+                            foreach(var s in listOfInValidRunConfigurationSettings)
+                            {
+                                var nodePath = RunConfigurationNodePath + "/" + s;
+                                XmlUtilities.RemoveChildNode(runSettingsNavigator, nodePath, s);
+                            }
+
+                            runSettingsNavigator.MoveToRoot();
+                            updatedRunSettingsXml = runSettingsNavigator.OuterXml;
+                        }
+                    }
+                }
+            }
+
+            return updatedRunSettingsXml;
+        }
+
 
         /// <summary>
         /// Updates the run settings XML with the specified values.
@@ -89,7 +175,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Utilities
         /// <param name="designModeValue">Value to set</param>
         public static void UpdateDesignMode(XPathNavigator runSettingsNavigator, bool designModeValue)
         {
-            AddNodeIfNotPresent<bool>(runSettingsNavigator, DesignModeNodePath, DesignModeNodeName, designModeValue);            
+            AddNodeIfNotPresent<bool>(runSettingsNavigator, DesignModeNodePath, DesignModeNodeName, designModeValue);
         }
 
         /// <summary>

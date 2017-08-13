@@ -176,12 +176,12 @@ namespace Microsoft.TestPlatform.TestUtilities
 
         public void StdOutputContains(string substring)
         {
-            Assert.IsTrue(this.standardTestOutput.Contains(substring));
+            Assert.IsTrue(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
         }
 
         public void StdOutputDoesNotContains(string substring)
         {
-            Assert.IsFalse(this.standardTestOutput.Contains(substring));
+            Assert.IsFalse(this.standardTestOutput.Contains(substring), $"StdOutout:{Environment.NewLine} Not expected substring: {substring}{Environment.NewLine}Acutal string: {this.standardTestOutput}");
         }
 
         /// <summary>

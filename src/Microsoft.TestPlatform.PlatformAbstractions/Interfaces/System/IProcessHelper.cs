@@ -42,6 +42,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         int GetCurrentProcessId();
 
         /// <summary>
+        /// Gets the process id of input process.
+        /// </summary>
+        /// <param name="process">process parameter</param>
+        /// <returns>process id.</returns>
+        int GetProcessId(object process);
+
+        /// <summary>
         /// Gets the process name for given process id.
         /// </summary>
         /// <param name="processId">process id</param>

@@ -18,8 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces
         /// <summary>
         /// Setups client based on port
         /// </summary>
-        /// <param name="port">port number to connect</param>
-        void InitializeCommunication(int port);
+        void InitializeCommunication();
 
         /// <summary>
         /// Waits for Request Handler to connect to Request Sender

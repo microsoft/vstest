@@ -31,11 +31,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private const string ListenerName = "TptTraceListener";
 
         /// <summary>
-        /// Use a custom trace source. This doesn't pollute the default tracing for user applications.
-        /// </summary>
-        private static readonly TraceSource Source = new TraceSource("TpTrace", SourceLevels.Off);
-
-        /// <summary>
         /// Create static maps for TraceLevel to SourceLevels. The APIs need to provide TraceLevel
         /// for backward compatibility with older versions of Object Model.
         /// </summary>
@@ -82,6 +77,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private static readonly string ProcessName = GetProcessName();
 
         private static readonly int ProcessId = GetProcessId();
+
+        private static object lockObject = new object();
+
+        private static TraceSource traceSource;
 
         /// <summary>
         /// Specifies whether the trace is initialized or not
@@ -131,6 +130,35 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             set;
         }
 
+        // This is added to ensure that traceSource should not be instantiated in when creating appdomains if EqtTrace is not enabled.
+        internal static bool DoNotInitialize
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets a custom trace source. This doesn't pollute the default tracing for user applications.
+        /// </summary>
+        private static TraceSource Source
+        {
+            get
+            {
+                if (traceSource == null)
+                {
+                    lock (lockObject)
+                    {
+                        if (traceSource == null)
+                        {
+                            traceSource = new TraceSource("TpTrace", SourceLevels.Off);
+                        }
+                    }
+                }
+
+                return traceSource;
+            }
+        }
+
         /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
@@ -147,6 +175,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
+            if (DoNotInitialize)
+            {
+                return false;
+            }
+
             switch (traceLevel)
             {
                 case PlatformTraceLevel.Off:

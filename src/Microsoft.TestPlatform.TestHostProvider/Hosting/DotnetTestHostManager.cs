@@ -11,6 +11,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.Extensions.DependencyModel;
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.TestPlatform.TestHostProvider.Resources;
@@ -27,6 +28,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -108,6 +110,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         internal virtual bool IsVersionCheckRequired => !this.hostPackageVersion.StartsWith("15.0.0");
 
         /// <summary>
+        /// Gets a value indicating whether the test host supports protocol version check
+        /// </summary>
+        internal bool MakeRunsettingsCompatible => this.hostPackageVersion.StartsWith("15.0.0-preview");
+
+        /// <summary>
         /// Gets or sets the error length for runtime error stream.
         /// </summary>
         protected int ErrorLength { get; set; } = 4096;
@@ -139,6 +146,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public void SetCustomLauncher(ITestHostLauncher customLauncher)
         {
             this.testHostLauncher = customLauncher;
+        }
+
+        /// <inheritdoc/>
+        public TestHostConnectionInfo GetTestHostConnectionInfo()
+        {
+            return new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
         }
 
         /// <inheritdoc/>
@@ -248,6 +261,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             }
 
             return Enumerable.Empty<string>();
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
+        {
+            // We do not have scenario where netcore tests are deployed to remote machine, so no need to udpate sources
+            return sources;
         }
 
         /// <inheritdoc/>

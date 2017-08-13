@@ -12,6 +12,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Microsoft.TestPlatform.TestHostProvider.Hosting;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
@@ -114,6 +115,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
+        public TestHostConnectionInfo GetTestHostConnectionInfo()
+        {
+            return new TestHostConnectionInfo { Endpoint = "127.0.0.1:0", Role = ConnectionRole.Client, Transport = Transport.Sockets };
+        }
+
+        /// <inheritdoc/>
         public async Task<bool> LaunchTestHostAsync(TestProcessStartInfo testHostStartInfo, CancellationToken cancellationToken)
         {
             return await Task.Run(() => this.LaunchHost(testHostStartInfo, cancellationToken), cancellationToken);
@@ -170,6 +177,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
         {
             return extensions;
+        }
+
+        /// <inheritdoc/>
+        public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
+        {
+            // We do not have scenario where full CLR tests are deployed to remote machine, so no need to udpate sources
+            return sources;
         }
 
         /// <inheritdoc/>

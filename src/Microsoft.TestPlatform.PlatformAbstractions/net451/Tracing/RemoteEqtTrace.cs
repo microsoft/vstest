@@ -29,6 +29,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
+        /// This is added to ensure that traceSource should not be instantiated in when creating appdomains if EqtTrace is not enabled.
+        /// </summary>
+        internal bool DoNotInitialize
+        {
+            set
+            {
+                PlatformEqtTrace.DoNotInitialize = value;
+            }
+        }
+
+        /// <summary>
         /// Register listeners from parent domain in current domain.
         /// </summary>
         /// <param name="listener">Trace listener instance.</param>

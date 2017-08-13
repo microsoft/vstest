@@ -7,6 +7,9 @@ namespace SampleUnitTestProject3
     using System.IO;
     using System.Reflection;
     using System.Threading;
+#if NET451
+    using System.Windows.Forms;
+#endif
 
     [TestClass]
     public class UnitTest1
@@ -31,5 +34,20 @@ namespace SampleUnitTestProject3
         {
             ExitWithStackoverFlow();
         }
+
+#if NET451
+        [TestMethod]
+        public void UITestMethod()
+        {
+            Clipboard.SetText("Clipboard");
+        }
+
+        [TestMethod]
+        public void UITestWithSleep1()
+        {
+            Clipboard.SetText("Clipboard");
+            Thread.Sleep(1000 * 3);
+        }
+#endif
     }
 }

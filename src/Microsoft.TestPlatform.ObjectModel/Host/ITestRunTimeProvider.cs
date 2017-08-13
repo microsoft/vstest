@@ -63,6 +63,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         void SetCustomLauncher(ITestHostLauncher customLauncher);
 
         /// <summary>
+        /// Gets the end point address and behaviour of TestRuntime
+        /// E.g. for phone device EndPoint:127.0.0.1:8080, ConnectionRole Host, TransportProtocol: Sockets
+        /// </summary>
+        /// <returns> Socket where the service is hosted by TestRuntime</returns>
+        TestHostConnectionInfo GetTestHostConnectionInfo();
+
+        /// <summary>
         /// Launches the test host for discovery/execution.
         /// </summary>
         /// <param name="testHostStartInfo">Start parameters for the test host.</param>
@@ -90,6 +97,15 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions);
 
         /// <summary>
+        /// Gets path of test sources, based on RuntimeProvider, and where the test is actually deployed(Remote Scenario).
+        /// A test host manager may choose to accept input source as XML file, and provide appropriate source(dll/exe) which the adapters can actually consume
+        /// E.g. for UWP, input source could be "appxrecipe" file, which gives information about actual source exe.
+        /// </summary>
+        /// <param name="sources">List of test sources.</param>
+        /// <returns>Updated List of test sources based on remote/local scenario.</returns>
+        IEnumerable<string> GetTestSources(IEnumerable<string> sources);
+
+        /// <summary>
         /// Cleanup the test host process and it's dependencies.
         /// </summary>
         /// <param name="cancellationToken">
@@ -99,39 +115,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Host
         /// The <see cref="Task"/>.
         /// </returns>
         Task CleanTestHostAsync(CancellationToken cancellationToken);
-    }
-
-    /// <summary>
-    /// Connection information for a test host to communicate with test runner.
-    /// </summary>
-    public struct TestRunnerConnectionInfo
-    {
-        /// <summary>
-        /// Gets or sets the port opened by test runner for host communication.
-        /// </summary>
-        public int Port
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the diagnostics log file.
-        /// </summary>
-        public string LogFile
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the runner process id.
-        /// </summary>
-        public int RunnerProcessId
-        {
-            get;
-            set;
-        }
     }
 
     public class HostProviderEventArgs : EventArgs

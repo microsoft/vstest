@@ -83,13 +83,28 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         [TestMethod]
         public void GetTestHostProcessStartInfoShouldIncludeConnectionInfo()
         {
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
             var info = this.testHostManager.GetTestHostProcessStartInfo(
                 Enumerable.Empty<string>(),
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101", info.Arguments);
+            Assert.AreEqual(" --port 123 --endpoint 127.0.0.0:123 --role client --parentprocessid 101", info.Arguments);
+        }
+
+        [TestMethod]
+        public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
+        {
+            var connectionInfo = new TestHostConnectionInfo
+                                     {
+                                         Endpoint = "127.0.0.1:0",
+                                         Role = ConnectionRole.Client,
+                                         Transport = Transport.Sockets
+                                     };
+
+            var info = this.testHostManager.GetTestHostConnectionInfo();
+
+            Assert.AreEqual(connectionInfo, info);
         }
 
         [TestMethod]
@@ -118,7 +133,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostProcessStartInfoShouldIncludeTestSourcePathInArgumentsIfNonShared()
         {
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X86}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{true}</DisableAppDomain> </RunConfiguration> </RunSettings>");
-            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, RunnerProcessId = 101 };
+            var connectionInfo = new TestRunnerConnectionInfo { Port = 123, ConnectionInfo = new TestHostConnectionInfo { Endpoint = "127.0.0.0:123", Role = ConnectionRole.Client, Transport = Transport.Sockets }, RunnerProcessId = 101 };
             var source = "C:\temp\a.dll";
 
             var info = this.testHostManager.GetTestHostProcessStartInfo(
@@ -126,7 +141,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 null,
                 connectionInfo);
 
-            Assert.AreEqual(" --port 123 --parentprocessid 101 --testsourcepath " + source.AddDoubleQuote(), info.Arguments);
+            Assert.AreEqual(" --port 123 --endpoint 127.0.0.0:123 --role client --parentprocessid 101 --testsourcepath " + source.AddDoubleQuote(), info.Arguments);
         }
 
         [TestMethod]
