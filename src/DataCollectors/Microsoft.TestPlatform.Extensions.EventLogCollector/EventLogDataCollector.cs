@@ -6,15 +6,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
-    using System.Runtime.Serialization;
     using System.Xml;
 
-    using MSResources = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
+
+    using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
 
     /// <summary>
     /// A data collector that collects event log data
@@ -40,26 +39,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         private static string eventLogFileName = "Event Log";
 
         /// <summary>
-        /// The event log directories.
-        /// </summary>
-        private List<string> eventLogDirectories;
-
-        /// <summary>
-        /// Object containing the execution events the data collector registers for
-        /// </summary>
-        private DataCollectionEvents events;
-
-        /// <summary>
-        /// The sink used by the data collector to send its data
-        /// </summary>
-        private DataCollectionSink dataSink;
-
-        /// <summary>
-        /// Used by the data collector to send warnings, errors, or other messages
-        /// </summary>
-        private DataCollectionLogger logger;
-
-        /// <summary>
         /// Event handler delegate for the SessionStart event
         /// </summary>
         private readonly EventHandler<SessionStartEventArgs> sessionStartEventHandler;
@@ -78,6 +57,26 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// Event handler delegate for the TestCaseEnd event
         /// </summary>
         private readonly EventHandler<TestCaseEndEventArgs> testCaseEndEventHandler;
+
+        /// <summary>
+        /// The event log directories.
+        /// </summary>
+        private readonly List<string> eventLogDirectories;
+
+        /// <summary>
+        /// Object containing the execution events the data collector registers for
+        /// </summary>
+        private DataCollectionEvents events;
+
+        /// <summary>
+        /// The sink used by the data collector to send its data
+        /// </summary>
+        private DataCollectionSink dataSink;
+
+        /// <summary>
+        /// Used by the data collector to send warnings, errors, or other messages
+        /// </summary>
+        private DataCollectionLogger logger;
 
         private List<string> eventLogNames;
 
@@ -104,7 +103,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.testCaseStartEventHandler = new EventHandler<TestCaseStartEventArgs>(this.OnTestCaseStart);
             this.testCaseEndEventHandler = new EventHandler<TestCaseEndEventArgs>(this.OnTestCaseEnd);
 
-            // todo: dataRequestEventHandler = new EventHandler<DataRequestEventArgs>(OnDataRequest);
             this.eventLogDirectories = new List<string>();
         }
 
@@ -264,10 +262,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void OnSessionStart(object sender, SessionStartEventArgs e)
         {
-            if (e == null || e.Context == null)
-            {
-                throw new ArgumentNullException("e");
-            }
+            ValidateArg.NotNull(e, "SessionStartEventArgs");
+            ValidateArg.NotNull(e.Context, "SessionStartEventArgs.Context");
 
             if (EqtTrace.IsVerboseEnabled)
             {
@@ -279,49 +275,50 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private void OnSessionEnd(object sender, SessionEndEventArgs e)
         {
-            if (e == null || e.Context == null)
+            ValidateArg.NotNull(e, "SessionEndEventArgs");
+            ValidateArg.NotNull(e.Context, "SessionEndEventArgs.Context");
+
+            if (EqtTrace.IsVerboseEnabled)
             {
-                throw new ArgumentNullException("e");
+                EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
             }
 
-            EqtTrace.Verbose("EventLogDataCollector: SessionEnd received");
             this.WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.Now);
         }
 
         private void OnTestCaseStart(object sender, TestCaseStartEventArgs e)
         {
-            if (e == null || e.Context == null)
-            {
-                throw new ArgumentNullException("e");
-            }
+            ValidateArg.NotNull(e, "TestCaseStartEventArgs");
+            ValidateArg.NotNull(e.Context, "TestCaseStartEventArgs.Context");
 
             if (!e.Context.HasTestCase)
             {
                 Debug.Fail("Context is not for a test case");
-                throw new ArgumentNullException("e");
+                throw new ArgumentNullException("TestCaseStartEventArgs.Context.HasTestCase");
             }
 
-            EqtTrace.Verbose(
-                "EventLogDataCollector: TestCaseStart received for test '{1}'.",
-                e.TestCaseName);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("EventLogDataCollector: TestCaseStart received for test '{1}'.", e.TestCaseName);
+            }
 
             this.StartCollectionForContext(e.Context, false);
         }
 
         private void OnTestCaseEnd(object sender, TestCaseEndEventArgs e)
         {
-            if (e == null)
-            {
-                throw new ArgumentNullException("e");
-            }
+            ValidateArg.NotNull(e, "TestCaseEndEventArgs");
 
             Debug.Assert(e.Context != null, "Context is null");
             Debug.Assert(e.Context.HasTestCase, "Context is not for a test case");
 
-            EqtTrace.Verbose(
-                "EventLogDataCollector: TestCaseEnd received for test '{1}' with Test Outcome: {2}.",
-                e.TestCaseName,
-                e.TestOutcome);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "EventLogDataCollector: TestCaseEnd received for test '{1}' with Test Outcome: {2}.",
+                    e.TestCaseName,
+                    e.TestOutcome);
+            }
 
             this.WriteCollectedEventLogEntries(e.Context, true, TimeSpan.MaxValue, DateTime.Now);
         }
@@ -329,6 +326,33 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         #endregion
 
         #region Private methods
+
+        private static List<string> ParseCommaSeparatedList(string commaSeparatedList)
+        {
+            List<string> strings = new List<string>();
+            string[] items = commaSeparatedList.Split(new char[] { ',' });
+            foreach (string item in items)
+            {
+                strings.Add(item.Trim());
+            }
+
+            return strings;
+        }
+
+        internal virtual IEventLogContainer CreateEventLogContainer(string eventLogName, EventLogCollectorContextData eventLogContext)
+        {
+            EventLog eventLog = new EventLog(eventLogName);
+
+            int currentCount = eventLog.Entries.Count;
+            int nextEntryIndexToCollect =
+                (currentCount == 0) ? 0 : eventLog.Entries[currentCount - 1].Index + 1;
+            EventLogContainer eventLogContainer =
+                new EventLogContainer(eventLog, nextEntryIndexToCollect, this, eventLogContext);
+
+            eventLog.EntryWritten += eventLogContainer.OnEventLogEntryWritten;
+            eventLog.EnableRaisingEvents = true;
+            return eventLogContainer;
+        }
 
         private void RemoveTempEventLogDirs(List<string> tempDirs)
         {
@@ -363,18 +387,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     dirPath,
                     ex);
             }
-        }
-
-        private static List<string> ParseCommaSeparatedList(string commaSeparatedList)
-        {
-            List<string> strings = new List<string>();
-            string[] items = commaSeparatedList.Split(new char[] { ',' });
-            foreach (string item in items)
-            {
-                strings.Add(item.Trim());
-            }
-
-            return strings;
         }
 
         private void StartCollectionForContext(DataCollectionContext dataCollectionContext, bool isSessionContext)
@@ -427,21 +439,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             }
         }
 
-        internal virtual IEventLogContainer CreateEventLogContainer(string eventLogName, EventLogCollectorContextData eventLogContext)
-        {
-            EventLog eventLog = new EventLog(eventLogName);
-
-            int currentCount = eventLog.Entries.Count;
-            int nextEntryIndexToCollect =
-                (currentCount == 0) ? 0 : eventLog.Entries[currentCount - 1].Index + 1;
-            EventLogContainer eventLogContainer =
-                new EventLogContainer(eventLog, nextEntryIndexToCollect, this, eventLogContext);
-
-            eventLog.EntryWritten += eventLogContainer.OnEventLogEntryWritten;
-            eventLog.EnableRaisingEvents = true;
-            return eventLogContainer;
-        }
-
         private void WriteCollectedEventLogEntries(
             DataCollectionContext dataCollectionContext,
             bool terminateCollectionForContext,
@@ -468,7 +465,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                             dataCollectionContext,
                             string.Format(
                                 CultureInfo.InvariantCulture,
-                                MSResources.Execution_Agent_DataCollectors_EventLog_CleanupException,
+                                Resource.Execution_Agent_DataCollectors_EventLog_CleanupException,
                                 eventLogContainer.EventLog,
                                 e.ToString()));
                     }
@@ -479,7 +476,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             string eventLogDirName = string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
-                MSResources.Execution_Agent_DataCollectors_EventLog_FriendlyName,
+                Resource.Execution_Agent_DataCollectors_EventLog_FriendlyName,
                 Environment.MachineName,
                 DateTime.Now);
 
@@ -574,7 +571,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 string msg = string.Format(
                     CultureInfo.InvariantCulture,
-                    MSResources.Execution_Agent_DataCollectors_EventLog_ContextNotFoundException,
+                    Resource.Execution_Agent_DataCollectors_EventLog_ContextNotFoundException,
                     dataCollectionContext.ToString());
                 throw new EventLogCollectorException(msg, null);
             }
@@ -591,22 +588,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             get
             {
                 return eventLogFileName;
-            }
-        }
-
-        internal static string FriendlyName
-        {
-            get
-            {
-                return MSResources.Execution_Agent_DataCollectors_EventLog_FriendlyName;
-            }
-        }
-
-        internal static string Uri
-        {
-            get
-            {
-                return DEFAULT_URI;
             }
         }
 

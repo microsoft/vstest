@@ -6,6 +6,9 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     using System.Collections.Generic;
     using System.Diagnostics;
 
+    /// <summary>
+    /// The event log collector context data.
+    /// </summary>
     internal class EventLogCollectorContextData
     {
         private bool limitReached;
@@ -16,38 +19,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
         private int maxLogEntries;
 
-        public bool ProcessEvents
-        {
-            get
-            {
-                return !this.limitReached;
-            }
-        }
-
-        public Dictionary<string, IEventLogContainer> EventLogContainers
-        {
-            get
-            {
-                return this.eventLogContainers;
-            }
-        }
-
-        public List<EventLogEntry> EventLogEntries
-        {
-            get
-            {
-                return this.eventLogEntries;
-            }
-        }
-
-        public int MaxLogEntries
-        {
-            get
-            {
-                return this.maxLogEntries;
-            }
-        }
-
         public EventLogCollectorContextData(int maxLogEntries)
         {
             this.maxLogEntries = maxLogEntries;
@@ -55,17 +26,34 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.eventLogEntries = new List<EventLogEntry>();
         }
 
+        /// <summary>
+        /// Gets a value indicating whether to process events or not.
+        /// </summary>
+        public bool ProcessEvents => !this.limitReached;
+
+        /// <summary>
+        /// Gets the event log containers.
+        /// </summary>
+        public Dictionary<string, IEventLogContainer> EventLogContainers => this.eventLogContainers;
+
+        /// <summary>
+        /// Gets the event log entries.
+        /// </summary>
+        public List<EventLogEntry> EventLogEntries => this.eventLogEntries;
+
+        /// <summary>
+        /// Gets the max log entries.
+        /// </summary>
+        public int MaxLogEntries => this.maxLogEntries;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether limit reached.
+        /// </summary>
         internal bool LimitReached
         {
-            get
-            {
-                return this.limitReached;
-            }
+            get => this.limitReached;
 
-            set
-            {
-                this.limitReached = value;
-            }
+            set => this.limitReached = value;
         }
     }
 }

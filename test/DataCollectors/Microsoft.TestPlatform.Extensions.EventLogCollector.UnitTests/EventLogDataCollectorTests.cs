@@ -41,7 +41,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
             this.eventLogDataCollector = new EventLogDataCollector();
         }
 
-
         [TestMethod]
         public void InitializeShouldThrowExceptionIfEventsIsNull()
         {
@@ -226,24 +225,76 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
         [TestMethod]
         public void TestCaseStartEventShouldCreateEventLogContainer()
         {
-            System.Diagnostics.Debugger.Launch();
             var testableEventLogDataCollector = new TestableEventLogDataCollector();
             testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink.Object, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(
-                new DataCollectionContext(new TestCase()),
+                new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid())),
                 new TestCase()));
             Assert.IsTrue(testableEventLogDataCollector.isCreateEventLogContainerInvoked);
         }
 
         [TestMethod]
-        public void TestCaseventShouldLogExceptionIfThrownByCreateEventLogContainer()
+        public void TestCaseStartEventShouldLogExceptionIfThrownByCreateEventLogContainer()
         {
             var testableEventLogDataCollector = new TestableEventLogDataCollector();
             testableEventLogDataCollector.throwException = true;
             testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink.Object, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
             var testcase = new TestCase() { Id = Guid.NewGuid() };
-            var context = new DataCollectionContext(testcase);
+            var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
             this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, testcase));
+            Assert.IsTrue(testableEventLogDataCollector.isCreateEventLogContainerInvoked);
+            this.mockDataCollectionLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>(), It.IsAny<Exception>()), Times.AtLeastOnce);
+        }
+
+        [TestMethod]
+        public void TestCaseEndEventShouldCreateEventLogContainer()
+        {
+            var testableEventLogDataCollector = new TestableEventLogDataCollector();
+            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink.Object, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var tc = new TestCase();
+            var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
+            this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
+            this.mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
+            Assert.IsTrue(testableEventLogDataCollector.isCreateEventLogContainerInvoked);
+        }
+
+        public void TestCaseEndEventShouldInvokeSendFileAsync()
+        {
+            System.Diagnostics.Debugger.Launch();
+            var testableEventLogDataCollector = new TestableEventLogDataCollector();
+            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink.Object, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var tc = new TestCase();
+            var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
+            this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, tc));
+            this.mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
+
+            this.mockDataCollectionSink.Verify(x => x.SendFileAsync(It.IsAny<DataCollectionContext>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void TestCaseEndEventShouldThrowIfTestCaseStartIsNotInvoked()
+        {
+            var testableEventLogDataCollector = new TestableEventLogDataCollector();
+            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink.Object, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var tc = new TestCase();
+            var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
+
+            Assert.ThrowsException<EventLogCollectorException>(() =>
+            {
+                this.mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, tc, TestOutcome.Passed));
+            });
+        }
+
+        [TestMethod]
+        public void TestCaseEndEventShouldLogExceptionIfThrownByCreateEventLogContainer()
+        {
+            var testableEventLogDataCollector = new TestableEventLogDataCollector();
+            testableEventLogDataCollector.throwException = true;
+            testableEventLogDataCollector.Initialize(null, this.mockDataCollectionEvents.Object, this.mockDataCollectionSink.Object, this.mockDataCollectionLogger.Object, this.dataCollectionEnvironmentContext);
+            var testcase = new TestCase() { Id = Guid.NewGuid() };
+            var context = new DataCollectionContext(new SessionId(Guid.NewGuid()), new TestExecId(Guid.NewGuid()));
+            this.mockDataCollectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(context, testcase));
+            this.mockDataCollectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(context, testcase, TestOutcome.Passed));
             Assert.IsTrue(testableEventLogDataCollector.isCreateEventLogContainerInvoked);
             this.mockDataCollectionLogger.Verify(x => x.LogError(It.IsAny<DataCollectionContext>(), It.IsAny<string>(), It.IsAny<Exception>()), Times.AtLeastOnce);
         }

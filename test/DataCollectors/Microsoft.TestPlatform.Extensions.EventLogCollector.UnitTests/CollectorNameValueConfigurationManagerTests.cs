@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
-    public class CollectionNameValueConfigurationManagerTests
+    public class CollectorNameValueConfigurationManagerTests
     {
         private const string ConfigurationString =
             @"<Configuration><Setting name=""key"" value=""value"" /></Configuration>";

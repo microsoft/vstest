@@ -9,7 +9,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     /// <summary>
     /// Private Exception class used for event log exceptions
     /// </summary>
-    [Serializable]
     internal class EventLogCollectorException : Exception
     {
         /// <summary>
