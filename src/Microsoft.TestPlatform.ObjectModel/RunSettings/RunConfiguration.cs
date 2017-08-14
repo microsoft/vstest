@@ -305,6 +305,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets the execution thread apartment state.
         /// </summary>
+        [CLSCompliant(false)]
         public PlatformApartmentState ExecutionThreadApartmentState
         {
             get;
