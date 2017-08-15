@@ -149,6 +149,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
+            string invalidAdapterPathArgument = argument;
+
             if (string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
@@ -181,6 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
                         if (!this.fileHelper.DirectoryExists(testAdapterFullPath))
                         {
+                            invalidAdapterPathArgument = testadapterPath;
                             throw new DirectoryNotFoundException(CommandLineResources.TestAdapterPathDoesNotExist);
                         }
 
@@ -197,7 +200,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             catch (Exception e)
             {
                 throw new CommandLineException(
-                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, argument, e.Message));
+                    string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestAdapterPathCommand, invalidAdapterPathArgument, e.Message));
             }
 
             this.commandLineOptions.TestAdapterPath = customAdaptersPath;
