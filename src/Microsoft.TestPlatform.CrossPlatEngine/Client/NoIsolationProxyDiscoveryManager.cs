@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using System.Threading.Tasks;
 
     class NoIsolationProxyDiscoveryManager : IProxyDiscoveryManager
     {
@@ -48,8 +49,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             var discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
 
             // Initialize extension before discovery
-            discoveryManager.Initialize(Enumerable.Empty<string>());
-            discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
+            Task.Run(() =>
+            {
+                discoveryManager.Initialize(Enumerable.Empty<string>());
+                discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
+            }
+            );
         }
 
         /// <summary>
@@ -65,7 +70,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Abort()
         {
-            this.testHostManagerFactory.GetDiscoveryManager().Abort();
+            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort());
         }
     }
 }

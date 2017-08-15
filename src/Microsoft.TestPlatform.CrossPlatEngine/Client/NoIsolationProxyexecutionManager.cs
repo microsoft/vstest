@@ -8,6 +8,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using System.Threading.Tasks;
 
     class NoIsolationProxyexecutionManager : IProxyExecutionManager
     {
@@ -58,12 +59,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             if (testRunCriteria.HasSpecificSources)
             {
                 // [TODO]: we need to revisit to second-last argument if we will enable datacollector. 
-                executionManager.StartTestRun(testRunCriteria.AdapterSourceMap, testRunCriteria.TestRunSettings, executionContext, null, eventHandler);
+                Task.Run(() => executionManager.StartTestRun(testRunCriteria.AdapterSourceMap, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
             }
             else
             {
                 // [TODO]: we need to revisit to second-last argument if we will enable datacollector. 
-                executionManager.StartTestRun(testRunCriteria.Tests, testRunCriteria.TestRunSettings, executionContext, null, eventHandler);
+                Task.Run(() => executionManager.StartTestRun(testRunCriteria.Tests, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
             }
 
             return 0;
@@ -74,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Abort()
         {
-            this.testHostManagerFactory.GetExecutionManager().Abort();
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Abort());
         }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Cancel()
         {
-            this.testHostManagerFactory.GetExecutionManager().Cancel();
+            Task.Run(() => this.testHostManagerFactory.GetExecutionManager().Cancel());
         }
 
         /// <summary>
