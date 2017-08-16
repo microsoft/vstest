@@ -73,6 +73,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
+        public void StartTestRunShouldAllowRuntimeProviderToUpdateAdapterSource()
+        {
+            // Make sure TestPlugincache is refreshed.
+            TestPluginCache.Instance = null;
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(this.mockTestRunCriteria.Object.Sources)).Returns(this.mockTestRunCriteria.Object.Sources);
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            Mock<ITestRunEventsHandler> mockTestRunEventsHandler = new Mock<ITestRunEventsHandler>();
+
+            this.testExecutionManager.StartTestRun(this.mockTestRunCriteria.Object, mockTestRunEventsHandler.Object);
+
+            this.mockTestHostManager.Verify(hm => hm.GetTestSources(this.mockTestRunCriteria.Object.Sources), Times.Once);
+        }
+
+        [TestMethod]
         public void StartTestRunShouldNotInitializeExtensionsOnCommunicationFailure()
         {
             // Make sure TestPlugincache is refreshed.

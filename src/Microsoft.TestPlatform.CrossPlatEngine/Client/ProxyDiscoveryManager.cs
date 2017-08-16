@@ -94,6 +94,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
+
+                    // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
+                    // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
+                    this.UpdateTestSources(discoveryCriteria.Sources, discoveryCriteria.AdapterSourceMap);
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }
             }

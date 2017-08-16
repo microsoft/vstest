@@ -66,7 +66,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
             ConnectionRole connectionRole = ConnectionRole.Client;
             string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
-            if (string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
             {
                 connectionRole = ConnectionRole.Host;
             }

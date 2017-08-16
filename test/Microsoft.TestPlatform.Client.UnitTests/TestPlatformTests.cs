@@ -61,31 +61,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
         }
 
         [TestMethod]
-        public void CreateDiscoveryRequestShouldAllowRuntimeProviderToUpdateAdapterSource()
-        {
-            var updatedSources = new List<string> { @"x:\dummy2\foo.dll" };
-            var originalSource = new List<string> { @"x:dummy\foo.dll" };
-            this.discoveryManager.Setup(dm => dm.Initialize()).Verifiable();
-
-            var discoveryCriteria = new DiscoveryCriteria(originalSource, 1, null);
-
-            this.hostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources))
-                .Returns(updatedSources);
-
-            this.testEngine.Setup(te => te.GetDiscoveryManager(this.hostManager.Object, It.IsAny<DiscoveryCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.discoveryManager.Object);
-            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
-            var tp = new TestableTestPlatform(this.testEngine.Object, this.hostManager.Object);
-
-            var discoveryRequest = tp.CreateDiscoveryRequest(discoveryCriteria, It.IsAny<ProtocolConfig>());
-
-            this.hostManager.Verify(hm => hm.Initialize(It.IsAny<TestSessionMessageLogger>(), It.IsAny<string>()), Times.Once);
-            this.discoveryManager.Verify(dm => dm.Initialize(), Times.Once);
-
-            this.hostManager.Verify(hm => hm.GetTestSources(originalSource), Times.Once);
-            Assert.IsTrue(!discoveryCriteria.Sources.Except(updatedSources).Any());
-        }
-
-        [TestMethod]
         public void CreateDiscoveryRequestThrowsIfDiscoveryCriteriaIsNull()
         {
             TestPlatform tp = new TestPlatform();
@@ -132,42 +107,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.UnitTests
             var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
 
             var testRunRequest = tp.CreateTestRunRequest(testRunCriteria, It.IsAny<ProtocolConfig>());
-            this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
-        }
-
-        [TestMethod]
-        public void CreateTestRunRequestShouldAllowRuntimeProviderToUpdateAdapterSource()
-        {
-            var updatedSources = new List<string> { @"x:\dummy2\foo.dll" };
-            var originalSource = new List<string> { @"x:dummy\foo.dll" };
-            var additionalExtensions = new List<string> { "foo.TestLogger.dll", "Joo.TestLogger.dll" };
-            this.mockFileHelper.Setup(fh => fh.DirectoryExists(It.IsAny<string>())).Returns(true);
-            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(It.IsAny<string>(), System.IO.SearchOption.TopDirectoryOnly, It.IsAny<string[]>())).Returns(additionalExtensions);
-
-            this.executionManager.Setup(dm => dm.Initialize()).Verifiable();
-
-            string settingsXml =
-                @"<?xml version=""1.0"" encoding=""utf-8""?>
-                <RunSettings>
-                     <RunConfiguration>
-                       <DesignMode>false</DesignMode>
-                     </RunConfiguration>
-                </RunSettings>";
-
-            var testRunCriteria = new TestRunCriteria(originalSource, 10, false, settingsXml, TimeSpan.Zero);
-
-            this.hostManager.Setup(hm => hm.GetTestSources(testRunCriteria.Sources))
-                .Returns(updatedSources);
-
-            this.testEngine.Setup(te => te.GetExecutionManager(this.hostManager.Object, It.IsAny<TestRunCriteria>(), It.IsAny<ProtocolConfig>())).Returns(this.executionManager.Object);
-            this.testEngine.Setup(te => te.GetExtensionManager()).Returns(this.extensionManager.Object);
-
-            var tp = new TestableTestPlatform(this.testEngine.Object, this.mockFileHelper.Object, this.hostManager.Object);
-
-            var testRunRequest = tp.CreateTestRunRequest(testRunCriteria, It.IsAny<ProtocolConfig>());
-
-            this.hostManager.Verify(hm => hm.GetTestSources(originalSource), Times.Once);
-            Assert.IsTrue(!testRunCriteria.Sources.Except(updatedSources).Any());
             this.extensionManager.Verify(em => em.UseAdditionalExtensions(additionalExtensions, true));
         }
 
