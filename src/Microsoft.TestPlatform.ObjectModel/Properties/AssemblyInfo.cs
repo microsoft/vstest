@@ -17,6 +17,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 [assembly: AssemblyProduct("Microsoft.TestPlatfrom.ObjectModel")]
 [assembly: AssemblyTrademark("")]
 [assembly: NeutralResourcesLanguage("en-US")]
+[assembly: CLSCompliant(true)]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
