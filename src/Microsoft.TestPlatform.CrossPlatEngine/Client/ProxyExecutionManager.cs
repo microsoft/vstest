@@ -123,6 +123,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
                     if (testRunCriteria.HasSpecificSources)
                     {
+                        // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
+                        // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
+                        this.UpdateTestSources(testRunCriteria.Sources, testRunCriteria.AdapterSourceMap);
                         var runRequest = new TestRunCriteriaWithSources(
                             testRunCriteria.AdapterSourceMap,
                             runsettings,

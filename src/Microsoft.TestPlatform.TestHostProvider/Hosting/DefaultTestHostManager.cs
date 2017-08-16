@@ -193,13 +193,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             var framework = config.TargetFrameworkVersion;
 
             // This is expected to be called once every run so returning a new instance every time.
-            if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (framework.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <inheritdoc/>
