@@ -4,22 +4,31 @@
 namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
-    using MSResources = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
+    using Resource = Microsoft.TestPlatform.Extensions.EventLogCollector.Resources.Resources;
 
-
+    /// <summary>
+    /// The event log container.
+    /// </summary>
     internal class EventLogContainer : IEventLogContainer
     {
+        private List<string> eventSources;
+
+        private List<EventLogEntryType> entryTypes;
+
+        private DataCollectionLogger logger;
+
+        private DataCollectionContext context;
         /// <inheritdoc />
         public EventLog EventLog { get; set; }
 
+        /// <inheritdoc />
         public int NextEntryIndexToCollect { get; set; }
-
-        public EventLogDataCollector DataCollector { get; set; }
 
         public EventLogCollectorContextData ContextData { get; set; }
 
@@ -32,8 +41,17 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <param name="nextEntryIndexToCollect">
         /// The next entry index to collect.
         /// </param>
-        /// <param name="dataCollector">
-        /// The data collector.
+        /// <param name="eventSources">
+        /// The event Sources.
+        /// </param>
+        /// <param name="entryTypes">
+        /// The entry Types.
+        /// </param>
+        /// <param name="logger">
+        /// The logger.
+        /// </param>
+        /// <param name="context">
+        /// The context.
         /// </param>
         /// <param name="contextData">
         /// The context data.
@@ -41,16 +59,47 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         public EventLogContainer(
             EventLog eventLog,
             int nextEntryIndexToCollect,
-            EventLogDataCollector dataCollector,
+            List<string> eventSources,
+            List<EventLogEntryType> entryTypes,
+            DataCollectionLogger logger,
+            DataCollectionContext context,
             EventLogCollectorContextData contextData)
         {
             this.EventLog = eventLog;
             this.NextEntryIndexToCollect = nextEntryIndexToCollect;
-            this.DataCollector = dataCollector;
             this.ContextData = contextData;
+            this.eventSources = eventSources;
+            this.entryTypes = entryTypes;
+            this.context = context;
+            this.logger = logger;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// This is the event handler for the EntryWritten event of the System.Diagnostics.EventLog class.
+        /// Note that the documentation for the EntryWritten event includes these remarks:
+        ///     "The system responds to WriteEntry only if the last write event occurred at least five seconds previously. 
+        ///      This implies you will only receive one EntryWritten event notification within a five-second interval, even if more
+        ///      than one event log change occurs. If you insert a sufficiently long sleep interval (around 10 seconds) between calls
+        ///      to WriteEntry, no events will be lost. However, if write events occur more frequently, the most recent write events 
+        ///      could be lost."
+        /// This complicates this data collector because we don't want to sleep to wait for all events or lose the most recent events.
+        /// To workaround, the implementation does several things:
+        /// 1. We get the EventLog entries to collect from the EventLog.Entries collection and ignore the EntryWrittenEventArgs.
+        /// 2. When event log collection ends for a data collection context, this method is called explicitly by the EventLogDataCollector
+        ///    passing null for EntryWrittenEventArgs (which is fine since the argument is ignored.
+        /// 3. We keep track of which EventLogEntry object in the EventLog.Entries we still need to collect.  We do this by inspecting
+        ///    the value of the EventLogEntry.Index property.  The value of this property is an integer that is incremented for each entry
+        ///    that is written to the event log, but is reset to 0 if the entire event log is cleared.
+        /// Another behavior of event logs that we need to account for is that if the event log reaches a size limit, older events are
+        /// automatically deleted.  In this case the collection EventLog.Entries contains only the entries remaining in the log,
+        /// and the value of the EventLog.Entries[0].Index will not be 0; it will be the index of the oldest entry still in the log.
+        /// For example, if the first 1000 entries written to an event log (since it was last completely cleared) are deleted because
+        /// of the size limitation, then EventLog.Entries[0].Index would have a value of 1000 (this value is saved in the local variable
+        /// "firstIndexInLog" in the method implementation.  Similarly "mostRecentIndexInLog" is the index of the last entry written
+        /// to the log at the time we examine it.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="e">The System.Diagnostics.EntryWrittenEventArgs object describing the entry that was written.</param>
         public void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e)
         {
             while (this.ContextData.ProcessEvents)
@@ -84,16 +133,12 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     }
 
                     // Send warning; event log must have been cleared.
-                    foreach (DataCollectionContext collectionContext in this.DataCollector.ContextData.Keys)
-                    {
-                        this.DataCollector.Logger.LogWarning(
-                            collectionContext,
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                MSResources.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
-                                this.EventLog.Log));
-                        break;
-                    }
+                    this.logger.LogWarning(
+                        this.context,
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resource.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
+                            this.EventLog.Log));
 
                     this.NextEntryIndexToCollect = 0;
                     firstIndexInLog = 0;
@@ -104,14 +149,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     int nextEntryIndexInCurrentLog = this.NextEntryIndexToCollect - firstIndexInLog;
                     EventLogEntry nextEntry = this.EventLog.Entries[nextEntryIndexInCurrentLog];
 
-                    // BILLBAR_TODO: Event sources can no longer be configured in the Test Settings Config UI (only by XML editor)
-                    //     Drop this feature, add to config UI, or leave as only configurable via XML editor?
-
                     // If an explicit list of event sources was provided, only report log entries from those sources
-                    if (this.DataCollector.EventSources != null && this.DataCollector.EventSources.Count > 0)
+                    if (this.eventSources != null && this.eventSources.Count > 0)
                     {
                         bool eventSourceFound = false;
-                        foreach (string eventSource in this.DataCollector.EventSources)
+                        foreach (string eventSource in this.eventSources)
                         {
                             if (string.Equals(nextEntry.Source, eventSource, StringComparison.OrdinalIgnoreCase))
                             {
@@ -126,10 +168,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         }
                     }
 
-                    if (this.DataCollector.EntryTypes != null && this.DataCollector.EntryTypes.Count > 0)
+                    if (this.entryTypes != null && this.entryTypes.Count > 0)
                     {
                         bool eventTypeFound = false;
-                        foreach (EventLogEntryType entryType in this.DataCollector.EntryTypes)
+                        foreach (EventLogEntryType entryType in this.entryTypes)
                         {
                             if (nextEntry.EntryType == entryType)
                             {

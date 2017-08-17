@@ -95,5 +95,32 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.Resources {
                 return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_FriendlyName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The event log diagnostic data adapter encountered an invalid event log entry type in its configuration: {0}.
+        /// </summary>
+        internal static string Execution_Agent_DataCollectors_EventLog_InvalidEntryTypeInConfig {
+            get {
+                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_InvalidEntryTypeInConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The event log diagnostic data adapter encountered an invalid value for &apos;MaxEventLogEntriesToCollect&apos; in its configuration: {0}.
+        /// </summary>
+        internal static string Execution_Agent_DataCollectors_EventLog_InvalidMaxEntriesInConfig {
+            get {
+                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_InvalidMaxEntriesInConfig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to read event log &apos;{0}&apos; from computer &apos;{1}&apos;.
+        /// </summary>
+        internal static string Execution_Agent_DataCollectors_EventLog_ReadError {
+            get {
+                return ResourceManager.GetString("Execution_Agent_DataCollectors_EventLog_ReadError", resourceCulture);
+            }
+        }
     }
 }

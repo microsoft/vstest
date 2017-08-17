@@ -73,6 +73,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// </summary>
         private DataCollectionSink dataSink;
 
+        private DataCollectionContext dataCollectorContext;
+
         /// <summary>
         /// Used by the data collector to send warnings, errors, or other messages
         /// </summary>
@@ -139,6 +141,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.events = events;
             this.dataSink = dataSink;
             this.logger = logger;
+            this.dataCollectorContext = dataCollectionEnvironmentContext.SessionDataCollectionContext;
 
             // Load the configuration
             CollectorNameValueConfigurationManager nameValueSettings =
@@ -184,13 +187,20 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     catch (ArgumentException e)
                     {
                         throw new EventLogCollectorException(
-                            "",
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                Resource.Execution_Agent_DataCollectors_EventLog_InvalidEntryTypeInConfig,
+                                entryTypesStr),
                             e);
                     }
                 }
 
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogShared.SETTING_ENTRY_TYPES + "=" + this.entryTypes);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "EventLogDataCollector configuration: " + EventLogShared.SETTING_ENTRY_TYPES + "="
+                        + this.entryTypes);
+                }
             }
             else
             {
@@ -215,7 +225,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 catch (FormatException e)
                 {
                     throw new EventLogCollectorException(
-                        "",
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resource.Execution_Agent_DataCollectors_EventLog_InvalidMaxEntriesInConfig,
+                            maxEntriesstring),
                         e);
                 }
 
@@ -347,7 +360,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             int nextEntryIndexToCollect =
                 (currentCount == 0) ? 0 : eventLog.Entries[currentCount - 1].Index + 1;
             EventLogContainer eventLogContainer =
-                new EventLogContainer(eventLog, nextEntryIndexToCollect, this, eventLogContext);
+                new EventLogContainer(eventLog, nextEntryIndexToCollect, this.eventSources, this.entryTypes, this.logger, this.dataCollectorContext, eventLogContext);
 
             eventLog.EntryWritten += eventLogContainer.OnEventLogEntryWritten;
             eventLog.EnableRaisingEvents = true;
@@ -433,7 +446,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                     this.logger.LogError(
                         dataCollectionContext,
                         new EventLogCollectorException(
-                            "",
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                Resource.Execution_Agent_DataCollectors_EventLog_ReadError,
+                                eventLogName,
+                                Environment.MachineName),
                             ex));
                 }
             }
