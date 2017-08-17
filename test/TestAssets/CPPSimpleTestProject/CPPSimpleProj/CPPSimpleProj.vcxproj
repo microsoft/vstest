@@ -22,7 +22,7 @@
     <ProjectGuid>{076CE7E6-92E8-49FD-9D98-57D377FAA46E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>CPPSimpleProj</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
     <ProjectName>Microsoft.TestPlatform.TestAsset.NativeCPP</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

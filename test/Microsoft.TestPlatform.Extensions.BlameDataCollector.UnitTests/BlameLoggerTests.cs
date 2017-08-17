@@ -81,30 +81,16 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
         [TestMethod]
         public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAborted()
         {
-            // Initialize
-            var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
-            var uriDataAttachment = new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description");
-            attachmentSet.Attachments.Add(uriDataAttachment);
-            var attachmentSetList = new List<AttachmentSet> { attachmentSet };
+            this.InitializeAndVerify(1);
+        }
 
-            // Initialize Blame Logger
-            this.blameLogger.Initialize(this.events.Object, null);
-
-            var testCaseList =
-                new List<TestCase>
-                    {
-                        new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath"),
-                        new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath")
-                    };
-
-            // Setup and Raise event
-            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
-            this.testRunRequest.Raise(
-               m => m.OnRunCompletion += null,
-               new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
-
-            // Verify Call
-            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Once);
+        /// <summary>
+        /// The test run complete handler should get faulty test run if test run aborted for multiple test project.
+        /// </summary>
+        [TestMethod]
+        public void TestRunCompleteHandlerShouldGetFaultyTestRunIfTestRunAbortedForMultipleProjects()
+        {
+            this.InitializeAndVerify(2);
         }
 
         /// <summary>
@@ -146,6 +132,45 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.UnitTests
 
             // Verify Call
             this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Never);
+        }
+
+        private AttachmentSet GetAttachmentSet()
+        {
+            var attachmentSet = new AttachmentSet(new Uri("test://uri"), "Blame");
+            var uriDataAttachment = new UriDataAttachment(new Uri("C:/folder1/sequence.xml"), "description");
+            attachmentSet.Attachments.Add(uriDataAttachment);
+
+            return attachmentSet;
+        }
+
+        private void InitializeAndVerify(int count)
+        {
+            // Initialize
+            var attachmentSetList = new List<AttachmentSet>();
+
+            for (int i = 0; i < count; i++)
+            {
+                attachmentSetList.Add(this.GetAttachmentSet());
+            }
+
+            // Initialize Blame Logger
+            this.blameLogger.Initialize(this.events.Object, null);
+
+            var testCaseList =
+                    new List<TestCase>
+                        {
+                        new TestCase("ABC.UnitTestMethod1", new Uri("test://uri"), "C://test/filepath"),
+                        new TestCase("ABC.UnitTestMethod2", new Uri("test://uri"), "C://test/filepath")
+                        };
+
+            // Setup and Raise event
+            this.mockBlameReaderWriter.Setup(x => x.ReadTestSequence(It.IsAny<string>())).Returns(testCaseList);
+            this.testRunRequest.Raise(
+               m => m.OnRunCompletion += null,
+               new TestRunCompleteEventArgs(stats: null, isCanceled: false, isAborted: true, error: null, attachmentSets: new Collection<AttachmentSet>(attachmentSetList), elapsedTime: new TimeSpan(1, 0, 0, 0)));
+
+            // Verify Call
+            this.mockBlameReaderWriter.Verify(x => x.ReadTestSequence(It.IsAny<string>()), Times.Exactly(count));
         }
 
         /// <summary>

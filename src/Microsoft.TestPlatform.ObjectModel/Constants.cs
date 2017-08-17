@@ -3,10 +3,12 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using System;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// Defines the defaults/constants used across different components.
@@ -94,6 +96,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// Default treatment of error from test adapters.
         /// </summary>
         public const bool DefaultTreatTestAdapterErrorsAsWarnings = false;
+
+        /// <summary>
+        /// The default execution thread apartment state.
+        /// </summary>
+        [CLSCompliant(false)]
+        public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.MTA;
 
         /// <summary>
         ///  Contants for detecting .net framework.

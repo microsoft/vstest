@@ -672,4 +672,7 @@
   <data name="TestRunCanceled" xml:space="preserve">
     <value>Test Run Canceled.</value>
   </data>
+  <data name="TestRunSummaryForCanceledOrAbortedRun" xml:space="preserve">
+    <value>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</value>
+  </data>
 </root>
