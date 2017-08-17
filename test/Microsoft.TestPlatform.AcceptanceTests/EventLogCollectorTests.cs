@@ -15,7 +15,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         public EventLogCollectorTests()
         {
-            System.Diagnostics.Debugger.Launch();
             this.resultsDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         }
 
