@@ -273,9 +273,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 // directory. The path to nuget directory is automatically setup for CLR to resolve.
                 // Test platform tries to load every extension by assembly name. If it is not resolved, we don't
                 // an error.
+                if (this.pathToExtensions != null)
+                {
+                    extensions.AddRange(this.pathToExtensions);
+                }
+
+                extensions = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
                 // Use the new paths and set the extensions discovered to false so that the next time 
                 // any one tries to get the additional extensions, we rediscover. 
-                this.pathToExtensions = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList(); ;
+                this.pathToExtensions = extensions;
 
                 this.TestExtensions?.InvalidateCache();
 
@@ -295,6 +302,14 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                     EqtTrace.Verbose("TestPluginCache: Updated the available extensions to '{0}'.", extensionString);
                 }
             }
+        }
+
+        /// <summary>
+        /// Clear the previously cached extensions
+        /// </summary>
+        public void ClearExtensions()
+        {
+            this.pathToExtensions?.Clear();
         }
 
         #endregion
