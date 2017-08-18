@@ -199,7 +199,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             GenerateFakesUtilities.GenerateFakesSettings(this.commandLineOptions, this.commandLineOptions.Sources.ToList(), ref runSettings);
 
             var runRequestPayload = new TestRunRequestPayload() { Sources = this.commandLineOptions.Sources.ToList(), RunSettings = runSettings, KeepAlive = keepAlive };
-            var result = this.testRequestManager.RunTests(runRequestPayload, null, null, Constants.DefaultProtocolConfig);
+            var result = this.testRequestManager.RunTests(runRequestPayload, null, this.testRunEventsRegistrar, Constants.DefaultProtocolConfig);
 
             if (EqtTrace.IsInfoEnabled)
             {

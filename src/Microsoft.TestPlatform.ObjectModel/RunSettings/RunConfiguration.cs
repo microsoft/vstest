@@ -62,7 +62,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Specify to not run tests in isolation.
         /// </summary>
-        private bool noIsolation;
+        private bool inProcess;
 
         /// <summary>
         /// Indication to adapters to disable parallelization.
@@ -100,7 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.batchSize = Constants.DefaultBatchSize;
             this.testSessionTimeout = 0;
             this.disableAppDomain = false;
-            this.noIsolation = false;
+            this.inProcess = false;
             this.disableParallelization = false;
             this.designMode = false;
             this.shouldCollectSourceInformation = false;
@@ -239,17 +239,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// Gets or sets a value indicating whether to run tests in isolation or not.
         /// </summary>
-        public bool NoIsolation
+        public bool InProcess
         {
             get
             {
-                return this.noIsolation;
+                return this.inProcess;
             }
 
             set
             {
-                this.noIsolation = value;
-                this.NoIsolationSet = true;
+                this.inProcess = value;
+                this.InProcessSet = true;
             }
         }
 
@@ -399,9 +399,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets a value indicating whether NoIsolation is set.
+        /// Gets a value indicating whether InProcess is set.
         /// </summary>
-        public bool NoIsolationSet
+        public bool InProcessSet
         {
             get;
             private set;
@@ -496,9 +496,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
             root.AppendChild(disableAppDomain);
 
-            XmlElement noIsolation = doc.CreateElement("NoIsolation");
-            noIsolation.InnerXml = this.NoIsolation.ToString();
-            root.AppendChild(noIsolation);
+            XmlElement inProcess = doc.CreateElement("InProcess");
+            inProcess.InnerXml = this.InProcess.ToString();
+            root.AppendChild(inProcess);
 
             XmlElement disableParallelization = doc.CreateElement("DisableParallelization");
             disableParallelization.InnerXml = this.DisableParallelization.ToString();
@@ -657,17 +657,17 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                             runConfiguration.DisableAppDomain = disableAppDomainCheck;
                             break;
 
-                        case "NoIsolation":
+                        case "InProcess":
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
 
-                            string noIsolationValueString = reader.ReadElementContentAsString();
-                            bool noIsolationCheck;
-                            if (!bool.TryParse(noIsolationValueString, out noIsolationCheck))
+                            string inProcessValueString = reader.ReadElementContentAsString();
+                            bool inProcessCheck;
+                            if (!bool.TryParse(inProcessValueString, out inProcessCheck))
                             {
                                 throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, noIsolationValueString, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inProcessValueString, elementName));
                             }
-                            runConfiguration.NoIsolation = noIsolationCheck;
+                            runConfiguration.InProcess = inProcessCheck;
                             break;
 
                         case "DisableParallelization":

@@ -88,9 +88,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         ParallelArgumentProcessorHelpPriority,
 
         /// <summary>
-        /// NoIsolationArgumentProcessor Help
+        /// InProcessArgumentProcessor Help
         /// </summary>
-        NoIsolationArgumentProcessorHelpPriority,
+        InProcessArgumentProcessorHelpPriority,
 
         /// <summary>
         /// TestAdapterPathArgumentProcessor Help

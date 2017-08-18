@@ -98,9 +98,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public bool Parallel { get; set; }
 
         /// <summary>
-        /// Specifies whether NoIsolation is on or off.
+        /// Specifies whether InProcess is on or off.
         /// </summary>
-        public bool NoIsolation { get; set; }
+        public bool InProcess { get; set; }
 
         /// <summary>
         /// Readonly collection of all available test sources

@@ -675,4 +675,12 @@
   <data name="TestRunSummaryForCanceledOrAbortedRun" xml:space="preserve">
     <value>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</value>
   </data>
+  <data name="InProcessHelp" xml:space="preserve">
+    <value>--InProcess|/InProcess
+      Runs the tests in vstest.console.exe process.
+      This is supported for framework ".NETFramework,Version=v4.*", Framework40 and Framework45.</value>
+  </data>
+  <data name="InvalidInProcessCommand" xml:space="preserve">
+    <value>Argument {0} is not expected in the 'InProcess' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InProcess) and try again.</value>
+  </data>
 </root>
