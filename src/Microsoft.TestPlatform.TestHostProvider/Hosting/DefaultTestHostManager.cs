@@ -180,19 +180,25 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         }
 
         /// <inheritdoc/>
+        public IEnumerable<string> GetTestSources(IEnumerable<string> sources)
+        {
+            // We do not have scenario where full CLR tests are deployed to remote machine, so no need to udpate sources
+            return sources;
+        }
+
+        /// <inheritdoc/>
         public bool CanExecuteCurrentRunConfiguration(string runsettingsXml)
         {
             var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
             var framework = config.TargetFrameworkVersion;
 
             // This is expected to be called once every run so returning a new instance every time.
-            if (framework.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                || framework.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (framework.Name.IndexOf("NETFramework", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <inheritdoc/>

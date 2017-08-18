@@ -9,10 +9,14 @@ namespace CPPSimpleProj
 	{
 	public:
 		
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(PassingTest)
 		{
 			Assert::AreEqual(2, 2);
-			// TODO: Your test code here
+		}
+
+		TEST_METHOD(FailingTest)
+		{
+			Assert::AreEqual(1, 2);
 		}
 
 	};

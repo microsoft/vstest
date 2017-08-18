@@ -3,9 +3,7 @@
 
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
 {
-    using System;
     using System.Collections.Generic;
-    using System.Xml;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -74,6 +72,8 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
     </DataCollectors>
   </DataCollectionRunSettings>
 </RunSettings>";
+
+        private readonly string EmptyRunSettings = "<RunSettings></RunSettings>";
 
         #endregion
 
@@ -305,7 +305,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void IsDataCollectionEnabledShouldReturnFalseIfDataCollectionNodeIsNotPresent()
         {
-            Assert.IsFalse(XmlRunSettingsUtilities.IsDataCollectionEnabled("<RunSettings></RunSettings>"));
+            Assert.IsFalse(XmlRunSettingsUtilities.IsDataCollectionEnabled(EmptyRunSettings));
         }
 
         [TestMethod]
@@ -334,7 +334,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void IsInProcDataCollectionEnabledShouldReturnFalseIfDataCollectionNodeIsNotPresent()
         {
-            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled("<RunSettings></RunSettings>"));
+            Assert.IsFalse(XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(EmptyRunSettings));
         }
 
         [TestMethod]
@@ -362,7 +362,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities
         [TestMethod]
         public void GetDataCollectionRunSettingsShouldReturnNullOnNoDataCollectorSettings()
         {
-            Assert.IsNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings("<RunSettings></RunSettings>"));
+            Assert.IsNull(XmlRunSettingsUtilities.GetDataCollectionRunSettings(EmptyRunSettings));
         }
 
         [TestMethod]
