@@ -3,6 +3,7 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
+    using System;
     using System.IO;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -99,6 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <summary>
         /// The default execution thread apartment state.
         /// </summary>
+        [CLSCompliant(false)]
         public static readonly PlatformApartmentState DefaultExecutionThreadApartmentState = PlatformApartmentState.MTA;
 
         /// <summary>

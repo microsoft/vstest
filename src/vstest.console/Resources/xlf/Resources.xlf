@@ -729,6 +729,11 @@
       Read response file for more options.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
+        <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
+        <target state="new">Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>
