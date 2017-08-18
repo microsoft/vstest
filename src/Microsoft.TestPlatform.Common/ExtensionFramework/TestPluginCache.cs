@@ -273,16 +273,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 // directory. The path to nuget directory is automatically setup for CLR to resolve.
                 // Test platform tries to load every extension by assembly name. If it is not resolved, we don't
                 // an error.
-                if (this.pathToExtensions != null)
-                {
-                    extensions.AddRange(this.pathToExtensions);
-                }
-
-                extensions = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-
                 // Use the new paths and set the extensions discovered to false so that the next time 
                 // any one tries to get the additional extensions, we rediscover. 
-                this.pathToExtensions = extensions;
+                this.pathToExtensions = extensions.Select(Path.GetFullPath).Distinct(StringComparer.OrdinalIgnoreCase).ToList(); ;
 
                 this.TestExtensions?.InvalidateCache();
 

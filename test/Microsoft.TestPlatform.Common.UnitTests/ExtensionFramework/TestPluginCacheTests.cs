@@ -101,6 +101,19 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
         }
 
         [TestMethod]
+        public void UpdateAdditionalExtensionsShouldReplacePathToExtensionsWithNewExtensions()
+        {
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { @"oldExtension.dll" }, false);
+            var newExtensions = new List<string> { typeof(TestPluginCacheTests).GetTypeInfo().Assembly.Location };
+
+            TestPluginCache.Instance.UpdateExtensions(newExtensions, true);
+            var updatedExtensions = TestPluginCache.Instance.PathToExtensions;
+
+            Assert.IsNotNull(updatedExtensions);
+            CollectionAssert.AreEqual(newExtensions, updatedExtensions.ToList());
+        }
+
+        [TestMethod]
         public void UpdateAdditionalExtensionsShouldOnlyAddUniqueExtensionPaths()
         {
             var additionalExtensions = new List<string>
