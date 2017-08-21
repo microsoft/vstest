@@ -1766,6 +1766,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources
         }
 
         /// <summary>
+        ///   Looks up a localized string similar to Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}..
+        /// </summary>
+        public static string TestRunSummaryForCanceledOrAbortedRun
+        {
+            get
+            {
+                return ResourceManager.GetString("TestRunSummaryForCanceledOrAbortedRun", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Using framework {0} to run the tests. Specify /Framework:{1} to suppress this warning..
         /// </summary>
         public static string TestSettingsFrameworkMismatch

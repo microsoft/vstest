@@ -89,6 +89,22 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockRequestSender.Verify(s => s.InitializeExecution(It.IsAny<IEnumerable<string>>(), It.IsAny<bool>()), Times.Never);
         }
 
+        [TestMethod]
+        public void DiscoverTestsShouldAllowRuntimeProviderToUpdateAdapterSource()
+        {
+            // Make sure TestPlugincache is refreshed.
+            TestPluginCache.Instance = null;
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(this.discoveryCriteria.Sources)).Returns(this.discoveryCriteria.Sources);
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler>();
+
+            this.testDiscoveryManager.DiscoverTests(this.discoveryCriteria, mockTestDiscoveryEventHandler.Object);
+
+            this.mockTestHostManager.Verify(hm => hm.GetTestSources(this.discoveryCriteria.Sources), Times.Once);
+        }
+
 
         [TestMethod]
         public void DiscoverTestsShouldNotSendDiscoveryRequestIfCommunicationFails()

@@ -426,7 +426,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             // Output a summary.
             if (this.testsTotal > 0)
             {
-                Output.Information(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, testsTotal, testsPassed, testsFailed, testsSkipped));
+                string testCountDetails;
+
+                if(e.IsAborted || e.IsCanceled)
+                {
+                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummaryForCanceledOrAbortedRun, testsPassed, testsFailed, testsSkipped);
+                }
+                else
+                {
+                    testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, testsTotal, testsPassed, testsFailed, testsSkipped);
+                }
+
+                Output.Information(false, testCountDetails);
 
                 if (e.IsCanceled)
                 {
