@@ -13,9 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="MSTests.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
     <None Update="XunitTests.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>XunitTests.cs</LastGenOutput>
