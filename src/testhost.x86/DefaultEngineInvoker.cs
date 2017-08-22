@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
     using System.Threading.Tasks;
 
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
@@ -23,8 +24,9 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
     {
         /// <summary>
         /// The timeout for the client to connect to the server.
+        /// Increasing Timeout to allow client to connect, not always the client can connect within 5 seconds
         /// </summary>
-        private const int ClientListenTimeOut = 5 * 1000;
+        private const int ClientListenTimeOut = 30 * 1000;
 
         private const string EndpointArgument = "--endpoint";
 
@@ -53,9 +55,21 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
             }
 #endif
 
-            // Get port number and initialize communication
+            // vstest.console < 15.5 won't send endpoint and role arguments.
+            // So derive endpoint from port argument and Make connectionRole as Client.
             string endpoint = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, EndpointArgument);
-            ConnectionRole connectionRole = string.Equals(CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument), "client", StringComparison.OrdinalIgnoreCase) ? ConnectionRole.Client : ConnectionRole.Host;
+            if (string.IsNullOrWhiteSpace(endpoint))
+            {
+                var port = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, "--port");
+                endpoint = IPAddress.Loopback + ":" + port;
+            }
+
+            ConnectionRole connectionRole = ConnectionRole.Client;
+            string role = CommandLineArgumentsHelper.GetStringArgFromDict(argsDictionary, RoleArgument);
+            if (!string.IsNullOrWhiteSpace(role) && string.Equals(role, "host", StringComparison.OrdinalIgnoreCase))
+            {
+                connectionRole = ConnectionRole.Host;
+            }
 
             // Start Processing of requests
             using (var requestHandler = new TestRequestHandler(new TestHostConnectionInfo { Endpoint = endpoint, Role = connectionRole, Transport = Transport.Sockets }))
@@ -107,9 +121,10 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
 
         private Task StartProcessingAsync(ITestRequestHandler requestHandler, ITestHostManagerFactory managerFactory)
         {
-            return Task.Run(() =>
-            {
-                // Wait for the connection to the sender and start processing requests from sender
+            var task = new Task(
+                () =>
+                    {
+                        // Wait for the connection to the sender and start processing requests from sender
                 if (requestHandler.WaitForRequestSenderConnection(ClientListenTimeOut))
                 {
                     requestHandler.ProcessRequests(managerFactory);
@@ -118,8 +133,12 @@ namespace Microsoft.VisualStudio.TestPlatform.TestHost
                 {
                     EqtTrace.Info("DefaultEngineInvoker: RequestHandler timed out while connecting to the Sender.");
                     throw new TimeoutException();
-                }
-            });
+                        }
+                    },
+                TaskCreationOptions.LongRunning);
+
+            task.Start();
+            return task;
         }
     }
 }

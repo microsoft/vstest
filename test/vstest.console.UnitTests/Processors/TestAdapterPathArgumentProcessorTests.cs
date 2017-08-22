@@ -210,6 +210,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.AreEqual("d:\\users;c:\\users", runConfiguration.TestAdaptersPaths);
         }
 
+        [TestMethod]
+        public void InitializeShouldAddRightAdapterPathInErrorMessage()
+        {
+            var runSettingsXml = "<RunSettings><RunConfiguration><TestAdaptersPaths>d:\\users</TestAdaptersPaths></RunConfiguration></RunSettings>";
+            var runSettings = new RunSettings();
+            runSettings.LoadSettingsXml(runSettingsXml);
+            RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
+            var mockFileHelper = new Mock<IFileHelper>();
+            var mockOutput = new Mock<IOutput>();
+
+            mockFileHelper.Setup(x => x.DirectoryExists("d:\\users")).Returns(false);
+            mockFileHelper.Setup(x => x.DirectoryExists("c:\\users")).Returns(true);
+            var executor = new TestAdapterPathArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance, mockOutput.Object, mockFileHelper.Object);
+
+            var message = string.Format(
+                @"The path '{0}' specified in the 'TestAdapterPath' is invalid. Error: {1}",
+                "d:\\users",
+                "The custom test adapter search path provided was not found, provide a valid path and try again.");
+
+            var isExceptionThrown = false;
+            try
+            {
+                executor.Initialize("c:\\users");
+            }
+            catch (Exception ex)
+            {
+                isExceptionThrown = true;
+                Assert.IsTrue(ex is CommandLineException);
+                Assert.AreEqual(message, ex.Message);
+            }
+
+            Assert.IsTrue(isExceptionThrown);
+        }
+
         #endregion
 
         #region Testable implementations

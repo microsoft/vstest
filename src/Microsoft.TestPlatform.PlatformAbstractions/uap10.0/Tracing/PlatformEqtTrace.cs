@@ -4,7 +4,8 @@
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
-    using System.Diagnostics;
+    using System.Diagnostics.Tracing;
+    using System.IO;
 
     /// <summary>
     /// Wrapper class for tracing.
@@ -21,36 +22,136 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// </summary>
     public class PlatformEqtTrace : IPlatformEqtTrace
     {
+        private static object initLock = new object();
+
+        private static bool isInitialized = false;
+
         public static string ErrorOnInitialization { get; set; }
 
+        public static string LogFile { get; set; }
+
+        private static PlatformTraceLevel TraceLevel { get; set; }
+
+        /// <inheritdoc/>
         public void WriteLine(PlatformTraceLevel level, string message)
         {
-            throw new NotImplementedException();
+            if (this.TraceInitialized() && TraceLevel > PlatformTraceLevel.Off)
+            {
+                switch (level)
+                {
+                    case PlatformTraceLevel.Off:
+                        break;
+
+                    case PlatformTraceLevel.Error:
+                        UnitTestEventSource.Log.Error(message);
+                        break;
+
+                    case PlatformTraceLevel.Warning:
+                        UnitTestEventSource.Log.Warn(message);
+                        break;
+
+                    case PlatformTraceLevel.Info:
+                        UnitTestEventSource.Log.Info(message);
+                        break;
+
+                    case PlatformTraceLevel.Verbose:
+                        UnitTestEventSource.Log.Verbose(message);
+                        break;
+                }
+            }
         }
 
+        /// <inheritdoc/>
         public bool InitializeVerboseTrace(string customLogFile)
         {
-            throw new NotImplementedException();
+            LogFile = Path.GetTempPath() + Path.GetFileNameWithoutExtension(customLogFile).Replace(" ", "_") + ".TpTrace.log";
+            TraceLevel = PlatformTraceLevel.Verbose;
+
+            return this.TraceInitialized();
         }
 
+        /// <inheritdoc/>
         public bool ShouldTrace(PlatformTraceLevel traceLevel)
         {
-            throw new NotImplementedException();
+            return isInitialized;
         }
 
+        /// <inheritdoc/>
         public string GetLogFile()
         {
-            throw new NotImplementedException();
+            return LogFile;
         }
 
+        /// <inheritdoc/>
         public void SetTraceLevel(PlatformTraceLevel value)
         {
-            throw new NotImplementedException();
+            TraceLevel = value;
         }
 
+        /// <inheritdoc/>
         public PlatformTraceLevel GetTraceLevel()
         {
-            throw new NotImplementedException();
+            return TraceLevel;
+        }
+
+        /// <summary>
+        /// Initializes Tracing based on Trace Level
+        /// </summary>
+        /// <returns>
+        /// The <see cref="bool"/>.
+        /// </returns>
+        private bool TraceInitialized()
+        {
+            lock (initLock)
+            {
+                if (isInitialized)
+                {
+                    return isInitialized;
+                }
+
+                try
+                {
+                    var eventListener = new FileEventListener(string.IsNullOrEmpty(LogFile) ? "UnitTestLog" : LogFile);
+
+                    PlatformTraceLevel traceLevel = this.GetTraceLevel();
+                    if (traceLevel > PlatformTraceLevel.Off)
+                    {
+                        eventListener.EnableEvents(UnitTestEventSource.Log, EventLevel.Error);
+                    }
+
+                    if (traceLevel > PlatformTraceLevel.Error)
+                    {
+                        eventListener.EnableEvents(UnitTestEventSource.Log, EventLevel.Warning);
+                    }
+
+                    if (traceLevel > PlatformTraceLevel.Warning)
+                    {
+                        eventListener.EnableEvents(UnitTestEventSource.Log, EventLevel.Informational);
+                    }
+
+                    if (traceLevel > PlatformTraceLevel.Info)
+                    {
+                        eventListener.EnableEvents(UnitTestEventSource.Log, EventLevel.Verbose);
+                    }
+
+                    isInitialized = true;
+                }
+                catch (Exception ex)
+                {
+                    this.UnInitializeVerboseTrace();
+                    ErrorOnInitialization = ex.Message;
+                    return false;
+                }
+
+                return isInitialized;
+            }
+        }
+
+        private void UnInitializeVerboseTrace()
+        {
+            isInitialized = false;
+            LogFile = null;
+            TraceLevel = PlatformTraceLevel.Off;
         }
     }
 }

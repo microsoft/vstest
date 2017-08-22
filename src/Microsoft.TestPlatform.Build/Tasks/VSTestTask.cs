@@ -103,6 +103,12 @@ namespace Microsoft.TestPlatform.Build.Tasks
             set;
         }
 
+        public string VSTestBlame
+        {
+            get;
+            set;
+        }
+
         public override bool Execute()
         {
             var traceEnabledValue = Environment.GetEnvironmentVariable("VSTEST_BUILD_TRACE");
@@ -225,6 +231,11 @@ namespace Microsoft.TestPlatform.Build.Tasks
                 {
                     allArgs.Add("--collect:" + ArgumentEscaper.HandleEscapeSequenceInArgForProcessStart(arg));
                 }
+            }
+
+            if (!string.IsNullOrEmpty(this.VSTestBlame))
+            {
+                allArgs.Add("--Blame");
             }
 
             return allArgs;
