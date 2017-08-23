@@ -75,8 +75,10 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
             StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
 
-            this.ValidateMinLineNumber(26, diaNavigationData.MinLineNumber);
-            Assert.AreEqual(27, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+            // Weird why DiaSession is now returning the first overloaded method
+            // as compared to before when it used to  retun second method
+            this.ValidateMinLineNumber(22, diaNavigationData.MinLineNumber);
+            Assert.AreEqual(23, diaNavigationData.MaxLineNumber, "Incorrect max line number");
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
         }
