@@ -1,0 +1,49 @@
+﻿using Xunit;
+
+namespace XUnitAdapterPerfTests
+{
+	public class XuniTests
+    {
+<#
+	int passedTests = 10000;
+	int failedTests = 0;
+	String padding = "00";
+	int count = 1;
+	String testmethodprefix = "Test_";
+#>
+
+		#region PassingTests
+<#
+	for(int i=0;i<passedTests;i++)
+	{
+	String methodName= testmethodprefix + count.ToString(padding);
+#>
+		[Fact]
+		public void <#=methodName#>()
+		{
+		}
+<#		
+		count++;
+	}
+#>
+		#endregion
+
+		#region FailingTests
+<#
+	for(int i=0;i<failedTests;i++)
+	{
+	String methodName= testmethodprefix + count.ToString(padding);
+#>
+		[Fact]
+		public void <#=methodName#>()
+		{
+			Assert.Fail();
+		}
+<#		
+		count++;
+	}
+#>
+		#endregion
+   	
+    }
+}
