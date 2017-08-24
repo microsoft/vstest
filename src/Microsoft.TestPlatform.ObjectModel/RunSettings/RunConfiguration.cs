@@ -60,6 +60,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool disableAppDomain;
 
         /// <summary>
+        /// Specify to not run tests in isolation.
+        /// </summary>
+        private bool inProcess;
+
+        /// <summary>
         /// Indication to adapters to disable parallelization.
         /// </summary>
         private bool disableParallelization;
@@ -95,6 +100,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.batchSize = Constants.DefaultBatchSize;
             this.testSessionTimeout = 0;
             this.disableAppDomain = false;
+            this.inProcess = false;
             this.disableParallelization = false;
             this.designMode = false;
             this.shouldCollectSourceInformation = false;
@@ -227,6 +233,23 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.disableAppDomain = value;
                 this.DisableAppDomainSet = true;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to run tests in isolation or not.
+        /// </summary>
+        public bool InProcess
+        {
+            get
+            {
+                return this.inProcess;
+            }
+
+            set
+            {
+                this.inProcess = value;
+                this.InProcessSet = true;
             }
         }
 
@@ -367,9 +390,18 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets a value indicating whether app domain needs to be disabled by the adapters.
+        /// Gets a value indicating whether disable appdomain is set.
         /// </summary>
         public bool DisableAppDomainSet
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether InProcess is set.
+        /// </summary>
+        public bool InProcessSet
         {
             get;
             private set;
@@ -463,6 +495,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement disableAppDomain = doc.CreateElement("DisableAppDomain");
             disableAppDomain.InnerXml = this.DisableAppDomain.ToString();
             root.AppendChild(disableAppDomain);
+
+            XmlElement inProcess = doc.CreateElement("InProcess");
+            inProcess.InnerXml = this.InProcess.ToString();
+            root.AppendChild(inProcess);
 
             XmlElement disableParallelization = doc.CreateElement("DisableParallelization");
             disableParallelization.InnerXml = this.DisableParallelization.ToString();
@@ -619,6 +655,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, disableAppDomainValueString, elementName));
                             }
                             runConfiguration.DisableAppDomain = disableAppDomainCheck;
+                            break;
+
+                        case "InProcess":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string inProcessValueString = reader.ReadElementContentAsString();
+                            bool inProcessCheck;
+                            if (!bool.TryParse(inProcessValueString, out inProcessCheck))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inProcessValueString, elementName));
+                            }
+                            runConfiguration.InProcess = inProcessCheck;
                             break;
 
                         case "DisableParallelization":
