@@ -9,9 +9,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
 
     /// <summary>
@@ -28,6 +28,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private TcpListener tcpListener;
 
         private TcpClient tcpClient;
+
+        private Stream stream;
 
         private bool stopped;
 
@@ -88,10 +90,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private void OnClientConnected(TcpClient client)
         {
             this.tcpClient = client;
+            this.tcpClient.Client.NoDelay = true;
 
             if (this.ClientConnected != null)
             {
-                this.channel = this.channelFactory(client.GetStream());
+                this.stream = new PlatformStream().PlaformBufferedStreamWithBufferSize(this.tcpClient.GetStream(), 8 * 1024);
+                this.channel = this.channelFactory(this.stream);
                 this.ClientConnected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
 
                 // Start the message loop
@@ -117,7 +121,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // tcpClient.Close() not available for netstandard1.5.
                 this.tcpClient?.Dispose();
 #endif
-                this.channel.Dispose();
+
+                // this.channel.Dispose();
+                // Close the client and dispose the underlying stream.
+                // Depending on implementation order of dispose may be important.
+                // 1. Channel dispose -> disposes reader/writer which call a Flush on the Stream. Stream shouldn't
+                // be disposed at this time.
+                // 2. Stream's dispose may Flush the underlying base stream (if it's a BufferedStream). We should try
+                // dispose it next.
+                // 3. TcpClient's dispose will clean up the network stream and close any sockets. NetworkStream's dispose
+                // is a no-op if called a second time.
+                this.channel?.Dispose();
+                this.stream?.Dispose();
+
+                // this.tcpClient?.Dispose();
                 this.cancellation.Dispose();
 
                 this.ClientDisconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
