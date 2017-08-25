@@ -13,9 +13,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
+    internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
+        IDiscoveryManager discoveryManager;
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
@@ -32,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         internal InProcessProxyDiscoveryManager(ITestHostManagerFactory testHostManagerFactory)
         {
             this.testHostManagerFactory = testHostManagerFactory;
+            this.discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
         }
 
         /// <summary>
@@ -41,11 +43,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             if(!this.IsInitialized)
             {
-                var discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
-
                 // We don't need to pass list of extension as we are running inside vstest.console and
                 // it will use TestPluginCache of vstest.console
-                discoveryManager.Initialize(Enumerable.Empty<string>());
+                this.discoveryManager.Initialize(Enumerable.Empty<string>());
                 this.IsInitialized = true;
             }
         }
@@ -57,25 +57,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="eventHandler">EventHandler for handling discovery events from Engine</param>
         public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler eventHandler)
         {
-            var discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
-
             Task.Run(() =>
             {
                 try
                 {
                     // Initialize extension before discovery if it’s not initialized
-                    if (!this.IsInitialized)
-                    {
-                        discoveryManager.Initialize(Enumerable.Empty<string>());
-                    }
-                    discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
+                    this.Initialize();
+                    this.discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
                 }
                 catch (Exception exception)
                 {
                     EqtTrace.Error("InProcessProxyDiscoveryManager.DiscoverTests: Failed to discover tests: {0}", exception);
 
                     // Send a discovery complete to caller.
-                    eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                    eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
                     eventHandler.HandleDiscoveryComplete(-1, new List<TestCase>(), true);
                 }
             }

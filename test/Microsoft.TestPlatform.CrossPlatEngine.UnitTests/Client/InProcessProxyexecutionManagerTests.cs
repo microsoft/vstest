@@ -27,9 +27,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockExecutionManager = new Mock<IExecutionManager>();
-            this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManagerFactory.Object);
-
             this.mockTestHostManagerFactory.Setup(o => o.GetExecutionManager()).Returns(this.mockExecutionManager.Object);
+            this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManagerFactory.Object);
         }
 
         [TestCleanup]
@@ -44,14 +43,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void InitializeShouldCallExecutionManagerInitializeWithEmptyIEnumerable()
         {
             this.inProcessProxyExecutionManager.Initialize();
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "ExecutionManager.Initialize() should get called with empty list");
         }
 
         [TestMethod]
         public void InitializeShouldSetIsInitializedTotrue()
         {
             this.inProcessProxyExecutionManager.Initialize();
-            Assert.IsTrue(this.inProcessProxyExecutionManager.IsInitialized);
+            Assert.IsTrue(this.inProcessProxyExecutionManager.IsInitialized, "ExecutionManager.Initialize() is not setting the value of varable IsInitialized to true");
         }
 
         [TestMethod]
@@ -59,7 +58,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.inProcessProxyExecutionManager.Initialize();
             this.inProcessProxyExecutionManager.Initialize();
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "ExecutionManager.Initialize() should get called once");
         }
 
         [TestMethod]
@@ -68,7 +67,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "StartTestRun should call Initialize if not already initialized");
         }
 
         [TestMethod]
@@ -78,7 +77,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.inProcessProxyExecutionManager.Initialize();
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "StartTestRun should not call Initialize if already initialized");
         }
 
         [TestMethod]

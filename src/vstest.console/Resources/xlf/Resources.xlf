@@ -176,7 +176,7 @@
         <note></note>
       </trans-unit>
       <trans-unit id="InIsolationHelp">
-        <source>/InIsolation
+        <source>--InIsolation|/InIsolation
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
@@ -732,20 +732,6 @@
       <trans-unit id="TestRunSummaryForCanceledOrAbortedRun">
         <source>Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</source>
         <target state="new">Total tests: Unknown. Passed: {0}. Failed: {1}. Skipped: {2}.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="InProcessHelp">
-        <source>--InProcess|/InProcess
-      Runs the tests in vstest.console.exe process.
-      This is supported for framework ".NETFramework,Version=v4.*", Framework40 and Framework45.</source>
-        <target state="new">--InProcess|/InProcess
-      Runs the tests in vstest.console.exe process.
-      This is supported for framework ".NETFramework,Version=v4.*", Framework40 and Framework45.</target>
-        <note></note>
-      </trans-unit>
-      <trans-unit id="InvalidInProcessCommand">
-        <source>Argument {0} is not expected in the 'InProcess' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InProcess) and try again.</source>
-        <target state="new">Argument {0} is not expected in the 'InProcess' command. Specify the command without the argument (Example: vstest.console.exe myTests.dll /InProcess) and try again.</target>
         <note></note>
       </trans-unit>
     </body>

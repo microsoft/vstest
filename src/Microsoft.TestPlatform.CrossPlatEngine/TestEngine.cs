@@ -31,17 +31,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private readonly TestRuntimeProviderManager testHostProviderManager;
         private ITestExtensionManager testExtensionManager;
         private IProcessHelper processHelper;
+        private bool isInIsolation = false;
 
         #endregion
 
-        public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
+        public TestEngine(bool isInIsolation = false) : this(TestRuntimeProviderManager.Instance, new ProcessHelper(), isInIsolation)
         {
         }
 
-        protected TestEngine(TestRuntimeProviderManager testHostProviderManager, IProcessHelper processHelper)
+        protected TestEngine(TestRuntimeProviderManager testHostProviderManager, IProcessHelper processHelper, bool isInIsolation)
         {
             this.testHostProviderManager = testHostProviderManager;
             this.processHelper = processHelper;
+            this.isInIsolation = isInIsolation;
         }
 
         #region ITestEngine implementation
@@ -63,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
 
-            if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings))
+            if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
                 return new InProcessProxyDiscoveryManager();
             }
@@ -95,7 +97,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
 
-            if (parallelLevel <= 1 && !isDataCollectorEnabled && this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings))
+            if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled))
             {
                 return new InProcessProxyExecutionManager();
             }
@@ -208,11 +210,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             return parallelLevelToUse;
         }
 
-        private bool ShouldRunInNoIsolation(string runsettings)
+        private bool ShouldRunInNoIsolation(string runsettings, bool isParallelEnabled, bool isDataCollectorEnabled)
         {
+            if(this.isInIsolation == true)
+            {
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in isolation");
+                }
+                return false;
+            }
+
             var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
 
-            // If running with the dotnet executable, then dont run in NoIsolation
+            // If running with the dotnet executable, then dont run in InProcess
             if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                 || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
             {
@@ -221,12 +232,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
 
-            if (runConfiguration.InProcess &&
+            // Return true if
+            // 1) Not running in parallel
+            // 2) Data collector is not enabled
+            // 3) Target framework is x86 or anyCpu
+            // 4) DisableAppDomain is false
+            // 5) Not running in design mode
+            // 6) target framework is NETFramework (Desktop test)
+            if (!isParallelEnabled &&
+                !isDataCollectorEnabled &&
+                (runConfiguration.TargetPlatform == Architecture.X86 || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
                 !runConfiguration.DisableAppDomain &&
                 !runConfiguration.DesignMode &&
-                !(runConfiguration.TargetFrameworkVersion.Name.IndexOf("netstandard", StringComparison.OrdinalIgnoreCase) >= 0
-                || runConfiguration.TargetFrameworkVersion.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0))
+                runConfiguration.TargetFrameworkVersion.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
             {
+                if(EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in process(inside vstest.console.exe process)");
+                }
                 return true ;
             }
 

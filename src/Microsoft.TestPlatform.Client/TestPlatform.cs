@@ -46,7 +46,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="TestPlatform"/> class.
         /// </summary>
-        public TestPlatform() : this(new TestEngine(), new FileHelper(), TestRuntimeProviderManager.Instance)
+        /// <param name="isInIsolation">inIsolation command line arg value</param>
+        public TestPlatform(bool isInIsolation = false) : this(new TestEngine(isInIsolation), new FileHelper(), TestRuntimeProviderManager.Instance)
         {
         }
 

@@ -58,7 +58,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
 
         public TestRequestManager() :
             this(CommandLineOptions.Instance,
-            TestPlatformFactory.GetTestPlatform(),
+            TestPlatformFactory.GetTestPlatform(CommandLineOptions.Instance.InIsolation),
             TestLoggerManager.Instance,
             TestRunResultAggregator.Instance,
             TestPlatformEventSource.Instance)

@@ -3,6 +3,7 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 {
     using System;
+    using System.Diagnostics.Contracts;
     using System.Globalization;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
@@ -51,7 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     this.executor =
                         new Lazy<IArgumentExecutor>(
                             () =>
-                            new InIsolationArgumentExecutor());
+                            new InIsolationArgumentExecutor(CommandLineOptions.Instance));
                 }
 
                 return this.executor;
@@ -74,14 +75,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
+        public override string HelpContentResourceName => CommandLineResources.InIsolationHelp;
+
         public override HelpContentPriority HelpPriority => HelpContentPriority.InIsolationArgumentProcessorHelpPriority;
     }
 
     internal class InIsolationArgumentExecutor : IArgumentExecutor
     {
+        private CommandLineOptions commandLineOptions;
         #region Constructors
-        public InIsolationArgumentExecutor()
+        public InIsolationArgumentExecutor(CommandLineOptions options)
         {
+            Contract.Requires(options != null);
+            this.commandLineOptions = options;
         }
         #endregion
 
@@ -99,7 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidInIsolationCommand, argument));
             }
 
-            ConsoleOutput.Instance.WriteLine(CommandLineResources.InIsolationDeprecated, OutputLevel.Information);
+            this.commandLineOptions.InIsolation = true;
         }
 
         /// <summary>

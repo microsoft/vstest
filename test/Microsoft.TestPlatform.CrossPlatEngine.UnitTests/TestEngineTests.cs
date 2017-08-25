@@ -29,15 +29,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         {
             TestPluginCacheTests.SetupMockExtensions(new[] { typeof(TestEngineTests).GetTypeInfo().Assembly.Location }, () => { });
             this.mockProcessHelper = new Mock<IProcessHelper>();
-            this.mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("vstest.console");
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object);
             this.testableTestRuntimeProvider = new TestableRuntimeProvider(true);
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        [TestInitialize]
+        public void Init()
         {
             this.mockProcessHelper.Setup(o => o.GetCurrentProcessFileName()).Returns("vstest.console");
+            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object);
         }
 
         [TestMethod]
@@ -50,6 +49,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnsNewInstanceOfProxyDiscoveryManagerIfTestHostIsShared()
         {
+            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
             var discoveryManager = this.testEngine.GetDiscoveryManager(this.testableTestRuntimeProvider, discoveryCriteria, this.protocolConfig);
 
@@ -60,6 +60,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnsParallelDiscoveryManagerIfTestHostIsNotShared()
         {
+            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
             var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
             this.testableTestRuntimeProvider = new TestableRuntimeProvider(false);
 
@@ -84,9 +85,9 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
+                        <TargetPlatform>x86</TargetPlatform>
                         <DisableAppDomain>true</DisableAppDomain>
-                        <DesignMode>true</DesignMode>
+                        <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
                     </RunConfiguration >
                  </RunSettings>";
@@ -104,7 +105,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
+                        <TargetPlatform>x86</TargetPlatform>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>true</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
@@ -124,7 +125,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
+                        <TargetPlatform>x86</TargetPlatform>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETCoreApp, Version=v1.1</TargetFrameworkVersion>
@@ -144,7 +145,27 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
+                        <TargetPlatform>x86</TargetPlatform>
+                        <DisableAppDomain>false</DisableAppDomain>
+                        <DesignMode>false</DesignMode>
+                        <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
+                    </RunConfiguration >
+                 </RunSettings>";
+
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
+
+            var discoveryManager = this.testEngine.GetDiscoveryManager(this.testableTestRuntimeProvider, discoveryCriteria, this.protocolConfig);
+            Assert.IsNotNull(discoveryManager);
+            Assert.IsNotInstanceOfType(discoveryManager, typeof(InProcessProxyDiscoveryManager));
+        }
+
+        [TestMethod]
+        public void GetDiscoveryManagerShouldNotReturnsInProcessProxyDiscoveryManagereIfTargetPlatformIsX64()
+        {
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <TargetPlatform>x64</TargetPlatform>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETStandard, Version=v1.4</TargetFrameworkVersion>
@@ -164,7 +185,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
+                        <TargetPlatform>x86</TargetPlatform>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
@@ -198,7 +219,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExecutionManagerShouldReturnDefaultExecutionManagerIfParallelDisabled()
         {
-            string settingXml = @"<RunSettings><RunConfiguration></RunConfiguration ></RunSettings>";
+            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
+            string settingXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.testableTestRuntimeProvider, testRunCriteria, this.protocolConfig));
@@ -208,6 +230,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExecutionManagerWithSingleSourceShouldReturnDefaultExecutionManagerEvenIfParallelEnabled()
         {
+            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
             string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration ></RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
@@ -228,6 +251,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExecutionManagerShouldReturnParallelExecutionManagerIfHostIsNotShared()
         {
+            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
             this.testableTestRuntimeProvider = new TestableRuntimeProvider(false);
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, null);
 
@@ -247,12 +271,32 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         }
 
         [TestMethod]
+        public void GetExecutionManagerShouldNotReturnInProcessProxyexecutionManagerIfInIsolationIsTrue()
+        {
+            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
+            string settingXml =
+               @"<RunSettings>
+                    <RunConfiguration>
+                        <DisableAppDomain>false</DisableAppDomain>
+                        <DesignMode>false</DesignMode>
+                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                    </RunConfiguration >
+                 </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+
+            var executionManager = this.testEngine.GetExecutionManager(this.testableTestRuntimeProvider, testRunCriteria, this.protocolConfig);
+
+            Assert.IsNotNull(executionManager);
+            Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
+        }
+
+        [TestMethod]
         public void GetExecutionManagerShouldNotReturnInProcessProxyexecutionManagerIfParallelEnabled()
         {
             string settingXml =
                @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
@@ -274,7 +318,6 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
@@ -296,13 +339,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
         }
 
+
         [TestMethod]
         public void GetExecutionManagerShouldReturnInProcessProxyexecutionManager()
         {
             string settingXml =
                 @"<RunSettings>
                     <RunConfiguration>
-                        <InProcess>true</InProcess>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>

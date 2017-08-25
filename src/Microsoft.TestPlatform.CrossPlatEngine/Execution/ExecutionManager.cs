@@ -53,7 +53,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             this.testPlatformEventSource.AdapterSearchStart();
 
-            if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Count() > 0)
+            if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
             {
                 // Start using these additional extensions
                 TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;

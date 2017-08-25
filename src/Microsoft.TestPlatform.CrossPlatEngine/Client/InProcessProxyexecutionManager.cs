@@ -14,9 +14,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    class InProcessProxyExecutionManager : IProxyExecutionManager
+    internal class InProcessProxyExecutionManager : IProxyExecutionManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
+        IExecutionManager executionManager;
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
@@ -35,14 +36,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         internal InProcessProxyExecutionManager(ITestHostManagerFactory testHostManagerFactory)
         {
             this.testHostManagerFactory = testHostManagerFactory;
+            this.executionManager = this.testHostManagerFactory.GetExecutionManager();
         }
 
+        /// <summary>
+        /// Initialize adapters.
+        /// </summary>
         public void Initialize()
         {
             if (!this.IsInitialized)
             {
-                var executionManager = this.testHostManagerFactory.GetExecutionManager();
-
                 // We don't need to pass list of extension as we are running inside vstest.console and
                 // it will use TestPluginCache of vstest.console
                 executionManager.Initialize(Enumerable.Empty<string>());
@@ -50,17 +53,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             }
         }
 
+        /// <inheritdoc/>
         public int StartTestRun(TestRunCriteria testRunCriteria, ITestRunEventsHandler eventHandler)
         {
             try
             {
-                var executionManager = this.testHostManagerFactory.GetExecutionManager();
-
                 // Initialize extension before execution if not already initialized
-                if (!this.IsInitialized)
-                {
-                    executionManager.Initialize(Enumerable.Empty<string>());
-                }
+                this.Initialize();
 
                 var executionContext = new TestExecutionContext(
                             testRunCriteria.FrequencyOfRunStatsChangeEvent,
@@ -89,8 +88,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             {
                 EqtTrace.Error("InProcessProxyexecutionManager.StartTestRun: Failed to start test run: {0}", exception);
 
-                // Send a discovery complete to caller.
-                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.Message);
+                // Send exception message.
+                eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
 
                 // Send a run complete to caller.
                 var completeArgs = new TestRunCompleteEventArgs(null, false, true, exception, new Collection<AttachmentSet>(), TimeSpan.Zero);

@@ -26,9 +26,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockDiscoveryManager = new Mock<IDiscoveryManager>();
-            this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManagerFactory.Object);
-
             this.mockTestHostManagerFactory.Setup(o => o.GetDiscoveryManager()).Returns(this.mockDiscoveryManager.Object);
+            this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManagerFactory.Object);
         }
 
         [TestCleanup]
@@ -43,14 +42,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         public void InitializeShouldCallDiscoveryManagerInitializeWithEmptyIEnumerable()
         {
             this.inProcessProxyDiscoveryManager.Initialize();
-            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "DiscoveryManager.Initialize() should get called with empty list");
         }
 
         [TestMethod]
         public void InitializeShouldSetIsInitializedTotrue()
         {
             this.inProcessProxyDiscoveryManager.Initialize();
-            Assert.IsTrue(this.inProcessProxyDiscoveryManager.IsInitialized);
+            Assert.IsTrue(this.inProcessProxyDiscoveryManager.IsInitialized, "DiscoveryManager.Initialize() is not setting the value of varable IsInitialized to true");
         }
 
         [TestMethod]
@@ -58,7 +57,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         {
             this.inProcessProxyDiscoveryManager.Initialize();
             this.inProcessProxyDiscoveryManager.Initialize();
-            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "DiscoveryManager.Initialize() should get called once");
         }
 
         [TestMethod]
@@ -71,7 +70,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.inProcessProxyDiscoveryManager.DiscoverTests(null, null);
 
-            Assert.IsTrue(manualResetEvent.WaitOne(5000));
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "DiscoverTests should call Initialize if not already initialized");
         }
 
         [TestMethod]
@@ -86,7 +85,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.inProcessProxyDiscoveryManager.DiscoverTests(null, null);
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000));
-            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once);
+            this.mockDiscoveryManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "DiscoverTests should not call Initialize if already initialized");
         }
 
         [TestMethod]
