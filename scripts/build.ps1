@@ -197,7 +197,7 @@ function Publish-Package
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
-	$coreCLR20TestHostPackageDir = Join-Path $coreCLR20PackageDir "TestHost"
+	$coreCLR20TestHostPackageDir = Get-CoreCLR20TestHostPackageDirectory
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
@@ -261,7 +261,7 @@ function Publish-Package
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
     Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
-    Copy-Item -Recurse $comComponentsDirectory\* $$coreCLR20TestHostPackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
 
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
@@ -474,6 +474,11 @@ function Get-CoreCLRPackageDirectory
 function Get-CoreCLR20PackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20")
+}
+
+function Get-CoreCLR20TestHostPackageDirectory
+{
+    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20\TestHost")
 }
 
 function Start-Timer
