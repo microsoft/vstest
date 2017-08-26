@@ -197,6 +197,7 @@ function Publish-Package
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
+	$coreCLR20TestHostPackageDir = Join-Path $coreCLR20PackageDir "TestHost"
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
@@ -247,6 +248,7 @@ function Publish-Package
         Set-ScriptFailed
     }
 
+    Write-Log "Package: Publish platform abstractions"
     # Publish platform abstractions
     $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
     $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
@@ -254,6 +256,13 @@ function Publish-Package
     Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
     
+    Write-Log "Package: Publish msdia"
+    # Publish msdia
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $$coreCLR20TestHostPackageDir -Force
+
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
     $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
@@ -329,7 +338,7 @@ function Create-VsixPackage
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
-    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostPackageDir -Force
 
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"

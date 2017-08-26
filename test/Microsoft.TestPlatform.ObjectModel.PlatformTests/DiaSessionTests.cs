@@ -77,8 +77,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
 
             // Weird why DiaSession is now returning the first overloaded method
             // as compared to before when it used to  retun second method
-            this.ValidateMinLineNumber(22, diaNavigationData.MinLineNumber);
-            Assert.AreEqual(23, diaNavigationData.MaxLineNumber, "Incorrect max line number");
+            this.ValidateLineNumbers(diaNavigationData.MinLineNumber, diaNavigationData.MaxLineNumber);
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
         }
@@ -121,6 +120,31 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             Assert.IsTrue(watch.Elapsed.Milliseconds < expectedTime, string.Format("DiaSession Perf test Actual time:{0} ms Expected time:{1} ms", watch.Elapsed.Milliseconds, expectedTime));
 
             this.testEnvironment.TargetFramework = currentTargetFrameWork;
+        }
+
+        private void ValidateLineNumbers(int min, int max)
+        {
+            // Release builds optimize code, hence min line numbers are different.
+            if (this.testEnvironment.BuildConfiguration.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+            {
+                Assert.AreEqual(min, max, "Incorrect min line number");
+            }
+            else
+            {
+                if (max == 23)
+                {
+                    Assert.AreEqual(min + 1, max, "Incorrect min line number");
+                }
+
+                else if (max == 27)
+                {
+                    Assert.AreEqual(min + 1, max, "Incorrect min line number");
+                }
+                else
+                {
+                    Assert.Fail("Incorrect min/max line number");
+                }
+            }
         }
 
         private void ValidateMinLineNumber(int expected, int actual)

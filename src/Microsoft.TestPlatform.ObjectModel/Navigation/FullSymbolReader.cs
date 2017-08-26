@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.IO;
     using System.Runtime.InteropServices;
 
     /// <summary>
@@ -30,8 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         /// Holds method symbols for all types in the source.
         /// Methods in different types can have same name, hence seprated dicitionary is created for each type.
         /// Bug: Method overrides in same type are not handled (not a regression)
-        /// Solution: Use method token along with as identifier, this will always give unique method.
-        /// The adapters would need to send this token to us to correct the behavior
+        /// ToDo(Solution): Use method token along with as identifier, this will always give unique method.The adapters would need to send this token to us to correct the behavior.
         /// </summary>
         private Dictionary<string, Dictionary<string, IDiaSymbol>> methodSymbols = new Dictionary<string, Dictionary<string, IDiaSymbol>>();
 
@@ -60,7 +60,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
         {
             try
             {
-                OpenSession(binaryPath, searchPath);
+                if(OpenSession(binaryPath, searchPath))
+                {
+                    this.PopulateCacheForTypeAndMethodSymbols();
+                }
             }
             catch (COMException)
             {
@@ -109,28 +112,45 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             return navigationData;
         }
 
-        private void OpenSession(string filename, string searchPath)
+        private bool OpenSession(string filename, string searchPath)
         {
             try
             {
                 // Activate the DIA data source COM object
                 this.source = DiaSourceObject.GetDiaSourceObject();
 
+                if (this.source == null)
+                {
+                    return false;
+                }
+
+                // UWP(App model) scenario
+                if (!Path.IsPathRooted(filename))
+                {
+                    // Big Big hack, talk to UWP deployement team as to how to fix this.
+                    // Do not check this PR till this is resolved
+                    filename = Path.Combine(Directory.GetCurrentDirectory(), "entrypoint", filename);
+                    if (string.IsNullOrEmpty(searchPath))
+                    {
+                        searchPath = Directory.GetCurrentDirectory();
+                    }
+                }
+
                 // Load the data for the executable
                 if (HResult.Failed(this.source.LoadDataForExe(filename, searchPath, IntPtr.Zero)))
                 {
-                    return;
+                    return false;
                 }
 
                 // Open the session and return it
                 if (HResult.Failed(this.source.OpenSession(out this.session)))
                 {
-                    return;
+                    return false;
                 }
             }
             catch (COMException)
             {
-                return;
+                return false;
             }
             finally
             {
@@ -139,6 +159,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                     Marshal.FinalReleaseComObject(this.source);
                 }
             }
+
+            return true;
         }
 
         private DiaNavigationData GetSymbolNavigationData(IDiaSymbol symbol)
