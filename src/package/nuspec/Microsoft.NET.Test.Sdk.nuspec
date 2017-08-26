@@ -14,6 +14,7 @@
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <dependencies>
       <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
+      <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
     </dependencies>
   </metadata>
   <files>
