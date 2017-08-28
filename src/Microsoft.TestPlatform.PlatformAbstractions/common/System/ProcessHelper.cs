@@ -161,5 +161,11 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
             var proc = process as Process;
             return proc?.Id ?? -1;
         }
+
+        /// <inheritdoc/>
+        public string GetCurrentProcessLocation()
+        {
+            return Path.GetDirectoryName(this.GetCurrentProcessFileName());
+        }
     }
 }
