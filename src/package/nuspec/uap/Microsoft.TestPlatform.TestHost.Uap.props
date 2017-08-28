@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Microsoft.TestPlatform.CommunicationUtilities.dll">
+      <Link>Microsoft.TestPlatform.CommunicationUtilities.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Microsoft.TestPlatform.CoreUtilities.dll">
+      <Link>Microsoft.TestPlatform.CoreUtilities.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+	<Content Include="$(MSBuildThisFileDirectory)Microsoft.TestPlatform.CrossPlatEngine.dll">
+      <Link>Microsoft.TestPlatform.CrossPlatEngine.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+	<Content Include="$(MSBuildThisFileDirectory)Microsoft.TestPlatform.PlatformAbstractions.dll">
+      <Link>Microsoft.TestPlatform.PlatformAbstractions.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+	<Content Include="$(MSBuildThisFileDirectory)Microsoft.TestPlatform.Utilities.dll">
+      <Link>Microsoft.TestPlatform.Utilities.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+	<Content Include="$(MSBuildThisFileDirectory)Microsoft.VisualStudio.TestPlatform.Common.dll">
+      <Link>Microsoft.VisualStudio.TestPlatform.Common.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+	<Content Include="$(MSBuildThisFileDirectory)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll">
+      <Link>Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+  </ItemGroup>
+</Project>

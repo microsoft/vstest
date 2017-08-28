@@ -390,6 +390,11 @@ function Create-NugetPackages
     Copy-Item $tpNuspecDir\"_._" $stagingDir -Force
     Copy-Item $tpNuspecDir\..\"ThirdPartyNotices.txt" $stagingDir -Force
 
+    #Copy Uap target, & props
+    $testhostNS1_4PackageDir = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\Microsoft.TestPlatform.TestHost\$TPB_TargetFrameworkNS1_4")
+    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.props" $testhostNS1_4PackageDir\Microsoft.TestPlatform.TestHost.props -Force
+    Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostNS1_4PackageDir\Microsoft.TestPlatform.TestHost.targets -Force
+
     # Call nuget pack on these components.
     $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
 
