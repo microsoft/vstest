@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
 {
     using System;
     using System.Collections.Generic;
-
+    using System.IO;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
@@ -29,6 +29,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         public string GetCurrentProcessFileName()
         {
             throw new NotImplementedException();
+        }
+
+        /// <inheritdoc/>
+        public string GetCurrentProcessLocation()
+        {
+            return Directory.GetCurrentDirectory();
         }
 
         /// <inheritdoc/>
