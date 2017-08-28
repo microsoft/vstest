@@ -339,6 +339,36 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
             Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
         }
 
+        [TestMethod]
+        public void GetExecutionManagerShouldNotReturnInProcessProxyexecutionManagerIfInProcDataCollectorIsEnabled()
+        {
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <DisableAppDomain>false</DisableAppDomain>
+                        <DesignMode>false</DesignMode>
+                        <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>
+                        <MaxCpuCount>1</MaxCpuCount>
+                    </RunConfiguration >
+                    <InProcDataCollectionRunSettings>
+                        <InProcDataCollectors>
+                            <InProcDataCollector friendlyName='Test Impact' uri='InProcDataCollector://Microsoft/TestImpact/1.0' assemblyQualifiedName='SimpleDataCollector.SimpleDataCollector, SimpleDataCollector, Version=15.5.0.0, Culture=neutral, PublicKeyToken=7ccb7239ffde675a'  codebase='E:\Enlistments\vstest\test\TestAssets\SimpleDataCollector\bin\Debug\net451\SimpleDataCollector.dll'>
+                                <Configuration>
+                                    <Port>4312</Port>
+                                </Configuration>
+                            </InProcDataCollector>
+                        </InProcDataCollectors>
+                    </InProcDataCollectionRunSettings>
+                 </RunSettings>";
+
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
+
+            var executionManager = this.testEngine.GetExecutionManager(this.testableTestRuntimeProvider, testRunCriteria, this.protocolConfig);
+
+            Assert.IsNotNull(executionManager);
+            Assert.IsNotInstanceOfType(executionManager, typeof(InProcessProxyExecutionManager));
+        }
+
 
         [TestMethod]
         public void GetExecutionManagerShouldReturnInProcessProxyexecutionManager()
