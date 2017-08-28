@@ -570,8 +570,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
 
             if(modHandle == IntPtr.Zero)
             {
-                // Failed to load msdia140, why?
-                return null;
+                throw new COMException(string.Format(Resources.Resources.FailedToLoadMsDia));
             }
 
             var diaSourceClassGuid = new Guid("{E6756135-1E65-4D17-8576-610761398C3C}");

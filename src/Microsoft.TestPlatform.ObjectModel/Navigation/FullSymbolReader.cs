@@ -137,9 +137,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
                 }
 
                 // Load the data for the executable
-                if (HResult.Failed(this.source.LoadDataForExe(filename, searchPath, IntPtr.Zero)))
+                int hResult = this.source.LoadDataForExe(filename, searchPath, IntPtr.Zero);
+                if (HResult.Failed(hResult))
                 {
-                    return false;
+                    throw new COMException(string.Format(Resources.Resources.FailedToCreateDiaSession, hResult));
                 }
 
                 // Open the session and return it
