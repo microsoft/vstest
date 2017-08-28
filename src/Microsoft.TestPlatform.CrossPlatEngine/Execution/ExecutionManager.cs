@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using System.Linq;
 
     /// <summary>
     /// Orchestrates test execution related functionality for the engine communicating with the test host process.
@@ -64,12 +65,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Starts the test run
         /// </summary>
         /// <param name="adapterSourceMap"> The adapter Source Map.  </param>
+        /// <param name="packages">The user input test sources(packages) list if they differ from actual test source otherwise null.</param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         /// <param name="testCaseEventsHandler"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine.  </param>
         public void StartTestRun(
             Dictionary<string, IEnumerable<string>> adapterSourceMap,
+            IEnumerable<string> packages,
             string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
@@ -80,6 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.activeTestRun = new RunTestsWithSources(
                      adapterSourceMap,
+                     packages,
                      runSettings,
                      testExecutionContext,
                      testCaseEventsHandler,
@@ -102,12 +106,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Starts the test run with tests.
         /// </summary>
         /// <param name="tests"> The test list. </param>
+        /// <param name="packages">The user input test sources(packages) list if they differ from actual test source otherwise null.</param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         /// <param name="testCaseEventsHandler"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine. </param>
         public void StartTestRun(
             IEnumerable<TestCase> tests,
+            IEnumerable<string> packages,
             string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
@@ -119,6 +125,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.activeTestRun = new RunTestsWithTests(
                                          tests,
+                                         packages,
                                          runSettings,
                                          testExecutionContext,
                                          testCaseEventsHandler,

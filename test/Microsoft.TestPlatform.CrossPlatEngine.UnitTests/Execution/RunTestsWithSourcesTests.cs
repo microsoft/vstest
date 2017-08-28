@@ -205,7 +205,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
             public TestableRunTestsWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string runSettings, 
                 TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
                 : base(
-                    adapterSourceMap, runSettings, testExecutionContext, testCaseEventsHandler,
+                    adapterSourceMap, null, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler)
             {
             }
@@ -214,7 +214,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 TestExecutionContext testExecutionContext,
                 ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, IEnumerable<string>> executorUriVsSourceList)
                 : base(
-                    adapterSourceMap, runSettings, testExecutionContext, testCaseEventsHandler,
+                    adapterSourceMap, null, runSettings, testExecutionContext, testCaseEventsHandler,
                     testRunEventsHandler, executorUriVsSourceList)
             {
             }

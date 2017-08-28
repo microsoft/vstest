@@ -24,8 +24,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList;
 
-        public RunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
-            : this(testCases, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
+        public RunTestsWithTests(IEnumerable<TestCase> testCases, IEnumerable<string> packages, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+            : this(testCases, packages, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
         {
         }
 
@@ -33,14 +33,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Used for unit testing only.
         /// </summary>
         /// <param name="testCases"></param>
+        /// <param name="packages">The user input test sources(packages) list if they differ from actual test source otherwise null.</param>
         /// <param name="testRunCache"></param>
         /// <param name="runSettings"></param>
         /// <param name="testExecutionContext"></param>
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
         /// <param name="executorUriVsTestList"></param>
-        internal RunTestsWithTests(IEnumerable<TestCase> testCases, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
-            : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
+        internal RunTestsWithTests(IEnumerable<TestCase> testCases, IEnumerable<string> packages, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
+            : base(packages, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
         {
             this.testCases = testCases;
             this.executorUriVsTestList = executorUriVsTestList;

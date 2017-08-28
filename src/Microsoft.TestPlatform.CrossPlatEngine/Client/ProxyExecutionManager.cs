@@ -121,13 +121,27 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                     var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
+
+                    var actualTestSources = this.testHostManager.GetTestSources(testSources);
+
+                    // For netcore/fullclr both packages and sources are same thing, 
+                    // For UWP the actual source(exe) differs from input source(.appxrecipe) which we call package.
+                    // So in such models we check if they differ, then we pass this info to test host to update TestCase source with package info,
+                    // since this is needed by IDE's to map a TestCase to project.
+                    var testSourcesDiffer = testSources.Except(actualTestSources).Any();
+
                     if (testRunCriteria.HasSpecificSources)
                     {
                         // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
                         // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
-                        this.UpdateTestSources(testRunCriteria.Sources, testRunCriteria.AdapterSourceMap);
+                        if(testSourcesDiffer)
+                        {
+                            this.UpdateTestSources(testRunCriteria.Sources, testRunCriteria.AdapterSourceMap);
+                        }
+
                         var runRequest = new TestRunCriteriaWithSources(
                             testRunCriteria.AdapterSourceMap,
+                            testSourcesDiffer ? testSources : null,
                             runsettings,
                             executionContext);
 
@@ -135,8 +149,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     }
                     else
                     {
+                        // In UWP scenario TestCase object contains the package as source, which is not actual test source for adapters, 
+                        // so update test case before sending them.
+                        // This approach will fail, once a package concept is introduced, where a package can contain multiple test sources.
+                        if (testSourcesDiffer)
+                        {
+                            testRunCriteria.Tests.ToList().ForEach(tc => tc.Source = actualTestSources.FirstOrDefault());
+                        }
+
                         var runRequest = new TestRunCriteriaWithTests(
                             testRunCriteria.Tests,
+                            testSourcesDiffer ? testSources : null,
                             runsettings,
                             executionContext);
 

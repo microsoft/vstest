@@ -31,6 +31,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         private ITestPlatformEventSource testPlatformEventSource;
 
         private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
+        private DiscoveryCriteria discoveryCriteria;
+        private bool updateTestCaseSource;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
@@ -50,6 +52,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             this.sessionMessageLogger = TestSessionMessageLogger.Instance;
             this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
             this.testPlatformEventSource = testPlatformEventSource;
+            this.updateTestCaseSource = false;
         }
 
         /// <summary>
@@ -82,8 +85,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
             try
             {
+                this.discoveryCriteria = discoveryCriteria;
                 EqtTrace.Info("TestDiscoveryManager.DoDiscovery: Background test discovery started.");
                 this.testDiscoveryEventsHandler = eventHandler;
+
+                // For netcore/fullclr both packages and sources are same thing, 
+                // For UWP the actual source(exe) differs from input source(.appxrecipe) which we call package.
+                // So in such models we check if they differ, then we pass this info to test host to update TestCase source with package info,
+                // since this is needed by IDE's to map a TestCase to project.
+
+                // For older testhost(netcore), we were not passing this Source Info from runner, so adding a null check.
+                if(this.discoveryCriteria.Sources != null)
+                {
+                    this.updateTestCaseSource = this.discoveryCriteria.Sources.Except(this.discoveryCriteria.AdapterSourceMap.FirstOrDefault().Value).Any();
+                }
 
                 var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
@@ -118,6 +133,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (eventHandler != null)
                 {
+                    if(lastChunk != null && this.updateTestCaseSource)
+                    {
+                        lastChunk.ToList().ForEach(tc => tc.Source = this.discoveryCriteria.Sources.FirstOrDefault());
+                    }
+
                     eventHandler.HandleDiscoveryComplete(totalDiscoveredTestCount, lastChunk, false);
                 }
                 else
@@ -142,6 +162,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
         private void OnReportTestCases(IEnumerable<TestCase> testCases)
         {
+            // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users), 
+            // else these test cases are not displayed in TestWindow.
+            if (this.updateTestCaseSource)
+            {
+                testCases.ToList().ForEach(tc => tc.Source = this.discoveryCriteria.Sources.FirstOrDefault());
+            }
+
             if (this.testDiscoveryEventsHandler != null)
             {
                 this.testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);

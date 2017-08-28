@@ -72,6 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 throw new ArgumentOutOfRangeException(nameof(discoveredTestEventTimeout), Resources.NotificationTimeoutIsZero);
             }
 
+            this.Sources = sources;
             this.AdapterSourceMap = new Dictionary<string, IEnumerable<string>>();
             this.AdapterSourceMap.Add(Constants.UnspecifiedAdapterPath, sources);
             this.FrequencyOfDiscoveredTestsEvent = frequencyOfDiscoveredTestsEvent;
@@ -83,16 +84,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// <summary>
         /// Gets the test Containers (e.g. DLL/EXE/artifacts to scan)
         /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<string> Sources
-        {
-            get
-            {
-                IEnumerable<string> sources = new List<string>();
-                return this.AdapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
-            }
-        }
-        
+        [DataMember]
+        public IEnumerable<string> Sources { get; private set; }
+
         /// <summary>
         /// Gets the test adapter and source map which would look like below:
         /// <code>

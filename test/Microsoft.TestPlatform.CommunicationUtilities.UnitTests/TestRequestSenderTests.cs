@@ -335,7 +335,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void StartTestRunWithSourcesShouldCallHandleTestRunStatsChange()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var runCriteria = new TestRunCriteriaWithSources(null, null, null);
+            var runCriteria = new TestRunCriteriaWithSources(null, null, null, null);
 
             var testRunChangedArgs = new TestRunChangedEventArgs(null, null, null);
             var rawMessage = "OnTestRunStatsChange";
@@ -382,7 +382,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void StartTestRunWithTestsShouldCallHandleTestRunStatsChange()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var runCriteria = new TestRunCriteriaWithTests(null, null, null);
+            var runCriteria = new TestRunCriteriaWithTests(null, null, null, null);
 
             var testRunChangedArgs = new TestRunChangedEventArgs(null, null, null);
             var rawMessage = "OnTestRunStatsChange";
@@ -420,7 +420,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void StartTestRunShouldCallHandleLogMessageOnTestMessage()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var runCriteria = new TestRunCriteriaWithSources(null, null, null);
+            var runCriteria = new TestRunCriteriaWithSources(null, null, null, null);
 
             var rawMessage = "OnLogMessage";
             var message = new Message() { MessageType = MessageType.TestMessage, Payload = null };
@@ -456,7 +456,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void StartTestRunShouldCallLaunchProcessWithDebuggerAndWaitForCallback()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var runCriteria = new TestRunCriteriaWithSources(null, null, null);
+            var runCriteria = new TestRunCriteriaWithSources(null, null, null, null);
 
             var rawMessage = "LaunchProcessWithDebugger";
             var message = new Message() { MessageType = MessageType.LaunchAdapterProcessWithDebuggerAttached, Payload = null };
@@ -503,7 +503,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         public void StartTestRunShouldCallHandleTestRunCompleteOnRunCompletion()
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var runCriteria = new TestRunCriteriaWithTests(null, null, null);
+            var runCriteria = new TestRunCriteriaWithTests(null, null, null, null);
 
             var rawMessage = "ExecComplete";
             var message = new Message() { MessageType = MessageType.ExecutionComplete, Payload = null };
@@ -576,7 +576,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private void StartTestRunErrorTestsTemplate(string errorMessage, Action<string> onClientProcessExitCallback)
         {
             var mockHandler = new Mock<ITestRunEventsHandler>();
-            var runCriteria = new TestRunCriteriaWithSources(null, null, null);
+            var runCriteria = new TestRunCriteriaWithSources(null, null, null, null);
             this.mockCommunicationManager.Setup(mc => mc.ReceiveRawMessageAsync(It.IsAny<CancellationToken>()))
                 .Callback(() => onClientProcessExitCallback(errorMessage)).Returns(Task.FromResult((string)null));
             this.mockCommunicationManager.Setup(mc => mc.HostServer(It.IsAny<IPEndPoint>())).Returns(new IPEndPoint(IPAddress.Loopback, 0));

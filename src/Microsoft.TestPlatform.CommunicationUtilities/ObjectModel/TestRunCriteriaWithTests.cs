@@ -21,12 +21,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Ensure that names of constructor parameters match the public property names of the same for JSON serialization
         /// </summary>
         /// <param name="tests"> The tests. </param>
+        /// <param name="packages"> The packages which actually contain sources(UWP).</param>
         /// <param name="runSettings"> The test run settings. </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         [JsonConstructor]
-        public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string runSettings, TestExecutionContext testExecutionContext)
+        public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, IEnumerable<string> packages, string runSettings, TestExecutionContext testExecutionContext)
         {
             this.Tests = tests;
+            this.Packages = packages;
             this.RunSettings = runSettings;
             this.TestExecutionContext = testExecutionContext;
         }
@@ -45,5 +47,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets the test execution context.
         /// </summary>
         public TestExecutionContext TestExecutionContext { get; set; }
+
+        /// <summary>
+        /// Gets the test Containers (e.g. DLL/EXE/artifacts to scan)
+        /// </summary>
+        public IEnumerable<string> Packages { get; private set; }
     }
 }
