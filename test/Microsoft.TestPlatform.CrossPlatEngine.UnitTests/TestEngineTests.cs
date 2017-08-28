@@ -49,8 +49,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnsNewInstanceOfProxyDiscoveryManagerIfTestHostIsShared()
         {
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
-            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <InIsolation>true</InIsolation>
+                    </RunConfiguration >
+                 </RunSettings>";
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
             var discoveryManager = this.testEngine.GetDiscoveryManager(this.testableTestRuntimeProvider, discoveryCriteria, this.protocolConfig);
 
             Assert.AreNotSame(discoveryManager, this.testEngine.GetDiscoveryManager(this.testableTestRuntimeProvider, discoveryCriteria, this.protocolConfig));
@@ -60,8 +65,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetDiscoveryManagerShouldReturnsParallelDiscoveryManagerIfTestHostIsNotShared()
         {
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
-            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, null);
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <InIsolation>true</InIsolation>
+                    </RunConfiguration >
+                 </RunSettings>";
+            var discoveryCriteria = new DiscoveryCriteria(new List<string> { "1.dll" }, 100, settingXml);
             this.testableTestRuntimeProvider = new TestableRuntimeProvider(false);
 
             Assert.IsNotNull(this.testEngine.GetDiscoveryManager(this.testableTestRuntimeProvider, discoveryCriteria, this.protocolConfig));
@@ -219,8 +229,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExecutionManagerShouldReturnDefaultExecutionManagerIfParallelDisabled()
         {
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
-            string settingXml = @"<RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            string settingXml = @"<RunSettings><RunConfiguration><InIsolation>true</InIsolation></RunConfiguration></RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.testableTestRuntimeProvider, testRunCriteria, this.protocolConfig));
@@ -230,8 +239,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExecutionManagerWithSingleSourceShouldReturnDefaultExecutionManagerEvenIfParallelEnabled()
         {
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
-            string settingXml = @"<RunSettings><RunConfiguration><MaxCpuCount>2</MaxCpuCount></RunConfiguration ></RunSettings>";
+            string settingXml = 
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <MaxCpuCount>2</MaxCpuCount>
+                        <InIsolation>true</InIsolation>
+                    </RunConfiguration >
+                </RunSettings>";
             var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll" }, 100, false, settingXml);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.testableTestRuntimeProvider, testRunCriteria, this.protocolConfig));
@@ -251,9 +265,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExecutionManagerShouldReturnParallelExecutionManagerIfHostIsNotShared()
         {
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
+            string settingXml =
+                @"<RunSettings>
+                    <RunConfiguration>
+                        <InIsolation>true</InIsolation>
+                    </RunConfiguration >
+                </RunSettings>";
             this.testableTestRuntimeProvider = new TestableRuntimeProvider(false);
-            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, null);
+            var testRunCriteria = new TestRunCriteria(new List<string> { "1.dll", "2.dll" }, 100, false, settingXml);
 
             Assert.IsNotNull(this.testEngine.GetExecutionManager(this.testableTestRuntimeProvider, testRunCriteria, this.protocolConfig));
             Assert.IsInstanceOfType(this.testEngine.GetExecutionManager(this.testableTestRuntimeProvider, testRunCriteria, this.protocolConfig), typeof(ParallelProxyExecutionManager));
@@ -273,10 +292,10 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
         [TestMethod]
         public void GetExecutionManagerShouldNotReturnInProcessProxyexecutionManagerIfInIsolationIsTrue()
         {
-            this.testEngine = new TestableTestEngine(this.mockProcessHelper.Object, true);
             string settingXml =
                @"<RunSettings>
                     <RunConfiguration>
+                        <InIsolation>true</InIsolation>
                         <DisableAppDomain>false</DisableAppDomain>
                         <DesignMode>false</DesignMode>
                         <TargetFrameworkVersion>.NETFramework, Version=v4.5</TargetFrameworkVersion>

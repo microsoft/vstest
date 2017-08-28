@@ -31,19 +31,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         private readonly TestRuntimeProviderManager testHostProviderManager;
         private ITestExtensionManager testExtensionManager;
         private IProcessHelper processHelper;
-        private bool isInIsolation = false;
 
         #endregion
 
-        public TestEngine(bool isInIsolation = false) : this(TestRuntimeProviderManager.Instance, new ProcessHelper(), isInIsolation)
+        public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
         {
         }
 
-        protected TestEngine(TestRuntimeProviderManager testHostProviderManager, IProcessHelper processHelper, bool isInIsolation)
+        protected TestEngine(TestRuntimeProviderManager testHostProviderManager, IProcessHelper processHelper)
         {
             this.testHostProviderManager = testHostProviderManager;
             this.processHelper = processHelper;
-            this.isInIsolation = isInIsolation;
         }
 
         #region ITestEngine implementation
@@ -67,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
             {
-                return new InProcessProxyDiscoveryManager();
+                return new InProcessProxyDiscoveryManager(testHostManager);
             }
 
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
@@ -100,7 +98,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
             if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
             {
-                return new InProcessProxyExecutionManager();
+                return new InProcessProxyExecutionManager(testHostManager);
             }
 
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
@@ -213,7 +211,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         private bool ShouldRunInNoIsolation(string runsettings, bool isParallelEnabled, bool isDataCollectorEnabled)
         {
-            if(this.isInIsolation == true)
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
+
+            if (runConfiguration.InIsolation)
             {
                 if (EqtTrace.IsInfoEnabled)
                 {
@@ -230,8 +230,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             {
                 return false;
             }
-
-            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
 
             // Return true if
             // 1) Not running in parallel

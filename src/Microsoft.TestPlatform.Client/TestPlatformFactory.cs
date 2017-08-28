@@ -16,9 +16,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Client
         /// Gets an instance of the test platform.
         /// </summary>
         /// <returns> The <see cref="ITestPlatform"/> instance. </returns>
-        public static ITestPlatform GetTestPlatform(bool isInIsolation)
+        public static ITestPlatform GetTestPlatform()
         {
-            return testPlatform ?? (testPlatform = new TestPlatform(isInIsolation));
+            return testPlatform ?? (testPlatform = new TestPlatform());
         }
     }
 }

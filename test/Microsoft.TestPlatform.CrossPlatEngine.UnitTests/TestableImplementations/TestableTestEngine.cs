@@ -10,8 +10,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 
     public class TestableTestEngine : TestEngine
     {
-        public TestableTestEngine(IProcessHelper processHelper, bool isInIsolation = false)
-            : base(TestRuntimeProviderManager.Instance, processHelper, isInIsolation)
+        public TestableTestEngine(IProcessHelper processHelper)
+            : base(TestRuntimeProviderManager.Instance, processHelper)
         {
         }
     }

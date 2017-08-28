@@ -5,7 +5,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     using System;
     using System.Diagnostics.Contracts;
     using System.Globalization;
-    using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Common;
+    using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
     using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
     /// <summary>
@@ -52,7 +54,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     this.executor =
                         new Lazy<IArgumentExecutor>(
                             () =>
-                            new InIsolationArgumentExecutor(CommandLineOptions.Instance));
+                            new InIsolationArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
                 }
 
                 return this.executor;
@@ -73,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
         public override bool IsAction => false;
 
-        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
+        public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.AutoUpdateRunSettings;
 
         public override string HelpContentResourceName => CommandLineResources.InIsolationHelp;
 
@@ -83,11 +85,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
     internal class InIsolationArgumentExecutor : IArgumentExecutor
     {
         private CommandLineOptions commandLineOptions;
+        private IRunSettingsProvider runSettingsManager;
+
+        public const string RunSettingsPath = "RunConfiguration.InIsolation";
+
         #region Constructors
-        public InIsolationArgumentExecutor(CommandLineOptions options)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="options">Commandline options</param>
+        /// <param name="runSettingsManager">the runsettings manager</param>
+        public InIsolationArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
         {
             Contract.Requires(options != null);
             this.commandLineOptions = options;
+            this.runSettingsManager = runSettingsManager;
         }
         #endregion
 
@@ -99,6 +111,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
         /// <param name="argument">Argument that was provided with the command.</param>
         public void Initialize(string argument)
         {
+            // InIsolation does not require any argument, throws exception if argument specified
             if (!string.IsNullOrWhiteSpace(argument))
             {
                 throw new CommandLineException(
@@ -106,6 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             }
 
             this.commandLineOptions.InIsolation = true;
+            this.runSettingsManager.UpdateRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath, "true");
         }
 
         /// <summary>

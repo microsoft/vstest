@@ -7,11 +7,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
+    using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.ClientProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
 
@@ -21,14 +23,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private Mock<ITestHostManagerFactory> mockTestHostManagerFactory;
         private InProcessProxyExecutionManager inProcessProxyExecutionManager;
         private Mock<IExecutionManager> mockExecutionManager;
+        private Mock<ITestRuntimeProvider> mockTestHostManager;
 
         [TestInitialize]
         public void TestInitialize()
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
             this.mockExecutionManager = new Mock<IExecutionManager>();
+            this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
             this.mockTestHostManagerFactory.Setup(o => o.GetExecutionManager()).Returns(this.mockExecutionManager.Object);
-            this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManagerFactory.Object);
+            this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
         }
 
         [TestCleanup]
@@ -37,32 +41,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockExecutionManager = null;
             this.mockTestHostManagerFactory = null;
             this.inProcessProxyExecutionManager = null;
+            this.mockTestHostManager = null;
         }
 
-        [TestMethod]
-        public void InitializeShouldCallExecutionManagerInitializeWithEmptyIEnumerable()
-        {
-            this.inProcessProxyExecutionManager.Initialize();
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "ExecutionManager.Initialize() should get called with empty list");
-        }
 
         [TestMethod]
-        public void InitializeShouldSetIsInitializedTotrue()
-        {
-            this.inProcessProxyExecutionManager.Initialize();
-            Assert.IsTrue(this.inProcessProxyExecutionManager.IsInitialized, "ExecutionManager.Initialize() is not setting the value of varable IsInitialized to true");
-        }
-
-        [TestMethod]
-        public void InitializeShouldCallExecutionManagerInitializeWithEmptyIEnumerableOnlyOnce()
-        {
-            this.inProcessProxyExecutionManager.Initialize();
-            this.inProcessProxyExecutionManager.Initialize();
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "ExecutionManager.Initialize() should get called once");
-        }
-
-        [TestMethod]
-        public void StartTestRunShouldCallInitializeIfNotAlreadyInitialized()
+        public void StartTestRunShouldCallInitialize()
         {
             var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
@@ -71,13 +55,20 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         }
 
         [TestMethod]
-        public void StartTestRunShouldNotCallInitializeIfAlreadyInitialized()
+        public void StartTestRunShouldUpdateTestPlauginCacheWithExtensionsReturnByTestHost()
         {
+            this.mockTestHostManager.Setup(o => o.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string> { "C:\\dummy.dll" });
+            List<string> expectedResult = new List<string>();
+            if (TestPluginCache.Instance.PathToExtensions != null)
+            {
+                expectedResult.AddRange(TestPluginCache.Instance.PathToExtensions);
+            }
+            expectedResult.Add("C:\\dummy.dll");
+
             var testRunCriteria = new TestRunCriteria(new List<string> { "source.dll" }, 10);
-            this.inProcessProxyExecutionManager.Initialize();
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockExecutionManager.Verify(o => o.Initialize(Enumerable.Empty<string>()), Times.Once, "StartTestRun should not call Initialize if already initialized");
+            Assert.IsFalse(expectedResult.Except(TestPluginCache.Instance.PathToExtensions).Any());
         }
 
         [TestMethod]

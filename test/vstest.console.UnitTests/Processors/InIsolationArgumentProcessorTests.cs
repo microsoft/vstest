@@ -4,17 +4,21 @@
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
 {
     using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+    using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using vstest.console.UnitTests.Processors;
 
     [TestClass]
     public class InIsolationArgumentProcessorTests
     {
         private InIsolationArgumentExecutor executor;
+        private TestableRunSettingsProvider runSettingsProvider;
 
         [TestInitialize]
         public void Init()
         {
-            this.executor = new InIsolationArgumentExecutor(CommandLineOptions.Instance);
+            this.runSettingsProvider = new TestableRunSettingsProvider();
+            this.executor = new InIsolationArgumentExecutor(CommandLineOptions.Instance, this.runSettingsProvider);
         }
 
         [TestCleanup]
@@ -47,7 +51,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
             Assert.IsFalse(isolationProcessor.Metadata.Value.IsSpecialCommand);
             Assert.AreEqual(InIsolationArgumentProcessor.CommandName, isolationProcessor.Metadata.Value.CommandName);
             Assert.AreEqual(null, isolationProcessor.Metadata.Value.ShortCommandName);
-            Assert.AreEqual(ArgumentProcessorPriority.Normal, isolationProcessor.Metadata.Value.Priority);
+            Assert.AreEqual(ArgumentProcessorPriority.AutoUpdateRunSettings, isolationProcessor.Metadata.Value.Priority);
             Assert.AreEqual(HelpContentPriority.InIsolationArgumentProcessorHelpPriority, isolationProcessor.Metadata.Value.HelpPriority);
             Assert.AreEqual("--InIsolation|/InIsolation\n      Runs the tests in an isolated process. This makes vstest.console.exe \n      process less likely to be stopped on an error in the tests, but tests \n      may run slower.", isolationProcessor.Metadata.Value.HelpContentResourceName);
         }
@@ -67,6 +71,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors
         {
             this.executor.Initialize(null);
             Assert.IsTrue(CommandLineOptions.Instance.InIsolation, "InProcess option must be set to true.");
+            Assert.AreEqual("true", this.runSettingsProvider.QueryRunSettingsNode(InIsolationArgumentExecutor.RunSettingsPath));
         }
 
         [TestMethod]
