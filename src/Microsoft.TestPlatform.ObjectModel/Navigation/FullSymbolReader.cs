@@ -150,7 +150,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Navigation
             }
             catch (COMException)
             {
-                return false;
+                throw;
             }
             finally
             {
