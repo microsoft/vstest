@@ -36,5 +36,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>False</Visible>
     </Content>
+	<Content Include="$(MSBuildThisFileDirectory)x86\msdia140.dll">
+      <Link>x86\msdia140.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
+	<Content Include="$(MSBuildThisFileDirectory)x64\msdia140.dll">
+      <Link>x64\msdia140.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>False</Visible>
+    </Content>
   </ItemGroup>
 </Project>

@@ -54,6 +54,9 @@
     <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\Microsoft.VisualStudio.TestPlatform.Common.dll" target="build\uap10.0\" />
     <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="build\uap10.0\" />
 
+    <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\x86\msdia140.dll" target="build\uap10.0\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\x64\msdia140.dll" target="build\uap10.0\x64\" />
+
     <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\Microsoft.TestPlatform.TestHost.props" target="build\uap10.0\" />
     <file src="Microsoft.TestPlatform.TestHost\netstandard1.4\Microsoft.TestPlatform.TestHost.targets" target="build\uap10.0\" />
 
