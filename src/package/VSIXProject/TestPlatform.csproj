@@ -95,6 +95,9 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\*.*" Exclude="$(VsixInputFileLocation)\Extensions\*.pdb">
       <VSIXSubPath>Extensions</VSIXSubPath>
     </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\CoreCon\*.*">
+      <VSIXSubPath>CoreCon</VSIXSubPath>
+    </VsixSourceItem>
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.*" Exclude="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.pdb">
       <VSIXSubPath>Extensions\CppUnitFramework</VSIXSubPath>
     </VsixSourceItem>
