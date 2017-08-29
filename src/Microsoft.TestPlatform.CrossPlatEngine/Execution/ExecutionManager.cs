@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -54,8 +54,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             this.testPlatformEventSource.AdapterSearchStart();
 
-            // Start using these additional extensions
-            TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
+            if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
+            {
+                // Start using these additional extensions
+                TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
+            }
+
             this.LoadExtensions();
 
             this.testPlatformEventSource.AdapterSearchStop();
