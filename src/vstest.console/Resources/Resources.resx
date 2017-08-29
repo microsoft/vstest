@@ -303,7 +303,7 @@
     <value>Hours</value>
   </data>
   <data name="InIsolationHelp" xml:space="preserve">
-    <value>/InIsolation
+    <value>--InIsolation|/InIsolation
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</value>

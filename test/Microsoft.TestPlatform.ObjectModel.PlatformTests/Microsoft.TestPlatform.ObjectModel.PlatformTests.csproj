@@ -26,10 +26,7 @@
     <PackageReference Include="Microsoft.Internal.Dia" Version="14.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\src\testhost.x86\TestPlatform.ObjectModel.manifest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src\testhost.x86\TestPlatform.ObjectModel.x86.manifest">
+    <Content Include="..\..\packages\microsoft.internal.dia\14.0.0\contentFiles\any\any\ComComponents\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
