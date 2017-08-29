@@ -25,6 +25,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
     /// <summary>
     /// The default test host launcher for the engine.
@@ -39,10 +41,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
         private const string DefaultTestHostFriendlyName = "DefaultTestHost";
+        private const string TestAdapterRegexPattern = @"TestAdapter.dll";
 
         private Architecture architecture;
 
         private IProcessHelper processHelper;
+        private IFileHelper fileHelper;
         private IEnvironment environment;
         private IDotnetHostHelper dotnetHostHelper;
 
@@ -51,12 +55,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         private StringBuilder testHostProcessStdError;
         private IMessageLogger messageLogger;
         private bool hostExitedEventRaised;
+        private bool projectOutputExtensionsRequired;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
         public DefaultTestHostManager()
-            : this(new ProcessHelper(), new PlatformEnvironment(), new DotnetHostHelper())
+            : this(new ProcessHelper(), new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
         {
         }
 
@@ -64,11 +69,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// Initializes a new instance of the <see cref="DefaultTestHostManager"/> class.
         /// </summary>
         /// <param name="processHelper">Process helper instance.</param>
+        /// <param name="fileHelper">File helper instance.</param>
         /// <param name="environment">Instance of platform environment.</param>
         /// <param name="dotnetHostHelper">Instance of dotnet host helper.</param>
-        internal DefaultTestHostManager(IProcessHelper processHelper, IEnvironment environment, IDotnetHostHelper dotnetHostHelper)
+        internal DefaultTestHostManager(IProcessHelper processHelper, IFileHelper fileHelper, IEnvironment environment, IDotnetHostHelper dotnetHostHelper)
         {
             this.processHelper = processHelper;
+            this.fileHelper = fileHelper;
             this.environment = environment;
             this.dotnetHostHelper = dotnetHostHelper;
         }
@@ -176,6 +183,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         /// <inheritdoc/>
         public IEnumerable<string> GetTestPlatformExtensions(IEnumerable<string> sources, IEnumerable<string> extensions)
         {
+            if (sources != null && sources.Any() && this.projectOutputExtensionsRequired)
+            {
+                extensions = extensions.Concat(sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterRegexPattern)));
+            }
+
             return extensions;
         }
 
@@ -211,6 +223,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
             this.testHostProcess = null;
 
             this.Shared = !runConfiguration.DisableAppDomain;
+            this.projectOutputExtensionsRequired = !(runConfiguration.TestAdaptersPaths?.Length > 0);
             this.hostExitedEventRaised = false;
         }
 

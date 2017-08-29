@@ -141,8 +141,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 runsettings = updatedRunsettings;
             }
 
-            runsettings = UpdateExtensionsFolderInRunSettings(runsettings);
-
             // create discovery request
             var criteria = new DiscoveryCriteria(discoveryPayload.Sources, batchSize, this.commandLineOptions.TestStatsEventTimeout, runsettings);
 
@@ -209,8 +207,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
             {
                 runsettings = updatedRunsettings;
             }
-
-            runsettings = UpdateExtensionsFolderInRunSettings(runsettings);
 
             if (testRunRequestPayload.Sources != null && testRunRequestPayload.Sources.Any())
             {
