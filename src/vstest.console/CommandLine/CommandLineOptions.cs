@@ -98,6 +98,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         public bool Parallel { get; set; }
 
         /// <summary>
+        /// Specifies whether InIsolation is on or off.
+        /// </summary>
+        public bool InIsolation { get; set; }
+
+        /// <summary>
         /// Readonly collection of all available test sources
         /// </summary>
         public IEnumerable<string> Sources
