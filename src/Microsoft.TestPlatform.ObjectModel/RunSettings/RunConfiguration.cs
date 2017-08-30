@@ -70,6 +70,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         private bool designMode;
 
         /// <summary>
+        /// Specify to run tests in isolation
+        /// </summary>
+        private bool inIsolation;
+
+        /// <summary>
         /// False indicates that the test adapter should not collect source information for discovered tests
         /// </summary>
         private bool shouldCollectSourceInformation;
@@ -97,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             this.disableAppDomain = false;
             this.disableParallelization = false;
             this.designMode = false;
+            this.inIsolation = false;
             this.shouldCollectSourceInformation = false;
             this.ExecutionThreadApartmentState = Constants.DefaultExecutionThreadApartmentState;
         }
@@ -193,6 +199,22 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 this.designMode = value;
                 this.DesignModeSet = true;
+            }
+        }
+
+        /// <summary> 
+        /// Gets or sets a value indicating whether to run tests in isolation or not.
+        /// </summary>
+        public bool InIsolation
+        {
+            get
+            {
+                return this.inIsolation;
+            }
+
+            set
+            {
+                this.inIsolation = value;
             }
         }
 
@@ -367,7 +389,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         }
 
         /// <summary>
-        /// Gets a value indicating whether app domain needs to be disabled by the adapters.
+        /// Gets a value indicating whether disable appdomain is set.
         /// </summary>
         public bool DisableAppDomainSet
         {
@@ -455,6 +477,10 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             XmlElement designMode = doc.CreateElement("DesignMode");
             designMode.InnerXml = this.DesignMode.ToString();
             root.AppendChild(designMode);
+
+            XmlElement inIsolation = doc.CreateElement("InIsolation");
+            inIsolation.InnerXml = this.InIsolation.ToString();
+            root.AppendChild(inIsolation);
 
             XmlElement collectSourceInformation = doc.CreateElement("CollectSourceInformation");
             collectSourceInformation.InnerXml = this.ShouldCollectSourceInformation.ToString();
@@ -606,6 +632,19 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                                     Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, designModeValueString, elementName));
                             }
                             runConfiguration.DesignMode = designMode;
+                            break;
+
+                        case "InIsolation":
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+
+                            string inIsolationValueString = reader.ReadElementContentAsString();
+                            bool inIsolation;
+                            if (!bool.TryParse(inIsolationValueString, out inIsolation))
+                            {
+                                throw new SettingsException(String.Format(CultureInfo.CurrentCulture,
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, inIsolationValueString, elementName));
+                            }
+                            runConfiguration.InIsolation = inIsolation;
                             break;
 
                         case "DisableAppDomain":

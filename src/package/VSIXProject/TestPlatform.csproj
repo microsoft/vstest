@@ -95,6 +95,9 @@
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\*.*" Exclude="$(VsixInputFileLocation)\Extensions\*.pdb">
       <VSIXSubPath>Extensions</VSIXSubPath>
     </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\CoreCon\*.*">
+      <VSIXSubPath>CoreCon</VSIXSubPath>
+    </VsixSourceItem>
     <VsixSourceItem Include="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.*" Exclude="$(VsixInputFileLocation)\Extensions\CppUnitFramework\*.pdb">
       <VSIXSubPath>Extensions\CppUnitFramework</VSIXSubPath>
     </VsixSourceItem>
@@ -153,6 +156,12 @@
     </VsixSourceItem>
     <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\zh-Hant\*.dll">
       <VSIXSubPath>TestHost\zh-Hant</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\x86\*.dll">
+      <VSIXSubPath>TestHost\x86</VSIXSubPath>
+    </VsixSourceItem>
+    <VsixSourceItem Include="$(VsixInputFileLocation)\TestHost\x64\*.dll">
+      <VSIXSubPath>TestHost\x64</VSIXSubPath>
     </VsixSourceItem>
 
     <VsixSourceItem Include="$(VsixInputFileLocation)\*.*" Exclude="$(VsixInputFileLocation)\*.pdb" />

@@ -18,6 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     /// <summary>
     /// Cross Platform test engine entry point for the client.
@@ -28,16 +30,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
         private readonly TestRuntimeProviderManager testHostProviderManager;
         private ITestExtensionManager testExtensionManager;
+        private IProcessHelper processHelper;
 
         #endregion
 
-        public TestEngine() : this(TestRuntimeProviderManager.Instance)
+        public TestEngine() : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
         {
         }
 
-        protected TestEngine(TestRuntimeProviderManager testHostProviderManager)
+        protected TestEngine(TestRuntimeProviderManager testHostProviderManager, IProcessHelper processHelper)
         {
             this.testHostProviderManager = testHostProviderManager;
+            this.processHelper = processHelper;
         }
 
         #region ITestEngine implementation
@@ -59,6 +63,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
         {
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(discoveryCriteria.Sources.Count(), discoveryCriteria.RunSettings);
 
+            if (this.ShouldRunInNoIsolation(discoveryCriteria.RunSettings, parallelLevel > 1, false))
+            {
+                return new InProcessProxyDiscoveryManager(testHostManager);
+            }
+
             Func<IProxyDiscoveryManager> proxyDiscoveryManagerCreator = delegate
             {
                 var hostManager = this.testHostProviderManager.GetTestHostManagerByRunConfiguration(discoveryCriteria.RunSettings);
@@ -66,7 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
 
                 return new ProxyDiscoveryManager(new TestRequestSender(protocolConfig, hostManager.GetTestHostConnectionInfo()), hostManager);
             };
-                
+
             return !testHostManager.Shared ? new ParallelProxyDiscoveryManager(proxyDiscoveryManagerCreator, parallelLevel, sharedHosts: testHostManager.Shared) : proxyDiscoveryManagerCreator();
         }
 
@@ -85,6 +94,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             var parallelLevel = this.VerifyParallelSettingAndCalculateParallelLevel(distinctSources, testRunCriteria.TestRunSettings);
 
             var isDataCollectorEnabled = XmlRunSettingsUtilities.IsDataCollectionEnabled(testRunCriteria.TestRunSettings);
+            var isInProcDataCollectorEnabled = XmlRunSettingsUtilities.IsInProcDataCollectionEnabled(testRunCriteria.TestRunSettings);
+
+            if (this.ShouldRunInNoIsolation(testRunCriteria.TestRunSettings, parallelLevel > 1, isDataCollectorEnabled || isInProcDataCollectorEnabled))
+            {
+                return new InProcessProxyExecutionManager(testHostManager);
+            }
 
             // SetupChannel ProxyExecutionManager with data collection if data collectors are specififed in run settings.
             Func<IProxyExecutionManager> proxyExecutionManagerCreator = delegate
@@ -103,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
                 return isDataCollectorEnabled ? new ProxyExecutionManagerWithDataCollection(requestSender, hostManager, new ProxyDataCollectionManager(testRunCriteria.TestRunSettings))
                                                 : new ProxyExecutionManager(requestSender, hostManager);
             };
-                    
+
             // parallelLevel = 1 for desktop should go via else route.
             if (parallelLevel > 1 || !testHostManager.Shared)
             {
@@ -192,6 +207,52 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine
             }
 
             return parallelLevelToUse;
+        }
+
+        private bool ShouldRunInNoIsolation(string runsettings, bool isParallelEnabled, bool isDataCollectorEnabled)
+        {
+            var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettings);
+
+            if (runConfiguration.InIsolation)
+            {
+                if (EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in isolation");
+                }
+                return false;
+            }
+
+            var currentProcessPath = this.processHelper.GetCurrentProcessFileName();
+
+            // If running with the dotnet executable, then dont run in InProcess
+            if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
+                || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            // Return true if
+            // 1) Not running in parallel
+            // 2) Data collector is not enabled
+            // 3) Target framework is x86 or anyCpu
+            // 4) DisableAppDomain is false
+            // 5) Not running in design mode
+            // 6) target framework is NETFramework (Desktop test)
+            if (!isParallelEnabled &&
+                !isDataCollectorEnabled &&
+                (runConfiguration.TargetPlatform == Architecture.X86 || runConfiguration.TargetPlatform == Architecture.AnyCPU) &&
+                !runConfiguration.DisableAppDomain &&
+                !runConfiguration.DesignMode &&
+                runConfiguration.TargetFrameworkVersion.Name.IndexOf("netframework", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                if(EqtTrace.IsInfoEnabled)
+                {
+                    EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: running test in process(inside vstest.console.exe process)");
+                }
+                return true ;
+            }
+
+            return false;
         }
     }
 }

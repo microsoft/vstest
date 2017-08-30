@@ -420,15 +420,15 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
       <trans-unit id="InIsolationHelp">
-        <source>/InIsolation
+        <source>--InIsolation|/InIsolation
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="translated">/InIsolation
+        <target state="new">/InIsolation
       격리 모드에서 테스트를 실행합니다. 이렇게 하면 테스트에서 오류가 발생해도 
       vstest.console.exe가 중지될 가능성이 작아지지만 테스트 실행 속도가 
       느려질 수 있습니다.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
       격리 된 프로세스에서 테스트를 실행 합니다. 이렇게 하면 vstest.console.exe 프로세스 테스트에서는 오류로 중지 될 가능성이 적은 있지만 테스트 다소 느려질 수 있습니다.</target>

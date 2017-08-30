@@ -14,7 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
     /// <summary>
     /// Helper class to deal with process related functionality.
     /// </summary>
-    public class ProcessHelper : IProcessHelper
+    public partial class ProcessHelper : IProcessHelper
     {
         /// <inheritdoc/>
         public object LaunchProcess(string processPath, string arguments, string workingDirectory, IDictionary<string, string> envVariables, Action<object, string> errorCallback, Action<object> exitCallBack)

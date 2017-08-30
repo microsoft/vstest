@@ -30,6 +30,12 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces
         string GetCurrentProcessFileName();
 
         /// <summary>
+        /// Gets the current process location.
+        /// </summary>
+        /// <returns>The current process location.</returns>
+        string GetCurrentProcessLocation();
+
+        /// <summary>
         /// Gets the location of test engine.
         /// </summary>
         /// <returns>Location of test engine.</returns>
