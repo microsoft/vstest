@@ -29,7 +29,7 @@ $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 Write-Verbose "Setup build configuration."
 $TPB_SignCertificate = $Certificate
 $TPB_Configuration = $Configuration
-$TPB_AssembliesPattern = @("*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe", "Microsoft.TestPlatform.Build.dll")
+$TPB_AssembliesPattern = @("*test*.dll", "*qualitytools*.dll", "*test*.exe", "*datacollector*.dll", "*datacollector*.exe", "Microsoft.TestPlatform.Build.dll", "Microsoft.DiaSymReader.dll")
 
 function Verify-Signature
 {
