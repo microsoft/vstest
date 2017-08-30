@@ -352,37 +352,5 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers
                 return success;
             }
         }
-
-        /// <summary>
-        /// Update Extensions path folder in testadapterspaths in runsettings.
-        /// </summary>
-        /// <param name="settingsXml"></param>
-        private static string UpdateExtensionsFolderInRunSettings(string settingsXml)
-        {
-            if (string.IsNullOrWhiteSpace(settingsXml))
-            {
-                return settingsXml;
-            }
-
-            var extensionsFolder = Path.Combine(Path.GetDirectoryName(typeof(TestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
-
-            using (var stream = new StringReader(settingsXml))
-            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
-            {
-                var document = new XmlDocument();
-                document.Load(reader);
-
-                var tapNode = RunSettingsProviderExtensions.GetXmlNode(document, "RunConfiguration.TestAdaptersPaths");
-
-                if (tapNode != null && !string.IsNullOrWhiteSpace(tapNode.InnerText))
-                {
-                    extensionsFolder = string.Concat(tapNode.InnerText, ';', extensionsFolder);
-                }
-
-                RunSettingsProviderExtensions.UpdateRunSettingsXmlDocument(document, "RunConfiguration.TestAdaptersPaths", extensionsFolder);
-
-                return document.OuterXml;
-            }
-        }
     }
 }
