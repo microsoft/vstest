@@ -85,7 +85,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
         /// Gets the test Containers (e.g. DLL/EXE/artifacts to scan)
         /// </summary>
         [DataMember]
-        public IEnumerable<string> Sources { get; private set; }
+        public IEnumerable<string> Sources { get; set; }
 
         /// <summary>
         /// Gets the test adapter and source map which would look like below:

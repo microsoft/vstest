@@ -129,5 +129,48 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.Abort should get called");
         }
+
+        [TestMethod]
+        public void DiscoverTestRunShouldAllowRuntimeProviderToUpdateAdapterSource()
+        {
+            var inputSources = new List<string> { "test.dll" };
+            var discoveryCriteria = new DiscoveryCriteria(inputSources, 1, string.Empty);
+            var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var manualResetEvent = new ManualResetEvent(false);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources)).Returns(discoveryCriteria.Sources);
+            this.mockDiscoveryManager.Setup(o => o.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object)).Callback(
+                () => manualResetEvent.Set());
+
+            this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
+            this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.DiscoverTests should get called");
+            this.mockTestHostManager.Verify(hm => hm.GetTestSources(inputSources), Times.Once);
+        }
+
+        [TestMethod]
+        public void DiscoverTestRunShouldUpdateTestSourcesIfSourceDiffersFromTestHostManagerSource()
+        {
+            var actualSources = new List<string> { "actualSource.dll" };
+            var inputSource =  new List<string> { "inputPackage.appxrecipe" };
+
+            var discoveryCriteria = new DiscoveryCriteria(inputSource, 1, string.Empty);
+            var mockTestDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
+            var manualResetEvent = new ManualResetEvent(false);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(discoveryCriteria.Sources)).Returns(actualSources);
+
+            this.mockDiscoveryManager.Setup(o => o.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object)).Callback(
+                () => manualResetEvent.Set());
+
+            this.inProcessProxyDiscoveryManager.DiscoverTests(discoveryCriteria, mockTestDiscoveryEventsHandler.Object);
+
+            Assert.IsTrue(manualResetEvent.WaitOne(5000), "IDiscoveryManager.DiscoverTests should get called");
+
+            // AdapterSourceMap should contail updated testSources.
+            Assert.AreEqual(actualSources.FirstOrDefault(), discoveryCriteria.AdapterSourceMap.FirstOrDefault().Value.FirstOrDefault());
+            Assert.AreEqual(inputSource, discoveryCriteria.Sources);
+        }
     }
 }

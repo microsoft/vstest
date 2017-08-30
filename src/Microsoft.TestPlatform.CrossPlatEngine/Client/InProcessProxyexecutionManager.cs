@@ -17,7 +17,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    internal class InProcessProxyExecutionManager : IProxyExecutionManager
+    internal class InProcessProxyExecutionManager : InProcessProxyOperationManager, IProxyExecutionManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
         private IExecutionManager executionManager;
@@ -37,7 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// <param name="testHostManagerFactory">
         /// Manager factory
         /// </param>
-        internal InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
+        internal InProcessProxyExecutionManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory) : base(testHostManager)
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
@@ -56,6 +56,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var testPackages = testRunCriteria.HasSpecificSources ? new List<string>(testRunCriteria.Sources) : null;
+
+                // If the test execution is with a test filter, group them by sources
+                if (testRunCriteria.HasSpecificTests)
+                {
+                    testPackages = new List<string>(testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
+                }
+
                 // This code should be in sync with ProxyExecutionManager.StartTestRun executionContext
                 var executionContext = new TestExecutionContext(
                             testRunCriteria.FrequencyOfRunStatsChangeEvent,
@@ -68,23 +76,34 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
                             testCaseFilter: testRunCriteria.TestCaseFilter);
 
+                // Initialize extension before execution
+                this.InitializeExtensions(testPackages);
+
+                var actualTestSources = this.testHostManager.GetTestSources(testPackages);
+                var testSourcesDiffer = testPackages.Except(actualTestSources).Any();
 
                 if (testRunCriteria.HasSpecificSources)
                 {
-                    // Initialize extension before execution
-                    this.InitializeExtensions(testRunCriteria.Sources);
+                    if (testSourcesDiffer)
+                    {
+                        this.UpdateTestSources(testRunCriteria.Sources, testRunCriteria.AdapterSourceMap);
+                    }
 
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.AdapterSourceMap, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.AdapterSourceMap, testSourcesDiffer ? testPackages : null, 
+                        testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
                 }
                 else
                 {
-                    // If the test execution is with a test filter, group them by sources
-                    var testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                    // In UWP scenario TestCase object contains the package as source, which is not actual test source for adapters, 
+                    // so update test case before sending them.
+                    // This approach will fail, once a package concept is introduced, where a package can contain multiple test sources.
+                    if (testSourcesDiffer)
+                    {
+                        testRunCriteria.Tests.ToList().ForEach(tc => tc.Source = actualTestSources.FirstOrDefault());
+                    }
 
-                    // Initialize extension before execution
-                    this.InitializeExtensions(testSources);
-
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.Tests, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.Tests, testSourcesDiffer ? testPackages : null, 
+                        testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
                 }
             }
             catch (Exception exception)

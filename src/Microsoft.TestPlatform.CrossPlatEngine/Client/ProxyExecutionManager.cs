@@ -85,15 +85,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
-                var testSources = testRunCriteria.Sources;
+                var testPackages = testRunCriteria.HasSpecificSources ? new List<string>(testRunCriteria.Sources) : null;
 
                 // If the test execution is with a test filter, group them by sources
                 if (testRunCriteria.HasSpecificTests)
                 {
-                    testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                    testPackages = new List<string>(testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
                 }
 
-                this.isCommunicationEstablished = this.SetupChannel(testSources, this.cancellationTokenSource.Token);
+                this.isCommunicationEstablished = this.SetupChannel(testPackages, this.cancellationTokenSource.Token);
 
                 if (this.isCommunicationEstablished)
                 {
@@ -106,7 +106,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                         throw new TestPlatformException(Resources.Resources.CancelationRequested);
                     }
 
-                    this.InitializeExtensions(testSources);
+                    this.InitializeExtensions(testPackages);
 
                     // This code should be in sync with InProcessProxyExecutionManager.StartTestRun executionContext
                     var executionContext = new TestExecutionContext(
@@ -123,13 +123,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                     var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
 
-                    var actualTestSources = this.testHostManager.GetTestSources(testSources);
+                    var actualTestSources = this.testHostManager.GetTestSources(testPackages);
 
                     // For netcore/fullclr both packages and sources are same thing, 
                     // For UWP the actual source(exe) differs from input source(.appxrecipe) which we call package.
                     // So in such models we check if they differ, then we pass this info to test host to update TestCase source with package info,
                     // since this is needed by IDE's to map a TestCase to project.
-                    var testSourcesDiffer = testSources.Except(actualTestSources).Any();
+                    var testSourcesDiffer = testPackages.Except(actualTestSources).Any();
 
                     if (testRunCriteria.HasSpecificSources)
                     {
@@ -142,7 +142,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                         var runRequest = new TestRunCriteriaWithSources(
                             testRunCriteria.AdapterSourceMap,
-                            testSourcesDiffer ? testSources : null,
+                            testSourcesDiffer ? testPackages : null,
                             runsettings,
                             executionContext);
 
@@ -160,7 +160,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                         var runRequest = new TestRunCriteriaWithTests(
                             testRunCriteria.Tests,
-                            testSourcesDiffer ? testSources : null,
+                            testSourcesDiffer ? testPackages : null,
                             runsettings,
                             executionContext);
 
