@@ -10,13 +10,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void UITestShouldPassIfApartmentStateIsSTA(string runnerFramework, string targetFramework, string targetRuntime)
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
+        public void UITestShouldPassIfApartmentStateIsSTA(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, " /testcasefilter:UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=STA");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 0, 0);
@@ -24,13 +26,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETCORETargetFramework]
-        public void WarningShouldBeShownWhenValueIsSTAForNetCore(string runnerFramework, string targetFramework, string targetRuntime)
+        public void WarningShouldBeShownWhenValueIsSTAForNetCore(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, " /testcasefilter:PassingTest2 -- RunConfiguration.ExecutionThreadApartmentState=STA");
             this.InvokeVsTest(arguments);
             this.StdOutputContains("ExecutionThreadApartmentState option not supported for framework:");
@@ -39,13 +41,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void UITestShouldFailWhenDefaultApartmentStateIsMTA(string runnerFramework, string targetFramework, string targetRuntime)
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
+        public void UITestShouldFailWhenDefaultApartmentStateIsMTA(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, " /testcasefilter:UITestMethod");
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(0, 1, 0);
@@ -54,13 +58,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [Ignore(@"Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980")]
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(string runnerFramework, string targetFramework, string targetRuntime)
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
+        public void CancelTestExectionShouldWorkWhenApartmentStateIsSTA(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject3.dll").Trim('\"');
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, " /tests:UITestWithSleep1,UITestMethod -- RunConfiguration.ExecutionThreadApartmentState=STA RunConfiguration.TestSessionTimeout=2000");
             this.InvokeVsTest(arguments);
             this.StdOutputContains("Canceling test run: test run timeout of");

@@ -11,11 +11,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
-        public void TrxFileShouldBeCreatedInResultsDirectory(string runnerFramework, string targetFramework, string targetRuntime)
+        public void TrxFileShouldBeCreatedInResultsDirectory(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             var trxFileName = "TestResults.trx";
             var resultsDir = Path.GetTempPath();
             var trxFilePath = Path.Combine(resultsDir, trxFileName);
@@ -32,11 +34,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
-        public void ResultsDirectoryRelativePathShouldWork(string runnerFramework, string targetFramework, string targetRuntime)
+        public void ResultsDirectoryRelativePathShouldWork(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             var trxFileName = "TestResults.trx";
             var relativeDirectory = @"relative\directory";
             var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), relativeDirectory);

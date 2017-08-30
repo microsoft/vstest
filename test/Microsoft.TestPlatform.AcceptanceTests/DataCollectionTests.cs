@@ -33,10 +33,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
         [NETCORETargetFramework]
-        public void ExecuteTestsWithDataCollection(string runnerFramework, string targetFramework, string targetRuntime)
+        public void ExecuteTestsWithDataCollection(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string runSettings = this.GetRunsettingsFilePath();
@@ -47,7 +48,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 "bin",
                 this.testEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runSettings, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
 
             this.InvokeVsTest(arguments);
@@ -58,10 +59,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
         [NETCORETargetFramework]
-        public void ExecuteTestsWithDataCollectionUsingCollectArgument(string runnerFramework, string targetFramework, string targetRuntime)
+        public void ExecuteTestsWithDataCollectionUsingCollectArgument(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject2.dll").Trim('\"');
             string diagFileName = Path.Combine(this.resultsDir, "diaglog.txt");
@@ -72,7 +74,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.testEnvironment.BuildConfiguration,
                 this.testEnvironment.RunnerFramework);
 
-            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), null, this.FrameworkArgValue);
+            var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), null, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, $" /ResultsDirectory:{resultsDir}", $" /Diag:{diagFileName}", $" /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
 
             this.InvokeVsTest(arguments);

@@ -14,16 +14,18 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
-        public void TrxLoggerShouldProperlyOverwriteFile(string runnerFramework, string targetFramework, string targetRuntime)
+        public void TrxLoggerShouldProperlyOverwriteFile(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
-            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
+            var arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             var trxFileName = "TestResults.trx";
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
             this.InvokeVsTest(arguments);
 
-            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
+            arguments = PrepareArguments(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue, inIsolation);
             arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
             arguments = string.Concat(arguments, " /testcasefilter:Name~Pass");
             this.InvokeVsTest(arguments);

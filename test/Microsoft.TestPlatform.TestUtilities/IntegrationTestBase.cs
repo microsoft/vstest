@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Text of run settings.</param>
         /// <param name="framework"></param>
         /// <returns>Command line arguments string.</returns>
-        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.5.1")
+        public static string PrepareArguments(string testAssembly, string testAdapterPath, string runSettings, string framework = ".NETFramework,Version=v4.5.1", string inIsolation = "")
         {
             var arguments = testAssembly.AddDoubleQuote();
 
@@ -78,6 +78,11 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
 
             arguments = string.Concat(arguments, " /logger:", "console;verbosity=normal".AddDoubleQuote());
+
+            if (!string.IsNullOrWhiteSpace(inIsolation))
+            {
+                arguments = string.Concat(arguments, " ", inIsolation);
+            }
 
             return arguments;
         }
@@ -105,7 +110,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             string runSettings = "",
             string framework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, framework, this.testEnvironment.InIsolationValue);
             this.InvokeVsTest(arguments);
         }
 
@@ -117,7 +122,7 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// <param name="runSettings">Run settings for execution.</param>
         public void InvokeVsTestForDiscovery(string testAssembly, string testAdapterPath, string runSettings = "", string targetFramework = "")
         {
-            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework);
+            var arguments = PrepareArguments(testAssembly, testAdapterPath, runSettings, targetFramework, this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, " /listtests");
             this.InvokeVsTest(arguments);
         }
@@ -313,7 +318,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             {
                 consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
             }
-            else 
+            else
             {
                 Assert.Fail("Unknown Runner framework - [{0}]", this.testEnvironment.RunnerFramework);
             }

@@ -10,10 +10,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
-        public void DiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime)
+        public void DiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             this.InvokeVsTestForDiscovery(this.GetSampleTestAssembly(), this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             var listOfTests = new string[] { "SampleUnitTestProject.UnitTest1.PassingTest", "SampleUnitTestProject.UnitTest1.FailingTest", "SampleUnitTestProject.UnitTest1.SkippingTest" };
@@ -22,10 +24,12 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
-        public void MultipleSourcesDiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime)
+        public void MultipleSourcesDiscoverAllTests(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var assemblyPaths =
                 this.BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll").Trim('\"');

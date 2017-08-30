@@ -6,10 +6,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using System.Text;
-
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Microsoft.TestPlatform.TestUtilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     /// <summary>
     /// The custom data test method attribute.
@@ -81,6 +79,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     /// <summary>
     /// The attribute defining runner framework, target framework and target runtime for net451.
+    /// First Argument (Runner framework) = This decides who will run the tests. If runner framework is netcoreapp then "dotnet vstest.console.dll" will run the tests. 
+    /// If runner framework is net46 then vstest.console.exe will run the tests.
+    /// Second argument (target framework) = The framework for which test will run
+    /// Third argument (Target runtime) = This get used to find vstest.console dll/exe. 
+    /// Fourth argument (InIsolation) = Run the test in isolation(inside testhost) or in process(inside vstest.console.exe)
     /// </summary>
     public class NETFullTargetFramework : Attribute
     {
@@ -89,9 +92,58 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         public NETFullTargetFramework()
         {
-            this.DataRows = new List<DataRowAttribute>(2);
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
+            this.DataRows = new List<DataRowAttribute>(1);
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
+        }
+
+        /// <summary>
+        /// Gets or sets the data rows.
+        /// </summary>
+        public List<DataRowAttribute> DataRows { get; set; }
+    }
+
+    /// <summary>
+    /// The attribute defining runner framework, target framework and target runtime for net451 if running in isoalation
+    /// First Argument (Runner framework) = This decides who will run the tests. If runner framework is netcoreapp then "dotnet vstest.console.dll" will run the tests. 
+    /// If runner framework is net46 then vstest.console.exe will run the tests.
+    /// Second argument (target framework) = The framework for which test will run
+    /// Third argument (Target runtime) = This get used to find vstest.console dll/exe. 
+    /// Fourth argument (InIsolation) = Run the test in isolation(inside testhost) or in process(inside vstest.console.exe)
+    /// </summary>
+    public class NETFullTargetFrameworkInIsolation : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NETFullTargetFramework"/> class.
+        /// </summary>
+        public NETFullTargetFrameworkInIsolation()
+        {
+            this.DataRows = new List<DataRowAttribute>(1);
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime, AcceptanceTestBase.InIsolation));
+        }
+
+        /// <summary>
+        /// Gets or sets the data rows.
+        /// </summary>
+        public List<DataRowAttribute> DataRows { get; set; }
+    }
+
+    /// <summary>
+    /// The attribute defining runner framework, target framework and target runtime for net451 if running in process
+    /// First Argument (Runner framework) = This decides who will run the tests. If runner framework is netcoreapp then "dotnet vstest.console.dll" will run the tests. 
+    /// If runner framework is net46 then vstest.console.exe will run the tests.
+    /// Second argument (target framework) = The framework for which test will run
+    /// Third argument (Target runtime) = This get used to find vstest.console dll/exe. 
+    /// Fourth argument (InIsolation) = Run the test in isolation(inside testhost) or in process(inside vstest.console.exe)
+    /// </summary>
+    public class NETFullTargetFrameworkInProcess : Attribute
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NETFullTargetFramework"/> class.
+        /// </summary>
+        public NETFullTargetFrameworkInProcess()
+        {
+            this.DataRows = new List<DataRowAttribute>(1);
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
         }
 
         /// <summary>
@@ -102,6 +154,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
     /// <summary>
     /// The attribute defining runner framework, target framework and target runtime for netcoreapp1.*
+    /// First Argument (Runner framework) = This decides who will run the tests. If runner framework is netcoreapp then "dotnet vstest.console.dll" will run the tests. 
+    /// If runner framework is net46 then vstest.console.exe will run the tests.
+    /// Second argument (target framework) = The framework for which test will run
+    /// Third argument (Target runtime) = This get used to find vstest.console dll/exe. 
+    /// Fourth argument (InIsolation) = Run the test in isolation(inside testhost) or in process(inside vstest.console.exe)
     /// </summary>
     public class NETCORETargetFramework : Attribute
     {
@@ -110,13 +167,13 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         public NETCORETargetFramework()
         {
-            this.DataRows = new List<DataRowAttribute>(4);
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime));
-            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime));
+            this.DataRows = new List<DataRowAttribute>(6);
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.CoreTargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core11TargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.CoreRunnerFramework, AcceptanceTestBase.Core20TargetFramework, AcceptanceTestBase.CoreRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
+            this.DataRows.Add(new DataRowAttribute(IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.Core20TargetFramework, AcceptanceTestBase.DesktopRunnerTargetRuntime, AcceptanceTestBase.NoIsolation));
         }
 
         /// <summary>

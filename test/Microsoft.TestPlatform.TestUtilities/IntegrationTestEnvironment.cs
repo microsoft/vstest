@@ -152,6 +152,15 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
 
         /// <summary>
+        /// Gets the inIsolation.
+        /// Supported values = <c>/InIsolation</c>.
+        /// </summary>
+        public string InIsolationValue
+        {
+            get; set;
+        }
+
+        /// <summary>
         /// Gets the root directory for test assets.
         /// </summary>
         public string TestAssetsPath

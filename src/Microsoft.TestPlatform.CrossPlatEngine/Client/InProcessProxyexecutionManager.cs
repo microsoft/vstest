@@ -16,6 +16,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
     internal class InProcessProxyExecutionManager : IProxyExecutionManager
     {
@@ -56,11 +57,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(testRunCriteria.TestRunSettings);
+
                 // This code should be in sync with ProxyExecutionManager.StartTestRun executionContext
                 var executionContext = new TestExecutionContext(
                             testRunCriteria.FrequencyOfRunStatsChangeEvent,
                             testRunCriteria.RunStatsChangeEventTimeout,
-                            inIsolation: false,
+                            inIsolation: runConfiguration.InIsolation,
                             keepAlive: testRunCriteria.KeepAlive,
                             isDataCollectionEnabled: false,
                             areTestCaseLevelEventsRequired: false,

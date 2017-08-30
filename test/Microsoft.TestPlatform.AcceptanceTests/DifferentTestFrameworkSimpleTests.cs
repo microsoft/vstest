@@ -13,57 +13,66 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void ChutzpahRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
+        public void ChutzpahRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var testJSFileAbsolutePath = Path.Combine(this.testEnvironment.TestAssetsPath, "test.js");
             var arguments = PrepareArguments(
                 testJSFileAbsolutePath,
                 this.GetTestAdapterPath(UnitTestFramework.Chutzpah),
                 string.Empty,
-                this.FrameworkArgValue);
+                this.FrameworkArgValue,
+                inIsolation);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
+        public void CPPRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
             CppRunAllTests(runnerFramework, "x86");
         }
 
         [CustomDataTestMethod]
-        [NETFullTargetFramework]
-        public void CPPRunAllTestExecutionPlatformx64(string runnerFramework, string targetFramework, string targetRuntime)
+        [NETFullTargetFrameworkInProcess]
+        public void CPPRunAllTestExecutionPlatformx64(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
             CppRunAllTests(runnerFramework, "x64");
         }
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
-        public void NUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
+        [NETFullTargetFrameworkInProcess]
+        [NETFullTargetFrameworkInIsolation]
+        public void NUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var arguments = PrepareArguments(
                 this.GetAssetFullPath("NUTestProject.dll"),
                 this.GetTestAdapterPath(UnitTestFramework.NUnit),
                 string.Empty,
-                this.FrameworkArgValue);
+                this.FrameworkArgValue,
+                inIsolation);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }
 
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInIsolation]
+        [NETFullTargetFrameworkInProcess]
         [NETCORETargetFramework]
-        public void XUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime)
+        public void XUnitRunAllTestExecution(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
             string testAssemblyPath = null;
 
             // Xunit >= 2.2 won't support net451, Minimum target framework it supports is net452.
@@ -80,7 +89,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 testAssemblyPath,
                 this.GetTestAdapterPath(UnitTestFramework.XUnit),
                 string.Empty,
-                this.FrameworkArgValue);
+                this.FrameworkArgValue,
+                inIsolation);
             this.InvokeVsTest(arguments);
             this.ValidateSummaryStatus(1, 1, 0);
         }
@@ -103,7 +113,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 assemblyAbsolutePath,
                 string.Empty,
                 string.Empty,
-                this.FrameworkArgValue);
+                this.FrameworkArgValue,
+                this.testEnvironment.InIsolationValue);
 
             arguments = string.Concat(arguments, $" /platform:{platform}");
             this.InvokeVsTest(arguments);

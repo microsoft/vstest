@@ -17,10 +17,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInProcess]
         [NETCORETargetFramework]
-        public void RunTestExecutionWithPlatformx64(string runnerFramework, string targetFramework, string targetRuntime)
+        public void RunTestExecutionWithPlatformx64(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var platformArg = " /Platform:x64";
             string testhostProcessName = string.Empty;
@@ -36,10 +37,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         /// </summary>
         [CustomDataTestMethod]
         [NETFullTargetFramework]
+        [NETFullTargetFrameworkInIsolation]
         [NETCORETargetFramework]
-        public void RunTestExecutionWithPlatformx86(string runnerFramework, string targetFramework, string targetRuntime)
+        public void RunTestExecutionWithPlatformx86(string runnerFramework, string targetFramework, string targetRuntime, string inIsolation)
         {
-            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime, inIsolation);
 
             var platformArg = " /Platform:x86";
             string testhostProcessName = string.Empty;
@@ -77,10 +79,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.GetSampleTestAssembly(),
                 this.GetTestAdapterPath(),
                 string.Empty,
-                this.FrameworkArgValue);
+                this.FrameworkArgValue,
+                this.testEnvironment.InIsolationValue);
             arguments = string.Concat(arguments, platformArg);
-
-            arguments = arguments + " /InIsolation";
 
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
