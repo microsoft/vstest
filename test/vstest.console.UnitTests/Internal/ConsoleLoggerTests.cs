@@ -114,14 +114,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         {
             var parameters = new Dictionary<string, string>();
 
-            Assert.IsFalse(ConsoleLogger.AppendPrefix);
-
-            parameters.Add("prefix", "true");
-            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
-
             Assert.IsTrue(ConsoleLogger.AppendPrefix);
 
-            ConsoleLogger.AppendPrefix = false;
+            parameters.Add("prefix", "false");
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.IsFalse(ConsoleLogger.AppendPrefix);
+
+            ConsoleLogger.AppendPrefix = true;
         }
 
         [TestMethod]
@@ -143,9 +143,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.testRunRequest.Raise(m => m.TestRunMessage += null, new TestRunMessageEventArgs(TestMessageLevel.Warning, "Warning123"));
             this.FlushLoggerMessages();
 
-            this.mockOutput.Verify(o => o.WriteLine("Informational123", OutputLevel.Information), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("Warning123", OutputLevel.Warning), Times.Once());
-            this.mockOutput.Verify(o => o.WriteLine("Error123", OutputLevel.Error), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("Information: Informational123", OutputLevel.Information), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("Warning: Warning123", OutputLevel.Warning), Times.Once());
+            this.mockOutput.Verify(o => o.WriteLine("Error: Error123", OutputLevel.Error), Times.Once());
         }
 
         [TestMethod]
