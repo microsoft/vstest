@@ -335,6 +335,9 @@ function Create-VsixPackage
     Copy-Item -Recurse $comComponentsDirectory\* $testhostPackageDir -Force
 
     # Copy COM Components and their manifests over to Extensions Test Impact directory
+    if (-not (Test-Path $testImpactComComponentsDir)) {
+        New-Item $testImpactComComponentsDir -Type Directory -Force | Out-Null
+    }
     Copy-Item -Recurse $comComponentsDirectory\* $testImpactComComponentsDir -Force
     
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
