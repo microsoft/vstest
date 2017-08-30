@@ -80,6 +80,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 this.FrameworkArgValue);
             arguments = string.Concat(arguments, platformArg);
 
+            arguments = arguments + " /InIsolation";
+
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,

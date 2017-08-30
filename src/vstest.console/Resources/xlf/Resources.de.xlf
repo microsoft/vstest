@@ -420,15 +420,15 @@
         <note from="bb-metadata">fuzzyMatch="15" wordcount="29" adjWordcount="24.65" curWordcount="24.65"</note>
       </trans-unit>
       <trans-unit id="InIsolationHelp">
-        <source>/InIsolation
+        <source>--InIsolation|/InIsolation
       Runs the tests in an isolated process. This makes vstest.console.exe 
       process less likely to be stopped on an error in the tests, but tests 
       may run slower.</source>
-        <target state="translated">/InIsolation
+        <target state="new">/InIsolation
       Führt die Tests in einem isolierten Prozess aus. Auf diese Weise ist es unwahrscheinlicher, dass der Prozess
       "vstest.console.exe" bei einem Fehler in den Tests beendet wird.
       Tests werden aber ggf. langsamer ausgeführt.</target>
-        <note />
+        <note></note>
         <alt-trans match-quality="100%" tool="BlackBox/MSR MT">
           <target state-qualifier="mt-suggestion">/ InIsolation
       Führt Tests in einem isolierten Prozess. Vstest.console.exe wird voraussichtlich auf Fehler in den Tests beendet jedoch Tests möglicherweise langsamer ausgeführt.</target>

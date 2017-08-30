@@ -621,5 +621,27 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Resources {
                 return ResourceManager.GetString("UnexpectedTypeOfProperty", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The test property type &apos;{0}&apos; of property &apos;{1}&apos; is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. .
+        /// </summary>
+        internal static string FailedToLoadMsDia
+        {
+            get
+            {
+                return ResourceManager.GetString("FailedToLoadMsDia", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to The test property type &apos;{0}&apos; of property &apos;{1}&apos; is not supported. Use one of the supported property type (primitive types, uri, string, string[]) and try again. .
+        /// </summary>
+        internal static string FailedToCreateDiaSession
+        {
+            get
+            {
+                return ResourceManager.GetString("FailedToCreateDiaSession", resourceCulture);
+            }
+        }
     }
 }

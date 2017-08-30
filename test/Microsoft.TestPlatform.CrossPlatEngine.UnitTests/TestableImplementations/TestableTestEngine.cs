@@ -5,11 +5,13 @@ namespace TestPlatform.CrossPlatEngine.UnitTests
 {
     using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
     public class TestableTestEngine : TestEngine
     {
-        public TestableTestEngine()
-            : base(TestRuntimeProviderManager.Instance)
+        public TestableTestEngine(IProcessHelper processHelper)
+            : base(TestRuntimeProviderManager.Instance, processHelper)
         {
         }
     }

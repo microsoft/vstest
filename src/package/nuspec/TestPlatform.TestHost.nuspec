@@ -33,6 +33,8 @@
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\Microsoft.VisualStudio.TestPlatform.Common.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.dll" target="lib\netstandard1.5\" />
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\testhost.deps.json" target="lib\netstandard1.5\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x86\msdia140.dll" target="lib\netstandard1.5\x86\" />
+    <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\x64\msdia140.dll" target="lib\netstandard1.5\x64\" />
 
     <!-- Add localized resources -->
     <file src="Microsoft.TestPlatform.TestHost\netcoreapp1.0\cs\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="lib\netstandard1.5\cs" />
