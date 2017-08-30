@@ -511,7 +511,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     attachments,
                     elapsedTime);
 
-                if (lastChunk.Any() && string.IsNullOrEmpty(this.package))
+                if (lastChunk.Any() && !string.IsNullOrEmpty(this.package))
                 {
                     lastChunk.ToList().ForEach(tr => tr.TestCase.Source = this.package);
                 }
@@ -535,7 +535,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             if (this.testRunEventsHandler != null)
             {
                 // Before sending the testresults back, update the test case objects with source provided by IDE/User.
-                if(string.IsNullOrEmpty(this.package))
+                if(!string.IsNullOrEmpty(this.package))
                 {
                     results.ToList().ForEach(tr => tr.TestCase.Source = this.package);
                 }
