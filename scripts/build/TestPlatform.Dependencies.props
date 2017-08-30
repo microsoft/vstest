@@ -13,7 +13,8 @@
     <XUnitFrameworkVersion>2.3.0-beta3-build3705</XUnitFrameworkVersion>
     <XUnitAdapterVersion>2.3.0-beta3-build3705</XUnitAdapterVersion>
 
-    <NUnit3FrameworkVersion>3.6.1</NUnit3FrameworkVersion>
+    <NUnit3FrameworkVersion>3.7.1</NUnit3FrameworkVersion>
+    <NUnit3AdapterVersion>3.8.0</NUnit3AdapterVersion>
     <NUnitFrameworkVersion>2.6.4</NUnitFrameworkVersion>
     <NUnitAdapterVersion>2.0.0</NUnitAdapterVersion>
 
