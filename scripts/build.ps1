@@ -330,15 +330,23 @@ function Create-VsixPackage
     $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
     $testhostPackageDir = Join-Path $packageDir "TestHost"
+    $extensionsPackageDir = Join-Path $packageDir "Extensions"
+    $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-941552\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-955793\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
     $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostPackageDir -Force
 
+    # Copy COM Components and their manifests over to Extensions Test Impact directory
+    if (-not (Test-Path $testImpactComComponentsDir)) {
+        New-Item $testImpactComComponentsDir -Type Directory -Force | Out-Null
+    }
+    Copy-Item -Recurse $comComponentsDirectory\* $testImpactComComponentsDir -Force
+    
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force
 
