@@ -197,6 +197,7 @@ function Publish-Package
     $fullCLRPackageDir = Get-FullCLRPackageDirectory
     $coreCLRPackageDir = Get-CoreCLRPackageDirectory
     $coreCLR20PackageDir = Get-CoreCLR20PackageDirectory
+    $coreCLR20TestHostPackageDir = Get-CoreCLR20TestHostPackageDirectory
     $packageProject = Join-Path $env:TP_PACKAGE_PROJ_DIR "package\package.csproj"
     $testHostProject = Join-Path $env:TP_ROOT_DIR "src\testhost\testhost.csproj"
     $testHostx86Project = Join-Path $env:TP_ROOT_DIR "src\testhost.x86\testhost.x86.csproj"
@@ -254,6 +255,12 @@ function Publish-Package
     Copy-Item $platformAbstractionNetFull\* $fullCLRPackageDir -Force
     Copy-Item $platformAbstractionNetCore\* $coreCLR20PackageDir -Force
     
+    # Publish msdia
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostCorePackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $testhostFullPackageDir -Force
+    Copy-Item -Recurse $comComponentsDirectory\* $coreCLR20TestHostPackageDir -Force
+
     # Copy over the logger assemblies to the Extensions folder.
     $extensions_Dir = "Extensions"
     $fullCLRExtensionsDir = Join-Path $fullCLRPackageDir $extensions_Dir
@@ -323,15 +330,23 @@ function Create-VsixPackage
     $vsixProjectDir = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\VSIX"
     $packageDir = Get-FullCLRPackageDirectory
     $testhostPackageDir = Join-Path $packageDir "TestHost"
+    $extensionsPackageDir = Join-Path $packageDir "Extensions"
+    $testImpactComComponentsDir = Join-Path $extensionsPackageDir "TestImpact"
 
     # Copy legacy dependencies
-    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-909739\contentFiles\any\any"
+    $legacyDir = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.TestPlatform.Extensions\15.5.0-preview-955793\contentFiles\any\any"
     Copy-Item -Recurse $legacyDir\* $packageDir -Force
 
     # Copy COM Components and their manifests over
-    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any"
+    $comComponentsDirectory = Join-Path $env:TP_PACKAGES_DIR "Microsoft.Internal.Dia\14.0.0\contentFiles\any\any\ComComponents"
     Copy-Item -Recurse $comComponentsDirectory\* $testhostPackageDir -Force
 
+    # Copy COM Components and their manifests over to Extensions Test Impact directory
+    if (-not (Test-Path $testImpactComComponentsDir)) {
+        New-Item $testImpactComComponentsDir -Type Directory -Force | Out-Null
+    }
+    Copy-Item -Recurse $comComponentsDirectory\* $testImpactComComponentsDir -Force
+    
     $fileToCopy = Join-Path $env:TP_PACKAGE_PROJ_DIR "ThirdPartyNotices.txt"
     Copy-Item $fileToCopy $packageDir -Force
 
@@ -465,6 +480,11 @@ function Get-CoreCLRPackageDirectory
 function Get-CoreCLR20PackageDirectory
 {
     return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20")
+}
+
+function Get-CoreCLR20TestHostPackageDirectory
+{
+    return $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$TPB_TargetFrameworkCore20\TestHost")
 }
 
 function Start-Timer
