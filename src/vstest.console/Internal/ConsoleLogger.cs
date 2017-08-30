@@ -32,9 +32,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         /// <summary>
         /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
-        /// Default value is true.
         /// </summary>
-        internal static bool AppendPrefix = true;
+        internal static bool AppendPrefix;
 
         /// <summary>
         /// Uri used to uniquely identify the console logger.
