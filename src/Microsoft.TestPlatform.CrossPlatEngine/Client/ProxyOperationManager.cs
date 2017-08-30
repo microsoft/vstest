@@ -175,19 +175,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         }
 
         /// <summary>
-        /// Update the AdapterSourceMap
-        /// </summary>
-        /// <param name="sources">test sources</param>
-        /// <param name="adapterSourceMap">Adapter Source Map</param>
-        /// <param name="testRuntimeProvider">testhostmanager which updates the sources</param>
-        public virtual void UpdateTestSources(IEnumerable<string> sources, Dictionary<string, IEnumerable<string>> adapterSourceMap)
-        {
-            var updatedTestSources = this.testHostManager.GetTestSources(sources);
-            adapterSourceMap.Clear();
-            adapterSourceMap.Add(Constants.UnspecifiedAdapterPath, updatedTestSources);
-        }
-
-        /// <summary>
         /// Closes the channel, terminate test host process.
         /// </summary>
         public virtual void Close()

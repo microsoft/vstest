@@ -170,7 +170,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             // AdapterSourceMap should contail updated testSources.
             Assert.AreEqual(actualSources.FirstOrDefault(), discoveryCriteria.AdapterSourceMap.FirstOrDefault().Value.FirstOrDefault());
-            Assert.AreEqual(inputSource, discoveryCriteria.Sources);
+            Assert.AreEqual(inputSource.FirstOrDefault(), discoveryCriteria.Package);
         }
     }
 }

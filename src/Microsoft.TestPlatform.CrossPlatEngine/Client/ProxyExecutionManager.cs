@@ -85,13 +85,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
             try
             {
                 EqtTrace.Verbose("ProxyExecutionManager: Test host is always Lazy initialize.");
-                var testPackages = testRunCriteria.HasSpecificSources ? new List<string>(testRunCriteria.Sources) : null;
 
-                // If the test execution is with a test filter, group them by sources
-                if (testRunCriteria.HasSpecificTests)
-                {
-                    testPackages = new List<string>(testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
-                }
+                var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
+                                                    // If the test execution is with a test filter, group them by sources
+                                                    testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
 
                 this.isCommunicationEstablished = this.SetupChannel(testPackages, this.cancellationTokenSource.Token);
 
@@ -123,26 +120,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     // This is workaround for the bug https://github.com/Microsoft/vstest/issues/970
                     var runsettings = this.RemoveNodesFromRunsettingsIfRequired(testRunCriteria.TestRunSettings, (testMessageLevel, message) => { this.LogMessage(testMessageLevel, message, eventHandler); });
 
-                    var actualTestSources = this.testHostManager.GetTestSources(testPackages);
-
-                    // For netcore/fullclr both packages and sources are same thing, 
-                    // For UWP the actual source(exe) differs from input source(.appxrecipe) which we call package.
-                    // So in such models we check if they differ, then we pass this info to test host to update TestCase source with package info,
-                    // since this is needed by IDE's to map a TestCase to project.
-                    var testSourcesDiffer = testPackages.Except(actualTestSources).Any();
-
                     if (testRunCriteria.HasSpecificSources)
                     {
-                        // Allow TestRuntimeProvider to update source map, this is required for remote scenarios.
-                        // If we run for specific tests, then we expect the test case object to contain correct source path for remote scenario as well
-                        if(testSourcesDiffer)
-                        {
-                            this.UpdateTestSources(testRunCriteria.Sources, testRunCriteria.AdapterSourceMap);
-                        }
+                        CriteriaTransform.UpdateTestRunCriteriaForSources(testRunCriteria, testHostManager, ref testPackages);
 
                         var runRequest = new TestRunCriteriaWithSources(
                             testRunCriteria.AdapterSourceMap,
-                            testSourcesDiffer ? testPackages : null,
+                            testPackages?.FirstOrDefault(),
                             runsettings,
                             executionContext);
 
@@ -150,17 +134,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     }
                     else
                     {
-                        // In UWP scenario TestCase object contains the package as source, which is not actual test source for adapters, 
-                        // so update test case before sending them.
-                        // This approach will fail, once a package concept is introduced, where a package can contain multiple test sources.
-                        if (testSourcesDiffer)
-                        {
-                            testRunCriteria.Tests.ToList().ForEach(tc => tc.Source = actualTestSources.FirstOrDefault());
-                        }
+                        CriteriaTransform.UpdateTestRunCriteriaForTests(testRunCriteria, testHostManager, ref testPackages);
 
                         var runRequest = new TestRunCriteriaWithTests(
                             testRunCriteria.Tests,
-                            testSourcesDiffer ? testPackages : null,
+                            testPackages?.FirstOrDefault(),
                             runsettings,
                             executionContext);
 

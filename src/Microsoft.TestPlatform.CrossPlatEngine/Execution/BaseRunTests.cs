@@ -48,7 +48,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         private ITestRunEventsHandler testRunEventsHandler;
         private ITestEventsPublisher testEventsPublisher;
         private ITestRunCache testRunCache;
-        private IEnumerable<string> packages;
+        private string package;
 
         /// <summary>
         /// Specifies that the test run cancellation is requested
@@ -83,20 +83,20 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
         /// </summary>
-        /// <param name="packages">The user input test sources(packages) list if they differ from actual test source otherwise null.</param>
+        /// <param name="package">The user input test source(package) if it differs from actual test source otherwise null.</param>
         /// <param name="runSettings">The run settings.</param>
         /// <param name="testExecutionContext">The test execution context.</param>
         /// <param name="testCaseEventsHandler">The test case events handler.</param>
         /// <param name="testRunEventsHandler">The test run events handler.</param>
         /// <param name="testPlatformEventSource">Test platform event source.</param>
-        protected BaseRunTests(IEnumerable<string> packages,
+        protected BaseRunTests(string package,
             string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
             ITestRunEventsHandler testRunEventsHandler,
             ITestPlatformEventSource testPlatformEventSource) :
             this(
-                packages,
+                package,
                 runSettings,
                 testExecutionContext,
                 testCaseEventsHandler,
@@ -110,7 +110,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseRunTests"/> class.
         /// </summary>
-        /// <param name="packages">The user input test sources(packages) list if they differ from actual test source otherwise null.</param>
+        /// <param name="package">The user input test source(package) list if it differs from actual test source otherwise null.</param>
         /// <param name="runSettings">The run settings.</param>
         /// <param name="testExecutionContext">The test execution context.</param>
         /// <param name="testCaseEventsHandler">The test case events handler.</param>
@@ -118,7 +118,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// <param name="testPlatformEventSource">Test platform event source.</param>
         /// <param name="testEventsPublisher">Publisher for test events.</param>
         /// <param name="platformThread">Platform Thread.</param>
-        protected BaseRunTests(IEnumerable<string> packages,
+        protected BaseRunTests(string package,
             string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
@@ -127,7 +127,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             ITestEventsPublisher testEventsPublisher,
             IThread platformThread)
         {
-            this.packages = packages;
+            this.package = package;
             this.runSettings = runSettings;
             this.testExecutionContext = testExecutionContext;
             this.testCaseEventsHandler = testCaseEventsHandler;
@@ -511,9 +511,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     attachments,
                     elapsedTime);
 
-                if (lastChunk.Count() > 0 && this.packages != null)
+                if (lastChunk.Any() && string.IsNullOrEmpty(this.package))
                 {
-                    lastChunk.ToList().ForEach(tr => tr.TestCase.Source = this.packages.FirstOrDefault());
+                    lastChunk.ToList().ForEach(tr => tr.TestCase.Source = this.package);
                 }
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunk, Enumerable.Empty<TestCase>());
@@ -535,9 +535,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             if (this.testRunEventsHandler != null)
             {
                 // Before sending the testresults back, update the test case objects with source provided by IDE/User.
-                if(this.packages != null)
+                if(string.IsNullOrEmpty(this.package))
                 {
-                    results.ToList().ForEach(tr => tr.TestCase.Source = this.packages.FirstOrDefault());
+                    results.ToList().ForEach(tr => tr.TestCase.Source = this.package);
                 }
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);

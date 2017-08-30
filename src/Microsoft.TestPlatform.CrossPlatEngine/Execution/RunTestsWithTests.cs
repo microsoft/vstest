@@ -9,7 +9,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
-    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -24,8 +23,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 
         private Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList;
 
-        public RunTestsWithTests(IEnumerable<TestCase> testCases, IEnumerable<string> packages, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
-            : this(testCases, packages, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
+        public RunTestsWithTests(IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler)
+            : this(testCases, package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, null)
         {
         }
 
@@ -33,15 +32,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Used for unit testing only.
         /// </summary>
         /// <param name="testCases"></param>
-        /// <param name="packages">The user input test sources(packages) list if they differ from actual test source otherwise null.</param>
+        /// <param name="package">The user input test source(package) if it differ from actual test source otherwise null.</param>
         /// <param name="testRunCache"></param>
         /// <param name="runSettings"></param>
         /// <param name="testExecutionContext"></param>
         /// <param name="testCaseEventsHandler"></param>
         /// <param name="testRunEventsHandler"></param>
         /// <param name="executorUriVsTestList"></param>
-        internal RunTestsWithTests(IEnumerable<TestCase> testCases, IEnumerable<string> packages, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
-            : base(packages, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
+        internal RunTestsWithTests(IEnumerable<TestCase> testCases, string package, string runSettings, TestExecutionContext testExecutionContext, ITestCaseEventsHandler testCaseEventsHandler, ITestRunEventsHandler testRunEventsHandler, Dictionary<Tuple<Uri, string>, List<TestCase>> executorUriVsTestList)
+            : base(package, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, TestPlatformEventSource.Instance)
         {
             this.testCases = testCases;
             this.executorUriVsTestList = executorUriVsTestList;

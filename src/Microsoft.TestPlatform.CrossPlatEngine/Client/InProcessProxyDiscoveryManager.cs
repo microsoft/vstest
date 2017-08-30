@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
-    internal class InProcessProxyDiscoveryManager : InProcessProxyOperationManager, IProxyDiscoveryManager
+    internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
         private IDiscoveryManager discoveryManager;
@@ -33,7 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// Initializes a new instance of the <see cref="InProcessProxyDiscoveryManager"/> class.
         /// </summary>
         /// <param name="testHostManagerFactory">Manager factory</param>
-        internal InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory) : base(testHostManager)
+        internal InProcessProxyDiscoveryManager(ITestRuntimeProvider testHostManager, ITestHostManagerFactory testHostManagerFactory)
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
@@ -60,17 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     // Initialize extension before discovery
                     this.InitializeExtensions(discoveryCriteria.Sources);
-                    var actualTestSources = this.testHostManager.GetTestSources(discoveryCriteria.Sources);
-                    var testSourcesDiffer = discoveryCriteria.Sources.Except(actualTestSources).Any();
-
-                    if (testSourcesDiffer)
-                    {
-                        this.UpdateTestSources(discoveryCriteria.Sources, discoveryCriteria.AdapterSourceMap);
-                    }
-                    else
-                    {
-                        discoveryCriteria.Sources = null;
-                    }
+                    CriteriaTransform.UpdateDiscoveryCriteria(discoveryCriteria, testHostManager);
 
                     this.discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
                 }
@@ -82,8 +72,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                     eventHandler.HandleLogMessage(TestMessageLevel.Error, exception.ToString());
                     eventHandler.HandleDiscoveryComplete(-1, Enumerable.Empty<TestCase>(), true);
                 }
-            }
-            );
+            });
         }
 
         /// <summary>

@@ -19,14 +19,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Initializes a new instance of the <see cref="TestRunCriteriaWithSources"/> class.
         /// </summary>
         /// <param name="adapterSourceMap"> The adapter source map.  </param>
-        /// <param name="packages"> The packages which actually contain sources(UWP).</param>
+        /// <param name="package"> The package which actually contain sources. A testhost can at max execute for one pakage at time
+        /// Package can be null if test source, & package are same
+        /// </param>
         /// <param name="runSettings"> The run settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         [JsonConstructor]
-        public TestRunCriteriaWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, IEnumerable<string> packages, string runSettings, TestExecutionContext testExecutionContext)
+        public TestRunCriteriaWithSources(Dictionary<string, IEnumerable<string>> adapterSourceMap, string package, string runSettings, TestExecutionContext testExecutionContext)
         {
             this.AdapterSourceMap = adapterSourceMap;
-            this.Packages = packages;
+            this.Package = package;
             this.RunSettings = runSettings;
             this.TestExecutionContext = testExecutionContext;
         }
@@ -47,8 +49,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         public TestExecutionContext TestExecutionContext { get; set; }
 
         /// <summary>
-        /// Gets the test Containers (e.g. DLL/EXE/artifacts to scan)
+        /// Gets the test Containers (e.g. .appx, .appxrecipie)
         /// </summary>
-        public IEnumerable<string> Packages { get; private set; }
+        public string Package { get; private set; }
     }
 }

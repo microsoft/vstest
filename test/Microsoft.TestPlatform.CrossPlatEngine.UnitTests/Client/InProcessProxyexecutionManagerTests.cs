@@ -126,14 +126,14 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
 
             this.mockTestHostManager.Setup(hm => hm.GetTestSources(inputSource)).Returns(actualSources);
 
-            this.mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, inputSource, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
+            this.mockExecutionManager.Setup(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null))
                 .Callback(() => manualResetEvent.Set());
 
             this.inProcessProxyExecutionManager = new InProcessProxyExecutionManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
 
             this.inProcessProxyExecutionManager.StartTestRun(testRunCriteria, null);
 
-            this.mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource, testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
+            this.mockExecutionManager.Verify(o => o.StartTestRun(testRunCriteria.Tests, inputSource.FirstOrDefault(), testRunCriteria.TestRunSettings, It.IsAny<TestExecutionContext>(), null, null));
 
             this.mockTestHostManager.Verify(hm => hm.GetTestSources(inputSource), Times.Once);
             Assert.AreEqual(actualSources.FirstOrDefault(), testRunCriteria.Tests.FirstOrDefault().Source);
