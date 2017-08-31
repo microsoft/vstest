@@ -25,7 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// </summary>
         /// <param name="adapterSourceMap"> The adapter Source Map.  </param>
         /// <param name="package"> The packages which actually contain sources. A testhost can at max execute for one pakage at time
-        /// Package can be null if test source, & package are same
+        /// Package can be null if test source, and package are same
         /// </param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
@@ -38,7 +38,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// </summary>
         /// <param name="tests"> The test list. </param>
         /// <param name="package"> The packages which actually contain sources. A testhost can at max execute for one pakage at time
-        /// Package can be null if test source, & package are same
+        /// Package can be null if test source, and package are same
         /// </param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>

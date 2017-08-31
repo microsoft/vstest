@@ -511,9 +511,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
                     attachments,
                     elapsedTime);
 
-                if (lastChunk.Any() && !string.IsNullOrEmpty(this.package))
+                if (lastChunk.Any())
                 {
-                    lastChunk.ToList().ForEach(tr => tr.TestCase.Source = this.package);
+                    UpdateTestResults(lastChunk, this.package);
                 }
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(runStats, lastChunk, Enumerable.Empty<TestCase>());
@@ -534,11 +534,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             if (this.testRunEventsHandler != null)
             {
-                // Before sending the testresults back, update the test case objects with source provided by IDE/User.
-                if(!string.IsNullOrEmpty(this.package))
-                {
-                    results.ToList().ForEach(tr => tr.TestCase.Source = this.package);
-                }
+                UpdateTestResults(results, this.package);
 
                 var testRunChangedEventArgs = new TestRunChangedEventArgs(testRunStats, results, inProgressTests);
                 this.testRunEventsHandler.HandleTestRunStatsChange(testRunChangedEventArgs);
@@ -569,6 +565,18 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             }
 
             return success;
+        }
+
+        private static void UpdateTestResults(IEnumerable<TestResult> testResults, string package)
+        {
+            // Before sending the testresults back, update the test case objects with source provided by IDE/User.
+            if (!string.IsNullOrEmpty(package))
+            {
+                foreach (var tr in testResults)
+                {
+                    tr.TestCase.Source = package;
+                }
+            }
         }
 
         #endregion

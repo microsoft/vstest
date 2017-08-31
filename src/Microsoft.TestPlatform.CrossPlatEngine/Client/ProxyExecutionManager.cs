@@ -122,25 +122,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                     if (testRunCriteria.HasSpecificSources)
                     {
-                        CriteriaTransform.UpdateTestRunCriteriaForSources(testRunCriteria, testHostManager, ref testPackages);
-
-                        var runRequest = new TestRunCriteriaWithSources(
-                            testRunCriteria.AdapterSourceMap,
-                            testPackages?.FirstOrDefault(),
-                            runsettings,
-                            executionContext);
+                        var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, runsettings, executionContext, testPackages);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
                     }
                     else
                     {
-                        CriteriaTransform.UpdateTestRunCriteriaForTests(testRunCriteria, testHostManager, ref testPackages);
-
-                        var runRequest = new TestRunCriteriaWithTests(
-                            testRunCriteria.Tests,
-                            testPackages?.FirstOrDefault(),
-                            runsettings,
-                            executionContext);
+                        var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, runsettings, executionContext, testPackages);
 
                         this.RequestSender.StartTestRun(runRequest, eventHandler);
                     }

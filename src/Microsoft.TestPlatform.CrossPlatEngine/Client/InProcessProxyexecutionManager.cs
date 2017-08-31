@@ -77,17 +77,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
 
                 if (testRunCriteria.HasSpecificSources)
                 {
-                    CriteriaTransform.UpdateTestRunCriteriaForSources(testRunCriteria, testHostManager, ref testPackages);
+                    var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, testRunCriteria.TestRunSettings, executionContext, testPackages);
 
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.AdapterSourceMap, testPackages?.FirstOrDefault(), 
-                        testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    Task.Run(() => executionManager.StartTestRun(runRequest.AdapterSourceMap, runRequest.Package,
+                        runRequest.RunSettings, runRequest.TestExecutionContext, null, eventHandler));
                 }
                 else
                 {
-                    CriteriaTransform.UpdateTestRunCriteriaForTests(testRunCriteria, testHostManager, ref testPackages);
+                    var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, testRunCriteria.TestRunSettings, executionContext, testPackages);
 
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.Tests, testPackages?.FirstOrDefault(), 
-                        testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    Task.Run(() => executionManager.StartTestRun(runRequest.Tests, runRequest.Package,
+                        runRequest.RunSettings, runRequest.TestExecutionContext, null, eventHandler));
                 }
             }
             catch (Exception exception)

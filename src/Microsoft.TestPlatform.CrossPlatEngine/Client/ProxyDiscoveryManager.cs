@@ -94,7 +94,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 if (this.isCommunicationEstablished)
                 {
                     this.InitializeExtensions(discoveryCriteria.Sources);
-                    CriteriaTransform.UpdateDiscoveryCriteria(discoveryCriteria, testHostManager);
+                    discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
                     this.RequestSender.DiscoverTests(discoveryCriteria, eventHandler);
                 }

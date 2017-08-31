@@ -123,11 +123,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
                 if (eventHandler != null)
                 {
-                    if(lastChunk != null && !string.IsNullOrEmpty(this.discoveryCriteria.Package))
+                    if(lastChunk != null)
                     {
-                        lastChunk.ToList().ForEach(tc => tc.Source = this.discoveryCriteria.Package);
+                        UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                     }
-
                     eventHandler.HandleDiscoveryComplete(totalDiscoveredTestCount, lastChunk, false);
                 }
                 else
@@ -152,12 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
 
         private void OnReportTestCases(IEnumerable<TestCase> testCases)
         {
-            // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users), 
-            // else these test cases are not displayed in TestWindow.
-            if (!string.IsNullOrEmpty(this.discoveryCriteria.Package))
-            {
-                testCases.ToList().ForEach(tc => tc.Source = this.discoveryCriteria.Package);
-            }
+            UpdateTestCases(testCases, this.discoveryCriteria.Package);
 
             if (this.testDiscoveryEventsHandler != null)
             {
@@ -245,6 +239,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     EqtTrace.Warning(
                         "DiscoveryManager: Could not pass the log message  '{0}' as the callback is null.",
                         e.Message);
+                }
+            }
+        }
+
+        private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
+        {
+            // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users),
+            // else these test cases are not displayed in TestWindow.
+            if (!string.IsNullOrEmpty(package))
+            {
+                foreach(var tc in testCases)
+                {
+                    tc.Source = package;
                 }
             }
         }

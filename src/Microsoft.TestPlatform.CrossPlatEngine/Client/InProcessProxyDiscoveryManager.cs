@@ -60,7 +60,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                 {
                     // Initialize extension before discovery
                     this.InitializeExtensions(discoveryCriteria.Sources);
-                    CriteriaTransform.UpdateDiscoveryCriteria(discoveryCriteria, testHostManager);
+                    discoveryCriteria.UpdateDiscoveryCriteria(testHostManager);
 
                     this.discoveryManager.DiscoverTests(discoveryCriteria, eventHandler);
                 }
