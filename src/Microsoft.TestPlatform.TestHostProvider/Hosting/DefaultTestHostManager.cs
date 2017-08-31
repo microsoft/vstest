@@ -41,7 +41,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
 
         private const string DefaultTestHostUri = "HostProvider://DefaultTestHost";
         private const string DefaultTestHostFriendlyName = "DefaultTestHost";
-        private const string TestAdapterRegexPattern = @"TestAdapter.dll";
+        private const string TestAdapterEndsWithPattern = @"TestAdapter.dll";
 
         private Architecture architecture;
 
@@ -185,7 +185,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
         {
             if (sources != null && sources.Any() && this.projectOutputExtensionsRequired)
             {
-                extensions = extensions.Concat(sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterRegexPattern)));
+                extensions = extensions.Concat(sources.SelectMany(s => this.fileHelper.EnumerateFiles(Path.GetDirectoryName(s), SearchOption.TopDirectoryOnly, TestAdapterEndsWithPattern)));
             }
 
             return extensions;
