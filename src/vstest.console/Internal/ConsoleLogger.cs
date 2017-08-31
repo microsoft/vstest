@@ -31,6 +31,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private const string TestMessageFormattingPrefix = " ";
 
         /// <summary>
+        /// Bool to decide whether Verbose level should be added as prefix or not in log messages.
+        /// </summary>
+        internal static bool AppendPrefix;
+
+        /// <summary>
         /// Uri used to uniquely identify the console logger.
         /// </summary>
         public const string ExtensionUri = "logger://Microsoft/TestPlatform/ConsoleLogger/v2";
@@ -44,6 +49,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         /// Parameter for Verbosity
         /// </summary>
         public const string VerbosityParam = "verbosity";
+
+        /// <summary>
+        /// Parameter for log message prefix
+        /// </summary>
+        public const string PrefixParam = "prefix";
 
         #endregion
 
@@ -66,7 +76,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         private int testsPassed = 0;
         private int testsFailed = 0;
         private int testsSkipped = 0;
-
         #endregion
 
         #region Constructor
@@ -89,7 +98,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
         #endregion
 
-        #region Properties
+        #region Properties        
+
         /// <summary>
         /// Gets instance of IOutput used for sending output.
         /// </summary>
@@ -150,6 +160,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 this.verbosityLevel = verbosityLevel;
             }
 
+            var prefixExists = parameters.TryGetValue(ConsoleLogger.PrefixParam, out string prefix);
+            if (prefixExists)
+            {
+                bool.TryParse(prefix, out ConsoleLogger.AppendPrefix);
+            }
+
             this.Initialize(events, String.Empty);
         }
         #endregion
@@ -163,19 +179,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
         {
             if (timeSpan.TotalDays >= 1)
             {
-                Output.Information(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalDays, CommandLineResources.Days));
+                Output.Information(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalDays, CommandLineResources.Days));
             }
             else if (timeSpan.TotalHours >= 1)
             {
-                Output.Information(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalHours, CommandLineResources.Hours));
+                Output.Information(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalHours, CommandLineResources.Hours));
             }
             else if (timeSpan.TotalMinutes >= 1)
             {
-                Output.Information(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalMinutes, CommandLineResources.Minutes));
+                Output.Information(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalMinutes, CommandLineResources.Minutes));
             }
             else
             {
-                Output.Information(string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalSeconds, CommandLineResources.Seconds));
+                Output.Information(false, string.Format(CultureInfo.CurrentCulture, CommandLineResources.ExecutionTimeFormatString, timeSpan.TotalSeconds, CommandLineResources.Seconds));
             }
         }
 
@@ -224,17 +240,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             if (!String.IsNullOrEmpty(result.ErrorMessage))
             {
                 addAdditionalNewLine = true;
-                Output.Information(ConsoleColor.Red, CommandLineResources.ErrorMessageBanner);
+                Output.Information(false, ConsoleColor.Red, CommandLineResources.ErrorMessageBanner);
                 var errorMessage = String.Format(CultureInfo.CurrentCulture, "{0}{1}", TestMessageFormattingPrefix, result.ErrorMessage);
-                Output.Information(ConsoleColor.Red, errorMessage);
+                Output.Information(false, ConsoleColor.Red, errorMessage);
             }
 
             if (!String.IsNullOrEmpty(result.ErrorStackTrace))
             {
                 addAdditionalNewLine = false;
-                Output.Information(ConsoleColor.Red, CommandLineResources.StacktraceBanner);
+                Output.Information(false, ConsoleColor.Red, CommandLineResources.StacktraceBanner);
                 var stackTrace = String.Format(CultureInfo.CurrentCulture, "{0}", result.ErrorStackTrace);
-                Output.Information(ConsoleColor.Red, stackTrace);
+                Output.Information(false, ConsoleColor.Red, stackTrace);
             }
 
             var stdOutMessagesCollection = GetTestMessages(result.Messages, TestResultMessage.StandardOutCategory);
@@ -245,8 +261,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(stdOutMessages))
                 {
-                    Output.Information(CommandLineResources.StdOutMessagesBanner);
-                    Output.Information(stdOutMessages);
+                    Output.Information(false, CommandLineResources.StdOutMessagesBanner);
+                    Output.Information(false, stdOutMessages);
                 }
             }
 
@@ -258,8 +274,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(stdErrMessages))
                 {
-                    Output.Information(ConsoleColor.Red, CommandLineResources.StdErrMessagesBanner);
-                    Output.Information(ConsoleColor.Red, stdErrMessages);
+                    Output.Information(false, ConsoleColor.Red, CommandLineResources.StdErrMessagesBanner);
+                    Output.Information(false, ConsoleColor.Red, stdErrMessages);
                 }
             }
 
@@ -271,8 +287,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(dbgTrcMessages))
                 {
-                    Output.Information(CommandLineResources.DbgTrcMessagesBanner);
-                    Output.Information(dbgTrcMessages);
+                    Output.Information(false, CommandLineResources.DbgTrcMessagesBanner);
+                    Output.Information(false, dbgTrcMessages);
                 }
             }
 
@@ -284,8 +300,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
 
                 if (!string.IsNullOrEmpty(addnlInfoMessages))
                 {
-                    Output.Information(CommandLineResources.AddnlInfoMessagesBanner);
-                    Output.Information(addnlInfoMessages);
+                    Output.Information(false, CommandLineResources.AddnlInfoMessagesBanner);
+                    Output.Information(false, addnlInfoMessages);
                 }
             }
 
@@ -310,14 +326,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             switch (e.Level)
             {
                 case TestMessageLevel.Informational:
-                    Output.Information(e.Message);
+                    Output.Information(ConsoleLogger.AppendPrefix, e.Message);
                     break;
                 case TestMessageLevel.Warning:
-                    Output.Warning(e.Message);
+                    Output.Warning(ConsoleLogger.AppendPrefix, e.Message);
                     break;
                 case TestMessageLevel.Error:
                     this.testOutcome = TestOutcome.Failed;
-                    Output.Error(e.Message);
+                    Output.Error(ConsoleLogger.AppendPrefix, e.Message);
                     break;
                 default:
                     Debug.Fail("ConsoleLogger.TestMessageHandler: The test message level is unrecognized: {0}", e.Level.ToString());
@@ -346,7 +362,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SkippedTestIndicator,
                         name);
-                    Output.Warning(output);
+                    Output.Warning(false, output);
                     DisplayFullInformation(e.Result);
                 }
             }
@@ -358,7 +374,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.FailedTestIndicator,
                         name);
-                    Output.Information(ConsoleColor.Red, output);
+                    Output.Information(false, ConsoleColor.Red, output);
                     DisplayFullInformation(e.Result);
                 }
             }
@@ -367,7 +383,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 if (this.verbosityLevel.Equals(Verbosity.Normal))
                 {
                     var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.PassedTestIndicator, name);
-                    Output.Information(output);
+                    Output.Information(false, output);
                     DisplayFullInformation(e.Result);
                 }
                 this.testsPassed++;
@@ -378,7 +394,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                 {
                     var output = string.Format(CultureInfo.CurrentCulture, CommandLineResources.NotRunTestIndicator,
                         name);
-                    Output.Information(output);
+                    Output.Information(false, output);
                     DisplayFullInformation(e.Result);
                 }
             }
@@ -395,13 +411,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
             var runLevelAttachementCount = (e.AttachmentSets == null) ? 0 : e.AttachmentSets.Sum(attachmentSet => attachmentSet.Attachments.Count);
             if (runLevelAttachementCount > 0)
             {
-                Output.Information(CommandLineResources.AttachmentsBanner);
+                Output.Information(false, CommandLineResources.AttachmentsBanner);
                 foreach (var attachmentSet in e.AttachmentSets)
                 {
                     foreach (var uriDataAttachment in attachmentSet.Attachments)
                     {
                         var attachmentOutput = string.Format(CultureInfo.CurrentCulture, CommandLineResources.AttachmentOutputFormat, uriDataAttachment.Uri.LocalPath);
-                        Output.Information(attachmentOutput);
+                        Output.Information(false, attachmentOutput);
                     }
                 }
                 Output.WriteLine(String.Empty, OutputLevel.Information);
@@ -421,23 +437,23 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Internal
                     testCountDetails = string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, testsTotal, testsPassed, testsFailed, testsSkipped);
                 }
 
-                Output.Information(testCountDetails);
+                Output.Information(false, testCountDetails);
 
                 if (e.IsCanceled)
                 {
-                    Output.Error(CommandLineResources.TestRunCanceled);
+                    Output.Error(false, CommandLineResources.TestRunCanceled);
                 }
-                else if(e.IsAborted)
+                else if (e.IsAborted)
                 {
-                    Output.Error(CommandLineResources.TestRunAborted);
+                    Output.Error(false, CommandLineResources.TestRunAborted);
                 }
-                else if(this.testOutcome == TestOutcome.Failed)
+                else if (this.testOutcome == TestOutcome.Failed)
                 {
-                    Output.Error(CommandLineResources.TestRunFailed);
+                    Output.Error(false, CommandLineResources.TestRunFailed);
                 }
                 else
                 {
-                    Output.Information(ConsoleColor.Green, CommandLineResources.TestRunSuccessful);
+                    Output.Information(false, ConsoleColor.Green, CommandLineResources.TestRunSuccessful);
                 }
 
                 if (!e.ElapsedTimeInRunningTests.Equals(TimeSpan.Zero))

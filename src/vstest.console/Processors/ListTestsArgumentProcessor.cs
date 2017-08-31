@@ -210,7 +210,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.output.WriteLine(CommandLineResources.ListTestsHeaderMessage, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                this.output.Information(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+                this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
             var runSettings = this.runSettingsManager.ActiveRunSettings.SettingsXml;

@@ -228,7 +228,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             this.output.WriteLine(CommandLineResources.StartingDiscovery, OutputLevel.Information);
             if (!string.IsNullOrEmpty(EqtTrace.LogFile))
             {
-                this.output.Information(CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
+                this.output.Information(false, CommandLineResources.VstestDiagLogOutputPath, EqtTrace.LogFile);
             }
 
             return this.testRequestManager.DiscoverTests(
@@ -247,7 +247,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 {
                     string missingFilters = string.Join(", ", this.undiscoveredFilters);
                     string warningMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.SomeTestsUnavailableAfterFiltering, this.discoveredTestCount, missingFilters);
-                    this.output.Warning(warningMessage);
+                    this.output.Warning(false, warningMessage);
                 }
 
                 // for command line keep alive is always false.
@@ -278,7 +278,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                     }
                 }
 
-                this.output.Warning(warningMessage);
+                this.output.Warning(false, warningMessage);
             }
 
             return result;

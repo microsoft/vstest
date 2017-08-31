@@ -110,6 +110,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
         }
 
         [TestMethod]
+        public void InitializeWithParametersShouldSetPrefixValue()
+        {
+            var parameters = new Dictionary<string, string>();
+
+            Assert.IsFalse(ConsoleLogger.AppendPrefix);
+
+            parameters.Add("prefix", "true");
+            this.consoleLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+
+            Assert.IsTrue(ConsoleLogger.AppendPrefix);
+
+            ConsoleLogger.AppendPrefix = false;
+        }
+
+        [TestMethod]
         public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
         {
             // Raise an event on mock object
@@ -427,7 +442,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Internal
             this.mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestRunSummary, 1, 1, 0, 0), OutputLevel.Information), Times.Once());
             this.mockOutput.Verify(o => o.WriteLine(CommandLineResources.TestRunSuccessful, OutputLevel.Information), Times.Once());
         }
-        
+
         [TestMethod]
         public void TestRunCompleteHandlerShouldWriteToConsoleIfTestsFail()
         {
