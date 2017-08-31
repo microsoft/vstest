@@ -35,6 +35,10 @@
         <dependency id="System.Diagnostics.TraceSource" version="[4.3.0, )" />
         <dependency id="System.Threading.Thread" version="[4.3.0, )" />
       </group>
+      <group targetFramework="netstandard1.4">
+        <dependency id="System.ComponentModel.TypeConverter" version="[4.3.0, )" />
+        <dependency id="System.Runtime.InteropServices.RuntimeInformation" version="[4.3.0, )" />
+      </group>
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.Configuration" targetFramework=".NETFramework4.6" />
@@ -55,6 +59,10 @@
     <file src="$NetCoreTargetFramework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.5\" />
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.5\" />
     <file src="$NetCoreTargetFramework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard1.5\" />
+
+    <file src="$UapTargetFramework$\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" target="lib\netstandard1.4\" />
+    <file src="$UapTargetFramework$\Microsoft.TestPlatform.CoreUtilities.dll" target="lib\netstandard1.4\" />
+    <file src="$UapTargetFramework$\Microsoft.TestPlatform.PlatformAbstractions.dll" target="lib\netstandard1.4\" />
 
     <!-- Add localized resources -->
     <file src="net451\$Runtime$\cs\Microsoft.VisualStudio.TestPlatform.ObjectModel.*resources.dll" target="lib\net451\cs" />
