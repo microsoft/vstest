@@ -21,12 +21,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Ensure that names of constructor parameters match the public property names of the same for JSON serialization
         /// </summary>
         /// <param name="tests"> The tests. </param>
+        /// <param name="package"> The package which actually contain sources. A testhost can at max execute for one pakage at time
+        /// Package can be null if test source, and package are same
+        /// </param>
         /// <param name="runSettings"> The test run settings. </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         [JsonConstructor]
-        public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string runSettings, TestExecutionContext testExecutionContext)
+        public TestRunCriteriaWithTests(IEnumerable<TestCase> tests, string package, string runSettings, TestExecutionContext testExecutionContext)
         {
             this.Tests = tests;
+            this.Package = package;
             this.RunSettings = runSettings;
             this.TestExecutionContext = testExecutionContext;
         }
@@ -45,5 +49,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets the test execution context.
         /// </summary>
         public TestExecutionContext TestExecutionContext { get; set; }
+
+        /// <summary>
+        /// Gets the test Containers (e.g. .appx, .appxrecipie)
+        /// </summary>
+        public string Package { get; private set; }
     }
 }
