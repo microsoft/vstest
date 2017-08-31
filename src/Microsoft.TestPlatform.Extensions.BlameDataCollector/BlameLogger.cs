@@ -112,7 +112,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 return;
             }
 
-            this.output.Error(Resources.Resources.AbortedTestRun);
+            this.output.Error(false, Resources.Resources.AbortedTestRun);
 
             StringBuilder sb = new StringBuilder();
             foreach (var tcn in testCaseNames)
@@ -120,7 +120,7 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector
                 sb.Append(tcn).Append(Environment.NewLine);
             }
 
-            this.output.Error(sb.ToString());
+            this.output.Error(false, sb.ToString());
         }
 
         #endregion
