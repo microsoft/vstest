@@ -183,7 +183,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 }
                 catch (Exception e)
                 {
-                    Output.Warning(e.Message);
+                    Output.Warning(false, e.Message);
                 }
             }
 

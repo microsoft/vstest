@@ -64,6 +64,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                     case "FrameworkCore10":
                         frameworkName = new FrameworkName(".NETCoreApp,Version=1.0");
                         break;
+                    case "FrameworkUap10":
+                        frameworkName = new FrameworkName("Uap,Version=10.0");
+                        break;
                     default:
                         return null;
                 }
