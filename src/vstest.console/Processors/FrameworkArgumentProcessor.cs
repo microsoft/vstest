@@ -151,6 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
                 // Legacy testsettings file support only default target framework.
                 IOutput output = ConsoleOutput.Instance;
                 output.Warning(
+                    false,
                     CommandLineResources.TestSettingsFrameworkMismatch,
                     this.commandLineOptions.TargetFrameworkVersion.ToString(),
                     Framework.DefaultFramework.ToString());
