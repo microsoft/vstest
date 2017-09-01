@@ -310,6 +310,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         public void ClearExtensions()
         {
             this.pathToExtensions?.Clear();
+            this.TestExtensions?.InvalidateCache();
         }
 
         #endregion
