@@ -20,6 +20,8 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+    using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
 
@@ -30,6 +32,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         private readonly TestProcessStartInfo startInfo;
         private readonly Mock<IMessageLogger> mockMessageLogger;
         private readonly Mock<IProcessHelper> mockProcessHelper;
+        private readonly Mock<IFileHelper> mockFileHelper;
         private readonly Mock<IDotnetHostHelper> mockDotnetHostHelper;
         private readonly Mock<IEnvironment> mockEnvironment;
 
@@ -43,13 +46,14 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public DefaultTestHostManagerTests()
         {
             this.mockProcessHelper = new Mock<IProcessHelper>();
+            this.mockFileHelper = new Mock<IFileHelper>();
             this.mockProcessHelper.Setup(ph => ph.GetCurrentProcessFileName()).Returns("vstest.console.exe");
             this.mockDotnetHostHelper = new Mock<IDotnetHostHelper>();
             this.mockEnvironment = new Mock<IEnvironment>();
 
             this.mockMessageLogger = new Mock<IMessageLogger>();
 
-            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object, this.mockEnvironment.Object, this.mockDotnetHostHelper.Object);
+            this.testHostManager = new DefaultTestHostManager(this.mockProcessHelper.Object, this.mockFileHelper.Object, this.mockEnvironment.Object, this.mockDotnetHostHelper.Object);
             this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{Architecture.X64}</TargetPlatform> <TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion> <DisableAppDomain>{false}</DisableAppDomain> </RunConfiguration> </RunSettings>");
             this.startInfo = this.testHostManager.GetTestHostProcessStartInfo(Enumerable.Empty<string>(), null, default(TestRunnerConnectionInfo));
         }
@@ -96,11 +100,11 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
         public void GetTestHostConnectionInfoShouldIncludeEndpointRoleAndChannelType()
         {
             var connectionInfo = new TestHostConnectionInfo
-                                     {
-                                         Endpoint = "127.0.0.1:0",
-                                         Role = ConnectionRole.Client,
-                                         Transport = Transport.Sockets
-                                     };
+            {
+                Endpoint = "127.0.0.1:0",
+                Role = ConnectionRole.Client,
+                Transport = Transport.Sockets
+            };
 
             var info = this.testHostManager.GetTestHostConnectionInfo();
 
@@ -176,6 +180,73 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
 
             StringAssert.Contains(info.FileName, "TestHost" + Path.DirectorySeparatorChar + "testhost.exe");
             Assert.IsFalse(info.Arguments.Contains("TestHost" + Path.DirectorySeparatorChar + "testhost.exe"));
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnExtensionsListAsIsIfSourcesListIsEmpty()
+        {
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration></RunConfiguration> </RunSettings>");
+            List<string> currentList = new List<string> { @"FooExtension.dll" };
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(new List<string>(), currentList).ToList();
+
+            // Verify
+            CollectionAssert.AreEqual(currentList, resultExtensions);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldReturnExtensionsListAsIsIfSourcesListIsNull()
+        {
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration></RunConfiguration> </RunSettings>");
+            List<string> currentList = new List<string> { @"FooExtension.dll" };
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(null, currentList).ToList();
+
+            // Verify
+            CollectionAssert.AreEqual(currentList, resultExtensions);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldExcludeOutputDirectoryExtensionsIfTestAdapterPathIsSet()
+        {
+            List<string> sourcesDir = new List<string> { @"C:\Source1" };
+            List<string> sources = new List<string> { @"C:\Source1\source1.dll" };
+
+            List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
+
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><TestAdaptersPaths>C:\\Foo</TestAdaptersPaths></RunConfiguration> </RunSettings>");
+            List<string> currentList = new List<string> { @"FooExtension.dll" };
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, currentList).ToList();
+
+            // Verify
+            CollectionAssert.AreEqual(currentList, resultExtensions);
+        }
+
+        [TestMethod]
+        public void GetTestPlatformExtensionsShouldIncludeOutputDirectoryExtensionsIfTestAdapterPathIsNotSet()
+        {
+            List<string> sourcesDir = new List<string> { "C:\\Source1", "C:\\Source2" };
+            List<string> sources = new List<string> { @"C:\Source1\source1.dll", @"C:\Source2\source2.dll" };
+
+            List<string> extensionsList1 = new List<string> { @"C:\Source1\ext1.TestAdapter.dll", @"C:\Source1\ext2.TestAdapter.dll" };
+            List<string> extensionsList2 = new List<string> { @"C:\Source2\ext1.TestAdapter.dll", @"C:\Source2\ext2.TestAdapter.dll" };
+
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[0], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList1);
+            this.mockFileHelper.Setup(fh => fh.EnumerateFiles(sourcesDir[1], SearchOption.TopDirectoryOnly, "TestAdapter.dll")).Returns(extensionsList2);
+
+            this.testHostManager.Initialize(this.mockMessageLogger.Object, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration><TargetFrameworkVersion>{Framework.DefaultFramework}</TargetFrameworkVersion></RunConfiguration> </RunSettings>");
+
+            // Act
+            var resultExtensions = this.testHostManager.GetTestPlatformExtensions(sources, new List<string>()).ToList();
+
+            // Verify
+            extensionsList1.AddRange(extensionsList2);
+            CollectionAssert.AreEqual(extensionsList1, resultExtensions);
         }
 
         [TestMethod]
@@ -437,7 +508,7 @@ namespace TestPlatform.TestHostProvider.UnitTests.Hosting
                 bool shared,
                 int errorLength,
                 IMessageLogger logger)
-                : base(processHelper, new PlatformEnvironment(), new DotnetHostHelper())
+                : base(processHelper, new FileHelper(), new PlatformEnvironment(), new DotnetHostHelper())
             {
                 this.ErrorLength = errorLength;
                 this.Initialize(logger, $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings> <RunConfiguration> <TargetPlatform>{architecture}</TargetPlatform> <TargetFrameworkVersion>{framework}</TargetFrameworkVersion> <DisableAppDomain>{!shared}</DisableAppDomain> </RunConfiguration> </RunSettings>");
