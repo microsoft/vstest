@@ -14,6 +14,7 @@
     <projectUrl>https://github.com/microsoft/vstest/</projectUrl>
     <dependencies>
       <dependency id="Microsoft.TestPlatform.TestHost" version="$Version$" />
+      <dependency id="Microsoft.CodeCoverage" version="1.0.3" />
     </dependencies>
   </metadata>
   <files>
@@ -22,5 +23,6 @@
     <file src="Microsoft.NET.Test.Sdk.targets" target="build\netcoreapp1.0\" />
     <file src="Microsoft.NET.Test.Sdk.props" target="build\net45\" />
     <file src="Microsoft.NET.Test.Sdk.targets" target="build\net45\" />
+    <file src="Microsoft.NET.Test.Sdk.props" target="build\uap10.0\" />
   </files>
 </package>

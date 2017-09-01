@@ -92,7 +92,13 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client
                 return this.AdapterSourceMap.Values.Aggregate(sources, (current, enumerable) => current.Concat(enumerable));
             }
         }
-        
+
+        /// <summary>
+        /// Gets the test Containers (e.g. .appx, .appxrecipie)
+        /// </summary>
+        [DataMember]
+        public string Package { get; set; }
+
         /// <summary>
         /// Gets the test adapter and source map which would look like below:
         /// <code>

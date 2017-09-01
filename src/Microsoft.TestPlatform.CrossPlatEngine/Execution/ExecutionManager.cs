@@ -5,7 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Linq;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
     using Microsoft.VisualStudio.TestPlatform.Common.SettingsProvider;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
@@ -53,8 +53,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         {
             this.testPlatformEventSource.AdapterSearchStart();
 
-            // Start using these additional extensions
-            TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
+            if (pathToAdditionalExtensions != null && pathToAdditionalExtensions.Any())
+            {
+                // Start using these additional extensions
+                TestPluginCache.Instance.DefaultExtensionPaths = pathToAdditionalExtensions;
+            }
+
             this.LoadExtensions();
 
             this.testPlatformEventSource.AdapterSearchStop();
@@ -64,12 +68,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Starts the test run
         /// </summary>
         /// <param name="adapterSourceMap"> The adapter Source Map.  </param>
+        /// <param name="package">The user input test source(package) if it differ from actual test source otherwise null.</param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         /// <param name="testCaseEventsHandler"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine.  </param>
         public void StartTestRun(
             Dictionary<string, IEnumerable<string>> adapterSourceMap,
+            string package,
             string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
@@ -80,6 +86,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.activeTestRun = new RunTestsWithSources(
                      adapterSourceMap,
+                     package,
                      runSettings,
                      testExecutionContext,
                      testCaseEventsHandler,
@@ -102,12 +109,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
         /// Starts the test run with tests.
         /// </summary>
         /// <param name="tests"> The test list. </param>
+        /// <param name="package">The user input test source(package) if it differ from actual test source otherwise null.</param>
         /// <param name="runSettings"> The run Settings.  </param>
         /// <param name="testExecutionContext"> The test Execution Context. </param>
         /// <param name="testCaseEventsHandler"> EventHandler for handling test cases level events from Engine. </param>
         /// <param name="runEventsHandler"> EventHandler for handling execution events from Engine. </param>
         public void StartTestRun(
             IEnumerable<TestCase> tests,
+            string package,
             string runSettings,
             TestExecutionContext testExecutionContext,
             ITestCaseEventsHandler testCaseEventsHandler,
@@ -119,6 +128,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution
             {
                 this.activeTestRun = new RunTestsWithTests(
                                          tests,
+                                         package,
                                          runSettings,
                                          testExecutionContext,
                                          testCaseEventsHandler,

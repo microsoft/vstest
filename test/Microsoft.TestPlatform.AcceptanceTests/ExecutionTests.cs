@@ -30,6 +30,23 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         [CustomDataTestMethod]
         [NETFullTargetFramework]
         [NETCORETargetFramework]
+        public void RunMultipleTestAssembliesWithoutTestAdapterPath(string runnerFramework, string targetFramework, string targetRuntime)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
+
+            var assemblyPaths = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
+            var xunitAssemblyPath = this.testEnvironment.TargetFramework.Equals("net451")?
+                testEnvironment.GetTestAsset("XUTestProject.dll", "net46") :
+                testEnvironment.GetTestAsset("XUTestProject.dll");
+
+            assemblyPaths = string.Concat(assemblyPaths, "\" \"", xunitAssemblyPath);
+            this.InvokeVsTestForExecution(assemblyPaths, string.Empty, string.Empty, this.FrameworkArgValue);
+            this.ValidateSummaryStatus(2, 2, 1);
+        }
+
+        [CustomDataTestMethod]
+        [NETFullTargetFramework]
+        [NETCORETargetFramework]
         public void RunMultipleTestAssembliesInParallel(string runnerFramework, string targetFramework, string targetRuntime)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerFramework, targetFramework, targetRuntime);
@@ -146,6 +163,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
+            arguments = string.Concat(arguments, $" /InIsolation");
 
             this.InvokeVsTest(arguments);
             var errorMessage = string.Empty;
@@ -179,6 +197,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty, this.FrameworkArgValue);
             arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
             arguments = string.Concat(arguments, $" /diag:{diagLogFilePath}");
+            arguments = string.Concat(arguments, $" /InIsolation");
 
             this.InvokeVsTest(arguments);
             var errorFirstLine = "Test host standard error line: Unhandled Exception: System.InvalidOperationException: Operation is not valid due to the current state of the object.";

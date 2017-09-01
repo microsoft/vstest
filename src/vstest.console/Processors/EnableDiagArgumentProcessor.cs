@@ -149,7 +149,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
             if (!EqtTrace.InitializeVerboseTrace(argument))
             {
                 if (!string.IsNullOrEmpty(EqtTrace.ErrorOnInitialization))
-                    ConsoleOutput.Instance.Warning(EqtTrace.ErrorOnInitialization);
+                    ConsoleOutput.Instance.Warning(false, EqtTrace.ErrorOnInitialization);
             }
         }
 

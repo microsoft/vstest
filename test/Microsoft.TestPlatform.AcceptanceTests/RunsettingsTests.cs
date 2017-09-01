@@ -38,7 +38,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
             // passing different platform
-            var additionalArgs = "/Platform:x64";
+            var additionalArgs = "/Platform:x64  /InIsolation";
 
             var runSettingsArgs = String.Join(
                 " ",
@@ -68,7 +68,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var expectedNumOfProcessCreated = GetExpectedNumOfProcessCreatedForWithoutParallel();
 
             // Pass parallel
-            var additionalArgs = "/Parallel";
+            var additionalArgs = "/Parallel /InIsolation";
 
             // Pass non parallel
             var runSettingsArgs = String.Join(
@@ -109,7 +109,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            var additionalArgs = "/Platform:x86";
+            var additionalArgs = "/Platform:x86 /InIsolation";
 
             this.RunTestWithRunSettings(runConfigurationDictionary, null, additionalArgs, testhostProcessName, expectedNumOfProcessCreated);
         }
@@ -134,7 +134,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                                                          { "TargetFrameworkVersion", this.GetTargetFramworkForRunsettings() },
                                                          { "TestAdaptersPaths", this.GetTestAdapterPath() }
                                                  };
-            this.RunTestWithRunSettings(runConfigurationDictionary, null, null, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestWithRunSettings(runConfigurationDictionary, null, "/InIsolation", testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [CustomDataTestMethod]
@@ -158,7 +158,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettings(null, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestWithRunSettings(null, runSettingsArgs, "/InIsolation", testhostProcessName, expectedNumOfProcessCreated);
         }
 
         [CustomDataTestMethod]
@@ -189,7 +189,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                         string.Concat("RunConfiguration.TestAdaptersPaths=" , this.GetTestAdapterPath())
                     });
 
-            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, null, testhostProcessName, expectedNumOfProcessCreated);
+            this.RunTestWithRunSettings(runConfigurationDictionary, runSettingsArgs, "/InIsolation", testhostProcessName, expectedNumOfProcessCreated);
         }
 
         // Randomly failing with error "The active test run was aborted. Reason: Destination array was not long enough.
@@ -266,14 +266,14 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), runsettingsPath, this.FrameworkArgValue);
 
-            if (!string.IsNullOrWhiteSpace(runSettingsArgs))
-            {
-                arguments = string.Concat(arguments, " -- ", runSettingsArgs);
-            }
-
             if (!string.IsNullOrWhiteSpace(additionalArgs))
             {
                 arguments = string.Concat(arguments, " ", additionalArgs);
+            }
+
+            if (!string.IsNullOrWhiteSpace(runSettingsArgs))
+            {
+                arguments = string.Concat(arguments, " -- ", runSettingsArgs);
             }
 
             var cts = new CancellationTokenSource();
