@@ -56,6 +56,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             try
             {
+                var testPackages = new List<string>(testRunCriteria.HasSpecificSources ? testRunCriteria.Sources :
+                                                    // If the test execution is with a test filter, group them by sources
+                                                    testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key));
+
                 // This code should be in sync with ProxyExecutionManager.StartTestRun executionContext
                 var executionContext = new TestExecutionContext(
                             testRunCriteria.FrequencyOfRunStatsChangeEvent,
@@ -68,23 +72,22 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
                             isDebug: (testRunCriteria.TestHostLauncher != null && testRunCriteria.TestHostLauncher.IsDebug),
                             testCaseFilter: testRunCriteria.TestCaseFilter);
 
+                // Initialize extension before execution
+                this.InitializeExtensions(testPackages);
 
                 if (testRunCriteria.HasSpecificSources)
                 {
-                    // Initialize extension before execution
-                    this.InitializeExtensions(testRunCriteria.Sources);
+                    var runRequest = testRunCriteria.CreateTestRunCriteriaForSources(testHostManager, testRunCriteria.TestRunSettings, executionContext, testPackages);
 
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.AdapterSourceMap, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    Task.Run(() => executionManager.StartTestRun(runRequest.AdapterSourceMap, runRequest.Package,
+                        runRequest.RunSettings, runRequest.TestExecutionContext, null, eventHandler));
                 }
                 else
                 {
-                    // If the test execution is with a test filter, group them by sources
-                    var testSources = testRunCriteria.Tests.GroupBy(tc => tc.Source).Select(g => g.Key);
+                    var runRequest = testRunCriteria.CreateTestRunCriteriaForTests(testHostManager, testRunCriteria.TestRunSettings, executionContext, testPackages);
 
-                    // Initialize extension before execution
-                    this.InitializeExtensions(testSources);
-
-                    Task.Run(() => executionManager.StartTestRun(testRunCriteria.Tests, testRunCriteria.TestRunSettings, executionContext, null, eventHandler));
+                    Task.Run(() => executionManager.StartTestRun(runRequest.Tests, runRequest.Package,
+                        runRequest.RunSettings, runRequest.TestExecutionContext, null, eventHandler));
                 }
             }
             catch (Exception exception)

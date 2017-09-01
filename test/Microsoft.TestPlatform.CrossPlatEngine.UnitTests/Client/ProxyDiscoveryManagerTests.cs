@@ -19,6 +19,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Moq;
 
     using TestPlatform.Common.UnitTests.ExtensionFramework;
+    using System.Linq;
 
     [TestClass]
     public class ProxyDiscoveryManagerTests
@@ -105,6 +106,50 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockTestHostManager.Verify(hm => hm.GetTestSources(this.discoveryCriteria.Sources), Times.Once);
         }
 
+        [TestMethod]
+        public void DiscoverTestsShouldUpdateTestSourcesIfSourceDiffersFromTestHostManagerSource()
+        {
+            var actualSources = new List<string> { "actualSource.dll" };
+            var inputSource = new List<string> { "inputPackage.appxrecipe" };
+
+            var localDiscoveryCriteria = new DiscoveryCriteria(inputSource, 1, string.Empty);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(localDiscoveryCriteria.Sources)).Returns(actualSources);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler>();
+
+            this.testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
+
+            Assert.IsNotNull(localDiscoveryCriteria.Package);
+            // AdapterSourceMap should contain updated testSources.
+            Assert.AreEqual(actualSources.FirstOrDefault(), localDiscoveryCriteria.AdapterSourceMap.FirstOrDefault().Value.FirstOrDefault());
+            Assert.AreEqual(inputSource.FirstOrDefault(), localDiscoveryCriteria.Package);
+        }
+
+        [TestMethod]
+        public void DiscoverTestsShouldNotUpdateTestSourcesIfSourceDoNotDifferFromTestHostManagerSource()
+        {
+            var actualSources = new List<string> { "actualSource.dll" };
+            var inputSource = new List<string> { "actualSource.dll" };
+
+            var localDiscoveryCriteria = new DiscoveryCriteria(inputSource, 1, string.Empty);
+
+            this.mockTestHostManager.Setup(hm => hm.GetTestSources(localDiscoveryCriteria.Sources)).Returns(actualSources);
+            this.mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true));
+            this.mockTestHostManager.Setup(th => th.GetTestPlatformExtensions(It.IsAny<IEnumerable<string>>(), It.IsAny<IEnumerable<string>>())).Returns(new List<string>());
+            this.mockRequestSender.Setup(s => s.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
+
+            Mock<ITestDiscoveryEventsHandler> mockTestDiscoveryEventHandler = new Mock<ITestDiscoveryEventsHandler>();
+
+            this.testDiscoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventHandler.Object);
+
+            Assert.IsNull(localDiscoveryCriteria.Package);
+            // AdapterSourceMap should contain updated testSources.
+            Assert.AreEqual(actualSources.FirstOrDefault(), localDiscoveryCriteria.AdapterSourceMap.FirstOrDefault().Value.FirstOrDefault());
+        }
 
         [TestMethod]
         public void DiscoverTestsShouldNotSendDiscoveryRequestIfCommunicationFails()

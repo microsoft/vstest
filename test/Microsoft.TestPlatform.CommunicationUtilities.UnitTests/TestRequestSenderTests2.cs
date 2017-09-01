@@ -43,7 +43,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
             this.connectedEventArgs = new ConnectedEventArgs(this.mockChannel.Object);
             this.mockDiscoveryEventsHandler = new Mock<ITestDiscoveryEventsHandler>();
             this.mockExecutionEventsHandler = new Mock<ITestRunEventsHandler>();
-            this.testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), "runsettings", null);
+            this.testRunCriteriaWithSources = new TestRunCriteriaWithSources(new Dictionary<string, IEnumerable<string>>(), null, "runsettings", null);
         }
 
         [TestMethod]
@@ -420,7 +420,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void StartTestRunWithTestsShouldSendStartTestExecutionWithTestsOnChannel()
         {
-            var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null);
+            var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], null, "runsettings", null);
             this.SetupFakeCommunicationChannel();
 
             this.testRequestSender.StartTestRun(runCriteria, this.mockExecutionEventsHandler.Object);
@@ -432,7 +432,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         [TestMethod]
         public void StartTestRunWithTestsShouldSendStartTestExecutionWithTestsOnChannelWithVersion()
         {
-            var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], "runsettings", null);
+            var runCriteria = new TestRunCriteriaWithTests(new TestCase[2], null, "runsettings", null);
             this.SetupFakeChannelWithVersionNegotiation(DUMMYNEGOTIATEDPROTOCOLVERSION);
 
             this.testRequestSender.StartTestRun(runCriteria, this.mockExecutionEventsHandler.Object);
