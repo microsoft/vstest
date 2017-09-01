@@ -352,11 +352,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             {
                 try
                 {
-                    if (this.socket.Poll(STREAMREADTIMEOUT, SelectMode.SelectRead))
-                    {
-                        str = this.ReceiveRawMessage();
-                        success = true;
-                    }
+                    str = this.ReceiveRawMessage();
+                    success = true;
                 }
                 catch (IOException ioException)
                 {
