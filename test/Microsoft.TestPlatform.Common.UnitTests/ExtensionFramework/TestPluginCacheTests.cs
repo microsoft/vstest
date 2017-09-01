@@ -144,12 +144,6 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
             TestPluginCache.Instance.ClearExtensions();
 
-            Assert.AreEqual(false, TestPluginCache.Instance.TestExtensions.AreTestDiscoverersCached);
-            Assert.AreEqual(false, TestPluginCache.Instance.TestExtensions.AreTestExecutorsCached);
-            Assert.AreEqual(false, TestPluginCache.Instance.TestExtensions.AreTestLoggersCached);
-            Assert.AreEqual(false, TestPluginCache.Instance.TestExtensions.AreTestSettingsProvidersCached);
-            Assert.AreEqual(false, TestPluginCache.Instance.TestExtensions.AreTestHostsCached);
-            Assert.AreEqual(false, TestPluginCache.Instance.TestExtensions.AreDataCollectorsCached);
             Assert.AreEqual(0, TestPluginCache.Instance.PathToExtensions.Count());
         }
 
