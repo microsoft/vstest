@@ -707,7 +707,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 ITestCaseEventsHandler testCaseEventsHandler,
                 ITestRunEventsHandler testRunEventsHandler,
                 ITestPlatformEventSource testPlatformEventSource)
-                : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
+                : base(null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource)
             {
             }
 
@@ -719,7 +719,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Execution
                 ITestPlatformEventSource testPlatformEventSource,
                 ITestEventsPublisher testEventsPublisher,
                 IThread platformThread)
-                : base(runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, testEventsPublisher, platformThread)
+                : base(null, runSettings, testExecutionContext, testCaseEventsHandler, testRunEventsHandler, testPlatformEventSource, testEventsPublisher, platformThread)
             {
             }
 

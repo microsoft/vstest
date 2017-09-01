@@ -151,6 +151,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 testHostManagerFactory.GetExecutionManager()
                                     .StartTestRun(
                                         testRunCriteriaWithSources.AdapterSourceMap,
+                                        testRunCriteriaWithSources.Package,
                                         testRunCriteriaWithSources.RunSettings,
                                         testRunCriteriaWithSources.TestExecutionContext,
                                         this.GetTestCaseEventsHandler(testRunCriteriaWithSources.RunSettings),
@@ -173,6 +174,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                                 testHostManagerFactory.GetExecutionManager()
                                     .StartTestRun(
                                         testRunCriteriaWithTests.Tests,
+                                        testRunCriteriaWithTests.Package,
                                         testRunCriteriaWithTests.RunSettings,
                                         testRunCriteriaWithTests.TestExecutionContext, 
                                         this.GetTestCaseEventsHandler(testRunCriteriaWithTests.RunSettings),
