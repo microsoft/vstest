@@ -19,6 +19,8 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Moq;
+    using System.IO;
+    using System.Reflection;
 
     [TestClass]
     public class ProxyDataCollectionManagerTests
@@ -83,6 +85,23 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.DataCollection
                 EqtTrace.TraceLevel = (PlatformTraceLevel)traceLevel;
 #endif
             }
+        }
+
+        [TestMethod]
+        public void BeforeTestRunStartShouldPassRunSettingsWithExtensionsFolderUpdatedAsTestAdapterPath()
+        {
+            string runsettings = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration></RunConfiguration></RunSettings>";
+            this.proxyDataCollectionManager = new ProxyDataCollectionManager(runsettings, this.mockDataCollectionRequestSender.Object, this.mockProcessHelper.Object, this.mockDataCollectionLauncher.Object);
+
+            BeforeTestRunStartResult res = new BeforeTestRunStartResult(new Dictionary<string, string>(), 123);
+            this.mockDataCollectionRequestSender.Setup(x => x.SendBeforeTestRunStartAndGetResult(It.IsAny<string>(), It.IsAny<ITestMessageEventHandler>())).Returns(res);
+
+            var result = this.proxyDataCollectionManager.BeforeTestRunStart(true, true, null);
+
+            var extensionsFolderPath = Path.Combine(Path.GetDirectoryName(typeof(ITestPlatform).GetTypeInfo().Assembly.Location), "Extensions");
+            var expectedSettingsXML = $"<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><RunConfiguration><TestAdaptersPaths>{extensionsFolderPath}</TestAdaptersPaths></RunConfiguration></RunSettings>";
+            this.mockDataCollectionRequestSender.Verify(
+                x => x.SendBeforeTestRunStartAndGetResult(expectedSettingsXML, It.IsAny<ITestMessageEventHandler>()), Times.Once);
         }
 
         [TestMethod]
