@@ -1,14 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting
+namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
-    using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-
     /// <summary>
     /// Extension methods for <see cref="TestRunnerConnectionInfo"/>.
     /// </summary>
-    internal static class TestRunnerConnectionInfoExtensions
+    public static class TestRunnerConnectionInfoExtensions
     {
         /// <summary>
         /// Creates a default command line options string from <see cref="TestRunnerConnectionInfo"/>.
