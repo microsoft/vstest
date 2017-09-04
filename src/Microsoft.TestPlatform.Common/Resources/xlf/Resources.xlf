@@ -126,6 +126,16 @@
         <target state="new">The Test Logger URI '{0}' is not valid.  The Test Logger will be ignored.</target>
         <note></note>
       </trans-unit>
+      <trans-unit id="FailedToFindInstalledUnitTestExtensions">
+        <source>Failed to find the list of installed unit test extensions. Reason: {0}</source>
+        <target state="new">Failed to find the list of installed unit test extensions. Reason: {0}</target>
+        <note></note>
+      </trans-unit>
+      <trans-unit id="VSInstallationNotFound">
+        <source>Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio.</source>
+        <target state="new">Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio.</target>
+        <note></note>
+      </trans-unit>
     </body>
   </file>
 </xliff>

@@ -8,11 +8,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Interfaces
     public interface IVSExtensionManager
     {
         /// <summary>
-        /// Initialize the manager
-        /// </summary>
-        void Initialize();
-
-        /// <summary>
         /// Get the unit test extensions installed via vsix.
         /// </summary>
         IEnumerable<string> GetUnitTestExtensions();

@@ -86,7 +86,6 @@ namespace vstest.console.UnitTests.Processors
 
             this.executor.Initialize("true");
 
-            this.extensionManager.Verify(em => em.Initialize(), Times.Once);
             this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Once);
             this.testRequestManager.Verify(trm => trm.InitializeExtensions(extensions), Times.Once);
         }
@@ -95,7 +94,7 @@ namespace vstest.console.UnitTests.Processors
         public void InitializeForArgumentEqualfalseShouldNotCallTestRequestManagerInitializeExtensions()
         {
             this.executor.Initialize("false");
-            this.extensionManager.Verify(em => em.Initialize(), Times.Never);
+
             this.extensionManager.Verify(em => em.GetUnitTestExtensions(), Times.Never);
             this.testRequestManager.Verify(trm => trm.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
         }

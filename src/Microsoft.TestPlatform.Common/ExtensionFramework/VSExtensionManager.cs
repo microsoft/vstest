@@ -15,6 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
     using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.Common.Resources;
 
     public class VSExtensionManager : IVSExtensionManager
     {
@@ -29,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private const string SettingsManagerAssemblyName = @"Microsoft.VisualStudio.Settings.15.0";
         
         private IFileHelper fileHelper;
+        private string vsInstallPath;
         private string pathToDevenv;
 
         private Assembly extensionManagerAssembly;
@@ -37,7 +39,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
         private Assembly settingsManagerAssembly;
         private Type settingsManagerType;
-        
+
         public VSExtensionManager() : this(new FileHelper())
         {
         }
@@ -45,26 +47,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         internal VSExtensionManager(IFileHelper fileHelper)
         {
             this.fileHelper = fileHelper;
-        }
-
-        public void Initialize()
-        {
-            // Navigate to the IDE folder
-            var vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.FullName;
-            this.pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
-
-            // Check for devenv
-            if (!this.fileHelper.Exists(this.pathToDevenv))
-            {
-                throw new TestPlatformException("Unable to find VS installation");
-            }
-
-            // Adding resolution directories
-            var resolutionPaths = new List<string> ();
-            resolutionPaths.Add(vsInstallPath);
-            resolutionPaths.Add(Path.Combine(vsInstallPath, PrivateAssembliesDirName));
-            resolutionPaths.Add(Path.Combine(vsInstallPath, PublicAssembliesDirName));
-            new AssemblyResolver(resolutionPaths);
         }
 
         /// <summary>
@@ -81,7 +63,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
             catch (Exception ex)
             {
-                string message = string.Format(CultureInfo.CurrentCulture, "Failed To find installed Extensions", ex.Message);
+                string message = string.Format(CultureInfo.CurrentCulture, Resources.FailedToFindInstalledUnitTestExtensions, ex.Message);
                 throw new TestPlatformException(message, ex);
             }
         }
@@ -92,7 +74,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
         private IEnumerable<string> GetTestExtensionsInternal(string extensionType)
         {
             IEnumerable<string> installedExtensions = new List<string>();
-            
+
+            // Navigate to the IDE folder
+            this.vsInstallPath = new DirectoryInfo(typeof(ITestPlatform).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.FullName;
+            this.pathToDevenv = Path.Combine(vsInstallPath, DevenvExe);
+
+            // Check for devenv
+            if (!this.fileHelper.Exists(this.pathToDevenv))
+            {
+                throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, Resources.VSInstallationNotFound, this.vsInstallPath));
+            }
+
+            // Adding resolution paths for resolving dependencies.
+            var resolutionPaths = new List<string>() {
+                this.vsInstallPath,
+                Path.Combine(this.vsInstallPath, PrivateAssembliesDirName),
+                Path.Combine(this.vsInstallPath, PublicAssembliesDirName)
+            };
+            var assemblyResolver = new AssemblyResolver(resolutionPaths);
+
             object extensionManager;
             object settingsManager;
                                        
@@ -104,7 +104,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
 
                 if (extensionManager != null)
                 {
-                    return ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
+                    installedExtensions = ExtensionManagerServiceType.GetMethod("GetEnabledExtensionContentLocations", new Type[] { typeof(String) }).Invoke(
                                                extensionManager, new object[] { extensionType }) as IEnumerable<string>;
                 }
             
@@ -116,9 +116,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
                 }
             }
 
+            // Unregister the resolver by disposing
+            assemblyResolver.Dispose();
+
             return installedExtensions;
         }
-         
+
         /// <summary>
         /// Used to explicitly load Microsoft.VisualStudio.ExtensionManager.dll
         /// </summary>

@@ -150,7 +150,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
                 return ResourceManager.GetString("EmptyParenthesis", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to find the list of installed unit test extensions. Reason: {0}.
+        /// </summary>
+        internal static string FailedToFindInstalledUnitTestExtensions {
+            get {
+                return ResourceManager.GetString("FailedToFindInstalledUnitTestExtensions", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to There are multiple configurations that have diagnostic data adapter  type &apos;{0}&apos; or Uri &apos;{1}&apos;. Duplicate configurations will be ignored in the test run..
         /// </summary>
@@ -314,7 +323,16 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
                 return ResourceManager.GetString("TestCaseFilterFormatException", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to find devenv under path {0}. Make sure tests are run via vstest.console.exe installed as part of Visual Studio..
+        /// </summary>
+        internal static string VSInstallationNotFound {
+            get {
+                return ResourceManager.GetString("VSInstallationNotFound", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Types deriving from the data collection context cannot be used for sending data and messages.  The DataCollectionContext used for sending data and messages must come from one of the events raised to the data collector..
         /// </summary>

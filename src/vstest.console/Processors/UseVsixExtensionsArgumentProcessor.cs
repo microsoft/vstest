@@ -120,7 +120,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Processors
 
             if (commandLineOptions.UseVsixExtensions)
             {
-                extensionManager.Initialize();
                 var vsixExtensions = extensionManager.GetUnitTestExtensions();
                 testRequestManager.InitializeExtensions(vsixExtensions);
             }
