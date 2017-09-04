@@ -208,99 +208,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 new CollectorNameValueConfigurationManager(configurationElement);
 
             // Apply the configuration
-            this.eventLogNames = new List<string>();
-
-            string eventLogs = nameValueSettings[EventLogConstants.SettingEventLogs];
-            if (eventLogs != null)
-            {
-                this.eventLogNames = ParseCommaSeparatedList(eventLogs);
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventLogs + "=" + eventLogs);
-            }
-            else
-            {
-                // Default to collecting these standard logs
-                this.eventLogNames.Add("System");
-                this.eventLogNames.Add("Security");
-                this.eventLogNames.Add("Application");
-            }
-
-            string eventSourcesStr = nameValueSettings[EventLogConstants.SettingEventSources];
-            if (!string.IsNullOrEmpty(eventSourcesStr))
-            {
-                this.eventSources = ParseCommaSeparatedList(eventSourcesStr);
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
-                    + this.eventSources);
-            }
-
-            this.entryTypes = new List<EventLogEntryType>();
-            string entryTypesStr = nameValueSettings[EventLogConstants.SettingEntryTypes];
-            if (entryTypesStr != null)
-            {
-                foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr))
-                {
-                    try
-                    {
-                        this.entryTypes.Add(
-                            (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
-                    }
-                    catch (ArgumentException e)
-                    {
-                        throw new EventLogCollectorException(
-                            string.Format(
-                                CultureInfo.InvariantCulture,
-                                Resource.Execution_Agent_DataCollectors_EventLog_InvalidEntryTypeInConfig,
-                                entryTypesStr),
-                            e);
-                    }
-                }
-
-                if (EqtTrace.IsVerboseEnabled)
-                {
-                    EqtTrace.Verbose(
-                        "EventLogDataCollector configuration: " + EventLogConstants.SettingEntryTypes + "="
-                        + this.entryTypes);
-                }
-            }
-            else
-            {
-                this.entryTypes.Add(EventLogEntryType.Error);
-                this.entryTypes.Add(EventLogEntryType.Warning);
-                this.entryTypes.Add(EventLogEntryType.FailureAudit);
-            }
-
-            string maxEntriesstring = nameValueSettings[EventLogConstants.SettingMaxEntries];
-            if (maxEntriesstring != null)
-            {
-                try
-                {
-                    this.maxEntries = int.Parse(maxEntriesstring, CultureInfo.InvariantCulture);
-
-                    // A negative or 0 value means no maximum
-                    if (this.maxEntries <= 0)
-                    {
-                        this.maxEntries = int.MaxValue;
-                    }
-                }
-                catch (FormatException e)
-                {
-                    throw new EventLogCollectorException(
-                        string.Format(
-                            CultureInfo.InvariantCulture,
-                            Resource.Execution_Agent_DataCollectors_EventLog_InvalidMaxEntriesInConfig,
-                            maxEntriesstring),
-                        e);
-                }
-
-                EqtTrace.Verbose(
-                    "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
-                    + maxEntriesstring);
-            }
-            else
-            {
-                this.maxEntries = EventLogConstants.DefaultMaxEntries;
-            }
+            this.ConfigureEventLogNames(nameValueSettings);
+            this.ConfigureEventSources(nameValueSettings);
+            this.ConfigureEntryTypes(nameValueSettings);
+            this.ConfigureMaxEntries(nameValueSettings);
 
             // Register for events
             events.SessionStart += this.sessionStartEventHandler;
@@ -312,7 +223,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         #endregion
 
         #region Internal Methods
-        internal virtual IEventLogContainer CreateEventLogContainer(string eventLogName, EventLogCollectorContextData eventLogContext)
+        internal virtual IEventLogContainer CreateEventLogContainer(string eventLogName, EventLogCollectorContextData eventLogContextData)
         {
             EventLog eventLog = new EventLog(eventLogName);
 
@@ -320,7 +231,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             int nextEntryIndexToCollect =
                 (currentCount == 0) ? 0 : eventLog.Entries[currentCount - 1].Index + 1;
             EventLogContainer eventLogContainer =
-                new EventLogContainer(eventLog, nextEntryIndexToCollect, this.eventSources, this.entryTypes, this.logger, this.dataCollectorContext, eventLogContext);
+                new EventLogContainer(eventLog, nextEntryIndexToCollect, this.eventSources, this.entryTypes, this.logger, this.dataCollectorContext, eventLogContextData);
 
             eventLog.EntryWritten += eventLogContainer.OnEventLogEntryWritten;
             eventLog.EnableRaisingEvents = true;
@@ -512,7 +423,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 {
                     this.logger.LogError(
                         dataCollectionContext,
-                        new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.Execution_Agent_DataCollectors_EventLog_ReadError, eventLogName, Environment.MachineName), ex));
+                        new EventLogCollectorException(string.Format(CultureInfo.InvariantCulture, Resource.EventLog_ReadError, eventLogName, Environment.MachineName), ex));
                 }
             }
         }
@@ -521,7 +432,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             DataCollectionContext dataCollectionContext,
             bool terminateCollectionForContext,
             TimeSpan requestedDuration,
-            DateTime timeRequestRecieved)
+            DateTime timeRequestReceived)
         {
             DateTime minDate = DateTime.MinValue;
             EventLogCollectorContextData eventLogContext = this.GetEventLogContext(dataCollectionContext);
@@ -543,7 +454,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                             dataCollectionContext,
                             string.Format(
                                 CultureInfo.InvariantCulture,
-                                Resource.Execution_Agent_DataCollectors_EventLog_CleanupException,
+                                Resource.EventLog_CleanupException,
                                 eventLogContainer.EventLog,
                                 e.ToString()));
                     }
@@ -554,7 +465,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             string eventLogDirName = string.Format(
                 CultureInfo.InvariantCulture,
                 "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
-                Resource.Execution_Agent_DataCollectors_EventLog_FriendlyName,
+                Resource.EventLog_FriendlyName,
                 Environment.MachineName,
                 DateTime.Now);
 
@@ -590,7 +501,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 try
                 {
-                    minDate = timeRequestRecieved - requestedDuration;
+                    minDate = timeRequestReceived - requestedDuration;
                 }
                 catch (ArgumentOutOfRangeException)
                 {
@@ -649,12 +560,120 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             {
                 string msg = string.Format(
                     CultureInfo.InvariantCulture,
-                    Resource.Execution_Agent_DataCollectors_EventLog_ContextNotFoundException,
+                    Resource.EventLog_ContextNotFoundException,
                     dataCollectionContext.ToString());
                 throw new EventLogCollectorException(msg, null);
             }
 
             return eventLogContext;
+        }
+
+        private void ConfigureEventLogNames(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
+        {
+            this.eventLogNames = new List<string>();
+            string eventLogs = collectorNameValueConfigurationManager[EventLogConstants.SettingEventLogs];
+            if (eventLogs != null)
+            {
+                this.eventLogNames = ParseCommaSeparatedList(eventLogs);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "EventLogDataCollector configuration: " + EventLogConstants.SettingEventLogs + "=" + eventLogs);
+                }
+            }
+            else
+            {
+                // Default to collecting these standard logs
+                this.eventLogNames.Add("System");
+                this.eventLogNames.Add("Security");
+                this.eventLogNames.Add("Application");
+            }
+        }
+
+        private void ConfigureEventSources(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
+        {
+            string eventSourcesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEventSources];
+            if (!string.IsNullOrEmpty(eventSourcesStr))
+            {
+                this.eventSources = ParseCommaSeparatedList(eventSourcesStr);
+                EqtTrace.Verbose(
+                    "EventLogDataCollector configuration: " + EventLogConstants.SettingEventSources + "="
+                    + this.eventSources);
+            }
+        }
+
+        private void ConfigureEntryTypes(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
+        {
+            this.entryTypes = new List<EventLogEntryType>();
+            string entryTypesStr = collectorNameValueConfigurationManager[EventLogConstants.SettingEntryTypes];
+            if (entryTypesStr != null)
+            {
+                foreach (string entryTypestring in ParseCommaSeparatedList(entryTypesStr))
+                {
+                    try
+                    {
+                        this.entryTypes.Add(
+                            (EventLogEntryType)Enum.Parse(typeof(EventLogEntryType), entryTypestring, true));
+                    }
+                    catch (ArgumentException e)
+                    {
+                        throw new EventLogCollectorException(
+                            string.Format(
+                                CultureInfo.InvariantCulture,
+                                Resource.EventLog_InvalidEntryTypeInConfig,
+                                entryTypesStr),
+                            e);
+                    }
+                }
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "EventLogDataCollector configuration: " + EventLogConstants.SettingEntryTypes + "="
+                        + this.entryTypes);
+                }
+            }
+            else
+            {
+                this.entryTypes.Add(EventLogEntryType.Error);
+                this.entryTypes.Add(EventLogEntryType.Warning);
+                this.entryTypes.Add(EventLogEntryType.FailureAudit);
+            }
+        }
+
+        private void ConfigureMaxEntries(CollectorNameValueConfigurationManager collectorNameValueConfigurationManager)
+        {
+            string maxEntriesstring = collectorNameValueConfigurationManager[EventLogConstants.SettingMaxEntries];
+            if (maxEntriesstring != null)
+            {
+                try
+                {
+                    this.maxEntries = int.Parse(maxEntriesstring, CultureInfo.InvariantCulture);
+
+                    // A negative or 0 value means no maximum
+                    if (this.maxEntries <= 0)
+                    {
+                        this.maxEntries = int.MaxValue;
+                    }
+                }
+                catch (FormatException e)
+                {
+                    throw new EventLogCollectorException(
+                        string.Format(
+                            CultureInfo.InvariantCulture,
+                            Resource.EventLog_InvalidMaxEntriesInConfig,
+                            maxEntriesstring),
+                        e);
+                }
+
+                EqtTrace.Verbose(
+                    "EventLogDataCollector configuration: " + EventLogConstants.SettingMaxEntries + "="
+                    + maxEntriesstring);
+            }
+            else
+            {
+                this.maxEntries = EventLogConstants.DefaultMaxEntries;
+            }
         }
 
         #endregion

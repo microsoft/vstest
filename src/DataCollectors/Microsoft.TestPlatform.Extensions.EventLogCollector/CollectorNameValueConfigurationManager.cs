@@ -60,7 +60,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
                 // Get the setting name
                 string settingName = settingElement.GetAttribute(SettingNameAttributeName);
-                if (string.IsNullOrEmpty(settingName))
+                if (string.IsNullOrWhiteSpace(settingName))
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {

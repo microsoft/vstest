@@ -101,7 +101,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                     It.IsAny<DataCollectionContext>(),
                     string.Format(
                         CultureInfo.InvariantCulture,
-                        Resource.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
+                        Resource.DataCollectors_EventLog_EventsLostWarning,
                "Application")));
         }
 

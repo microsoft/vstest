@@ -39,13 +39,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             // The MaxLength of the Type and Source columns must be set to allow indices to be created on them
             DataColumn typeColumn = new DataColumn("Type", typeof(string));
-            typeColumn.MaxLength = 64;
+            typeColumn.MaxLength = EventLogConstants.TypeColumnMaxLength;
             dataTable.Columns.Add(typeColumn);
 
             dataTable.Columns.Add(new DataColumn("DateTime", typeof(DateTime)));
 
             DataColumn sourceColumn = new DataColumn("Source", typeof(string));
-            sourceColumn.MaxLength = 212;
+            sourceColumn.MaxLength = EventLogConstants.SourceColumnMaxLength;
             dataTable.Columns.Add(sourceColumn);
 
             dataTable.Columns.Add(new DataColumn("Category", typeof(string)));

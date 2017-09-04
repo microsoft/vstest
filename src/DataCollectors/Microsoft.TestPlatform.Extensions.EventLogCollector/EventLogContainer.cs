@@ -137,7 +137,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         this.context,
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            Resource.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
+                            Resource.DataCollectors_EventLog_EventsLostWarning,
                             this.EventLog.Log));
 
                     this.nextEntryIndexToCollect = 0;

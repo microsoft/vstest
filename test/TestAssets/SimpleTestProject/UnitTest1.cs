@@ -20,7 +20,6 @@ namespace SampleUnitTestProject
         [TestMethod]
         public void PassingTest()
         {
-            System.Threading.Thread.Sleep(10000);
             Assert.AreEqual(2, 2);
         }
 
