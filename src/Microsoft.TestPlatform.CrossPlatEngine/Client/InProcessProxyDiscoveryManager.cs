@@ -14,12 +14,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     internal class InProcessProxyDiscoveryManager : IProxyDiscoveryManager
     {
         private ITestHostManagerFactory testHostManagerFactory;
         private IDiscoveryManager discoveryManager;
         private ITestRuntimeProvider testHostManager;
+        private IMetricsCollector metricsCollector;
+
         public bool IsInitialized { get; private set; } = false;
 
         /// <summary>
@@ -37,7 +40,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         {
             this.testHostManager = testHostManager;
             this.testHostManagerFactory = testHostManagerFactory;
-            this.discoveryManager = this.testHostManagerFactory.GetDiscoveryManager();
+            this.metricsCollector = new MetricsCollector();
+            this.discoveryManager = this.testHostManagerFactory.GetDiscoveryManager(this.metricsCollector);
         }
 
         /// <summary>
@@ -88,7 +92,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client
         /// </summary>
         public void Abort()
         {
-            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager().Abort());
+            Task.Run(() => this.testHostManagerFactory.GetDiscoveryManager(metricsCollector).Abort());
         }
 
         private void InitializeExtensions(IEnumerable<string> sources)

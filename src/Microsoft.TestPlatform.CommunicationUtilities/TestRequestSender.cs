@@ -9,12 +9,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
-
     using CommonResources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
     /// <summary>
@@ -168,6 +168,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     else if (string.Equals(MessageType.DiscoveryComplete, message.MessageType))
                     {
                         var discoveryCompletePayload = this.dataSerializer.DeserializePayload<DiscoveryCompletePayload>(message);
+
+                        // Add Metrics from TestHost Process
+                        TelemetryClient.HandleDiscoveryCompleteMetrics(discoveryCompletePayload.Metrics);
+
                         discoveryEventsHandler.HandleDiscoveryComplete(
                             discoveryCompletePayload.TotalTests,
                             discoveryCompletePayload.LastDiscoveredTests,
@@ -294,6 +298,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     {
                         var testRunCompletePayload =
                             this.dataSerializer.DeserializePayload<TestRunCompletePayload>(message);
+
+                        // Handle Metrics From TestHost
+                       TelemetryClient.HandleTestRunCompleteMetrics(testRunCompletePayload.Metrics);
 
                         testRunEventsHandler.HandleTestRunComplete(
                             testRunCompletePayload.TestRunCompleteArgs,

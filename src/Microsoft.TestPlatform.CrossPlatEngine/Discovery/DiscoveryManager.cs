@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
     using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// Orchestrates discovery operations for the engine communicating with the test host process.
@@ -29,14 +30,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
     {
         private TestSessionMessageLogger sessionMessageLogger;
         private ITestPlatformEventSource testPlatformEventSource;
-
+        private IMetricsCollector metricsCollector;
         private ITestDiscoveryEventsHandler testDiscoveryEventsHandler;
         private DiscoveryCriteria discoveryCriteria;
+
+        private int totalTestsDiscovered;
+        private Dictionary<string, int> adapterUrisAndTestCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiscoveryManager"/> class.
         /// </summary>
-        public DiscoveryManager() : this(TestPlatformEventSource.Instance)
+        public DiscoveryManager(IMetricsCollector metricsCollector) : this(TestPlatformEventSource.Instance, metricsCollector)
         {
         }
 
@@ -46,11 +50,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
         /// <param name="testPlatformEventSource">
         /// The test platform event source.
         /// </param>
-        protected DiscoveryManager(ITestPlatformEventSource testPlatformEventSource)
+        protected DiscoveryManager(ITestPlatformEventSource testPlatformEventSource, IMetricsCollector metricsCollector)
         {
             this.sessionMessageLogger = TestSessionMessageLogger.Instance;
             this.sessionMessageLogger.TestRunMessage += this.TestSessionMessageHandler;
             this.testPlatformEventSource = testPlatformEventSource;
+
+            this.metricsCollector = metricsCollector;
+            this.totalTestsDiscovered = 0;
+            this.adapterUrisAndTestCount = new Dictionary<string, int>();
         }
 
         /// <summary>
@@ -89,7 +97,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 this.discoveryCriteria = discoveryCriteria;
                 EqtTrace.Info("TestDiscoveryManager.DoDiscovery: Background test discovery started.");
                 this.testDiscoveryEventsHandler = eventHandler;
-
                 var verifiedExtensionSourceMap = new Dictionary<string, IEnumerable<string>>();
 
                 // Validate the sources 
@@ -105,7 +112,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 // If there are sources to discover
                 if (verifiedExtensionSourceMap.Any())
                 {
-                    new DiscovererEnumerator(discoveryResultCache).LoadTests(
+                    new DiscovererEnumerator(discoveryResultCache,this.metricsCollector).LoadTests(
                         verifiedExtensionSourceMap,
                         RunSettingsUtilities.CreateAndInitializeRunSettings(discoveryCriteria.RunSettings),
                         this.sessionMessageLogger);
@@ -120,13 +127,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                 var lastChunk = discoveryResultCache.Tests;
 
                 EqtTrace.Verbose("TestDiscoveryManager.DiscoveryComplete: Calling DiscoveryComplete callback.");
-
+ 
                 if (eventHandler != null)
                 {
                     if(lastChunk != null)
                     {
                         UpdateTestCases(lastChunk, this.discoveryCriteria.Package);
                     }
+
+                    this.totalTestsDiscovered += lastChunk.Count();
+
+                    //For Collecting Metric
+                    AddTestDiscoveredToEachAdapter(lastChunk);
+
+                    // Collecting Discovery State
+                    this.metricsCollector.AddMetric(UnitTestTelemetryDataConstants.DiscoveryState, "Completed");
+
+                    // Collecting Total Tests Discovered
+                    this.metricsCollector.AddMetric(UnitTestTelemetryDataConstants.TotalTestsDiscovered, totalTestsDiscovered.ToString());
+
+                    // Collecting Number of tests discover by each adapter
+                    LogNumberOfTestDiscoveredByEachAdapter();
+
                     eventHandler.HandleDiscoveryComplete(totalDiscoveredTestCount, lastChunk, false);
                 }
                 else
@@ -156,6 +178,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             if (this.testDiscoveryEventsHandler != null)
             {
                 this.testDiscoveryEventsHandler.HandleDiscoveredTests(testCases);
+
+                this.totalTestsDiscovered += testCases.Count();
+
+                //For Collecting Metrics
+                AddTestDiscoveredToEachAdapter(testCases);
             }
             else
             {
@@ -243,6 +270,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
             }
         }
 
+
         private static void UpdateTestCases(IEnumerable<TestCase> testCases, string package)
         {
             // Update TestCase objects Source data to contain the actual source(package) provided by IDE(users),
@@ -254,6 +282,40 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery
                     tc.Source = package;
                 }
             }
+        }
+
+        private void AddTestDiscoveredToEachAdapter(IEnumerable<TestCase> TotalTests)
+        {
+            var groupByUris = TotalTests.GroupBy(x => x.ExecutorUri.ToString());
+
+            int currentCountOfTests = 0;
+            int alreadyExistTestCount = 0;
+
+            foreach (var uri in groupByUris)
+            {
+                currentCountOfTests = uri.Count();
+
+                if (adapterUrisAndTestCount.TryGetValue(uri.Key, out alreadyExistTestCount))
+                {
+                    adapterUrisAndTestCount[uri.Key] = alreadyExistTestCount + currentCountOfTests;
+                }
+                else
+                {
+                    adapterUrisAndTestCount.Add(uri.Key, currentCountOfTests);
+                }
+            }
+        }
+
+        private void LogNumberOfTestDiscoveredByEachAdapter()
+        {
+            // Collecting Total Tests Discovered by each Adapter
+            foreach (var key in adapterUrisAndTestCount.Keys)
+            {
+                this.metricsCollector.AddMetric(String.Format("{0}.{1}", UnitTestTelemetryDataConstants.TotalTestsByAdapter, key), adapterUrisAndTestCount[key].ToString());
+            }
+
+            // Collectoing Number Of Adapters used to discover tests.
+            this.metricsCollector.AddMetric(UnitTestTelemetryDataConstants.NumberOfAdapterUsedToDiscoverTests, adapterUrisAndTestCount.Count.ToString());
         }
     }
 }

@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtocol
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
+    
     /// <summary>
     /// The factory that provides discovery and execution managers to the test host.
     /// </summary>
@@ -12,12 +14,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine.TesthostProtoco
         /// The discovery manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The discovery manager.</returns>
-        IDiscoveryManager GetDiscoveryManager();
+        IDiscoveryManager GetDiscoveryManager(IMetricsCollector metricsCollector);
 
         /// <summary>
         /// The execution manager instance for any discovery related operations inside of the test host.
         /// </summary>
         /// <returns>The execution manager.</returns>
-        IExecutionManager GetExecutionManager();
+        IExecutionManager GetExecutionManager(IMetricsCollector metricsCollector);
     }
 }

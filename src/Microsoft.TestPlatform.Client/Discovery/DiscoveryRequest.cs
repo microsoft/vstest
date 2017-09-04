@@ -13,6 +13,8 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
     using Microsoft.VisualStudio.TestPlatform.Utilities;
+    using Microsoft.VisualStudio.TestPlatform.Client.Telemetry;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 
     /// <summary>
     /// The discovery request.
@@ -28,6 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         {
             this.DiscoveryCriteria = criteria;
             this.DiscoveryManager = discoveryManager;
+            this.unitTestDiscoveryTelemetryCollector = new UnitTestDiscoveryTelemetryCollector();
         }
 
         /// <summary>
@@ -53,6 +56,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                 this.discoveryInProgress = true;
                 try
                 {
+                    this.unitTestDiscoveryTelemetryCollector?.Start();
+
+                    // Collecting Data Point Number of sources sent for discovery
+                    TelemetryClient.AddMetric(UnitTestTelemetryDataConstants.NumberOfSourcesSentForDiscovery, (this.DiscoveryCriteria.Sources.Count()).ToString());
+
                     this.DiscoveryManager.DiscoverTests(this.DiscoveryCriteria, this);
                 }
                 catch
@@ -247,6 +255,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                     }
 
                     this.discoveryInProgress = false;
+                    this.unitTestDiscoveryTelemetryCollector?.CollectAndPostTelemetrydata();
                 }
             }
 
@@ -259,6 +268,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <inheritdoc/>
         public void HandleDiscoveredTests(IEnumerable<TestCase> discoveredTestCases)
         {
+          
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveredTests: Starting.");
@@ -291,7 +301,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// <param name="level">Output level of the message being sent.</param>
         /// <param name="message">Actual contents of the message</param>
         public void HandleLogMessage(TestMessageLevel level, string message)
-        {
+        { 
             if (EqtTrace.IsVerboseEnabled)
             {
                 EqtTrace.Verbose("DiscoveryRequest.SendDiscoveryMessage: Starting.");
@@ -358,12 +368,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
                         if (this.discoveryCompleted != null)
                         {
                             this.discoveryCompleted.Dispose();
+                            this.unitTestDiscoveryTelemetryCollector?.Dispose();
+                            TelemetryClient.Dispose();
                         }
                     }
 
                     // Indicate that object has been disposed
                     this.discoveryCompleted = null;
                     this.disposed = true;
+                    this.unitTestDiscoveryTelemetryCollector = null;
                 }
             }
 
@@ -396,6 +409,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Client.Discovery
         /// Whether or not the test discovery is in progress.
         /// </summary>
         private bool discoveryInProgress;
+
+        /// <summary>
+        /// The unit test discovery session telemetry collector.
+        /// </summary>
+        private UnitTestDiscoveryTelemetryCollector unitTestDiscoveryTelemetryCollector;
 
         #endregion
     }

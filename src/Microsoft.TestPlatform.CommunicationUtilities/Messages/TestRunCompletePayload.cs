@@ -32,5 +32,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel
         /// Gets or sets the executor uris that were used to run the tests.
         /// </summary>
         public ICollection<string> ExecutorUris { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Telemetry Data
+        /// </summary>
+        public IDictionary<string, string> Metrics { get; set; }
     }
 }
