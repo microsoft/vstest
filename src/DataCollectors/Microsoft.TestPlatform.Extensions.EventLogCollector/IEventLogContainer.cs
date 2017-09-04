@@ -16,13 +16,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         EventLog EventLog { get; set; }
 
         /// <summary>
-        /// The on event log entry written.
+        /// Event Handler for handling log entries.
         /// </summary>
         /// <param name="source">
-        /// The source.
+        /// The source object that raised EventLog entry event.
         /// </param>
         /// <param name="e">
-        /// The e.
+        /// Contains data related to EventLog entry.
         /// </param>
         void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e);
     }

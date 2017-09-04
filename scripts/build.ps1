@@ -324,7 +324,7 @@ function Publish-Package
     Write-Verbose "Copy-Item $newtonsoft $coreCLR20PackageDir -Force"
     Copy-Item $newtonsoft $coreCLR20PackageDir -Force
 
-    # For libraries that are externally publish, copy the output into artifacts. These will be signed and packaged independently.
+    # For libraries that are externally published, copy the output into artifacts. These will be signed and packaged independently.
     Copy-PackageItems "Microsoft.TestPlatform.Build"
 
     Write-Log "Publish-Package: Complete. {$(Get-ElapsedTime($timer))}"

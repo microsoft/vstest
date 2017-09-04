@@ -109,11 +109,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         private Dictionary<DataCollectionContext, EventLogCollectorContextData> contextData =
             new Dictionary<DataCollectionContext, EventLogCollectorContextData>();
 
-        /// <summary>
-        /// The event log containers.
-        /// </summary>
-        private Dictionary<string, IEventLogContainer> eventLogContainers;
-
         #endregion
 
         #region Constructor
@@ -129,7 +124,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             this.testCaseEndEventHandler = this.OnTestCaseEnd;
 
             this.eventLogDirectories = new List<string>();
-            this.eventLogContainers = new Dictionary<string, IEventLogContainer>();
         }
 
         #endregion
@@ -492,10 +486,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 try
                 {
                     // Create an EventLog object and add it to the eventLogContext if one does not already exist
-                    if (!this.eventLogContainers.ContainsKey(eventLogName))
+                    if (!eventLogContext.EventLogContainers.ContainsKey(eventLogName))
                     {
                         var eventLogContainer = this.CreateEventLogContainer(eventLogName, eventLogContext);
-                        this.eventLogContainers.Add(eventLogName, eventLogContainer);
+                        eventLogContext.EventLogContainers.Add(eventLogName, eventLogContainer);
 
                         if (EqtTrace.IsVerboseEnabled)
                         {
@@ -528,7 +522,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
 
             if (terminateCollectionForContext)
             {
-                foreach (IEventLogContainer eventLogContainer in this.eventLogContainers.Values)
+                foreach (IEventLogContainer eventLogContainer in eventLogContext.EventLogContainers.Values)
                 {
                     try
                     {
