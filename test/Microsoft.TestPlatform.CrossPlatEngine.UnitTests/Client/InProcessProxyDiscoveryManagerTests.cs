@@ -8,6 +8,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using System.Linq;
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -23,14 +24,16 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
         private InProcessProxyDiscoveryManager inProcessProxyDiscoveryManager;
         private Mock<IDiscoveryManager> mockDiscoveryManager;
         private Mock<ITestRuntimeProvider> mockTestHostManager;
+        private IMetricsCollector metricsCollector;
 
         [TestInitialize]
         public void TestInitialize()
         {
             this.mockTestHostManagerFactory = new Mock<ITestHostManagerFactory>();
+            this.metricsCollector = new DummyMetricCollector();
             this.mockDiscoveryManager = new Mock<IDiscoveryManager>();
             this.mockTestHostManager = new Mock<ITestRuntimeProvider>();
-            this.mockTestHostManagerFactory.Setup(o => o.GetDiscoveryManager()).Returns(this.mockDiscoveryManager.Object);
+            this.mockTestHostManagerFactory.Setup(o => o.GetDiscoveryManager(this.metricsCollector)).Returns(this.mockDiscoveryManager.Object);
             this.inProcessProxyDiscoveryManager = new InProcessProxyDiscoveryManager(this.mockTestHostManager.Object, this.mockTestHostManagerFactory.Object);
         }
 

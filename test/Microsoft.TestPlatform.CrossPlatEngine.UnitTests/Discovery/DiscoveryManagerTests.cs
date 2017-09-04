@@ -10,6 +10,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
     using System.Reflection;
     
     using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
+    using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
     using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Discovery;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -30,7 +31,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Discovery
         [TestInitialize]
         public void TestInit()
         {
-            this.discoveryManager = new DiscoveryManager();
+            this.discoveryManager = new DiscoveryManager(new DummyMetricCollector());
         }
 
         [TestCleanup]
