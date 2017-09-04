@@ -304,6 +304,15 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework
             }
         }
 
+        /// <summary>
+        /// Clear the previously cached extensions
+        /// </summary>
+        public void ClearExtensions()
+        {
+            this.pathToExtensions?.Clear();
+            this.TestExtensions?.InvalidateCache();
+        }
+
         #endregion
 
         #region Utility methods

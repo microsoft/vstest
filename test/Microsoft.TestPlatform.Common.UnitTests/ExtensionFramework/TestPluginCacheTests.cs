@@ -135,6 +135,20 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework
 
         #endregion
 
+        #region ClearExtensions
+
+        [TestMethod]
+        public void ClearExtensionsShouldClearPathToExtensions()
+        {
+            TestPluginCache.Instance.UpdateExtensions(new List<string> { @"oldExtension.dll" }, false);
+
+            TestPluginCache.Instance.ClearExtensions();
+
+            Assert.AreEqual(0, TestPluginCache.Instance.PathToExtensions.Count());
+        }
+
+        #endregion
+
         #region GetDefaultResolutionPaths tests
 
         [TestMethod]

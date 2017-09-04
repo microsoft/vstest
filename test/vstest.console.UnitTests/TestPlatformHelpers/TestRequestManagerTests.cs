@@ -91,11 +91,12 @@ namespace vstest.console.UnitTests.TestPlatformHelpers
         }
 
         [TestMethod]
-        public void InitializeExtensionsShouldCallTestPlatformToInitialize()
+        public void InitializeExtensionsShouldCallTestPlatformToClearAndUpdateExtensions()
         {
             var paths = new List<string>() { "a", "b" };
             this.testRequestManager.InitializeExtensions(paths);
 
+            this.mockTestPlatform.Verify(mt => mt.ClearExtensions(), Times.Once);
             this.mockTestPlatform.Verify(mt => mt.UpdateExtensions(paths, false), Times.Once);
         }
 
