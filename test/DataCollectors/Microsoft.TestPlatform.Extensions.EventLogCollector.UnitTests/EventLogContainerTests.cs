@@ -8,8 +8,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
     using System.Diagnostics;
     using System.Globalization;
 
-    using Castle.Components.DictionaryAdapter;
-
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -52,8 +50,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 this.context,
                 eventLogCollectorContextData);
 
-            eventLogCollectorContextData.EventLogContainers.Add("Application", container);
-
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Error, 234);
             container.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
             var newCount = eventLogCollectorContextData.EventLogEntries.Count;
@@ -76,7 +72,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 this.logger.Object,
                 this.context,
                 eventLogCollectorContextData);
-            eventLogCollectorContextData.EventLogContainers.Add("Application", container);
 
             container.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
             var newCount = eventLogCollectorContextData.EventLogEntries.Count;
@@ -99,12 +94,14 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 this.logger.Object,
                 this.context,
                 eventLogCollectorContextData);
-            eventLogCollectorContextData.EventLogContainers.Add("Application", container);
 
             container.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
-            this.logger.Verify(x => x.LogWarning(It.IsAny<DataCollectionContext>(), string.Format(
-                CultureInfo.InvariantCulture,
-                Resource.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
+            this.logger.Verify(
+                x => x.LogWarning(
+                    It.IsAny<DataCollectionContext>(),
+                    string.Format(
+                        CultureInfo.InvariantCulture,
+                        Resource.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
                "Application")));
         }
 
@@ -125,8 +122,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 this.logger.Object,
                 this.context,
                 eventLogCollectorContextData);
-
-            eventLogCollectorContextData.EventLogContainers.Add("Application", container);
 
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             container.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
@@ -152,8 +147,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 this.context,
                 eventLogCollectorContextData);
 
-            eventLogCollectorContextData.EventLogContainers.Add("Application", container);
-
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             container.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);
             var newCount = eventLogCollectorContextData.EventLogEntries.Count;
@@ -177,8 +170,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests
                 this.logger.Object,
                 this.context,
                 eventLogCollectorContextData);
-
-            eventLogCollectorContextData.EventLogContainers.Add("Application", container);
 
             EventLog.WriteEntry("Application", "Application", EventLogEntryType.Warning, 234);
             container.OnEventLogEntryWritten(eventLog, entryWrittenEventArgs);

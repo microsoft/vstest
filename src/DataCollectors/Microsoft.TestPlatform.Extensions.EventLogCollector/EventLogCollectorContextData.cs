@@ -13,16 +13,19 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     {
         private bool limitReached;
 
-        private Dictionary<string, IEventLogContainer> eventLogContainers;
-
         private List<EventLogEntry> eventLogEntries;
 
         private int maxLogEntries;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventLogCollectorContextData"/> class.
+        /// </summary>
+        /// <param name="maxLogEntries">
+        /// The max log entries.
+        /// </param>
         public EventLogCollectorContextData(int maxLogEntries)
         {
             this.maxLogEntries = maxLogEntries;
-            this.eventLogContainers = new Dictionary<string, IEventLogContainer>();
             this.eventLogEntries = new List<EventLogEntry>();
         }
 
@@ -30,11 +33,6 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// Gets a value indicating whether to process events or not.
         /// </summary>
         public bool ProcessEvents => !this.limitReached;
-
-        /// <summary>
-        /// Gets the event log containers.
-        /// </summary>
-        public Dictionary<string, IEventLogContainer> EventLogContainers => this.eventLogContainers;
 
         /// <summary>
         /// Gets the event log entries.

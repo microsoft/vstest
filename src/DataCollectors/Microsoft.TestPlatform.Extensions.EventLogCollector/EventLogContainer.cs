@@ -24,13 +24,10 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         private DataCollectionLogger logger;
 
         private DataCollectionContext context;
-        /// <inheritdoc />
-        public EventLog EventLog { get; set; }
 
-        /// <inheritdoc />
-        public int NextEntryIndexToCollect { get; set; }
+        private int nextEntryIndexToCollect;
 
-        public EventLogCollectorContextData ContextData { get; set; }
+        private EventLogCollectorContextData contextData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EventLogContainer"/> class.
@@ -66,21 +63,24 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             EventLogCollectorContextData contextData)
         {
             this.EventLog = eventLog;
-            this.NextEntryIndexToCollect = nextEntryIndexToCollect;
-            this.ContextData = contextData;
+            this.nextEntryIndexToCollect = nextEntryIndexToCollect;
+            this.contextData = contextData;
             this.eventSources = eventSources;
             this.entryTypes = entryTypes;
             this.context = context;
             this.logger = logger;
         }
 
+        /// <inheritdoc />
+        public EventLog EventLog { get; set; }
+
         /// <summary>
         /// This is the event handler for the EntryWritten event of the System.Diagnostics.EventLog class.
         /// Note that the documentation for the EntryWritten event includes these remarks:
-        ///     "The system responds to WriteEntry only if the last write event occurred at least five seconds previously. 
+        ///     "The system responds to WriteEntry only if the last write event occurred at least five seconds previously.
         ///      This implies you will only receive one EntryWritten event notification within a five-second interval, even if more
         ///      than one event log change occurs. If you insert a sufficiently long sleep interval (around 10 seconds) between calls
-        ///      to WriteEntry, no events will be lost. However, if write events occur more frequently, the most recent write events 
+        ///      to WriteEntry, no events will be lost. However, if write events occur more frequently, the most recent write events
         ///      could be lost."
         /// This complicates this data collector because we don't want to sleep to wait for all events or lose the most recent events.
         /// To workaround, the implementation does several things:
@@ -98,11 +98,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// "firstIndexInLog" in the method implementation.  Similarly "mostRecentIndexInLog" is the index of the last entry written
         /// to the log at the time we examine it.
         /// </summary>
-        /// <param name="source"></param>
+        /// <param name="source">Source</param>
         /// <param name="e">The System.Diagnostics.EntryWrittenEventArgs object describing the entry that was written.</param>
         public void OnEventLogEntryWritten(object source, EntryWrittenEventArgs e)
         {
-            while (this.ContextData.ProcessEvents)
+            while (this.contextData.ProcessEvents)
             {
                 int currentCount = this.EventLog.Entries.Count;
                 if (currentCount == 0)
@@ -113,13 +113,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                 int firstIndexInLog = this.EventLog.Entries[0].Index;
                 int mostRecentIndexInLog = this.EventLog.Entries[currentCount - 1].Index;
 
-                if (mostRecentIndexInLog == this.NextEntryIndexToCollect - 1)
+                if (mostRecentIndexInLog == this.nextEntryIndexToCollect - 1)
                 {
                     // We've already collected the most recent entry in the log
                     break;
                 }
 
-                if (mostRecentIndexInLog < this.NextEntryIndexToCollect - 1)
+                if (mostRecentIndexInLog < this.nextEntryIndexToCollect - 1)
                 {
                     if (EqtTrace.IsWarningEnabled)
                     {
@@ -129,7 +129,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                                 "EventLogDataCollector: OnEventLogEntryWritten: Handling clearing of log (mostRecentIndexInLog < eventLogContainer.NextEntryIndex): firstIndexInLog: {0}:, mostRecentIndexInLog: {1}, NextEntryIndex: {2}",
                                 firstIndexInLog,
                                 mostRecentIndexInLog,
-                                this.NextEntryIndexToCollect));
+                                this.nextEntryIndexToCollect));
                     }
 
                     // Send warning; event log must have been cleared.
@@ -140,13 +140,13 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                             Resource.Execution_Agent_DataCollectors_EventLog_EventsLostWarning,
                             this.EventLog.Log));
 
-                    this.NextEntryIndexToCollect = 0;
+                    this.nextEntryIndexToCollect = 0;
                     firstIndexInLog = 0;
                 }
 
-                for (; this.NextEntryIndexToCollect <= mostRecentIndexInLog; ++this.NextEntryIndexToCollect)
+                for (; this.nextEntryIndexToCollect <= mostRecentIndexInLog; ++this.nextEntryIndexToCollect)
                 {
-                    int nextEntryIndexInCurrentLog = this.NextEntryIndexToCollect - firstIndexInLog;
+                    int nextEntryIndexInCurrentLog = this.nextEntryIndexToCollect - firstIndexInLog;
                     EventLogEntry nextEntry = this.EventLog.Entries[nextEntryIndexInCurrentLog];
 
                     // If an explicit list of event sources was provided, only report log entries from those sources
@@ -186,11 +186,11 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         }
                     }
 
-                    lock (this.ContextData.EventLogEntries)
+                    lock (this.contextData.EventLogEntries)
                     {
-                        if (this.ContextData.EventLogEntries.Count < this.ContextData.MaxLogEntries)
+                        if (this.contextData.EventLogEntries.Count < this.contextData.MaxLogEntries)
                         {
-                            this.ContextData.EventLogEntries.Add(nextEntry);
+                            this.contextData.EventLogEntries.Add(nextEntry);
 
                             if (EqtTrace.IsVerboseEnabled)
                             {
@@ -205,7 +205,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
                         }
                         else
                         {
-                            this.ContextData.LimitReached = true;
+                            this.contextData.LimitReached = true;
                             break;
                         }
                     }

@@ -14,12 +14,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
     internal class CollectorNameValueConfigurationManager
     {
         #region Private constants
-
         // Configuration XML constants
-        private const string ConfigurationNodeName = "Configuration";
-
-        private const string SettingNodeName = "Setting";
-
         private const string SettingNameAttributeName = "name";
 
         private const string SettingValueAttributeName = "value";
@@ -31,16 +26,15 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         /// <summary>
         /// The name/value pairs loaded from the configuration XML element
         /// </summary>
-        internal Dictionary<string, string> nameValuePairs = new Dictionary<string, string>();
+        private Dictionary<string, string> nameValuePairs = new Dictionary<string, string>();
 
         #endregion
 
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CollectorNameValueConfigurationManager"/> class. 
-        /// Loads the configuration name/value information from the provided XML element into a
-        /// dictionary
+        /// Initializes a new instance of the <see cref="CollectorNameValueConfigurationManager"/> class.
+        /// Loads the configuration name/value information from the provided XML element into a dictionary
         /// </summary>
         /// <param name="configurationElement">
         /// XML element containing the configuration
@@ -107,6 +101,8 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
         #endregion
 
         #region Public properties
+
+        internal Dictionary<string, string> NameValuePairs => this.nameValuePairs;
 
         /// <summary>
         /// Gets the value of the setting specified by name, or null if it was not found

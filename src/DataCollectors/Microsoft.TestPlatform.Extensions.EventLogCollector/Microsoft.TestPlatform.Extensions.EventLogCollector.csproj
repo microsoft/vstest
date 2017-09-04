@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
@@ -11,7 +11,7 @@
     <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector</AssemblyName>
     <TargetFrameworks>net451</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
-    <EnableCodeAnalysis>false</EnableCodeAnalysis>
+    <EnableCodeAnalysis>true</EnableCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />

@@ -78,7 +78,7 @@ namespace Microsoft.TestPlatform.Extensions.EventLogCollector
             dataSet.Locale = CultureInfo.InvariantCulture;
             dataSet.Tables.Add(dataTable);
 
-            // Use UTF-16 encoding 
+            // Use UTF-16 encoding
             using (System.IO.StreamWriter xmlStreamWriter = new System.IO.StreamWriter(xmlFilePath, false, Encoding.UTF8))
             {
                 dataSet.WriteXml(xmlStreamWriter, XmlWriteMode.WriteSchema);
